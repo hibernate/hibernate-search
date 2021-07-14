@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.AssociationOverride;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
@@ -1329,7 +1330,7 @@ public class AutomaticIndexingEmbeddableIT {
 		@IndexedEmbedded(includePaths = "containedList.includedInEmbeddedList")
 		@AssociationOverride(
 				name = "containedList",
-				joinTable = @JoinTable(name = "containing_embeddedList")
+				joinTable = @JoinTable(name = "containing_embeddedList", inverseJoinColumns = @JoinColumn(name = "CEList_containedList"))
 		)
 		private ListContainingEmbeddable containedEmbeddedList = new ListContainingEmbeddable();
 
@@ -1343,12 +1344,13 @@ public class AutomaticIndexingEmbeddableIT {
 				 * "containedElementCollection_collection&&element_containedSingle_id".
 				 * Let's work around the problem...
 				 */
-				joinColumns = @JoinColumn(name = "elementCollection_containedSingle_id")
+				joinColumns = @JoinColumn(name = "ec_containedSingle")
 		)
 		@IndexedEmbedded(includePaths = "containedSingle.includedInElementCollection")
 		private List<SingleContainingEmbeddable> containedElementCollection = new ArrayList<>();
 
 		@OneToOne
+		@JoinColumn(name = "singleWithInverse")
 		@IndexedEmbedded(includePaths = "includedInContainedSingleWithInverseSideEmbedded")
 		private ContainedEntity containedSingleWithInverseSideEmbedded;
 
@@ -1466,7 +1468,7 @@ public class AutomaticIndexingEmbeddableIT {
 		 * Anyway, we can't use mappedBy in this specific case.
 		 */
 		@ManyToMany
-		@JoinTable(name = "contained_containingAsElementCollection")
+		@JoinTable(name = "contained_containingEC", inverseJoinColumns = { @JoinColumn( name = "containingEC_id" ) })
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
 				inversePath = @ObjectPath({
@@ -1495,10 +1497,12 @@ public class AutomaticIndexingEmbeddableIT {
 		private String includedInElementCollection;
 
 		@Basic
+		@Column(name = "inContainedSingle")
 		@GenericField
 		private String includedInContainedSingleWithInverseSideEmbedded;
 
 		@Basic
+		@Column(name = "inBidirectionalEmbedded")
 		@GenericField
 		private String includedInBidirectionalEmbedded;
 
@@ -1597,6 +1601,7 @@ public class AutomaticIndexingEmbeddableIT {
 	public static class SingleContainingEmbeddable {
 
 		@ManyToOne
+		@JoinColumn(name = "emb_containedSingle")
 		@IndexedEmbedded
 		private ContainedEntity containedSingle;
 
@@ -1652,6 +1657,7 @@ public class AutomaticIndexingEmbeddableIT {
 		 * so there should be no problem, but this test should prevent any regression.
 		 */
 		@OneToOne
+		@JoinColumn(name = "containing")
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
 						@PropertyValue(propertyName = "containedSingleWithInverseSideEmbedded")
@@ -1679,6 +1685,7 @@ public class AutomaticIndexingEmbeddableIT {
 	public static class BidirectionalEmbeddable {
 
 		@OneToOne
+		@JoinColumn(name = "biDir_containedSingle")
 		@IndexedEmbedded
 		private ContainedEntity containedSingle;
 

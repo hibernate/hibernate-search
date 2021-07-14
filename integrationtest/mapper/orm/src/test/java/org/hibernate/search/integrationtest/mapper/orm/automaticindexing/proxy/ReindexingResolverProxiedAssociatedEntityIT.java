@@ -15,6 +15,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
@@ -283,6 +284,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 		private ContainedLevel1Entity containingSingle;
 
 		@ManyToMany(fetch = FetchType.LAZY)
+		@JoinTable(name = "ContainedE_ContainingE")
 		private List<ContainedLevel1Entity> containingList = new ArrayList<>();
 
 		protected ContainedLevel2Entity() {

@@ -76,7 +76,7 @@ public class MappedSuperclassIT {
 		}
 	}
 
-	@Entity
+	@Entity(name = "IndexedEntity")
 	public static class IndexedEntity extends TextEntity {
 
 		@Id

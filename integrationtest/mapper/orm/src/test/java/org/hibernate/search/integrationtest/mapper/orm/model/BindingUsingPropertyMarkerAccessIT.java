@@ -106,7 +106,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		T create(int id, double latitude, double longitude);
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class PublicFieldAccessEntity {
@@ -137,7 +137,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		public Double longitude;
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class ProtectedFieldAccessEntity {
@@ -168,7 +168,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		protected Double longitude;
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class PrivateFieldAccessEntity {
@@ -199,7 +199,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		private Double longitude;
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class PublicMethodAccessEntity {
@@ -260,7 +260,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		}
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class ProtectedMethodAccessEntity {
@@ -321,7 +321,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		}
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	@GeoPointBinding(fieldName = "location")
 	public static final class PrivateMethodAccessEntity {

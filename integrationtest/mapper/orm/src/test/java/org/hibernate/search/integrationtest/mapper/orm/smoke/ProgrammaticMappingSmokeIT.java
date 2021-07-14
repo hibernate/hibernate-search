@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -509,11 +510,11 @@ public class ProgrammaticMappingSmokeIT {
 		private Integer numeric;
 
 		@ManyToMany
-		@JoinTable(name = "yetanother_indexed_list")
+		@JoinTable(name = "yetanother_indexed_list", joinColumns = @JoinColumn(name = "eListYAIndexed_id"))
 		private List<IndexedEntity> embeddedList;
 
 		@ManyToMany
-		@JoinTable(name = "yetanother_indexed_map")
+		@JoinTable(name = "yetanother_indexed_map", joinColumns = @JoinColumn(name = "eMapYAIndexed_id"))
 		private Map<String, IndexedEntity> embeddedMap;
 
 		public Integer getId() {

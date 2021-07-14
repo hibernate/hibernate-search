@@ -173,7 +173,7 @@ public class HibernateOrmIntegrationBooterIT {
 				.build();
 	}
 
-	@Entity
+	@Entity(name = INDEX_NAME)
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntity {
 		private static final Field ID_FIELD;

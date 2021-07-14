@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -972,19 +975,23 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		private ContainedEntity containedNonIndexedEmbedded;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private ContainedEntity containedIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne
+		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(targetEntity = ContainedEntity.class)
+		@JoinColumn(name = "CIndexedEmbeddedCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
 
@@ -1123,6 +1130,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		private String indexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "indexedECF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
@@ -1132,20 +1140,26 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		private String nonIndexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "nonIndexedECF")
+		@Column(name = "nonIndexedECF")
 		@GenericField
 		// Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF1")
 		private String fieldUsedInContainedDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF2")
 		private String fieldUsedInContainedDerivedField2;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF1")
 		private String fieldUsedInCrossEntityDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF2")
 		private String fieldUsedInCrossEntityDerivedField2;
 
 		public Integer getId() {

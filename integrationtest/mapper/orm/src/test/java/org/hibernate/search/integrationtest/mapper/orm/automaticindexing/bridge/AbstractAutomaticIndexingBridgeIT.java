@@ -11,6 +11,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -804,9 +805,11 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		private String includedInTypeBridge;
 
 		@Basic
+		@Column(name = "IISingleVPB")
 		private String includedInSingleValuedPropertyBridge;
 
 		@Basic
+		@Column(name = "IIMultiVPB")
 		private String includedInMultiValuedPropertyBridge;
 
 		@Basic
