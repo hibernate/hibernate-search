@@ -13,9 +13,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
@@ -304,37 +307,42 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		private ContainingEntity child;
 
 		@ManyToMany
-		@JoinTable(name = "indexed_containedIndexedEmbedded")
+		@JoinTable(name = "i_containedIndexedEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@SortNatural
 		private SortedSet<ContainedEntity> containedIndexedEmbedded = new TreeSet<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_containedNonIndexedEmbedded")
+		@JoinTable(name = "i_containedNonIndexedEmbedded", joinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"),
+				inverseJoinColumns = @JoinColumn(name = "containedNonIndexedEmbedded"))
 		@SortNatural
 		private SortedSet<ContainedEntity> containedNonIndexedEmbedded = new TreeSet<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_indexedEmbeddedShallowReindexOnUpdateContained")
+		@JoinTable(name = "i_indexedEmbeddedShallow",
+				inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedShallow"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		@SortNatural
 		private SortedSet<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new TreeSet<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_indexedEmbeddedNoReindexOnUpdateContained")
+		@JoinTable(name = "i_indexedEmbeddedNoReindex",
+				inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedNoReindex"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		@SortNatural
 		private SortedSet<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new TreeSet<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_containedUsedInCrossEntityDerivedProperty")
+		@JoinTable(name = "i_containedCrossEntityDP", joinColumns = @JoinColumn(name = "containingCrossEntityDP"),
+				inverseJoinColumns = @JoinColumn(name = "containedCrossEntityDP"))
 		@SortNatural
 		private SortedSet<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new TreeSet<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
-		@JoinTable(name = "indexed_containedIndexedEmbeddedWithCast")
+		@JoinTable(name = "i_containedIndexedEmbeddedCast", joinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"),
+				inverseJoinColumns = @JoinColumn(name = "containedIndexedEmbeddedCast"))
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		@SortNatural
 		private SortedSet<Object> containedIndexedEmbeddedWithCast = new TreeSet<>();
@@ -470,6 +478,7 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		private String indexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
@@ -479,20 +488,26 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		private String nonIndexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "nonIndexedECF")
+		@Column(name = "nonIndexed")
 		@GenericField
 		// Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF1")
 		private String fieldUsedInContainedDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF2")
 		private String fieldUsedInContainedDerivedField2;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF1")
 		private String fieldUsedInCrossEntityDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF2")
 		private String fieldUsedInCrossEntityDerivedField2;
 
 		@Override

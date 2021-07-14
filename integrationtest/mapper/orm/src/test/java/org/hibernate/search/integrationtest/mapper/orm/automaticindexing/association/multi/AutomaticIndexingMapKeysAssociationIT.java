@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -309,7 +310,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		@ElementCollection
 		@JoinTable(
-				name = "indexed_containedIndexedEmbedded",
+				name = "i_containedIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
 		@MapKeyJoinColumn(name = "map_key")
@@ -323,7 +324,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		@ElementCollection
 		@JoinTable(
-				name = "indexed_containedNonIndexedEmbedded",
+				name = "i_containedNonIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
 		@MapKeyJoinColumn(name = "map_key")
@@ -333,7 +334,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		@ElementCollection
 		@JoinTable(
-				name = "indexed_containedIndexedEmbeddedShallowReindexOnUpdate",
+				name = "i_indexedEmbeddedShallow",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
 		@MapKeyJoinColumn(name = "map_key")
@@ -351,7 +352,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		@ElementCollection
 		@JoinTable(
-				name = "indexed_containedIndexedEmbeddedNoReindexOnUpdate",
+				name = "i_indexedEmbeddedNoReindex",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
 		@MapKeyJoinColumn(name = "map_key")
@@ -369,7 +370,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		@ElementCollection
 		@JoinTable(
-				name = "indexed_containedUsedInCrossEntityDerivedProperty",
+				name = "i_containedCrossEntityDP",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
 		@MapKeyJoinColumn(name = "map_key")
@@ -379,7 +380,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		@ElementCollection
 		@JoinTable(
-				name = "indexed_containedIndexedEmbeddedWithCast",
+				name = "i_containedIndexedEmbeddedCast",
 				joinColumns = @JoinColumn(name = "mapHolder")
 		)
 		@MapKeyClass(ContainedEntity.class)
@@ -531,7 +532,8 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		 * No mappedBy here, same reasons as above.
 		 */
 		@ManyToMany
-		@JoinTable(name = "contained_nonIndexedMapHolder")
+		@JoinTable(name = "contained_nonIndexedMapHolder",
+				inverseJoinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
@@ -539,6 +541,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		 * No mappedBy here, same reasons as above.
 		 */
 		@ManyToMany
+		@JoinTable(inverseJoinColumns = @JoinColumn(name = "containingCrossEntityPD"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
@@ -556,7 +559,8 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		 * and ends up adding all kind of wrong foreign keys.
 		 */
 		@ManyToMany(targetEntity = ContainingEntity.class)
-		@JoinTable(name = "contained_withCastMapHolder")
+		@JoinTable(name = "contained_withCastMapHolder",
+			inverseJoinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
@@ -573,6 +577,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		private String indexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
@@ -582,20 +587,26 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		private String nonIndexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "nonIndexedECF")
+		@Column(name = "nonIndexed")
 		@GenericField
 		// Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF1")
 		private String fieldUsedInContainedDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF2")
 		private String fieldUsedInContainedDerivedField2;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF1")
 		private String fieldUsedInCrossEntityDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF2")
 		private String fieldUsedInCrossEntityDerivedField2;
 
 		public Integer getId() {

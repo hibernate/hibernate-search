@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
@@ -299,32 +302,37 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		private ContainingEntity child;
 
 		@ManyToMany
-		@JoinTable(name = "indexed_containedIndexedEmbedded")
+		@JoinTable(name = "i_containedIndexedEmbedded")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_containedNonIndexedEmbedded")
+		@JoinTable(name = "i_containedNonIndexedEmbedded", joinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"),
+			inverseJoinColumns = @JoinColumn(name = "containedNonIndexedEmbedded"))
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_indexedEmbeddedShallowReindexOnUpdateContained")
+		@JoinTable(name = "i_indexedEmbeddedShallow",
+			inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedShallow"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_indexedEmbeddedNoReindexOnUpdateContained")
+		@JoinTable(name = "i_indexedEmbeddedNoReindex",
+			inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedNoReindex"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "indexed_containedUsedInCrossEntityDerivedProperty")
+		@JoinTable(name = "i_containedCrossEntityDP", joinColumns = @JoinColumn(name = "containingCrossEntityDP"),
+				inverseJoinColumns = @JoinColumn(name = "containedCrossEntityDP"))
 		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
-		@JoinTable(name = "indexed_containedIndexedEmbeddedWithCast")
+		@JoinTable(name = "i_containedIndexedEmbeddedCast", joinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"),
+				inverseJoinColumns = @JoinColumn(name = "containedIndexedEmbeddedCast"))
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		private List<Object> containedIndexedEmbeddedWithCast = new ArrayList<>();
 
@@ -464,6 +472,7 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		private String indexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
@@ -473,20 +482,26 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		private String nonIndexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "nonIndexedECF")
+		@Column(name = "nonIndexed")
 		@GenericField
 		// Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF1")
 		private String fieldUsedInContainedDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUIContainedDF2")
 		private String fieldUsedInContainedDerivedField2;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF1")
 		private String fieldUsedInCrossEntityDerivedField1;
 
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
+		@Column(name = "FUICrossEntityDF2")
 		private String fieldUsedInCrossEntityDerivedField2;
 
 		public Integer getId() {

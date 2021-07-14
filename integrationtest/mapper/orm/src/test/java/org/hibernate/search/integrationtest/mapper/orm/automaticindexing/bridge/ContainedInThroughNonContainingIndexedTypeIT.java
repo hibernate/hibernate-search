@@ -106,7 +106,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Entity
+	@Entity(name = Containing.INDEX)
 	@Indexed(index = Containing.INDEX)
 	public static class Containing {
 		static final String INDEX = "Containing";
@@ -136,7 +136,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		}
 	}
 
-	@Entity
+	@Entity(name = Contained.INDEX)
 	@Indexed(index = Contained.INDEX)
 	public static class Contained {
 		static final String INDEX = "Contained";

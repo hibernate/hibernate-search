@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -224,6 +225,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		private String indexedField;
 
 		@ElementCollection
+		@CollectionTable(name = "indexedColl")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 

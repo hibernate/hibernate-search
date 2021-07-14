@@ -11,7 +11,10 @@ import static org.junit.Assert.fail;
 import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -155,6 +158,7 @@ public class AnnotationMappingAccessTypeIT {
 
 		@Access( AccessType.PROPERTY )
 		@Basic
+		@Column(name = "nonDefaultMethodAccess")
 		@GenericField
 		public String getFieldWithNonDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
@@ -220,6 +224,10 @@ public class AnnotationMappingAccessTypeIT {
 			this.internalFieldWithDifferentName = value;
 		}
 
+		@AttributeOverrides({
+				@AttributeOverride(name = "fieldWithDefaultFieldAccess", column = @Column(name = "ef_defaultFieldAccess")),
+				@AttributeOverride(name = "fieldWithNonDefaultMethodAccess", column = @Column(name = "ef_nonDefaultMethodAccess"))
+		})
 		@IndexedEmbedded
 		public EmbeddableWithDefaultFieldAccess getEmbeddedWithDefaultFieldAccess() {
 			return embeddedWithDefaultFieldAccess;
@@ -229,6 +237,10 @@ public class AnnotationMappingAccessTypeIT {
 			this.embeddedWithDefaultFieldAccess = embeddedWithDefaultFieldAccess;
 		}
 
+		@AttributeOverrides({
+				@AttributeOverride(name = "fieldWithDefaultMethodAccess", column = @Column(name = "em_defaultMethodAccess")),
+				@AttributeOverride(name = "fieldWithNonDefaultFieldAccess", column = @Column(name = "em_nonDefaultFieldAccess"))
+		})
 		public EmbeddableWithDefaultMethodAccess getEmbeddedWithDefaultMethodAccess() {
 			return embeddedWithDefaultMethodAccess;
 		}

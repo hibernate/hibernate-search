@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -409,18 +411,26 @@ public class AutomaticIndexingElementCollectionIT {
 		private Integer id;
 
 		@ElementCollection
+		@CollectionTable(name = "indexedColl")
+		@Column(name = "indexed")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
 		@ElementCollection
+		@CollectionTable(name = "nonIndexedColl")
+		@Column(name = "nonIndexed")
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@ElementCollection
+		@CollectionTable(name = "shallowReindexOnUpdateColl")
+		@Column(name = "shallowReindexOnUpdate")
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private List<String> shallowReindexOnUpdateElementCollectionField = new ArrayList<>();
 
 		@ElementCollection
+		@CollectionTable(name = "noReindexOnUpdateColl")
+		@Column(name = "noReindexOnUpdate")
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<String> noReindexOnUpdateElementCollectionField = new ArrayList<>();
