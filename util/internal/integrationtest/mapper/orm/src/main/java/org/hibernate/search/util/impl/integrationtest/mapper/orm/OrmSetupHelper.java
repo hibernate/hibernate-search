@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import static org.junit.Assume.assumeFalse;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
@@ -152,6 +155,14 @@ public final class OrmSetupHelper
 
 		public SetupContext tenants(String ... tenants) {
 			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
+			return thisAsC();
+		}
+
+		public SetupContext skipTestForDialect(Class<? extends Dialect> dialect, String reason) {
+			withConfiguration( b -> b.onMetadata( metadataImplementor -> {
+				Dialect currentDialect = metadataImplementor.getDatabase().getDialect();
+				assumeFalse( "Skipping test for dialect " + dialect.getName() + "; reason: " + reason, dialect.isAssignableFrom( currentDialect.getClass() ) );
+			} ) );
 			return thisAsC();
 		}
 
