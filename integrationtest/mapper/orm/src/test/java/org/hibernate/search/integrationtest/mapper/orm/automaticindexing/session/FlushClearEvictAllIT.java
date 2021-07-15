@@ -21,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyCollection;
@@ -148,6 +149,7 @@ public class FlushClearEvictAllIT {
 
 	@Entity(name = Comment.NAME)
 	@Indexed(index = Comment.NAME)
+	@Table(name = "CommentTable") // Oracle 11g does not like Comment as table name
 	public static class Comment {
 		public static final String NAME = "Comment";
 
