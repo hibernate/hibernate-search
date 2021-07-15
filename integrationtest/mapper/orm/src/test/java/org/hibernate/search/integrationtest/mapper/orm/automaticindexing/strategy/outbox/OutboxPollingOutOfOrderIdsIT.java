@@ -43,7 +43,7 @@ import org.awaitility.Awaitility;
 
 public class OutboxPollingOutOfOrderIdsIT {
 
-	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HIBERNATE_SEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
+	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
