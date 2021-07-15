@@ -34,7 +34,8 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String OUTBOX_TABLE_NAME = "HIBERNATE_SEARCH_OUTBOX_TABLE";
+	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
+	private static final String OUTBOX_TABLE_NAME = "HSEARCH_OUTBOX_TABLE";
 
 	private static final String OUTBOX_ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 	"\n" +
