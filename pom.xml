@@ -219,7 +219,7 @@
         <elasticsearchClientVersion>5.6.4</elasticsearchClientVersion>
         <elasticsearchSnifferVersion>5.6.4</elasticsearchSnifferVersion>
         <elasticsearchGsonVersion>2.8.2</elasticsearchGsonVersion>
-        <elasticsearchAWSV4SignerVersion>1.3</elasticsearchAWSV4SignerVersion>
+<elasticsearchAWSV4SignerVersion>1.3</elasticsearchAWSV4SignerVersion>
         
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -258,6 +258,32 @@
             Allows to distinguish between multiple executions of the same test in test reports.
          -->
         <surefire.environment>default</surefire.environment>
+
+        <!-- JVM args to be customized by each Maven module -->
+        <surefire.jvm.args.module></surefire.jvm.args.module>
+        <additionalRuntimeArgLine></additionalRuntimeArgLine>
+        <surefire.jvm.args>${surefire.jvm.args.module} ${additionalRuntimeArgLine}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.module} ${additionalRuntimeArgLine}</failsafe.jvm.args>
+
+        <!--
+			First and second property: local Maven repository.
+               1. Use the same local Maven repository in Pax Exam as the build job.
+			      This allows to retrieve the just-installed artifacts in case
+			      the local repo was overridden from the command line.
+               2. Include snapshots, which is useful when experimenting with new ORM versions.
+            Third property: remove Maven repositories.
+               1. Erase the defaults: some versions of Pax-Exam use HTTP for Maven Central by default.
+               2. Include snapshots from the JBoss repository, which is useful when experimenting with new ORM versions.
+
+            See https://ops4j1.jira.com/wiki/spaces/paxurl/pages/3833866/Mvn+Protocol for more information
+            on these properties.
+         -->
+        <pax-exam.jvm.args.maven>
+            -Dorg.ops4j.pax.url.mvn.defaultRepositories=file://${settings.localRepository}@snapshots@id=local-repo-from-maven-settings
+            -Dorg.ops4j.pax.url.mvn.localRepository=${settings.localRepository}
+            -Dorg.ops4j.pax.url.mvn.repositories=${mavencentral.repo.url}@id=central,${repository.jboss-public.url}@noreleases@id=jboss-public-repository
+        </pax-exam.jvm.args.maven>
+        <pax-exam.jvm.args>${pax-exam.jvm.args.maven}</pax-exam.jvm.args>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -1038,7 +1064,7 @@
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                         </systemPropertyVariables>
-                        <argLine>${additionalRuntimeArgLine}</argLine>
+                        <argLine>${surefire.jvm.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1142,7 +1168,7 @@
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                         </systemPropertyVariables>
-                        <argLine>${additionalRuntimeArgLine}</argLine>
+                        <argLine>${failsafe.jvm.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
