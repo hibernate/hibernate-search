@@ -190,9 +190,8 @@
         <jacksonVersion>2.6.1</jacksonVersion>
 
         <!-- Integration tests -->
-        <arquillianVersion>1.1.11.Final</arquillianVersion>
-        <arquillianContainerVersion>2.0.0.Final</arquillianContainerVersion>
-        <shrinkwrapResolverVersion>2.2.2</shrinkwrapResolverVersion>
+        <arquillianVersion>1.5.0.0</arquillianVersion>
+        <arquillianContainerVersion>2.2.0.Final</arquillianContainerVersion>
         <wildflyVersion>10.1.0.Final</wildflyVersion>
         <jmhVersion>1.11.2</jmhVersion>
         <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
