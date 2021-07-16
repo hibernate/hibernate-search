@@ -405,8 +405,10 @@
         <surefire.jvm.args.java-version>${surefire.jvm.args.java-version.strict}</surefire.jvm.args.java-version>
         <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
         <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
-        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
+        <!-- JVM args to be customized by each Maven module -->
+        <surefire.jvm.args.module></surefire.jvm.args.module>
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
 
         <failsafe.wildfly.skip>false</failsafe.wildfly.skip>
         <failsafe.osgi.skip>false</failsafe.osgi.skip>
@@ -440,7 +442,25 @@
 
         <pax-exam.jvm.args.java-version></pax-exam.jvm.args.java-version>
         <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
-        <pax-exam.jvm.args>${pax-exam.jvm.args.java-version} ${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
+        <!--
+			First and second property: local Maven repository.
+               1. Use the same local Maven repository in Pax Exam as the build job.
+			      This allows to retrieve the just-installed artifacts in case
+			      the local repo was overridden from the command line.
+               2. Include snapshots, which is useful when experimenting with new ORM versions.
+            Third property: remove Maven repositories.
+               1. Erase the defaults: some versions of Pax-Exam use HTTP for Maven Central by default.
+               2. Include snapshots from the JBoss repository, which is useful when experimenting with new ORM versions.
+
+            See https://ops4j1.jira.com/wiki/spaces/paxurl/pages/3833866/Mvn+Protocol for more information
+            on these properties.
+         -->
+        <pax-exam.jvm.args.maven>
+            -Dorg.ops4j.pax.url.mvn.defaultRepositories=file://${settings.localRepository}@snapshots@id=local-repo-from-maven-settings
+            -Dorg.ops4j.pax.url.mvn.localRepository=${settings.localRepository}
+            -Dorg.ops4j.pax.url.mvn.repositories=${mavencentral.repo.url}@id=central,${jboss.public.repo.url}@noreleases@id=jboss-public-repository
+        </pax-exam.jvm.args.maven>
+        <pax-exam.jvm.args>${pax-exam.jvm.args.java-version} ${pax-exam.jvm.args.jacoco} ${pax-exam.jvm.args.maven}</pax-exam.jvm.args>
 
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
