@@ -274,7 +274,7 @@
 
         <!-- >>> Common -->
         <version.log4j>2.13.3</version.log4j>
-        <version.junit>4.13.1</version.junit>
+        <version.junit>4.13.2</version.junit>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>3.5.13</version.org.mockito>
