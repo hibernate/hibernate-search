@@ -22,11 +22,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -42,19 +41,25 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.wiring.BundleRevision;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
+import org.ops4j.pax.exam.options.CompositeOption;
+import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.wiring.BundleRevision;
 
 /**
  * A basic integration test that executes Hibernate Search in Apache Karaf using
@@ -92,6 +97,7 @@ import org.osgi.framework.wiring.BundleRevision;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class HibernateSearchWithKarafIT {
+	private static final Pattern JVM_PROPERTY_FLAG_PATTERN = Pattern.compile( "-D([^=]+)=(.*)" );
 
 	/**
 	 * Switch to simplify debugging of this test
@@ -133,12 +139,9 @@ public class HibernateSearchWithKarafIT {
 				.type( "xml" )
 				.versionAsInProject();
 
-		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
-		String jbossPublicRepository = System.getProperty( "maven.jboss.public.repo.url" );
-		String mavenCentralRepository = System.getProperty( "maven.mavencentral.repo.url" );
 		String[] vmArgsFromProperties =
 				Arrays.stream(
-						System.getProperty( "pax-exam.jvm.args", "" ).split( "\\s" )
+						System.getProperty( "pax-exam.jvm.args", "" ).split( "\\s+" )
 				)
 						.filter( StringHelper::isNotEmpty )
 						.toArray( String[]::new );
@@ -193,38 +196,30 @@ public class HibernateSearchWithKarafIT {
 						"log4j2.rootLogger.appenderRef.Console.filter.threshold.level",
 						"TRACE" // Means "whatever the root logger level is"
 				),
-				/*
-				 * Use the same local Maven repository as the build job.
-				 * This allows to retrieve the just-installed artifacts in case
-				 * the local repo was overridden from the command line.
-				 *
-				 * See https://ops4j1.jira.com/wiki/spaces/paxurl/pages/3833866/Mvn+Protocol for more information
-				 * on the configuration below.
-				 */
-				editConfigurationFilePut(
-						"etc/org.ops4j.pax.url.mvn.cfg",
-						"org.ops4j.pax.url.mvn.defaultRepositories",
-						"file://" + mavenLocalRepository
-								+ "@snapshots" // Include snapshots, useful when experimenting with new ORM versions
-								+ "@id=local-repo-from-maven-settings"
-				),
-				editConfigurationFilePut(
-						"etc/org.ops4j.pax.url.mvn.cfg",
-						"org.ops4j.pax.url.mvn.localRepository",
-						mavenLocalRepository
-				),
-				editConfigurationFilePut( // Erase the defaults: Maven Central uses HTTP by default...
-						"etc/org.ops4j.pax.url.mvn.cfg",
-						"org.ops4j.pax.url.mvn.repositories",
-						mavenCentralRepository
-								+ "@id=central"
-								+ ", "
-						+ jbossPublicRepository
-								+ "@snapshots" // Include snapshots, useful when experimenting with new ORM versions
-								+ "@noreleases" // Exclude releases as we expect all releases to be available on central
-								+ "@id=jboss-public-repository"
-				)
+				mavenOptions()
 		};
+	}
+
+	private CompositeOption mavenOptions() {
+		DefaultCompositeOption result = new DefaultCompositeOption();
+		for ( String arg : System.getProperty( "pax-exam.jvm.args.maven", "" ).split( "\\s+" ) ) {
+			if ( StringHelper.isEmpty( arg ) ) {
+				continue;
+			}
+			Matcher jvmPropertyFlagMatcher = JVM_PROPERTY_FLAG_PATTERN.matcher( arg );
+			if ( !jvmPropertyFlagMatcher.matches() ) {
+				throw new IllegalArgumentException(
+						"Could not interpret part of system property 'pax-exam.jvm.args.maven': " + arg );
+			}
+			String propertyKey = jvmPropertyFlagMatcher.group( 1 );
+			String propertyValue = jvmPropertyFlagMatcher.group( 2 );
+			result.add( editConfigurationFilePut(
+					"etc/org.ops4j.pax.url.mvn.cfg",
+					propertyKey,
+					propertyValue
+			) );
+		}
+		return result;
 	}
 
 	@Before
