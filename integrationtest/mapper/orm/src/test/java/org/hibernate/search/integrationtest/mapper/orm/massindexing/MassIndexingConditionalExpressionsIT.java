@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import java.time.Instant;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -523,6 +524,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 		private Instant moment;
 
+		@Column(name = "numb")
 		private Integer number;
 
 		public H0_Indexed() {
