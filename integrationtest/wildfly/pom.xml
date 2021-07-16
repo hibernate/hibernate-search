@@ -33,7 +33,7 @@
         <test.hibernate.orm.module.slot>${hibernateShortVersion}</test.hibernate.orm.module.slot>
 
         <!-- Relax the JVM restrictions for integration tests, when using Jigsaw -->
-        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests}</additionalRuntimeArgLine>
+        <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFlyTests}</additionalRuntimeArgLine>
     </properties>
 
     <dependencyManagement>

@@ -288,6 +288,7 @@
         <!-- JVM args to be customized by each Maven module -->
         <surefire.jvm.args.module></surefire.jvm.args.module>
         <additionalRuntimeArgLine></additionalRuntimeArgLine>
+        <additionalRuntimeArgLineForWildFlyTests></additionalRuntimeArgLineForWildFlyTests>
         <surefire.jvm.args>${surefire.jvm.args.module} ${additionalRuntimeArgLine}</surefire.jvm.args>
         <failsafe.jvm.args>${surefire.jvm.args.module} ${additionalRuntimeArgLine}</failsafe.jvm.args>
 
@@ -1925,8 +1926,8 @@ org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <additionalRuntimeArgLineForWildFyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFyTests>
-                <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFyTests} --illegal-access=deny</additionalRuntimeArgLine>
+                <additionalRuntimeArgLineForWildFlyTests>-Djdk.attach.allowAttachSelf=true --add-modules java.xml.bind --add-opens=java.base/java.lang=ALL-UNNAMED</additionalRuntimeArgLineForWildFlyTests>
+                <additionalRuntimeArgLine>${additionalRuntimeArgLineForWildFlyTests} --illegal-access=deny</additionalRuntimeArgLine>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
