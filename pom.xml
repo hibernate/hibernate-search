@@ -312,6 +312,7 @@
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
+        <version.exec.plugin>3.0.0</version.exec.plugin>
         <version.forbiddenapis.plugin>2.6</version.forbiddenapis.plugin>
         <version.help.plugin>2.2</version.help.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
@@ -1140,6 +1141,24 @@
         <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <executions>
+                    <execution>
+                        <id>print-java-executable-version</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <commandlineArgs>-version</commandlineArgs>
+                            <useMavenLogger>true</useMavenLogger>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -1607,6 +1626,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>${version.enforcer.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${version.exec.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
