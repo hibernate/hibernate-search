@@ -85,6 +85,35 @@ class ProgressiveCharBufferWriter extends Writer {
 		this.output = output;
 	}
 
+	// Overrides super.write(int) to remove the synchronized() wrapper.
+	// WARNING: when you update this method, make sure to update ALL write(...) methods.
+	@Override
+	public void write(int c) throws IOException {
+		if ( 1 > charBuffer.remaining() ) {
+			flush();
+		}
+		charBuffer.put( (char) c );
+	}
+
+	// Overrides super.write(String, int, int) to remove the synchronized() wrapper.
+	// WARNING: when you update this method, make sure to update ALL write(...) methods.
+	@Override
+	public void write(String str, int off, int len) throws IOException {
+		// See write(char[], int, int) for comments.
+		if ( len > charBuffer.capacity() ) {
+			flush();
+			writeToByteBuffer( CharBuffer.wrap( str, off, off + len ) );
+		}
+		else if ( len > charBuffer.remaining() ) {
+			flush();
+			charBuffer.put( str, off, off + len );
+		}
+		else {
+			charBuffer.put( str, off, off + len );
+		}
+	}
+
+	// WARNING: when you update this method, make sure to update ALL write(...) methods.
 	@Override
 	public void write(char[] cbuf, int off, int len) throws IOException {
 		if ( len > charBuffer.capacity() ) {
