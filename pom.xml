@@ -237,10 +237,9 @@
         <gsonVersion>2.8.2</gsonVersion>
         <gson.module.slot>2.8</gson.module.slot>
         <gson.feature-pack.version>2.8.2.hibernate03</gson.feature-pack.version>
-        <awsV4SignerJavaVersion>1.3</awsV4SignerJavaVersion>
+<awsV4SignerJavaVersion>1.3</awsV4SignerJavaVersion>
         <aws-v4-signer-java.module.slot>${awsV4SignerJavaVersion}</aws-v4-signer-java.module.slot>
         <aws-v4-signer-java.feature-pack.version>1.3.0.hibernate03</aws-v4-signer-java.feature-pack.version>
-
         <!-- Tests -->
         <!-- Fixes dependency convergence within Wiremock, see below -->
         <jacksonVersion>2.8.6</jacksonVersion>
@@ -285,6 +284,32 @@
             Allows to distinguish between multiple executions of the same test in test reports.
          -->
         <surefire.environment>default</surefire.environment>
+
+        <!-- JVM args to be customized by each Maven module -->
+        <surefire.jvm.args.module></surefire.jvm.args.module>
+        <additionalRuntimeArgLine></additionalRuntimeArgLine>
+        <surefire.jvm.args>${surefire.jvm.args.module} ${additionalRuntimeArgLine}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.module} ${additionalRuntimeArgLine}</failsafe.jvm.args>
+
+        <!--
+			First and second property: local Maven repository.
+               1. Use the same local Maven repository in Pax Exam as the build job.
+			      This allows to retrieve the just-installed artifacts in case
+			      the local repo was overridden from the command line.
+               2. Include snapshots, which is useful when experimenting with new ORM versions.
+            Third property: remove Maven repositories.
+               1. Erase the defaults: some versions of Pax-Exam use HTTP for Maven Central by default.
+               2. Include snapshots from the JBoss repository, which is useful when experimenting with new ORM versions.
+
+            See https://ops4j1.jira.com/wiki/spaces/paxurl/pages/3833866/Mvn+Protocol for more information
+            on these properties.
+         -->
+        <pax-exam.jvm.args.maven>
+            -Dorg.ops4j.pax.url.mvn.defaultRepositories=file://${settings.localRepository}@snapshots@id=local-repo-from-maven-settings
+            -Dorg.ops4j.pax.url.mvn.localRepository=${settings.localRepository}
+            -Dorg.ops4j.pax.url.mvn.repositories=${mavencentral.repo.url}@id=central,${repository.jboss-public.url}@noreleases@id=jboss-public-repository
+        </pax-exam.jvm.args.maven>
+        <pax-exam.jvm.args>${pax-exam.jvm.args.maven}</pax-exam.jvm.args>
 
         <!--
             Please don't change the name of this property, it may be used and
@@ -1260,7 +1285,7 @@
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
-                        <argLine>${additionalRuntimeArgLine}</argLine>
+                        <argLine>${surefire.jvm.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
@@ -1384,7 +1409,7 @@
                             <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
                             <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
-                        <argLine>${additionalRuntimeArgLine}</argLine>
+                        <argLine>${failsafe.jvm.args}</argLine>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
