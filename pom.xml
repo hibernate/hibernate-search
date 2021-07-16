@@ -593,7 +593,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>4.13.2</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
@@ -624,7 +624,7 @@
                 Fix dependency convergence within jackson-databind 2.6 (used by wiremock).
                 Jackson databind 2.6.x has a packaging issue: it depends on jackson-annotations:2.6.0
                 for every version of databind (2.6.1, 2.6.2, ...).
-                We solve this by managing the version of jackson ourselves. 
+                We solve this by managing the version of jackson ourselves.
              -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -656,7 +656,7 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4jVersion}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -1518,13 +1518,13 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
         <!--
              Different profiles are needed to handle the environment setup (which is handled in Maven,
              on contrary to the various database profiles).
-             
+
              To run tests against a different version of Elasticsearch, use the appropriate profile
              and provide the Elasticsearch version:
-             
+
                  mvn clean test -Pelasticsearch-2.0 -DtestElasticsearchVersion=2.1.0
           -->
-        
+
         <!-- Elasticsearch [2.0,2.2) test environment -->
         <profile>
             <id>elasticsearch-2.0</id>
@@ -1533,7 +1533,7 @@ org.jboss.logging.BasicLogger#debugf(java.lang.Throwable, java.lang.String, long
                 <testElasticsearchVersion>2.0.0</testElasticsearchVersion>
             </properties>
         </profile>
-        
+
         <!-- Elasticsearch 2.2+ test environment (default) -->
         <profile>
             <id>elasticsearch-2.2</id>
