@@ -458,7 +458,7 @@
         <pax-exam.jvm.args.maven>
             -Dorg.ops4j.pax.url.mvn.defaultRepositories=file://${settings.localRepository}@snapshots@id=local-repo-from-maven-settings
             -Dorg.ops4j.pax.url.mvn.localRepository=${settings.localRepository}
-            -Dorg.ops4j.pax.url.mvn.repositories=${mavencentral.repo.url}@id=central,${jboss.public.repo.url}@noreleases@id=jboss-public-repository
+            -Dorg.ops4j.pax.url.mvn.repositories=${mavencentral.repo.url}@id=central,${jboss.public.repo.url}@snapshots@noreleases@id=jboss-public-repository
         </pax-exam.jvm.args.maven>
         <pax-exam.jvm.args>${pax-exam.jvm.args.java-version} ${pax-exam.jvm.args.jacoco} ${pax-exam.jvm.args.maven}</pax-exam.jvm.args>
 
