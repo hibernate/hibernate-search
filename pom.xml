@@ -483,6 +483,7 @@
         <!-- By default, the plugin is not skipped, but each container (elastic, etc.) is skipped;
              Maven profiles will re-enable the right container depending on configuration.
           -->
+        <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
         <test.elasticsearch.run.elastic.image.name>docker.elastic.co/elasticsearch/elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
@@ -513,6 +514,7 @@
         <!-- Mapper ORM tests properties -->
 
         <!-- Run containers for additional ORM databases -->
+        <test.database.run.skip>true</test.database.run.skip>
         <!-- PostgreSQL -->
         <test.database.run.postgres.skip>true</test.database.run.postgres.skip>
         <test.database.run.postgres.image.name>postgres</test.database.run.postgres.image.name>
