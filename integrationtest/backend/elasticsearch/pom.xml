@@ -13,6 +13,8 @@
     <description>Hibernate Search integration tests for the Elasticsearch backend, running the Backend TCK in particular</description>
 
     <properties>
+        <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+
         <surefire.executing-module>it-elasticsearch</surefire.executing-module>
         <!-- By default we don't exclude tests because of the version, but profiles override this -->
         <failsafe.excludedGroups.elasticsearch.version />
