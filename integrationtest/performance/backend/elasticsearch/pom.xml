@@ -18,6 +18,10 @@
     <name>Hibernate Search ITs - Performance - Backend - Elasticsearch</name>
     <description>Performance tests for the Elasticsearch backend</description>
 
+    <properties>
+        <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
