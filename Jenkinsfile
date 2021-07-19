@@ -554,7 +554,7 @@ stage('Non-default environments') {
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
-			runBuildOnNode(NODE_PATTERN_BASE + '&&LegacyDBInstall') {
+			runBuildOnNode(NODE_PATTERN_BASE) {
 				if ( buildEnv.dockerHubImage ) {
 					// Authenticated pull, to avoid failure due to throttling.
 					docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
