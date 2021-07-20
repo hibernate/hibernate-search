@@ -15,6 +15,8 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.data.impl.HashTable;
+import org.hibernate.search.util.common.data.impl.ModuloHashTable;
 import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -38,7 +40,7 @@ public class LuceneSerialWorkOrchestratorImpl
 	private final BackendThreads threads;
 	private final FailureHandler failureHandler;
 
-	private BatchingExecutor<LuceneBatchedWorkProcessor>[] executors;
+	private HashTable<BatchingExecutor<LuceneBatchedWorkProcessor>> executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -67,20 +69,19 @@ public class LuceneSerialWorkOrchestratorImpl
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // We aren't allowed to create generic arrays, so we have to use a raw type here.
 	protected void doStart(ConfigurationPropertySource propertySource) {
 		int queueCount = QUEUE_COUNT.get( propertySource );
 		int queueSize = QUEUE_SIZE.get( propertySource );
 
-		executors = new BatchingExecutor[queueCount];
-		for ( int i = 0; i < executors.length; i++ ) {
-			executors[i] = new BatchingExecutor<>(
+		executors = new ModuloHashTable<>( SimpleHashFunction.INSTANCE, queueCount );
+		for ( int i = 0; i < executors.size(); i++ ) {
+			executors.set( i, new BatchingExecutor<>(
 					name() + " - " + i,
 					processor,
 					queueSize,
 					true,
 					failureHandler
-			);
+			) );
 		}
 
 		for ( BatchingExecutor<?> executor : executors ) {
@@ -90,15 +91,14 @@ public class LuceneSerialWorkOrchestratorImpl
 
 	@Override
 	protected void doSubmit(LuceneBatchedWork<?> work) throws InterruptedException {
-		SimpleHashFunction.pick( executors, work.getQueuingKey() )
-				.submit( work );
+		executors.get( work.getQueuingKey() ).submit( work );
 	}
 
 	@Override
 	protected CompletableFuture<?> completion() {
-		CompletableFuture<?>[] completions = new CompletableFuture[executors.length];
-		for ( int i = 0; i < executors.length; i++ ) {
-			completions[i] = executors[i].completion();
+		CompletableFuture<?>[] completions = new CompletableFuture[executors.size()];
+		for ( int i = 0; i < executors.size(); i++ ) {
+			completions[i] = executors.get( i ).completion();
 		}
 		return CompletableFuture.allOf( completions );
 	}
