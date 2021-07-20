@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.6.Final (20-07-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4254 AWS request signing producing an incorrect signature in very specific cases involving non-ascii characters
+
+** Task
+    * HSEARCH-4260 Display Java version during builds
+    * HSEARCH-4257 Upgrade to JUnit 4.13.2
+
 6.0.5.Final (23-06-2021)
 -------------------------
 
