@@ -831,6 +831,8 @@
                 <jdbc.user>SYSTEM</jdbc.user>
                 <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
+                <!-- avoid `ORA-01882: timezone region not found` exception on CI -->
+                <failsafe.jvm.args.jdbc>-Doracle.jdbc.timezoneAsRegion=false</failsafe.jvm.args.jdbc>
             </properties>
         </profile>
 
