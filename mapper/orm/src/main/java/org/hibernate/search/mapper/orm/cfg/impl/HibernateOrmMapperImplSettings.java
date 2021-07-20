@@ -19,7 +19,7 @@ public final class HibernateOrmMapperImplSettings {
 		private AutomaticIndexingRadicals() {
 		}
 
-		public static final String OUTBOX_EVENT_FINDER = "outbox_event_finder";
+		public static final String OUTBOX_EVENT_FINDER_PROVIDER = "outbox_event_finder.provider";
 	}
 
 }
