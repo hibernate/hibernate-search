@@ -16,6 +16,8 @@ import org.hibernate.search.backend.lucene.index.spi.ShardingStrategyInitializat
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.util.common.data.impl.HashTable;
+import org.hibernate.search.util.common.data.impl.ModuloHashTable;
 import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -30,7 +32,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 					.asInteger()
 					.build();
 
-	private String[] shardIds;
+	private HashTable<String> shardIds;
 
 	@Override
 	public void initialize(ShardingStrategyInitializationContext context) {
@@ -38,11 +40,13 @@ public class HashShardingStrategy implements ShardingStrategy {
 				context.configurationPropertySource(),
 				key -> log.missingPropertyValueForShardingStrategy( NAME, key )
 		);
-		this.shardIds = new String[numberOfShards];
+		// Note the hash function / table implementations MUST NOT CHANGE,
+		// otherwise existing indexes will no longer work correctly.
+		this.shardIds = new ModuloHashTable<>( SimpleHashFunction.INSTANCE, numberOfShards );
 		Set<String> shardIdSet = new LinkedHashSet<>();
 		for ( int i = 0; i < numberOfShards; i++ ) {
 			String shardId = String.valueOf( i );
-			shardIds[i] = shardId;
+			shardIds.set( i, shardId );
 			shardIdSet.add( shardId );
 		}
 		context.shardIdentifiers( shardIdSet );
@@ -63,7 +67,6 @@ public class HashShardingStrategy implements ShardingStrategy {
 	}
 
 	private String toShardIdentifier(String routingKey) {
-		// Note the hash function MUST NOT CHANGE, otherwise existing indexes will no longer work correctly.
-		return SimpleHashFunction.pick( shardIds, routingKey );
+		return shardIds.get( routingKey );
 	}
 }

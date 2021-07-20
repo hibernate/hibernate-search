@@ -8,26 +8,37 @@ package org.hibernate.search.util.common.data.impl;
 
 /**
  * A fast, but cryptographically insecure hash function,
- * for use in hash tables.
+ * based on Java's {@link String#toString()}.
  */
-public class SimpleHashFunction {
+public final class SimpleHashFunction implements HashFunction {
+
+	public static final SimpleHashFunction INSTANCE = new SimpleHashFunction();
 
 	private SimpleHashFunction() {
 	}
 
-	public static <T> T pick(T[] content, String key) {
-		return content[Math.abs( hash( key ) % content.length )];
+	@Override
+	public String toString() {
+		return "SimpleHashFunction";
 	}
 
 	/**
-	 * The same hash function as Java's String.toString().
+	 * Hashes a {@code key}, i.e. turns it into an integer for use in a {@link HashTable}.
 	 * <p>
-	 * This does not delegate to String.toString() in order to protect against
+	 * This implementation is the same hash function as Java's String.toString().
+	 * <p>
+	 * It does not delegate to String.toString() in order to protect against
 	 * future changes in the JDK (?) or different JDK implementations,
 	 * so that the resulting hash can safely be used for persistence
 	 * (e.g. to route data to a file).
+	 *
+	 * @param key A key to hash.
+	 * @return A hash.
 	 */
-	private static int hash(String key) {
+	@Override
+	public int hash(CharSequence key) {
+		// WARNING: NEVER CHANGE THIS IMPLEMENTATION
+		// This is used to persist data (picking a shard in a Lucene index in particular)
 		int hash = 0;
 		int length = key.length();
 		for ( int index = 0; index < length; index++ ) {
