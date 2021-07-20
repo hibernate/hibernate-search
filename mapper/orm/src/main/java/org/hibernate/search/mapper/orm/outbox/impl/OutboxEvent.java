@@ -41,15 +41,6 @@ public final class OutboxEvent {
 		this.originalEntityId = originalEntityId;
 	}
 
-	public OutboxEvent(Type type, String entityName, String entityId, byte[] payload, int retries) {
-		this.type = type;
-		this.entityName = entityName;
-		this.entityId = entityId;
-		this.payload = payload;
-		this.retries = retries;
-		this.originalEntityId = null;
-	}
-
 	public Long getId() {
 		return id;
 	}
