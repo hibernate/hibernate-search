@@ -54,7 +54,7 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 
 	@Override
 	public void configure(AutomaticIndexingConfigurationContext context) {
-		context.sendIndexingEventsTo( ctx -> new OutboxTableSendingPlan( ctx.session() ), true );
+		context.sendIndexingEventsTo( ctx -> new OutboxEventSendingPlan( ctx.session() ), true );
 	}
 
 	@Override

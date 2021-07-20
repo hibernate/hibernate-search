@@ -18,12 +18,12 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQu
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
+public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
 
 	private final Session session;
 	private final List<OutboxEvent> events = new ArrayList<>();
 
-	public OutboxTableSendingPlan(Session session) {
+	public OutboxEventSendingPlan(Session session) {
 		this.session = session;
 	}
 
