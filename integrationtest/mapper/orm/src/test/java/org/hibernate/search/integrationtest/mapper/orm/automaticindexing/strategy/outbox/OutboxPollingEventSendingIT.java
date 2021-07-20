@@ -75,7 +75,7 @@ public class OutboxPollingEventSendingIT {
 		);
 
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class );
 		backendMock.verifyExpectationsMet();

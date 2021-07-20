@@ -66,7 +66,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		failureHandler = new TestFailureHandler();
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
-				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}

@@ -8,8 +8,12 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strate
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -18,28 +22,32 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.outbox.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventFinder;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventFinderProvider;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventPredicate;
 
-/**
- * A replacement for the default outbox event finder that can prevent existing outbox events from being detected,
- * thereby simulating a delay in the processing of outbox events.
- */
-class FilteringOutboxEventFinder implements OutboxEventFinder {
-
-	private final DefaultOutboxEventFinder defaultFinder = new DefaultOutboxEventFinder();
+class FilteringOutboxEventFinder {
 
 	private boolean filter = true;
 	private final Set<Long> allowedIds = new HashSet<>();
 
-	@Override
-	public synchronized List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
-		if ( !filter ) {
-			return defaultFinder.findOutboxEvents( session, maxResults );
-		}
+	public FilteringOutboxEventFinder() {
+	}
 
-		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e where e.id in :ids order by e.moment, e.id", OutboxEvent.class );
+	public OutboxEventFinderProvider provider() {
+		return new Provider();
+	}
+
+	public synchronized List<OutboxEvent> findOutboxEvents(Session session, int maxResults,
+			Optional<OutboxEventPredicate> predicate) {
+		Optional<OutboxEventPredicate> combinedPredicate = combineFilterWithPredicate( predicate );
+		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
+		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
 		query.setMaxResults( maxResults );
-		query.setParameter( "ids", allowedIds );
+		if ( combinedPredicate.isPresent() ) {
+			for ( Map.Entry<String, Object> entry : combinedPredicate.get().params().entrySet() ) {
+				query.setParameter( entry.getKey(), entry.getValue() );
+			}
+		}
 		List<OutboxEvent> returned = query.list();
 		// Only return each event once.
 		// This is important because in the case of a retry, the same event will be reused.
@@ -95,6 +103,61 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 		if ( !filter ) {
 			throw new IllegalStateException(
 					"Cannot use filtering features while the filter is disabled; see enableFilter()" );
+		}
+	}
+
+	private Optional<OutboxEventPredicate> combineFilterWithPredicate(Optional<OutboxEventPredicate> predicate) {
+		if ( !filter ) {
+			return predicate;
+		}
+
+		OutboxEventPredicate filterPredicate = new OutboxEventPredicate() {
+			@Override
+			public String queryPart(String eventAlias) {
+				return eventAlias + ".id in :ids";
+			}
+
+			@Override
+			public Map<String, Object> params() {
+				return Collections.singletonMap( "ids", allowedIds );
+			}
+		};
+
+		if ( !predicate.isPresent() ) {
+			return Optional.of( filterPredicate );
+		}
+
+		// Need to combine the predicates...
+		return Optional.of( and( predicate.get(), filterPredicate ) );
+	}
+
+	private OutboxEventPredicate and(OutboxEventPredicate left, OutboxEventPredicate right) {
+		return new OutboxEventPredicate() {
+			@Override
+			public String queryPart(String eventAlias) {
+				return "(" + left.queryPart( eventAlias ) + ") and (" + right.queryPart( eventAlias ) + ")";
+			}
+
+			@Override
+			public Map<String, Object> params() {
+				Map<String, Object> merged = new HashMap<>();
+				// Assuming no conflicts...
+				merged.putAll( left.params() );
+				merged.putAll( right.params() );
+				return merged;
+			}
+		};
+	}
+
+	/**
+	 * A replacement for the default outbox event finder that can prevent existing outbox events from being detected,
+	 * thereby simulating a delay in the processing of outbox events.
+	 */
+	private class Provider implements OutboxEventFinderProvider {
+		@Override
+		public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
+			return (session, maxResults) -> FilteringOutboxEventFinder.this.findOutboxEvents(
+					session, maxResults, predicate );
 		}
 	}
 }

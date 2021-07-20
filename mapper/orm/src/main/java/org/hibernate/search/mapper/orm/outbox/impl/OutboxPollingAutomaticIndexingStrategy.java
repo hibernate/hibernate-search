@@ -35,9 +35,9 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_POLLING_INTERVAL )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinder>> AUTOMATIC_INDEXING_OUTBOX_EVENT_FINDER =
-			ConfigurationProperty.forKey( HibernateOrmMapperImplSettings.AutomaticIndexingRadicals.OUTBOX_EVENT_FINDER )
-					.asBeanReference( OutboxEventFinder.class )
+	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> AUTOMATIC_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER =
+			ConfigurationProperty.forKey( HibernateOrmMapperImplSettings.AutomaticIndexingRadicals.OUTBOX_EVENT_FINDER_PROVIDER )
+					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
 	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_BATCH_SIZE =
@@ -48,7 +48,7 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 
 	public static final String NAME = "Outbox table automatic indexing";
 
-	private BeanHolder<? extends OutboxEventFinder> finderHolder;
+	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
 	private ScheduledExecutorService scheduledExecutor;
 	private volatile OutboxEventBackgroundExecutor executor;
 
@@ -59,14 +59,15 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 
 	@Override
 	public CompletableFuture<?> start(AutomaticIndexingStrategyStartContext context) {
-		Optional<BeanHolder<? extends OutboxEventFinder>> finderHolderOptional =
-				AUTOMATIC_INDEXING_OUTBOX_EVENT_FINDER.getAndMap( context.configurationPropertySource(), context.beanResolver()::resolve );
-		if ( finderHolderOptional.isPresent() ) {
-			finderHolder = finderHolderOptional.get();
-			log.debugf( "Outbox processing will use custom outbox event finder '%s'.", finderHolder.get() );
+		Optional<BeanHolder<? extends OutboxEventFinderProvider>> finderProviderHolderOptional =
+				AUTOMATIC_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
+						context.configurationPropertySource(), context.beanResolver()::resolve );
+		if ( finderProviderHolderOptional.isPresent() ) {
+			finderProviderHolder = finderProviderHolderOptional.get();
+			log.debugf( "Outbox processing will use custom outbox event finder provider '%s'.", finderProviderHolder.get() );
 		}
 		else {
-			finderHolder = BeanHolder.of( new DefaultOutboxEventFinder() );
+			finderProviderHolder = BeanHolder.of( new DefaultOutboxEventFinder.Provider() );
 		}
 
 		int pollingInterval = AUTOMATIC_INDEXING_POLLING_INTERVAL.get( context.configurationPropertySource() );
@@ -74,7 +75,9 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 		int batchSize = AUTOMATIC_INDEXING_BATCH_SIZE.get( context.configurationPropertySource() );
 
 		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, NAME );
-		executor = new OutboxEventBackgroundExecutor( context.mapping(), scheduledExecutor, finderHolder.get(),
+		// TODO pass a predicate in case we're sharding the queue
+		OutboxEventFinder finder = finderProviderHolder.get().create( Optional.empty() );
+		executor = new OutboxEventBackgroundExecutor( context.mapping(), scheduledExecutor, finder,
 				pollingInterval, batchSize );
 		executor.start();
 		return CompletableFuture.completedFuture( null );
@@ -94,7 +97,7 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( OutboxEventBackgroundExecutor::stop, executor );
 			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutor );
-			closer.push( BeanHolder::close, finderHolder );
+			closer.push( BeanHolder::close, finderProviderHolder );
 		}
 	}
 }
