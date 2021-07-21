@@ -29,18 +29,18 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_POLLING_INTERVAL =
+	private static final ConfigurationProperty<Integer> POLLING_INTERVAL =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.POLLING_INTERVAL )
 					.asInteger()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_POLLING_INTERVAL )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> AUTOMATIC_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER =
+	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> OUTBOX_EVENT_FINDER_PROVIDER =
 			ConfigurationProperty.forKey( HibernateOrmMapperImplSettings.AutomaticIndexingRadicals.OUTBOX_EVENT_FINDER_PROVIDER )
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
-	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_BATCH_SIZE =
+	private static final ConfigurationProperty<Integer> BATCH_SIZE =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.BATCH_SIZE )
 					.asInteger()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_BATCH_SIZE )
@@ -60,7 +60,7 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 	@Override
 	public CompletableFuture<?> start(AutomaticIndexingStrategyStartContext context) {
 		Optional<BeanHolder<? extends OutboxEventFinderProvider>> finderProviderHolderOptional =
-				AUTOMATIC_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
+				OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
 						context.configurationPropertySource(), context.beanResolver()::resolve );
 		if ( finderProviderHolderOptional.isPresent() ) {
 			finderProviderHolder = finderProviderHolderOptional.get();
@@ -70,9 +70,9 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 			finderProviderHolder = BeanHolder.of( new DefaultOutboxEventFinder.Provider() );
 		}
 
-		int pollingInterval = AUTOMATIC_INDEXING_POLLING_INTERVAL.get( context.configurationPropertySource() );
+		int pollingInterval = POLLING_INTERVAL.get( context.configurationPropertySource() );
 
-		int batchSize = AUTOMATIC_INDEXING_BATCH_SIZE.get( context.configurationPropertySource() );
+		int batchSize = BATCH_SIZE.get( context.configurationPropertySource() );
 
 		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, NAME );
 		// TODO pass a predicate in case we're sharding the queue
