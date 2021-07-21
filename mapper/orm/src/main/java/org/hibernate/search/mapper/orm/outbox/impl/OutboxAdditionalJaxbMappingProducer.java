@@ -22,6 +22,7 @@ import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
@@ -44,6 +45,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	private static final String DEFAULT_CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP";
 	private static final String DEFAULT_TYPE_TIMESTAMP = "TIMESTAMP";
 	private static final String MYSQL_TYPE_TIMESTAMP = "TIMESTAMP(6)";
+	private static final String MSSQL_TYPE_TIMESTAMP = "datetime2";
 
 	private static final String TYPE_TIMESTAMP_PLACEHOLDER = "{{type_timestamp}}";
 	private static final String CURRENT_TIMESTAMP_PLACEHOLDER = "{{current_timestamp}}";
@@ -90,7 +92,8 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 		Dialect dialect = jdbcServices.getJdbcEnvironment().getDialect();
 		SQLFunction timestampFunction = dialect.getFunctions().get( "current_timestamp" );
 
-		String typeTimestamp = ( dialect instanceof MySQLDialect ) ? MYSQL_TYPE_TIMESTAMP : DEFAULT_TYPE_TIMESTAMP;
+		String typeTimestamp = ( dialect instanceof MySQLDialect ) ? MYSQL_TYPE_TIMESTAMP :
+				( dialect instanceof SQLServerDialect ) ? MSSQL_TYPE_TIMESTAMP : DEFAULT_TYPE_TIMESTAMP;
 		String currentTimestamp = ( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
 				timestampFunction.render( null, Collections.emptyList(), null );
 
