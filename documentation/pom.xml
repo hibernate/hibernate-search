@@ -20,7 +20,7 @@
     <description>Hibernate Search reference documentation</description>
 
     <properties>
-        <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+        <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
 
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/</asciidoctor.base-output-dir>
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
