@@ -16,9 +16,15 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
+import org.hibernate.search.util.common.data.impl.Murmur3HashFunction;
+import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
+
+	// Note the hash function / table implementations MUST NOT CHANGE,
+	// otherwise existing indexes will no longer work correctly.
+	public static final RangeCompatibleHashFunction HASH_FUNCTION = Murmur3HashFunction.INSTANCE;
 
 	private final Session session;
 	private final List<OutboxEvent> events = new ArrayList<>();
@@ -30,7 +36,9 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 	@Override
 	public void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload) {
 		events.add( new OutboxEvent( OutboxEvent.Type.ADD, entityName, serializedId,
-				SerializationUtils.serialize( payload ), identifier
+				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
+				SerializationUtils.serialize( payload ),
+				identifier
 		) );
 	}
 
@@ -38,7 +46,9 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 	public void addOrUpdate(String entityName, Object identifier, String serializedId,
 			PojoIndexingQueueEventPayload payload) {
 		events.add( new OutboxEvent( OutboxEvent.Type.ADD_OR_UPDATE, entityName, serializedId,
-				SerializationUtils.serialize( payload ), identifier
+				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
+				SerializationUtils.serialize( payload ),
+				identifier
 		) );
 	}
 
@@ -46,7 +56,9 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 	public void delete(String entityName, Object identifier, String serializedId,
 			PojoIndexingQueueEventPayload payload) {
 		events.add( new OutboxEvent( OutboxEvent.Type.DELETE, entityName, serializedId,
-				SerializationUtils.serialize( payload ), identifier
+				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
+				SerializationUtils.serialize( payload ),
+				identifier
 		) );
 	}
 

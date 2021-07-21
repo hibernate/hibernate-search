@@ -247,4 +247,17 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 48, value = "Stopping outbox event processor '%1$s'" )
 	void stoppingOutboxEventProcessor(String name);
 
+	@Message(id = ID_OFFSET + 49,
+			value = "The total shard count must be strictly positive.")
+	SearchException invalidTotalShardCount();
+
+	@Message(id = ID_OFFSET + 50,
+			value = "Shard indices must be between 0 (inclusive) and %1d (exclusive, set by '%2$s').")
+	SearchException invalidShardIndex(int totalShardCount, String totalShardCountPropertyKey);
+
+	@Message(id = ID_OFFSET + 51,
+			value = "When using static sharding, this property must be set."
+	)
+	SearchException missingPropertyForStaticSharding();
+
 }

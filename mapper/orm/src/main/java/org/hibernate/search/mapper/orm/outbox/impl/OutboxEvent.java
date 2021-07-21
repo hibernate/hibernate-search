@@ -23,6 +23,7 @@ public final class OutboxEvent {
 
 	private String entityName;
 	private String entityId;
+	private int entityIdHash;
 	private byte[] payload;
 	private int retries = 0;
 
@@ -32,11 +33,12 @@ public final class OutboxEvent {
 	public OutboxEvent() {
 	}
 
-	public OutboxEvent(Type type, String entityName, String entityId, byte[] payload,
+	public OutboxEvent(Type type, String entityName, String entityId, int entityIdHash, byte[] payload,
 			Object originalEntityId) {
 		this.type = type;
 		this.entityName = entityName;
 		this.entityId = entityId;
+		this.entityIdHash = entityIdHash;
 		this.payload = payload;
 		this.originalEntityId = originalEntityId;
 	}
@@ -79,6 +81,14 @@ public final class OutboxEvent {
 
 	public void setEntityId(String entityId) {
 		this.entityId = entityId;
+	}
+
+	public int getEntityIdHash() {
+		return entityIdHash;
+	}
+
+	public void setEntityIdHash(int entityIdHash) {
+		this.entityIdHash = entityIdHash;
 	}
 
 	public byte[] getPayload() {
@@ -137,6 +147,7 @@ public final class OutboxEvent {
 				", moment=" + moment +
 				", entityName='" + entityName + '\'' +
 				", entityId='" + entityId + '\'' +
+				", entityIdHash='" + entityIdHash + '\'' +
 				", retries=" + retries +
 				", originalEntityId=" + originalEntityId +
 				'}';
