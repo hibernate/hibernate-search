@@ -25,15 +25,15 @@ public interface Log extends BasicLogger {
 
 	int ID_OFFSET = MessageConstants.BACKEND_ES_AWS_ID_RANGE_MIN;
 
-	@Message(id = ID_OFFSET + 0,
-			value = "AWS request signing is enabled, but mandatory property '%1$s' is not set."
+	@Message(id = ID_OFFSET,
+			value = "When AWS request signing is enabled, this property must be set."
 	)
-	SearchException missingPropertyForSigning(String propertyKey);
+	SearchException missingPropertyForSigning();
 
 	@Message(id = ID_OFFSET + 1,
-			value = "AWS request signing is enabled with credentials of type '%1$s', but mandatory property '%2$s' is not set."
+			value = "When AWS request signing is enabled with credentials of type '%1$s', this property must be set."
 	)
-	SearchException missingPropertyForSigningWithCredentialsType(String credentialsType, String propertyKey);
+	SearchException missingPropertyForSigningWithCredentialsType(String credentialsType);
 
 	@Message(id = ID_OFFSET + 2,
 			value = "Invalid credentials configuration for AWS request signing."

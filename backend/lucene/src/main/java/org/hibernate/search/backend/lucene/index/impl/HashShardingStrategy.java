@@ -38,7 +38,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 	public void initialize(ShardingStrategyInitializationContext context) {
 		int numberOfShards = NUMBER_OF_SHARDS.getOrThrow(
 				context.configurationPropertySource(),
-				key -> log.missingPropertyValueForShardingStrategy( NAME, key )
+				() -> log.missingPropertyValueForShardingStrategy( NAME )
 		);
 		// Note the hash function / table implementations MUST NOT CHANGE,
 		// otherwise existing indexes will no longer work correctly.

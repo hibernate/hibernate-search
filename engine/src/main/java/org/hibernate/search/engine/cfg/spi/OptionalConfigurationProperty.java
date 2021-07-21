@@ -8,6 +8,7 @@ package org.hibernate.search.engine.cfg.spi;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
@@ -35,11 +36,11 @@ public interface OptionalConfigurationProperty<T> extends ConfigurationProperty<
 	 * Get the value of this configuration property, throwing an exception if the value is not present.
 	 *
 	 * @param source A configuration source.
-	 * @param exceptionFunction A function that will be called with the property key as a parameter
+	 * @param exceptionSupplier A supplier that will be called to create an exception if the value is missing.
 	 * to create an exception if the value is missing.
 	 * @return The value of this property according to the given source.
 	 */
-	T getOrThrow(ConfigurationPropertySource source, Function<String, RuntimeException> exceptionFunction);
+	T getOrThrow(ConfigurationPropertySource source, Supplier<RuntimeException> exceptionSupplier);
 
 	/**
 	 * Get and transform the value of this configuration property, throwing an exception if the value is not present.
@@ -47,15 +48,14 @@ public interface OptionalConfigurationProperty<T> extends ConfigurationProperty<
 	 * Any exception occurring during transformation will be wrapped in another exception adding some context,
 	 * such as the {@link #resolveOrRaw(ConfigurationPropertySource) resolved key} for this property.
 	 *
+	 * @param <R> The transformed type.
 	 * @param source A configuration source.
 	 * @param transform A transform function to be applied to the value of this configuration property
 	 * before returning the result.
-	 * @param exceptionFunction A function that will be called with the property key as a parameter
-	 * to create an exception if the value is missing.
-	 * @param <R> The transformed type.
+	 * @param exceptionSupplier A supplier that will be called to create an exception if the value is missing.
 	 * @return The value of this property according to the given source.
 	 */
 	<R> R getAndMapOrThrow(ConfigurationPropertySource source, Function<T, R> transform,
-			Function<String, RuntimeException> exceptionFunction);
+			Supplier<RuntimeException> exceptionSupplier);
 
 }

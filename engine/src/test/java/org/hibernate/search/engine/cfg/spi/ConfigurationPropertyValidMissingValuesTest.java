@@ -164,7 +164,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThat( result ).contains( expectedMappedValue );
 
 		// Valid value and mapping function fails
-		SimulatedFailure simulatedFailure = new SimulatedFailure( "SIMULATED" );
+		SimulatedFailure simulatedFailure = new SimulatedFailure();
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		when( mappingFunction.apply( expectedValue ) ).thenThrow( simulatedFailure );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
@@ -193,8 +193,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
-				.isInstanceOf( SimulatedFailure.class )
-				.hasMessage( resolvedKey );
+				.isInstanceOf( SearchException.class )
+				.hasCauseInstanceOf( SimulatedFailure.class )
+				.hasMessageContainingAll( "Invalid value for configuration property '" + resolvedKey + "': ''",
+						SimulatedFailure.MESSAGE );
 		verifyNoOtherSourceInteractionsAndReset();
 
 		// Valid value -> no exception
@@ -220,8 +222,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getAndMapOrThrow( sourceMock, mappingFunction, SimulatedFailure::new ) )
-				.isInstanceOf( SimulatedFailure.class )
-				.hasMessage( resolvedKey );
+				.isInstanceOf( SearchException.class )
+				.hasCauseInstanceOf( SimulatedFailure.class )
+				.hasMessageContainingAll( "Invalid value for configuration property '" + resolvedKey + "': ''",
+						SimulatedFailure.MESSAGE );
 		verifyNoOtherSourceInteractionsAndReset();
 
 		// Valid value -> no exception, mapping function applied
@@ -233,17 +237,15 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedMappedValue );
 
 		// Valid value and mapping function fails
-		SimulatedFailure simulatedFailure = new SimulatedFailure( "SIMULATED" );
+		SimulatedFailure simulatedFailure = new SimulatedFailure();
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		when( mappingFunction.apply( expectedValue ) ).thenThrow( simulatedFailure );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"Invalid value for configuration property '" + resolvedKey
-								+ "': '" + expectedValue + "'."
-				)
-				.hasMessageContaining( simulatedFailure.getMessage() )
+				.hasMessageContainingAll( "Invalid value for configuration property '" + resolvedKey
+						+ "': '" + expectedValue + "'.",
+						simulatedFailure.getMessage() )
 				.hasCause( simulatedFailure );
 		verifyNoOtherSourceInteractionsAndReset();
 	}
@@ -355,8 +357,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 	}
 
 	private static class SimulatedFailure extends RuntimeException {
-		SimulatedFailure(String message) {
-			super( message );
+		public static final String MESSAGE = "The simulated message";
+
+		SimulatedFailure() {
+			super( MESSAGE );
 		}
 	}
 
