@@ -29,21 +29,21 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Integer> POLLING_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.POLLING_INTERVAL )
-					.asInteger()
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_POLLING_INTERVAL )
-					.build();
-
 	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> OUTBOX_EVENT_FINDER_PROVIDER =
 			ConfigurationProperty.forKey( HibernateOrmMapperImplSettings.AutomaticIndexingRadicals.OUTBOX_EVENT_FINDER_PROVIDER )
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
-	private static final ConfigurationProperty<Integer> BATCH_SIZE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.BATCH_SIZE )
+	private static final ConfigurationProperty<Integer> PROCESSING_POLLING_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.PROCESSING_POLLING_INTERVAL )
 					.asInteger()
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_BATCH_SIZE )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL )
+					.build();
+
+	private static final ConfigurationProperty<Integer> PROCESSING_BATCH_SIZE =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.PROCESSING_BATCH_SIZE )
+					.asInteger()
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE )
 					.build();
 
 	public static final String PROCESSOR_NAME = "Outbox table automatic indexing";
@@ -70,9 +70,9 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 			finderProviderHolder = BeanHolder.of( new DefaultOutboxEventFinder.Provider() );
 		}
 
-		int pollingInterval = POLLING_INTERVAL.get( context.configurationPropertySource() );
+		int pollingInterval = PROCESSING_POLLING_INTERVAL.get( context.configurationPropertySource() );
 
-		int batchSize = BATCH_SIZE.get( context.configurationPropertySource() );
+		int batchSize = PROCESSING_BATCH_SIZE.get( context.configurationPropertySource() );
 
 		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, PROCESSOR_NAME );
 		// TODO pass a predicate in case we're sharding the queue

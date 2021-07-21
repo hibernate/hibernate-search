@@ -84,7 +84,7 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
-	 * The polling interval for the outbox events table, in milliseconds.
+	 * The interval in the background processor between two queries to the outbox events table, in milliseconds.
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
 	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
@@ -98,12 +98,12 @@ public final class HibernateOrmMapperSettings {
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_POLLING_INTERVAL}.
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL}.
 	 */
-	public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = PREFIX + Radicals.AUTOMATIC_INDEXING_POLLING_INTERVAL;
+	public static final String AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL;
 
 	/**
-	 * How many outbox events to process in the same transaction.
+	 * How many outbox events to process in the background processor in the same transaction.
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
 	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
@@ -111,9 +111,9 @@ public final class HibernateOrmMapperSettings {
 	 * Expects a positive Integer value, such as {@code 50},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_BATCH_SIZE}.
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE}.
 	 */
-	public static final String AUTOMATIC_INDEXING_BATCH_SIZE = PREFIX + Radicals.AUTOMATIC_INDEXING_BATCH_SIZE;
+	public static final String AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE;
 
 	/**
 	 * The strategy to use when loading entities during the execution of a search query.
@@ -185,8 +185,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
-		public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.POLLING_INTERVAL;
-		public static final String AUTOMATIC_INDEXING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.BATCH_SIZE;
+		public static final String AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_POLLING_INTERVAL;
+		public static final String AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_BATCH_SIZE;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
@@ -204,8 +204,9 @@ public final class HibernateOrmMapperSettings {
 
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
-		public static final String POLLING_INTERVAL = "polling_interval";
-		public static final String BATCH_SIZE = "batch_size";
+		public static final String PROCESSING_PREFIX = "processing.";
+		public static final String PROCESSING_POLLING_INTERVAL = PROCESSING_PREFIX + "polling_interval";
+		public static final String PROCESSING_BATCH_SIZE = PROCESSING_PREFIX + "batch_size";
 	}
 
 	/**
@@ -222,8 +223,8 @@ public final class HibernateOrmMapperSettings {
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
-		public static final int AUTOMATIC_INDEXING_POLLING_INTERVAL = 8;
-		public static final int AUTOMATIC_INDEXING_BATCH_SIZE = 50;
+		public static final int AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = 8;
+		public static final int AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = 50;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
