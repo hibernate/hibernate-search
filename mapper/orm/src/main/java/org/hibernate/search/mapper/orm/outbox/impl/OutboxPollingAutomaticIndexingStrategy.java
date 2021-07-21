@@ -46,11 +46,11 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_BATCH_SIZE )
 					.build();
 
-	public static final String NAME = "Outbox table automatic indexing";
+	public static final String PROCESSOR_NAME = "Outbox table automatic indexing";
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
 	private ScheduledExecutorService scheduledExecutor;
-	private volatile OutboxEventBackgroundExecutor executor;
+	private volatile OutboxEventBackgroundProcessor processor;
 
 	@Override
 	public void configure(AutomaticIndexingConfigurationContext context) {
@@ -74,28 +74,28 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 
 		int batchSize = BATCH_SIZE.get( context.configurationPropertySource() );
 
-		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, NAME );
+		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, PROCESSOR_NAME );
 		// TODO pass a predicate in case we're sharding the queue
 		OutboxEventFinder finder = finderProviderHolder.get().create( Optional.empty() );
-		executor = new OutboxEventBackgroundExecutor( context.mapping(), scheduledExecutor, finder,
+		processor = new OutboxEventBackgroundProcessor( PROCESSOR_NAME, context.mapping(), scheduledExecutor, finder,
 				pollingInterval, batchSize );
-		executor.start();
+		processor.start();
 		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override
 	public CompletableFuture<?> preStop(AutomaticIndexingStrategyPreStopContext context) {
-		if ( executor == null ) {
+		if ( processor == null ) {
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		return executor.preStop();
+		return processor.preStop();
 	}
 
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( OutboxEventBackgroundExecutor::stop, executor );
+			closer.push( OutboxEventBackgroundProcessor::stop, processor );
 			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutor );
 			closer.push( BeanHolder::close, finderProviderHolder );
 		}
