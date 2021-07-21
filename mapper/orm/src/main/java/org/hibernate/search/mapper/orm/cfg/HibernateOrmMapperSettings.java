@@ -223,7 +223,7 @@ public final class HibernateOrmMapperSettings {
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
-		public static final int AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = 8;
+		public static final int AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = 100;
 		public static final int AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = 50;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
