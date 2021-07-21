@@ -407,8 +407,8 @@ public interface Log extends BasicLogger {
 	SearchException missingShardIdentifiersAfterShardingStrategyInitialization(Object strategy);
 
 	@Message(id = ID_OFFSET + 90,
-			value = "Invalid configuration for sharding strategy '%1$s': configuration property '%2$s' must be set.")
-	SearchException missingPropertyValueForShardingStrategy(String strategyName, String propertyKey);
+			value = "When using sharding strategy '%1$s', this configuration property must be set.")
+	SearchException missingPropertyValueForShardingStrategy(String strategyName);
 
 	@Message(id = ID_OFFSET + 91,
 			value = "Invalid routing key: '%1$s'. Valid keys are: %2$s.")

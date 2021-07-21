@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -148,8 +149,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
-				.isInstanceOf( SimulatedFailure.class )
-				.hasMessage( resolvedKey );
+				.isInstanceOf( SearchException.class )
+				.hasCauseInstanceOf( SimulatedFailure.class )
+				.hasMessageContainingAll( "Invalid value for configuration property '" + resolvedKey + "': ''",
+						SimulatedFailure.MESSAGE );
 		verifyNoOtherSourceInteractionsAndReset();
 
 		// Valid value -> no exception
@@ -408,8 +411,10 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 	}
 
 	private static class SimulatedFailure extends RuntimeException {
-		SimulatedFailure(String message) {
-			super( message );
+		public static final String MESSAGE = "The simulated message";
+
+		SimulatedFailure() {
+			super( MESSAGE );
 		}
 	}
 

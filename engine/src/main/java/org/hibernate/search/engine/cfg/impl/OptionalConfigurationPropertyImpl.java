@@ -8,6 +8,7 @@ package org.hibernate.search.engine.cfg.impl;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -28,15 +29,14 @@ final class OptionalConfigurationPropertyImpl<T> extends AbstractConfigurationPr
 	}
 
 	@Override
-	public T getOrThrow(ConfigurationPropertySource source, Function<String, RuntimeException> exceptionFunction) {
-		return get( source ).orElseThrow( () -> exceptionFunction.apply( resolveOrRaw( source ) ) );
+	public T getOrThrow(ConfigurationPropertySource source, Supplier<RuntimeException> exceptionSupplier) {
+		return getAndTransform( source, optional -> optional.orElseThrow( exceptionSupplier ) );
 	}
 
 	@Override
 	public <R> R getAndMapOrThrow(ConfigurationPropertySource source, Function<T, R> transform,
-			Function<String, RuntimeException> exceptionFunction) {
-		return getAndTransform( source, optional -> optional.map( transform ) )
-				.orElseThrow( () -> exceptionFunction.apply( resolveOrRaw( source ) ) );
+			Supplier<RuntimeException> exceptionSupplier) {
+		return getAndTransform( source, optional -> optional.map( transform ).orElseThrow( exceptionSupplier ) );
 	}
 
 	@Override

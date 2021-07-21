@@ -36,7 +36,7 @@ public class ExplicitShardingStrategy implements ShardingStrategy {
 	public void initialize(ShardingStrategyInitializationContext context) {
 		List<String> shardIdentifiers = SHARD_IDENTIFIERS.getOrThrow(
 				context.configurationPropertySource(),
-				key -> log.missingPropertyValueForShardingStrategy( NAME, key )
+				() -> log.missingPropertyValueForShardingStrategy( NAME )
 		);
 		this.shardIdSet = new LinkedHashSet<>( shardIdentifiers );
 		context.shardIdentifiers( shardIdSet );
