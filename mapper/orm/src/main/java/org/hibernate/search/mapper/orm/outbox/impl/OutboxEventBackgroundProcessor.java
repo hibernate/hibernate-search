@@ -31,7 +31,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public class OutboxEventBackgroundExecutor {
+public class OutboxEventBackgroundProcessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final int MAX_RETRIES = 3;
@@ -41,6 +41,7 @@ public class OutboxEventBackgroundExecutor {
 		STARTED
 	}
 
+	private final String name;
 	private final AutomaticIndexingMappingContext mapping;
 	private final OutboxEventFinder finder;
 	private final int pollingInterval;
@@ -49,9 +50,11 @@ public class OutboxEventBackgroundExecutor {
 	private final FailureHandler failureHandler;
 	private final SingletonTask processingTask;
 
-	public OutboxEventBackgroundExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
+	public OutboxEventBackgroundProcessor(String name,
+			AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
 			OutboxEventFinder finder,
 			int pollingInterval, int batchSize) {
+		this.name = name;
 		this.mapping = mapping;
 		this.finder = finder;
 		this.pollingInterval = pollingInterval;
@@ -59,7 +62,7 @@ public class OutboxEventBackgroundExecutor {
 
 		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
-				"Delayed commit for " + OutboxPollingAutomaticIndexingStrategy.NAME,
+				name,
 				new HibernateOrmOutboxWorker( mapping.sessionFactory() ),
 				new HibernateOrmOutboxScheduler( executor ),
 				failureHandler
@@ -114,8 +117,7 @@ public class OutboxEventBackgroundExecutor {
 					// calling ensureScheduled() will lead to immediate re-execution right after we're done
 					ensureScheduled();
 
-					log.tracef( "Processing %d outbox events for '%s': '%s'", events.size(),
-							OutboxPollingAutomaticIndexingStrategy.NAME, events );
+					log.tracef( "Processing %d outbox events for '%s': '%s'", events.size(), name, events );
 
 					// Process the events
 					OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
