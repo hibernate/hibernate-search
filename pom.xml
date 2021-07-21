@@ -484,6 +484,11 @@
              Maven profiles will re-enable the right container depending on configuration.
           -->
         <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+
+        <!-- If an external connection url is defined this property will be true -->
+        <!-- See elasticsearch-run and elasticsearch-do-not-run profiles -->
+        <test.elasticsearch.connection.uris.defined></test.elasticsearch.connection.uris.defined>
+
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
         <test.elasticsearch.run.elastic.image.name>docker.elastic.co/elasticsearch/elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
