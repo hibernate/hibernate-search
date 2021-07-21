@@ -116,6 +116,67 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE;
 
 	/**
+	 * Whether shards are static, i.e. configured explicitly for each node, with a fixed number of shards/nodes.
+	 * <p>
+	 * <strong>WARNING:</strong> This property must have the same value for all application nodes,
+	 * and must never change unless all application nodes are stopped, then restarted.
+	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
+	 * resulting in errors and/or out-of-sync indexes.
+	 * <p>
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC}.
+	 */
+	public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC =
+			PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC;
+
+	/**
+	 * The total number of shards across all application nodes.
+	 * <p>
+	 * <strong>WARNING:</strong> This property must have the same value for all application nodes,
+	 * and must never change unless all application nodes are stopped, then restarted.
+	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
+	 * resulting in errors and/or out-of-sync indexes.
+	 * <p>
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}
+	 * and {@link #AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC} is {@code true}.
+	 * <p>
+	 * Expects an Integer value of at least {@code 2},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * No default: must be provided when static sharding is enabled.
+	 */
+	public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_TOTAL_COUNT =
+			PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_SHARDS_TOTAL_COUNT;
+
+	/**
+	 * The indices of shards assigned to this application node.
+	 * <p>
+	 * <strong>WARNING:</strong> shards must be uniquely assigned to one and only one application nodes.
+	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
+	 * resulting in errors and/or out-of-sync indexes.
+	 * <p>
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}
+	 * and {@link #AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC} is {@code true}.
+	 * <p>
+	 * Expects a shard index, i.e. an Integer value between {@code 0} (inclusive) and the
+	 * {@link #AUTOMATIC_INDEXING_PROCESSING_SHARDS_TOTAL_COUNT total shard count} (exclusive),
+	 * or a String that can be parsed into such shard index,
+	 * or a String containing multiple such shard index strings separated by commas,
+	 * or a {@code Collection<Integer>} containing such shard indices.
+	 * <p>
+	 * No default: must be provided when static sharding is enabled.
+	 */
+	public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_ASSIGNED =
+			PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_SHARDS_ASSIGNED;
+
+	/**
 	 * The strategy to use when loading entities during the execution of a search query.
 	 * <p>
 	 * Expects a {@link EntityLoadingCacheLookupStrategy} value, or a String representation of such value.
@@ -187,6 +248,9 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_POLLING_INTERVAL;
 		public static final String AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_BATCH_SIZE;
+		public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_SHARDS_STATIC;
+		public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_TOTAL_COUNT = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_SHARDS_TOTAL_COUNT;
+		public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_ASSIGNED = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_SHARDS_ASSIGNED;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
@@ -207,6 +271,9 @@ public final class HibernateOrmMapperSettings {
 		public static final String PROCESSING_PREFIX = "processing.";
 		public static final String PROCESSING_POLLING_INTERVAL = PROCESSING_PREFIX + "polling_interval";
 		public static final String PROCESSING_BATCH_SIZE = PROCESSING_PREFIX + "batch_size";
+		public static final String PROCESSING_SHARDS_STATIC = PROCESSING_PREFIX + "shards.static";
+		public static final String PROCESSING_SHARDS_TOTAL_COUNT = PROCESSING_PREFIX + "shards.total_count";
+		public static final String PROCESSING_SHARDS_ASSIGNED = PROCESSING_PREFIX + "shards.assigned";
 	}
 
 	/**
@@ -225,6 +292,7 @@ public final class HibernateOrmMapperSettings {
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final int AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = 100;
 		public static final int AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = 50;
+		public static final boolean AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC = false;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
