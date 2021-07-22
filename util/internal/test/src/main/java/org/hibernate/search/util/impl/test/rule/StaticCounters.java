@@ -86,4 +86,9 @@ public final class StaticCounters implements TestRule {
 		}
 		return counters.computeIfAbsent( key, ignored -> 0 );
 	}
+
+	public void clear() {
+		counters.clear();
+	}
+
 }
