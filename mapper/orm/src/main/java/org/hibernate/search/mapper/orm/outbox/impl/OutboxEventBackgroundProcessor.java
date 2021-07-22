@@ -70,6 +70,7 @@ public class OutboxEventBackgroundProcessor {
 	}
 
 	public void start() {
+		log.startingOutboxEventProcessor( name );
 		status.set( Status.STARTED );
 		processingTask.ensureScheduled();
 	}
@@ -80,6 +81,7 @@ public class OutboxEventBackgroundProcessor {
 	}
 
 	public void stop() {
+		log.stoppingOutboxEventProcessor( name );
 		processingTask.stop();
 	}
 
