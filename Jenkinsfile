@@ -921,7 +921,6 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 			} else {
 				echo "Building feature branch '$helper.scmSource.branch.name'"
 				enableDefaultEnv = true
-				enableBeforeMergeEnvs = true
 			}
 			break
 		default:
