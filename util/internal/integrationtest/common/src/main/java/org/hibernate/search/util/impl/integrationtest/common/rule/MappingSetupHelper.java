@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
@@ -78,6 +79,10 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		private final List<Configuration<B, R>> configurations = new ArrayList<>();
 
 		protected AbstractSetupContext() {
+		}
+
+		public final C with(UnaryOperator<C> config) {
+			return config.apply( thisAsC() );
 		}
 
 		public final C withPropertyRadical(String keyRadical, Object value) {
