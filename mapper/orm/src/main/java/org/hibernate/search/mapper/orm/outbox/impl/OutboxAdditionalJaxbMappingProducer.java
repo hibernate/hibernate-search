@@ -43,6 +43,8 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	private static final String OUTBOX_TABLE_NAME = "HSEARCH_OUTBOX_TABLE";
 
 	private static final String DEFAULT_CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP";
+	private static final String MSSQL_CURRENT_TIMESTAMP = "SYSDATETIME()";
+
 	private static final String DEFAULT_TYPE_TIMESTAMP = "TIMESTAMP";
 	private static final String MYSQL_TYPE_TIMESTAMP = "TIMESTAMP(6)";
 	private static final String MSSQL_TYPE_TIMESTAMP = "datetime2";
@@ -94,7 +96,8 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 
 		String typeTimestamp = ( dialect instanceof MySQLDialect ) ? MYSQL_TYPE_TIMESTAMP :
 				( dialect instanceof SQLServerDialect ) ? MSSQL_TYPE_TIMESTAMP : DEFAULT_TYPE_TIMESTAMP;
-		String currentTimestamp = ( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
+		String currentTimestamp = ( dialect instanceof SQLServerDialect ) ? MSSQL_CURRENT_TIMESTAMP :
+				( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
 				timestampFunction.render( null, Collections.emptyList(), null );
 
 		String outboxSchema = OUTBOX_ENTITY_DEFINITION
