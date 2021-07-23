@@ -441,6 +441,9 @@ stage('Non-default environment ITs') {
 				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
 						resumeFromDefaultBuild()
+						// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+						// To that end, escape the '$' when referencing the variables.
+						// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
 										 credentialsId   : awsCredentialsId,
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
@@ -456,8 +459,8 @@ stage('Non-default environment ITs') {
 									-Dtest.elasticsearch.host.provided=true \
 									-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
 									-Dtest.elasticsearch.host.aws.signing.enabled=true \
-									-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
-									-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
+									-Dtest.elasticsearch.host.aws.access_key=\${AWS_ACCESS_KEY_ID} \
+									-Dtest.elasticsearch.host.aws.secret_key=\${AWS_SECRET_ACCESS_KEY} \
 									-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \
 								"""
 							}
