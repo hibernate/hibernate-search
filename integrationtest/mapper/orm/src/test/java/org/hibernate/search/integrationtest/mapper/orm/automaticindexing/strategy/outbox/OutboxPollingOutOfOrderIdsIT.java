@@ -108,10 +108,19 @@ public class OutboxPollingOutOfOrderIdsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 3 );
-			// out-of-order now
+			// out-of-order by id
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
 			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
 			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 3 );
+			// findOutboxEventsNoFilter is supposed to return the right order
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
 		} );
 
 		// The events were hidden until now, to ensure they were not processed in separate batches.
@@ -206,9 +215,17 @@ public class OutboxPollingOutOfOrderIdsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 2 );
-			// out-of-order now
+			// out-of-order by id
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
 			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 2 );
+			// findOutboxEventsNoFilter is supposed to return the right order
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
 		} );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
