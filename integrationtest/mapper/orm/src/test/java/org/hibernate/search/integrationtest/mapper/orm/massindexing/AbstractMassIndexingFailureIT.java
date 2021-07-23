@@ -87,7 +87,9 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"1 failure(s) occurred during mass indexing",
+								// Sometimes the JDBC driver of Oracle may (or may not) react to thread interruptions raising other failures.
+								// In this case, more failures than 1 can be raised, so we cannot assert the exact failures number.
+								"failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								exceptionMessage
 						)
@@ -131,7 +133,9 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"1 failure(s) occurred during mass indexing",
+								// Sometimes the JDBC driver of Oracle may (or may not) react to thread interruptions raising other failures.
+								// In this case, more failures than 1 can be raised, so we cannot assert the exact failures number.
+								"failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								exceptionMessage
 						)
