@@ -458,10 +458,13 @@ stage('Default build') {
 			if (enableDefaultBuildIT) {
 				if (helper.configuration.file?.coveralls?.credentials) {
 					def coverallsCredentialsId = helper.configuration.file.coveralls.credentials
+					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+					// To that end, escape the '$' when referencing the variables.
+					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 					withCredentials([string(credentialsId: coverallsCredentialsId, variable: 'COVERALLS_TOKEN')]) {
 						sh """ \
 								mvn coveralls:report \
-								-DrepoToken=${COVERALLS_TOKEN} \
+								-DrepoToken=\${COVERALLS_TOKEN} \
 								${helper.scmSource.pullRequest ? """ \
 										-DpullRequest=${helper.scmSource.pullRequest.id} \
 								""" : """ \
@@ -476,6 +479,9 @@ stage('Default build') {
 
 				if (helper.configuration.file?.sonar?.credentials) {
 					def sonarCredentialsId = helper.configuration.file.sonar.credentials
+					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+					// To that end, escape the '$' when referencing the variables.
+					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 					withCredentials([usernamePassword(
 									credentialsId: sonarCredentialsId,
 									usernameVariable: 'SONARCLOUD_ORGANIZATION',
@@ -483,9 +489,9 @@ stage('Default build') {
 					)]) {
 						sh """ \
 								mvn sonar:sonar \
-								-Dsonar.organization=${SONARCLOUD_ORGANIZATION} \
+								-Dsonar.organization=\${SONARCLOUD_ORGANIZATION} \
 								-Dsonar.host.url=https://sonarcloud.io \
-								-Dsonar.login=${SONARCLOUD_TOKEN} \
+								-Dsonar.login=\${SONARCLOUD_TOKEN} \
 								${helper.scmSource.pullRequest ? """ \
 										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
 										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
@@ -624,11 +630,15 @@ stage('Non-default environments') {
 						// (just to check that statically-provided credentials work correctly)
 
 						helper.withMavenWorkspace {
+							// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+							// To that end, escape the '$' when referencing the variables.
+							// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 							withCredentials([[$class          : 'AmazonWebServicesCredentialsBinding',
 											  credentialsId   : awsCredentialsId,
 											  usernameVariable: 'AWS_ACCESS_KEY_ID',
 											  passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 											 ]]) {
+
 								// Tests may fail because of hourly AWS snapshots,
 								// which prevent deleting indexes while they are being executed.
 								// Unfortunately, this triggers test failure in @BeforeClass/@AfterClass,
@@ -648,8 +658,8 @@ stage('Non-default environments') {
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
 										-Dtest.elasticsearch.connection.aws.credentials.type=static \
-										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
-										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
+										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=\${AWS_ACCESS_KEY_ID} \
+										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=\${AWS_SECRET_ACCESS_KEY} \
 									"""
 								}
 							}
