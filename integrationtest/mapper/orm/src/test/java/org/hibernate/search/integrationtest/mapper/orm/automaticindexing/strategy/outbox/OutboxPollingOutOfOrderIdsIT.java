@@ -12,6 +12,7 @@ import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,9 +26,11 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
@@ -43,6 +46,7 @@ import org.awaitility.Awaitility;
 public class OutboxPollingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
@@ -224,6 +228,12 @@ public class OutboxPollingOutOfOrderIdsIT {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// findOutboxEventsNoFilter is supposed to return the right order
+
+			// log the content of the events if something goes wrong:
+			if ( OutboxEvent.Type.ADD.equals( events.get( 0 ).getType() ) ) {
+				log.info( "findOutboxEvents returns wrong order: " + events );
+			}
+
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
 			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
 		} );
