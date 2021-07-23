@@ -383,10 +383,13 @@ stage('Default build') {
 			if (enableDefaultBuildIT) {
 				if (helper.configuration.file?.coveralls?.credentials) {
 					def coverallsCredentialsId = helper.configuration.file.coveralls.credentials
+					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+					// To that end, escape the '$' when referencing the variables.
+					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 					withCredentials([string(credentialsId: coverallsCredentialsId, variable: 'COVERALLS_TOKEN')]) {
 						sh """ \
 								mvn coveralls:report \
-								-DrepoToken=${COVERALLS_TOKEN} \
+								-DrepoToken=\${COVERALLS_TOKEN} \
 								${helper.scmSource.pullRequest ? """ \
 										-DpullRequest=${helper.scmSource.pullRequest.id} \
 								""" : """ \
@@ -467,6 +470,9 @@ stage('Non-default environments') {
 			lock(label: buildEnv.lockedResourcesLabel) {
 				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
+						// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+						// To that end, escape the '$' when referencing the variables.
+						// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
 										 credentialsId   : awsCredentialsId,
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
@@ -481,8 +487,8 @@ stage('Non-default environments') {
 									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 									-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
 									-Dtest.elasticsearch.host.aws.signing.enabled=true \
-									-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
-									-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
+									-Dtest.elasticsearch.host.aws.access_key=\${AWS_ACCESS_KEY_ID} \
+									-Dtest.elasticsearch.host.aws.secret_key=\${AWS_SECRET_ACCESS_KEY} \
 									-Dtest.elasticsearch.host.aws.region=$buildEnv.awsRegion \
 								"""
 							}
