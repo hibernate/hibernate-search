@@ -10,10 +10,9 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
-import org.hibernate.search.mapper.orm.automaticindexing.impl.NoneAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.SessionAutomaticIndexingStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxPollingAutomaticIndexingStrategy;
 
@@ -23,7 +22,8 @@ public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 		context.define(
 				AutomaticIndexingStrategy.class,
 				AutomaticIndexingStrategyNames.NONE,
-				BeanReference.ofInstance( new NoneAutomaticIndexingStrategy() )
+				// FIXME HSEARCH-4268 remove this when we stop configuring clustering through automatic indexing
+				BeanReference.ofInstance( new SessionAutomaticIndexingStrategy() )
 		);
 		context.define(
 				AutomaticIndexingStrategy.class,

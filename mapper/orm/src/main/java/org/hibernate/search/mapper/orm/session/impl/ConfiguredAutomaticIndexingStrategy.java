@@ -34,6 +34,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.AutomaticIndexingStrategyPreStopContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -58,6 +59,27 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 	}
 
+	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.ENABLED )
+					.asBoolean()
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLED )
+					.build();
+
+	@SuppressWarnings("deprecation")
+	private static final OptionalConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.STRATEGY )
+					.as( Boolean.class, v -> {
+						try {
+							return !org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE
+									.equals( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.of( v ) );
+						}
+						// FIXME HSEARCH-4268 remove this when we stop configuring clustering through automatic indexing
+						catch (SearchException e) {
+							return true;
+						}
+					} )
+					.build();
+
 	@SuppressWarnings("deprecation")
 	private static final ConfigurationProperty<BeanReference<? extends AutomaticIndexingStrategy>> AUTOMATIC_INDEXING_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
@@ -79,7 +101,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					.build();
 
 	private final BeanHolder<? extends AutomaticIndexingStrategy> strategyHolder;
-	private final boolean enableOrmEventListener;
 	private final Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
 	private final boolean enlistsInTransaction;
 
@@ -89,7 +110,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	private ConfiguredAutomaticIndexingStrategy(Builder builder) {
 		strategyHolder = builder.strategyHolder;
-		enableOrmEventListener = builder.enableOrmEventListener;
 		senderFactory = builder.senderFactory;
 		enlistsInTransaction = builder.enlistsInTransaction;
 	}
@@ -103,8 +123,9 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			AutomaticIndexingStrategyStartContext startContext,
 			HibernateOrmListenerContextProvider contextProvider) {
 		this.mappingContext = mappingContext;
+		ConfigurationPropertySource configurationSource = startContext.configurationPropertySource();
 		defaultSynchronizationStrategyHolder =
-				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform( startContext.configurationPropertySource(), referenceOptional -> {
+				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform( configurationSource, referenceOptional -> {
 					if ( usesEventQueue() ) {
 						// If we send events to a queue, we're mostly asynchronous
 						// and thus configuring the synchronization strategy does not make sense.
@@ -123,7 +144,13 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					}
 				} );
 		defaultSynchronizationStrategy = configure( defaultSynchronizationStrategyHolder.get() );
-		if ( enableOrmEventListener ) {
+		if ( AUTOMATIC_INDEXING_ENABLED.get( configurationSource )
+				&& AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.getAndMap( configurationSource, enabled -> {
+					log.automaticIndexingStrategyIsDeprecated( AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY.resolveOrRaw( configurationSource ),
+							AUTOMATIC_INDEXING_ENABLED.resolveOrRaw( configurationSource ) );
+					return enabled;
+				} )
+				.orElse( true ) ) {
 			log.debug( "Hibernate Search event listeners activated" );
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 					contextProvider, DIRTY_CHECK_ENABLED.get( startContext.configurationPropertySource() ) );
@@ -217,7 +244,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	private static final class Builder implements AutomaticIndexingConfigurationContext {
 		private final BeanHolder<? extends AutomaticIndexingStrategy> strategyHolder;
-		private boolean enableOrmEventListener = true;
 		private Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
 		private boolean enlistsInTransaction = false;
 
@@ -225,17 +251,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 			this.strategyHolder = strategyHolder;
 		}
 
-		// TODO HSEARCH-168 move this to a configuration property: this is really orthogonal to the indexing strategy,
-		//  as one could want to send indexing events to an outbox table,
-		//  but only manually.
-		@Override
-		public void enableOrmEventListener(boolean enableOrmEventListener) {
-			this.enableOrmEventListener = enableOrmEventListener;
-		}
-
 		@Override
 		public void reindexInSession() {
-			enableOrmEventListener = true;
 			this.senderFactory = null;
 			this.enlistsInTransaction = false;
 		}
@@ -244,7 +261,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		public void sendIndexingEventsTo(
 				Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
 				boolean enlistsInTransaction) {
-			enableOrmEventListener = true;
 			this.senderFactory = senderFactory;
 			this.enlistsInTransaction = enlistsInTransaction;
 		}

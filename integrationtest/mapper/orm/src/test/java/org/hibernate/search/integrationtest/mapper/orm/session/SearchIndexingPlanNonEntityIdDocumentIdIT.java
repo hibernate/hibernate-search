@@ -13,7 +13,6 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -70,10 +69,7 @@ public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyNames.NONE
-				)
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

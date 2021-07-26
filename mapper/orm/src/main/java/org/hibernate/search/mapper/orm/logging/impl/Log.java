@@ -272,4 +272,8 @@ public interface Log extends BasicLogger {
 			+ " unless another application node connects to the same database with event processing enabled.")
 	void outboxEventProcessingDisabled();
 
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 53, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
+	void automaticIndexingStrategyIsDeprecated(String resolveOrRaw, String resolveOrRaw1);
+
 }

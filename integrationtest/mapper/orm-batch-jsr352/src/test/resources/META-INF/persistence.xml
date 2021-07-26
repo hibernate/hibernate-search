@@ -19,7 +19,7 @@
             <property name="hibernate.session_factory_name" value="primary_session_factory" />
             <property name="hibernate.session_factory_name_is_jndi" value="false" />
 
-            <property name="hibernate.search.automatic_indexing.strategy" value="none"/>
+            <property name="hibernate.search.automatic_indexing.enabled" value="false"/>
             <property name="hibernate.search.backend.type" value="lucene" />
             <property name="hibernate.search.backend.directory.type" value="local-heap" />
         </properties>
@@ -36,7 +36,7 @@
             <property name="hibernate.session_factory_name" value="primary_session_factory" />
             <property name="hibernate.session_factory_name_is_jndi" value="false" />
 
-            <property name="hibernate.search.automatic_indexing.strategy" value="none"/>
+            <property name="hibernate.search.automatic_indexing.enabled" value="false"/>
             <property name="hibernate.search.schema_management.strategy" value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backend.type" value="elasticsearch" />
             <property name="hibernate.search.backend.uris" value="${test.elasticsearch.connection.uris}" />

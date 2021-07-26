@@ -42,6 +42,17 @@ public final class HibernateOrmMapperSettings {
 	public static final String ENABLED = PREFIX + Radicals.ENABLED;
 
 	/**
+	 * Whether automatic indexing is enabled, i.e. whether changes to entities in a Hibernate ORM session
+	 * are detected automatically and lead to reindexing.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_ENABLED}.
+	 */
+	public static final String AUTOMATIC_INDEXING_ENABLED = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLED;
+
+	/**
 	 * The automatic indexing strategy to use.
 	 * <p>
 	 * Expects one of the strings defined in {@link AutomaticIndexingStrategyNames},
@@ -54,6 +65,7 @@ public final class HibernateOrmMapperSettings {
 	 *
 	 * @see AutomaticIndexingStrategyNames
 	 */
+	// FIXME HSEARCH-4268 deprecate this when we stop configuring clustering through automatic indexing
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
 	/**
@@ -261,7 +273,9 @@ public final class HibernateOrmMapperSettings {
 		public static final String ENABLED = "enabled";
 		public static final String AUTOMATIC_INDEXING = "automatic_indexing";
 		public static final String AUTOMATIC_INDEXING_PREFIX = AUTOMATIC_INDEXING + ".";
-		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
+		public static final String AUTOMATIC_INDEXING_ENABLED = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLED;
+		// FIXME HSEARCH-4268 deprecate this when we stop configuring clustering through automatic indexing
+		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.STRATEGY;
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String AUTOMATIC_INDEXING_PROCESSING_ENABLED = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_ENABLED;
@@ -285,6 +299,9 @@ public final class HibernateOrmMapperSettings {
 		private AutomaticIndexingRadicals() {
 		}
 
+		public static final String ENABLED = "enabled";
+		// FIXME HSEARCH-4268 deprecate this when we stop configuring clustering through automatic indexing
+		public static final String STRATEGY = "strategy";
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
 		public static final String PROCESSING_PREFIX = "processing.";
@@ -305,6 +322,7 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final boolean ENABLED = true;
+		public static final boolean AUTOMATIC_INDEXING_ENABLED = true;
 		public static final BeanReference<AutomaticIndexingStrategy> AUTOMATIC_INDEXING_STRATEGY =
 				BeanReference.of( AutomaticIndexingStrategy.class, AutomaticIndexingStrategyNames.SESSION );
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
