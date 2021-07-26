@@ -46,7 +46,7 @@ public class TransactionOutboxIT {
 		public BackendMock backendMock() {
 			BackendMock backendMock = super.backendMock();
 			backendMock.indexingWorkThreadingExpectations(
-					BackendWorkThreadingExpectations.async( ".*Outbox table.*" ) );
+					BackendWorkThreadingExpectations.async( ".*Outbox event processor.*" ) );
 			return backendMock;
 		}
 	}

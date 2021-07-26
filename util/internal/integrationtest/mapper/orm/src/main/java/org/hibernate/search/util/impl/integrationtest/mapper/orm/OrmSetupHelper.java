@@ -31,12 +31,12 @@ public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
 	public static void defaultAutomaticIndexingStrategy(
-			AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations) {
-		OrmSetupHelper.defaultAutomaticIndexingStrategyExpectations = automaticIndexingStrategyExpectations;
+			CoordinationStrategyExpectations coordinationStrategyExpectations) {
+		OrmSetupHelper.defaultCoordinationStrategyExpectations = coordinationStrategyExpectations;
 	}
 
-	private static AutomaticIndexingStrategyExpectations defaultAutomaticIndexingStrategyExpectations =
-			AutomaticIndexingStrategyExpectations.defaults();
+	private static CoordinationStrategyExpectations defaultCoordinationStrategyExpectations =
+			CoordinationStrategyExpectations.defaults();
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
 		return new OrmSetupHelper(
@@ -81,8 +81,8 @@ public final class OrmSetupHelper
 
 	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
-	private AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations =
-			defaultAutomaticIndexingStrategyExpectations;
+	private CoordinationStrategyExpectations coordinationStrategyExpectations =
+			defaultCoordinationStrategyExpectations;
 
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
@@ -91,13 +91,13 @@ public final class OrmSetupHelper
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 	}
 
-	public OrmSetupHelper automaticIndexingStrategy(AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations) {
-		this.automaticIndexingStrategyExpectations = automaticIndexingStrategyExpectations;
+	public OrmSetupHelper automaticIndexingStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
+		this.coordinationStrategyExpectations = coordinationStrategyExpectations;
 		return this;
 	}
 
 	public boolean areEntitiesProcessedInSession() {
-		return automaticIndexingStrategyExpectations.sync;
+		return coordinationStrategyExpectations.sync;
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public final class OrmSetupHelper
 	protected void init() {
 		for ( BackendMock backendMock : backendMocks ) {
 			backendMock.indexingWorkThreadingExpectations(
-					automaticIndexingStrategyExpectations.indexingWorkThreadingExpectations );
+					coordinationStrategyExpectations.indexingWorkThreadingExpectations );
 		}
 	}
 
@@ -130,9 +130,7 @@ public final class OrmSetupHelper
 			// Override the schema management strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, schemaManagementStrategyName );
 			// Set the automatic indexing strategy according to the expectations
-			withProperty( "hibernate.search.automatic_indexing.strategy",
-					automaticIndexingStrategyExpectations.strategyName
-			);
+			withProperty( "hibernate.search.coordination.strategy", coordinationStrategyExpectations.strategyName );
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}

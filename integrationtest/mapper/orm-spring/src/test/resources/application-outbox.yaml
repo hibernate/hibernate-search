@@ -1,4 +1,4 @@
 spring.jpa:
   properties:
     hibernate.search:
-      automatic_indexing.strategy: outbox-polling
+      coordination.strategy: database-polling

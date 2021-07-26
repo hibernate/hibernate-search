@@ -267,10 +267,10 @@ public interface Log extends BasicLogger {
 	SearchException missingPropertyForStaticSharding();
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 52, value = "Outbox event processing is disabled. "
+	@Message(id = ID_OFFSET + 52, value = "The indexing processor is disabled. "
 			+ " Events will accumulate in the queue and indexes will not be updated,"
-			+ " unless another application node connects to the same database with event processing enabled.")
-	void outboxEventProcessingDisabled();
+			+ " unless another application node connects to the same database with their indexing processor enabled.")
+	void indexingProcessorDisabled();
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 53, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")

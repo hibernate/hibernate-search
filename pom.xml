@@ -1519,7 +1519,7 @@
                                      -->
                                     <exclude>**/Futures.class</exclude>
                                     <!-- The following class needs to use Hibernate ORM internal -->
-                                    <exclude>**/OutboxAdditionalJaxbMappingProducer.class</exclude>
+                                    <exclude>**/DatabasePollingAdditionalJaxbMappingProducer.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->

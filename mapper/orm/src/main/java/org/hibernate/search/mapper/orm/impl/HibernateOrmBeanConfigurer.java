@@ -9,31 +9,25 @@ package org.hibernate.search.mapper.orm.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
-import org.hibernate.search.mapper.orm.automaticindexing.impl.SessionAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
+import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
-import org.hibernate.search.mapper.orm.outbox.impl.OutboxPollingAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.DatabasePollingCooordinationStrategy;
 
 public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				AutomaticIndexingStrategy.class,
-				AutomaticIndexingStrategyNames.NONE,
-				// FIXME HSEARCH-4268 remove this when we stop configuring clustering through automatic indexing
-				BeanReference.ofInstance( new SessionAutomaticIndexingStrategy() )
+				CooordinationStrategy.class,
+				CoordinationStrategyNames.NONE,
+				BeanReference.ofInstance( new NoCoordinationStrategy() )
 		);
 		context.define(
-				AutomaticIndexingStrategy.class,
-				AutomaticIndexingStrategyNames.SESSION,
-				BeanReference.ofInstance( new SessionAutomaticIndexingStrategy() )
-		);
-		context.define(
-				AutomaticIndexingStrategy.class,
-				AutomaticIndexingStrategyNames.OUTBOX_POLLING,
-				BeanReference.ofInstance( new OutboxPollingAutomaticIndexingStrategy() )
+				CooordinationStrategy.class,
+				CoordinationStrategyNames.DATABASE_POLLING,
+				BeanReference.ofInstance( new DatabasePollingCooordinationStrategy() )
 		);
 
 		context.define(
