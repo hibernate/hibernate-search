@@ -23,7 +23,6 @@ import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
@@ -45,10 +44,7 @@ public class HibernateOrmBatchJsr352IT {
 	@Before
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyNames.NONE
-				)
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory, HibernateOrmBatchJsr352IT::newAuthor );
 	}

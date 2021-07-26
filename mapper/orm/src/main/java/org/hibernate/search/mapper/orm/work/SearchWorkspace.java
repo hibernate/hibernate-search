@@ -15,7 +15,7 @@ import java.util.concurrent.CompletionStage;
  * A {@link SearchWorkspace} targets a pre-defined set of indexed types (and their indexes),
  * filtered to only affect a single tenant, if relevant.
  * <p>
- * While {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY automatic indexing}
+ * While {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED automatic indexing}
  * generally takes care of indexing entities as they are persisted/deleted in the database,
  * there are cases where massive operations must be applied to the index,
  * such as completely purging the index.

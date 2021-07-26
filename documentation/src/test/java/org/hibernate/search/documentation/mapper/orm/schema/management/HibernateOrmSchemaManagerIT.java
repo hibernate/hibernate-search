@@ -14,7 +14,6 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -38,14 +37,9 @@ public class HibernateOrmSchemaManagerIT {
 	@Before
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-						SchemaManagementStrategyName.NONE
-				)
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyNames.NONE
-				)
+				.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+						SchemaManagementStrategyName.NONE )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
 				.setup( Book.class, Author.class );
 		initData();
 	}

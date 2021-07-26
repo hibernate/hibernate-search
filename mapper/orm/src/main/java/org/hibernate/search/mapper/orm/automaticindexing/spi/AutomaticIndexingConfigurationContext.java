@@ -11,12 +11,6 @@ import java.util.function.Function;
 public interface AutomaticIndexingConfigurationContext {
 
 	/**
-	 * Enables or disables the Hibernate ORM event listener.
-	 * @param enableOrmEventListener {@code true} to enable the event listener, {@code false to disable it}.
-	 */
-	void enableOrmEventListener(boolean enableOrmEventListener);
-
-	/**
 	 * Requests that indexing events be processed directly in the current session.
 	 * <p>
 	 * This is incompatible with {@link #sendIndexingEventsTo(Function, boolean)}.

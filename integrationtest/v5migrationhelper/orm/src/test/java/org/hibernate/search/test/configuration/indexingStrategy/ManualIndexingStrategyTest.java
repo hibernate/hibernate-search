@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.test.configuration.indexingStrategy;
 
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
 
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,12 +16,10 @@ import javax.persistence.Table;
 
 import org.hibernate.Session;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
@@ -45,7 +44,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyNames.NONE );
+		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
 	}
 
 	private void indexTestEntity() {

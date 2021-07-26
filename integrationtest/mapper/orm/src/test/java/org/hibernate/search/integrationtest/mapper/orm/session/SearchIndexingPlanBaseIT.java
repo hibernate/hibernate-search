@@ -20,7 +20,6 @@ import javax.persistence.OneToMany;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -56,7 +55,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void simple() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -84,7 +83,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void mergedEvents() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -159,7 +158,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void purgeByEntityClass_invalidClass() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		Class<?> invalidClass = String.class;
 
@@ -177,7 +176,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void purgeByEntityName() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
@@ -191,7 +190,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void purgeByEntityName_invalidName() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		String invalidName = "foo";
 
@@ -219,7 +218,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void earlyProcess() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.SESSION );
+		SessionFactory sessionFactory = setup( true );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -261,7 +260,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void earlyExecute() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.SESSION );
+		SessionFactory sessionFactory = setup( true );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -296,7 +295,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void mixedExplicitAndAutomaticIndexing() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.SESSION );
+		SessionFactory sessionFactory = setup( true );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -334,7 +333,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void multiIndexMultiBackend() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
@@ -362,7 +361,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void outOfSession() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyNames.NONE );
+		SessionFactory sessionFactory = setup( false );
 
 		SearchIndexingPlan indexingPlan;
 		IndexedEntity1 entity;
@@ -397,15 +396,12 @@ public class SearchIndexingPlanBaseIT {
 				.hasMessageContaining( "Underlying Hibernate ORM Session is closed" );
 	}
 
-	private SessionFactory setup(String automaticIndexingStrategy) {
+	private SessionFactory setup(boolean automaticIndexingStrategyEnabled) {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						automaticIndexingStrategy
-				)
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, automaticIndexingStrategyEnabled )
 				.setup( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class );
 
 		defaultBackendMock.verifyExpectationsMet();
