@@ -19,6 +19,8 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -29,6 +31,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
@@ -45,6 +48,15 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.build();
 
+	@SuppressWarnings("deprecation")
+	private static final ConfigurationProperty<BeanReference<? extends AutomaticIndexingStrategy>> AUTOMATIC_INDEXING_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
+					.asBeanReference( AutomaticIndexingStrategy.class )
+					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE, AutomaticIndexingStrategyNames.NONE )
+					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION, AutomaticIndexingStrategyNames.SESSION )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
+					.build();
+
 	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
 			ValueReadHandleFactory valueReadHandleFactory, ConfigurationService ormConfigurationService) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
@@ -58,7 +70,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
-	private ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
+	private BeanHolder<? extends AutomaticIndexingStrategy> automaticIndexingStrategyHolder;
+	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
 
 	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			HibernateOrmBootstrapIntrospector introspector, ConfigurationService ormConfigurationService) {
@@ -83,8 +96,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	}
 
 	public void closeOnFailure() {
-		if ( automaticIndexingStrategy != null ) {
-			automaticIndexingStrategy.stop();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
+			closer.push( AutomaticIndexingStrategy::stop, automaticIndexingStrategyHolder, BeanHolder::get );
+			closer.push( BeanHolder::close, automaticIndexingStrategyHolder );
 		}
 	}
 
@@ -98,11 +113,16 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				new HibernateOrmMetatadaContributor( basicTypeMetadataProvider, introspector )
 		);
 
-		automaticIndexingStrategy = ConfiguredAutomaticIndexingStrategy.create( beanResolver, propertySource );
+		ConfiguredAutomaticIndexingStrategy.Builder builder = new ConfiguredAutomaticIndexingStrategy.Builder();
+		automaticIndexingStrategyHolder =
+				AUTOMATIC_INDEXING_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
+		automaticIndexingStrategyHolder.get().configure( builder );
+		configuredAutomaticIndexingStrategy = builder.build();
+
 		// If the automatic indexing strategy uses an event queue,
 		// it will need to send events relative to contained entities,
 		// and thus contained entities need to have an identity mapping.
-		containedEntityIdentityMappingRequired( automaticIndexingStrategy.usesEventQueue() );
+		containedEntityIdentityMappingRequired( configuredAutomaticIndexingStrategy.usesEventQueue() );
 
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
@@ -130,6 +150,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	@Override
 	protected PojoMapperDelegate<HibernateOrmMappingPartialBuildState> createMapperDelegate() {
-		return new HibernateOrmMapperDelegate( basicTypeMetadataProvider, automaticIndexingStrategy );
+		return new HibernateOrmMapperDelegate( basicTypeMetadataProvider, automaticIndexingStrategyHolder,
+				configuredAutomaticIndexingStrategy );
 	}
 }
