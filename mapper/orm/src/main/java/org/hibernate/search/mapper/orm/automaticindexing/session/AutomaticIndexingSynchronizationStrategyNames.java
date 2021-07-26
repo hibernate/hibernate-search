@@ -6,6 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.automaticindexing.session;
 
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+
+/**
+ * The names of built-in automatic indexing synchronization strategies,
+ * accepted by {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
+ */
 public final class AutomaticIndexingSynchronizationStrategyNames {
 
 	private AutomaticIndexingSynchronizationStrategyNames() {
