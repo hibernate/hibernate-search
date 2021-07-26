@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import javax.transaction.Synchronization;
 
@@ -17,47 +16,26 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.HibernateOrmIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingConfigurationContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.impl.AutomaticIndexingStrategyPreStopContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ConfiguredAutomaticIndexingStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	public static ConfiguredAutomaticIndexingStrategy create(BeanResolver beanResolver,
-			ConfigurationPropertySource propertySource) {
-		BeanHolder<? extends AutomaticIndexingStrategy> strategyHolder =
-				AUTOMATIC_INDEXING_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
-		try {
-			Builder builder = new Builder( strategyHolder );
-			strategyHolder.get().configure( builder );
-			return builder.build();
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( strategyHolder );
-			throw e;
-		}
-	}
 
 	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.ENABLED )
@@ -80,15 +58,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					} )
 					.build();
 
-	@SuppressWarnings("deprecation")
-	private static final ConfigurationProperty<BeanReference<? extends AutomaticIndexingStrategy>> AUTOMATIC_INDEXING_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
-					.asBeanReference( AutomaticIndexingStrategy.class )
-					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE, AutomaticIndexingStrategyNames.NONE )
-					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION, AutomaticIndexingStrategyNames.SESSION )
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
-					.build();
-
 	private static final OptionalConfigurationProperty<BeanReference<? extends AutomaticIndexingSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY )
 					.asBeanReference( AutomaticIndexingSynchronizationStrategy.class )
@@ -100,7 +69,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
 					.build();
 
-	private final BeanHolder<? extends AutomaticIndexingStrategy> strategyHolder;
 	private final Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
 	private final boolean enlistsInTransaction;
 
@@ -109,7 +77,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	private ConfiguredAutomaticIndexingSynchronizationStrategy defaultSynchronizationStrategy;
 
 	private ConfiguredAutomaticIndexingStrategy(Builder builder) {
-		strategyHolder = builder.strategyHolder;
 		senderFactory = builder.senderFactory;
 		enlistsInTransaction = builder.enlistsInTransaction;
 	}
@@ -119,7 +86,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	}
 
 	// Do everything related to runtime configuration or that doesn't involve I/O
-	public void preStart(HibernateOrmSearchSessionMappingContext mappingContext,
+	public void start(HibernateOrmSearchSessionMappingContext mappingContext,
 			AutomaticIndexingStrategyStartContext startContext,
 			HibernateOrmListenerContextProvider contextProvider) {
 		this.mappingContext = mappingContext;
@@ -161,22 +128,11 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 	}
 
-	// Do anything that couldn't be done in preStart()
-	public CompletableFuture<?> start(AutomaticIndexingStrategyStartContext startContext) {
-		return strategyHolder.get().start( startContext );
-	}
-
-	public CompletableFuture<?> preStop(AutomaticIndexingStrategyPreStopContextImpl context) {
-		return strategyHolder.get().preStop( context );
-	}
-
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( BeanHolder::close, defaultSynchronizationStrategyHolder );
 			defaultSynchronizationStrategy = null;
 			defaultSynchronizationStrategyHolder = null;
-			closer.push( AutomaticIndexingStrategy::stop, strategyHolder, BeanHolder::get );
-			closer.push( BeanHolder::close, strategyHolder );
 			mappingContext = null;
 		}
 	}
@@ -242,14 +198,9 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		return builder.build();
 	}
 
-	private static final class Builder implements AutomaticIndexingConfigurationContext {
-		private final BeanHolder<? extends AutomaticIndexingStrategy> strategyHolder;
+	public static final class Builder implements AutomaticIndexingConfigurationContext {
 		private Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
 		private boolean enlistsInTransaction = false;
-
-		Builder(BeanHolder<? extends AutomaticIndexingStrategy> strategyHolder) {
-			this.strategyHolder = strategyHolder;
-		}
 
 		@Override
 		public void reindexInSession() {
