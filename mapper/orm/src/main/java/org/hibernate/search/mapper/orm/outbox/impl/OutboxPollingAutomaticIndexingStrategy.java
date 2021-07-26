@@ -42,6 +42,12 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> PROCESSING_ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.PROCESSING_ENABLED )
+					.asBoolean()
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_PROCESSING_ENABLED )
+					.build();
+
 	private static final ConfigurationProperty<Integer> PROCESSING_POLLING_INTERVAL =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.PROCESSING_POLLING_INTERVAL )
 					.asInteger()
@@ -99,7 +105,12 @@ public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexing
 			finderProviderHolder = BeanHolder.of( new DefaultOutboxEventFinder.Provider() );
 		}
 
-		initializeProcessors( context );
+		if ( PROCESSING_ENABLED.get( context.configurationPropertySource() ) ) {
+			initializeProcessors( context );
+		}
+		else {
+			log.outboxEventProcessingDisabled();
+		}
 
 		return CompletableFuture.completedFuture( null );
 	}
