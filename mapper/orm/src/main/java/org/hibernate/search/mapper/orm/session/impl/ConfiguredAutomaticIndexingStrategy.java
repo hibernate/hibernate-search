@@ -29,7 +29,6 @@ import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -46,16 +45,8 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	@SuppressWarnings("deprecation")
 	private static final OptionalConfigurationProperty<Boolean> AUTOMATIC_INDEXING_ENABLED_LEGACY_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.STRATEGY )
-					.as( Boolean.class, v -> {
-						try {
-							return !org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE
-									.equals( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.of( v ) );
-						}
-						// FIXME HSEARCH-4268 remove this when we stop configuring clustering through automatic indexing
-						catch (SearchException e) {
-							return true;
-						}
-					} )
+					.as( Boolean.class, v -> !org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE
+							.equals( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.of( v ) ) )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends AutomaticIndexingSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =

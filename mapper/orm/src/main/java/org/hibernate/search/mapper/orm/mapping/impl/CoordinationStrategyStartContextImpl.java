@@ -8,18 +8,29 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
-public class AutomaticIndexingStrategyStartContextImpl implements AutomaticIndexingStrategyStartContext {
+public class CoordinationStrategyStartContextImpl implements CoordinationStrategyStartContext {
+	private final AutomaticIndexingMappingContext mapping;
 	private final MappingStartContext delegate;
 	private final ConfigurationPropertySource configurationPropertySource;
 
-	public AutomaticIndexingStrategyStartContextImpl(MappingStartContext delegate) {
+	public CoordinationStrategyStartContextImpl(AutomaticIndexingMappingContext mapping,
+			MappingStartContext delegate) {
+		this.mapping = mapping;
 		this.delegate = delegate;
 		this.configurationPropertySource = delegate.configurationPropertySource()
-				.withMask( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING );
+				.withMask( HibernateOrmMapperSettings.Radicals.COORDINATION );
+	}
+
+	@Override
+	public ContextualFailureCollector failureCollector() {
+		return delegate.failureCollector();
 	}
 
 	@Override
@@ -32,4 +43,13 @@ public class AutomaticIndexingStrategyStartContextImpl implements AutomaticIndex
 		return configurationPropertySource;
 	}
 
+	@Override
+	public ThreadPoolProvider threadPoolProvider() {
+		return delegate.threadPoolProvider();
+	}
+
+	@Override
+	public AutomaticIndexingMappingContext mapping() {
+		return mapping;
+	}
 }

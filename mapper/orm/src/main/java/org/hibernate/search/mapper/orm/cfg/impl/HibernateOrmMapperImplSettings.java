@@ -14,12 +14,12 @@ public final class HibernateOrmMapperImplSettings {
 	private HibernateOrmMapperImplSettings() {
 	}
 
-	public static final class AutomaticIndexingRadicals {
+	public static final class CoordinationRadicals {
 
-		private AutomaticIndexingRadicals() {
+		private CoordinationRadicals() {
 		}
 
-		public static final String OUTBOX_EVENT_FINDER_PROVIDER = "outbox_event_finder.provider";
+		public static final String PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER = "processors.indexing.outbox_event_finder.provider";
 	}
 
 }
