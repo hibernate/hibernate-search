@@ -85,8 +85,10 @@ public abstract class AbstractCloser<S, E extends Exception> {
 	 */
 	public <T, U> S pushAll(ClosingOperator<T, ? extends E> operator, Iterable<? extends U> objectsToExtractFrom,
 			Function<U, T> extract) {
-		for ( U objectToExtractFrom : objectsToExtractFrom ) {
-			push( operator, objectToExtractFrom, extract );
+		if ( objectsToExtractFrom != null ) {
+			for ( U objectToExtractFrom : objectsToExtractFrom ) {
+				push( operator, objectToExtractFrom, extract );
+			}
 		}
 		return getSelf();
 	}

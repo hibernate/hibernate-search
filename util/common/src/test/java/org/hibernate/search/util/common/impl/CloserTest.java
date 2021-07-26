@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.common.impl;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -228,6 +229,16 @@ public class CloserTest {
 	}
 
 	@Test
+	public void nullIterable() {
+		assertThatCode( () -> {
+			try ( Closer<IOException> closer = new Closer<>() ) {
+				closer.pushAll( Closeable::close, (List<Closeable>) null );
+			}
+		} )
+				.doesNotThrowAnyException(); // In particular should not throw any NPE
+	}
+
+	@Test
 	public void extract_iterable() {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -249,6 +260,16 @@ public class CloserTest {
 				.hasSuppressedException( exception2 )
 				.hasSuppressedException( exception3 )
 				.hasSuppressedException( exception4 );
+	}
+
+	@Test
+	public void extract_nullIterable() {
+		assertThatCode( () -> {
+			try ( Closer<IOException> closer = new Closer<>() ) {
+				closer.pushAll( Closeable::close, (List<Supplier<Closeable>>) null, Supplier::get );
+			}
+		} )
+				.doesNotThrowAnyException(); // In particular should not throw any NPE
 	}
 
 	@Test
