@@ -87,19 +87,22 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 3,
 			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
+	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation,
+			List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 7,
 			value = "Unable to resolve path '%1$s' to a persisted attribute in Hibernate ORM metadata."
 					+ " If this path points to a transient attribute, use @IndexingDependency(derivedFrom = ...)"
 					+ " to specify which persisted attributes it is derived from."
 					+ " See the reference documentation for more information.")
-	SearchException unknownPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, @Cause Exception e);
+	SearchException unknownPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path,
+			@Cause Exception e);
 
 	@Message(id = ID_OFFSET + 8,
 			value = "Path '%1$s' points to attribute '%2$s' that will never be reported as dirty by Hibernate ORM."
 					+ " Check that you didn't declare an invalid indexing dependency.")
-	SearchException unreportedPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, Value value);
+	SearchException unreportedPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path,
+			Value value);
 
 	@Message(id = ID_OFFSET + 9,
 			value = "Unable to apply container value extractor with name '%2$s' to"
@@ -109,22 +112,24 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 11,
 			value = "Unable to create a SearchSession for sessions created using a different session factory."
 					+ " Expected: '%1$s'. In use: '%2$s'.")
-	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory, SessionFactory usedSessionFactory);
+	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory,
+			SessionFactory usedSessionFactory);
 
 	@Message(id = ID_OFFSET + 12, value = "Unable to retrieve property type model for '%1$s' on '%2$s': %3$s")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName,
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel,
 			String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 16, value = "Unable to access Hibernate ORM session: %1$s" )
+	@Message(id = ID_OFFSET + 16, value = "Unable to access Hibernate ORM session: %1$s")
 	SearchException hibernateSessionAccessError(String causeMessage, @Cause IllegalStateException cause);
 
-	@Message(id = ID_OFFSET + 17, value = "Underlying Hibernate ORM Session is closed." )
+	@Message(id = ID_OFFSET + 17, value = "Underlying Hibernate ORM Session is closed.")
 	SearchException hibernateSessionIsClosed(@Cause IllegalStateException cause);
 
 	@Message(id = ID_OFFSET + 18,
 			value = "Invalid automatic indexing synchronization strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation, List<String> validRepresentations);
+	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation,
+			List<String> validRepresentations);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 19,
@@ -141,19 +146,19 @@ public interface Log extends BasicLogger {
 					+ " because caching is not enabled for this entity type.")
 	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(String entityName);
 
-	@Message(id = ID_OFFSET + 21, value = "Unable to access Hibernate ORM session factory: %1$s" )
+	@Message(id = ID_OFFSET + 21, value = "Unable to access Hibernate ORM session factory: %1$s")
 	SearchException hibernateSessionFactoryAccessError(String causeMessage, @Cause IllegalStateException cause);
 
-	@Message(id = ID_OFFSET + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s." )
+	@Message(id = ID_OFFSET + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s.")
 	SearchException indexingFailure(String causeMessage, List<EntityReference> failingEntities, @Cause Throwable cause);
 
 	@Message(value = "Automatic indexing of Hibernate ORM entities")
 	String automaticIndexing();
 
-	@Message(id = ID_OFFSET + 23, value = "Unable to process entities for automatic indexing before transaction completion: %1$s" )
+	@Message(id = ID_OFFSET + 23, value = "Unable to process entities for automatic indexing before transaction completion: %1$s")
 	SearchException synchronizationBeforeTransactionFailure(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET + 24, value = "Unable to index documents for automatic indexing after transaction completion: %1$s" )
+	@Message(id = ID_OFFSET + 24, value = "Unable to index documents for automatic indexing after transaction completion: %1$s")
 	SearchException synchronizationAfterTransactionFailure(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 25, value = "Unable to handle transaction: %1$s")
@@ -184,7 +189,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 32, value = "Invalid schema management strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")
-	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation, List<String> validRepresentations);
+	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation,
+			List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 33, value = "Type '%1$s' is not an entity type, or this entity type is not indexed.")
 	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
@@ -212,7 +218,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotUseClosedScrollableResults();
 
 	@Message(id = ID_OFFSET + 40, value = "Multiple instances of entity type '%1$s' have their property '%2$s' set to '%3$s'."
-				+ " '%2$s' is the document ID and must be assigned unique values.")
+			+ " '%2$s' is the document ID and must be assigned unique values.")
 	SearchException foundMultipleEntitiesForDocumentId(String entityName, String documentIdSourcePropertyName,
 			Object id);
 
@@ -240,11 +246,11 @@ public interface Log extends BasicLogger {
 	void automaticIndexingRetry(Long eventId, String entityName, String entityId, int attempts);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 47, value = "Starting outbox event processor '%1$s'" )
+	@Message(id = ID_OFFSET + 47, value = "Starting outbox event processor '%1$s'")
 	void startingOutboxEventProcessor(String name);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 48, value = "Stopping outbox event processor '%1$s'" )
+	@Message(id = ID_OFFSET + 48, value = "Stopping outbox event processor '%1$s'")
 	void stoppingOutboxEventProcessor(String name);
 
 	@Message(id = ID_OFFSET + 49,
@@ -259,5 +265,11 @@ public interface Log extends BasicLogger {
 			value = "When using static sharding, this property must be set."
 	)
 	SearchException missingPropertyForStaticSharding();
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 52, value = "Outbox event processing is disabled. "
+			+ " Events will accumulate in the queue and indexes will not be updated,"
+			+ " unless another application node connects to the same database with event processing enabled.")
+	void outboxEventProcessingDisabled();
 
 }

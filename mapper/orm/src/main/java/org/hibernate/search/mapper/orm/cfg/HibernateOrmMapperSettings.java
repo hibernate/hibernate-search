@@ -84,6 +84,24 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
+	 * Whether the application will process entity change events.
+	 * <p>
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESSING_ENABLED}.
+	 * <p>
+	 * When processing is disabled, events will still be produced by this application node whenever an entity changes,
+	 * but indexing will not happen on this application node
+	 * and is assumed to happen on another node.
+	 */
+	public static final String AUTOMATIC_INDEXING_PROCESSING_ENABLED =
+			PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESSING_ENABLED;
+
+	/**
 	 * The interval in the background processor between two queries to the outbox events table, in milliseconds.
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
@@ -246,6 +264,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
+		public static final String AUTOMATIC_INDEXING_PROCESSING_ENABLED = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_ENABLED;
 		public static final String AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_POLLING_INTERVAL;
 		public static final String AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_BATCH_SIZE;
 		public static final String AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESSING_SHARDS_STATIC;
@@ -269,6 +288,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
 		public static final String PROCESSING_PREFIX = "processing.";
+		public static final String PROCESSING_ENABLED = PROCESSING_PREFIX + "enabled";
 		public static final String PROCESSING_POLLING_INTERVAL = PROCESSING_PREFIX + "polling_interval";
 		public static final String PROCESSING_BATCH_SIZE = PROCESSING_PREFIX + "batch_size";
 		public static final String PROCESSING_SHARDS_STATIC = PROCESSING_PREFIX + "shards.static";
@@ -290,6 +310,7 @@ public final class HibernateOrmMapperSettings {
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
+		public static final boolean AUTOMATIC_INDEXING_PROCESSING_ENABLED = true;
 		public static final int AUTOMATIC_INDEXING_PROCESSING_POLLING_INTERVAL = 100;
 		public static final int AUTOMATIC_INDEXING_PROCESSING_BATCH_SIZE = 50;
 		public static final boolean AUTOMATIC_INDEXING_PROCESSING_SHARDS_STATIC = false;
