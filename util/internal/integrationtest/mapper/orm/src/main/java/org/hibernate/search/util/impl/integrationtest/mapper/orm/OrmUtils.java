@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -77,9 +76,16 @@ public final class OrmUtils {
 			}
 			catch (AssertionError e) {
 				// An assertion failed while rolling back...
-				// Propagate the assertion failure, but make sure to add some context
-				e.addSuppressed( t );
-				throw e;
+				if ( t instanceof AssertionError ) {
+					// The original exception was an assertion error, so it's more important.
+					t.addSuppressed( e );
+				}
+				else {
+					// The original exception was not an assertion error, so it's less important.
+					// Propagate the assertion error, with the suppressed exception as added context.
+					e.addSuppressed( t );
+					throw e;
+				}
 			}
 			catch (RuntimeException e) {
 				t.addSuppressed( e );
@@ -106,9 +112,16 @@ public final class OrmUtils {
 			}
 			catch (AssertionError e) {
 				// An assertion failed while rolling back...
-				// Propagate the assertion failure, but make sure to add some context
-				e.addSuppressed( t );
-				throw e;
+				if ( t instanceof AssertionError ) {
+					// The original exception was an assertion error, so it's more important.
+					t.addSuppressed( e );
+				}
+				else {
+					// The original exception was not an assertion error, so it's less important.
+					// Propagate the assertion error, with the suppressed exception as added context.
+					e.addSuppressed( t );
+					throw e;
+				}
 			}
 			catch (RuntimeException e) {
 				t.addSuppressed( e );
