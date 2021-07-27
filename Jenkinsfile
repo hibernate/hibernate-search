@@ -199,12 +199,12 @@ stage('Configure') {
 			],
 			database: [
 					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2',
-							condition: TestCondition.BEFORE_MERGE, dockerHubImage: null,
+							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql',
-							condition: TestCondition.AFTER_MERGE, dockerHubImage: "postgres:13.1"),
+							condition: TestCondition.AFTER_MERGE),
 					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb',
-							condition: TestCondition.AFTER_MERGE, dockerHubImage: "mariadb:10.5.8")
+							condition: TestCondition.AFTER_MERGE)
 			],
 			esLocal: [
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
@@ -442,17 +442,21 @@ stage('Default build') {
 	}
 	runBuildOnNode {
 		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+			String mavenArgs = """ \
+					--fail-at-end \
+					-Pdist -Pcoverage -Pjqassistant \
+					${enableDefaultBuildIT ? '' : '-DskipITs'} \
+					${toTestJdkArg(environments.content.jdk.default)} \
+			"""
+			pullContainerImages( mavenArgs )
 			sh """ \
 					mvn clean \
-					--fail-at-end \
 					${deploySnapshot ? "\
 							deploy \
 					" : "\
 							install \
 					"} \
-					-Pdist -Pcoverage -Pjqassistant \
-					${enableDefaultBuildIT ? '' : '-DskipITs'} \
-					${toTestJdkArg(environments.content.jdk.default)} \
+					$mavenArgs \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
@@ -529,9 +533,7 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					// Re-run integration tests against the JARs produced by the default build,
 					// but using a different JDK to build and run the tests.
-					mavenNonDefaultBuild buildEnv, """ \
-							clean install \
-					""", 'integrationtest'
+					mavenNonDefaultBuild buildEnv, "", 'integrationtest'
 				}
 			}
 		})
@@ -543,7 +545,6 @@ stage('Non-default environments') {
 			runBuildOnNode {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
-							clean install \
 							-DskipTests -DskipITs \
 							-P${buildEnv.mavenProfile},!javaModuleITs \
 					"""
@@ -556,15 +557,8 @@ stage('Non-default environments') {
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode(NODE_PATTERN_BASE) {
-				if ( buildEnv.dockerHubImage ) {
-					// Authenticated pull, to avoid failure due to throttling.
-					docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
-						docker.image(buildEnv.dockerHubImage).pull()
-					}
-				}
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
-							clean install \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm',
 								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers',
@@ -583,7 +577,6 @@ stage('Non-default environments') {
 			runBuildOnNode {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
-							clean install \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
 								'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
@@ -628,7 +621,6 @@ stage('Non-default environments') {
 							// we use --fail-fast here, to make sure we don't waste time.
 							retry(count: 3) {
 								mavenNonDefaultBuild buildEnv, """ \
-										clean install \
 										--fail-fast \
 										-pl ${[
 											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
@@ -667,7 +659,6 @@ stage('Non-default environments') {
 								// we use --fail-fast here, to make sure we don't waste time.
 								retry(count: 3) {
 									mavenNonDefaultBuild buildEnv, """ \
-										clean install \
 										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
@@ -796,7 +787,6 @@ class CompilerBuildEnvironment extends BuildEnvironment {
 class DatabaseBuildEnvironment extends BuildEnvironment {
 	String dbName
 	String mavenProfile
-	String dockerHubImage
 	@Override
 	String getTag() { "database-$dbName" }
 }
@@ -916,6 +906,24 @@ void pruneDockerContainers() {
 	sh 'docker volume prune -f || true'
 }
 
+// Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
+def pullContainerImages(String mavenArgs) {
+	String containerImageRefsString = ((String) sh( script: "./ci/list-container-images.sh ${mavenArgs}", returnStdout: true ) )
+	String[] containerImageRefs = containerImageRefsString ? containerImageRefsString.split( '\\s+' ) : new String[0]
+	echo 'Container images to be used in tests: ' + Arrays.toString( containerImageRefs )
+	if ( containerImageRefs.length == 0 ) {
+		return
+	}
+	docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
+		// Cannot use a foreach loop because then Jenkins wants to serialize the iterator,
+		// and obviously the iterator is not serializable.
+		for (int i = 0; i < containerImageRefs.length; i++) {
+			containerImageRef = containerImageRefs[i]
+			docker.image( containerImageRef ).pull()
+		}
+	}
+}
+
 void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String projectPath = '.') {
 	if ( buildEnv.requiresDefaultBuildArtifacts() ) {
 		dir(helper.configuration.maven.localRepositoryPath) {
@@ -923,13 +931,15 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 		}
 	}
 
+	pullContainerImages( args )
+
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 
 	dir(projectPath) {
 		sh """ \
-				mvn -Dsurefire.environment=$testSuffix \
+				mvn clean install -Dsurefire.environment=$testSuffix \
 						${toTestJdkArg(buildEnv)} \
 						--fail-at-end \
 						$args \

@@ -331,6 +331,8 @@
         <version.docker.maven.plugin>0.34.1</version.docker.maven.plugin>
         <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
         <version.sonar.plugin>3.7.0.1746</version.sonar.plugin>
+        <version.scripting.plugin>3.0.0</version.scripting.plugin>
+        <version.org.codehaus.groovy-jsr223>3.0.8</version.org.codehaus.groovy-jsr223>
         <!--
             Please don't change the name of this property, it may be used and
             overridden by a CI job of the Checkstyle project so that they can
@@ -1869,6 +1871,47 @@
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>${version.sonar.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scripting-plugin</artifactId>
+                    <version>${version.scripting.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>list-container-images</id>
+                            <configuration>
+                                <engineName>groovy</engineName>
+                                <!--
+                                     Note that expressions ('${...}') are evaluated by Maven before the script is
+                                     interpreted by the Groovy interpreter.
+                                     That's the only way to access profile-defined properties,
+                                     since accessing project.properties within the script will ignore profiles.
+                                 -->
+                                <script><![CDATA[
+                                    def images = []
+                                    def isFalseString = { string -> !string || !Boolean.parseBoolean( string ) }
+                                    if ( isFalseString( '${test.elasticsearch.run.elastic.skip}' ) ) {
+                                        images += '${test.elasticsearch.run.elastic.image.name}:${test.elasticsearch.run.elastic.image.tag}'
+                                    }
+                                    if ( isFalseString( '${test.database.run.postgres.skip}' ) ) {
+                                        images += '${test.database.run.postgres.image.name}:${test.database.run.postgres.image.tag}'
+                                    }
+                                    if ( isFalseString( '${test.database.run.mariadb.skip}' ) ) {
+                                        images += '${test.database.run.mariadb.image.name}:${test.database.run.mariadb.image.tag}'
+                                    }
+                                    new File('${containerImagesListFile}').append( images.join('\n') + '\n' )
+                                ]]></script>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <!-- ScriptEngines -->
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-jsr223</artifactId>
+                            <version>${version.org.codehaus.groovy-jsr223}</version> <!-- look for latest -->
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
