@@ -498,7 +498,7 @@
         <test.elasticsearch.connection.uris.defined></test.elasticsearch.connection.uris.defined>
 
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
-        <test.elasticsearch.run.elastic.image.name>docker.elastic.co/elasticsearch/elasticsearch</test.elasticsearch.run.elastic.image.name>
+        <test.elasticsearch.run.elastic.image.name>elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
         <!--
              These properties are transparently passed as system properties to integration tests,
