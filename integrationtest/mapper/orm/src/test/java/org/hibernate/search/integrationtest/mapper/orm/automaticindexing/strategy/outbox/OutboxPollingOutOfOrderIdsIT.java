@@ -173,7 +173,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDeleteRecreate_outOfOrder() {
+	public void processDeleteRecreate_outOfOrder() throws Exception {
 		// An entity is deleted, then re-created in separate transactions,
 		// but the add event has ID 1, the and the delete event has ID 2.
 
@@ -194,6 +194,10 @@ public class OutboxPollingOutOfOrderIdsIT {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
+
+		// Make sure that the two events are outdistanced a bit
+		Thread.sleep( 50 );
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
