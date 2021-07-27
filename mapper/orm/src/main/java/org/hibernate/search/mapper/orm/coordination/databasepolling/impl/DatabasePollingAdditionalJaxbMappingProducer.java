@@ -95,11 +95,22 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 		Dialect dialect = jdbcServices.getJdbcEnvironment().getDialect();
 		SQLFunction timestampFunction = dialect.getFunctions().get( "current_timestamp" );
 
-		String typeTimestamp = ( dialect instanceof MySQLDialect ) ? MYSQL_TYPE_TIMESTAMP :
-				( dialect instanceof SQLServerDialect ) ? MSSQL_TYPE_TIMESTAMP : DEFAULT_TYPE_TIMESTAMP;
-		String currentTimestamp = ( dialect instanceof SQLServerDialect ) ? MSSQL_CURRENT_TIMESTAMP :
-				( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
-				timestampFunction.render( null, Collections.emptyList(), null );
+		String typeTimestamp = null;
+		String currentTimestamp = null;
+		if ( dialect instanceof MySQLDialect ) {
+			typeTimestamp = MYSQL_TYPE_TIMESTAMP;
+		}
+		else if ( dialect instanceof SQLServerDialect ) {
+			typeTimestamp = MSSQL_TYPE_TIMESTAMP;
+			currentTimestamp = MSSQL_CURRENT_TIMESTAMP;
+		}
+		if ( typeTimestamp == null ) {
+			typeTimestamp = DEFAULT_TYPE_TIMESTAMP;
+		}
+		if ( currentTimestamp == null ) {
+			currentTimestamp = ( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
+					timestampFunction.render( null, Collections.emptyList(), null );
+		}
 
 		String outboxSchema = OUTBOX_ENTITY_DEFINITION
 				.replace( TYPE_TIMESTAMP_PLACEHOLDER, typeTimestamp )
@@ -110,7 +121,7 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( outboxSchema.getBytes() );
 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
-		Binding binding = mappingBinder.bind( bufferedInputStream, origin );
+		Binding<?> binding = mappingBinder.bind( bufferedInputStream, origin );
 
 		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
 
