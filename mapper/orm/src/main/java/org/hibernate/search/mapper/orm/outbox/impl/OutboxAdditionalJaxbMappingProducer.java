@@ -47,7 +47,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 
 	private static final String DEFAULT_TYPE_TIMESTAMP = "TIMESTAMP";
 	private static final String MYSQL_TYPE_TIMESTAMP = "TIMESTAMP(6)";
-	private static final String MSSQL_TYPE_TIMESTAMP = "datetime2";
+	private static final String MSSQL_TYPE_TIMESTAMP = "datetime2(7)";
 
 	private static final String TYPE_TIMESTAMP_PLACEHOLDER = "{{type_timestamp}}";
 	private static final String CURRENT_TIMESTAMP_PLACEHOLDER = "{{current_timestamp}}";
