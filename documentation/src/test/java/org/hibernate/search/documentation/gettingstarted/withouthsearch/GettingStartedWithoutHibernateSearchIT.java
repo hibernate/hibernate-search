@@ -58,8 +58,8 @@ public class GettingStartedWithoutHibernateSearchIT {
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			TypedQuery<Book> query = entityManager.createQuery( "select b from Book b where title = ?0", Book.class );
-			query.setParameter( 0, "Refactoring: Improving the Design of Existing Code" );
+			TypedQuery<Book> query = entityManager.createQuery( "select b from Book b where title = ?1", Book.class );
+			query.setParameter( 1, "Refactoring: Improving the Design of Existing Code" );
 
 			List<Book> result = query.getResultList();
 
