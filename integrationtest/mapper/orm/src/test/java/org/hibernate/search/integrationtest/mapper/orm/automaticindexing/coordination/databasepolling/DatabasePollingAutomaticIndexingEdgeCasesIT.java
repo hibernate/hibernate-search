@@ -123,7 +123,7 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 
 	@Test
 	public void massiveInsert() {
-		for ( int i = 0; i < 15; i++ ) {
+		for ( int i = 0; i < 5; i++ ) {
 			int finalI = i;
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.INDEX );
