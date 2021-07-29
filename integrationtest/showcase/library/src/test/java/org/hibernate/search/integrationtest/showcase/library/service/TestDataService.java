@@ -265,11 +265,8 @@ public class TestDataService {
 		}
 	}
 
-	public void executeHql(String hql, Object... parameters) {
+	public void executeHql(String hql) {
 		Query query = entityManager.createQuery( hql );
-		for ( int i = 0; i < parameters.length; i++ ) {
-			query.setParameter( i, parameters[i] );
-		}
 		query.executeUpdate();
 	}
 }
