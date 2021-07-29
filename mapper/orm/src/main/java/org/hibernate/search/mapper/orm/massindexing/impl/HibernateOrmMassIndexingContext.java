@@ -44,7 +44,7 @@ public final class HibernateOrmMassIndexingContext
 	private final DetachedBackendSessionContext sessionContext;
 
 	private final Map<Class<?>, ConditionalExpression> conditionalExpressions = new HashMap<>();
-	private CacheMode cacheMode;
+	private CacheMode cacheMode = CacheMode.IGNORE;
 	private Integer idLoadingTransactionTimeout;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private int objectLoadingBatchSize = 10;
