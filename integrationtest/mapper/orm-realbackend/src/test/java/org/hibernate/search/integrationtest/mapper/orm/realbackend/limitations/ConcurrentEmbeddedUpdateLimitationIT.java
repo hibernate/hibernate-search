@@ -85,6 +85,10 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 
 		reproducer();
 
+		Awaitility.await()
+				.timeout( 5, TimeUnit.SECONDS )
+				.until( () -> noMoreOutboxEvents( sessionFactory ) );
+
 		verify( () -> assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L ) );
 		verify( () -> assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 1L ) );
 		verify( () -> assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 0L ) );
@@ -169,10 +173,6 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 
 	long countByEditionAndAuthor(String editionLabel, String authorName) {
 		return with( sessionFactory ).apply( session -> {
-			if ( synchronizationAsync ) {
-				Awaitility.await().until( () -> noMoreOutboxEvents( session ) );
-			}
-
 			SearchSession searchSession = Search.session( session );
 
 			return searchSession.search( Book.class )
@@ -183,8 +183,10 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 		} );
 	}
 
-	private static boolean noMoreOutboxEvents(Session session) {
-		return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list().isEmpty();
+	private static boolean noMoreOutboxEvents(SessionFactory sessionFactory) {
+		try ( Session session = sessionFactory.openSession() ) {
+			return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list().isEmpty();
+		}
 	}
 
 	@Entity(name = Author.NAME)
