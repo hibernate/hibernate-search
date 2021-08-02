@@ -1,7 +1,5 @@
 # Hibernate Search
 
-*Version: 5.7.3.Final - 25-10-2017*
-
 ## Description
 
 Full text search for Java objects
