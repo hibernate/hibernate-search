@@ -1,7 +1,5 @@
 # Hibernate Search
 
-*Version: 5.5.8.Final - 18-08-2017*
-
 ## Description
 
 Full text search engines like Apache Lucene are very powerful technologies to add efficient free
