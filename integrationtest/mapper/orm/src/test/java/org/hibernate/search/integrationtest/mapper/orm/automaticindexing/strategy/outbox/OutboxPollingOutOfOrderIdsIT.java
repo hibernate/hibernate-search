@@ -70,7 +70,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processCreateUpdateDelete() {
+	public void processCreateUpdateDelete() throws Exception {
 		// An entity is created, updated, then deleted in separate transactions,
 		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
 
@@ -82,11 +82,17 @@ public class OutboxPollingOutOfOrderIdsIT {
 			session.persist( entity );
 		} );
 
+		// Make sure that the two events are outdistanced a bit
+		Thread.sleep( 50 );
+
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
 			entity.setIndexedField( "another value for the field" );
 			session.merge( entity );
 		} );
+
+		// Make sure that the two events are outdistanced a bit
+		Thread.sleep( 50 );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
@@ -122,8 +128,19 @@ public class OutboxPollingOutOfOrderIdsIT {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// findOutboxEventsNoFilter is supposed to return the right order
+
+			// log the content of the events if something goes wrong:
+			if ( !OutboxEvent.Type.ADD.equals( events.get( 0 ).getType() ) ) {
+				log.info( "findOutboxEvents returns wrong order: " + events );
+			}
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+
+			// log the content of the events if something goes wrong:
+			if ( !OutboxEvent.Type.ADD_OR_UPDATE.equals( events.get( 1 ).getType() ) ) {
+				log.info( "findOutboxEvents returns wrong order: " + events );
+			}
 			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
+
 			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
 		} );
 
