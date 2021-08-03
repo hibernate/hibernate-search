@@ -73,7 +73,9 @@ See <<search-dsl>> for details.
 // Search 5 anchors backward compatibility
 [[_lucene]]
 
-With the <<backend-lucene,Lucene backend>>, indexes are local to a given node (JVM).
+==== Description
+
+With the <<backend-lucene,Lucene backend>>, indexes are local to a given application node (JVM).
 They are accessed through direct calls to the Lucene library,
 without going through the network.
 
@@ -81,22 +83,27 @@ image::lucene-backend.png[Lucene backend configuration]
 
 This mode is only relevant to single-node applications.
 
+==== Pros and cons
+
 Pros:
 
-* Simplicity. No external services are required, everything lives on the same server.
-* <<backend-lucene-io-refresh,Immediate (~milliseconds) visibility>> of indexes updates.
-While other backends can perform comparably well for most use cases,
+* Simplicity: no external services are required, everything lives on the same server.
+* <<backend-lucene-io-refresh,Immediate visibility>> (~milliseconds) of index updates.
+While other architectures can perform comparably well for most use cases,
 a single-node, Lucene backend is the best way to implement indexing
 if you need changes to be visible immediately after the database changes.
 
 Cons:
 
-* No horizontal scalability: there can only be one application node,
-and all indexes need to live on the same server.
+* <<limitations-parallel-embedded-update>>.
 * Not so easy to extend: experienced developers can access a lot of Lucene features,
 even those that are not exposed by Hibernate Search, by providing native Lucene objects;
 however, Lucene APIs are not very easy to figure out for developers unfamiliar with Lucene.
 If you're interested, see for example <<search-dsl-predicate-extensions-lucene-from-lucene-query,`Query`-based predicates>>.
+* No horizontal scalability: there can only be one application node,
+and all indexes need to live on the same server.
+
+==== Getting started
 
 To implement this architecture, use the following Maven dependencies:
 
@@ -115,11 +122,13 @@ To implement this architecture, use the following Maven dependencies:
 ----
 
 [[architecture-examples-elasticsearch]]
-=== Single-node or multi-node application with the Elasticsearch backend
+=== Simple single-node or multi-node application with the Elasticsearch backend
 // Search 5 anchors backward compatibility
 [[_elasticsearch]]
 
-With the <<backend-elasticsearch,Elasticsearch backend>>, indexes are not tied to the application.
+==== Description
+
+With the <<backend-elasticsearch,Elasticsearch backend>>, indexes are not tied to the application node.
 They are managed by a separate cluster of Elasticsearch nodes,
 and accessed through calls to REST APIs.
 
@@ -127,32 +136,30 @@ image::elasticsearch-backend.png[Elasticsearch backend configuration]
 
 TIP: The Elasticsearch cluster may be a single node living on the same server as the application.
 
+==== Pros and cons
+
 Pros:
 
-* Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
-See link:{elasticsearchDocUrl}/scalability.html["Scalability and resilience" in the Elasticsearch documentation].
-* Horizontal scalability of the application: you can have as many instances of the application as you need.
 * Easy to extend: you can easily access most Elasticsearch features,
 even those that are not exposed by Hibernate Search, by providing your own JSON.
 See for example <<search-dsl-predicate-extensions-elasticsearch-from-json,JSON-defined predicates>>,
 or <<search-dsl-aggregation-extensions-elasticsearch-from-json,JSON-defined aggregations>>,
 or <<search-dsl-query-elasticsearch-json,leveraging advanced features with JSON manipulation>>.
+* Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
+See link:{elasticsearchDocUrl}/scalability.html["Scalability and resilience" in the Elasticsearch documentation].
+* Horizontal scalability of the application: you can have as many instances of the application as you need
+(though high concurrency increases the likeliness of some problems with this architecture, see "Cons" below).
 
 Cons:
 
+* <<limitations-parallel-embedded-update>>.
 * Need to manage an additional service: the Elasticsearch cluster.
-* <<backend-elasticsearch-io-refresh,Delayed (~1 second) visibility>> of indexes updates (near-real-time).
+* <<backend-elasticsearch-io-refresh,Delayed visibility>> (~1 second) of index updates (near-real-time).
 While changes can be made visible as soon as possible after the database changes,
 Elasticsearch is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] by nature,
 and won't perform very well if you need changes to be visible immediately after the database changes.
 
-[NOTE]
-====
-In multi-node applications, there is a possibility for the indexes to get out of sync in very specific scenarios
-where two transactions simultaneously trigger reindexing of the same entity instance.
-+
-https://hibernate.atlassian.net/browse/HSEARCH-3281[HSEARCH-3281] will restore full support for clustered applications.
-====
+==== Getting started
 
 To implement this architecture, use the following Maven dependencies:
 
