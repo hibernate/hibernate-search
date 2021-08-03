@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.persistence.LockModeType;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -35,6 +37,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 			query.setParameter( entry.getKey(), entry.getValue() );
 		}
 		query.setMaxResults( maxResults );
+		query.setLockMode( LockModeType.NONE );
 		return query.list();
 	}
 
