@@ -38,10 +38,29 @@ public class Clock {
 			"The only thing left to do is register the path that is depended on (in our example, longField). With this path registered, "
 					+ "we will be able to build a PojoPathFilter, so that whenever SecondLevelEmbeddedEntityClass changes, we will walk through the tree, but not all the tree: "
 					+ "if at some point we notice that a node is relevant only if longField changed, but the \"dirtiness state\" tells us that longField did not change, "
-					+ "we can skip a whole branch of the tree, avoiding useless lazy loading and reindexing."
+					+ "we can skip a whole branch of the tree, avoiding useless lazy loading and reindexing.",
+			// William Blake's poetries:
+			"O Rose thou art sick. The invisible worm, That flies in the night In the howling storm: Has found out thy bed Of crimson joy: And his dark secret love Does thy life destroy.",
+			"Piping down the valleys wild, Piping songs of pleasant glee, On a cloud I saw a child, And he laughing said to me: "
+					+ " 'Pipe a song about a Lamb!'So I piped with merry cheer. 'Piper, pipe that song again.'So I piped: he wept to hear. "
+					+ " 'Drop thy pipe, thy happy pipe; Sing thy songs of happy cheer!'So I sung the same again, While he wept with joy to hear. "
+					+ " 'Piper, sit thee down and write In a book, that all may read.'So he vanished from my sight; And I plucked a hollow reed, "
+					+ " And I made a rural pen, And I stained the water clear, And I wrote my happy songs Every child may joy to hear.",
+			// Lord Byron Childe Harold's Pilgrimage:
+			" There is a pleasure in the pathless woods, There is a rapture on the lonely shore, There is society where none intrudes,"
+					+ " By the deep Sea, and music in its roar: I love not Man the less, but Nature more, From these our interviews, "
+					+ " in which I steal From all I may be, or have been before, To mingle with the Universe, "
+					+ " and feel What I can ne'er express, yet cannot all conceal. Roll on, thou deep and dark blue Ocean--roll! "
+					+ " Ten thousand fleets sweep over thee in vain; Man marks the earth with ruin--his control Stops with the shore; "
+					+ "--upon the watery plain The wrecks are all thy deed, nor doth remain A shadow of man's ravage, save his own, "
+					+ " When for a moment, like a drop of rain, He sinks into thy depths with bubbling groan, Without a grave, unknelled, "
+					+ " uncoffined, and unknown. His steps are not upon thy paths,--thy fields Are not a spoil for him,--thou dost "
+					+ "arise And shake him from thee; the vile strength he wields For earth's destruction thou dost all despise, "
+					+ "Spurning him from thy bosom to the skies, And send'st him, shivering in thy playful spray And howling, to his gods,"
+					+ "where haply lies His petty hope in some near port or bay, And dashest him again to earth: —there let him lay."
 	};
 
-	public static final String BUZZ_WORDS = "tree search avoid nested reference thread concurrency scaling reindexing node track";
+	public static final String BUZZ_WORDS = "solar rose system house family random art painting modern ocean discovery butterfly violet ignore spelling custom legacy tree search avoid nested reference thread concurrency scaling reindexing node track";
 
 	private Long id;
 	private String model;
