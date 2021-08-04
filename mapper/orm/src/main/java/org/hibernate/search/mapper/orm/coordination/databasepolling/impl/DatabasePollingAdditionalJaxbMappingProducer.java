@@ -39,8 +39,12 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	// WARNING: Always use this prefix for all tables added by Hibernate Search;
+	// we guarantee that in the documentation.
+	private static final String HSEARCH_TABLE_NAME_PREFIX = "HSEARCH_";
+
 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-	private static final String OUTBOX_TABLE_NAME = "HSEARCH_OUTBOX_TABLE";
+	private static final String OUTBOX_TABLE_NAME = HSEARCH_TABLE_NAME_PREFIX + "OUTBOX_TABLE";
 
 	private static final String DEFAULT_CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP";
 	private static final String MSSQL_CURRENT_TIMESTAMP = "SYSDATETIME()";

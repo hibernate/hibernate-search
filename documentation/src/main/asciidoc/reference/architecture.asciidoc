@@ -45,8 +45,10 @@ Automatic indexing::
 This is how Hibernate Search keeps indexes in sync with a database.
 +
 When an entity changes, the mapper detects the change and stores the information in an indexing plan.
-Upon transaction commit, entities are processed to generate documents that are sent to the backend for indexing.
-The backend puts the document in an internal queue, and will index documents in batches, in background processes,
+Upon transaction commit, these changes processed (either in the same thread or in a background process,
+depending on the <<coordination,coordination strategy>>),
+and documents are generated, then sent to the backend for indexing.
+The backend puts the documents in an internal queue, and will index documents in batches, in background processes,
 notifying the mapper when it's done.
 +
 See <<mapper-orm-indexing-automatic>> for details.
@@ -68,21 +70,74 @@ See <<search-dsl>> for details.
 // Search 5 anchors backward compatibility
 [[_backend]]
 
-[[architecture-examples-lucene]]
+[[architecture-examples-overview]]
+=== Overview
+
+[cols="h,3*^",options="header"]
+.Comparison of architectures
+|===
+|Architecture
+|<<architecture-examples-single-node-lucene,Single-node with Lucene>>
+|<<architecture-examples-no-coordination-elasticsearch,No coordination with Elasticsearch>>
+|<<architecture-examples-database-polling-elasticsearch,Database polling with Elasticsearch>>
+
+|Application topology
+|Single-node
+2+|Single-node or multi-node
+
+|Extra bits to maintain
+|Indexes on filesystem
+2+|Elasticsearch cluster
+
+|Guarantee of index updates
+2+|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
+|<<coordination-database-polling-indexing-guarantee,On commit (transactional)>>
+
+|Visibility of index updates
+|<<coordination-none-indexing-visibility,Configurable: immediate or eventual>>
+|<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
+|<<coordination-database-polling-indexing-visibility,Eventual>>
+
+|Native features
+|Mostly for experts
+2+|For anyone
+
+|Overhead for application threads
+2+|<<coordination-none-indexing-on-flush,Low to medium>>
+|<<coordination-database-polling-indexing-background,Very low>>
+
+|Overhead for the database
+2+|<<coordination-none-indexing-lazy-loading,Low>>
+|<<coordination-database-polling-indexing-full-loading,Low to medium>>
+
+|Impact on database schema
+2+|None
+|<<coordination-database-polling-schema,Extra tables>>
+
+|Limitations
+2+|Out-of-sync indexes in rare situations: <<limitations-parallel-embedded-update,concurrent `@IndexedEmbedded`>>, <<limitations-backend-indexing-error,backend I/O errors>>
+|Out-of-sync indexes <<limitations-database-polling-event-order,in very rare situations with some databases>>.
+|===
+
+[[architecture-examples-single-node-lucene]]
 === Single-node application with the Lucene backend
 // Search 5 anchors backward compatibility
 [[_lucene]]
+// Old Search 6 anchors backward compatibility
+[[architecture-examples-lucene]]
 
+[[architecture-examples-single-node-lucene-description]]
 ==== Description
 
 With the <<backend-lucene,Lucene backend>>, indexes are local to a given application node (JVM).
 They are accessed through direct calls to the Lucene library,
 without going through the network.
 
-image::lucene-backend.png[Lucene backend configuration]
+image::architecture-single-node-lucene.png[Simple architecture with Lucene backend,align="center"]
 
 This mode is only relevant to single-node applications.
 
+[[architecture-examples-single-node-lucene-pros-and-cons]]
 ==== Pros and cons
 
 Pros:
@@ -95,14 +150,20 @@ if you need changes to be visible immediately after the database changes.
 
 Cons:
 
+* <<limitations-backend-indexing-error>>.
 * <<limitations-parallel-embedded-update>>.
 * Not so easy to extend: experienced developers can access a lot of Lucene features,
 even those that are not exposed by Hibernate Search, by providing native Lucene objects;
 however, Lucene APIs are not very easy to figure out for developers unfamiliar with Lucene.
 If you're interested, see for example <<search-dsl-predicate-extensions-lucene-from-lucene-query,`Query`-based predicates>>.
+* Overhead for application threads: reindexing is done directly in application threads,
+and it may require additional time to load data that must be indexed from the database.
+Depending on the amount of data to load,
+this may increase the application's latency and/or decrease its throughput.
 * No horizontal scalability: there can only be one application node,
 and all indexes need to live on the same server.
 
+[[architecture-examples-single-node-lucene-getting-started]]
 ==== Getting started
 
 To implement this architecture, use the following Maven dependencies:
@@ -121,21 +182,26 @@ To implement this architecture, use the following Maven dependencies:
 </dependency>
 ----
 
+[[architecture-examples-no-coordination-elasticsearch]]
+=== Single-node or multi-node application, without coordination and with the Elasticsearch backend
 [[architecture-examples-elasticsearch]]
-=== Simple single-node or multi-node application with the Elasticsearch backend
-// Search 5 anchors backward compatibility
-[[_elasticsearch]]
 
+[[architecture-examples-no-coordination-elasticsearch-description]]
 ==== Description
 
 With the <<backend-elasticsearch,Elasticsearch backend>>, indexes are not tied to the application node.
 They are managed by a separate cluster of Elasticsearch nodes,
 and accessed through calls to REST APIs.
 
-image::elasticsearch-backend.png[Elasticsearch backend configuration]
+Thus, it is possible to set up multiple application nodes in such a way
+that they all perform index updates and search queries independently,
+without coordinating with each other.
+
+image::architecture-no-coordination-elasticsearch.png[Simple architecture with Elasticsearch backend,align="center"]
 
 TIP: The Elasticsearch cluster may be a single node living on the same server as the application.
 
+[[architecture-examples-no-coordination-elasticsearch-pros-and-cons]]
 ==== Pros and cons
 
 Pros:
@@ -152,13 +218,19 @@ See link:{elasticsearchDocUrl}/scalability.html["Scalability and resilience" in 
 
 Cons:
 
+* <<limitations-backend-indexing-error>>.
 * <<limitations-parallel-embedded-update>>.
 * Need to manage an additional service: the Elasticsearch cluster.
+* Overhead for application threads: reindexing is done directly in application threads,
+and it may require additional time to load data that must be indexed from the database.
+Depending on the amount of data to load,
+this may increase the application's latency and/or decrease its throughput.
 * <<backend-elasticsearch-io-refresh,Delayed visibility>> (~1 second) of index updates (near-real-time).
 While changes can be made visible as soon as possible after the database changes,
 Elasticsearch is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] by nature,
 and won't perform very well if you need changes to be visible immediately after the database changes.
 
+[[architecture-examples-no-coordination-elasticsearch-getting-started]]
 ==== Getting started
 
 To implement this architecture, use the following Maven dependencies:
@@ -176,3 +248,85 @@ To implement this architecture, use the following Maven dependencies:
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
+
+[[architecture-examples-database-polling-elasticsearch]]
+=== Multi-node application with database polling and Elasticsearch backend
+// Search 5 anchors backward compatibility
+[[_elasticsearch]]
+
+[[architecture-examples-database-polling-elasticsearch-description]]
+==== Description
+
+With Hibernate Search's <<coordination-database-polling>>,
+entity change events are not processed immediately in the ORM session where they arise,
+but are pushed to a database table.
+
+A background process polls that table for new events,
+and processes them asynchronously,
+updating the indexes as necessary.
+Since that queue <<coordination-database-polling-sharding,can be sharded>>,
+multiple application nodes can share the workload of indexing.
+
+This requires the <<backend-elasticsearch,Elasticsearch backend>>
+so that indexes are not tied to a single application node
+and can be updated or queried from multiple application nodes.
+
+image::architecture-database-polling-elasticsearch.png[Clustered architecture with database polling and Elasticsearch backend,align="center"]
+
+[[architecture-examples-database-polling-elasticsearch-pros-and-cons]]
+==== Pros and cons
+
+Pros:
+
+* Safest:
+** the possibility of out-of-sync indexes caused by <<limitations-backend-indexing-error,indexing errors in the backend>>
+that affects other architectures is eliminated here,
+because entity change events <<coordination-database-polling-indexing-guarantee,are persisted in the same transaction as the entity changes>>
+allowing retries for as long as necessary.
+** the possibility of out-of-sync indexes caused by <<limitations-parallel-embedded-update,concurrent updates>>
+that affects other architectures is eliminated here,
+because <<coordination-database-polling-indexing-full-loading,each entity instance is reloaded from the database within a new transaction>>
+before being reindexed.
+* Easy to extend: you can easily access most Elasticsearch features,
+even those that are not exposed by Hibernate Search, by providing your own JSON.
+See for example <<search-dsl-predicate-extensions-elasticsearch-from-json,JSON-defined predicates>>,
+or <<search-dsl-aggregation-extensions-elasticsearch-from-json,JSON-defined aggregations>>,
+or <<search-dsl-query-elasticsearch-json,leveraging advanced features with JSON manipulation>>.
+* Minimal overhead for application threads:
+application threads <<coordination-database-polling-indexing-background,only need to append events to the queue>>,
+they don't perform reindexing themselves.
+* Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
+See link:{elasticsearchDocUrl}/scalability.html["Scalability and resilience" in the Elasticsearch documentation].
+* Horizontal scalability of the application: you can have as many instances of the application as you need.
+
+Cons:
+
+* Need to manage an additional service: the Elasticsearch cluster.
+* Delayed visibility (~1 second or more, depending on load and hardware) of index updates.
+First because Elasticsearch is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] by nature,
+but also because <<coordination-database-polling-indexing-visibility,the event queue introduces additional delays>>.
+* Impact on the database schema: <<coordination-database-polling-schema,additional tables must be created in the database>>
+to hold the data necessary for coordination.
+* Overhead for the database: the background process that reads entity changes and performs reindexing
+<<coordination-database-polling-indexing-full-loading,needs to read changed entities from the database>>.
+
+[[architecture-examples-database-polling-elasticsearch-getting-started]]
+==== Getting started
+
+To implement this architecture, use the following Maven dependencies:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
+Also, configure coordination as explained in <<coordination-database-polling>>.
