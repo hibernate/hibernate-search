@@ -147,7 +147,9 @@ and do the work of converting between user entities and documents to be indexed.
 
 ### Basic build
 
-You will need JDK 11 or later.
+You will need JDK 11 exactly;
+newer JDKs will require you to [pass additional properties](#other-jdks)
+in order for tests to run correctly.
 
 The following command will build Hibernate Search, install it in your local Maven repository,
 and run unit tests and integration tests.
@@ -179,6 +181,26 @@ To build the distribution bundle run:
 
 ```bash
 ./mvnw clean install -Pdocumentation-pdf,dist
+```
+
+### <a id="other-jdks"></a> Other JDKs
+
+To test Hibernate Search against JDK 8:
+
+```bash
+./mvnw clean install -Djava-version.test.release=8 -Djava-version.test.launcher.java_home=/path/to/jdk8
+```
+
+To test Hibernate Search against JDKs newer than 11:
+
+```bash
+./mvnw clean install -Djava-version.test.release=17 -Djava-version.test.compiler.java_home=/path/to/jdk17
+```
+
+Or more simply, if the newer JDK you want to test against is your default JDK:
+
+```bash
+./mvnw clean install -Djava-version.test.release=17
 ```
 
 ### Elasticsearch
