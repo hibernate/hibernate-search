@@ -26,7 +26,9 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <!-- Apply the test JDK release settings to all code in integration tests, even code in src/main -->
-        <maven.compiler.release>${maven.compiler.testRelease}</maven.compiler.release>
+        <java-version.main.release>${java-version.test.release}</java-version.main.release>
+        <java-version.main.compiler.java_home>${java-version.test.compiler.java_home}</java-version.main.compiler.java_home>
+        <java-version.main.compiler>${java-version.test.compiler}</java-version.main.compiler>
         <!--
              Pass these properties as system properties to be able to switch to
              a different database without re-compiling the hibernate.properties file
