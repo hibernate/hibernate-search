@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,6 +66,12 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 						base.evaluate();
 					}
 					finally {
+						// Make sure to close the last-created resource first,
+						// to avoid problems e.g. if starting multiple ORM SessionFactories
+						// where only the first one creates/drops the schema:
+						// in that case the other SessionFactories must be closed before the first one,
+						// to avoid any SQL queries after the schema was dropped.
+						Collections.reverse( toClose );
 						closer.pushAll( MappingSetupHelper.this::close, toClose );
 						toClose.clear();
 					}
