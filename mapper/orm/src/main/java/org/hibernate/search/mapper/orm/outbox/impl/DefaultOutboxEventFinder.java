@@ -37,6 +37,11 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 			query.setParameter( entry.getKey(), entry.getValue() );
 		}
 		query.setMaxResults( maxResults );
+		// HSEARCH-4281: some databases encounter deadlocks when multiple processes query the outbox
+		// in concurrent transactions.
+		// Since we are certain that those processes are interested in a strictly distinct subset of the outbox events
+		// (thanks to sharding), we can be sure those deadlocks are false positives,
+		// so we disable database checks by settings the lock mode to NONE.
 		query.setLockMode( LockModeType.NONE );
 		return query.list();
 	}
