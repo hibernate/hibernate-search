@@ -148,6 +148,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *         settingsId: ...
  */
 
+@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 11 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.6'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -177,19 +178,19 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					new JdkBuildEnvironment(version: '8', buildJdkTool: 'OpenJDK 11 Latest',
-							testJdkRelease: '8', testJdkTool: 'OpenJDK 8 Latest',
+					// We only run the tests with JDK8, but we compile them with JDK11 (with --release 8).
+					new JdkBuildEnvironment(version: '8', testLauncherTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(version: '11', buildJdkTool: 'OpenJDK 11 Latest',
+					new JdkBuildEnvironment(version: '11', testCompilerTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
-					new JdkBuildEnvironment(version: '14', buildJdkTool: 'OpenJDK 14 Latest',
+					new JdkBuildEnvironment(version: '14', testCompilerTool: 'OpenJDK 14 Latest',
 							condition: TestCondition.ON_DEMAND),
-					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
+					new JdkBuildEnvironment(version: '15', testCompilerTool: 'OpenJDK 15 Latest',
 							condition: TestCondition.ON_DEMAND),
-					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
+					new JdkBuildEnvironment(version: '16', testCompilerTool: 'OpenJDK 16 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(version: '17', buildJdkTool: 'OpenJDK 17 Latest',
+					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			compiler: [
@@ -288,7 +289,7 @@ stage('Configure') {
 		configurationNodePattern QUICK_USE_NODE_PATTERN
 		file 'job-configuration.yaml'
 		jdk {
-			defaultTool environments.content.jdk.default.buildJdkTool
+			defaultTool DEFAULT_JDK_TOOL
 		}
 		maven {
 			defaultTool MAVEN_TOOL
@@ -525,7 +526,7 @@ stage('Non-default environments') {
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
+				helper.withMavenWorkspace {
 					// Re-run integration tests against the JARs produced by the default build,
 					// but using a different JDK to build and run the tests.
 					mavenNonDefaultBuild buildEnv, """ \
@@ -774,23 +775,14 @@ abstract class BuildEnvironment {
 	abstract String getTag()
 	boolean isDefault() { isDefault }
 	boolean requiresDefaultBuildArtifacts() { true }
-
-	String getMavenJdkTool(def allEnvironments) {
-		allEnvironments.content.jdk.default.buildJdkTool
-	}
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
 	String version
-	String buildJdkTool
-	String testJdkTool
-	String testJdkRelease
+	String testCompilerTool
+	String testLauncherTool
 	@Override
 	String getTag() { "jdk-$version" }
-	@Override
-	String getMavenJdkTool(def allEnvironments) {
-		buildJdkTool
-	}
 }
 
 class CompilerBuildEnvironment extends BuildEnvironment {
@@ -970,14 +962,21 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 		return args;
 	}
 
-	String testJdkTool = buildEnv.testJdkTool
-	if ( testJdkTool ) {
-		def testJdkToolPath = tool(name: testJdkTool, type: 'jdk')
-		args += " -Dsurefire.jvm.java_home=$testJdkToolPath"
+	String testCompilerTool = buildEnv.testCompilerTool
+	if ( testCompilerTool && DEFAULT_JDK_TOOL != testCompilerTool ) {
+		def testCompilerToolPath = tool(name: testCompilerTool, type: 'jdk')
+		args += " -Djava-version.test.compiler.java_home=$testCompilerToolPath"
 	}
-	String testJdkRelease = buildEnv.testJdkRelease
-	if ( testJdkRelease ) {
-		args += " -Dmaven.compiler.testRelease=$testJdkRelease"
+	// Note: the POM uses the java_home of the test compiler for the test launcher by default.
+	String testLauncherTool = buildEnv.testLauncherTool
+	if ( testLauncherTool && DEFAULT_JDK_TOOL != testLauncherTool ) {
+		def testLauncherToolPath = tool(name: testLauncherTool, type: 'jdk')
+		args += " -Djava-version.test.launcher.java_home=$testLauncherToolPath"
+	}
+	String defaultVersion = environments.content.jdk.default.version
+	String version = buildEnv.version
+	if ( defaultVersion != version ) {
+		args += " -Djava-version.test.release=$version"
 	}
 
 	return args
