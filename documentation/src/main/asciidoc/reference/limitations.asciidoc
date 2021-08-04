@@ -4,11 +4,12 @@
 [[elasticsearch-limitations]]
 
 [[limitations-parallel-embedded-update]]
-== In rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
+== Without coordination, in rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
 
 === Description
 
-If two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
+With the default settings (<<coordination-none,no coordination>>),
+if two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
 and these two entity instance are updated in parallel transactions,
 there is a small risk that the transaction commits happen in just the wrong way,
 leading to the index-embedding entity being reindexed with only part of the updates.
@@ -40,43 +41,60 @@ This chain of events ends with the index containing a version of A where C is up
 
 The following solutions can help circumvent this limitation:
 
-1. Avoid parallel updates to entities that are indexed-embedded in the same indexed entity.
+1. Use a safer <<coordination,coordination strategy>>,
+e.g. the <<coordination-database-polling,database-polling coordination strategy>>.
+See in particular <<architecture-examples>>.
+2. OR avoid parallel updates to entities that are indexed-embedded in the same indexed entity.
 This is only possible in very specific setups.
+3. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
+to get the index back in sync with the database.
+
+=== Roadmap
+
+This limitation is caused directly by the lack of coordination between threads or application nodes,
+so it can only be addressed completely by configuring <<coordination,coordination>>.
+
+There are no other solutions currently on the roadmap.
+
+[[limitations-backend-indexing-error]]
+== Without coordination, backend errors during automatic indexing may lead to out-of sync indexes
+
+=== Description
+
+With the default settings (<<coordination-none,no coordination>>),
+<<mapper-orm-indexing-automatic,automatic indexing>>
+will actually apply index changes in the backend *just after* the transaction commit,
+without any kind of transaction log for the index changes.
+
+Consequently, should an error occur in the backend while indexing (i.e. an I/O error),
+this indexing will be cancelled, with no way to cancel the corresponding database transaction:
+the index will thus become out of sync.
+
+NOTE: The risk is exclusively related to errors in the backend, mostly to filesystem or network issues.
+Errors occurring in user code (getters, custom <<mapper-orm-bridge,bridges>>, ...)
+will safely cancel the whole database transaction without indexing anything,
+ensuring that indexes are still in sync with the database.
+
+=== Workaround
+
+The following solutions can help circumvent this limitation:
+
+1. Use a safer <<coordination,coordination strategy>>,
+e.g. the <<coordination-database-polling,database-polling coordination strategy>>.
+See in particular <<architecture-examples>>.
 2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
 === Roadmap
 
-This problem cannot be solved using
-link:{elasticsearchDocUrl}/optimistic-concurrency-control.html[Elasticsearch's optimistic concurrency control]:
-when two conflicting versions of the same documents are created due to this issue,
-neither version is completely right.
+This limitation is caused directly by the lack of persistence of entity change events,
+so it can only be addressed completely by persisting those events,
+e.g. by switching to the <<coordination-database-polling,database-polling coordination strategy>>.
 
-We plan to address this limitation in Hibernate Search 6.1 by offering fully asynchronous indexing,
-from entity loading to index updates.
-To track progress of this feature, see https://hibernate.atlassian.net/browse/HSEARCH-3281[HSEARCH-3281].
-
-In short, entities will no longer be indexed directly in the ORM session where the entity change occurred.
-Instead, "change events" will be sent to a queue, then consumed by a background process,
-which will load the entity from a separate session and perform the indexing.
-
-As long as events are sent to the queue after the original transaction is committed,
-and background indexing processes avoid concurrent reindexing of the same entity,
-the limitation will no longer apply:
-indexing will always get data from the latest committed state of the database,
-and out-of-date documents will never "overwrite" up-to-date documents.
-
-This feature will be opt-in, as it has both upsides and downsides.
-
-Upsides::
-* It will provide opportunities for scaling out indexing,
-  by sharding the event queue and distributing the process across multiple nodes.
-* It may even clear the way for new features such as https://hibernate.atlassian.net/browse/HSEARCH-1937[HSEARCH-1937].
-Downsides::
-* It may require additional infrastructure to store the indexing queue.
-However, we intend to provide a basic solution relying on the database exclusively.
-* It will most likely prevent any form of <<mapper-orm-indexing-automatic-synchronization,synchronous indexing>>
-(waiting for indexing to finish before releasing the application thread).
+Some incomplete countermeasures may be considered in future versions,
+such as automatic in-thread retries,
+but they will never solve the problem completely,
+and they are not currently on the roadmap.
 
 [[limitations-indexing-plan-serialization]]
 == Automatic indexing is not compatible with `Session` serialization
@@ -106,3 +124,46 @@ Avoid serializing an ORM `EntityManager`/`Session` after changing entities.
 
 There are no plans to address this limitation.
 We do not intend to support `Session` serialization when Hibernate Search is enabled.
+
+[[limitations-database-polling-event-order]]
+== With database-polling coordination, in rare cases, rapid deletion then re-creation of an entity may lead to out-of-sync indexes
+
+=== Description
+
+With <<coordination-database-polling,database-polling coordination>>,
+entity change events are always processed in the order they happen
+(or in an order that is close enough to produce the same indexing results),
+except in the following case:
+
+* An entity is deleted, then re-created with the same identifier.
+* The deletion and re-creation happen very rapidly one after another,
+so rapidly that the database date/time functions do not have enough resolution
+to assign a different timestamp to the two events.
+This generally means the two events happen **within ~1 microsecond** of each other.
+* The deletion event is automatically assigned an identifier higher than the re-creation event.
+This generally means link:{hibernateDocUrl}#identifiers-generators-optimizer[identifier generator optimizers] are used;
+they may lead to out-of-order ID generation.
+
+In this **very** specific case, the entity may end up being deleted from the index,
+and not added until another change happens for that entity.
+
+=== Workaround
+
+The following solutions can help circumvent this limitation:
+
+1. Do not reuse identifiers when an indexed entity is deleted then re-created:
+assign a different identifier to the re-created entity.
+This should be the case with the vast majority of applications,
+as long as they rely on automatically generated identifiers.
+2. OR if you do reuse an identifier, ensure the entity re-creation
+happens significantly more than 1 microsecond after its deletion.
+3. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
+to get the index back in sync with the database.
+
+=== Roadmap
+
+Several countermeasures are already in place,
+and they are the reason the problem only occurs when the entity re-creation
+happens shortly after (~1 microsecond) after the deletion.
+
+https://hibernate.atlassian.net/browse/HSEARCH-4287[HSEARCH-4287] is expected to get rid of the limitation completely.

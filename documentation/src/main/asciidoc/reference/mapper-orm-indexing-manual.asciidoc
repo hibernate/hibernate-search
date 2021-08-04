@@ -53,12 +53,17 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 
 With Hibernate Search 6 (on contrary to Hibernate Search 5 and earlier),
 this pattern will work as expected:
-documents will be built on flushes,
-and sent to the index upon transaction commit.
 
-However, each `flush` call will potentially add data to an internal document buffer,
+* <<coordination-none,with coordination disabled>> (the default),
+documents will be built on flushes, and sent to the index upon transaction commit.
+* <<coordination-database-polling,with database-polling coordination>>,
+entity change events will be persisted on flushes, and committed along with the rest of the changes upon transaction commit.
+
+However, each `flush` call will potentially add data to an internal buffer,
 which for large volumes of data may lead to an `OutOfMemoryException`,
-depending on the JVM heap size and on the complexity and number of documents.
+depending on the JVM heap size,
+the <<coordination,coordination strategy>>
+and the complexity and number of documents.
 
 If you run into memory issues,
 the first solution is to break down the batch process

@@ -7,8 +7,52 @@ By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapper-orm-entityindexmapping,mapped to an index>>,
 Hibernate Search updates the relevant index.
 
-To be precise, index updates happen on transaction commit or,
-if working outside of a transaction, on session flush.
+Exactly how and when the index update happens depends on the <<coordination,coordination strategy>>;
+see <<mapper-orm-indexing-automatic-concepts>> for more information.
+
+[[mapper-orm-indexing-automatic-concepts]]
+== Overview
+
+Below is a summary of how automatic indexing works depending
+on the configured <<coordination,coordination strategy>>.
+
+Follow the links for more details.
+
+[cols="h,2*^",options="header"]
+.Comparison of architectures
+|===
+|Coordination strategy
+|<<coordination-none,No coordination>> (default)
+|<<coordination-database-polling,Database-polling>>
+
+|Detects changes occurring in ORM sessions (`session.persist()`, `session.delete()`, setters, ...)
+2+|<<mapper-orm-indexing-automatic-concepts-changes-in-session,Yes>>
+
+|Detects changes caused by JPQL or SQL queries (`insert`/`update`/`delete`)
+2+|<<mapper-orm-indexing-automatic-concepts-changes-in-session-jpql-sql,No>>
+
+|Associations must be updated on both sides
+2+|<<mapper-orm-indexing-automatic-concepts-session-consistency,Yes>>
+
+|Changes triggering reindexing
+2+|<<mapper-orm-indexing-automatic-concepts-dirty-checking,Only relevant changes>>
+
+|Guarantee of indexes updates
+|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
+|<<coordination-database-polling-indexing-guarantee,On commit (transactional)>>
+
+|Visibility of index updates
+|<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
+|<<coordination-database-polling-indexing-visibility,Eventual>>
+
+|Overhead for application threads
+|<<coordination-none-indexing-on-flush,Low to medium>>
+|<<coordination-database-polling-indexing-background,Very low>>
+
+|Overhead for the database
+|<<coordination-none-indexing-lazy-loading,Low>>
+|<<coordination-database-polling-indexing-full-loading,Low to medium>>
+|===
 
 [[mapper-orm-indexing-automatic-configuration]]
 == Configuration
@@ -20,109 +64,76 @@ or <<mapper-orm-indexing-manual,manually>>.
 You can disable automatic indexing by setting the configuration property
 `hibernate.search.automatic_indexing.enabled` to `false`.
 
-[[mapper-orm-indexing-automatic-concepts]]
-== How automatic indexing works
-
 [[mapper-orm-indexing-automatic-concepts-changes-in-session]]
-Changes have to occur in the ORM session in order to be detected::
+== In-session entity change detection and limitations
+
+[[mapper-orm-indexing-automatic-concepts-changes-in-session-basics]]
+=== Basics
+
 Hibernate Search uses internal events of Hibernate ORM in order to detect changes:
 these events will only be triggered if you actually manipulate managed entity objects in your code,
 updating them by setting their properties or deleting them by calling the appropriate method
 on the Hibernate ORM session.
-+
-Conversely, changes resulting from `insert`/`delete`/`update` queries, be it SQL or JPQL/HQL queries,
+
+[[mapper-orm-indexing-automatic-concepts-changes-in-session-jpql-sql]]
+=== Limitation: no detection of changes caused by JPQL or SQL queries
+
+Changes resulting from `insert`/`delete`/`update` queries, be it SQL or JPQL/HQL queries,
 are not detected by Hibernate Search.
 This is because queries are executed on the database side,
- without Hibernate having any knowledge of which entities are actually created, deleted or updated.
+without Hibernate having any knowledge of which entities are actually created, deleted or updated.
 One workaround is to explicitly reindex after you run such queries,
-either using the  <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
-[[mapper-orm-indexing-automatic-concepts-extraction-on-flush]]
-Entity data is retrieved from entities upon session flushes::
-When a Hibernate ORM session is flushed,
-Hibernate Search will extract data from the entities
-to build documents to index,
-and will put these documents in an internal buffer for later indexing (see the next paragraphs).
-+
-This means in particular that you can safely `clear()` the session after a `flush()`:
-entity changes performed up to the flush will be indexed correctly.
+
+[[mapper-orm-indexing-automatic-concepts-session-consistency]]
+=== Limitation: asymmetric association updates
+
+Hibernate ORM is able to handle asymmetric updates of associations,
+where only the owning side of association is updated and the other side is ignored.
+The entities in the session will be inconsistent for the duration of the session,
+but upon reloading they will be consistent once again,
+due to how entity loading works.
+
+This practice of asymmetric updates of associations
+can cause problems in applications in general,
+but also in Hibernate Search specifically,
+where it may lead to out-of-sync indexes.
+Thus, it must be avoided.
+
 [NOTE]
 ====
-If you come from Hibernate Search 5 or earlier,
-you may see this as a significant improvement:
-there is no need to call `flushToIndexes()` and update indexes in the middle of a transaction anymore,
-except for larger volumes of data (see <<mapper-orm-indexing-manual-indexingplan-process-execute>>).
+For example, let's assume an indexed entity `A` has an `@IndexedEmbedded` association `A.b` to entity `B`,
+and that `B` owns that association on its side, `B.a`.
+One can just set `B.a` to `null` in order to remove the association between `A` and `B`,
+and the effect on the database will be exactly what we want.
+
+However, Hibernate Search will only be able to detect that `B.a` changed,
+and by the time it tries to infer which entities need to be reindexed,
+it will no longer be able to know what `B.a` used to refer to.
+That change in itself is useless to Hibernate Search:
+Hibernate Search will not know that `A`, specifically, needs to be reindexed.
+It will "forget" to reindex `A`, leading to an out-of-sync index where `A.b` still contains `B`.
+
+In the end, the only way for Hibernate Search to know that `A` needs to be reindexed
+is to also set `A.b` to `null`, which will cause Hibernate Search to detect that `A.b` changed,
+and thus that `A` changed too.
 ====
-[[mapper-orm-indexing-automatic-concepts-session-consistency]]
-Entity data (especially associations) must stay consistent within the session::
-Hibernate Search reads entities _within the same session that updated the entity_.
-Thus, entity data must be consistent when the session is flushed.
-Inconsistent updates, for example associations updated on one side only,
-will lead to Hibernate Search missing pieces of information and not updating the index properly.
-+
-In particular, a common (dodgy) practice when creating/updating entities
-with Hibernate ORM is to only update the owning side of associations,
-ignoring the non-owning side.
-Hibernate ORM will generally handle the creation/update just fine,
-because only the owning side of associations is actually modeled in the database.
-Reading the non-owning side of the association later, in another Hibernate ORM session,
-will also work fine, as the non-owning side is derived from the (updated) owning side.
-However, reading the non-owning side of the association _within the same session that updated the entity_
-will expose inconsistencies.
-Thus, the practice of "one-sided association updates" must be avoided when using Hibernate Search.
-[[mapper-orm-indexing-automatic-concepts-transaction-commit]]
-Inside transactions, indexing happens after transactions are committed::
-When entity changes happen inside a transaction,
-indexes are not updated immediately, but only after the transaction is successfully committed.
-That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database,
-discarding all the index changes that were planned during the transaction.
-+
-However, if you perform a batch process inside a transaction,
-and perform flush/clear, regularly to save memory,
-be aware that Hibernate Search's internal buffer holding documents to index
-will grow on each flush, and will not be cleared until the transaction is committed or rolled back.
-If you encounter memory issues because of that,
-see <<mapper-orm-indexing-manual-indexingplan-process-execute>> for a few solutions.
-[[mapper-orm-indexing-automatic-concepts-notransaction-flush]]
-Outside of transactions, indexing happens on session flush::
-When entity changes happen outside of any transaction (not recommended),
-indexes are updated immediately upon session `flush()`.
-Without that flush, indexes will not be updated automatically.
-[[mapper-orm-indexing-automatic-concepts-nearrealtime]]
-Index changes may not be visible immediately::
-By default, indexing will resume the application thread after index changes are committed to the indexes.
-This means index changes are safely stored to disk,
-but this does not mean a search query ran immediately after indexing will take the changes into account:
-when using the Elasticsearch backend in particular, changes may take some time to be visible from search queries.
-+
-See <<mapper-orm-indexing-automatic-synchronization>> for details.
-[[mapper-orm-indexing-automatic-concepts-changes-filter]]
-Only relevant changes trigger indexing::
-Hibernate Search is aware of the properties that are accessed when building indexed documents.
-Thanks to that knowledge, it is able to skip reindexing
-when a property is modified, but does not affect the indexed document.
-+
+
+[[mapper-orm-indexing-automatic-concepts-dirty-checking]]
+== Dirty checking
+Hibernate Search is aware of the entity properties that are accessed when building indexed documents.
+Thanks to that knowledge, it is able to detect which entity changes are actually relevant to indexing,
+and to skip reindexing when a property is modified, but does not affect the indexed document.
+
 You can control this "dirty checking" by setting
 the <<configuration-property-types,boolean property>> `hibernate.search.automatic_indexing.enable_dirty_check`:
-+
+
 * by default, or when set to `true`,
 Hibernate Search will consider whether modified properties are relevant
 before triggering reindexing.
 * when set to `false`, Hibernate Search will trigger reindexing upon any change,
 regardless of the entity properties that changed.
-[[mapper-orm-indexing-automatic-concepts-indexing-triggers-lazy-loading]]
-Indexing may fetch extra data from the database::
-Even when you change only a single property of an indexed entity,
-if that property is indexed,
-Hibernate Search needs to rebuild the corresponding document *in full*.
-+
-Even if Hibernate Search tries to only load what is necessary for indexing,
-depending on your mapping, this may lead to lazy associations being loaded just to reindex entities,
-even if you didn't need them in your business code.
-+
-This extra cost can be mitigated to some extent by leveraging Hibernate ORM's batch fetching;
-see link:{hibernateDocUrl}#configurations-database-fetch[the `batch_fetch_size` property]
-and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
@@ -131,7 +142,15 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 
 include::components/writing-reading-intro-note.asciidoc[]
 
-When a transaction is committed,
+[WARNING]
+====
+Indexing synchronization is only relevant when <<coordination-none,coordination is disabled>>.
+
+With coordination strategies such as <<coordination-database-polling>>,
+indexing happens in background threads and is always asynchronous.
+====
+
+When a transaction is committed, <<coordination-none,with default coordination settings>>,
 automatic indexing can (and, by default, will) block the application thread
 until indexing reaches a certain level of completion.
 
@@ -156,14 +175,14 @@ The default strategy is defined by the configuration property
 Below is a reference of all available strategies and their guarantees.
 
 |====
-.2+h|Strategy 3+h| Guarantees when the application thread resumes .2+h|Throughput
+.2+h|Strategy .2+h|Throughput 3+h| Guarantees when the application thread resumes
 h|Changes applied (with or without <<concepts-commit-refresh,commit>>)
 h|Changes safe from crash/power loss (<<concepts-commit-refresh,commit>>)
 h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
-|`async`|No guarantee|No guarantee|No guarantee|Best
-|`write-sync` (**default**)|Guaranteed|Guaranteed|No guarantee|Medium
-|`read-sync`|Guaranteed|No guarantee|Guaranteed|Medium to <<mapper-orm-indexing-automatic-synchronization-refresh-throughput,worst>>
-|`sync`|Guaranteed|Guaranteed|Guaranteed|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>
+|Best|`async`|No guarantee|No guarantee|No guarantee
+|Medium|`write-sync` (**default**)|Guaranteed|Guaranteed|No guarantee
+|Medium to <<mapper-orm-indexing-automatic-synchronization-refresh-throughput,worst>>|`read-sync`|Guaranteed|No guarantee|Guaranteed
+|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>|`sync`|Guaranteed|Guaranteed|Guaranteed
 |====
 
 [[mapper-orm-indexing-automatic-synchronization-refresh-throughput]]

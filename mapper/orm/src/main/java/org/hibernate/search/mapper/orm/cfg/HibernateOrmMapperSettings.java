@@ -240,7 +240,8 @@ public final class HibernateOrmMapperSettings {
 			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_ENABLED;
 
 	/**
-	 * The interval in the background processor between two queries to the outbox events table, in milliseconds.
+	 * In the background indexing processor, how long to wait for another query to the outbox events table
+	 * after a query didn't return any event, in milliseconds.
 	 * <p>
 	 * Only available when {@link #COORDINATION_STRATEGY} is
 	 * {@link CoordinationStrategyNames#DATABASE_POLLING}.
@@ -260,7 +261,7 @@ public final class HibernateOrmMapperSettings {
 			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL;
 
 	/**
-	 * How many outbox events to process in the background processor in the same transaction.
+	 * In the background indexing processor, how many outbox events, at most, are processed in a single transaction.
 	 * <p>
 	 * Only available when {@link #COORDINATION_STRATEGY} is
 	 * {@link CoordinationStrategyNames#DATABASE_POLLING}.

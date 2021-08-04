@@ -1,0 +1,12 @@
+[WARNING]
+====
+Dynamic sharding for the database-polling coordination strategy has not been implemented yet.
+
+In practice, this means your application must have a fixed number of nodes
+participating in indexing,
+and all application nodes participating in indexing
+must configure <<coordination-database-polling-sharding-static,static sharding>>.
+
+Dynamic sharding is going to be implemented in later 6.1.0.Alpha releases;
+see https://hibernate.atlassian.net/browse/HSEARCH-4140 for progress.
+====

@@ -179,7 +179,7 @@ Until the refresh happens, results of search queries might be slightly out of da
 documents added since the last refresh will be missing,
 documents delete since the last refresh will still be there, etc.
 
-Unsafe changes and out-of-date indexes are obviously undesirable,
+Unsafe changes and out-of-sync indexes are obviously undesirable,
 but they are a trade-off that improves performance.
 
 Different factors influence when refreshes and commit happen:
