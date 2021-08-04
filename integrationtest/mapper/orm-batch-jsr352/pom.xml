@@ -201,7 +201,7 @@
             <id>testWithJdk11+</id>
             <activation>
                 <property>
-                    <name>maven.compiler.testRelease</name>
+                    <name>java-version.test.release</name>
                     <value>!8</value>
                 </property>
             </activation>
