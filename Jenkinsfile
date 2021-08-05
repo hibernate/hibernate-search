@@ -212,8 +212,9 @@ stage('Configure') {
                     		condition: TestCondition.AFTER_MERGE, dockerHubImage: "mysql:8.0.22"),
                     new DatabaseBuildEnvironment(dbName: 'db2', mavenProfile: 'ci-db2',
                             condition: TestCondition.AFTER_MERGE, dockerHubImage: "ibmcom/db2:11.5.5.0"),
+                    // Temporarily disabled because of database deadlocks making tests fail; see HSEARCH-4288
                     new DatabaseBuildEnvironment(dbName: 'mssql', mavenProfile: 'ci-mssql',
-                            condition: TestCondition.AFTER_MERGE, dockerHubImage: "mcr.microsoft.com/mssql/server:2019-CU8-ubuntu-16.04")
+                            condition: TestCondition.ON_DEMAND, dockerHubImage: "mcr.microsoft.com/mssql/server:2019-CU8-ubuntu-16.04")
 			],
 			esLocal: [
 					// --------------------------------------------
