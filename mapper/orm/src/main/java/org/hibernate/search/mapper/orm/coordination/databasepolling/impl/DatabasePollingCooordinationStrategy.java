@@ -108,6 +108,10 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 			initializeProcessors( context );
 		}
 		else {
+			// IMPORTANT: in this case we don't even configure sharding, and that's on purpose.
+			// Application developers may want a fixed number of processing nodes (static sharding)
+			// with a varying number of non-processing nodes,
+			// so we want to make those non-processing nodes easy to configure.
 			log.indexingProcessorDisabled();
 		}
 
@@ -117,6 +121,8 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 	private void initializeProcessors(CoordinationStrategyStartContext context) {
 		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
 
+		// IMPORTANT: we only configure sharding here, if processors are enabled.
+		// See the comment in the caller method.
 		boolean shardsStatic = SHARDS_STATIC.get( configurationSource );
 		int totalShardCount;
 		if ( shardsStatic ) {
