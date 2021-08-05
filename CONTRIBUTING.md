@@ -184,7 +184,7 @@ To build the distribution bundle run:
 ### Elasticsearch
 
 The Elasticsearch integration tests run against one single version of Elasticsearch at a time,
-launching an Elasticsearch server automatically on port 9200.
+launching an Elasticsearch server automatically on port 9200 using Docker.
 You may redefine the version to use by specifying the right profile and using the
 `test.elasticsearch.connection.version` property:
 

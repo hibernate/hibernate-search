@@ -477,7 +477,13 @@
         <!-- Elasticsearch tests properties -->
 
         <!-- Control how an Elasticsearch instance is run automatically during tests -->
+        <!-- By default, the plugin is not skipped, but each container (elastic, etc.) is skipped;
+             Maven profiles will re-enable the right container depending on configuration.
+          -->
         <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+        <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
+        <test.elasticsearch.run.elastic.image.name>docker.elastic.co/elasticsearch/elasticsearch</test.elasticsearch.run.elastic.image.name>
+        <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:
@@ -487,6 +493,7 @@
              (which is located in a dependency of the integration tests modules).
          -->
         <test.elasticsearch.connection.uris></test.elasticsearch.connection.uris>
+        <test.elasticsearch.connection.version></test.elasticsearch.connection.version>
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
         <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>
