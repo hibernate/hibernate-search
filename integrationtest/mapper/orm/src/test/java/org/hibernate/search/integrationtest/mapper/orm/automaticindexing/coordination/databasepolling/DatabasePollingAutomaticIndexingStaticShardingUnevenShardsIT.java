@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Environment;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
@@ -71,6 +72,8 @@ public class DatabasePollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		) );
 		sessionFactories.add( setup(
 				Action.NONE, // Avoid session factories getting in each other's feet.
+				// Make sure that nodes can disable processing,
+				// and if so that they don't need to configure sharding.
 				false, null // 0 shard
 		) );
 		sessionFactories.add( setup(
@@ -94,14 +97,21 @@ public class DatabasePollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		StaticCounters.Key counterKey = StaticCounters.createKey();
 		sessionFactoryCounterKeys.add( counterKey );
 
-		return ormSetupHelper.start()
-				.withProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, action )
-				.withProperty( PerSessionFactoryIndexingTracingBridge.SESSION_FACTORY_COUNTER_KEY_PROPERTY, counterKey )
-				.withProperty( "hibernate.search.coordination.shards.static", "true" )
-				.withProperty( "hibernate.search.coordination.shards.total_count", TOTAL_SHARD_COUNT )
-				.withProperty( "hibernate.search.coordination.shards.assigned", assignedShardIndices )
-				.withProperty( "hibernate.search.coordination.processors.indexing.enabled", Boolean.toString( processingEnabled ) )
-				.setup( IndexedEntity.class );
+		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
+				.withProperty( Environment.HBM2DDL_AUTO, action )
+				.withProperty( PerSessionFactoryIndexingTracingBridge.SESSION_FACTORY_COUNTER_KEY_PROPERTY, counterKey );
+
+		if ( processingEnabled ) {
+			context = context.withProperty( "hibernate.search.coordination.shards.static", "true" )
+					.withProperty( "hibernate.search.coordination.shards.total_count", TOTAL_SHARD_COUNT )
+					.withProperty( "hibernate.search.coordination.shards.assigned", assignedShardIndices );
+		}
+		else {
+			// If processing is disabled, sharding is irrelevant: we don't need to configure it.
+			context = context.withProperty( "hibernate.search.coordination.processors.indexing.enabled", "false" );
+		}
+
+		return context.setup( IndexedEntity.class );
 	}
 
 	@Test
