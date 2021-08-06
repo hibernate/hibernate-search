@@ -441,7 +441,7 @@ stage('Default build') {
 		return
 	}
 	runBuildOnNode {
-		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
+		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			String mavenArgs = """ \
 					--fail-at-end \
 					-Pdist -Pcoverage -Pjqassistant \
@@ -530,7 +530,7 @@ stage('Non-default environments') {
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace {
+				withMavenWorkspace {
 					// Re-run integration tests against the JARs produced by the default build,
 					// but using a different JDK to build and run the tests.
 					mavenNonDefaultBuild buildEnv, "", 'integrationtest'
@@ -543,7 +543,7 @@ stage('Non-default environments') {
 	environments.content.compiler.enabled.each { CompilerBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace {
+				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							-DskipTests -DskipITs \
 							-P${buildEnv.mavenProfile},!javaModuleITs \
@@ -557,7 +557,7 @@ stage('Non-default environments') {
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode(NODE_PATTERN_BASE) {
-				helper.withMavenWorkspace {
+				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm',
@@ -575,7 +575,7 @@ stage('Non-default environments') {
 	environments.content.esLocal.enabled.each { EsLocalBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace {
+				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
@@ -609,7 +609,7 @@ stage('Non-default environments') {
 					if (awsCredentialsId == null) {
 						// By default, rely on credentials provided by the EC2 infrastructure
 
-						helper.withMavenWorkspace {
+						withMavenWorkspace {
 							// Tests may fail because of hourly AWS snapshots,
 							// which prevent deleting indexes while they are being executed.
 							// Unfortunately, this triggers test failure in @BeforeClass/@AfterClass,
@@ -638,7 +638,7 @@ stage('Non-default environments') {
 						// For a few builds only, rely on static credentials provided by Jenkins
 						// (just to check that statically-provided credentials work correctly)
 
-						helper.withMavenWorkspace {
+						withMavenWorkspace {
 							// WARNING: Make sure credentials are evaluated by sh, not Groovy.
 							// To that end, escape the '$' when referencing the variables.
 							// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
@@ -695,7 +695,7 @@ stage('Deploy') {
 	else if (performRelease) {
 		echo "Performing full release for version ${releaseVersion.toString()}"
 		runBuildOnNode {
-			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
+			withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
 				configFileProvider([configFile(fileId: 'release.config.ssh', targetLocation: env.HOME + '/.ssh/config')]) {
 					sshagent(['hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
 						sh 'cat $HOME/.ssh/config'
@@ -889,21 +889,26 @@ void runBuildOnNode(Closure body) {
 
 void runBuildOnNode(String label, Closure body) {
 	node( label ) {
-		pruneDockerContainers()
-        try {
-        	timeout( [time: 1, unit: 'HOURS'], body )
-        }
-        finally {
-        	pruneDockerContainers()
-        }
+		timeout( [time: 1, unit: 'HOURS'], body )
 	}
 }
 
-void pruneDockerContainers() {
-	sh 'docker container prune -f || true'
-	sh 'docker image prune -f || true'
-	sh 'docker network prune -f || true'
-	sh 'docker volume prune -f || true'
+void withMavenWorkspace(Closure body) {
+	withMavenWorkspace([:], body)
+}
+
+void withMavenWorkspace(Map args, Closure body) {
+	helper.withMavenWorkspace(args, {
+		// The script is in the code repository, so we need the scm checkout
+		// to be performed by helper.withMavenWorkspace before we can call the script.
+		sh 'ci/docker-prune.sh'
+		try {
+			body()
+		}
+		finally {
+			sh 'ci/docker-prune.sh'
+		}
+	})
 }
 
 // Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.

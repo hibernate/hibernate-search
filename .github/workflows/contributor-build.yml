@@ -45,6 +45,8 @@ jobs:
           key: maven-localrepo-${{ steps.get-date.outputs.yearmonth }}
       - name: Set up Maven
         run: ./mvnw -v
+      - name: Docker prune
+        run: ./ci/docker-prune.sh
       - name: Build and test
         run: ./mvnw $MAVEN_ARGS install -Pdist -Pcoverage -Pjqassistant
       - name: Upload test reports (if Maven failed)
@@ -53,5 +55,8 @@ jobs:
         with:
           name: test-reports-java11
           path: './**/*-reports/'
+      - name: Docker prune
+        if: always()
+        run: ./ci/docker-prune.sh
       - name: Omit produced artifacts from build cache
         run: rm -r ~/.m2/repository/org/hibernate/search
