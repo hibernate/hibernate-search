@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.common.data.impl;
 
-import com.google.common.primitives.Chars;
-
 /**
  * A fast, but cryptographically insecure hash function,
  * implementing Murmur3.
@@ -35,6 +33,8 @@ import com.google.common.primitives.Chars;
  */
 public final class Murmur3HashFunction implements RangeCompatibleHashFunction {
 	public static final Murmur3HashFunction INSTANCE = new Murmur3HashFunction( 0 );
+
+	private static final int BYTES_PER_CHAR = Character.SIZE / Byte.SIZE;
 
 	private static final int C1 = 0xcc9e2d51;
 	private static final int C2 = 0x1b873593;
@@ -68,7 +68,7 @@ public final class Murmur3HashFunction implements RangeCompatibleHashFunction {
 			h1 ^= k1;
 		}
 
-		return fmix( h1, Chars.BYTES * input.length() );
+		return fmix( h1, BYTES_PER_CHAR * input.length() );
 	}
 
 	private static int mixK1(int k1) {
