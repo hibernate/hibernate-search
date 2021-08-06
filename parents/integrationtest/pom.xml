@@ -430,15 +430,17 @@
                                 </run>
                             </image>
                         </images>
-                        <!--Stops all images currently running, not just those we just started.
-                          Useful to stop processes still running from a previously failed integration test run -->
-                        <allContainers>true</allContainers>
                     </configuration>
                     <executions>
                         <execution>
                             <id>docker-start</id>
                             <phase>pre-integration-test</phase>
                             <goals>
+                                <!-- Stops all images currently running before starting them again.
+                                     Useful to stop processes still running from a previously failed integration test run.
+                                     Because this is invoked before the start goal,
+                                     this will stop all images defined in the configuration, not just those we will start.
+                                     -->
                                 <goal>stop</goal>
                                 <goal>start</goal>
                             </goals>
