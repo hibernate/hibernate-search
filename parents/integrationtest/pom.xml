@@ -147,6 +147,7 @@
                     <version>${version.docker.maven.plugin}</version>
                     <configuration>
                         <skip>${test.containers.run.skip}</skip>
+                        <startParallel>true</startParallel>
                         <images>
                             <image>
                                 <name>${test.elasticsearch.run.elastic.image.name}:${test.elasticsearch.run.elastic.image.tag}</name>
