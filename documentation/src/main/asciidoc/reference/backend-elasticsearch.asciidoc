@@ -400,8 +400,8 @@ Elasticsearch disables sharding by default.
 To enable it,
 link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
 
-[[backend-elasticsearch-index-lifecycle]]
-== Index lifecycle
+[[backend-elasticsearch-schema-management]]
+== Schema management
 // Search 5 anchors backward compatibility
 [[elasticsearch-schema-management-strategy]]
 
@@ -409,6 +409,8 @@ Elasticsearch indexes need to be created before they can be used for indexing an
 see <<mapper-orm-schema-management>> for more information about how to create indexes and their schema
 in Hibernate Search.
 
+// Search 6 anchors backward compatibility
+[[backend-elasticsearch-index-lifecycle]]
 For Elasticsearch specifically, some fine-tuning is available through the following options:
 
 [source]
@@ -436,26 +438,27 @@ Hibernate Search works with link:{elasticsearchDocUrl}/indices-aliases.html[alia
 This means an index with a given name in Hibernate Search will not directly be mapped
 to an index with the same name in Elasticsearch.
 
-Multiple layout strategies are available:
+The index layout is how Hibernate Search index names are mapped to Elasticsearch indexes,
+and the strategy controlling that layout is set at the backend level:
 
-[[backend-elasticsearch-indexlayout-strategy-simple]]`simple`::
-The default, future-proof strategy.
-+
+[source]
+----
+hibernate.search.backend.layout.strategy = simple
+----
+
+The default for this property is `simple`.
+
+See the following subsections for details about available strategies.
+
+[[backend-elasticsearch-indexlayout-strategy-simple]]
+=== `simple`: the default, future-proof strategy
+
 For an index whose name in Hibernate Search is `myIndex`:
 
-* If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
+* If Hibernate Search <<backend-elasticsearch-schema-management,creates the index automatically>>,
 it will name the index `myindex-000001` and will automatically create the write and read aliases.
 * Write operations (indexing, purge, ...) will target the alias `myindex-write`.
 * Read operations (searching, explaining, ...) will target the alias `myindex-read`.
-[[backend-elasticsearch-indexlayout-strategy-no-alias]]`no-alias`::
-A strategy without index aliases. Mostly useful on legacy clusters.
-+
-For an index whose name in Hibernate Search is `myIndex`:
-
-* If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
-it will name the index `myindex` and will not create any alias.
-* Write operations (indexing, purge, ...) will target the index directly by its name, `myindex`.
-* Read operations (searching, explaining, ...) will target the index directly by its name `myindex`.
 
 [TIP]
 ====
@@ -490,6 +493,21 @@ You will find discussions on this topic in https://hibernate.atlassian.net/brows
 and https://hibernate.atlassian.net/browse/HSEARCH-3499[HSEARCH-3499].
 ====
 
+[[backend-elasticsearch-indexlayout-strategy-no-alias]]
+=== `no-alias`: a strategy without index aliases
+
+This strategy is mostly useful on legacy clusters.
+
+For an index whose name in Hibernate Search is `myIndex`:
+
+* If Hibernate Search <<backend-elasticsearch-schema-management,creates the index automatically>>,
+it will name the index `myindex` and will not create any alias.
+* Write operations (indexing, purge, ...) will target the index directly by its name, `myindex`.
+* Read operations (searching, explaining, ...) will target the index directly by its name `myindex`.
+
+[[backend-elasticsearch-indexlayout-strategy-custom]]
+=== Custom strategy
+
 If the built-in layout strategies do not fit your requirements,
 you can define a custom layout in two simple steps:
 
@@ -503,7 +521,7 @@ For example, the implementation below will lead to the following layout for an i
 
 * Write operations (indexing, purge, ...) will target the alias `myindex-write`.
 * Read operations (searching, explaining, ...) will target the alias `myindex` (no suffix).
-* If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>
+* If Hibernate Search <<backend-elasticsearch-schema-management,creates the index automatically>>
 at exactly 19:19:00 on November 6th, 2017,
 it will name the index `myindex-20171106-191900-000000000`.
 
@@ -515,7 +533,8 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/la
 ----
 ====
 
-=== Retrieving the read and write index names
+[[backend-elasticsearch-indexlayout-metamodel]]
+=== Retrieving index or alias names
 
 Index or alias names used to read and write can be retrieved from the <<mapper-orm-mapping-inspect,metamodel>>.
 
@@ -548,7 +567,7 @@ Aspects that are specific to the Elasticsearch backend are explained in this sec
 [TIP]
 ====
 Hibernate Search can be configured to push the mapping to Elasticsearch when creating the indexes
-through the <<backend-elasticsearch-index-lifecycle,index lifecycle strategy>>.
+through <<backend-elasticsearch-schema-management,schema management>>.
 ====
 
 [[backend-elasticsearch-field-types]]
@@ -719,7 +738,7 @@ it needs to determine the type of each search hit in order to map it back to an 
 There are multiple strategies to handle this "type name resolution",
 and each has pros and cons.
 
-The strategy is set a the backend level:
+The strategy is set at the backend level:
 
 [source]
 ----
