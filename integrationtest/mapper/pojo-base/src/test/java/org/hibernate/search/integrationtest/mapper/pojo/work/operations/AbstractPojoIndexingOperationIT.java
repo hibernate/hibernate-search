@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
-import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.ADD;
-import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.DELETE;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.when;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -38,24 +37,22 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 /**
- * Abstract base for {@link PojoIndexingPlanOperationIT}
- * and {@link PojoIndexerOperationIT}
+ * Abstract base for {@link AbstractPojoIndexingPlanOperationBaseIT}
+ * and {@link AbstractPojoIndexerOperationBaseIT}
  */
 @RunWith(Parameterized.class)
 public abstract class AbstractPojoIndexingOperationIT {
 
-	@Parameterized.Parameters(name = "operation: {0}, commit: {1}, refresh: {2}, tenantID: {3}, routing: {4}")
+	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
 	public static List<Object[]> parameters() {
 		List<Object[]> params = new ArrayList<>();
 		MyRoutingBinder routingBinder = new MyRoutingBinder();
-		for ( PojoIndexingOperation operation : PojoIndexingOperation.values() ) {
-			for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
-				for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
-					params.add( new Object[] { operation, commitStrategy, refreshStrategy, null, null } );
-					params.add( new Object[] { operation, commitStrategy, refreshStrategy, null, routingBinder } );
-					params.add( new Object[] { operation, commitStrategy, refreshStrategy, "tenant1", null } );
-					params.add( new Object[] { operation, commitStrategy, refreshStrategy, "tenant1", routingBinder } );
-				}
+		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
+			for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
+				params.add( new Object[] { commitStrategy, refreshStrategy, null, null } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, null, routingBinder } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", null } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", routingBinder } );
 			}
 		}
 		return params;
@@ -71,15 +68,13 @@ public abstract class AbstractPojoIndexingOperationIT {
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	@Parameterized.Parameter(0)
-	public PojoIndexingOperation operation;
-	@Parameterized.Parameter(1)
+	@Parameterized.Parameter
 	public DocumentCommitStrategy commitStrategy;
-	@Parameterized.Parameter(2)
+	@Parameterized.Parameter(1)
 	public DocumentRefreshStrategy refreshStrategy;
-	@Parameterized.Parameter(3)
+	@Parameterized.Parameter(2)
 	public String tenantId;
-	@Parameterized.Parameter(4)
+	@Parameterized.Parameter(3)
 	public MyRoutingBinder routingBinder;
 
 	protected SearchMapping mapping;
@@ -119,12 +114,14 @@ public abstract class AbstractPojoIndexingOperationIT {
 		MyRoutingBridge.previousValues = null;
 	}
 
+	protected abstract PojoIndexingOperationScenario scenario();
+
 	protected final boolean isAdd() {
-		return ADD.equals( operation );
+		return BackendIndexingOperation.ADD.equals( scenario().expectedBackendOperation );
 	}
 
 	protected final boolean isDelete() {
-		return DELETE.equals( operation );
+		return BackendIndexingOperation.DELETE.equals( scenario().expectedBackendOperation );
 	}
 
 	protected abstract boolean isImplicitRoutingEnabled();
@@ -143,27 +140,41 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.build();
 	}
 
-	protected final void expectIndexedEntityLoading(Integer ... ids) {
+	protected final void expectIndexedEntityLoadingIfRelevant(Integer ... ids) {
 		List<IndexedEntity> entities = new ArrayList<>();
 		for ( Integer id : ids ) {
 			entities.add( IndexedEntity.of( id ) );
 		}
-		expectIndexedEntityLoading( Arrays.asList( ids ), entities );
+		expectIndexedEntityLoadingIfRelevant( Arrays.asList( ids ), entities );
 	}
 
-	protected final void expectIndexedEntityLoading(List<Integer> ids, List<IndexedEntity> entities) {
+	protected final void expectIndexedEntityLoadingIfRelevant(List<Integer> ids, List<IndexedEntity> entities) {
+		if ( !scenario().expectImplicitLoadingOnNullEntity() ) {
+			return;
+		}
+		if ( !scenario().isEntityPresentOnLoading() ) {
+			entities = new ArrayList<>( entities );
+			Collections.fill( entities, null );
+		}
 		when( indexedEntityLoaderMock.load( ids, null ) ).thenReturn( entities );
 	}
 
-	protected final void expectContainedEntityLoading(Integer ... ids) {
+	protected final void expectContainedEntityLoadingIfRelevant(Integer ... ids) {
 		List<ContainedEntity> entities = new ArrayList<>();
 		for ( Integer id : ids ) {
 			entities.add( ContainedEntity.of( id ) );
 		}
-		expectContainedEntityLoading( Arrays.asList( ids ), entities );
+		expectContainedEntityLoadingIfRelevant( Arrays.asList( ids ), entities );
 	}
 
-	protected final void expectContainedEntityLoading(List<Integer> ids, List<ContainedEntity> entities) {
+	protected final void expectContainedEntityLoadingIfRelevant(List<Integer> ids, List<ContainedEntity> entities) {
+		if ( !scenario().expectImplicitLoadingOnNullEntity() ) {
+			return;
+		}
+		if ( !scenario().isEntityPresentOnLoading() ) {
+			entities = new ArrayList<>( entities );
+			Collections.fill( entities, null );
+		}
 		when( containedEntityLoaderMock.load( ids, null ) ).thenReturn( entities );
 	}
 
@@ -186,7 +197,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		else {
 			expectedRoutingKey = providedRoutingKey;
 		}
-		operation.expect( context,
+		scenario().expectedBackendOperation.expect( context,
 				tenantId, String.valueOf( id ), expectedRoutingKey, value, null );
 	}
 
@@ -209,7 +220,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		else {
 			expectedRoutingKey = null;
 		}
-		PojoIndexingOperation.ADD_OR_UPDATE.expect( context.createAndExecuteFollowingWorks( futureFromBackend ),
+		BackendIndexingOperation.ADD_OR_UPDATE.expect( context.createAndExecuteFollowingWorks( futureFromBackend ),
 				tenantId, String.valueOf( id ), expectedRoutingKey, value, containedValue );
 	}
 

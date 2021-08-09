@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
-import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.addWorkInfo;
+import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.BackendIndexingOperation.addWorkInfo;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.Arrays;
@@ -21,14 +21,11 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexer}.
  */
-@RunWith(Parameterized.class)
-public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
+public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoIndexingOperationIT {
 
 	@Test
 	public void success() {
@@ -37,7 +34,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 1, null, "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -53,7 +50,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 42, null, "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, 42, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, 42, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -92,7 +89,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 						}
 					},
 					42, "UE-123", "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, 42,
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ), Collections.emptyList() ),
 					IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
@@ -134,7 +131,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 					},
 					// And only then, expect the actual operation.
 					42, "UE-123", "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, 42,
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
 							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
 									DocumentRouteDescriptor.of( "UE-122" ),
@@ -170,7 +167,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 					// And only then, expect the actual operation.
 					1, null, "1"
 			);
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -206,7 +203,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 					// And only then, expect the actual operation.
 					1, null, "1"
 			);
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -226,7 +223,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 			MyRoutingBridge.indexed = false;
 			MyRoutingBridge.previouslyIndexed = false;
 			// We don't expect the actual operation, which should be skipped because the entity is not indexed.
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isSuccessful();
 		}
@@ -249,7 +246,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isSuccessful();
 		}
@@ -279,7 +276,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isSuccessful();
 		}
@@ -293,7 +290,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 1, null, "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -310,7 +307,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 1, null, "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
+			CompletionStage<?> returnedFuture = scenario().execute( indexer, null, IndexedEntity.of( 1 ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 

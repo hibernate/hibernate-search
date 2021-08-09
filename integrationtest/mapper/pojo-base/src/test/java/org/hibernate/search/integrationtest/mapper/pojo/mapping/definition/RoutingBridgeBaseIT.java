@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingPlanOperationIT;
+import org.hibernate.search.integrationtest.mapper.pojo.work.operations.AbstractPojoIndexingPlanOperationBaseIT;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
@@ -41,7 +41,7 @@ import org.junit.Test;
  * Test common use cases of (custom) routing bridges.
  * <p>
  * Does not test the effect of routing in depth for all operations; this is tested in
- * {@link PojoIndexingPlanOperationIT}.
+ * {@link AbstractPojoIndexingPlanOperationBaseIT}.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3108")
