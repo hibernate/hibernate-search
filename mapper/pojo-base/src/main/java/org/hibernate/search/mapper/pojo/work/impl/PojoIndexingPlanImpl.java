@@ -88,6 +88,17 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 	}
 
 	@Override
+	public void addOrUpdateOrDelete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, boolean forceSelfDirty, boolean forceContainingDirty,
+			BitSet dirtyPaths) {
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
+		if ( ! mayRequireLoading ) {
+			mayRequireLoading = true;
+		}
+		delegate.addOrUpdateOrDelete( providedId, providedRoutes, dirtyPaths, forceSelfDirty, forceContainingDirty );
+	}
+
+	@Override
 	public void process() {
 		if ( isProcessing ) {
 			throw log.recursiveIndexingPlanProcess();

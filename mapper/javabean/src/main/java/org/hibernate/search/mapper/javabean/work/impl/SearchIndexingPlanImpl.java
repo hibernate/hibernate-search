@@ -104,6 +104,16 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes, null );
 	}
 
+	@Override
+	public void addOrUpdateOrDelete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes,
+			boolean forceSelfDirty, boolean forceContainingDirty, String... dirtyPathsAsStrings) {
+		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entityClass );
+		SearchIndexingPlanTypeContext<?> typeContext = typeContextProvider.forExactType( typeIdentifier );
+		BitSet dirtyPaths = typeContext == null ? null : typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
+		delegate.addOrUpdateOrDelete( typeIdentifier, providedId, providedRoutes,
+				forceSelfDirty, forceContainingDirty, dirtyPaths );
+	}
+
 	public CompletableFuture<?> execute() {
 		return delegate.executeAndReport( entityReferenceFactory ).thenApply( report -> {
 			report.throwable().ifPresent( t -> {
