@@ -135,7 +135,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		EntityStatus initialStatus = EntityStatus.UNKNOWN;
 		EntityStatus currentStatus = EntityStatus.UNKNOWN;
 
-		private boolean shouldResolveToReindex;
+		private boolean resolvingToReindex;
 		private boolean updatedBecauseOfContained;
 		private boolean forceSelfDirty;
 		private boolean forceContainingDirty;
@@ -161,7 +161,6 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			shouldResolveToReindex = true;
 			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
 				initialStatus = EntityStatus.ABSENT;
 			}
@@ -174,7 +173,6 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		void addOrUpdate(Supplier<E> entitySupplier, BitSet dirtyPaths,
 				boolean forceSelfDirty, boolean forceContainingDirty) {
 			doAddOrUpdate( entitySupplier );
-			shouldResolveToReindex = true;
 			this.forceSelfDirty = this.forceSelfDirty || forceSelfDirty;
 			this.forceContainingDirty = this.forceContainingDirty || forceContainingDirty;
 			if ( this.forceSelfDirty && this.forceContainingDirty ) {
@@ -235,17 +233,23 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 
 		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
-			if ( shouldResolveToReindex ) {
-				shouldResolveToReindex = false; // Avoid infinite looping
-				Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
-				if ( entitySupplier == null ) {
-					// We couldn't retrieve the entity.
-					// Assume it was deleted and there's nothing to resolve.
-					return;
+			// Reindexing does not make sense for a deleted entity
+			if ( currentStatus == EntityStatus.PRESENT && !resolvingToReindex ) {
+				resolvingToReindex = true; // Avoid infinite looping
+				try {
+					Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
+					if ( entitySupplier == null ) {
+						// We couldn't retrieve the entity.
+						// Assume it was deleted and there's nothing to resolve.
+						return;
+					}
+					typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
+							entitySupplier, this
+					);
 				}
-				typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
-						entitySupplier, this
-				);
+				finally {
+					resolvingToReindex = false;
+				}
 			}
 		}
 
