@@ -423,7 +423,7 @@ changes will not be visible right after the transaction is committed.
 A slight delay (by default one second) will be necessary for Elasticsearch to process the changes.
 
 For that reason, if you modify entities in a transaction,
-and then a execute search query right after that transaction,
+and then execute a search query right after that transaction,
 the search results may not be consistent with the changes you just performed.
 
 See <<mapper-orm-indexing-automatic-synchronization>> for more information about this behavior and how to tune it.
