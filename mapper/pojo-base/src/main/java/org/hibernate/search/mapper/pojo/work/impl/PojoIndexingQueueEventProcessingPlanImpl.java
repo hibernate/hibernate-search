@@ -53,7 +53,7 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 		UpdateCauseDescriptor cause = payload.updateCause;
 		delegate.addOrUpdate( typeContext.typeIdentifier(), id, payload.routes, null,
 				// Force the reindexing now if the entity was marked as dirty because of a contained entity;
-				// this is to avoid sending events forever and to force the processing of "updateBecauseofContained" now.
+				// this is to avoid sending events forever and to force the processing of "updateBecauseOfContained" now.
 				// See org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexingPlanIndexOrEventQueueDelegate.addOrUpdate
 				cause.updatedBecauseOfContained() || cause.forceSelfDirty(),
 				cause.forceContainingDirty(),
