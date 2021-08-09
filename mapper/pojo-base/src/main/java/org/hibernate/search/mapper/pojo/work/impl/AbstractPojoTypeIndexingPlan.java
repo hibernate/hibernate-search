@@ -67,6 +67,14 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		state.providedRoutes( providedRoutes );
 	}
 
+	void addOrUpdateOrDelete(Object providedId, DocumentRoutesDescriptor providedRoutes, BitSet dirtyPaths,
+			boolean forceSelfDirty, boolean forceContainingDirty) {
+		I identifier = toIdentifier( providedId, null );
+		S state = getState( identifier );
+		state.addOrUpdateOrDelete( dirtyPaths, forceSelfDirty, forceContainingDirty );
+		state.providedRoutes( providedRoutes );
+	}
+
 	void planLoading(PojoLoadingPlanProvider loadingPlanProvider) {
 		for ( S state : statesPerId.values() ) {
 			state.planLoading( loadingPlanProvider );
@@ -173,14 +181,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		void addOrUpdate(Supplier<E> entitySupplier, BitSet dirtyPaths,
 				boolean forceSelfDirty, boolean forceContainingDirty) {
 			doAddOrUpdate( entitySupplier );
-			this.forceSelfDirty = this.forceSelfDirty || forceSelfDirty;
-			this.forceContainingDirty = this.forceContainingDirty || forceContainingDirty;
-			if ( this.forceSelfDirty && this.forceContainingDirty ) {
-				this.dirtyPaths = null;
-			}
-			else {
-				addDirtyPaths( dirtyPaths );
-			}
+			doUpdateDirty( dirtyPaths, forceSelfDirty, forceContainingDirty );
 		}
 
 		// Should only be called on indexed types,
@@ -215,11 +216,27 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			currentStatus = EntityStatus.ABSENT;
 
 			// Reindexing does not make sense for a deleted entity
-			shouldResolveToReindex = false;
 			updatedBecauseOfContained = false;
 			forceSelfDirty = false;
 			forceContainingDirty = false;
 			dirtyPaths = null;
+		}
+
+		void addOrUpdateOrDelete(BitSet dirtyPaths, boolean forceSelfDirty, boolean forceContainingDirty) {
+			this.entitySupplier = null;
+			currentStatus = EntityStatus.UNKNOWN;
+			doUpdateDirty( dirtyPaths, forceSelfDirty, forceContainingDirty );
+		}
+
+		protected void doUpdateDirty(BitSet dirtyPaths, boolean forceSelfDirty, boolean forceContainingDirty) {
+			this.forceSelfDirty = this.forceSelfDirty || forceSelfDirty;
+			this.forceContainingDirty = this.forceContainingDirty || forceContainingDirty;
+			if ( this.forceSelfDirty && this.forceContainingDirty ) {
+				this.dirtyPaths = null;
+			}
+			else {
+				addDirtyPaths( dirtyPaths );
+			}
 		}
 
 		abstract void providedRoutes(DocumentRoutesDescriptor routes);
@@ -227,14 +244,14 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		abstract DocumentRoutesDescriptor providedRoutes();
 
 		void planLoading(PojoLoadingPlanProvider loadingPlanProvider) {
-			if ( EntityStatus.PRESENT == currentStatus && entitySupplier == null ) {
+			if ( EntityStatus.ABSENT != currentStatus && entitySupplier == null ) {
 				loadingOrdinal = loadingPlanProvider.loadingPlan().planLoading( typeContext(), identifier );
 			}
 		}
 
 		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
 			// Reindexing does not make sense for a deleted entity
-			if ( currentStatus == EntityStatus.PRESENT && !resolvingToReindex ) {
+			if ( currentStatus != EntityStatus.ABSENT && !resolvingToReindex ) {
 				resolvingToReindex = true; // Avoid infinite looping
 				try {
 					Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
@@ -254,11 +271,11 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 
 		void sendCommandsToDelegate(PojoLoadingPlanProvider loadingPlanProvider) {
+			if ( EntityStatus.UNKNOWN.equals( currentStatus ) ) {
+				Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
+				currentStatus = entitySupplier != null ? EntityStatus.PRESENT : EntityStatus.ABSENT;
+			}
 			switch ( currentStatus ) {
-				case UNKNOWN:
-					// No operation was called on this state.
-					// Don't do anything.
-					return;
 				case PRESENT:
 					switch ( initialStatus ) {
 						case ABSENT:

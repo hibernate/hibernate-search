@@ -223,4 +223,28 @@ public interface SearchIndexingPlan {
 	 */
 	void delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes);
 
+	/**
+	 * Consider an entity added, updated, or deleted,
+	 * depending on the result of loading it by ID,
+	 * and perform reindexing of this entity as well as containing entities as necessary,
+	 * taking into account {@code dirtyPaths}, {@code forceSelfDirty} and {@code forceContainingDirty}.
+	 *
+	 * @param entityClass The class of the entity to add, update or delete from the index.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutes The routes to the current and previous index shards.
+	 * Only required if custom routing is enabled
+	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
+	 * or unable to provide all the correct previous routes.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
+	 * @param forceSelfDirty If {@code true}, forces reindexing of this entity regardless of the dirty paths.
+	 * @param forceContainingDirty If {@code true}, forces the resolution of containing entities as dirty.
+	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
+	 */
+	void addOrUpdateOrDelete(Class<?> entityClass, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
+			boolean forceSelfDirty, boolean forceContainingDirty, String... dirtyPaths);
+
 }

@@ -113,6 +113,33 @@ public interface PojoIndexingPlan {
 			DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
+	 * Consider an entity added, updated, or deleted,
+	 * depending on the result of loading it by ID,
+	 * and perform reindexing of this entity as well as containing entities as necessary,
+	 * taking into account {@code dirtyPaths}, {@code forceSelfDirty} and {@code forceContainingDirty}.
+	 *
+	 * @param typeIdentifier The identifier of the entity type.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutes The routes to the current and previous index shards.
+	 * Only required if custom routing is enabled
+	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
+	 * or unable to provide all the correct previous routes.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
+	 * @param forceSelfDirty If {@code true}, forces reindexing of this entity regardless of the dirty paths.
+	 * @param forceContainingDirty If {@code true}, forces the resolution of containing entities as dirty.
+	 * @param dirtyPaths The paths to consider dirty, as a {@link BitSet}.
+	 * You can build such a {@link BitSet} by obtaining the
+	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}
+	 * for the entity type and calling one of the {@code filter} methods.
+	 */
+	void addOrUpdateOrDelete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths);
+
+	/**
 	 * Extract all data from objects passed to the indexing plan so far,
 	 * create documents to be indexed and put them into an internal buffer,
 	 * without writing them to the indexes.
