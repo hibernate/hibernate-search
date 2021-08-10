@@ -1,5 +1,5 @@
 [[limitations]]
-= Limitations
+= Known issues and limitations
 // Search 5 anchors backward compatibility
 [[elasticsearch-limitations]]
 
@@ -37,7 +37,7 @@ will lead to an out of date index:
 
 This chain of events ends with the index containing a version of A where C is updated, but B is not.
 
-=== Workaround
+=== Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
@@ -75,7 +75,7 @@ Errors occurring in user code (getters, custom <<mapper-orm-bridge,bridges>>, ..
 will safely cancel the whole database transaction without indexing anything,
 ensuring that indexes are still in sync with the database.
 
-=== Workaround
+=== Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
@@ -109,7 +109,7 @@ be it SQL or JPQL/HQL queries.
 This is because queries are executed on the database side,
 without Hibernate ORM or Search having any knowledge of which entities are actually created, deleted or updated.
 
-=== Workaround
+=== Solutions and workarounds
 
 One workaround is to reindex explicitly after you run JPQL/SQL queries,
 either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
@@ -158,7 +158,7 @@ In the end, the only way for Hibernate Search to know that `A` needs to be reind
 is to also set `A.b` to `null`, which will cause Hibernate Search to detect that `A.b` changed,
 and thus that `A` changed too.
 
-=== Workaround
+=== Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
@@ -202,7 +202,7 @@ and Hibernate Search will likely "forget" to reindex some entities.
 This is fine in most applications, since they do not rely on serializing the session,
 but it might be a problem with some JEE applications relying on Bean Passivation.
 
-=== Workaround
+=== Solutions and workarounds
 
 Avoid serializing an ORM `EntityManager`/`Session` after changing entities.
 
@@ -233,7 +233,7 @@ they may lead to out-of-order ID generation.
 In this **very** specific case, the entity may end up being deleted from the index,
 and not added until another change happens for that entity.
 
-=== Workaround
+=== Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
