@@ -67,7 +67,7 @@ public class DatabasePollingAutomaticIndexingLifecycleIT {
 		// wait for the first call is processed (partial progressing)
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		SessionFactory finalSessionFactory = sessionFactory;
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( finalSessionFactory, session -> {
 				assertThat( outboxEventFinder.findOutboxEventIdsNoFilter( session ) ).hasSizeLessThan( size );
 			} );

@@ -7,15 +7,15 @@
 package org.hibernate.search.integrationtest.spring.jta;
 
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendWorkThreadingExpectations;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
 
 public class JtaAndSpringOutboxApplicationConfiguration extends JtaAndSpringApplicationConfiguration {
 
 	@Override
 	public BackendMock backendMock() {
 		BackendMock backendMock = super.backendMock();
-		backendMock.indexingWorkThreadingExpectations(
-				BackendWorkThreadingExpectations.async( ".*Outbox event processor.*" ) );
+		backendMock.indexingWorkExpectations(
+				BackendIndexingWorkExpectations.async( ".*Outbox event processor.*" ) );
 		return backendMock;
 	}
 }

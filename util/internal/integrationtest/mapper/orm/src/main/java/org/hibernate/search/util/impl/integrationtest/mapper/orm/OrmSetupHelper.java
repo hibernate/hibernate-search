@@ -108,8 +108,7 @@ public final class OrmSetupHelper
 	@Override
 	protected void init() {
 		for ( BackendMock backendMock : backendMocks ) {
-			backendMock.indexingWorkThreadingExpectations(
-					coordinationStrategyExpectations.indexingWorkThreadingExpectations );
+			backendMock.indexingWorkExpectations( coordinationStrategyExpectations.indexingWorkExpectations );
 		}
 	}
 

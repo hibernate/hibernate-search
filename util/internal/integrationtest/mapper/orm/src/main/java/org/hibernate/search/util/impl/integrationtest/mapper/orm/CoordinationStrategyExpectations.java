@@ -7,13 +7,13 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendWorkThreadingExpectations;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.coordination.localheap.LocalHeapQueueCooordinationStrategy;
 
 public final class CoordinationStrategyExpectations {
 
 	public static CoordinationStrategyExpectations defaults() {
-		return new CoordinationStrategyExpectations( null, true, BackendWorkThreadingExpectations.sync() );
+		return new CoordinationStrategyExpectations( null, true, BackendIndexingWorkExpectations.sync() );
 	}
 
 	public static CoordinationStrategyExpectations localHeapQueue() {
@@ -26,18 +26,18 @@ public final class CoordinationStrategyExpectations {
 
 	private static CoordinationStrategyExpectations async(String strategyName, String threadNamePattern) {
 		return new CoordinationStrategyExpectations( strategyName, false,
-				BackendWorkThreadingExpectations.async( threadNamePattern ) );
+				BackendIndexingWorkExpectations.async( threadNamePattern ) );
 	}
 
 	final String strategyName;
 	final boolean sync;
-	final BackendWorkThreadingExpectations indexingWorkThreadingExpectations;
+	final BackendIndexingWorkExpectations indexingWorkExpectations;
 
 	private CoordinationStrategyExpectations(String strategyName, boolean sync,
-			BackendWorkThreadingExpectations indexingWorkThreadingExpectations) {
+			BackendIndexingWorkExpectations indexingWorkExpectations) {
 		this.strategyName = strategyName;
 		this.sync = sync;
-		this.indexingWorkThreadingExpectations = indexingWorkThreadingExpectations;
+		this.indexingWorkExpectations = indexingWorkExpectations;
 	}
 
 }

@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractSpringITConfig;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendWorkThreadingExpectations;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,8 +45,8 @@ public class TransactionOutboxIT {
 		@Override
 		public BackendMock backendMock() {
 			BackendMock backendMock = super.backendMock();
-			backendMock.indexingWorkThreadingExpectations(
-					BackendWorkThreadingExpectations.async( ".*Outbox event processor.*" ) );
+			backendMock.indexingWorkExpectations(
+					BackendIndexingWorkExpectations.async( ".*Outbox event processor.*" ) );
 			return backendMock;
 		}
 	}

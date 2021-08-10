@@ -40,11 +40,11 @@ public class BackendMock implements TestRule {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior( this::indexingWorkThreadingExpectations );
+	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
 
 	private boolean started = false;
 
-	private BackendWorkThreadingExpectations indexingWorkThreadingExpectations = BackendWorkThreadingExpectations.sync();
+	private BackendIndexingWorkExpectations indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
 
 	@Override
 	public Statement apply(Statement base, Description description) {
@@ -58,7 +58,7 @@ public class BackendMock implements TestRule {
 				}
 				finally {
 					resetExpectations();
-					indexingWorkThreadingExpectations = BackendWorkThreadingExpectations.sync();
+					indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
 					started = false;
 				}
 			}
@@ -74,12 +74,12 @@ public class BackendMock implements TestRule {
 		return new StubBackendFactory( backendBehavior );
 	}
 
-	public void indexingWorkThreadingExpectations(BackendWorkThreadingExpectations expectations) {
-		indexingWorkThreadingExpectations = expectations;
+	public void indexingWorkExpectations(BackendIndexingWorkExpectations expectations) {
+		indexingWorkExpectations = expectations;
 	}
 
-	public BackendWorkThreadingExpectations indexingWorkThreadingExpectations() {
-		return indexingWorkThreadingExpectations;
+	public BackendIndexingWorkExpectations indexingWorkExpectations() {
+		return indexingWorkExpectations;
 	}
 
 	public void resetExpectations() {
@@ -376,11 +376,11 @@ public class BackendMock implements TestRule {
 		}
 
 		public DocumentWorkCallListContext add(Consumer<StubDocumentWork.Builder> contributor) {
-			return documentWork( StubDocumentWork.Type.ADD, contributor );
+			return documentWork( indexingWorkExpectations.addWorkType, contributor );
 		}
 
 		public DocumentWorkCallListContext add(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
-			return documentWork( StubDocumentWork.Type.ADD, id, documentContributor );
+			return documentWork( indexingWorkExpectations.addWorkType, id, documentContributor );
 		}
 
 		public DocumentWorkCallListContext addOrUpdate(Consumer<StubDocumentWork.Builder> contributor) {

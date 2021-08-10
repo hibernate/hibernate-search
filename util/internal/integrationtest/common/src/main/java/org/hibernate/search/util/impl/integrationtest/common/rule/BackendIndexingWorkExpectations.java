@@ -14,25 +14,33 @@ import java.time.Duration;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 import org.awaitility.core.ThrowingRunnable;
 
-public final class BackendWorkThreadingExpectations {
+public final class BackendIndexingWorkExpectations {
 
-	public static BackendWorkThreadingExpectations sync() {
-		return new BackendWorkThreadingExpectations( true, null );
+	public static BackendIndexingWorkExpectations sync() {
+		return new BackendIndexingWorkExpectations( true, null, StubDocumentWork.Type.ADD );
 	}
 
-	public static BackendWorkThreadingExpectations async(String threadNamePattern) {
-		return new BackendWorkThreadingExpectations( false, Pattern.compile( threadNamePattern ) );
+	public static BackendIndexingWorkExpectations async(String threadNamePattern) {
+		return async( threadNamePattern, StubDocumentWork.Type.ADD );
+	}
+
+	public static BackendIndexingWorkExpectations async(String threadNamePattern, StubDocumentWork.Type addWorkType) {
+		return new BackendIndexingWorkExpectations( false, Pattern.compile( threadNamePattern ), addWorkType );
 	}
 
 	private final boolean sync;
 	private final Pattern expectedThreadNamePattern;
+	final StubDocumentWork.Type addWorkType;
 
-	private BackendWorkThreadingExpectations(boolean sync, Pattern expectedThreadNamePattern) {
+	private BackendIndexingWorkExpectations(boolean sync, Pattern expectedThreadNamePattern,
+			StubDocumentWork.Type addWorkType) {
 		this.sync = sync;
 		this.expectedThreadNamePattern = expectedThreadNamePattern;
+		this.addWorkType = addWorkType;
 	}
 
 	public void awaitIndexingAssertions(ThrowingRunnable assertions) {
