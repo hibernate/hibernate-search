@@ -22,7 +22,7 @@ public class CallQueue<C extends Call<? super C>> {
 	private final Deque<C> callsExpectedInOrder = new LinkedList<>();
 	private final List<C> callsExpectedOutOfOrder = new ArrayList<>();
 	private C lastMatchingCall;
-	private AssertionError lastVerifyFailure;
+	private volatile AssertionError lastVerifyFailure;
 
 	public void reset() {
 		callsExpectedInOrder.clear();
@@ -38,7 +38,18 @@ public class CallQueue<C extends Call<? super C>> {
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
-	public synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
+	public final synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
+			Function<C2, T> noExpectationBehavior) {
+		try {
+			return tryVerify( actualCall, callVerifyFunction, noExpectationBehavior );
+		}
+		catch (AssertionError e) {
+			lastVerifyFailure = e;
+			throw e;
+		}
+	}
+
+	private synchronized <C2 extends C, T> T tryVerify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
 			Function<C2, T> noExpectationBehavior) {
 		if ( callsExpectedInOrder.isEmpty() && callsExpectedOutOfOrder.isEmpty() ) {
 			return noExpectationBehavior.apply( actualCall );
@@ -110,7 +121,6 @@ public class CallQueue<C extends Call<? super C>> {
 			Fail.fail( message );
 		}
 		catch (AssertionError e) {
-			lastVerifyFailure = e;
 			return e;
 		}
 		// Dead code, the code above always throws an exception
