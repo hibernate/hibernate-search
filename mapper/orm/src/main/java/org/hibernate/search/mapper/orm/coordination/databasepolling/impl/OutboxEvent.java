@@ -13,12 +13,7 @@ import javax.persistence.Transient;
 
 public final class OutboxEvent {
 
-	public enum Type {
-		ADD, ADD_OR_UPDATE, DELETE
-	}
-
 	private Long id;
-	private Type type;
 	private Instant moment;
 
 	private String entityName;
@@ -33,9 +28,8 @@ public final class OutboxEvent {
 	public OutboxEvent() {
 	}
 
-	public OutboxEvent(Type type, String entityName, String entityId, int entityIdHash, byte[] payload,
+	public OutboxEvent(String entityName, String entityId, int entityIdHash, byte[] payload,
 			Object originalEntityId) {
-		this.type = type;
 		this.entityName = entityName;
 		this.entityId = entityId;
 		this.entityIdHash = entityIdHash;
@@ -49,14 +43,6 @@ public final class OutboxEvent {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Type getType() {
-		return type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
 	}
 
 	public Instant getMoment() {
@@ -128,13 +114,13 @@ public final class OutboxEvent {
 			return false;
 		}
 		OutboxEvent event = (OutboxEvent) o;
-		return type == event.type && Objects.equals( entityName, event.entityName ) && Objects.equals(
+		return Objects.equals( entityName, event.entityName ) && Objects.equals(
 				entityId, event.entityId ) && Arrays.equals( payload, event.payload );
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash( type, entityName, entityId );
+		int result = Objects.hash( entityName, entityId );
 		result = 31 * result + Arrays.hashCode( payload );
 		return result;
 	}
@@ -143,7 +129,6 @@ public final class OutboxEvent {
 	public String toString() {
 		return "OutboxEvent{" +
 				"id=" + id +
-				", type=" + type +
 				", moment=" + moment +
 				", entityName='" + entityName + '\'' +
 				", entityId='" + entityId + '\'' +

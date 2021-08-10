@@ -12,7 +12,6 @@ import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
-import java.lang.invoke.MethodHandles;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -26,11 +25,9 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
@@ -44,7 +41,6 @@ import org.junit.Test;
 public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
@@ -98,49 +94,42 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 3 );
-			// right order
-			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
-			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
-			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+			// Correct order when ordered by id (you'll have to trust me on that)
+			// add
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", null );
+			// update
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", null );
+			// delete
+			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			// change the ids 1 <--> 3
+			// Swap the IDs of event 1 (add) and 3 (delete)
 			updateOutboxTableRow( session, 1, 4 );
 			updateOutboxTableRow( session, 3, 1 );
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 3 );
-			// out-of-order by id
-			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
-			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
-			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+			// Out-of-order when ordered by id (you'll have to trust me on that)
+			// delete
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", null );
+			// update
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", null );
+			// add
+			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", null );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
-			assertThat( events ).hasSize( 3 );
-			// findOutboxEventsNoFilter is supposed to return the right order
-
-			// log the content of the events if something goes wrong:
-			if ( !OutboxEvent.Type.ADD.equals( events.get( 0 ).getType() ) ) {
-				log.info( "findOutboxEvents returns wrong order: " + events );
-			}
-			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
-
-			// log the content of the events if something goes wrong:
-			if ( !OutboxEvent.Type.ADD_OR_UPDATE.equals( events.get( 1 ).getType() ) ) {
-				log.info( "findOutboxEvents returns wrong order: " + events );
-			}
-			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
-
-			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
-		} );
+		// Only a delete work is expected to be executed by the time the outbox events are processed;
+		// that's because we don't trust events to tell us whether the document already exists in the index.
+		// We don't trust the events for this because they can arrive in the wrong order
+		// (and that's the case here).
+		backendMock.expectWorks( DatabasePollingAutomaticIndexingLifecycleIT.IndexedEntity.NAME )
+				.delete( "1" );
 
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
@@ -148,7 +137,6 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 
 		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
-		// No works are expected to be executed by the time the outbox events are processed
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -220,40 +208,30 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
-			// right order
-			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
-			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+			// Correct order when ordered by id (you'll have to trust me on that)
+			// delete
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", null );
+			// add
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			// change the ids 2 <--> 3
+			// Swap the IDs of event 2 (delete) and 3 (add)
 			updateOutboxTableRow( session, 2, 4 );
 			updateOutboxTableRow( session, 3, 2 );
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
-			// out-of-order by id
-			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
-			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
-		} );
-
-		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
-			assertThat( events ).hasSize( 2 );
-			// findOutboxEventsNoFilter is supposed to return the right order
-
-			// log the content of the events if something goes wrong:
-			if ( OutboxEvent.Type.ADD.equals( events.get( 0 ).getType() ) ) {
-				log.info( "findOutboxEvents returns wrong order: " + events );
-			}
-
-			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
-			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+			// Out-of-order when ordered by id (you'll have to trust me on that)
+			// add
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", null );
+			// delete
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", null );
 		} );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
@@ -343,32 +321,33 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
-			// right order
-			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+			// Correct order when ordered by id
+			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1",
 					"SECOND", "FIRST"
 			);
-			verifyOutboxEntry( events.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+			verifyOutboxEntry( events.get( 1 ), RoutedIndexedEntity.NAME, "1",
 					"THIRD", "SECOND"
 			);
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			// change the ids 2 <--> 3
+			// Swap the IDs of event 2 (update routing key from "FIRST" to "SECOND") and
+			// 3 (update routing key from "SECOND" to "THIRD")
 			updateOutboxTableRow( session, 2, 4 );
 			updateOutboxTableRow( session, 3, 2 );
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
-			// out-of-order now
-			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+			// Out-of-order when ordered by id
+			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1",
 					"THIRD", "SECOND"
 			);
-			verifyOutboxEntry( events.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+			verifyOutboxEntry( events.get( 1 ), RoutedIndexedEntity.NAME, "1",
 					"SECOND", "FIRST"
 			);
 		} );

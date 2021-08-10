@@ -78,18 +78,7 @@ public class OutboxEventProcessingPlan {
 	private void addEventsToThePlan() {
 		for ( OutboxEvent event : events ) {
 			PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize( PojoIndexingQueueEventPayload.class, event.getPayload() );
-
-			switch ( event.getType() ) {
-				case ADD:
-					processingPlan.add( event.getEntityName(), event.getEntityId(), payload );
-					break;
-				case ADD_OR_UPDATE:
-					processingPlan.addOrUpdate( event.getEntityName(), event.getEntityId(), payload );
-					break;
-				case DELETE:
-					processingPlan.delete( event.getEntityName(), event.getEntityId(), payload );
-					break;
-			}
+			processingPlan.append( event.getEntityName(), event.getEntityId(), payload );
 		}
 	}
 

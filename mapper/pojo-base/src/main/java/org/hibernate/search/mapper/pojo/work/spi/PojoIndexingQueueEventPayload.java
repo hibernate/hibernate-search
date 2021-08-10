@@ -13,19 +13,19 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 public final class PojoIndexingQueueEventPayload implements Serializable {
 
 	public final DocumentRoutesDescriptor routes;
-	public final UpdateCauseDescriptor updateCause;
+	public final DirtinessDescriptor dirtiness;
 
 	public PojoIndexingQueueEventPayload(DocumentRoutesDescriptor routes,
-			UpdateCauseDescriptor updateCause) {
+			DirtinessDescriptor dirtiness) {
 		this.routes = routes;
-		this.updateCause = updateCause;
+		this.dirtiness = dirtiness;
 	}
 
 	@Override
 	public String toString() {
 		return "PojoIndexingQueueEventPayload{" +
 				"routes=" + routes +
-				", updateCause=" + updateCause +
+				", updateCause=" + dirtiness +
 				'}';
 	}
 }

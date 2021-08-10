@@ -122,12 +122,22 @@ public class DatabasePollingAutomaticIndexingLifecycleIT {
 		sessionFactory = setup();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
-			assertThat( outboxEntries ).hasSize( 3 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
-			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
-			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedEntity.NAME, "1", OutboxEvent.Type.DELETE, null );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 3 );
+			// add
+			verifyOutboxEntry( events.get( 0 ), DatabasePollingAutomaticIndexingOutOfOrderIdsIT.IndexedEntity.INDEX, "1", null );
+			// update
+			verifyOutboxEntry( events.get( 1 ), DatabasePollingAutomaticIndexingOutOfOrderIdsIT.IndexedEntity.INDEX, "1", null );
+			// delete
+			verifyOutboxEntry( events.get( 2 ), DatabasePollingAutomaticIndexingOutOfOrderIdsIT.IndexedEntity.INDEX, "1", null );
 		} );
+
+		// Only a delete work is expected to be executed by the time the outbox events are processed;
+		// that's because we don't trust events to tell us whether the document already exists in the index.
+		// We don't trust the events for this because they can arrive in the wrong order
+		// (see DatabasePollingAutomaticIndexingOutOfOrderIdsIT).
+		backendMock.expectWorks( IndexedEntity.NAME )
+				.delete( "1" );
 
 		// The events were hidden until now, to ensure they were not processed in separate batches.
 		// Make them visible to Hibernate Search now.
@@ -135,7 +145,6 @@ public class DatabasePollingAutomaticIndexingLifecycleIT {
 
 		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
-		// No works are expected to be executed by the time the outbox events are processed
 		backendMock.verifyExpectationsMet();
 	}
 

@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.mapper.pojo.work.spi.UpdateCauseDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -52,32 +52,45 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 
 	@Override
 	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
-		sendingPlan.add( typeContext.entityName(), identifier,
+		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
+				true, false,
+				null,
+				false
+		);
+		sendingPlan.append( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
-				new PojoIndexingQueueEventPayload( DocumentRoutesDescriptor.of( route ), null ) );
+				new PojoIndexingQueueEventPayload( DocumentRoutesDescriptor.of( route ), dirtiness ) );
 	}
 
 	@Override
 	public void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier,
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths,
 			boolean updatedBecauseOfContained, boolean updateBecauseOfDirty) {
-		UpdateCauseDescriptor cause = new UpdateCauseDescriptor(
+		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
 				forceSelfDirty, forceContainingDirty,
 				dirtyPaths == null ? null : typeContext.pathOrdinals().toPathSet( dirtyPaths ),
 				updatedBecauseOfContained
 		);
-		sendingPlan.addOrUpdate(
+		sendingPlan.append(
 				typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
-				new PojoIndexingQueueEventPayload( routes, cause )
+				new PojoIndexingQueueEventPayload( routes, dirtiness )
 		);
 	}
 
 	@Override
 	public void delete(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier) {
-		sendingPlan.delete( typeContext.entityName(), identifier,
+		// This is only relevant if, upon processing the delete event,
+		// we load the entity and it's actually present.
+		// In that case, we expect the entity itself to be reindexed.
+		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
+				true, false,
+				null,
+				false
+		);
+		sendingPlan.append( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
-				new PojoIndexingQueueEventPayload( routes, null ) );
+				new PojoIndexingQueueEventPayload( routes, dirtiness ) );
 	}
 
 	@Override

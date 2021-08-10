@@ -9,19 +9,19 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.io.Serializable;
 import java.util.Set;
 
-public final class UpdateCauseDescriptor implements Serializable {
+public final class DirtinessDescriptor implements Serializable {
 
 	private final boolean forceSelfDirty;
 	private final boolean forceContainingDirty;
 	private final Set<String> dirtyPaths;
-	private final boolean updatedBecauseOfContained;
+	private final boolean updateBecauseOfContained;
 
-	public UpdateCauseDescriptor(boolean forceSelfDirty, boolean forceContainingDirty,
+	public DirtinessDescriptor(boolean forceSelfDirty, boolean forceContainingDirty,
 			Set<String> dirtyPaths, boolean updatedBecauseOfContained) {
 		this.forceSelfDirty = forceSelfDirty;
 		this.forceContainingDirty = forceContainingDirty;
 		this.dirtyPaths = dirtyPaths;
-		this.updatedBecauseOfContained = updatedBecauseOfContained;
+		this.updateBecauseOfContained = updatedBecauseOfContained;
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public final class UpdateCauseDescriptor implements Serializable {
 				"forceSelfDirty=" + forceSelfDirty +
 				", forceContainingDirty=" + forceContainingDirty +
 				", dirtyPaths=" + dirtyPaths +
-				", updatedBecauseOfContained=" + updatedBecauseOfContained +
+				", updatedBecauseOfContained=" + updateBecauseOfContained +
 				'}';
 	}
 
@@ -47,6 +47,6 @@ public final class UpdateCauseDescriptor implements Serializable {
 	}
 
 	public boolean updatedBecauseOfContained() {
-		return updatedBecauseOfContained;
+		return updateBecauseOfContained;
 	}
 }

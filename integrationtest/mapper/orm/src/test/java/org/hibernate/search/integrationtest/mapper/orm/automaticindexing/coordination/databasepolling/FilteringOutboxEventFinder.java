@@ -101,7 +101,8 @@ class FilteringOutboxEventFinder {
 		return query.list();
 	}
 
-	public List<OutboxEvent> findOutboxEventsNoFilterById(Session session) {
+	// Orders events by ID, regardless of what order is used when processing them.
+	public List<OutboxEvent> findOutboxEventsNoFilterOrderById(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
 				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
