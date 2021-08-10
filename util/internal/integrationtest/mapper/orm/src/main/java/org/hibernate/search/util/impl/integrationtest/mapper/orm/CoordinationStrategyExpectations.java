@@ -31,7 +31,7 @@ public final class CoordinationStrategyExpectations {
 
 	final String strategyName;
 	final boolean sync;
-	final BackendIndexingWorkExpectations indexingWorkExpectations;
+	public final BackendIndexingWorkExpectations indexingWorkExpectations;
 
 	private CoordinationStrategyExpectations(String strategyName, boolean sync,
 			BackendIndexingWorkExpectations indexingWorkExpectations) {
