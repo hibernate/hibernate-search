@@ -44,7 +44,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
-	private final Supplier<BackendWorkThreadingExpectations> indexingWorkThreadingExpectationsSupplier;
+	private final Supplier<BackendIndexingWorkExpectations> indexingWorkThreadingExpectationsSupplier;
 
 	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new HashMap<>();
 
@@ -76,7 +76,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private boolean ignoreSchema = false;
 
-	VerifyingStubBackendBehavior(Supplier<BackendWorkThreadingExpectations> indexingWorkThreadingExpectationsSupplier) {
+	VerifyingStubBackendBehavior(Supplier<BackendIndexingWorkExpectations> indexingWorkThreadingExpectationsSupplier) {
 		this.indexingWorkThreadingExpectationsSupplier = indexingWorkThreadingExpectationsSupplier;
 	}
 

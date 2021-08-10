@@ -242,7 +242,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
@@ -256,7 +256,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 
 		// Processing the update event should yield more events for containing entities
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
@@ -291,7 +291,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
@@ -310,7 +310,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 						.field( "nonIndexedEmbeddedText", "initial" ) );
 		backendMock.verifyExpectationsMet();
 		// Processing the update event should yield more events for containing entities
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
@@ -341,7 +341,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
@@ -356,7 +356,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
@@ -389,7 +389,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
@@ -409,7 +409,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		backendMock.verifyExpectationsMet();
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
-		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
