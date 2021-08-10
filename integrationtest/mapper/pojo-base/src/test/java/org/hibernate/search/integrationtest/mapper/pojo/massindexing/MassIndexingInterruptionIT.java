@@ -174,9 +174,12 @@ public class MassIndexingInterruptionIT {
 		waitForMassIndexingThreadsToSpawn( expectedThreadCount );
 
 		// Cancel mass indexing
-		future.cancel( true );
+		// inLenientMode since, with cancel, the final flush, refresh, and merge are invoked
+		backendMock.inLenientMode( () -> {
+			future.cancel( true );
 
-		waitForMassIndexingThreadsToTerminate( expectedThreadCount );
+			waitForMassIndexingThreadsToTerminate( expectedThreadCount );
+		} );
 	}
 
 	private MassIndexer prepareMassIndexingThatWillNotTerminate() {
