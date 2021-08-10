@@ -96,6 +96,92 @@ such as automatic in-thread retries,
 but they will never solve the problem completely,
 and they are not currently on the roadmap.
 
+[[limitations-changes-in-session]]
+== Automatic indexing only considers changes applied directly to entity instances in Hibernate ORM sessions
+
+=== Description
+
+Due to <<mapper-orm-indexing-automatic-concepts-changes-in-session,how Hibernate Search uses internal events of Hibernate ORM>>
+in order to detect changes,
+it will not detect changes resulting from `insert`/`delete`/`update` queries,
+be it SQL or JPQL/HQL queries.
+
+This is because queries are executed on the database side,
+without Hibernate ORM or Search having any knowledge of which entities are actually created, deleted or updated.
+
+=== Workaround
+
+One workaround is to reindex explicitly after you run JPQL/SQL queries,
+either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-manual,manually>>.
+
+=== Roadmap
+
+One solution to actually detect these changes would be to source entity change events
+directly from the database, using for example Debezium.
+
+This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3513],
+but is long-term goal.
+
+[[limitations-changes-asymmetric-association-updates]]
+== Automatic indexing ignores asymmetric association updates
+// Old anchors backwards compatibility
+[[mapper-orm-indexing-automatic-concepts-session-consistency]]
+
+=== Description
+
+Hibernate ORM is able to handle asymmetric updates of associations,
+where only the owning side of association is updated and the other side is ignored.
+The entities in the session will be inconsistent for the duration of the session,
+but upon reloading they will be consistent once again,
+due to how entity loading works.
+
+This practice of asymmetric updates of associations
+can cause problems in applications in general,
+but also in Hibernate Search specifically,
+where it may lead to out-of-sync indexes.
+Thus, it must be avoided.
+
+For example, let's assume an indexed entity `A` has an `@IndexedEmbedded` association `A.b` to entity `B`,
+and that `B` owns that association on its side, `B.a`.
+One can just set `B.a` to `null` in order to remove the association between `A` and `B`,
+and the effect on the database will be exactly what we want.
+
+However, Hibernate Search will only be able to detect that `B.a` changed,
+and by the time it tries to infer which entities need to be reindexed,
+it will no longer be able to know what `B.a` used to refer to.
+That change in itself is useless to Hibernate Search:
+Hibernate Search will not know that `A`, specifically, needs to be reindexed.
+It will "forget" to reindex `A`, leading to an out-of-sync index where `A.b` still contains `B`.
+
+In the end, the only way for Hibernate Search to know that `A` needs to be reindexed
+is to also set `A.b` to `null`, which will cause Hibernate Search to detect that `A.b` changed,
+and thus that `A` changed too.
+
+=== Workaround
+
+The following solutions can help circumvent this limitation:
+
+1. When you update one side of an association,
+always update the other side consistently.
+2. When the above is not possible,
+reindex affected entities explicitly after the association update,
+either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-manual,manually>>.
+
+=== Roadmap
+
+Hibernate Search may handle asymmetric association updates in the future,
+by keeping tracks of entities added to / removed from an association.
+However, this will only solve the problem completely if indexing happens asynchronously in a background thread,
+such as with the <<coordination-database-polling,database-polling coordination strategy>>.
+This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3567[HSEARCH-3567].
+
+Alternatively, sourcing entity change events directly from the database, using for example Debezium,
+would also solve the problem.
+This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3513],
+but is long-term goal.
+
 [[limitations-indexing-plan-serialization]]
 == Automatic indexing is not compatible with `Session` serialization
 
