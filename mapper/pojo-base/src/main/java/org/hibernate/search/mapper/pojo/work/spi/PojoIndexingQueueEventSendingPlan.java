@@ -20,40 +20,16 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 public interface PojoIndexingQueueEventSendingPlan {
 
 	/**
-	 * Appends an "add" event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
+	 * Appends an event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
 	 * and ultimately added to a {@link PojoIndexingQueueEventProcessingPlan}.
 	 *
 	 * @param entityName The name of the entity type.
 	 * @param identifier The non-serialized entity identifier, to report sending errors.
 	 * @param serializedId The serialized entity identifier.
 	 * @param payload A payload to be forwarded as-is to the processing plan.
-	 * @see PojoIndexingQueueEventProcessingPlan#add(String, String, PojoIndexingQueueEventPayload)
+	 * @see PojoIndexingQueueEventProcessingPlan#append(String, String, PojoIndexingQueueEventPayload)
 	 */
-	void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
-
-	/**
-	 * Appends an "add-or-update" event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
-	 * and ultimately added to a {@link PojoIndexingQueueEventProcessingPlan}.
-	 *
-	 * @param entityName The name of the entity type.
-	 * @param identifier The non-serialized entity identifier, to report sending errors.
-	 * @param serializedId The serialized entity identifier.
-	 * @param payload A payload to be forwarded as-is to the processing plan.
-	 * @see PojoIndexingQueueEventProcessingPlan#addOrUpdate(String, String, PojoIndexingQueueEventPayload)
-	 */
-	void addOrUpdate(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
-
-	/**
-	 * Appends a "delete" event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
-	 * and ultimately added to a {@link PojoIndexingQueueEventProcessingPlan}.
-	 *
-	 * @param entityName The name of the entity type.
-	 * @param identifier The non-serialized entity identifier, to report sending errors.
-	 * @param serializedId The serialized entity identifier.
-	 * @param payload A payload to be forwarded as-is to the processing plan.
-	 * @see PojoIndexingQueueEventProcessingPlan#delete(String, String, PojoIndexingQueueEventPayload)
-	 */
-	void delete(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
+	void append(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Discards all events that were added to this plan, without sending them.

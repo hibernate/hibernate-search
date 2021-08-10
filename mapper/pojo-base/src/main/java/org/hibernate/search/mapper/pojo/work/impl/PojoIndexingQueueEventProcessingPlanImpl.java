@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.mapper.pojo.work.spi.UpdateCauseDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndexingQueueEventProcessingPlan {
@@ -40,32 +40,18 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	}
 
 	@Override
-	public void add(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
+	public void append(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
 		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		delegate.add( typeContext.typeIdentifier(), id, payload.routes, null );
-	}
-
-	@Override
-	public void addOrUpdate(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
-		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
-		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		UpdateCauseDescriptor cause = payload.updateCause;
-		delegate.addOrUpdate( typeContext.typeIdentifier(), id, payload.routes, null,
+		DirtinessDescriptor dirtiness = payload.dirtiness;
+		delegate.addOrUpdateOrDelete( typeContext.typeIdentifier(), id, payload.routes,
 				// Force the reindexing now if the entity was marked as dirty because of a contained entity;
 				// this is to avoid sending events forever and to force the processing of "updateBecauseOfContained" now.
 				// See org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexingPlanIndexOrEventQueueDelegate.addOrUpdate
-				cause.updatedBecauseOfContained() || cause.forceSelfDirty(),
-				cause.forceContainingDirty(),
-				cause.dirtyPaths() == null ? null : typeContext.pathOrdinals().toPathSelection( cause.dirtyPaths() )
+				dirtiness.updatedBecauseOfContained() || dirtiness.forceSelfDirty(),
+				dirtiness.forceContainingDirty(),
+				dirtiness.dirtyPaths() == null ? null : typeContext.pathOrdinals().toPathSelection( dirtiness.dirtyPaths() )
 		);
-	}
-
-	@Override
-	public void delete(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
-		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
-		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		delegate.delete( typeContext.typeIdentifier(), id, payload.routes, null );
 	}
 
 	@Override

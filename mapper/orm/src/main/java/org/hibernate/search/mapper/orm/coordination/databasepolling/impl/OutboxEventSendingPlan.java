@@ -34,28 +34,9 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 	}
 
 	@Override
-	public void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload) {
-		events.add( new OutboxEvent( OutboxEvent.Type.ADD, entityName, serializedId,
-				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
-				SerializationUtils.serialize( payload ),
-				identifier
-		) );
-	}
-
-	@Override
-	public void addOrUpdate(String entityName, Object identifier, String serializedId,
+	public void append(String entityName, Object identifier, String serializedId,
 			PojoIndexingQueueEventPayload payload) {
-		events.add( new OutboxEvent( OutboxEvent.Type.ADD_OR_UPDATE, entityName, serializedId,
-				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
-				SerializationUtils.serialize( payload ),
-				identifier
-		) );
-	}
-
-	@Override
-	public void delete(String entityName, Object identifier, String serializedId,
-			PojoIndexingQueueEventPayload payload) {
-		events.add( new OutboxEvent( OutboxEvent.Type.DELETE, entityName, serializedId,
+		events.add( new OutboxEvent( entityName, serializedId,
 				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
 				SerializationUtils.serialize( payload ),
 				identifier

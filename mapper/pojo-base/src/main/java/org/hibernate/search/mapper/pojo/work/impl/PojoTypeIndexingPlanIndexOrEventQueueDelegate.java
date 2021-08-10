@@ -65,7 +65,7 @@ final class PojoTypeIndexingPlanIndexOrEventQueueDelegate<I, E> implements PojoT
 		if ( updatedBecauseOfContained && !updateBecauseOfDirty ) {
 			// The entity needs to be updated because of a contained entity,
 			// but there was no processed event for this entity proper
-			// (otherwise updateBecauseOfDirty would be true - see
+			// (otherwise selfDirty would be true - see
 			// org.hibernate.search.mapper.pojo.work.impl.PojoIndexingQueueEventProcessingPlanImpl.addOrUpdate).
 			// In order to ensure that a given entity instance is always processed
 			// by the same background process, we will send an event to be processed later.
@@ -75,7 +75,8 @@ final class PojoTypeIndexingPlanIndexOrEventQueueDelegate<I, E> implements PojoT
 			delegate = indexDelegate;
 		}
 		delegate.addOrUpdate( identifier, routes, entitySupplier,
-				forceSelfDirty, forceContainingDirty, dirtyPaths, updatedBecauseOfContained, updateBecauseOfDirty );
+				forceSelfDirty, forceContainingDirty, dirtyPaths, updatedBecauseOfContained, updateBecauseOfDirty
+		);
 	}
 
 	@Override

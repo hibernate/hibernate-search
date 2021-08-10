@@ -47,17 +47,7 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 	public void process(LocalHeapQueueIndexingEvent event) {
 		PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
 				PojoIndexingQueueEventPayload.class, event.payload );
-		switch ( event.eventType ) {
-			case ADD:
-				plan.add( event.entityName, event.serializedId, payload );
-				break;
-			case ADD_OR_UPDATE:
-				plan.addOrUpdate( event.entityName, event.serializedId, payload );
-				break;
-			case DELETE:
-				plan.delete( event.entityName, event.serializedId, payload );
-				break;
-		}
+		plan.append( event.entityName, event.serializedId, payload );
 		eventsInBatch.add( event );
 	}
 

@@ -71,11 +71,6 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 	" 		 <property name=\"moment\" generated=\"insert\" index=\"moment\">\n" +
 	"     		 <column sql-type=\"" + TYPE_TIMESTAMP_PLACEHOLDER + "\" updatable=\"false\" default=\"" + CURRENT_TIMESTAMP_PLACEHOLDER + "\" />\n" +
 	" 		 </property>\n" +
-	"		 <property name=\"type\" >\n" +
-	" 			 <type name=\"org.hibernate.type.EnumType\">\n" +
-	" 				 <param name=\"enumClass\">" + OutboxEvent.Type.class.getName() + "</param>\n" +
-	" 			 </type>\n" +
-	"		 </property>\n" +
 	"        <property name=\"entityName\" type=\"string\" />\n" +
 	"        <property name=\"entityId\" type=\"string\" />\n" +
 	"        <property name=\"entityIdHash\" type=\"integer\" index=\"entityIdHash\" />\n" +

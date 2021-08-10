@@ -23,20 +23,9 @@ public class HibernateOrmIndexingQueueEventSendingPlan implements PojoIndexingQu
 	}
 
 	@Override
-	public void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload) {
-		delegate.add( entityName, identifier, serializedId, payload );
-	}
-
-	@Override
-	public void addOrUpdate(String entityName, Object identifier, String serializedId,
+	public void append(String entityName, Object identifier, String serializedId,
 			PojoIndexingQueueEventPayload payload) {
-		delegate.addOrUpdate( entityName, identifier, serializedId, payload );
-	}
-
-	@Override
-	public void delete(String entityName, Object identifier, String serializedId,
-			PojoIndexingQueueEventPayload payload) {
-		delegate.delete( entityName, identifier, serializedId, payload );
+		delegate.append( entityName, identifier, serializedId, payload );
 	}
 
 	@Override

@@ -16,15 +16,13 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	final Type eventType;
 	final String entityName;
 	final transient Object identifier;
 	final String serializedId;
 	final byte[] payload;
 
-	public LocalHeapQueueIndexingEvent(Type eventType, String entityName, Object identifier, String serializedId,
+	public LocalHeapQueueIndexingEvent(String entityName, Object identifier, String serializedId,
 			byte[] payload) {
-		this.eventType = eventType;
 		this.entityName = entityName;
 		this.identifier = identifier;
 		this.serializedId = serializedId;
@@ -35,7 +33,6 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 	public String toString() {
 		return "LocalHeapQueueIndexingEvent{" +
 				"id=" + System.identityHashCode( this ) +
-				", eventType=" + eventType +
 				", entityName='" + entityName + '\'' +
 				", identifier=" + identifier +
 				'}';
@@ -51,11 +48,5 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 		// In a real implementation we would put this event back into a queue, to re-try later.
 		// But here it's just for testing.
 		log.errorf( t, "Failed to process event '%s'", this );
-	}
-
-	public enum Type {
-		ADD,
-		ADD_OR_UPDATE,
-		DELETE;
 	}
 }

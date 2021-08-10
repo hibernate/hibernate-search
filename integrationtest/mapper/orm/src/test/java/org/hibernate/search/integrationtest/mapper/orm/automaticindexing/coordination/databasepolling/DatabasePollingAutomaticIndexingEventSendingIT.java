@@ -92,7 +92,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -104,7 +104,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -116,7 +116,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
-			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedEntity.NAME, "1", OutboxEvent.Type.DELETE, null );
+			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedEntity.NAME, "1", null );
 		} );
 	}
 
@@ -139,8 +139,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			// it does not affect any other entity unless they are modified to refer to that contained entity,
 			// in which case they get an event of their own.
 			assertThat( outboxEntries ).hasSize( 1 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
-					OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -152,8 +151,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 1 ), ContainedEntity.NAME, "2",
-					OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), ContainedEntity.NAME, "2", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -188,10 +186,8 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
-					OutboxEvent.Type.ADD, null );
-			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainedEntity.NAME, "2",
-					OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -203,8 +199,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
-			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedAndContainedEntity.NAME, "2",
-					OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -216,8 +211,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 4 );
-			verifyOutboxEntry( outboxEntries.get( 3 ), IndexedAndContainedEntity.NAME, "2",
-					OutboxEvent.Type.DELETE, null );
+			verifyOutboxEntry( outboxEntries.get( 3 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 	}
 
@@ -260,8 +254,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
-				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
-						OutboxEvent.Type.ADD_OR_UPDATE, null );
+				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
 			} );
 		} );
 	}
@@ -314,8 +307,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
-				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
-						OutboxEvent.Type.ADD_OR_UPDATE, null );
+				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
 			} );
 		} );
 	}
@@ -431,7 +423,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 
 			assertThat( outboxEntries ).hasSize( 7 );
 			for ( int i = 0; i < 7; i++ ) {
-				verifyOutboxEntry( outboxEntries.get( i ), IndexedEntity.NAME, ( i + 1 ) + "", OutboxEvent.Type.ADD, null );
+				verifyOutboxEntry( outboxEntries.get( i ), IndexedEntity.NAME, ( i + 1 ) + "", null );
 			}
 		} );
 	}
@@ -452,8 +444,8 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
-			verifyOutboxEntry( outboxEntries.get( 1 ), AnotherIndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), AnotherIndexedEntity.NAME, "1", null );
 		} );
 	}
 
@@ -470,7 +462,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
-					outboxEntries.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD,
+					outboxEntries.get( 0 ), RoutedIndexedEntity.NAME, "1",
 					"FIRST" );
 		} );
 
@@ -485,18 +477,17 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
-					outboxEntries.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+					outboxEntries.get( 1 ), RoutedIndexedEntity.NAME, "1",
 					"SECOND",
 					"FIRST" ); // previous routing keys
 		} );
 	}
 
 	static void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String entityId,
-			OutboxEvent.Type type, String currentRouteRoutingKey, String... previousRoutesRoutingKeys) {
+			String currentRouteRoutingKey, String... previousRoutesRoutingKeys) {
 		assertSoftly( softly -> {
 			softly.assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
 			softly.assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
-			softly.assertThat( outboxEvent.getType() ).isEqualTo( type );
 
 			PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
 					PojoIndexingQueueEventPayload.class, outboxEvent.getPayload() );

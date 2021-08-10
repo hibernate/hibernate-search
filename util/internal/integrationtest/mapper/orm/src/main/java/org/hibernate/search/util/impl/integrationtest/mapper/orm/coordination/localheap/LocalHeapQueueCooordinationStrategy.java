@@ -77,27 +77,10 @@ public class LocalHeapQueueCooordinationStrategy implements CooordinationStrateg
 		private final List<LocalHeapQueueIndexingEvent> content = new ArrayList<>();
 
 		@Override
-		public void add(String entityName, Object identifier, String serializedId,
+		public void append(String entityName, Object identifier, String serializedId,
 				PojoIndexingQueueEventPayload payload) {
-			plan( LocalHeapQueueIndexingEvent.Type.ADD, entityName, identifier, serializedId, payload );
-		}
-
-		@Override
-		public void addOrUpdate(String entityName, Object identifier, String serializedId,
-				PojoIndexingQueueEventPayload payload) {
-			plan( LocalHeapQueueIndexingEvent.Type.ADD_OR_UPDATE, entityName, identifier, serializedId, payload );
-		}
-
-		@Override
-		public void delete(String entityName, Object identifier, String serializedId,
-				PojoIndexingQueueEventPayload payload) {
-			plan( LocalHeapQueueIndexingEvent.Type.DELETE, entityName, identifier, serializedId, payload );
-		}
-
-		private void plan(LocalHeapQueueIndexingEvent.Type eventType, String entityName, Object identifier,
-				String serializedId, PojoIndexingQueueEventPayload payload) {
 			checkAcceptsEvents();
-			LocalHeapQueueIndexingEvent event = new LocalHeapQueueIndexingEvent( eventType, entityName, identifier,
+			LocalHeapQueueIndexingEvent event = new LocalHeapQueueIndexingEvent( entityName, identifier,
 					serializedId, SerializationUtils.serialize( payload ) );
 			log.tracef( "Planning to send %s from %s", event, this );
 			content.add( event );

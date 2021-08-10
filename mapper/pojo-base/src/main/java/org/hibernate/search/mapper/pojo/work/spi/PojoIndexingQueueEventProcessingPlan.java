@@ -14,34 +14,14 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 public interface PojoIndexingQueueEventProcessingPlan {
 
 	/**
-	 * Appends an "add" event to the plan, received from a {@link PojoIndexingQueueEventSendingPlan}.
+	 * Appends an event to the plan, received from a {@link PojoIndexingQueueEventSendingPlan}.
 	 *
 	 * @param entityName The name of the entity type.
 	 * @param serializedId The serialized entity identifier.
 	 * @param payload The payload as passed to the sending plan.
-	 * @see PojoIndexingQueueEventSendingPlan#add(String, Object, String, PojoIndexingQueueEventPayload)
+	 * @see PojoIndexingQueueEventSendingPlan#append(String, Object, String, PojoIndexingQueueEventPayload)
 	 */
-	void add(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
-
-	/**
-	 * Appends an "add-or-update" event to the plan, received from a {@link PojoIndexingQueueEventSendingPlan}.
-	 *
-	 * @param entityName The name of the entity type.
-	 * @param serializedId The serialized entity identifier.
-	 * @param payload The payload as passed to the sending plan.
-	 * @see PojoIndexingQueueEventSendingPlan#addOrUpdate(String, Object, String, PojoIndexingQueueEventPayload)
-	 */
-	void addOrUpdate(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
-
-	/**
-	 * Appends a "delete" event to the plan, received from a {@link PojoIndexingQueueEventSendingPlan}.
-	 *
-	 * @param entityName The name of the entity type.
-	 * @param serializedId The serialized entity identifier.
-	 * @param payload The payload as passed to the sending plan.
-	 * @see PojoIndexingQueueEventSendingPlan#delete(String, Object, String, PojoIndexingQueueEventPayload)
-	 */
-	void delete(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
+	void append(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Writes all pending changes to the index now,

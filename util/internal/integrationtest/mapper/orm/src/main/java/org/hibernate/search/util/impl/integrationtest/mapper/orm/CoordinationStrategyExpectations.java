@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.coordination.localheap.LocalHeapQueueCooordinationStrategy;
 
 public final class CoordinationStrategyExpectations {
@@ -26,7 +27,7 @@ public final class CoordinationStrategyExpectations {
 
 	private static CoordinationStrategyExpectations async(String strategyName, String threadNamePattern) {
 		return new CoordinationStrategyExpectations( strategyName, false,
-				BackendIndexingWorkExpectations.async( threadNamePattern ) );
+				BackendIndexingWorkExpectations.async( threadNamePattern, StubDocumentWork.Type.ADD_OR_UPDATE ) );
 	}
 
 	final String strategyName;

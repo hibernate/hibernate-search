@@ -27,18 +27,8 @@ public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticI
 	}
 
 	@Override
-	public void add(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
-		delegate.add( entityName, serializedId, payload );
-	}
-
-	@Override
-	public void addOrUpdate(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
-		delegate.addOrUpdate( entityName, serializedId, payload );
-	}
-
-	@Override
-	public void delete(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
-		delegate.delete( entityName, serializedId, payload );
+	public void append(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
+		delegate.append( entityName, serializedId, payload );
 	}
 
 	@Override
