@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.Collections;
@@ -39,6 +41,26 @@ class FilteringOutboxEventFinder {
 
 	public synchronized List<OutboxEvent> findOutboxEvents(Session session, int maxResults,
 			Optional<OutboxEventPredicate> predicate) {
+		Query<OutboxEvent> query = createQuery( session, maxResults, predicate );
+		List<OutboxEvent> returned = query.list();
+		// Only return each event once.
+		// This is important because in the case of a retry, the same event will be reused.
+		for ( OutboxEvent outboxEvent : returned ) {
+			allowedIds.remove( outboxEvent.getId() );
+		}
+		return returned;
+	}
+
+	// Find outbox events as shown by the filter, but not for processing:
+	// don't update the filter as a result of this query.
+	public synchronized List<OutboxEvent> findOutboxEventsNotForProcessing(Session session, int maxResults,
+			Optional<OutboxEventPredicate> predicate) {
+		Query<OutboxEvent> query = createQuery( session, maxResults, predicate );
+		return query.list();
+	}
+
+	private Query<OutboxEvent> createQuery(Session session, int maxResults,
+			Optional<OutboxEventPredicate> predicate) {
 		Optional<OutboxEventPredicate> combinedPredicate = combineFilterWithPredicate( predicate );
 		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
 		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
@@ -48,13 +70,7 @@ class FilteringOutboxEventFinder {
 				query.setParameter( entry.getKey(), entry.getValue() );
 			}
 		}
-		List<OutboxEvent> returned = query.list();
-		// Only return each event once.
-		// This is important because in the case of a retry, the same event will be reused.
-		for ( OutboxEvent outboxEvent : returned ) {
-			allowedIds.remove( outboxEvent.getId() );
-		}
-		return returned;
+		return query;
 	}
 
 	public synchronized FilteringOutboxEventFinder enableFilter(boolean enable) {
@@ -147,6 +163,13 @@ class FilteringOutboxEventFinder {
 				return merged;
 			}
 		};
+	}
+
+	public void awaitUntilNoMoreVisibleEvents(SessionFactory sessionFactory) {
+		await().untilAsserted( () -> withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = findOutboxEventsNotForProcessing( session, 1, Optional.empty() );
+			assertThat( outboxEntries ).isEmpty();
+		} ) );
 	}
 
 	/**

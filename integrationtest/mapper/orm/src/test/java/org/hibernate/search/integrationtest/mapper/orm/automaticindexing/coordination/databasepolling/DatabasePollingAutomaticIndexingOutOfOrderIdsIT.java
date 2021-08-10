@@ -41,8 +41,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.awaitility.Awaitility;
-
 public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
@@ -148,8 +146,7 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 		// Make them visible to Hibernate Search now.
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 
-		SessionFactory finalSessionFactory = sessionFactory;
-		Awaitility.await().untilAsserted( () -> thereAreNoMoreOutboxEntities( finalSessionFactory ) );
+		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		// No works are expected to be executed by the time the outbox events are processed
 		backendMock.verifyExpectationsMet();
@@ -418,13 +415,6 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 		catch (SQLException exception) {
 			fail( "Unexpected SQL exception: " + exception );
 		}
-	}
-
-	private void thereAreNoMoreOutboxEntities(SessionFactory sessionFactory) {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
-			assertThat( outboxEntries ).isEmpty();
-		} );
 	}
 
 	@Entity(name = IndexedEntity.INDEX)

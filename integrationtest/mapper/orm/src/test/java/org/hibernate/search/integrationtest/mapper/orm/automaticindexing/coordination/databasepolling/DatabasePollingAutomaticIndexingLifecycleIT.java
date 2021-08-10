@@ -27,8 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.awaitility.Awaitility;
-
 public class DatabasePollingAutomaticIndexingLifecycleIT {
 
 	@Rule
@@ -135,18 +133,10 @@ public class DatabasePollingAutomaticIndexingLifecycleIT {
 		// Make them visible to Hibernate Search now.
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 
-		SessionFactory finalSessionFactory = sessionFactory;
-		Awaitility.await().untilAsserted( () -> thereAreNoMoreOutboxEntities( finalSessionFactory ) );
+		outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
 
 		// No works are expected to be executed by the time the outbox events are processed
 		backendMock.verifyExpectationsMet();
-	}
-
-	private void thereAreNoMoreOutboxEntities(SessionFactory sessionFactory) {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
-			assertThat( outboxEntries ).isEmpty();
-		} );
 	}
 
 	private SessionFactory setup() {
