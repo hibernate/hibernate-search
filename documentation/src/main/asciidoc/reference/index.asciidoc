@@ -21,8 +21,6 @@ include::concepts.asciidoc[]
 
 include::architecture.asciidoc[]
 
-include::limitations.asciidoc[]
-
 include::configuration.asciidoc[]
 
 include::mapper-orm-mapping.asciidoc[]
@@ -40,6 +38,8 @@ include::backend-lucene.asciidoc[]
 include::backend-elasticsearch.asciidoc[]
 
 include::coordination.asciidoc[]
+
+include::limitations.asciidoc[]
 
 include::troubleshooting.asciidoc[]
 
