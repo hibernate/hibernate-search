@@ -54,7 +54,7 @@ Changes have to occur in the ORM session in order to be detected::
 See <<mapper-orm-indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-none-indexing-association-consistency]]
 Associations must be updated on both sides::
-See <<mapper-orm-indexing-automatic-concepts-session-consistency>> for more details.
+See <<limitations-changes-asymmetric-association-updates>> for more details.
 [[coordination-none-indexing-change-filter]]
 Only relevant changes trigger indexing::
 See <<mapper-orm-indexing-automatic-concepts-dirty-checking>> for more details.
@@ -165,7 +165,7 @@ Changes have to occur in the ORM session in order to be detected::
 See <<mapper-orm-indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-database-polling-indexing-association-consistency]]
 Associations must be updated on both sides::
-See <<mapper-orm-indexing-automatic-concepts-session-consistency>> for more details.
+See <<limitations-changes-asymmetric-association-updates>> for more details.
 [[coordination-database-polling-indexing-change-filter]]
 Only relevant changes trigger indexing::
 See <<mapper-orm-indexing-automatic-concepts-dirty-checking>> for more details.

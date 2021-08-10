@@ -25,11 +25,11 @@ Follow the links for more details.
 |<<coordination-none,No coordination>> (default)
 |<<coordination-database-polling,Database-polling>>
 
-|Detects changes occurring in ORM sessions (`session.persist()`, `session.delete()`, setters, ...)
+|Detects changes occurring in ORM sessions (`session.persist(...)`, `session.delete(...)`, setters, ...)
 2+|<<mapper-orm-indexing-automatic-concepts-changes-in-session,Yes>>
 
 |Detects changes caused by JPQL or SQL queries (`insert`/`update`/`delete`)
-2+|<<mapper-orm-indexing-automatic-concepts-changes-in-session-jpql-sql,No>>
+2+|<<limitations-changes-in-session,No>>
 
 |Associations must be updated on both sides
 2+|<<mapper-orm-indexing-automatic-concepts-session-consistency,Yes>>
@@ -67,58 +67,14 @@ You can disable automatic indexing by setting the configuration property
 [[mapper-orm-indexing-automatic-concepts-changes-in-session]]
 == In-session entity change detection and limitations
 
-[[mapper-orm-indexing-automatic-concepts-changes-in-session-basics]]
-=== Basics
+Hibernate Search uses internal events of Hibernate ORM in order to detect changes.
+These events will be triggered if you actually manipulate managed entity objects in your code:
+calls o `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
 
-Hibernate Search uses internal events of Hibernate ORM in order to detect changes:
-these events will only be triggered if you actually manipulate managed entity objects in your code,
-updating them by setting their properties or deleting them by calling the appropriate method
-on the Hibernate ORM session.
+This works great for most applications, but you need to consider some limitations:
 
-[[mapper-orm-indexing-automatic-concepts-changes-in-session-jpql-sql]]
-=== Limitation: no detection of changes caused by JPQL or SQL queries
-
-Changes resulting from `insert`/`delete`/`update` queries, be it SQL or JPQL/HQL queries,
-are not detected by Hibernate Search.
-This is because queries are executed on the database side,
-without Hibernate having any knowledge of which entities are actually created, deleted or updated.
-One workaround is to explicitly reindex after you run such queries,
-either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
-or <<mapper-orm-indexing-manual,manually>>.
-
-[[mapper-orm-indexing-automatic-concepts-session-consistency]]
-=== Limitation: asymmetric association updates
-
-Hibernate ORM is able to handle asymmetric updates of associations,
-where only the owning side of association is updated and the other side is ignored.
-The entities in the session will be inconsistent for the duration of the session,
-but upon reloading they will be consistent once again,
-due to how entity loading works.
-
-This practice of asymmetric updates of associations
-can cause problems in applications in general,
-but also in Hibernate Search specifically,
-where it may lead to out-of-sync indexes.
-Thus, it must be avoided.
-
-[NOTE]
-====
-For example, let's assume an indexed entity `A` has an `@IndexedEmbedded` association `A.b` to entity `B`,
-and that `B` owns that association on its side, `B.a`.
-One can just set `B.a` to `null` in order to remove the association between `A` and `B`,
-and the effect on the database will be exactly what we want.
-
-However, Hibernate Search will only be able to detect that `B.a` changed,
-and by the time it tries to infer which entities need to be reindexed,
-it will no longer be able to know what `B.a` used to refer to.
-That change in itself is useless to Hibernate Search:
-Hibernate Search will not know that `A`, specifically, needs to be reindexed.
-It will "forget" to reindex `A`, leading to an out-of-sync index where `A.b` still contains `B`.
-
-In the end, the only way for Hibernate Search to know that `A` needs to be reindexed
-is to also set `A.b` to `null`, which will cause Hibernate Search to detect that `A.b` changed,
-and thus that `A` changed too.
-====
+* <<limitations-changes-in-session>>
+* <<limitations-changes-asymmetric-association-updates>>
 
 [[mapper-orm-indexing-automatic-concepts-dirty-checking]]
 == Dirty checking
