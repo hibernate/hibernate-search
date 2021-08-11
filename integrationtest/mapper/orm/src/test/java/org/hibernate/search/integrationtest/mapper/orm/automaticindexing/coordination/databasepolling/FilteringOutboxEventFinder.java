@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -65,6 +66,7 @@ class FilteringOutboxEventFinder {
 		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
 		Query<OutboxEvent> query = DefaultOutboxEventFinder.createQuery( session, maxResults, queryString,
 				combinedPredicate.map( OutboxEventPredicate::params ).orElse( Collections.emptyMap() ) );
+		avoidLockingConflicts( query );
 		return query;
 	}
 
@@ -93,6 +95,7 @@ class FilteringOutboxEventFinder {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
 				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
+		avoidLockingConflicts( query );
 		return query.list();
 	}
 
@@ -101,6 +104,7 @@ class FilteringOutboxEventFinder {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
 				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
+		avoidLockingConflicts( query );
 		return query.list();
 	}
 
@@ -159,6 +163,12 @@ class FilteringOutboxEventFinder {
 				return merged;
 			}
 		};
+	}
+
+	// Configures a query to avoid locking on events,
+	// so as not to conflict with background processors.
+	private void avoidLockingConflicts(Query<OutboxEvent> query) {
+		query.setLockOptions( LockOptions.NONE );
 	}
 
 	public void awaitUntilNoMoreVisibleEvents(SessionFactory sessionFactory) {
