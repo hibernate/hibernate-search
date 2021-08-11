@@ -11,13 +11,12 @@ import static org.junit.Assert.fail;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -46,21 +45,21 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Supplier<BackendIndexingWorkExpectations> indexingWorkThreadingExpectationsSupplier;
 
-	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new HashMap<>();
+	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new ConcurrentHashMap<>();
 
-	private final List<ParameterizedCallBehavior<BackendBuildContext, Void>> createBackendBehaviors = new ArrayList<>();
+	private final List<ParameterizedCallBehavior<BackendBuildContext, Void>> createBackendBehaviors = Collections.synchronizedList( new ArrayList<>() );
 
-	private final List<CallBehavior<Void>> stopBackendBehaviors = new ArrayList<>();
+	private final List<CallBehavior<Void>> stopBackendBehaviors = Collections.synchronizedList( new ArrayList<>() );
 
-	private final Map<String, CallQueue<IndexScaleWorkCall>> indexScaleWorkCalls = new HashMap<>();
+	private final Map<String, CallQueue<IndexScaleWorkCall>> indexScaleWorkCalls = new ConcurrentHashMap<>();
 
-	private final Map<String, CallQueue<SchemaDefinitionCall>> schemaDefinitionCalls = new HashMap<>();
+	private final Map<String, CallQueue<SchemaDefinitionCall>> schemaDefinitionCalls = new ConcurrentHashMap<>();
 
-	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
+	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new ConcurrentHashMap<>();
 
-	private final Map<DocumentKey, CallQueue<DocumentWorkCreateCall>> documentWorkCreateCalls = new LinkedHashMap<>();
-	private final Map<DocumentKey, CallQueue<DocumentWorkDiscardCall>> documentWorkDiscardCalls = new LinkedHashMap<>();
-	private final Map<DocumentKey, CallQueue<DocumentWorkExecuteCall>> documentWorkExecuteCalls = new LinkedHashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkCreateCall>> documentWorkCreateCalls = new ConcurrentHashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkDiscardCall>> documentWorkDiscardCalls = new ConcurrentHashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkExecuteCall>> documentWorkExecuteCalls = new ConcurrentHashMap<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -72,9 +71,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final CallQueue<NextScrollWorkCall<?>> nextScrollCalls = new CallQueue<>();
 
-	private boolean lenient = false;
+	private volatile boolean lenient = false;
 
-	private boolean ignoreSchema = false;
+	private volatile boolean ignoreSchema = false;
 
 	VerifyingStubBackendBehavior(Supplier<BackendIndexingWorkExpectations> indexingWorkThreadingExpectationsSupplier) {
 		this.indexingWorkThreadingExpectationsSupplier = indexingWorkThreadingExpectationsSupplier;

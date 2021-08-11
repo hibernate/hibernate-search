@@ -37,9 +37,9 @@ public class BackendMock implements TestRule {
 
 	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
 
-	private boolean started = false;
+	private volatile boolean started = false;
 
-	private BackendIndexingWorkExpectations indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
+	private volatile BackendIndexingWorkExpectations indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
 
 	@Override
 	public Statement apply(Statement base, Description description) {
