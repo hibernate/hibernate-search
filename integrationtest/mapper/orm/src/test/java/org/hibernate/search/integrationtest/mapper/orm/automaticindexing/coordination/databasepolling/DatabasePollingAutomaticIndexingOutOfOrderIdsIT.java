@@ -55,7 +55,7 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.automaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private SessionFactory sessionFactory;
 

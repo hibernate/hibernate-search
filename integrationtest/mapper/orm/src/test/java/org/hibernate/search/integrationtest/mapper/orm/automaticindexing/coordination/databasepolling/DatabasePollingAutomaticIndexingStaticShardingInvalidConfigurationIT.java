@@ -33,7 +33,7 @@ public class DatabasePollingAutomaticIndexingStaticShardingInvalidConfigurationI
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.automaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	@Test
 	public void totalCount_missing() {
