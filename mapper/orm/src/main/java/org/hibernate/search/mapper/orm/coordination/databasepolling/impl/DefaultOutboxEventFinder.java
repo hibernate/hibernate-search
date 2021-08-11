@@ -27,7 +27,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 	public static String createQueryString(Optional<OutboxEventPredicate> predicate) {
 		return "select e from OutboxEvent e"
 				+ predicate.map( p -> " where " + p.queryPart( "e" ) ).orElse( "" )
-				+ " order by e.moment, e.id";
+				+ " order by e.id";
 	}
 
 	public static List<OutboxEvent> findOutboxEvents(Session session, int maxResults,

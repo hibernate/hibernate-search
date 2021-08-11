@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.persistence.Transient;
@@ -14,7 +13,6 @@ import javax.persistence.Transient;
 public final class OutboxEvent {
 
 	private Long id;
-	private Instant moment;
 
 	private String entityName;
 	private String entityId;
@@ -43,14 +41,6 @@ public final class OutboxEvent {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Instant getMoment() {
-		return moment;
-	}
-
-	public void setMoment(Instant moment) {
-		this.moment = moment;
 	}
 
 	public String getEntityName() {
@@ -129,7 +119,6 @@ public final class OutboxEvent {
 	public String toString() {
 		return "OutboxEvent{" +
 				"id=" + id +
-				", moment=" + moment +
 				", entityName='" + entityName + '\'' +
 				", entityId='" + entityId + '\'' +
 				", entityIdHash='" + entityIdHash + '\'' +

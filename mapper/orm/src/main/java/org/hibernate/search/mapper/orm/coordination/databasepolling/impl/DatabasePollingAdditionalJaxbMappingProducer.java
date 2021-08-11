@@ -20,12 +20,7 @@ import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.MySQLDialect;
-import org.hibernate.dialect.SQLServerDialect;
-import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -46,16 +41,6 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
 	private static final String OUTBOX_TABLE_NAME = HSEARCH_TABLE_NAME_PREFIX + "OUTBOX_TABLE";
 
-	private static final String DEFAULT_CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP";
-	private static final String MSSQL_CURRENT_TIMESTAMP = "SYSDATETIME()";
-
-	private static final String DEFAULT_TYPE_TIMESTAMP = "TIMESTAMP";
-	private static final String MYSQL_TYPE_TIMESTAMP = "TIMESTAMP(6)";
-	private static final String MSSQL_TYPE_TIMESTAMP = "datetime2(7)";
-
-	private static final String TYPE_TIMESTAMP_PLACEHOLDER = "{{type_timestamp}}";
-	private static final String CURRENT_TIMESTAMP_PLACEHOLDER = "{{current_timestamp}}";
-
 	private static final String OUTBOX_ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 	"\n" +
 	"<hibernate-mapping>\n" +
@@ -68,9 +53,6 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 	"                <param name=\"increment_size\">1</param>\n" +
 	"            </generator>\n" +
 	"        </id>\n" +
-	" 		 <property name=\"moment\" generated=\"insert\" index=\"moment\">\n" +
-	"     		 <column sql-type=\"" + TYPE_TIMESTAMP_PLACEHOLDER + "\" updatable=\"false\" default=\"" + CURRENT_TIMESTAMP_PLACEHOLDER + "\" />\n" +
-	" 		 </property>\n" +
 	"        <property name=\"entityName\" type=\"string\" />\n" +
 	"        <property name=\"entityId\" type=\"string\" />\n" +
 	"        <property name=\"entityIdHash\" type=\"integer\" index=\"entityIdHash\" />\n" +
@@ -84,41 +66,16 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
 		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
 		ConfigurationService service = serviceRegistry.getService( ConfigurationService.class );
-		JdbcServices jdbcServices = serviceRegistry.getService( JdbcServices.class );
 
 		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.COORDINATION_STRATEGY );
 		if ( !CoordinationStrategyNames.DATABASE_POLLING.equals( customIndexingStrategy ) ) {
 			return Collections.emptyList();
 		}
 
-		Dialect dialect = jdbcServices.getJdbcEnvironment().getDialect();
-		SQLFunction timestampFunction = dialect.getFunctions().get( "current_timestamp" );
-
-		String typeTimestamp = null;
-		String currentTimestamp = null;
-		if ( dialect instanceof MySQLDialect ) {
-			typeTimestamp = MYSQL_TYPE_TIMESTAMP;
-		}
-		else if ( dialect instanceof SQLServerDialect ) {
-			typeTimestamp = MSSQL_TYPE_TIMESTAMP;
-			currentTimestamp = MSSQL_CURRENT_TIMESTAMP;
-		}
-		if ( typeTimestamp == null ) {
-			typeTimestamp = DEFAULT_TYPE_TIMESTAMP;
-		}
-		if ( currentTimestamp == null ) {
-			currentTimestamp = ( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
-					timestampFunction.render( null, Collections.emptyList(), null );
-		}
-
-		String outboxSchema = OUTBOX_ENTITY_DEFINITION
-				.replace( TYPE_TIMESTAMP_PLACEHOLDER, typeTimestamp )
-				.replace( CURRENT_TIMESTAMP_PLACEHOLDER, currentTimestamp );
-
-		log.outboxGeneratedEntityMapping( outboxSchema );
+		log.outboxGeneratedEntityMapping( OUTBOX_ENTITY_DEFINITION );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
 
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( outboxSchema.getBytes() );
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( OUTBOX_ENTITY_DEFINITION.getBytes() );
 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
 		Binding<?> binding = mappingBinder.bind( bufferedInputStream, origin );
 
