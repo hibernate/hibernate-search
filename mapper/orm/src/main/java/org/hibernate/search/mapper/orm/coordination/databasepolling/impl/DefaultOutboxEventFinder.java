@@ -30,7 +30,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 				+ " order by e.id";
 	}
 
-	public static List<OutboxEvent> findOutboxEvents(Session session, int maxResults,
+	public static Query<OutboxEvent> createQuery(Session session, int maxResults,
 			String queryString, Map<String, Object> params) {
 		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
 		for ( Map.Entry<String, Object> entry : params.entrySet() ) {
@@ -43,7 +43,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 		// (thanks to sharding), we can be sure those deadlocks are false positives,
 		// so we disable database checks by settings the lock mode to NONE.
 		query.setLockMode( LockModeType.NONE );
-		return query.list();
+		return query;
 	}
 
 	private final String queryString;
@@ -56,7 +56,8 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 
 	@Override
 	public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
-		return DefaultOutboxEventFinder.findOutboxEvents( session, maxResults, queryString, params );
+		return DefaultOutboxEventFinder.createQuery( session, maxResults, queryString, params )
+				.list();
 	}
 
 }
