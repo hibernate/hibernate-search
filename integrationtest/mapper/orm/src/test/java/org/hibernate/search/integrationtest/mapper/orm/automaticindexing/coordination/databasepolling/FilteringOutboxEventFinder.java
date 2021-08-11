@@ -63,13 +63,8 @@ class FilteringOutboxEventFinder {
 			Optional<OutboxEventPredicate> predicate) {
 		Optional<OutboxEventPredicate> combinedPredicate = combineFilterWithPredicate( predicate );
 		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
-		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
-		query.setMaxResults( maxResults );
-		if ( combinedPredicate.isPresent() ) {
-			for ( Map.Entry<String, Object> entry : combinedPredicate.get().params().entrySet() ) {
-				query.setParameter( entry.getKey(), entry.getValue() );
-			}
-		}
+		Query<OutboxEvent> query = DefaultOutboxEventFinder.createQuery( session, maxResults, queryString,
+				combinedPredicate.map( OutboxEventPredicate::params ).orElse( Collections.emptyMap() ) );
 		return query;
 	}
 
