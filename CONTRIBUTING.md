@@ -233,8 +233,6 @@ The following profiles are available:
   * `elasticsearch-7.12` for 7.12+ ([not open-source](https://opensource.org/node/1099))
 * [OpenSearch](https://www.opensearch.org/)
   * `opensearch-1.0` for 1.0+
-* [Open Distro for Elasticsearch](https://opendistro.github.io/for-elasticsearch/):
-  * `opendistro-elasticsearch-1.13` for 1.13+
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
@@ -255,15 +253,6 @@ you will still have to select a profile among those listed above, and specify th
 
 ```bash
 ./mvnw clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 \
-        -Dtest.elasticsearch.connection.uris=http://localhost:9200
-```
-
-You can specify the image tag independently of the Elasticsearch version,
-which can be useful for Open Distro for Elasticsearch:
-
-```bash
-./mvnw clean install -Popendistro-elasticsearch-1.13 -Dtest.elasticsearch.run.image.tag=1.13.1 \
-        -Dtest.elasticsearch.connection.version=7.10.2 \
         -Dtest.elasticsearch.connection.uris=http://localhost:9200
 ```
 

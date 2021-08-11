@@ -187,43 +187,6 @@
                                 </run>
                             </image>
                             <image>
-                                <name>${test.elasticsearch.run.opendistro.image.name}:${test.elasticsearch.run.opendistro.image.tag}</name>
-                                <alias>opendistro-elasticsearch</alias>
-                                <run>
-                                    <skip>${test.elasticsearch.run.opendistro.skip}</skip>
-                                    <env>
-                                        <logger.level>WARN</logger.level>
-                                        <discovery.type>single-node</discovery.type>
-                                        <!-- Prevent swapping, same as the Elasticsearch image above. -->
-                                        <bootstrap.memory_lock>true</bootstrap.memory_lock>
-                                        <!-- Open Distro for Elasticsearch expects SSL and uses a self-signed certificate by default;
-                                             it's not practical for testing, so we disable that.
-                                         -->
-                                        <opendistro_security.disabled>true</opendistro_security.disabled>
-                                        <!-- ISM floods the logs with errors, and we don't need it.
-                                             See https://opendistro.github.io/for-elasticsearch-docs/docs/im/ism/settings/
-                                         -->
-                                        <opendistro.index_state_management.enabled>false</opendistro.index_state_management.enabled>
-                                    </env>
-                                    <ports>
-                                        <port>9200:9200</port>
-                                    </ports>
-                                    <log>
-                                        <prefix>OpenDistro-ES: </prefix>
-                                        <date>default</date>
-                                        <color>cyan</color>
-                                    </log>
-                                    <wait>
-                                        <http>
-                                            <url>http://localhost:9200</url>
-                                            <method>GET</method>
-                                            <status>200</status>
-                                        </http>
-                                        <time>20000</time>
-                                    </wait>
-                                </run>
-                            </image>
-                            <image>
                                 <name>${test.elasticsearch.run.opensearch.image.name}:${test.elasticsearch.run.opensearch.image.tag}</name>
                                 <alias>opensearch</alias>
                                 <run>
@@ -699,18 +662,6 @@
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.13}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
-            </properties>
-        </profile>
-
-        <!-- OpenDistro for Elasticsearch 1.13+ test environment -->
-        <profile>
-            <id>opendistro-elasticsearch-1.13</id>
-            <properties>
-                <test.elasticsearch.run.opendistro.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opendistro.skip>
-                <test.elasticsearch.run.opendistro.image.tag>${version.io.github.opendistro.elasticsearch.latest-1.13}</test.elasticsearch.run.opendistro.image.tag>
-                <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
-                <test.elasticsearch.connection.version>${version.io.github.opendistro.elasticsearch.latest-1.13.reported}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
