@@ -22,8 +22,8 @@ import org.junit.runner.RunWith;
 @ClasspathSuite.ClassnameFilters({
 		// Just execute all automatic indexing tests
 		"org.hibernate.search.integrationtest.mapper.orm.automaticindexing..*",
-		// ... except tests designed for a particular strategy:
-		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy..*",
+		// ... except tests designed for a particular coordination strategy:
+		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination..*",
 		// ... and except these tests that just cannot work with the outbox table strategy:
 		// > Synchronization strategies can only be used with the "session" automatic indexing strategy
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyIT",
