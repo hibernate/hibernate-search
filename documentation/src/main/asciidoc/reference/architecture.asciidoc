@@ -117,7 +117,7 @@ See <<search-dsl>> for details.
 .2+|Limitations
 3+|Automatic indexing ignores: <<limitations-changes-in-session,JPQL/SQL queries>>, <<limitations-changes-asymmetric-association-updates,asymmetric association updates>>
 2+d|Out-of-sync indexes in rare situations: <<limitations-parallel-embedded-update,concurrent `@IndexedEmbedded`>>, <<limitations-backend-indexing-error,backend I/O errors>>
-|Out-of-sync indexes <<limitations-database-polling-event-order,in very rare situations with some databases>>.
+|No other known limitation
 |===
 
 [[architecture-examples-single-node-lucene]]
