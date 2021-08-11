@@ -270,16 +270,6 @@
             </properties>
         </profile>
 
-        <!-- OpenDistro for Elasticsearch 1.13+ test environment -->
-        <profile>
-            <id>opendistro-elasticsearch-1.13</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
         <!-- OpenSearch 1.0+ test environment -->
         <profile>
             <id>opensearch-1.0</id>
