@@ -214,9 +214,8 @@ stage('Configure') {
                     		condition: TestCondition.AFTER_MERGE),
                     new DatabaseBuildEnvironment(dbName: 'db2', mavenProfile: 'ci-db2',
                             condition: TestCondition.AFTER_MERGE),
-                    // Temporarily disabled because of database deadlocks making tests fail; see HSEARCH-4288
                     new DatabaseBuildEnvironment(dbName: 'mssql', mavenProfile: 'ci-mssql',
-                            condition: TestCondition.ON_DEMAND)
+                            condition: TestCondition.AFTER_MERGE)
 			],
 			esLocal: [
 					// --------------------------------------------
