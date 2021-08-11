@@ -40,6 +40,6 @@ class DocumentWorkCreateCall extends Call<DocumentWorkCreateCall> {
 
 	@Override
 	public String toString() {
-		return "creation of a work on document '" + documentKey + "'";
+		return "creation of a " + work.getType() + " work on document '" + documentKey + "'";
 	}
 }
