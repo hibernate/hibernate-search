@@ -10,11 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -22,11 +19,8 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.impl.LogFailureHandler;
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -304,34 +298,6 @@ public class DatabasePollingAutomaticIndexingBackendFailureIT {
 	private static class SimulatedFailure extends RuntimeException {
 		SimulatedFailure(String message) {
 			super( message );
-		}
-	}
-
-	private static class TestFailureHandler implements FailureHandler {
-		private LogFailureHandler delegate = new LogFailureHandler();
-		// there are no concurrent write in this test,
-		// using volatile list / concurrent hashmap only to make the changes on value lists visible by the main thread
-		private volatile List<FailureContext> genericFailures = new ArrayList<>();
-		private Map<Integer, List<EntityIndexingFailureContext>> entityFailures = new ConcurrentHashMap<>();
-
-		@Override
-		public void handle(FailureContext context) {
-			genericFailures.add( context );
-			// For easier debugging
-			delegate.handle( context );
-		}
-
-		@Override
-		public void handle(EntityIndexingFailureContext context) {
-			for ( Object item : context.entityReferences() ) {
-				EntityReference entityReference = (EntityReference) item;
-				Integer id = (Integer) entityReference.id();
-
-				entityFailures.computeIfAbsent( id, key -> new ArrayList<>() );
-				entityFailures.get( id ).add( context );
-			}
-			// For easier debugging
-			delegate.handle( context );
 		}
 	}
 
