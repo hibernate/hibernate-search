@@ -37,12 +37,12 @@ public class CallQueue<C extends Call<? super C>> {
 	}
 
 	public void expectInOrder(C expectedCall) {
-		log.debugf( "Expecting %s", expectedCall );
+		log.tracef( "Expecting %s", expectedCall );
 		callsExpectedInOrder.addLast( expectedCall );
 	}
 
 	public void expectOutOfOrder(C expectedCall) {
-		log.debugf( "Expecting %s", expectedCall );
+		log.tracef( "Expecting %s", expectedCall );
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
