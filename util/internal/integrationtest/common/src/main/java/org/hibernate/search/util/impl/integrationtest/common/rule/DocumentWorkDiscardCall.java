@@ -40,6 +40,6 @@ class DocumentWorkDiscardCall extends Call<DocumentWorkDiscardCall> {
 
 	@Override
 	public String toString() {
-		return "discarding of a work on document '" + documentKey + "'";
+		return "discarding of a " + work.getType() + " work on document '" + documentKey + "'";
 	}
 }

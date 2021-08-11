@@ -47,6 +47,6 @@ class DocumentWorkExecuteCall extends Call<DocumentWorkExecuteCall> {
 
 	@Override
 	public String toString() {
-		return "execution of a work on document '" + documentKey + "'";
+		return "execution of a " + work.getType() + " work on document '" + documentKey + "'";
 	}
 }
