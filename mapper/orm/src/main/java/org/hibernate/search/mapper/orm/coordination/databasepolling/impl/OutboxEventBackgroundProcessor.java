@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -175,9 +174,9 @@ public class OutboxEventBackgroundProcessor {
 
 	private static void updateOrDeleteEvents(FailureHandler failureHandler, Session session,
 			OutboxEventProcessingPlan processingPlan) {
-		List<Long> eventToDeleteIds = new ArrayList<>();
+		List<OutboxEvent> eventToDelete = new ArrayList<>();
 		for ( OutboxEvent event : processingPlan.getEvents() ) {
-			eventToDeleteIds.add( event.getId() );
+			eventToDelete.add( event );
 		}
 
 		for ( OutboxEvent failedEvent : processingPlan.getFailedEvents() ) {
@@ -193,7 +192,7 @@ public class OutboxEventBackgroundProcessor {
 			}
 			else {
 				// This is slow, but we don't expect failures often, so that's fine.
-				eventToDeleteIds.remove( failedEvent.getId() );
+				eventToDelete.remove( failedEvent );
 
 				failedEvent.setRetries( attempts );
 
@@ -202,9 +201,9 @@ public class OutboxEventBackgroundProcessor {
 			}
 		}
 
-		Query<?> query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
-		query.setParameter( "ids", eventToDeleteIds );
-		query.executeUpdate();
+		for ( OutboxEvent event : eventToDelete ) {
+			session.delete( event );
+		}
 
 		session.flush();
 		session.clear();
