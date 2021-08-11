@@ -8,12 +8,15 @@ package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.persistence.OptimisticLockException;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -102,7 +105,19 @@ public class OutboxEventBackgroundProcessor {
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
 				transactionHelper.begin( session, null );
 				try {
-					List<OutboxEvent> events = finder.findOutboxEvents( session, batchSize );
+					List<OutboxEvent> events;
+					try {
+						events = finder.findOutboxEvents( session, batchSize );
+					}
+					catch (OptimisticLockException lockException) {
+						// Don't be fooled by the exception type, this is actually a *pessimistic* lock failure.
+						// It can happen with some databases (Mariadb before 10.6, perhaps others) that do not support
+						// skipping locked rows (see LockOptions.SKIP).
+						// If that happens, we will just log something and try again later.
+						// See also https://jira.mariadb.org/browse/MDEV-13115
+						log.outboxEventProcessorUnableToLock( name, lockException );
+						events = Collections.emptyList();
+					}
 					if ( events.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
 						transactionHelper.commit( session );
