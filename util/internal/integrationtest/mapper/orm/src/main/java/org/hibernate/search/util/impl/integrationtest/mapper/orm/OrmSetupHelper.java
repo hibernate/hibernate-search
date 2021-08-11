@@ -91,7 +91,7 @@ public final class OrmSetupHelper
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 	}
 
-	public OrmSetupHelper automaticIndexingStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
+	public OrmSetupHelper coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		this.coordinationStrategyExpectations = coordinationStrategyExpectations;
 		return this;
 	}

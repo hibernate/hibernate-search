@@ -36,7 +36,7 @@ public class DatabasePollingAutomaticIndexingLifecycleIT {
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.automaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 

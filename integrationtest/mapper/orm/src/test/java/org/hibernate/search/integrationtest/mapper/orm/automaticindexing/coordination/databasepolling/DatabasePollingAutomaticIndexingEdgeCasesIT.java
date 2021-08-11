@@ -52,7 +52,7 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.automaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder()
 			// Disable the filter by default: only some of the tests actually need it.

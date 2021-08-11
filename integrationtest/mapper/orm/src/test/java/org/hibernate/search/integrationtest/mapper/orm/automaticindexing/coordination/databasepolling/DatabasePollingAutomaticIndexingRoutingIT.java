@@ -29,7 +29,7 @@ public class DatabasePollingAutomaticIndexingRoutingIT {
 
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.automaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 

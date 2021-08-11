@@ -68,7 +68,7 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
-			.automaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
