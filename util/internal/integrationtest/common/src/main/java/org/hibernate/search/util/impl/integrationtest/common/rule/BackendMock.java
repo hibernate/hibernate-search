@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -21,8 +20,6 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
@@ -37,8 +34,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class BackendMock implements TestRule {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior( this::indexingWorkExpectations );
 
@@ -447,27 +442,22 @@ public class BackendMock implements TestRule {
 		}
 
 		private void expect(DocumentWorkCreateCall call) {
-			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkCreateCalls( call.documentKey() ).expectInOrder( call );
 		}
 
 		private void expectOutOfOrder(DocumentWorkCreateCall call) {
-			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkCreateCalls( call.documentKey() ).expectOutOfOrder( call );
 		}
 
 		private void expect(DocumentWorkDiscardCall call) {
-			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkDiscardCalls( call.documentKey() ).expectInOrder( call );
 		}
 
 		private void expect(DocumentWorkExecuteCall call) {
-			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkExecuteCalls( call.documentKey() ).expectInOrder( call );
 		}
 
 		private void expectOutOfOrder(DocumentWorkExecuteCall call) {
-			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkExecuteCalls( call.documentKey() ).expectOutOfOrder( call );
 		}
 	}

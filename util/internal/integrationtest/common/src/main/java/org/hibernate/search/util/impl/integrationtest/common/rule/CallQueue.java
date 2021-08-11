@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.junit.Assert.fail;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -15,9 +16,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
 import org.assertj.core.api.Fail;
 
 public class CallQueue<C extends Call<? super C>> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Deque<C> callsExpectedInOrder = new LinkedList<>();
 	private final List<C> callsExpectedOutOfOrder = new ArrayList<>();
@@ -31,16 +37,19 @@ public class CallQueue<C extends Call<? super C>> {
 	}
 
 	public void expectInOrder(C expectedCall) {
+		log.debugf( "Expecting %s", expectedCall );
 		callsExpectedInOrder.addLast( expectedCall );
 	}
 
 	public void expectOutOfOrder(C expectedCall) {
+		log.debugf( "Expecting %s", expectedCall );
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
 	public final synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
 			Function<C2, T> noExpectationBehavior) {
 		try {
+			log.tracef( "Verifying %s", actualCall );
 			return tryVerify( actualCall, callVerifyFunction, noExpectationBehavior );
 		}
 		catch (AssertionError e) {
