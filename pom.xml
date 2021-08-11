@@ -233,7 +233,7 @@
         <!-- WARNING: Don't forget to update the version of container images in the Jenkinsfile if you update versions here -->
         <version.io.github.opendistro.elasticsearch.latest-1.13>1.13.2</version.io.github.opendistro.elasticsearch.latest-1.13>
         <version.io.github.opendistro.elasticsearch.latest-1.13.reported>7.10.2</version.io.github.opendistro.elasticsearch.latest-1.13.reported>
-        <version.org.opensearch.latest-1.0>1.0.0-rc1</version.org.opensearch.latest-1.0>
+        <version.org.opensearch.latest-1.0>1.0.0</version.org.opensearch.latest-1.0>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.14.18</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
