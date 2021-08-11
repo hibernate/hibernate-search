@@ -14,6 +14,8 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.OptimisticLockException;
+
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
@@ -275,5 +277,9 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 53, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
 	void automaticIndexingStrategyIsDeprecated(String resolveOrRaw, String resolveOrRaw1);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 54, value = "'%1$s' failed to obtain a lock on events to process; will try again later.")
+	void outboxEventProcessorUnableToLock(String name, @Cause OptimisticLockException lockException);
 
 }
