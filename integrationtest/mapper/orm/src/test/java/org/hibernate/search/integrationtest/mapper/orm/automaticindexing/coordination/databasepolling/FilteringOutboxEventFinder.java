@@ -97,7 +97,7 @@ class FilteringOutboxEventFinder {
 	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e order by e.moment, e.id", OutboxEvent.class );
+				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
 		return query.list();
 	}
 
@@ -112,7 +112,7 @@ class FilteringOutboxEventFinder {
 	public List<Long> findOutboxEventIdsNoFilter(Session session) {
 		checkFiltering();
 		Query<Long> query = session.createQuery(
-				"select e.id from OutboxEvent e order by e.moment, e.id", Long.class );
+				"select e.id from OutboxEvent e order by e.id", Long.class );
 		return query.list();
 	}
 
