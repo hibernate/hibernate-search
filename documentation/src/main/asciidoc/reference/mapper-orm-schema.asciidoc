@@ -222,10 +222,9 @@ One exception: date formats must match exactly the formats specified by Hibernat
 due to implementation constraints.
 [[mapper-orm-schema-management-concepts-update-failure]]
 Schema updates may fail::
-A schema update, triggered by the `create-or-update` strategy, may very well fail.
-This is because schemas may changed in an incompatible way, such as a field having its type changed,
-updating the schema may be impossible without manual intervention,
-and then the schema update
+A schema update, triggered by the `create-or-update` strategy, may simply fail.
+This is because schemas may change in an incompatible way, such as a field having its type changed,
+or its analyzer changed, etc.
 +
 Worse, since updates are handled on a per-index basis,
 a schema update may succeed for one index but fail on another,
