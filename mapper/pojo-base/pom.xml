@@ -47,4 +47,39 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <jvmVersion>9</jvmVersion>
+                            <module>
+                                <moduleInfo>
+                                    <name>${java.module.name}</name>
+                                    <exports>
+                                        <!-- TODO HSEARCH-3274 Handle export of impl packages
+                                            !org.hibernate.search.*.impl;
+                                            !org.hibernate.search.*.impl.*; -->
+                                        *;
+                                    </exports>
+                                </moduleInfo>
+                            </module>
+                            <jdepsExtraArgs>
+                                <arg>--multi-release=9</arg>
+                            </jdepsExtraArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
