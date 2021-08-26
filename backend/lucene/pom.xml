@@ -62,45 +62,10 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>module-descriptors</id>
-            <!--
-                TODO HSEARCH-3274
-                Trying to generate module info, we got some issues on package names
-
-                Invocation of jdeps failed: jdeps -generate-module-info ...
-                Error: Module lucene.sandbox contains package org.apache.lucene.search, module lucene.core exports package org.apache.lucene.search to lucene.sandbox
-
-                The problem seems to be that we depend on Lucene as a module,
-                whereas we should only depend on it as a package of the unnamed module,
-                because Lucene has split packages and thus cannot be consumed as a module.
-
-                To solve this, a good first step would be to tell moditect to ignore some dependencies (Lucene dependencies)...
-                is that even possible?
-                Then we should be able to at least run Hibernate Search as module by passing
-                `-add-reads org.hibernate.search.backend.lucene=ALL-UNNAMED` to the JVM,
-                telling it to allow Hibernate Search to access classes of the unnamed module.
-
-                A second step would be to express the dependency to the unnamed module directly in the module-info descriptor,
-                but I'm not sure this is even possible.
-            -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.moditect</groupId>
-                        <artifactId>moditect-maven-plugin</artifactId>
-                        <!-- Override the executions defined in the parent module -->
-                        <executions>
-                            <execution>
-                                <id>add-module-infos</id>
-                                <!-- Disable the plugin, see above -->
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <build>
+        <plugins>
+            <!-- Not generate module-info with moditect-maven-plugin:
+            Lucene has split packages module issue and thus cannot be consumed as a module. -->
+        </plugins>
+    </build>
 </project>
