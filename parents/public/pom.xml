@@ -215,40 +215,5 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>module-descriptors</id>
-            <!--
-                TODO HSEARCH-3274 enable this profile by default to add module descriptors to Hibernate Search modules
-             -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.moditect</groupId>
-                        <artifactId>moditect-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>add-module-infos</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>add-module-info</goal>
-                                </goals>
-                                <configuration>
-                                    <module>
-                                        <moduleInfo>
-                                            <name>${java.module.name}</name>
-                                            <exports>
-                                                !org.hibernate.search.*.impl;
-                                                !org.hibernate.search.*.impl.*;
-                                                *;
-                                            </exports>
-                                        </moduleInfo>
-                                    </module>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>
