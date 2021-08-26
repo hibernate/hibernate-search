@@ -56,12 +56,7 @@
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
                         <configuration>
-                            <jvmVersion>9</jvmVersion>
                             <module>
                                 <moduleInfo>
                                     <name>${java.module.name}</name>
@@ -73,9 +68,6 @@
                                     </exports>
                                 </moduleInfo>
                             </module>
-                            <jdepsExtraArgs>
-                                <arg>--multi-release=9</arg>
-                            </jdepsExtraArgs>
                         </configuration>
                     </execution>
                 </executions>
