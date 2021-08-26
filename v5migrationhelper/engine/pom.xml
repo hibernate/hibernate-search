@@ -65,6 +65,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
+            <!-- Not generate module-info with moditect-maven-plugin:
+                This module depends on Lucene jars that have split packages module issue. -->
         </plugins>
     </build>
 
