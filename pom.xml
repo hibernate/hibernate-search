@@ -356,7 +356,7 @@
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.com.buschmais.jqassistant.plugin>1.8.0</version.com.buschmais.jqassistant.plugin>
         <version.docker.maven.plugin>0.34.1</version.docker.maven.plugin>
-        <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
+        <version.moditect.plugin>1.0.0.RC2</version.moditect.plugin>
         <version.sonar.plugin>3.7.0.1746</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.org.codehaus.groovy-jsr223>3.0.8</version.org.codehaus.groovy-jsr223>
