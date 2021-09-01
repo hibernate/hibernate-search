@@ -72,31 +72,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <name>${java.module.name}</name>
-                                    <exports>
-                                        org.hibernate.search.*.logging.impl to org.jboss.logging;
-                                        org.hibernate.search.*.reporting.impl to org.jboss.logging;
-                                        !org.hibernate.search.*.impl;
-                                        *;
-                                    </exports>
-                                </moduleInfo>
-                            </module>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

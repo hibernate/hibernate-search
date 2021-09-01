@@ -82,14 +82,8 @@
                         <configuration>
                             <module>
                                 <moduleInfo>
-                                    <name>${java.module.name}</name>
-                                    <exports>
-                                        org.hibernate.search.*.logging.impl to org.jboss.logging;
-                                        org.hibernate.search.*.reporting.impl to org.jboss.logging;
-                                        !org.hibernate.search.*.impl;
-                                        *;
-                                    </exports>
                                     <requires>
+                                        <!-- there is no cdi.api module -->
                                         !cdi.api;
                                     </requires>
                                 </moduleInfo>
