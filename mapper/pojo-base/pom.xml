@@ -61,7 +61,10 @@
                                 <moduleInfo>
                                     <name>${java.module.name}</name>
                                     <exports>
-                                        org.hibernate.search.*.impl to org.hibernate.search.util.common, org.hibernate.search.engine, org.hibernate.search.backend.elasticsearch, org.hibernate.search.backend.elasticsearch.aws, org.hibernate.search.mapper.pojo, org.hibernate.search.mapper.javabean, org.hibernate.search.mapper.orm, org.hibernate.search.batch.jsr352.core, org.jboss.logging;
+                                        org.hibernate.search.*.logging.impl to org.jboss.logging;
+                                        org.hibernate.search.*.reporting.impl to org.jboss.logging;
+                                        org.hibernate.search.*.processing.impl to org.hibernate.search.engine;
+                                        !org.hibernate.search.*.impl;
                                         *;
                                     </exports>
                                 </moduleInfo>
