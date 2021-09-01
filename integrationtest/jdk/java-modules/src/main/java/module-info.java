@@ -3,7 +3,7 @@ module org.hibernate.search.integrationtest.java.module {
 	opens org.hibernate.search.integrationtest.java.module.entity to
 			org.hibernate.orm.core,
 			/*
-			 * TODO HSEARCH-3274 This part of the "opens" directive ideally should not be necessary.
+			 * TODO HSEARCH-4302 This part of the "opens" directive ideally should not be necessary.
 			 *  Hopefully we should be able to ask for a MethodHandles.Lookup instance from Hibernate ORM
 			 *  and take advantage of the fact the package is already open to Hibernate ORM?
 			 */
