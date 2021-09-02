@@ -163,10 +163,22 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 		}
 
 		@Override
+		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+					ContainedEntity::getContainingAsIndexedEmbeddedShallowReindexOnUpdate );
+		}
+
+		@Override
 		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Map<ContainedEntity, String>> containedIndexedEmbeddedNoReindexOnUpdate() {
 			return new MultiValuedPropertyAccessor<>( MAP_KEYS_PRIMITIVES,
 					ContainingEntity::getContainedIndexedEmbeddedNoReindexOnUpdate,
 					ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
+		}
+
+		@Override
+		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+					ContainedEntity::getContainingAsIndexedEmbeddedNoReindexOnUpdate );
 		}
 
 		@Override
@@ -499,6 +511,40 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 		 * No mappedBy here, same reasons as above.
 		 */
 		@ManyToMany
+		@JoinTable(name = "contained_indexedShallowMapHolder",
+				inverseJoinColumns = @JoinColumn(name = "containingIndexedShallow"))
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbeddedShallowReindexOnUpdate",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
+		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
+
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
+		@JoinTable(name = "contained_indexedNoReindexMapHolder",
+				inverseJoinColumns = @JoinColumn(name = "containingIndexedNoReindex"))
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
+		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
+
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
@@ -572,6 +618,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {

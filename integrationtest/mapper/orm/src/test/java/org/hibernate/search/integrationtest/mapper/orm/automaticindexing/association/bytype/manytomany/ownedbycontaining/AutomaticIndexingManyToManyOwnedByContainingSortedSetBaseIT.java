@@ -153,10 +153,22 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 		}
 
 		@Override
+		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+					ContainedEntity::getContainingAsIndexedEmbeddedShallowReindexOnUpdate );
+		}
+
+		@Override
 		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedIndexedEmbeddedNoReindexOnUpdate() {
 			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
 					ContainingEntity::getContainedIndexedEmbeddedNoReindexOnUpdate,
 					ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
+		}
+
+		@Override
+		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+					ContainedEntity::getContainingAsIndexedEmbeddedNoReindexOnUpdate );
 		}
 
 		@Override
@@ -411,6 +423,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
+
 		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
@@ -468,6 +488,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
