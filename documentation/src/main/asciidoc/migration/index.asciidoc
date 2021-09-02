@@ -465,6 +465,8 @@ Hibernate Search 6 equivalent: `hibernate.search.query.loading.cache_lookup.stra
 See link:{hibernateSearchDocUrl}#search-dsl-query-cache-lookup-strategy[this section of the documentation].
 `hibernate.search.similarity`::
 No direct equivalent in Hibernate Search 6: the similarity is configured through the <<analysis-definition-provider,analysis configurer>>.
++
+IMPORTANT: The default similarity when this property is not set changed; see <<default-similarity>>.
 `hibernate.search.worker.*`::
 No equivalent to the concept of "worker" in Hibernate Search 6:
 * automatic indexing is link:{hibernateSearchDocUrl}#mapper-orm-indexing-automatic-concepts[always performed on transaction commit or,
@@ -3381,3 +3383,11 @@ Hibernate Search logs all executed search queries to logger `org.hibernate.searc
 
 In Hibernate Search 5, these logs were at the `DEBUG` level.
 In Hibernate Search 5, they are at the `TRACE` level.
+
+[[default-similarity]]
+=== The default similarity for Lucene is now BM25
+
+The default similarity for the Lucene is now `BM25Similarity`, instead of `ClassicSimilarity` in Hibernate Search 5.
+
+If necessary, you can force the `ClassicSimilarity`
+through an <<analysis-definition-provider,analysis definition provider>>.
