@@ -79,16 +79,12 @@
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
-                        <configuration>
-                            <module>
-                                <moduleInfo>
-                                    <requires>
-                                        <!-- there is no cdi.api module -->
-                                        !cdi.api;
-                                    </requires>
-                                </moduleInfo>
-                            </module>
-                        </configuration>
+                        <!-- TODO HSEARCH-4304 Do not generate module-info with moditect-maven-plugin:
+                        This module depends on some packages of unnamed module jar: cdi-api*.jar.
+                        It seems that it is not possible to use directly unnamed modules from an explicit module,
+                        but we need an automatic module that acts as a bridge.
+                        -->
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>
