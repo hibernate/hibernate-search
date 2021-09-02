@@ -137,12 +137,24 @@ public class AutomaticIndexingOneToOneOwnedByContainingBaseIT
 
 		@Override
 		public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate() {
-			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedShallowReindexOnUpdate );
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedShallowReindexOnUpdate,
+					ContainingEntity::getContainedIndexedEmbeddedShallowReindexOnUpdate );
+		}
+
+		@Override
+		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbeddedShallowReindexOnUpdate );
 		}
 
 		@Override
 		public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate() {
-			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate,
+					ContainingEntity::getContainedIndexedEmbeddedNoReindexOnUpdate );
+		}
+
+		@Override
+		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbeddedNoReindexOnUpdate );
 		}
 
 		@Override
@@ -390,6 +402,12 @@ public class AutomaticIndexingOneToOneOwnedByContainingBaseIT
 		@OneToOne(mappedBy = "containedNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
+		@OneToOne(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
+		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
+
+		@OneToOne(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
+		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
+
 		@OneToOne(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
@@ -455,6 +473,24 @@ public class AutomaticIndexingOneToOneOwnedByContainingBaseIT
 
 		public void setContainingAsNonIndexedEmbedded(ContainingEntity containingAsNonIndexedEmbedded) {
 			this.containingAsNonIndexedEmbedded = containingAsNonIndexedEmbedded;
+		}
+
+		public ContainingEntity getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public void setContainingAsIndexedEmbeddedShallowReindexOnUpdate(
+				ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate) {
+			this.containingAsIndexedEmbeddedShallowReindexOnUpdate = containingAsIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public ContainingEntity getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
+			return containingAsIndexedEmbeddedNoReindexOnUpdate;
+		}
+
+		public void setContainingAsIndexedEmbeddedNoReindexOnUpdate(
+				ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate) {
+			this.containingAsIndexedEmbeddedNoReindexOnUpdate = containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public ContainingEntity getContainingAsUsedInCrossEntityDerivedProperty() {

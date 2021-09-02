@@ -317,6 +317,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_1 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 
@@ -337,6 +338,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_2 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 
@@ -359,6 +361,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContained contained = session.get( primitives.getContainedClass(), 2 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().remove( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().remove( contained, entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -388,6 +391,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_1 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 			session.persist( entity1 );
@@ -412,6 +416,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			);
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().setContainer( entity1, newAssociation );
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 
@@ -454,6 +459,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_1 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 
@@ -469,6 +475,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_2 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 
@@ -483,6 +490,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContained contained = session.get( primitives.getContainedClass(), 2 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().remove( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().remove( contained, entity1 );
 
 			// Do not expect any work
 		} );
@@ -507,6 +515,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_1 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 			session.persist( entity1 );
@@ -531,6 +540,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			);
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().setContainer( entity1, newAssociation );
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( entity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, entity1 );
 
 			session.persist( contained );
 
@@ -889,6 +899,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_1 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -911,6 +922,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_2 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -935,6 +947,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().remove( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().remove( contained, containingEntity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -972,6 +985,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContained contained = primitives.newContained( 3 );
 			primitives.indexedField().set( contained, VALUE_1 );
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 			session.persist( containingEntity1 );
@@ -999,6 +1013,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			);
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().setContainer( containingEntity1, newAssociation );
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1051,6 +1066,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_1 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1066,6 +1082,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			primitives.indexedField().set( contained, VALUE_2 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1080,6 +1097,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().remove( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().remove( contained, containingEntity1 );
 
 			// Do not expect any work
 		} );
@@ -1108,6 +1126,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContained contained = primitives.newContained( 3 );
 			primitives.indexedField().set( contained, VALUE_1 );
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1 , contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 			session.persist( containingEntity1 );
@@ -1135,6 +1154,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			);
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().setContainer( containingEntity1, newAssociation );
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1, contained );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().add( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1183,7 +1203,13 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedShallowReindexOnUpdate();
 
 		@Override
+		MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsIndexedEmbeddedShallowReindexOnUpdate();
+
+		@Override
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedNoReindexOnUpdate();
+
+		@Override
+		MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsIndexedEmbeddedNoReindexOnUpdate();
 
 		@Override
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedUsedInCrossEntityDerivedProperty();
