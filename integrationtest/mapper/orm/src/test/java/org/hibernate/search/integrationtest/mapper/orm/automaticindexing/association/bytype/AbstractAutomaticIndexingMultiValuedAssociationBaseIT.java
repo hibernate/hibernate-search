@@ -4,27 +4,26 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.multi;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
 
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.AbstractAutomaticIndexingAssociationIT;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
 /**
- * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events
- * and involving a multi-valued association.
- * <p>
- * See {@link AbstractAutomaticIndexingAssociationIT} for more details on how this test is designed.
+ * Abstract base for tests of automatic indexing caused by association updates
+ * or by updates of associated (contained) entities,
+ * with a multi-valued association.
  */
-public abstract class AbstractAutomaticIndexingMultiAssociationIT<
-		TIndexed extends TContaining, TContaining, TContained,
-		TContainedAssociation, TContainingAssociation
+public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
+				TIndexed extends TContaining, TContaining, TContained,
+				TContainedAssociation, TContainingAssociation
 		>
-		extends AbstractAutomaticIndexingAssociationIT<
-				TIndexed, TContaining, TContained
-				> {
+		extends AbstractAutomaticIndexingAssociationBaseIT<
+								TIndexed, TContaining, TContained
+						> {
 
 	/*
 	 * Make sure that the values are in lexicographical order, so that SortedMap tests
@@ -33,19 +32,19 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	private final String VALUE_1 = "1 - firstValue";
 	private final String VALUE_2 = "2 - secondValue";
 
-	private final MultiAssociationModelPrimitives<TIndexed, TContaining, TContained,
-			TContainedAssociation, TContainingAssociation> primitives;
+	private final MultiValuedModelPrimitives<TIndexed, TContaining, TContained,
+					TContainedAssociation, TContainingAssociation> primitives;
 
-	AbstractAutomaticIndexingMultiAssociationIT(
-			MultiAssociationModelPrimitives<TIndexed, TContaining, TContained,
-					TContainedAssociation, TContainingAssociation> primitives) {
+	public AbstractAutomaticIndexingMultiValuedAssociationBaseIT(
+			MultiValuedModelPrimitives<TIndexed, TContaining, TContained,
+											TContainedAssociation, TContainingAssociation> primitives) {
 		super( primitives );
 		this.primitives = primitives;
 	}
 
 	@Test
 	public void directAssociationUpdate_indexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			session.persist( entity1 );
@@ -56,7 +55,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -77,7 +76,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a second value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -101,7 +100,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 2 );
@@ -129,7 +128,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directAssociationReplace_indexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -150,7 +149,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -186,7 +185,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directAssociationUpdate_nonIndexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			session.persist( entity1 );
@@ -197,7 +196,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -213,7 +212,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a second value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -229,7 +228,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 2 );
@@ -253,7 +252,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void directAssociationReplace_nonIndexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -270,7 +269,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -300,7 +299,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			session.persist( entity1 );
@@ -311,7 +310,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -331,7 +330,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a second value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -354,7 +353,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 2 );
@@ -382,7 +381,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -402,7 +401,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -437,7 +436,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void directAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			session.persist( entity1 );
@@ -448,7 +447,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -463,7 +462,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a second value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -478,7 +477,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 2 );
@@ -501,7 +500,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void directAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContained contained = primitives.newContained( 2 );
@@ -521,7 +520,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
 			TContained contained = primitives.newContained( 3 );
@@ -551,7 +550,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 	@Test
 	public void indirectAssociationUpdate_indexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -574,7 +573,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -597,7 +596,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding another value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 5 );
@@ -623,7 +622,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining deeplyNestedContainingEntity1 = session.get( primitives.getContainingClass(), 3 );
 
 			TContained contained = primitives.newContained( 6 );
@@ -639,7 +638,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
@@ -670,7 +669,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectAssociationReplace_indexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -697,7 +696,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -735,7 +734,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectAssociationUpdate_nonIndexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -753,7 +752,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -769,7 +768,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding another value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 5 );
@@ -785,7 +784,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
@@ -809,7 +808,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void indirectAssociationReplace_nonIndexedEmbedded() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -832,7 +831,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -865,7 +864,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -883,7 +882,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -905,7 +904,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding another value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 5 );
@@ -930,7 +929,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
@@ -963,7 +962,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -989,7 +988,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -1027,7 +1026,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void indirectAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -1045,7 +1044,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -1060,7 +1059,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding another value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 5 );
@@ -1075,7 +1074,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
@@ -1099,7 +1098,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void indirectAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -1125,7 +1124,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
 			TContained contained = primitives.newContained( 4 );
@@ -1155,4 +1154,48 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	public interface MultiValuedModelPrimitives<
+					TIndexed extends TContaining,
+					TContaining,
+					TContained,
+					TContainedAssociation,
+					TContainingAssociation
+			> extends ModelPrimitives<TIndexed, TContaining, TContained> {
+
+		@Override
+		default boolean isMultiValuedAssociation() {
+			return true;
+		}
+
+		TContainedAssociation newContainedAssociation(TContainedAssociation original);
+
+		@Override
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbedded();
+
+		@Override
+		MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsIndexedEmbedded();
+
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedNonIndexedEmbedded();
+
+		MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsNonIndexedEmbedded();
+
+		@Override
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedShallowReindexOnUpdate();
+
+		@Override
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedNoReindexOnUpdate();
+
+		@Override
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedUsedInCrossEntityDerivedProperty();
+
+		@Override
+		MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsUsedInCrossEntityDerivedProperty();
+
+		@Override
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedWithCast();
+
+		@Override
+		MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsIndexedEmbeddedWithCast();
+
+	}
 }

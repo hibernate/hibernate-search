@@ -4,29 +4,27 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.single;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.AbstractAutomaticIndexingAssociationIT;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
 /**
- * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events
- * and involving a single-valued association.
- * <p>
- * See {@link AbstractAutomaticIndexingAssociationIT} for more details on how this test is designed.
+ * Abstract base for tests of automatic indexing caused by association updates
+ * or by updates of associated (contained) entities,
+ * with a single-valued association.
  */
-public abstract class AbstractAutomaticIndexingSingleAssociationIT<
+public abstract class AbstractAutomaticIndexingSingleValuedAssociationBaseIT<
 				TIndexed extends TContaining, TContaining, TContained
 		>
-		extends AbstractAutomaticIndexingAssociationIT<TIndexed, TContaining, TContained> {
+		extends AbstractAutomaticIndexingAssociationBaseIT<TIndexed, TContaining, TContained> {
 
 	private final SingleValuedAssociationModelPrimitives<TIndexed, TContaining, TContained> primitives;
 
-	public AbstractAutomaticIndexingSingleAssociationIT(
+	public AbstractAutomaticIndexingSingleValuedAssociationBaseIT(
 			SingleValuedAssociationModelPrimitives<TIndexed, TContaining, TContained> primitives) {
 		super( primitives );
 		this.primitives = primitives;
@@ -727,4 +725,12 @@ public abstract class AbstractAutomaticIndexingSingleAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	public interface SingleValuedAssociationModelPrimitives<TIndexed extends TContaining, TContaining, TContained>
+			extends ModelPrimitives<TIndexed, TContaining, TContained> {
+
+		PropertyAccessor<TContaining, TContained> containedNonIndexedEmbedded();
+
+		PropertyAccessor<TContained, TContaining> containingAsNonIndexedEmbedded();
+
+	}
 }
