@@ -10,6 +10,8 @@ public interface PropertyAccessor<R, V> {
 
 	void set(R root, V value);
 
+	V get(R root);
+
 	void clear(R root);
 
 }

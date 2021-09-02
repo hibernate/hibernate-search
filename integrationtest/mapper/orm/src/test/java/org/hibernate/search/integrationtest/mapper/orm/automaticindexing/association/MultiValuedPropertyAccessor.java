@@ -34,6 +34,11 @@ public final class MultiValuedPropertyAccessor<R, V, C> implements PropertyAcces
 	}
 
 	@Override
+	public V get(R root) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void clear(R root) {
 		C container = getContainer( root );
 		containerPrimitives.clear( container );
