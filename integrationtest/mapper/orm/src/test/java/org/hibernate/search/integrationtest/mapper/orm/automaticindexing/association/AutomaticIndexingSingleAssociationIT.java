@@ -42,7 +42,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		> {
 
 	public AutomaticIndexingSingleAssociationIT() {
-		super( new SingleAssociationModelPrimitives() );
+		super( new ModelPrimitives() );
 	}
 
 	@Test
@@ -776,7 +776,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		backendMock.verifyExpectationsMet();
 	}
 
-	private static class SingleAssociationModelPrimitives
+	private static class ModelPrimitives
 			implements AssociationModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity> {
 
 		@Override
@@ -826,114 +826,102 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		}
 
 		@Override
-		public void setContainingEntityNonIndexedField(ContainingEntity containingEntity, String value) {
-			containingEntity.setNonIndexedField( value );
+		public SingleValuedPropertyAccessor<ContainingEntity, String> containingEntityNonIndexedField() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setNonIndexedField );
 		}
 
 		@Override
-		public void setChild(ContainingEntity parent, ContainingEntity child) {
-			parent.setChild( child );
+		public SingleValuedPropertyAccessor<ContainingEntity, ContainingEntity> child() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setChild );
 		}
 
 		@Override
-		public void setParent(ContainingEntity child, ContainingEntity parent) {
-			child.setParent( parent );
+		public SingleValuedPropertyAccessor<ContainingEntity, ContainingEntity> parent() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setParent );
 		}
 
 		@Override
-		public void setContainedIndexedEmbeddedSingle(ContainingEntity containingEntity, ContainedEntity containedEntity) {
-			containingEntity.setContainedIndexedEmbedded( containedEntity );
+		public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbedded() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbedded );
 		}
 
 		@Override
-		public void setContainingAsIndexedEmbeddedSingle(ContainedEntity containedEntity, ContainingEntity containingEntity) {
-			containedEntity.setContainingAsIndexedEmbedded( containingEntity );
+		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbedded() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbedded );
 		}
 
 		@Override
-		public void setContainedIndexedEmbeddedShallowReindexOnUpdateSingle(ContainingEntity containingEntity,
-				ContainedEntity containedEntity) {
-			containingEntity.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntity );
+		public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedShallowReindexOnUpdate );
 		}
 
 		@Override
-		public void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(ContainingEntity containingEntity,
-				ContainedEntity containedEntity) {
-			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntity );
+		public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
 		}
 
 		@Override
-		public void setContainedUsedInCrossEntityDerivedPropertySingle(ContainingEntity containingEntity,
-				ContainedEntity containedEntity) {
-			containingEntity.setContainedUsedInCrossEntityDerivedProperty( containedEntity );
+		public PropertyAccessor<ContainingEntity, ContainedEntity> containedUsedInCrossEntityDerivedProperty() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedUsedInCrossEntityDerivedProperty );
 		}
 
 		@Override
-		public void setContainingAsUsedInCrossEntityDerivedPropertySingle(ContainedEntity containedEntity,
-				ContainingEntity containingEntity) {
-			containedEntity.setContainingAsUsedInCrossEntityDerivedProperty( containingEntity );
+		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsUsedInCrossEntityDerivedProperty() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsUsedInCrossEntityDerivedProperty );
 		}
 
 		@Override
-		public void setContainedIndexedEmbeddedWithCastSingle(ContainingEntity containingEntity,
-				ContainedEntity containedEntity) {
-			containingEntity.setContainedIndexedEmbeddedWithCast( containedEntity );
+		public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbeddedWithCast() {
+			return new SingleValuedPropertyAccessor<>( ContainingEntity::setContainedIndexedEmbeddedWithCast );
 		}
 
 		@Override
-		public void setContainingAsIndexedEmbeddedWithCastSingle(ContainedEntity containedEntity,
-				ContainingEntity containingEntity) {
-			containedEntity.setContainingAsIndexedEmbeddedWithCast( containingEntity );
+		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedWithCast() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbeddedWithCast );
 		}
 
 		@Override
-		public void setIndexedField(ContainedEntity containedEntity, String value) {
-			containedEntity.setIndexedField( value );
+		public SingleValuedPropertyAccessor<ContainedEntity, String> indexedField() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setIndexedField );
 		}
 
 		@Override
-		public void setNonIndexedField(ContainedEntity containedEntity, String value) {
-			containedEntity.setNonIndexedField( value );
+		public SingleValuedPropertyAccessor<ContainedEntity, String> nonIndexedField() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setNonIndexedField );
 		}
 
 		@Override
-		public List<String> getIndexedElementCollectionField(ContainedEntity containedEntity) {
-			return containedEntity.getIndexedElementCollectionField();
+		public MultiValuedPropertyAccessor<ContainedEntity, String, List<String>> indexedElementCollectionField() {
+			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+					ContainedEntity::getIndexedElementCollectionField,
+					ContainedEntity::setIndexedElementCollectionField );
 		}
 
 		@Override
-		public void setIndexedElementCollectionField(ContainedEntity containedEntity, List<String> value) {
-			containedEntity.setIndexedElementCollectionField( value );
+		public MultiValuedPropertyAccessor<ContainedEntity, String, List<String>> nonIndexedElementCollectionField() {
+			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+					ContainedEntity::getNonIndexedElementCollectionField,
+					ContainedEntity::setNonIndexedElementCollectionField );
 		}
 
 		@Override
-		public List<String> getNonIndexedElementCollectionField(ContainedEntity containedEntity) {
-			return containedEntity.getNonIndexedElementCollectionField();
+		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInContainedDerivedField1() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInContainedDerivedField1 );
 		}
 
 		@Override
-		public void setNonIndexedElementCollectionField(ContainedEntity containedEntity, List<String> value) {
-			containedEntity.setNonIndexedElementCollectionField( value );
+		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInContainedDerivedField2() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInContainedDerivedField2 );
 		}
 
 		@Override
-		public void setFieldUsedInContainedDerivedField1(ContainedEntity containedEntity, String value) {
-			containedEntity.setFieldUsedInContainedDerivedField1( value );
+		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField1() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInCrossEntityDerivedField1 );
 		}
 
 		@Override
-		public void setFieldUsedInContainedDerivedField2(ContainedEntity containedEntity, String value) {
-			containedEntity.setFieldUsedInContainedDerivedField2( value );
-		}
-
-		@Override
-		public void setFieldUsedInCrossEntityDerivedField1(ContainedEntity containedEntity, String value) {
-			containedEntity.setFieldUsedInCrossEntityDerivedField1( value );
-		}
-
-		@Override
-		public void setFieldUsedInCrossEntityDerivedField2(ContainedEntity containedEntity, String value) {
-			containedEntity.setFieldUsedInCrossEntityDerivedField2( value );
+		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField2() {
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInCrossEntityDerivedField2 );
 		}
 	}
 
