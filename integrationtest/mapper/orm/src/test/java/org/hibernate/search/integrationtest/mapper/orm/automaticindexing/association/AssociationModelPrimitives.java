@@ -29,45 +29,41 @@ public interface AssociationModelPrimitives<
 
 	TContained newContained(int id);
 
-	void setContainingEntityNonIndexedField(TContaining containing, String value);
+	SingleValuedPropertyAccessor<TContaining, String> containingEntityNonIndexedField();
 
-	void setChild(TContaining parent, TContaining child);
+	SingleValuedPropertyAccessor<TContaining, TContaining> child();
 
-	void setParent(TContaining child, TContaining parent);
+	SingleValuedPropertyAccessor<TContaining, TContaining> parent();
 
-	void setContainedIndexedEmbeddedSingle(TContaining containing, TContained contained);
+	PropertyAccessor<TContaining, TContained> containedIndexedEmbedded();
 
-	void setContainingAsIndexedEmbeddedSingle(TContained contained, TContaining containing);
+	PropertyAccessor<TContained, TContaining> containingAsIndexedEmbedded();
 
-	void setContainedIndexedEmbeddedShallowReindexOnUpdateSingle(TContaining containing, TContained contained);
+	PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedShallowReindexOnUpdate();
 
-	void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained);
+	PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedNoReindexOnUpdate();
 
-	void setContainedUsedInCrossEntityDerivedPropertySingle(TContaining containing, TContained contained);
+	PropertyAccessor<TContaining, TContained> containedUsedInCrossEntityDerivedProperty();
 
-	void setContainingAsUsedInCrossEntityDerivedPropertySingle(TContained contained, TContaining containing);
+	PropertyAccessor<TContained, TContaining> containingAsUsedInCrossEntityDerivedProperty();
 
-	void setContainedIndexedEmbeddedWithCastSingle(TContaining containing, TContained contained);
+	PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedWithCast();
 
-	void setContainingAsIndexedEmbeddedWithCastSingle(TContained contained, TContaining containing);
+	PropertyAccessor<TContained, TContaining> containingAsIndexedEmbeddedWithCast();
 
-	void setIndexedField(TContained contained, String value);
+	SingleValuedPropertyAccessor<TContained, String> indexedField();
 
-	void setNonIndexedField(TContained contained, String value);
+	SingleValuedPropertyAccessor<TContained, String> nonIndexedField();
 
-	List<String> getIndexedElementCollectionField(TContained contained);
+	MultiValuedPropertyAccessor<TContained, String, List<String>> indexedElementCollectionField();
 
-	void setIndexedElementCollectionField(TContained contained, List<String> value);
+	MultiValuedPropertyAccessor<TContained, String, List<String>> nonIndexedElementCollectionField();
 
-	List<String> getNonIndexedElementCollectionField(TContained contained);
+	SingleValuedPropertyAccessor<TContained, String> fieldUsedInContainedDerivedField1();
 
-	void setNonIndexedElementCollectionField(TContained contained, List<String> value);
+	SingleValuedPropertyAccessor<TContained, String> fieldUsedInContainedDerivedField2();
 
-	void setFieldUsedInContainedDerivedField1(TContained contained, String value);
+	SingleValuedPropertyAccessor<TContained, String> fieldUsedInCrossEntityDerivedField1();
 
-	void setFieldUsedInContainedDerivedField2(TContained contained, String value);
-
-	void setFieldUsedInCrossEntityDerivedField1(TContained contained, String value);
-
-	void setFieldUsedInCrossEntityDerivedField2(TContained contained, String value);
+	SingleValuedPropertyAccessor<TContained, String> fieldUsedInCrossEntityDerivedField2();
 }

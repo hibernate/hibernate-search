@@ -181,22 +181,22 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
-			primitives.setChild( containingEntity1, deeplyNestedContainingEntity );
-			primitives.setParent( deeplyNestedContainingEntity, containingEntity1 );
+			primitives.child().set( containingEntity1, deeplyNestedContainingEntity );
+			primitives.parent().set( deeplyNestedContainingEntity, containingEntity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setIndexedField( contained1, "initialValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.indexedField().set( contained1, "initialValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			TContained contained2 = primitives.newContained( 5 );
-			primitives.setIndexedField( contained2, "initialOutOfScopeValue" );
-			primitives.setContainedIndexedEmbeddedSingle( deeplyNestedContainingEntity, contained2 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained2, deeplyNestedContainingEntity );
+			primitives.indexedField().set( contained2, "initialOutOfScopeValue" );
+			primitives.containedIndexedEmbedded().set( deeplyNestedContainingEntity, contained2 );
+			primitives.containingAsIndexedEmbedded().set( contained2, deeplyNestedContainingEntity );
 
 			session.persist( contained1 );
 			session.persist( contained2 );
@@ -218,7 +218,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedField( contained, "updatedValue" );
+			primitives.indexedField().set( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -234,7 +234,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
-			primitives.setIndexedField( contained, "updatedOutOfScopeValue" );
+			primitives.indexedField().set( contained, "updatedOutOfScopeValue" );
 
 			// Do not expect any work
 		} );
@@ -246,16 +246,16 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	public void directValueUpdate_nonIndexed_then_indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
-			primitives.setContainingEntityNonIndexedField( entity1, "initialValue" );
+			primitives.containingEntityNonIndexedField().set( entity1, "initialValue" );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setIndexedField( contained1, "initialValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.indexedField().set( contained1, "initialValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -275,9 +275,9 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating a value in the indexed entity, then in the same transaction updating a value in a contained entity
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TIndexed indexed = session.get( primitives.getIndexedClass(), 1 );
-			primitives.setContainingEntityNonIndexedField( indexed, "updatedValue" );
+			primitives.containingEntityNonIndexedField().set( indexed, "updatedValue" );
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedField( contained, "updatedValue" );
+			primitives.indexedField().set( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -303,13 +303,13 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setNonIndexedField( contained1, "initialValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.nonIndexedField().set( contained1, "initialValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -329,7 +329,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setNonIndexedField( contained, "updatedValue" );
+			primitives.nonIndexedField().set( contained, "updatedValue" );
 
 			// Do not expect any work
 		} );
@@ -342,22 +342,22 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
-			primitives.setChild( containingEntity1, deeplyNestedContainingEntity );
-			primitives.setParent( deeplyNestedContainingEntity, containingEntity1 );
+			primitives.child().set( containingEntity1, deeplyNestedContainingEntity );
+			primitives.parent().set( deeplyNestedContainingEntity, containingEntity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.indexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			TContained contained2 = primitives.newContained( 5 );
-			primitives.getIndexedElementCollectionField( contained2 ).add( "firstOutOfScopeValue" );
-			primitives.setContainedIndexedEmbeddedSingle( deeplyNestedContainingEntity, contained2 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained2, deeplyNestedContainingEntity );
+			primitives.indexedElementCollectionField().add( contained2, "firstOutOfScopeValue" );
+			primitives.containedIndexedEmbedded().set( deeplyNestedContainingEntity, contained2 );
+			primitives.containingAsIndexedEmbedded().set( contained2, deeplyNestedContainingEntity );
 
 			session.persist( contained1 );
 			session.persist( contained2 );
@@ -383,7 +383,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test adding a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getIndexedElementCollectionField( contained ).add( "secondValue" );
+			primitives.indexedElementCollectionField().add( contained, "secondValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -403,7 +403,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test removing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getIndexedElementCollectionField( contained ).remove( 0 );
+			primitives.indexedElementCollectionField().remove( contained, "firstValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -423,7 +423,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
-			primitives.getIndexedElementCollectionField( contained ).add( "secondOutOfScopeValue" );
+			primitives.indexedElementCollectionField().add( contained, "secondOutOfScopeValue" );
 
 			// Do not expect any work
 		} );
@@ -445,22 +445,22 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
-			primitives.setChild( containingEntity1, deeplyNestedContainingEntity );
-			primitives.setParent( deeplyNestedContainingEntity, containingEntity1 );
+			primitives.child().set( containingEntity1, deeplyNestedContainingEntity );
+			primitives.parent().set( deeplyNestedContainingEntity, containingEntity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.indexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			TContained contained2 = primitives.newContained( 5 );
-			primitives.getIndexedElementCollectionField( contained2 ).add( "firstOutOfScopeValue" );
-			primitives.setContainedIndexedEmbeddedSingle( deeplyNestedContainingEntity, contained2 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained2, deeplyNestedContainingEntity );
+			primitives.indexedElementCollectionField().add( contained2, "firstOutOfScopeValue" );
+			primitives.containedIndexedEmbedded().set( deeplyNestedContainingEntity, contained2 );
+			primitives.containingAsIndexedEmbedded().set( contained2, deeplyNestedContainingEntity );
 
 			session.persist( contained1 );
 			session.persist( contained2 );
@@ -486,7 +486,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test replacing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedElementCollectionField( contained, new ArrayList<>( Arrays.asList(
+			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
 
@@ -508,7 +508,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test replacing a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
-			primitives.setIndexedElementCollectionField( contained, new ArrayList<>( Arrays.asList(
+			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstOutOfScopeValue", "newSecondOutOfScopeValue"
 			) ) );
 
@@ -529,13 +529,13 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getNonIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.nonIndexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -555,7 +555,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test adding a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getNonIndexedElementCollectionField( contained ).add( "secondValue" );
+			primitives.nonIndexedElementCollectionField().add( contained, "secondValue" );
 
 			// Do not expect any work
 		} );
@@ -564,7 +564,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test removing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getNonIndexedElementCollectionField( contained ).remove( 0 );
+			primitives.nonIndexedElementCollectionField().remove( contained, "firstValue" );
 
 			// Do not expect any work
 		} );
@@ -586,13 +586,13 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getNonIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.nonIndexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -612,7 +612,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test replacing the values
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setNonIndexedElementCollectionField( contained, new ArrayList<>( Arrays.asList(
+			primitives.nonIndexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
 
@@ -635,14 +635,14 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setFieldUsedInContainedDerivedField1( contained1, "field1_initialValue" );
-			primitives.setFieldUsedInContainedDerivedField2( contained1, "field2_initialValue" );
-			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+			primitives.fieldUsedInContainedDerivedField1().set( contained1, "field1_initialValue" );
+			primitives.fieldUsedInContainedDerivedField2().set( contained1, "field2_initialValue" );
+			primitives.containedIndexedEmbedded().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbedded().set( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -667,7 +667,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating one value the field depends on
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setFieldUsedInContainedDerivedField1( contained, "field1_updatedValue" );
+			primitives.fieldUsedInContainedDerivedField1().set( contained, "field1_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -687,7 +687,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the other value the field depends on
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setFieldUsedInContainedDerivedField2( contained, "field2_updatedValue" );
+			primitives.fieldUsedInContainedDerivedField2().set( contained, "field2_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -716,14 +716,14 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setFieldUsedInCrossEntityDerivedField1( contained1, "field1_initialValue" );
-			primitives.setFieldUsedInCrossEntityDerivedField2( contained1, "field2_initialValue" );
-			primitives.setContainedUsedInCrossEntityDerivedPropertySingle( containingEntity1, contained1 );
-			primitives.setContainingAsUsedInCrossEntityDerivedPropertySingle( contained1, containingEntity1 );
+			primitives.fieldUsedInCrossEntityDerivedField1().set( contained1, "field1_initialValue" );
+			primitives.fieldUsedInCrossEntityDerivedField2().set( contained1, "field2_initialValue" );
+			primitives.containedUsedInCrossEntityDerivedProperty().set( containingEntity1, contained1 );
+			primitives.containingAsUsedInCrossEntityDerivedProperty().set( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -744,7 +744,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating one value the field depends on
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setFieldUsedInCrossEntityDerivedField1( contained, "field1_updatedValue" );
+			primitives.fieldUsedInCrossEntityDerivedField1().set( contained, "field1_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -761,7 +761,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the other value the field depends on
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setFieldUsedInCrossEntityDerivedField2( contained, "field2_updatedValue" );
+			primitives.fieldUsedInCrossEntityDerivedField2().set( contained, "field2_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -783,12 +783,12 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setIndexedField( contained1, "initialValue" );
-			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.indexedField().set( contained1, "initialValue" );
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( containingEntity1, contained1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -808,7 +808,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedField( contained, "updatedValue" );
+			primitives.indexedField().set( contained, "updatedValue" );
 
 			// Do not expect any work
 		} );
@@ -828,12 +828,12 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.indexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( containingEntity1, contained1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -857,7 +857,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test adding a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getIndexedElementCollectionField( contained ).add( "secondValue" );
+			primitives.indexedElementCollectionField().add( contained, "secondValue" );
 
 			// Do not expect any work
 		} );
@@ -866,7 +866,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test removing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getIndexedElementCollectionField( contained ).remove( 0 );
+			primitives.indexedElementCollectionField().remove( contained, "firstValue" );
 
 			// Do not expect any work
 		} );
@@ -889,12 +889,12 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.indexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( containingEntity1, contained1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -918,7 +918,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test replacing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedElementCollectionField( contained, new ArrayList<>( Arrays.asList(
+			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
 
@@ -934,12 +934,12 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setIndexedField( contained1, "initialValue" );
-			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.indexedField().set( contained1, "initialValue" );
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( containingEntity1, contained1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -959,7 +959,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedField( contained, "updatedValue" );
+			primitives.indexedField().set( contained, "updatedValue" );
 
 			// Do not expect any work
 		} );
@@ -979,12 +979,12 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.indexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( containingEntity1, contained1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -1008,7 +1008,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test adding a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getIndexedElementCollectionField( contained ).add( "secondValue" );
+			primitives.indexedElementCollectionField().add( contained, "secondValue" );
 
 			// Do not expect any work
 		} );
@@ -1017,7 +1017,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test removing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.getIndexedElementCollectionField( contained ).remove( 0 );
+			primitives.indexedElementCollectionField().remove( contained, "firstValue" );
 
 			// Do not expect any work
 		} );
@@ -1040,12 +1040,12 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
-			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
+			primitives.indexedElementCollectionField().add( contained1, "firstValue" );
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( containingEntity1, contained1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -1069,7 +1069,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test replacing a value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedElementCollectionField( contained, new ArrayList<>( Arrays.asList(
+			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
 			) ) );
 
@@ -1085,22 +1085,22 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
-			primitives.setChild( entity1, containingEntity1 );
-			primitives.setParent( containingEntity1, entity1 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
 
 			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
-			primitives.setChild( containingEntity1, deeplyNestedContainingEntity );
-			primitives.setParent( deeplyNestedContainingEntity, containingEntity1 );
+			primitives.child().set( containingEntity1, deeplyNestedContainingEntity );
+			primitives.parent().set( deeplyNestedContainingEntity, containingEntity1 );
 
 			TContained contained1 = primitives.newContained( 4 );
-			primitives.setIndexedField( contained1, "initialValue" );
-			primitives.setContainedIndexedEmbeddedWithCastSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedWithCastSingle( contained1, containingEntity1 );
+			primitives.indexedField().set( contained1, "initialValue" );
+			primitives.containedIndexedEmbeddedWithCast().set( containingEntity1, contained1 );
+			primitives.containingAsIndexedEmbeddedWithCast().set( contained1, containingEntity1 );
 
 			TContained contained2 = primitives.newContained( 5 );
-			primitives.setIndexedField( contained2, "initialOutOfScopeValue" );
-			primitives.setContainedIndexedEmbeddedWithCastSingle( deeplyNestedContainingEntity, contained2 );
-			primitives.setContainingAsIndexedEmbeddedWithCastSingle( contained2, deeplyNestedContainingEntity );
+			primitives.indexedField().set( contained2, "initialOutOfScopeValue" );
+			primitives.containedIndexedEmbeddedWithCast().set( deeplyNestedContainingEntity, contained2 );
+			primitives.containingAsIndexedEmbeddedWithCast().set( contained2, deeplyNestedContainingEntity );
 
 			session.persist( contained1 );
 			session.persist( contained2 );
@@ -1122,7 +1122,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
-			primitives.setIndexedField( contained, "updatedValue" );
+			primitives.indexedField().set( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -1138,7 +1138,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
-			primitives.setIndexedField( contained, "updatedOutOfScopeValue" );
+			primitives.indexedField().set( contained, "updatedOutOfScopeValue" );
 
 			// Do not expect any work
 		} );
