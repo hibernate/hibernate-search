@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.multi;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.AssociationModelPrimitives;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.MultiValuedPropertyAccessor;
 
 public interface MultiAssociationModelPrimitives<
 				TIndexed extends TContaining,
@@ -21,103 +22,34 @@ public interface MultiAssociationModelPrimitives<
 		return true;
 	}
 
-	@Override
-	default void setContainedIndexedEmbeddedSingle(TContaining containing, TContained contained) {
-		TContainedAssociation containedAssociation = getContainedIndexedEmbedded( containing );
-		clearContained( containedAssociation );
-		addContained( containedAssociation, contained );
-	}
-
-	@Override
-	default void setContainingAsIndexedEmbeddedSingle(TContained contained, TContaining containing) {
-		TContainingAssociation containingAssociation = getContainingAsIndexedEmbedded( contained );
-		clearContaining( containingAssociation );
-		addContaining( containingAssociation, containing );
-	}
-
-	@Override
-	default void setContainedIndexedEmbeddedShallowReindexOnUpdateSingle(TContaining containing, TContained contained) {
-		TContainedAssociation containedAssociation = getContainedIndexedEmbeddedShallowReindexOnUpdate( containing );
-		clearContained( containedAssociation );
-		addContained( containedAssociation, contained );
-	}
-
-	@Override
-	default void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained) {
-		TContainedAssociation containedAssociation = getContainedIndexedEmbeddedNoReindexOnUpdate( containing );
-		clearContained( containedAssociation );
-		addContained( containedAssociation, contained );
-	}
-
-	@Override
-	default void setContainedUsedInCrossEntityDerivedPropertySingle(TContaining containing,
-			TContained contained) {
-		TContainedAssociation containedAssociation = getContainedUsedInCrossEntityDerivedProperty( containing );
-		clearContained( containedAssociation );
-		addContained( containedAssociation, contained );
-	}
-
-	@Override
-	default void setContainingAsUsedInCrossEntityDerivedPropertySingle(TContained contained,
-			TContaining containing) {
-		TContainingAssociation containingAssociation = getContainingAsUsedInCrossEntityDerivedProperty( contained );
-		clearContaining( containingAssociation );
-		addContaining( containingAssociation, containing );
-	}
-
-	@Override
-	default void setContainedIndexedEmbeddedWithCastSingle(TContaining containing, TContained contained) {
-		TContainedAssociation containedAssociation = getContainedIndexedEmbeddedWithCast( containing );
-		clearContained( containedAssociation );
-		addContained( containedAssociation, contained );
-	}
-
-	@Override
-	default void setContainingAsIndexedEmbeddedWithCastSingle(TContained contained, TContaining containing) {
-		TContainingAssociation containingAssociation = getContainingAsIndexedEmbeddedWithCast( contained );
-		clearContaining( containingAssociation );
-		addContaining( containingAssociation, containing );
-	}
-
 	TContainedAssociation newContainedAssociation(TContainedAssociation original);
 
-	void addContained(TContainedAssociation association, TContained contained);
+	@Override
+	MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbedded();
 
-	void removeContained(TContainedAssociation association, TContained contained);
+	@Override
+	MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsIndexedEmbedded();
 
-	void clearContained(TContainedAssociation association);
+	MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedNonIndexedEmbedded();
 
-	void addContaining(TContainingAssociation association, TContaining containing);
+	MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsNonIndexedEmbedded();
 
-	void removeContaining(TContainingAssociation association, TContaining containing);
+	@Override
+	MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedShallowReindexOnUpdate();
 
-	void clearContaining(TContainingAssociation association);
+	@Override
+	MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedNoReindexOnUpdate();
 
-	TContainedAssociation getContainedIndexedEmbedded(TContaining containing);
+	@Override
+	MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedUsedInCrossEntityDerivedProperty();
 
-	void setContainedIndexedEmbedded(TContaining containing, TContainedAssociation association);
+	@Override
+	MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsUsedInCrossEntityDerivedProperty();
 
-	TContainingAssociation getContainingAsIndexedEmbedded(TContained contained);
+	@Override
+	MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbeddedWithCast();
 
-	TContainedAssociation getContainedNonIndexedEmbedded(TContaining containing);
+	@Override
+	MultiValuedPropertyAccessor<TContained, TContaining, TContainingAssociation> containingAsIndexedEmbeddedWithCast();
 
-	void setContainedNonIndexedEmbedded(TContaining containing, TContainedAssociation association);
-
-	TContainingAssociation getContainingAsNonIndexedEmbedded(TContained contained);
-
-	TContainedAssociation getContainedIndexedEmbeddedShallowReindexOnUpdate(TContaining containing);
-
-	void setContainedIndexedEmbeddedShallowReindexOnUpdate(TContaining containing, TContainedAssociation association);
-
-	TContainedAssociation getContainedIndexedEmbeddedNoReindexOnUpdate(TContaining containing);
-
-	void setContainedIndexedEmbeddedNoReindexOnUpdate(TContaining containing, TContainedAssociation association);
-
-	TContainedAssociation getContainedUsedInCrossEntityDerivedProperty(TContaining containing);
-
-	TContainingAssociation getContainingAsUsedInCrossEntityDerivedProperty(TContained contained);
-
-	TContainedAssociation getContainedIndexedEmbeddedWithCast(TContaining containing);
-
-	TContainingAssociation getContainingAsIndexedEmbeddedWithCast(TContained contained);
 }
