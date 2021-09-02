@@ -4,10 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
+
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,7 +21,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -26,10 +28,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events
- * and involving an association.
+ * Abstract base for tests of automatic indexing caused by association updates
+ * or by updates of associated (contained) entities.
  * <p>
- * We use a contrived design based on a {@link AssociationModelPrimitives} class that defines all the factory methods,
+ * We use a contrived design based on a {@link ModelPrimitives} class that defines all the factory methods,
  * setters and getters we need,
  * because we want to have separate model classes for every test,
  * in order to avoid introducing exotic situations that would arise
@@ -64,10 +66,6 @@ import org.junit.Test;
  *                 indirectValueReplace: replace the entire value of an element-collection field
  *                 (not clear/add, but really use a different collection)
  *             </li>
- *             <li>
- *                 indirectAssociationReplace: replace the entire value of a collection
- *                 (not clear/add, but really use a different collection)
- *             </li>
  *         </ul>
  *      </li>
  *     <li>
@@ -85,8 +83,8 @@ import org.junit.Test;
  *     </li>
  * </ul>
  */
-public abstract class AbstractAutomaticIndexingAssociationIT<
-		TIndexed extends TContaining, TContaining, TContained
+public abstract class AbstractAutomaticIndexingAssociationBaseIT<
+				TIndexed extends TContaining, TContaining, TContained
 		> {
 
 	@Rule
@@ -97,10 +95,10 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 	protected SessionFactory sessionFactory;
 
-	private final AssociationModelPrimitives<TIndexed, TContaining, TContained> primitives;
+	private final ModelPrimitives<TIndexed, TContaining, TContained> primitives;
 
-	public AbstractAutomaticIndexingAssociationIT(
-			AssociationModelPrimitives<TIndexed, TContaining, TContained> primitives) {
+	public AbstractAutomaticIndexingAssociationBaseIT(
+			ModelPrimitives<TIndexed, TContaining, TContained> primitives) {
 		this.primitives = primitives;
 	}
 
@@ -177,7 +175,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 	@Test
 	public void indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -216,7 +214,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedField().set( contained, "updatedValue" );
 
@@ -232,7 +230,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
 			primitives.indexedField().set( contained, "updatedOutOfScopeValue" );
 
@@ -244,7 +242,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4137")
 	public void directValueUpdate_nonIndexed_then_indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 			primitives.containingEntityNonIndexedField().set( entity1, "initialValue" );
 
@@ -273,7 +271,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value in the indexed entity, then in the same transaction updating a value in a contained entity
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed indexed = session.get( primitives.getIndexedClass(), 1 );
 			primitives.containingEntityNonIndexedField().set( indexed, "updatedValue" );
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
@@ -299,7 +297,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectValueUpdate_indexedEmbedded_singleValue_nonIndexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -327,7 +325,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.nonIndexedField().set( contained, "updatedValue" );
 
@@ -338,7 +336,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 	@Test
 	public void indirectValueUpdate_indexedEmbedded_elementCollectionValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -381,7 +379,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().add( contained, "secondValue" );
 
@@ -401,7 +399,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().remove( contained, "firstValue" );
 
@@ -421,7 +419,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
 			primitives.indexedElementCollectionField().add( contained, "secondOutOfScopeValue" );
 
@@ -441,7 +439,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectValueReplace_indexedEmbedded_elementCollectionValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -484,7 +482,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -506,7 +504,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
 			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstOutOfScopeValue", "newSecondOutOfScopeValue"
@@ -525,7 +523,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectValueUpdate_indexedEmbedded_elementCollectionValue_nonIndexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -553,7 +551,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.nonIndexedElementCollectionField().add( contained, "secondValue" );
 
@@ -562,7 +560,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.nonIndexedElementCollectionField().remove( contained, "firstValue" );
 
@@ -582,7 +580,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void indirectValueReplace_indexedEmbedded_elementCollectionValue_nonIndexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -610,7 +608,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing the values
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.nonIndexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -631,7 +629,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 	@Test
 	public void indirectValueUpdate_indexedEmbedded_containedDerivedValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -665,7 +663,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating one value the field depends on
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.fieldUsedInContainedDerivedField1().set( contained, "field1_updatedValue" );
 
@@ -685,7 +683,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the other value the field depends on
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.fieldUsedInContainedDerivedField2().set( contained, "field2_updatedValue" );
 
@@ -712,7 +710,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	 */
 	@Test
 	public void indirectValueUpdate_usedInCrossEntityDerivedProperty_crossEntityDerivedValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -742,7 +740,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating one value the field depends on
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.fieldUsedInCrossEntityDerivedField1().set( contained, "field1_updatedValue" );
 
@@ -759,7 +757,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the other value the field depends on
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.fieldUsedInCrossEntityDerivedField2().set( contained, "field2_updatedValue" );
 
@@ -779,7 +777,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectValueUpdate_indexedEmbeddedShallowReindexOnUpdate_singleValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -806,7 +804,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedField().set( contained, "updatedValue" );
 
@@ -824,7 +822,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectValueUpdate_indexedEmbeddedShallowReindexOnUpdate_elementCollectionValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -855,7 +853,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().add( contained, "secondValue" );
 
@@ -864,7 +862,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().remove( contained, "firstValue" );
 
@@ -885,7 +883,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectValueReplace_indexedEmbeddedShallowReindexOnUpdate_elementCollectionValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -916,7 +914,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -930,7 +928,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void indirectValueUpdate_indexedEmbeddedNoReindexOnUpdate_singleValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -957,7 +955,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedField().set( contained, "updatedValue" );
 
@@ -975,7 +973,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void indirectValueUpdate_indexedEmbeddedNoReindexOnUpdate_elementCollectionValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -1006,7 +1004,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().add( contained, "secondValue" );
 
@@ -1015,7 +1013,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().remove( contained, "firstValue" );
 
@@ -1036,7 +1034,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void indirectValueReplace_indexedEmbeddedNoReindexOnUpdate_elementCollectionValue_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -1067,7 +1065,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test replacing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedElementCollectionField().setContainer( contained, new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -1081,7 +1079,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3072")
 	public void indirectValueUpdate_indexedEmbeddedWithCast_singleValue() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
 			TContaining containingEntity1 = primitives.newContaining( 2 );
@@ -1120,7 +1118,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 4 );
 			primitives.indexedField().set( contained, "updatedValue" );
 
@@ -1136,7 +1134,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			TContained contained = session.get( primitives.getContainedClass(), 5 );
 			primitives.indexedField().set( contained, "updatedOutOfScopeValue" );
 
@@ -1164,4 +1162,63 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		}
 	}
 
+	public interface ModelPrimitives<
+					TIndexed extends TContaining,
+					TContaining,
+					TContained
+			> {
+		String getIndexName();
+
+		boolean isMultiValuedAssociation();
+
+		Class<TIndexed> getIndexedClass();
+
+		Class<TContaining> getContainingClass();
+
+		Class<TContained> getContainedClass();
+
+		TIndexed newIndexed(int id);
+
+		TContaining newContaining(int id);
+
+		TContained newContained(int id);
+
+		SingleValuedPropertyAccessor<TContaining, String> containingEntityNonIndexedField();
+
+		SingleValuedPropertyAccessor<TContaining, TContaining> child();
+
+		SingleValuedPropertyAccessor<TContaining, TContaining> parent();
+
+		PropertyAccessor<TContaining, TContained> containedIndexedEmbedded();
+
+		PropertyAccessor<TContained, TContaining> containingAsIndexedEmbedded();
+
+		PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedShallowReindexOnUpdate();
+
+		PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedNoReindexOnUpdate();
+
+		PropertyAccessor<TContaining, TContained> containedUsedInCrossEntityDerivedProperty();
+
+		PropertyAccessor<TContained, TContaining> containingAsUsedInCrossEntityDerivedProperty();
+
+		PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedWithCast();
+
+		PropertyAccessor<TContained, TContaining> containingAsIndexedEmbeddedWithCast();
+
+		SingleValuedPropertyAccessor<TContained, String> indexedField();
+
+		SingleValuedPropertyAccessor<TContained, String> nonIndexedField();
+
+		MultiValuedPropertyAccessor<TContained, String, List<String>> indexedElementCollectionField();
+
+		MultiValuedPropertyAccessor<TContained, String, List<String>> nonIndexedElementCollectionField();
+
+		SingleValuedPropertyAccessor<TContained, String> fieldUsedInContainedDerivedField1();
+
+		SingleValuedPropertyAccessor<TContained, String> fieldUsedInContainedDerivedField2();
+
+		SingleValuedPropertyAccessor<TContained, String> fieldUsedInCrossEntityDerivedField1();
+
+		SingleValuedPropertyAccessor<TContained, String> fieldUsedInCrossEntityDerivedField2();
+	}
 }

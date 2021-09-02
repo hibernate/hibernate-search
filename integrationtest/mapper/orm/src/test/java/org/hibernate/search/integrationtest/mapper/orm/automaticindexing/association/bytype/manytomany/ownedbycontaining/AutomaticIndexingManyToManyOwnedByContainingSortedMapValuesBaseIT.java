@@ -4,13 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.multi;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.manytomany.ownedbycontaining;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
@@ -21,15 +21,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.SortNatural;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.AbstractAutomaticIndexingAssociationIT;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.ContainerPrimitives;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.MultiValuedPropertyAccessor;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.SingleValuedPropertyAccessor;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingMultiValuedAssociationBaseIT;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.MultiValuedPropertyAccessor;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.SingleValuedPropertyAccessor;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -40,27 +41,31 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 /**
- * Test automatic indexing based on Hibernate ORM entity events
- * when a SortedSet association is involved.
- * <p>
- * See {@link AbstractAutomaticIndexingAssociationIT} for more details on how this test is designed.
+ * Test automatic indexing caused by multi-valued association updates
+ * or by updates of associated (contained) entities,
+ * with a {@code @ManyToMany SortedMap} association owned by the containing side
+ * where associated entities are map values.
  */
 @TestForIssue(jiraKey = "HSEARCH-2490")
-public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIndexingMultiAssociationIT<
-		AutomaticIndexingSortedSetAssociationIT.IndexedEntity,
-		AutomaticIndexingSortedSetAssociationIT.ContainingEntity,
-		AutomaticIndexingSortedSetAssociationIT.ContainedEntity,
-		SortedSet<AutomaticIndexingSortedSetAssociationIT.ContainedEntity>,
-		List<AutomaticIndexingSortedSetAssociationIT.ContainingEntity>
-		> {
+public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
+		extends AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
+						AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.IndexedEntity,
+						AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainingEntity,
+						AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainedEntity,
+						SortedMap<String, AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainedEntity>,
+						List<AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainingEntity>
+				> {
 
-	public AutomaticIndexingSortedSetAssociationIT() {
-		super( new ModelPrimitives() );
+	public AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT() {
+		super( new ModelPrimitivesImpl() );
 	}
 
-	private static class ModelPrimitives
-			implements MultiAssociationModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-					SortedSet<ContainedEntity>, List<ContainingEntity>> {
+	private static class ModelPrimitivesImpl
+			implements MultiValuedModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
+											SortedMap<String, ContainedEntity>, List<ContainingEntity>> {
+
+		private final ContainerPrimitives<SortedMap<String, ContainedEntity>, ContainedEntity> MAP_VALUES_PRIMITIVES =
+				ContainerPrimitives.mapValues( containedEntity -> containedEntity.getIndexedField() + "_value" );
 
 		@Override
 		public String getIndexName() {
@@ -120,13 +125,14 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
-		public SortedSet<ContainedEntity> newContainedAssociation(SortedSet<ContainedEntity> original) {
-			return new TreeSet<>( original );
+		public SortedMap<String, ContainedEntity> newContainedAssociation(SortedMap<String, ContainedEntity> original) {
+			return new TreeMap<>( original );
 		}
 
 		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedIndexedEmbedded() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedMap<String, ContainedEntity>> containedIndexedEmbedded() {
+			return new MultiValuedPropertyAccessor<>(
+					MAP_VALUES_PRIMITIVES,
 					ContainingEntity::getContainedIndexedEmbedded, ContainingEntity::setContainedIndexedEmbedded );
 		}
 
@@ -137,8 +143,9 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedNonIndexedEmbedded() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedMap<String, ContainedEntity>> containedNonIndexedEmbedded() {
+			return new MultiValuedPropertyAccessor<>(
+					MAP_VALUES_PRIMITIVES,
 					ContainingEntity::getContainedNonIndexedEmbedded, ContainingEntity::setContainedNonIndexedEmbedded );
 		}
 
@@ -149,22 +156,25 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedIndexedEmbeddedShallowReindexOnUpdate() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedMap<String, ContainedEntity>> containedIndexedEmbeddedShallowReindexOnUpdate() {
+			return new MultiValuedPropertyAccessor<>(
+					MAP_VALUES_PRIMITIVES,
 					ContainingEntity::getContainedIndexedEmbeddedShallowReindexOnUpdate,
 					ContainingEntity::setContainedIndexedEmbeddedShallowReindexOnUpdate );
 		}
 
 		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedIndexedEmbeddedNoReindexOnUpdate() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedMap<String, ContainedEntity>> containedIndexedEmbeddedNoReindexOnUpdate() {
+			return new MultiValuedPropertyAccessor<>(
+					MAP_VALUES_PRIMITIVES,
 					ContainingEntity::getContainedIndexedEmbeddedNoReindexOnUpdate,
 					ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
 		}
 
 		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedUsedInCrossEntityDerivedProperty() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
+		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedMap<String, ContainedEntity>> containedUsedInCrossEntityDerivedProperty() {
+			return new MultiValuedPropertyAccessor<>(
+					MAP_VALUES_PRIMITIVES,
 					ContainingEntity::getContainedUsedInCrossEntityDerivedProperty );
 		}
 
@@ -176,9 +186,10 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedSet<ContainedEntity>> containedIndexedEmbeddedWithCast() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					root -> (SortedSet) root.getContainedIndexedEmbeddedWithCast() );
+		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, SortedMap<String, ContainedEntity>> containedIndexedEmbeddedWithCast() {
+			return new MultiValuedPropertyAccessor<>(
+					MAP_VALUES_PRIMITIVES,
+					root -> (SortedMap) root.getContainedIndexedEmbeddedWithCast() );
 		}
 
 		@Override
@@ -261,45 +272,70 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		private ContainingEntity child;
 
 		@ManyToMany
-		@JoinTable(name = "i_containedIndexedEmbedded")
+		@JoinTable(
+				name = "i_containedIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@SortNatural
-		private SortedSet<ContainedEntity> containedIndexedEmbedded = new TreeSet<>();
+		private SortedMap<String, ContainedEntity> containedIndexedEmbedded = new TreeMap<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedNonIndexedEmbedded", joinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"),
-				inverseJoinColumns = @JoinColumn(name = "containedNonIndexedEmbedded"))
+		@JoinTable(
+				name = "i_containedNonIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
 		@SortNatural
-		private SortedSet<ContainedEntity> containedNonIndexedEmbedded = new TreeSet<>();
+		private SortedMap<String, ContainedEntity> containedNonIndexedEmbedded = new TreeMap<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_indexedEmbeddedShallow",
-				inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedShallow"))
+		@JoinTable(
+				name = "i_indexedEmbeddedShallow",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		@SortNatural
-		private SortedSet<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new TreeSet<>();
+		private SortedMap<String, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new TreeMap<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_indexedEmbeddedNoReindex",
-				inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedNoReindex"))
+		@JoinTable(
+				name = "i_indexedEmbeddedNoReindex",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		@SortNatural
-		private SortedSet<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new TreeSet<>();
+		private SortedMap<String, ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new TreeMap<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedCrossEntityDP", joinColumns = @JoinColumn(name = "containingCrossEntityDP"),
-				inverseJoinColumns = @JoinColumn(name = "containedCrossEntityDP"))
+		@JoinTable(
+				name = "i_containedCrossEntityDP",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
 		@SortNatural
-		private SortedSet<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new TreeSet<>();
+		private SortedMap<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty = new TreeMap<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
-		@JoinTable(name = "i_containedIndexedEmbeddedCast", joinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"),
-				inverseJoinColumns = @JoinColumn(name = "containedIndexedEmbeddedCast"))
+		@JoinTable(
+				name = "i_containedIndexedEmbeddedCast",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		@SortNatural
-		private SortedSet<Object> containedIndexedEmbeddedWithCast = new TreeSet<>();
+		private SortedMap<String, Object> containedIndexedEmbeddedWithCast = new TreeMap<>();
 
 		public Integer getId() {
 			return id;
@@ -333,45 +369,45 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 			this.child = child;
 		}
 
-		public SortedSet<ContainedEntity> getContainedIndexedEmbedded() {
+		public SortedMap<String, ContainedEntity> getContainedIndexedEmbedded() {
 			return containedIndexedEmbedded;
 		}
 
-		public void setContainedIndexedEmbedded(SortedSet<ContainedEntity> containedIndexedEmbedded) {
+		public void setContainedIndexedEmbedded(SortedMap<String, ContainedEntity> containedIndexedEmbedded) {
 			this.containedIndexedEmbedded = containedIndexedEmbedded;
 		}
 
-		public SortedSet<ContainedEntity> getContainedNonIndexedEmbedded() {
+		public SortedMap<String, ContainedEntity> getContainedNonIndexedEmbedded() {
 			return containedNonIndexedEmbedded;
 		}
 
-		public void setContainedNonIndexedEmbedded(SortedSet<ContainedEntity> containedNonIndexedEmbedded) {
+		public void setContainedNonIndexedEmbedded(SortedMap<String, ContainedEntity> containedNonIndexedEmbedded) {
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 
-		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate() {
+		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate() {
 			return containedIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(
-				SortedSet<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate) {
+				SortedMap<String, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate) {
 			this.containedIndexedEmbeddedShallowReindexOnUpdate = containedIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
-		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
+		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
 			return containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public void setContainedIndexedEmbeddedNoReindexOnUpdate(
-				SortedSet<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate) {
+				SortedMap<String, ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate) {
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
-		public SortedSet<ContainedEntity> getContainedUsedInCrossEntityDerivedProperty() {
+		public SortedMap<String, ContainedEntity> getContainedUsedInCrossEntityDerivedProperty() {
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public SortedSet<Object> getContainedIndexedEmbeddedWithCast() {
+		public SortedMap<String, Object> getContainedIndexedEmbeddedWithCast() {
 			return containedIndexedEmbeddedWithCast;
 		}
 
@@ -389,7 +425,7 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		})
 		public Optional<String> getCrossEntityDerivedField() {
 			return computeDerived(
-					containedUsedInCrossEntityDerivedProperty.stream().flatMap( c -> Stream.of(
+					containedUsedInCrossEntityDerivedProperty.values().stream().flatMap( c -> Stream.of(
 							c.getFieldUsedInCrossEntityDerivedField1(),
 							c.getFieldUsedInCrossEntityDerivedField2()
 					) )
@@ -406,7 +442,7 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 	}
 
 	@Entity(name = "contained")
-	public static class ContainedEntity implements Comparable<ContainedEntity> {
+	public static class ContainedEntity {
 
 		@Id
 		private Integer id;
@@ -463,11 +499,6 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		@Basic // Do not annotate with @GenericField, this would make the test pointless
 		@Column(name = "FUICrossEntityDF2")
 		private String fieldUsedInCrossEntityDerivedField2;
-
-		@Override
-		public int compareTo(ContainedEntity o) {
-			return getId() - o.getId();
-		}
 
 		public Integer getId() {
 			return id;
