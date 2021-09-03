@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 interface PojoIndexingPlanStrategy {
 
-	boolean shouldResolveDirty();
+	boolean shouldResolveDirtyForDeleteOnly();
 
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,

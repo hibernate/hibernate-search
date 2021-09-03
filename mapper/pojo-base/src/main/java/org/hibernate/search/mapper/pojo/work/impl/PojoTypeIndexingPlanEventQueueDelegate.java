@@ -53,7 +53,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 	@Override
 	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
 		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
-				true, false,
+				true, true,
 				null,
 				false
 		);

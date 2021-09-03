@@ -32,8 +32,8 @@ public class PojoIndexingPlanLocalStrategy implements PojoIndexingPlanStrategy {
 	}
 
 	@Override
-	public boolean shouldResolveDirty() {
-		return true;
+	public boolean shouldResolveDirtyForDeleteOnly() {
+		return false;
 	}
 
 	@Override
