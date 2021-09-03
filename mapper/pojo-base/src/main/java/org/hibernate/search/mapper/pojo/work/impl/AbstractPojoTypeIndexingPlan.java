@@ -144,7 +144,6 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		EntityStatus initialStatus = EntityStatus.UNKNOWN;
 		EntityStatus currentStatus = EntityStatus.UNKNOWN;
 
-		private boolean resolvingToReindex;
 		private boolean updatedBecauseOfContained;
 		private boolean forceSelfDirty;
 		private boolean forceContainingDirty;
@@ -281,22 +280,16 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
 			// Reindexing does not make sense for a deleted entity
-			if ( currentStatus != EntityStatus.ABSENT && !resolvingToReindex ) {
-				resolvingToReindex = true; // Avoid infinite looping
-				try {
-					Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
-					if ( entitySupplier == null ) {
-						// We couldn't retrieve the entity.
-						// Assume it was deleted and there's nothing to resolve.
-						return;
-					}
-					typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
-							entitySupplier, this
-					);
+			if ( currentStatus != EntityStatus.ABSENT ) {
+				Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
+				if ( entitySupplier == null ) {
+					// We couldn't retrieve the entity.
+					// Assume it was deleted and there's nothing to resolve.
+					return;
 				}
-				finally {
-					resolvingToReindex = false;
-				}
+				typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
+						entitySupplier, this
+				);
 			}
 		}
 
