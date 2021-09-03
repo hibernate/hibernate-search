@@ -97,6 +97,16 @@ public class AutomaticIndexingOneToOneOwnedByContainedBaseIT
 		}
 
 		@Override
+		public boolean isAssociationOwnedByContainedSide() {
+			return true;
+		}
+
+		@Override
+		public boolean isAssociationLazyOnContainingSide() {
+			return false;
+		}
+
+		@Override
 		public Class<IndexedEntity> getIndexedClass() {
 			return IndexedEntity.class;
 		}
