@@ -55,9 +55,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 						AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT.IndexedEntity,
 						AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT.ContainingEntity,
 						AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT.ContainedEntity,
-						Map<AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT.ContainedEntity, String>,
-						List<AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT.ContainingEntity>
-				> {
+						Map<AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT.ContainedEntity, String>
+		> {
 
 	public AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT() {
 		super( new ModelPrimitivesImpl() );
@@ -65,7 +64,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 
 	private static class ModelPrimitivesImpl
 			implements MultiValuedModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-												Map<ContainedEntity, String>, List<ContainingEntity>> {
+												Map<ContainedEntity, String>> {
 
 		private final ContainerPrimitives<Map<ContainedEntity, String>, ContainedEntity> MAP_KEYS_PRIMITIVES =
 				ContainerPrimitives.mapKeys( containedEntity -> containedEntity.getIndexedField() + "_value" );
