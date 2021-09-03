@@ -59,6 +59,34 @@ import org.junit.Test;
  *         the first token defines what operation we are testing:
  *         <ul>
  *             <li>
+ *                 directAssociationUpdate: set the value of the association
+ *                 directly on the indexed entity
+ *             </li>
+ *             <li>
+ *                 directMultiValuedAssociationUpdate: set the value of the association
+ *                 directly on the indexed entity,
+ *                 adding multiple values to the association
+ *             </li>
+ *             <li>
+ *                 directMultiValuedAssociationReplace: replace the entire value of the association
+ *                 (not clear/add, but really use a different collection)
+ *                 directly on the indexed entity
+ *             </li>
+ *             <li>
+ *                 indirectAssociationUpdate: set the value of the association
+ *                 on an entity that is itself indexed-embedded in the indexed entity
+ *             </li>
+ *             <li>
+ *                 indirectMultiValuedAssociationUpdate: set the value of the association
+ *                 on an entity that is itself indexed-embedded in the indexed entity,
+ *                 adding multiple values to the association
+ *             </li>
+ *             <li>
+ *                 directMultiValuedAssociationReplace: replace the entire value of the association
+ *                 (not clear/add, but really use a different collection)
+ *                 on an entity that is itself indexed-embedded in the indexed entity
+ *             </li>
+ *             <li>
  *                 indirectValueUpdate: set the value of a basic field,
  *                 add/remove elements to/from an element-collection field
  *             </li>
@@ -170,6 +198,729 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 		sessionFactory = ormSetupHelper.start()
 				.setup( primitives.getIndexedClass(), primitives.getContainedClass() );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4305")
+	public void directAssociationUpdate_indexedEmbedded() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedIndexedEmbedded().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "containedIndexedEmbedded", b2 -> b2
+									.field( "indexedField", "initialValue" )
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 3 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( entity1 ) );
+			primitives.containedIndexedEmbedded().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "containedIndexedEmbedded", b2 -> b2
+									.field( "indexedField", "updatedValue" )
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( entity1 ) );
+			primitives.containedIndexedEmbedded().clear( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating a non-IndexedEmbedded association in an entity
+	 * whose other properties are indexed
+	 * does not trigger reindexing of the entity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public final void directAssociationUpdate_nonIndexedEmbedded() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.nonIndexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedNonIndexedEmbedded().set( entity1, containedEntity );
+			primitives.containingAsNonIndexedEmbedded().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 3 );
+			primitives.nonIndexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( entity1 ) );
+			primitives.containedNonIndexedEmbedded().set( entity1, containedEntity );
+			primitives.containingAsNonIndexedEmbedded().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( entity1 ) );
+			primitives.containedNonIndexedEmbedded().clear( entity1 );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an IndexedEmbedded association in an indexed entity
+	 * does trigger reindexing of the entity
+	 * if the association is marked with ReindexOnUpdate = SHALLOW.
+	 */
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-4001", "HSEARCH-4305" })
+	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", "initialValue" )
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 3 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate()
+					.clear( primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( entity1 ) );
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", "updatedValue" )
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			TContained containedEntity = session.get( primitives.getContainedClass(), 3 );
+
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().clear( entity1 );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an IndexedEmbedded association in an indexed entity
+	 * does not trigger reindexing of the entity
+	 * if the association is marked with ReindexOnUpdate = NO.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public final void directAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 3 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate()
+					.clear( primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( entity1 ) );
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			TContained containedEntity = session.get( primitives.getContainedClass(), 3 );
+
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().clear( entity1 );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4305")
+	public void indirectAssociationUpdate_indexedEmbedded() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+
+			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
+			primitives.child().set( containingEntity1, deeplyNestedContainingEntity );
+			primitives.parent().set( deeplyNestedContainingEntity, containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 4 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedIndexedEmbedded().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									)
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 5 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( containingEntity1 ) );
+			primitives.containedIndexedEmbedded().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "updatedValue" )
+									)
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		withinTransaction( sessionFactory, session -> {
+			TContaining deeplyNestedContainingEntity1 = session.get( primitives.getContainingClass(), 3 );
+
+			TContained containedEntity = primitives.newContained( 6 );
+			primitives.indexedField().set( containedEntity, "outOfScopeValue" );
+
+			primitives.containedIndexedEmbedded().set( deeplyNestedContainingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( containingEntity1 ) );
+			primitives.containedIndexedEmbedded().clear( containingEntity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating a non-IndexedEmbedded association in an entity
+	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
+	 * does not trigger reindexing of the indexed entity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public final void indirectAssociationUpdate_nonIndexedEmbedded() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 4 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedNonIndexedEmbedded().set( containingEntity1, containedEntity );
+			primitives.containingAsNonIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 5 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( containingEntity1 ) );
+			primitives.containedNonIndexedEmbedded().set( containingEntity1, containedEntity );
+			primitives.containingAsNonIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( containingEntity1 ) );
+			primitives.containedNonIndexedEmbedded().clear( containingEntity1 );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an IndexedEmbedded association in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does trigger reindexing of the indexed entity
+	 * if the first association is marked with ReindexOnUpdate = SHALLOW.
+	 */
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-4001", "HSEARCH-4305" })
+	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 4 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									)
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 5 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate()
+					.clear( primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( containingEntity1 ) );
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", "updatedValue" )
+									)
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+			TContained containedEntity = session.get( primitives.getContainedClass(), 5 );
+
+			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().clear( containingEntity1 );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an IndexedEmbedded association in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does not trigger reindexing of the indexed entity
+	 * if the first association is marked with ReindexOnUpdate = NO.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3206")
+	public final void indirectAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 4 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 5 );
+			primitives.indexedField().set( containedEntity, "updatedValue" );
+
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate()
+					.clear( primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( containingEntity1 ) );
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+			TContained containedEntity = session.get( primitives.getContainedClass(), 5 );
+
+			primitives.containedIndexedEmbeddedNoReindexOnUpdate().clear( containingEntity1 );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an association in an entity
+	 * when this association is a component of a path in a @IndexingDependency.derivedFrom attribute
+	 * does trigger reindexing of the indexed entity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4305")
+	public void indirectAssociationUpdate_usedInCrossEntityDerivedProperty() {
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+
+			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
+			primitives.child().set( containingEntity1, deeplyNestedContainingEntity );
+			primitives.parent().set( deeplyNestedContainingEntity, containingEntity1 );
+
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 4 );
+			primitives.fieldUsedInCrossEntityDerivedField1().set( containedEntity, "field1_initialValue" );
+			primitives.fieldUsedInCrossEntityDerivedField2().set( containedEntity, "field2_initialValue" );
+
+			primitives.containedUsedInCrossEntityDerivedProperty().set( containingEntity1, containedEntity );
+			primitives.containingAsUsedInCrossEntityDerivedProperty().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_initialValue field2_initialValue"
+									)
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 5 );
+			primitives.fieldUsedInCrossEntityDerivedField1().set( containedEntity, "field1_updatedValue" );
+			primitives.fieldUsedInCrossEntityDerivedField2().set( containedEntity, "field2_updatedValue" );
+
+			primitives.containingAsUsedInCrossEntityDerivedProperty().clear( primitives.containedUsedInCrossEntityDerivedProperty().get( containingEntity1 ) );
+			primitives.containedUsedInCrossEntityDerivedProperty().set( containingEntity1, containedEntity );
+			primitives.containingAsUsedInCrossEntityDerivedProperty().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.field(
+											"crossEntityDerivedField",
+											"field1_updatedValue field2_updatedValue"
+									)
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value that is too deeply nested to matter (it's out of the path)
+		withinTransaction( sessionFactory, session -> {
+			TContaining deeplyNestedContainingEntity1 = session.get( primitives.getContainingClass(), 3 );
+
+			TContained containedEntity = primitives.newContained( 6 );
+			primitives.fieldUsedInCrossEntityDerivedField1().set( containedEntity, "field1_outOfScopeValue" );
+			primitives.fieldUsedInCrossEntityDerivedField2().set( containedEntity, "field2_outOfScopeValue" );
+
+			primitives.containedUsedInCrossEntityDerivedProperty().set( deeplyNestedContainingEntity1, containedEntity );
+			primitives.containingAsUsedInCrossEntityDerivedProperty().set( containedEntity, deeplyNestedContainingEntity1 );
+
+			session.persist( containedEntity );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			primitives.containingAsUsedInCrossEntityDerivedProperty()
+					.clear( primitives.containedUsedInCrossEntityDerivedProperty().get( containingEntity1 ) );
+			primitives.containedUsedInCrossEntityDerivedProperty().clear( containingEntity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					);
+		} );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -1198,6 +1949,10 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		PropertyAccessor<TContaining, TContained> containedIndexedEmbedded();
 
 		PropertyAccessor<TContained, TContaining> containingAsIndexedEmbedded();
+
+		PropertyAccessor<TContaining, TContained> containedNonIndexedEmbedded();
+
+		PropertyAccessor<TContained, TContaining> containingAsNonIndexedEmbedded();
 
 		PropertyAccessor<TContaining, TContained> containedIndexedEmbeddedShallowReindexOnUpdate();
 
