@@ -62,6 +62,11 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		}
 
 		@Override
+		public boolean isAssociationOwnedByContainedSide() {
+			return true;
+		}
+
+		@Override
 		public Class<IndexedEntity> getIndexedClass() {
 			return IndexedEntity.class;
 		}
