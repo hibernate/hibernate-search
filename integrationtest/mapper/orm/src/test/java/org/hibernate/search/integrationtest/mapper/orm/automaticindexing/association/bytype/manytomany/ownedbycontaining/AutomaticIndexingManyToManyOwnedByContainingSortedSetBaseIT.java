@@ -50,9 +50,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 						AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT.IndexedEntity,
 						AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT.ContainingEntity,
 						AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT.ContainedEntity,
-						SortedSet<AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT.ContainedEntity>,
-						List<AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT.ContainingEntity>
-				> {
+						SortedSet<AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT.ContainedEntity>
+		> {
 
 	public AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT() {
 		super( new ModelPrimitivesImpl() );
@@ -60,7 +59,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 
 	private static class ModelPrimitivesImpl
 			implements MultiValuedModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-											SortedSet<ContainedEntity>, List<ContainingEntity>> {
+											SortedSet<ContainedEntity>> {
 
 		@Override
 		public String getIndexName() {
