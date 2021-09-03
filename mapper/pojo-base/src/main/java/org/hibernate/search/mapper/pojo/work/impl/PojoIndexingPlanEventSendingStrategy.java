@@ -26,10 +26,11 @@ public class PojoIndexingPlanEventSendingStrategy implements PojoIndexingPlanStr
 	}
 
 	@Override
-	public boolean shouldResolveDirty() {
-		// We will resolve dirty entities to reindex in the background process
+	public boolean shouldResolveDirtyForDeleteOnly() {
+		// When possible, we will resolve dirty entities to reindex in the background process
 		// that consumes the events we're sending.
-		return false;
+		// For deletes, though, we cannot do that, so we resolve dirty entities directly in-session.
+		return true;
 	}
 
 	@Override

@@ -117,16 +117,15 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 			if ( loadingPlan != null ) {
 				loadingPlan.loadBlocking( null );
 			}
-			if ( strategy.shouldResolveDirty() ) {
-				for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
-					delegate.resolveDirty( this, this );
-				}
-				// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
-				List<PojoIndexedTypeIndexingPlan<?, ?>> frozenIndexedTypeDelegates = new ArrayList<>(
-						indexedTypeDelegates.values() );
-				for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : frozenIndexedTypeDelegates ) {
-					delegate.resolveDirty( this, this );
-				}
+			boolean shouldResolveDirtyForDeleteOnly = strategy.shouldResolveDirtyForDeleteOnly();
+			for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
+				delegate.resolveDirty( this, this, shouldResolveDirtyForDeleteOnly );
+			}
+			// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
+			List<PojoIndexedTypeIndexingPlan<?, ?>> frozenIndexedTypeDelegates =
+					new ArrayList<>( indexedTypeDelegates.values() );
+			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : frozenIndexedTypeDelegates ) {
+				delegate.resolveDirty( this, this, shouldResolveDirtyForDeleteOnly );
 			}
 			for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
 				delegate.process( this );

@@ -135,11 +135,11 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
-			// No event when a contained entity is created:
-			// it does not affect any other entity unless they are modified to refer to that contained entity,
-			// in which case they get an event of their own.
-			assertThat( outboxEntries ).hasSize( 1 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
+			// There *is* an event when a contained entity is created,
+			// in order to support implicit association updates (see HSEARCH-4303).
+			assertThat( outboxEntries ).hasSize( 2 );
+			verifyOutboxEntry( outboxEntries.get( 0 ), ContainedEntity.NAME, "2", null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainingEntity.NAME, "1", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -150,8 +150,8 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
-			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 1 ), ContainedEntity.NAME, "2", null );
+			assertThat( outboxEntries ).hasSize( 3 );
+			verifyOutboxEntry( outboxEntries.get( 2 ), ContainedEntity.NAME, "2", null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -162,11 +162,11 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
-			// No event when a contained entity is deleted:
-			// if other entities used to refer to that contained entity,
-			// they should be updated to not refer to it anymore,
-			// in which case they get an event of their own.
-			assertThat( outboxEntries ).hasSize( 2 );
+			// When a contained entity is deleted,
+			// reindexing resolution is performed in the original session,
+			// resulting in events for containing entities.
+			assertThat( outboxEntries ).hasSize( 4 );
+			verifyOutboxEntry( outboxEntries.get( 3 ), IndexedAndContainingEntity.NAME, "1", null );
 		} );
 	}
 
@@ -210,8 +210,12 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
-			assertThat( outboxEntries ).hasSize( 4 );
+			assertThat( outboxEntries ).hasSize( 5 );
 			verifyOutboxEntry( outboxEntries.get( 3 ), IndexedAndContainedEntity.NAME, "2", null );
+			// Since HSEARCH-4303, we resolve reindexing in the original session for deleted entities,
+			// in order to handle implicit association updates through deletions.
+			// This leads to creating reindexing events for containing entities.
+			verifyOutboxEntry( outboxEntries.get( 4 ), IndexedAndContainingEntity.NAME, "1", null );
 		} );
 	}
 

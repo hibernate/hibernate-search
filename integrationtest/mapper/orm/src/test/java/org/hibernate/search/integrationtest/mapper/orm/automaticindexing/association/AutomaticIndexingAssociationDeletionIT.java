@@ -40,14 +40,16 @@ import org.junit.Test;
 
 /**
  * Test that Hibernate Search does not throw a {@link org.hibernate.LazyInitializationException}
- * when executing automatic indexing after one side of an non-cascading associations was deleted,
+ * when executing automatic indexing after one side of a non-cascading associations was deleted,
  * especially if that side of the association has an ElementCollection
  * that will trigger a PostCollectionRemove event (which counts as an update for the deleted entity...).
  * <p>
- * This type of deletion used to trigger an update (because of the PostCollectionRemove event),
- * and the deleted entity ended up being processed to find associated entities to reindex,
- * which led to attempts to initialize association collections that no longer could be initialized
- * due to one of the entities involved having been deleted.
+ * This type of deletion may trigger reindexing resolution (because of the PostCollectionRemove event,
+ * or simply because Hibernate Search resolves reindexing on deletion),
+ * and the deleted entity ends up being processed to find associated entities to reindex,
+ * which may lead to attempts to initialize association collections
+ * that can no longer be initialized due to one of the entities involved having been deleted.
+ * Thus, we take extra care to catch {@link org.hibernate.LazyInitializationException} and ignore it.
  */
 @TestForIssue(jiraKey = "HSEARCH-3999")
 public class AutomaticIndexingAssociationDeletionIT {
@@ -83,9 +85,9 @@ public class AutomaticIndexingAssociationDeletionIT {
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" );
 
-			// We don't expect any update of the containing entity (id 2),
-			// since its association to 1 was not updated
-			// (the code above is technically incorrect).
+			backendMock.expectWorks( AssociationNonOwner.NAME )
+					.addOrUpdate( "2", b -> b.field( "basic", "text 2" )
+							.field( "elementCollection", 1002, 2002 ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -174,9 +176,12 @@ public class AutomaticIndexingAssociationDeletionIT {
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" );
 
-			// We don't expect any update of the containing entity (id 2),
-			// since its association to 1 was not updated
-			// (the code above is technically incorrect).
+			backendMock.expectWorks( AssociationNonOwner.NAME )
+					.addOrUpdate( "2", b -> b.field( "basic", "text 2" )
+							.field( "elementCollection", 1002, 2002 )
+							.objectField( "oneToMany", b2 -> b2
+									.field( "basic", "text 3" )
+									.field( "elementCollection", 1003, 2003 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

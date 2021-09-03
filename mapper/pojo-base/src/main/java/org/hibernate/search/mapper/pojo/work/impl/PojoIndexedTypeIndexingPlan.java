@@ -40,11 +40,12 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 	}
 
 	@Override
-	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
+	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector,
+			boolean deleteOnly) {
 		// We need to iterate on a "frozen snapshot" of the states because of HSEARCH-3857
 		List<IndexedEntityState> frozenIndexingPlansPerId = new ArrayList<>( statesPerId.values() );
 		for ( IndexedEntityState state : frozenIndexingPlansPerId ) {
-			state.resolveDirty( loadingPlanProvider, collector );
+			state.resolveDirty( loadingPlanProvider, collector, deleteOnly );
 		}
 	}
 

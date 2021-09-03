@@ -61,13 +61,6 @@ public class PojoContainedTypeIndexingPlan<I, E>
 		}
 
 		@Override
-		void delegateAdd(PojoLoadingPlanProvider loadingPlanProvider) {
-			// No event when a contained entity is created:
-			// it does not affect any other entity unless they are modified to refer to that contained entity,
-			// in which case they get an event of their own.
-		}
-
-		@Override
 		void delegateDelete() {
 			// No event when a contained entity is deleted:
 			// if other entities used to refer to that contained entity,

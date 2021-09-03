@@ -82,9 +82,10 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 	}
 
-	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
+	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector,
+			boolean deleteOnly) {
 		for ( S state : statesPerId.values() ) {
-			state.resolveDirty( loadingPlanProvider, collector );
+			state.resolveDirty( loadingPlanProvider, collector, deleteOnly );
 		}
 	}
 
@@ -244,10 +245,11 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 			currentStatus = EntityStatus.ABSENT;
 
-			// Reindexing does not make sense for a deleted entity
+			// Reindexing does not make sense for a deleted entity,
+			// but we can still resolve containing entities to reindex.
 			updatedBecauseOfContained = false;
 			forceSelfDirty = false;
-			forceContainingDirty = false;
+			forceContainingDirty = true;
 			dirtyPaths = null;
 		}
 
@@ -278,19 +280,24 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 		}
 
-		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
-			// Reindexing does not make sense for a deleted entity
-			if ( currentStatus != EntityStatus.ABSENT ) {
-				Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
-				if ( entitySupplier == null ) {
-					// We couldn't retrieve the entity.
-					// Assume it was deleted and there's nothing to resolve.
-					return;
-				}
-				typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
-						entitySupplier, this
-				);
+		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector,
+				boolean deleteOnly) {
+			// In some configurations, we will perform reindexing resolution later,
+			// after we reloaded the entities from the database;
+			// but that's not possible for deleted entities,
+			// so even those configurations perform reindexing resolution for deleted entities
+			// in-session.
+			if ( deleteOnly && !( initialStatus == EntityStatus.PRESENT && currentStatus == EntityStatus.ABSENT ) ) {
+				return;
 			}
+			Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
+			if ( entitySupplier == null ) {
+				// We couldn't retrieve the entity.
+				// Assume it was deleted before the current transaction started and there's nothing to resolve.
+				return;
+			}
+			typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
+					entitySupplier, this );
 		}
 
 		void sendCommandsToDelegate(PojoLoadingPlanProvider loadingPlanProvider) {
