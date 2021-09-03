@@ -68,9 +68,14 @@ public class AutomaticIndexingAssociationDeletionIT {
 		backendMock.expectAnySchema( AssociationNonOwner.NAME );
 		sessionFactory = ormSetupHelper
 				.start()
+				.with( this::configure )
 				.withProperty( AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true )
 				.setup( AssociationOwner.class, AssociationNonOwner.class );
 		backendMock.verifyExpectationsMet();
+	}
+
+	protected OrmSetupHelper.SetupContext configure(OrmSetupHelper.SetupContext ctx) {
+		return ctx;
 	}
 
 	@Test
@@ -452,7 +457,8 @@ public class AutomaticIndexingAssociationDeletionIT {
 		private List<Integer> elementCollection;
 
 		@IndexedEmbedded(includePaths = {"basic", "elementCollection"})
-		@OneToOne(fetch = FetchType.LAZY, optional = true)
+		@OneToOne(fetch = FetchType.LAZY, // Will be ignored except in the test extending this one and using bytecode enhancement.
+				optional = true)
 		private AssociationNonOwner optionalOneToOne;
 
 		@IndexedEmbedded(includePaths = {"basic", "elementCollection"})
@@ -531,7 +537,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 		private List<Integer> elementCollection;
 
 		@IndexedEmbedded(includePaths = {"basic", "elementCollection"})
-		@OneToOne(fetch = FetchType.LAZY, // Will probably be ignored: an optional one-to-one can hardly use lazy proxies on the non-owning side.
+		@OneToOne(fetch = FetchType.LAZY, // Will be ignored except in the test extending this one and using bytecode enhancement.
 				mappedBy = "optionalOneToOne", optional = true)
 		private AssociationOwner optionalOneToOne;
 
