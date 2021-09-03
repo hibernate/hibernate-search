@@ -222,8 +222,13 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		);
 
 		sessionFactory = ormSetupHelper.start()
+				.with( this::configure )
 				.setup( primitives.getIndexedClass(), primitives.getContainedClass() );
 		backendMock.verifyExpectationsMet();
+	}
+
+	protected OrmSetupHelper.SetupContext configure(OrmSetupHelper.SetupContext setupContext) {
+		return setupContext;
 	}
 
 	@Test
