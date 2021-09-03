@@ -50,9 +50,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 						AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.IndexedEntity,
 						AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainingEntity,
 						AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainedEntity,
-						SortedMap<String, AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainedEntity>,
-						List<AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainingEntity>
-				> {
+						SortedMap<String, AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT.ContainedEntity>
+		> {
 
 	public AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT() {
 		super( new ModelPrimitivesImpl() );
@@ -60,7 +59,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 
 	private static class ModelPrimitivesImpl
 			implements MultiValuedModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-											SortedMap<String, ContainedEntity>, List<ContainingEntity>> {
+											SortedMap<String, ContainedEntity>> {
 
 		private final ContainerPrimitives<SortedMap<String, ContainedEntity>, ContainedEntity> MAP_VALUES_PRIMITIVES =
 				ContainerPrimitives.mapValues( containedEntity -> containedEntity.getIndexedField() + "_value" );

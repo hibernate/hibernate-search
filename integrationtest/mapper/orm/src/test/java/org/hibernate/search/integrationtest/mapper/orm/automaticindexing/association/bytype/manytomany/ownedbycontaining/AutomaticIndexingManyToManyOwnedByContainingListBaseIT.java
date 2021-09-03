@@ -42,9 +42,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 						AutomaticIndexingManyToManyOwnedByContainingListBaseIT.IndexedEntity,
 						AutomaticIndexingManyToManyOwnedByContainingListBaseIT.ContainingEntity,
 						AutomaticIndexingManyToManyOwnedByContainingListBaseIT.ContainedEntity,
-						List<AutomaticIndexingManyToManyOwnedByContainingListBaseIT.ContainedEntity>,
-						List<AutomaticIndexingManyToManyOwnedByContainingListBaseIT.ContainingEntity>
-				> {
+						List<AutomaticIndexingManyToManyOwnedByContainingListBaseIT.ContainedEntity>
+		> {
 
 	public AutomaticIndexingManyToManyOwnedByContainingListBaseIT() {
 		super( new ModelPrimitivesImpl() );
@@ -52,7 +51,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 
 	private static class ModelPrimitivesImpl
 			implements MultiValuedModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-					List<ContainedEntity>, List<ContainingEntity>> {
+					List<ContainedEntity>> {
 
 		@Override
 		public String getIndexName() {
