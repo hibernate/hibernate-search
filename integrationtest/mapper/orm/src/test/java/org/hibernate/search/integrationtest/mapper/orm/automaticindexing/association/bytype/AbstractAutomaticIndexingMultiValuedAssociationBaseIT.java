@@ -1183,6 +1183,11 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			return true;
 		}
 
+		@Override
+		default boolean isAssociationLazyOnContainingSide() {
+			return true;
+		}
+
 		TContainedAssociation newContainedAssociation(TContainedAssociation original);
 
 		@Override

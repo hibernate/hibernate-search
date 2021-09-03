@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +64,18 @@ import org.junit.Test;
  *                 directly on the indexed entity
  *             </li>
  *             <li>
+ *                 directImplicitAssociationUpdateThroughInsert: set the value of the association
+ *                 directly on the indexed entity,
+ *                 but implicitly through an insert of the contained entity,
+ *                 without updating the containing side of the association explicitly.
+ *             </li>
+ *             <li>
+ *                 directImplicitAssociationUpdateThroughDelete: set the value of the association
+ *                 directly on the indexed entity,
+ *                 but implicitly through a delete of the contained entity,
+ *                 without updating the containing side of the association explicitly.
+ *             </li>
+ *             <li>
  *                 directMultiValuedAssociationUpdate: set the value of the association
  *                 directly on the indexed entity,
  *                 adding multiple values to the association
@@ -75,6 +88,18 @@ import org.junit.Test;
  *             <li>
  *                 indirectAssociationUpdate: set the value of the association
  *                 on an entity that is itself indexed-embedded in the indexed entity
+ *             </li>
+ *             <li>
+ *                 indirectImplicitAssociationUpdateThroughInsert: set the value of the association
+ *                 on an entity that is itself indexed-embedded in the indexed entity,
+ *                 but implicitly through an insert of the contained entity,
+ *                 without updating the containing side of the association explicitly.
+ *             </li>
+ *             <li>
+ *                 indirectImplicitAssociationUpdateThroughDelete: set the value of the association
+ *                 on an entity that is itself indexed-embedded in the indexed entity,
+ *                 but implicitly through a delete of the contained entity,
+ *                 without updating the containing side of the association explicitly.
  *             </li>
  *             <li>
  *                 indirectMultiValuedAssociationUpdate: set the value of the association
@@ -470,6 +495,117 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( containedEntity );
 
 			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that inserting a contained entity and having its side of the association point to the containing entity
+	 * is enough to trigger reindexing of the indexed entity,
+	 * even if we don't update the containing side of the association.
+	 * <p>
+	 * Until HSEARCH-3567 is fixed (and maybe even after),
+	 * this can only work if
+	 * the owning side of the association is the contained side,
+	 * and the containing side of the association is lazy and is not yet loaded
+	 * before the contained entity is inserted.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4303")
+	public final void directImplicitAssociationUpdateThroughInsert_indexedEmbedded() {
+		assumeTrue( "This test only makes sense if the association is owned by the contained side",
+				primitives.isAssociationOwnedByContainedSide() );
+		assumeTrue( "This test can only succeed if the containing side of the association is loaded after the contained entity is inserted."
+						+ " See the paragraph starting with \"By the way\" in"
+						+ " https://discourse.hibernate.org/t/hs6-not-indexing-add-or-delete-only-update-with-onetomany-indexedembedded/5638/6",
+				primitives.isAssociationLazyOnContainingSide() );
+
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			// Do NOT set the association on the containing side; that's on purpose.
+			// Only set it on the contained side.
+			primitives.containingAsIndexedEmbedded().set( containedEntity, entity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "containedIndexedEmbedded", b2 -> b2
+									.field( "indexedField", "initialValue" )
+							)
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that deleting a contained entity
+	 * is enough to trigger reindexing of the indexed entity,
+	 * even if we don't update the containing side of the association.
+	 * <p>
+	 * Until HSEARCH-3567 is fixed (and maybe even after),
+	 * this can only work if
+	 * the contained side of the association is already loaded before the contained entity is deleted,
+	 * and the contained side of the association is not explicitly updated,
+	 * and the containing side of the association is lazy and is not yet loaded
+	 * before the contained entity is deleted.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4303")
+	public final void directImplicitAssociationUpdateThroughDelete_indexedEmbedded() {
+		assumeTrue( "This test only makes sense if the association is owned by the contained side",
+				primitives.isAssociationOwnedByContainedSide() );
+		assumeTrue( "This test can only succeed if the containing side of the association is loaded after the contained entity is inserted."
+						+ " See the paragraph starting with \"By the way\" in"
+						+ " https://discourse.hibernate.org/t/hs6-not-indexing-add-or-delete-only-update-with-onetomany-indexedembedded/5638/6",
+				primitives.isAssociationLazyOnContainingSide() );
+
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			session.persist( entity1 );
+			session.persist( containedEntity );
+
+			primitives.containedIndexedEmbedded().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "containedIndexedEmbedded", b2 -> b2
+									.field( "indexedField", "initialValue" )
+							) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		withinTransaction( sessionFactory, session -> {
+			TContained containedEntity = session.get( primitives.getContainedClass(), 2 );
+
+			// Do NOT update the association on either side; that's on purpose.
+			// But DO force loading on contained side:
+			// if the association is lazy and unloaded, it won't be loadable after the deletion
+			// and the deletion even will simply be ignored.
+			primitives.containingAsIndexedEmbedded().get( containedEntity );
+
+			session.delete( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -920,6 +1056,114 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					);
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Same as {@link #directImplicitAssociationUpdateThroughInsert_indexedEmbedded()},
+	 * but with an additional association: indexedEntity -> containingEntity -> containedEntity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4303")
+	public final void indirectImplicitAssociationUpdateThroughInsert_indexedEmbedded() {
+		assumeTrue( "This test only makes sense if the association is owned by the contained side",
+				primitives.isAssociationOwnedByContainedSide() );
+		assumeTrue( "This test can only succeed if the containing side of the association is loaded after the contained entity is inserted."
+						+ " See the paragraph starting with \"By the way\" in"
+						+ " https://discourse.hibernate.org/t/hs6-not-indexing-add-or-delete-only-update-with-onetomany-indexedembedded/5638/6",
+				primitives.isAssociationLazyOnContainingSide() );
+
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } ) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			// Do NOT set the association on the containing side; that's on purpose.
+			// Only set it on the contained side.
+			primitives.containingAsIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			session.persist( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									) ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Same as {@link #directImplicitAssociationUpdateThroughDelete_indexedEmbedded()},
+	 * but with an additional association: indexedEntity -> containingEntity -> containedEntity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4303")
+	public final void indirectImplicitAssociationUpdateThroughDelete_indexedEmbedded() {
+		assumeTrue( "This test only makes sense if the association is owned by the contained side",
+				primitives.isAssociationOwnedByContainedSide() );
+		assumeTrue( "This test can only succeed if the containing side of the association is loaded after the contained entity is inserted."
+						+ " See the paragraph starting with \"By the way\" in"
+						+ " https://discourse.hibernate.org/t/hs6-not-indexing-add-or-delete-only-update-with-onetomany-indexedembedded/5638/6",
+				primitives.isAssociationLazyOnContainingSide() );
+
+		withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+			session.persist( containedEntity );
+
+			primitives.containedIndexedEmbedded().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									) ) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		withinTransaction( sessionFactory, session -> {
+			TContained containedEntity = session.get( primitives.getContainedClass(), 2 );
+
+			// Do NOT update the association on either side; that's on purpose.
+			// But DO force loading on contained side:
+			// if the association is lazy and unloaded, it won't be loadable after the deletion
+			// and the deletion even will simply be ignored.
+			primitives.containingAsIndexedEmbedded().get( containedEntity );
+
+			session.delete( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> { } ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1927,6 +2171,10 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		String getIndexName();
 
 		boolean isMultiValuedAssociation();
+
+		boolean isAssociationOwnedByContainedSide();
+
+		boolean isAssociationLazyOnContainingSide();
 
 		Class<TIndexed> getIndexedClass();
 
