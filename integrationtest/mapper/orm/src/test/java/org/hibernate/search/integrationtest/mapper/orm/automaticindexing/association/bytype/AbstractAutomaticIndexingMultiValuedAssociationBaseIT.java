@@ -40,7 +40,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	}
 
 	@Test
-	public void directAssociationUpdate_indexedEmbedded() {
+	public void directMultiValuedAssociationUpdate_indexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -124,7 +124,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void directAssociationReplace_indexedEmbedded() {
+	public void directMultiValuedAssociationReplace_indexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -181,7 +181,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void directAssociationUpdate_nonIndexedEmbedded() {
+	public void directMultiValuedAssociationMultiValuedUpdate_nonIndexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -248,7 +248,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void directAssociationReplace_nonIndexedEmbedded() {
+	public void directMultiValuedAssociationReplace_nonIndexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -295,7 +295,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+	public void directMultiValuedAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -380,7 +380,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void directAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
+	public void directMultiValuedAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -437,7 +437,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
-	public void directAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
+	public void directMultiValuedAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -504,7 +504,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void directAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
+	public void directMultiValuedAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -556,7 +556,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	}
 
 	@Test
-	public void indirectAssociationUpdate_indexedEmbedded() {
+	public void indirectMultiValuedAssociationUpdate_indexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -675,7 +675,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectAssociationReplace_indexedEmbedded() {
+	public void indirectMultiValuedAssociationReplace_indexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -740,7 +740,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void indirectAssociationUpdate_nonIndexedEmbedded() {
+	public void indirectMultiValuedAssociationUpdate_nonIndexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -814,7 +814,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void indirectAssociationReplace_nonIndexedEmbedded() {
+	public void indirectMultiValuedAssociationReplace_nonIndexedEmbedded() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -870,7 +870,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+	public void indirectMultiValuedAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -971,7 +971,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void indirectAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
+	public void indirectMultiValuedAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -1037,7 +1037,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
-	public void indirectAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
+	public void indirectMultiValuedAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -1112,7 +1112,7 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void indirectAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
+	public void indirectMultiValuedAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
 		withinTransaction( sessionFactory, session -> {
 			TIndexed entity1 = primitives.newIndexed( 1 );
 
@@ -1188,8 +1188,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 		@Override
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedIndexedEmbedded();
 
+		@Override
 		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containedNonIndexedEmbedded();
 
+		@Override
 		PropertyAccessor<TContained, TContaining> containingAsNonIndexedEmbedded();
 
 		@Override

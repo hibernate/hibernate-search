@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -17,6 +18,8 @@ public interface ContainerPrimitives<C, V> {
 	void remove(C container, V value);
 
 	void clear(C container);
+
+	Iterator<V> iterator(C container);
 
 	static <C extends Collection<T>, T> ContainerPrimitives<C, T> collection() {
 		return new ContainerPrimitives<C, T>() {
@@ -33,6 +36,11 @@ public interface ContainerPrimitives<C, V> {
 			@Override
 			public void clear(C container) {
 				container.clear();
+			}
+
+			@Override
+			public Iterator<T> iterator(C container) {
+				return container.iterator();
 			}
 		};
 	}
@@ -53,6 +61,11 @@ public interface ContainerPrimitives<C, V> {
 			public void clear(M container) {
 				container.clear();
 			}
+
+			@Override
+			public Iterator<K> iterator(M container) {
+				return container.keySet().iterator();
+			}
 		};
 	}
 
@@ -71,6 +84,11 @@ public interface ContainerPrimitives<C, V> {
 			@Override
 			public void clear(M container) {
 				container.clear();
+			}
+
+			@Override
+			public Iterator<V> iterator(M container) {
+				return container.values().iterator();
 			}
 		};
 	}
