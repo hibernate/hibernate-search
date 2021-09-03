@@ -20,7 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingSingleValuedAssociationBaseIT;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.MultiValuedPropertyAccessor;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.PropertyAccessor;
@@ -39,18 +39,18 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
  * with a {@code @OneToOne} association owned by the containing side.
  */
 public class AutomaticIndexingOneToOneOwnedByContainingBaseIT
-		extends AbstractAutomaticIndexingSingleValuedAssociationBaseIT<
+		extends AbstractAutomaticIndexingAssociationBaseIT<
 						AutomaticIndexingOneToOneOwnedByContainingBaseIT.IndexedEntity,
 						AutomaticIndexingOneToOneOwnedByContainingBaseIT.ContainingEntity,
 						AutomaticIndexingOneToOneOwnedByContainingBaseIT.ContainedEntity
 				> {
 
 	public AutomaticIndexingOneToOneOwnedByContainingBaseIT() {
-		super( new ModelPrimitives() );
+		super( new ModelPrimitivesImpl() );
 	}
 
-	private static class ModelPrimitives
-			implements SingleValuedAssociationModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity> {
+	private static class ModelPrimitivesImpl
+			implements ModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity> {
 
 		@Override
 		public String getIndexName() {

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
 
+import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -35,7 +36,16 @@ public final class MultiValuedPropertyAccessor<R, V, C> implements PropertyAcces
 
 	@Override
 	public V get(R root) {
-		throw new UnsupportedOperationException();
+		C container = getContainer( root );
+		Iterator<V> iterator = containerPrimitives.iterator( container );
+		if ( !iterator.hasNext() ) {
+			return null;
+		}
+		V first = iterator.next();
+		if ( iterator.hasNext() ) {
+			throw new IllegalArgumentException( "get() can only be used if the container is empty or contains a single value." );
+		}
+		return first;
 	}
 
 	@Override
