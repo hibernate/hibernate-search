@@ -33,15 +33,17 @@ public interface ContainerExtractor<C, V> {
 	 * @param perValueProcessor A processor for values extracted from the container.
 	 * @param target The target to pass to the {@code perValueProcessor}.
 	 * @param context The context to pass to the {@code perValueProcessor}.
+	 * @param extractionContext A context for use by the container extractor itself.
 	 * @param <T> The type of the {@code target} of the {@code perValueProcessor},
 	 * i.e. whatever it is supposed to push the result of its processing to.
 	 * @param <C2> The type of the {@code context} of the {@code perValueProcessor},
 	 * i.e. whatever information it needs that is independent from the target or value.
 	 */
-	<T, C2> void extract(C container, ValueProcessor<T, ? super V, C2> perValueProcessor, T target, C2 context);
+	<T, C2> void extract(C container, ValueProcessor<T, ? super V, C2> perValueProcessor, T target, C2 context,
+			ContainerExtractionContext extractionContext);
 
 	/**
-	 * @return {@code true} if this extractor's {@link #extract(Object, ValueProcessor, Object, Object)}
+	 * @return {@code true} if this extractor's {@link #extract(Object, ValueProcessor, Object, Object, ContainerExtractionContext)}
 	 * method may call the consumer multiple times.
 	 * {@code false} if it will always call the {@code consumer} either zero or one time for a given container.
 	 */

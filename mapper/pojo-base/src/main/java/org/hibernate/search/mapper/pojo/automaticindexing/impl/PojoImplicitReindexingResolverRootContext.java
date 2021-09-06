@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
 
 /**
  * The context passed to a {@link PojoImplicitReindexingResolver}
@@ -18,7 +19,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReinde
  *
  * @param <S> The type of {@link #dirtinessState()}.
  */
-public interface PojoImplicitReindexingResolverRootContext<S> {
+public interface PojoImplicitReindexingResolverRootContext<S> extends ContainerExtractionContext {
 
 	/**
 	 * @return The context for the current session.
@@ -30,5 +31,14 @@ public interface PojoImplicitReindexingResolverRootContext<S> {
 	 * {@code null} means "no information", in which case all paths are considered dirty.
 	 */
 	S dirtinessState();
+
+	/**
+	 * Propagates (rethrows) a {@link RuntimeException} thrown while accessing a property (getter or field access),
+	 * or ignores it so that the property is skipped.
+	 *
+	 * @param exception A {@link RuntimeException} thrown while accessing a property.
+	 * @see org.hibernate.search.util.common.reflect.spi.ValueReadHandle#get(Object)
+	 */
+	void propagateOrIgnorePropertyAccessException(RuntimeException exception);
 
 }

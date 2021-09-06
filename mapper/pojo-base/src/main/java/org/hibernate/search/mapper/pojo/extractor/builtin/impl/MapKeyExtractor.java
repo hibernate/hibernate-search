@@ -6,26 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
+import java.util.Iterator;
 import java.util.Map;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
-public class MapKeyExtractor<T> implements ContainerExtractor<Map<T, ?>, T> {
+public class MapKeyExtractor<T> extends AbstractIteratorBasedElementExtractor<Map<T, ?>, T> {
 	@Override
 	public String toString() {
 		return BuiltinContainerExtractors.MAP_KEY;
 	}
 
 	@Override
-	public <T1, C2> void extract(Map<T, ?> container, ValueProcessor<T1, ? super T, C2> perValueProcessor, T1 target,
-			C2 context) {
-		if ( container == null ) {
-			return;
-		}
-		for ( T element : container.keySet() ) {
-			perValueProcessor.process( target, element, context );
-		}
+	protected Iterator<T> iterator(Map<T, ?> container) {
+		return container.keySet().iterator();
 	}
 }
