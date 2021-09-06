@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * @param <I> The type of identifiers of entities in this plan.
@@ -104,6 +105,35 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		@Override
 		public Set<String> dirtinessState() {
 			return dirtyPaths;
+		}
+
+		// This is used for reindexing resolution only:
+		// for indexing, we always propagate exceptions.
+		@Override
+		public void propagateOrIgnoreContainerExtractionException(RuntimeException exception) {
+			if ( isIgnorableDataAccessThrowable( exception ) ) {
+				return;
+			}
+			throw exception;
+		}
+
+		// This is used for reindexing resolution only:
+		// for indexing, we always propagate exceptions.
+		@Override
+		public void propagateOrIgnorePropertyAccessException(RuntimeException exception) {
+			if ( isIgnorableDataAccessThrowable( exception ) ) {
+				return;
+			}
+			throw exception;
+		}
+
+		private boolean isIgnorableDataAccessThrowable(RuntimeException exception) {
+			Throwable firstNonSearchThrowable = exception;
+			while ( firstNonSearchThrowable instanceof SearchException ) {
+				firstNonSearchThrowable = exception.getCause();
+			}
+			return firstNonSearchThrowable != null &&
+					sessionContext.runtimeIntrospector().isIgnorableDataAccessThrowable( firstNonSearchThrowable );
 		}
 
 		void add(Supplier<E> entitySupplier, String providedRoutingKey) {

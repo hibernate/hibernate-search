@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 
@@ -28,7 +29,7 @@ public final class ContainerExtractingProcessor<T, C, V, C2> implements ValuePro
 	}
 
 	@Override
-	public void process(T target, C container, C2 context) {
-		extractor.extract( container, perValueProcessor, target, context );
+	public void process(T target, C container, C2 context, ContainerExtractionContext extractionContext) {
+		extractor.extract( container, perValueProcessor, target, context, extractionContext );
 	}
 }

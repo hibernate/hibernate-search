@@ -15,6 +15,7 @@ import java.util.List;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -99,13 +100,13 @@ public class FieldContainerExtractorBaseIT {
 		public static final String NAME = "my-container-extractor";
 
 		@Override
-		public <T1, C2> void extract(MyContainer<T> container, ValueProcessor<T1, ? super T, C2> perValueProcessor, T1 target,
-				C2 context) {
+		public <T1, C2> void extract(MyContainer<T> container, ValueProcessor<T1, ? super T, C2> perValueProcessor,
+				T1 target, C2 context, ContainerExtractionContext extractionContext) {
 			if ( container == null ) {
 				return;
 			}
 			for ( T element : container.toList() ) {
-				perValueProcessor.process( target, element, context );
+				perValueProcessor.process( target, element, context, extractionContext );
 			}
 		}
 	}
@@ -167,7 +168,8 @@ public class FieldContainerExtractorBaseIT {
 	private static class RawContainerExtractor implements ContainerExtractor {
 		public static final String NAME = "raw-container-extractor";
 		@Override
-		public void extract(Object container, ValueProcessor perValueProcessor, Object target, Object context) {
+		public void extract(Object container, ValueProcessor perValueProcessor, Object target, Object context,
+				ContainerExtractionContext extractionContext) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}

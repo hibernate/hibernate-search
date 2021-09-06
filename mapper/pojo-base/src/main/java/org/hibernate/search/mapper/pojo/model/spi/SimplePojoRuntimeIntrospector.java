@@ -29,6 +29,12 @@ final class SimplePojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 	}
 
 	@Override
+	public boolean isIgnorableDataAccessThrowable(Throwable throwable) {
+		// Don't ignore any throwable by default.
+		return false;
+	}
+
+	@Override
 	public Object unproxy(Object value) {
 		return value;
 	}
