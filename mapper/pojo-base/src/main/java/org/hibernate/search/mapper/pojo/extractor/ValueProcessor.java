@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.extractor;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A processor of values extracted from a container.
  *
@@ -16,6 +18,7 @@ package org.hibernate.search.mapper.pojo.extractor;
  * i.e. whatever information it needs that is independent from the target or value.
  * @see ContainerExtractor#extract(Object, ValueProcessor, Object, Object)
  */
+@Incubating
 public interface ValueProcessor<T, V, C> {
 
 	/**
