@@ -12,13 +12,11 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
-		implements SearchIndexedEntity<E>, HibernateOrmSessionIndexedTypeContext<E>,
-				HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
+		implements SearchIndexedEntity<E>, HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
 
 	private final MappedIndexManager indexManager;
 

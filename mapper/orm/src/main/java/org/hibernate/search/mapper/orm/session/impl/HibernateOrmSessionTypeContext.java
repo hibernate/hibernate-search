@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
+import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
@@ -14,6 +15,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 public interface HibernateOrmSessionTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> typeIdentifier();
+
+	IdentifierMapping identifierMapping();
 
 	String jpaEntityName();
 

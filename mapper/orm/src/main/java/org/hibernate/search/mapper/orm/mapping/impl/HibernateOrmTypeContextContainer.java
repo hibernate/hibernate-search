@@ -36,7 +36,7 @@ class HibernateOrmTypeContextContainer
 	private final Map<PojoRawTypeIdentifier<?>, AbstractHibernateOrmTypeContext<?>> typeContexts = new LinkedHashMap<>();
 	private final Map<String, AbstractHibernateOrmTypeContext<?>> typeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
 	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
-	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByJpaEntityName = new LinkedHashMap<>();
+	private final Map<String, AbstractHibernateOrmTypeContext<?>> typeContextsByJpaEntityName = new LinkedHashMap<>();
 
 	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
 
@@ -47,13 +47,14 @@ class HibernateOrmTypeContextContainer
 			typeContexts.put( typeIdentifier, indexedTypeContext );
 			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
 			typeContextsByHibernateOrmEntityName.put( indexedTypeContext.hibernateOrmEntityName(), indexedTypeContext );
-			indexedTypeContextsByJpaEntityName.put( indexedTypeContext.jpaEntityName(), indexedTypeContext );
+			typeContextsByJpaEntityName.put( indexedTypeContext.jpaEntityName(), indexedTypeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
 			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.typeIdentifier();
 			typeContexts.put( typeIdentifier, containedTypeContext );
 			typeContextsByHibernateOrmEntityName.put( containedTypeContext.hibernateOrmEntityName(), containedTypeContext );
+			typeContextsByJpaEntityName.put( containedTypeContext.jpaEntityName(), containedTypeContext );
 		}
 
 		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
@@ -72,8 +73,8 @@ class HibernateOrmTypeContextContainer
 	}
 
 	@Override
-	public HibernateOrmIndexedTypeContext<?> indexedForJpaEntityName(String indexName) {
-		return indexedTypeContextsByJpaEntityName.get( indexName );
+	public AbstractHibernateOrmTypeContext<?> forJpaEntityName(String indexName) {
+		return typeContextsByJpaEntityName.get( indexName );
 	}
 
 	@Override
