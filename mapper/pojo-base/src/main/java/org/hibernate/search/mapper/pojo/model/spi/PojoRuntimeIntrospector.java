@@ -29,6 +29,16 @@ public interface PojoRuntimeIntrospector {
 	Object unproxy(Object value);
 
 	/**
+	 * @param throwable A {@link Throwable} thrown while accessing data on an entity: calling a getter, accessing a field,
+	 * accessing the elements of a container, etc.
+	 * @return {@code true} if this exception should be ignored
+	 * and the data should be assumed empty ({@code null}, empty container, ...).
+	 * {@code false} if this exception should be propagated.
+	 * Note this is currently only taken into account while performing reindexing resolution.
+	 */
+	boolean isIgnorableDataAccessThrowable(Throwable throwable);
+
+	/**
 	 * @return A simple {@link PojoRuntimeIntrospector} that relies on the object's class to return entity types,
 	 * and assumes objects are not proxyfied.
 	 */
