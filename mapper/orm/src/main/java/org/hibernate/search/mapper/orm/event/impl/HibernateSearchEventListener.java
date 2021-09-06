@@ -71,30 +71,41 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
-		if ( typeContext != null ) {
-			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.delete( typeContext.typeIdentifier(), providedId, null, entity );
+		if ( typeContext == null ) {
+			return;
 		}
+		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
+		getCurrentIndexingPlan( contextProvider, event.getSession() )
+				.delete( typeContext.typeIdentifier(), providedId, null, entity );
 	}
 
 	@Override
 	public void onPostInsert(PostInsertEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
-		if ( typeContext != null ) {
-			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.add( typeContext.typeIdentifier(), providedId, null, entity );
+		if ( typeContext == null ) {
+			return;
 		}
+		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
+		getCurrentIndexingPlan( contextProvider, event.getSession() )
+				.add( typeContext.typeIdentifier(), providedId, null, entity );
 	}
 
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
 		if ( typeContext != null ) {
@@ -131,6 +142,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	@Override
 	public void onFlush(FlushEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		EventSource session = event.getSession();
 
 		PojoIndexingPlan<EntityReference> plan = getCurrentIndexingPlanIfExisting( contextProvider, session );
@@ -161,13 +175,21 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			 */
 			return;
 		}
-		getCurrentIndexingPlan( state.getContextProvider(), event.getSession() ).process();
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
+		getCurrentIndexingPlan( contextProvider, event.getSession() ).process();
 	}
 
 	@Override
 	public void onClear(ClearEvent event) {
+		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		EventSource session = event.getSession();
-		PojoIndexingPlan<?> plan = getCurrentIndexingPlanIfExisting( state.getContextProvider(), session );
+		PojoIndexingPlan<?> plan = getCurrentIndexingPlanIfExisting( contextProvider, session );
 
 		// skip the clearNotPrepared operation in case there has been no one to clear
 		if ( plan != null ) {
@@ -201,6 +223,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		Object ownerEntity = event.getAffectedOwnerOrNull();
 		if ( ownerEntity == null ) {
 			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
