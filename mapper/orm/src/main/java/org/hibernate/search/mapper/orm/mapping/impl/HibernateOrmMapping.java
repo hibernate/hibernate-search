@@ -58,7 +58,7 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -193,8 +193,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public EntityReference createEntityReference(String typeName, Object identifier) {
-		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextContainer.indexedForJpaEntityName( typeName );
+		HibernateOrmSessionTypeContext<?> typeContext = typeContextContainer.forJpaEntityName( typeName );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Type " + typeName + " refers to an unknown type"

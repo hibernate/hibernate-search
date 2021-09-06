@@ -12,6 +12,4 @@ public interface AutomaticIndexingTypeContextProvider {
 
 	<T> AutomaticIndexingIndexedTypeContext indexedForExactType(PojoRawTypeIdentifier<T> typeIdentifier);
 
-	AutomaticIndexingIndexedTypeContext indexedForJpaEntityName(String entityName);
-
 }
