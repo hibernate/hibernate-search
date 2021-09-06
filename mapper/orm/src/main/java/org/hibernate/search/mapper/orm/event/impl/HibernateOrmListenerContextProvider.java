@@ -14,6 +14,8 @@ public interface HibernateOrmListenerContextProvider {
 
 	HibernateOrmListenerTypeContextProvider typeContextProvider();
 
+	boolean listenerEnabled();
+
 	PojoIndexingPlan currentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
 
 	ConfiguredAutomaticIndexingSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(

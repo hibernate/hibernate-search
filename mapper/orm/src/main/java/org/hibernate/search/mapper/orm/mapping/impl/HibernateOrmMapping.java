@@ -127,6 +127,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private final SchemaManagementListener schemaManagementListener;
 
+	private volatile boolean listenerEnabled = true;
+
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
@@ -302,6 +304,16 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public DetachedBackendSessionContext detachedBackendSessionContext(String tenantId) {
 		return DetachedBackendSessionContext.of( this, tenantId );
+	}
+
+	@Override
+	public boolean listenerEnabled() {
+		return listenerEnabled;
+	}
+
+	// For tests
+	public void listenerEnabled(boolean enabled) {
+		this.listenerEnabled = enabled;
 	}
 
 	@Override

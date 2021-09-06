@@ -86,28 +86,39 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( event.getPersister() );
-		if ( typeContext != null ) {
-			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-			getCurrentIndexingPlan( event.getSession() )
-					.delete( typeContext.typeIdentifier(), providedId, null, entity );
+		if ( typeContext == null ) {
+			return;
 		}
+		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
+		getCurrentIndexingPlan( event.getSession() )
+				.delete( typeContext.typeIdentifier(), providedId, null, entity );
 	}
 
 	@Override
 	public void onPostInsert(PostInsertEvent event) {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( event.getPersister() );
-		if ( typeContext != null ) {
-			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-			getCurrentIndexingPlan( event.getSession() )
-					.add( typeContext.typeIdentifier(), providedId, null, entity );
+		if ( typeContext == null ) {
+			return;
 		}
+		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
+		getCurrentIndexingPlan( event.getSession() )
+				.add( typeContext.typeIdentifier(), providedId, null, entity );
 	}
 
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( event.getPersister() );
 		if ( typeContext == null ) {
@@ -173,6 +184,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	 */
 	@Override
 	public void onFlush(FlushEvent event) {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		EventSource session = event.getSession();
 
 		PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( session );
@@ -194,6 +208,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onAutoFlush(AutoFlushEvent event) throws HibernateException {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		if ( !event.isFlushRequired() ) {
 			/*
 			 * Auto-flush was disabled or there wasn't any entity/collection to flush.
@@ -208,6 +225,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	@Override
 	public void onClear(ClearEvent event) {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		EventSource session = event.getSession();
 		PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( session );
 
@@ -231,6 +251,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
+		if ( !contextProvider.listenerEnabled() ) {
+			return;
+		}
 		Object ownerEntity = event.getAffectedOwnerOrNull();
 		if ( ownerEntity == null ) {
 			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
