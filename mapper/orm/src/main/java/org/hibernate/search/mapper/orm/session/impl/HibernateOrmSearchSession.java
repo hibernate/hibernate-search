@@ -229,8 +229,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	@Override
 	public EntityReference createEntityReference(String typeName, Object identifier) {
-		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.indexedForJpaEntityName( typeName );
+		HibernateOrmSessionTypeContext<?> typeContext =
+				typeContextProvider.forJpaEntityName( typeName );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Type " + typeName + " refers to an unknown type"

@@ -16,4 +16,6 @@ public interface HibernateOrmSessionTypeContextProvider
 
 	HibernateOrmSessionIndexedTypeContext<?> indexedForJpaEntityName(String indexName);
 
+	HibernateOrmSessionTypeContext<?> forJpaEntityName(String indexName);
+
 }

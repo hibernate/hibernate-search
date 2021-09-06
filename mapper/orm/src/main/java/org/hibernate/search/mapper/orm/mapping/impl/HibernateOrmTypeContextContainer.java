@@ -32,6 +32,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
+	private final Map<String, AbstractHibernateOrmTypeContext<?>> typeContextsByJpaEntityName = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByJpaEntityName = new LinkedHashMap<>();
 	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmContainedTypeContext<?>> containedTypeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
@@ -44,6 +45,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.typeIdentifier();
 			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
 			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.hibernateOrmEntityName(), indexedTypeContext );
+			typeContextsByJpaEntityName.put( indexedTypeContext.jpaEntityName(), indexedTypeContext );
 			indexedTypeContextsByJpaEntityName.put( indexedTypeContext.jpaEntityName(), indexedTypeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
@@ -51,6 +53,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.typeIdentifier();
 			containedTypeContexts.put( typeIdentifier, containedTypeContext );
 			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.hibernateOrmEntityName(), containedTypeContext );
+			typeContextsByJpaEntityName.put( containedTypeContext.jpaEntityName(), containedTypeContext );
 		}
 
 		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
@@ -60,6 +63,11 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 	@SuppressWarnings("unchecked")
 	public <E> HibernateOrmIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
 		return (HibernateOrmIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
+	}
+
+	@Override
+	public AbstractHibernateOrmTypeContext<?> forJpaEntityName(String indexName) {
+		return typeContextsByJpaEntityName.get( indexName );
 	}
 
 	@Override
