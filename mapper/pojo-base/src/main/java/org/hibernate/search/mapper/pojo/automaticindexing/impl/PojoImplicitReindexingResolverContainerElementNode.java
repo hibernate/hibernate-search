@@ -34,7 +34,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, V>
 			PojoImplicitReindexingResolverNode<? super V> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
-		this.extractingDelegate = extractorHolder.wrap( (collector, value, context) -> {
+		this.extractingDelegate = extractorHolder.wrap( (collector, value, context, extractionContext) -> {
 			if ( value != null ) {
 				nested.resolveEntitiesToReindex( collector, value, context );
 			}
@@ -59,7 +59,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, V>
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			C dirty, PojoImplicitReindexingResolverRootContext context) {
-		extractingDelegate.process( collector, dirty, context );
+		extractingDelegate.process( collector, dirty, context, context );
 	}
 
 }

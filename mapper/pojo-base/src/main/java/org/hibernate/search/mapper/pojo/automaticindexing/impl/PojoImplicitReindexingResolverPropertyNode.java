@@ -50,7 +50,14 @@ public class PojoImplicitReindexingResolverPropertyNode<T, P> extends PojoImplic
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context) {
-		P propertyValue = handle.get( dirty );
+		P propertyValue;
+		try {
+			propertyValue = handle.get( dirty );
+		}
+		catch (RuntimeException e) {
+			context.propagateOrIgnorePropertyAccessException( e );
+			return;
+		}
 		if ( propertyValue != null ) {
 			nested.resolveEntitiesToReindex( collector, propertyValue, context );
 		}

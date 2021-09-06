@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import org.hibernate.AssertionFailure;
+import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -38,7 +40,8 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 		if ( entityName == null ) {
 			return null;
 		}
-		return (PojoRawTypeIdentifier<? extends T>) typeContextProvider.typeIdentifierForHibernateOrmEntityName( entityName );
+		return (PojoRawTypeIdentifier<? extends T>) typeContextProvider.typeIdentifierForHibernateOrmEntityName(
+				entityName );
 	}
 
 	@Override
@@ -60,4 +63,16 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 		return value;
 	}
 
+	@Override
+	public boolean isIgnorableDataAccessThrowable(Throwable throwable) {
+		// Ideally we would only need to ignore LazyInitializationException,
+		// but we have to work around HHH-14811 somehow,
+		// and there are other situations where lazy loading with bytecode enhancement enabled lead to
+		// a plain HibernateException (not a particular subclass).
+		// So this addresses HibernateException, LazyInitializationException, AssertionFailure.
+		return throwable instanceof HibernateException
+				// Ideally this shouldn't be needed, but we have to work around HHH-14811 somehow
+				// See https://hibernate.atlassian.net/browse/HHH-14811
+				|| throwable instanceof AssertionFailure;
+	}
 }
