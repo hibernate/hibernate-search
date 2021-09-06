@@ -26,7 +26,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -69,7 +68,6 @@ public class AutomaticIndexingAssociationDeletionIT {
 		sessionFactory = ormSetupHelper
 				.start()
 				.with( this::configure )
-				.withProperty( AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true )
 				.setup( AssociationOwner.class, AssociationNonOwner.class );
 		backendMock.verifyExpectationsMet();
 	}
