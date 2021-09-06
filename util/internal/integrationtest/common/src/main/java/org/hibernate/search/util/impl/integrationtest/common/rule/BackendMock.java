@@ -53,7 +53,6 @@ public class BackendMock implements TestRule {
 				}
 				finally {
 					resetExpectations();
-					indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
 					started = false;
 				}
 			}
