@@ -179,15 +179,21 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 			currentStatus = EntityStatus.ABSENT;
 
-			// Reindexing does not make sense for a deleted entity
-			shouldResolveToReindex = false;
-			considerAllDirty = false;
+			// Reindexing does not make sense for a deleted entity,
+			// but we can still resolve containing entities to reindex.
+			shouldResolveToReindex = true;
+			considerAllDirty = true;
 			dirtyPaths = null;
 		}
 
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
+				if ( entitySupplier == null ) {
+					// Purge of an indexed entity without access to the entity itself.
+					// Cannot perform reindexing resolution.
+					return;
+				}
 				typeContext().resolveEntitiesToReindex( containingEntityCollector, sessionContext, identifier,
 						entitySupplier, this );
 			}

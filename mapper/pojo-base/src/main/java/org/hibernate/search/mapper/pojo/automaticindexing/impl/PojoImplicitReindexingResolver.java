@@ -34,10 +34,10 @@ public interface PojoImplicitReindexingResolver<T, S> extends AutoCloseable, ToS
 	/**
 	 * Add all entities that should be reindexed to {@code collector},
 	 * taking into account the given "dirtiness state".
-	 *  @param collector A collector for dirty entities that should be reindexed.
+	 * @param collector A collector for dirty entities that should be reindexed.
 	 * @param dirty The entity whose dirtiness is to be checked.
 	 * @param context The set of dirty paths in the given entity.
- * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
+ 	 * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext<S> context);
