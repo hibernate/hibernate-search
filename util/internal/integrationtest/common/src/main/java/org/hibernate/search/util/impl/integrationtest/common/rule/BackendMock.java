@@ -49,11 +49,19 @@ public class BackendMock implements TestRule {
 				started = true;
 				try {
 					base.evaluate();
-					verifyExpectationsMet();
+					// Workaround for a problem in Hibernate ORM's CustomRunner
+					// (used by BytecodeEnhancerRunner in particular)
+					// which applies class rules twices, resulting in "started" being false
+					// when we get here in the outermost statement...
+					if ( started ) {
+						verifyExpectationsMet();
+					}
 				}
 				finally {
-					resetExpectations();
-					started = false;
+					if ( started ) {
+						resetExpectations();
+						started = false;
+					}
 				}
 			}
 		};
