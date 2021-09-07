@@ -66,7 +66,8 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 				ContainedEntity.class
 		);
 
-		dataClearConfig.clearOrder( IndexedEntity.class, ContainingEntity.class, ContainedEntity.class );
+		dataClearConfig.clearOrder( IndexedEntity.class, ContainingEntity.class, UnrelatedContainingEntity.class,
+				FirstMiddleContainingEntity.class, SecondMiddleContainingEntity.class, ContainedEntity.class );
 	}
 
 	/**

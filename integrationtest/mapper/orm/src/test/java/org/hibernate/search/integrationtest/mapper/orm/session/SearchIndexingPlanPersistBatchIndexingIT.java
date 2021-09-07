@@ -6,22 +6,22 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test batch indexing relying not on the {@link org.hibernate.search.mapper.orm.massindexing.MassIndexer},
@@ -37,11 +37,21 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	// Make sure that entity count is not a multiple of batch size, to test for corner cases
 	private static final int ENTITY_COUNT = BATCH_SIZE * 200 + BATCH_SIZE / 2;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
+
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
+	}
 
 	/**
 	 * Batch-index by simply processing entities before the session is cleared.
@@ -50,9 +60,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	 */
 	@Test
 	public void processPerBatch() {
-		SessionFactory sessionFactory = setup();
-
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;
 
@@ -91,9 +99,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	 */
 	@Test
 	public void executePerBatch() {
-		SessionFactory sessionFactory = setup();
-
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			// This is for test only and wouldn't be present in real code
@@ -146,17 +152,6 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 			final int id = i;
 			expectations.add( String.valueOf( id ), b -> b.field( "text", "number" + id ) );
 		}
-	}
-
-	private SessionFactory setup() {
-		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
-
-		SessionFactory sessionFactory = ormSetupHelper.start()
-				.setup( IndexedEntity.class );
-
-		backendMock.verifyExpectationsMet();
-
-		return sessionFactory;
 	}
 
 	@Entity(name = "indexed1")

@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
@@ -28,11 +27,13 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
@@ -46,30 +47,35 @@ public class MassIndexingBaseIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( Book.INDEX );
 
-		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
-				.setup( Book.class );
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withAnnotatedTypes( Book.class );
+	}
 
-		backendMock.verifyExpectationsMet();
-
-		initData();
+	@Before
+	public void initData() {
+		setupHolder.runInTransaction( session -> {
+			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
+			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
+			session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );
+		} );
 	}
 
 	@Test
 	public void defaultMassIndexerStartAndWait() throws Exception {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
@@ -113,7 +119,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void dropAndCreateSchemaOnStart() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
 
@@ -160,7 +166,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void mergeSegmentsOnFinish() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
 
@@ -206,7 +212,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void fromMappingWithoutSession() throws Exception {
-		SearchMapping searchMapping = Search.mapping( sessionFactory );
+		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer();
 
 		// add operations on indexes can follow any random order,
@@ -247,7 +253,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
-		Session session = sessionFactory.openSession();
+		Session session = setupHolder.sessionFactory().openSession();
 		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -263,7 +269,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
-		Session session = sessionFactory.openSession();
+		Session session = setupHolder.sessionFactory().openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );
 		session.close();
@@ -273,14 +279,6 @@ public class MassIndexingBaseIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to access Hibernate ORM session", "is closed" );
-	}
-
-	private void initData() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
-			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
-			session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );
-		} );
 	}
 
 	@Entity

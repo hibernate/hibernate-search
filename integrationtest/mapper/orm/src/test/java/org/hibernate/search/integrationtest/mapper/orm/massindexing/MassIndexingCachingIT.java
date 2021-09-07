@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,7 +15,6 @@ import javax.persistence.SharedCacheMode;
 import javax.persistence.Table;
 
 import org.hibernate.CacheMode;
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -28,52 +26,53 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.stat.Statistics;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.SoftAssertions;
 
-/**
- * Very basic test to probe an use of {@link MassIndexer} api.
- */
 public class MassIndexingCachingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
 	private Statistics statistics;
 
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
-		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, "false" )
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, "false" )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
-				.setup( IndexedEntity.class );
+				.withAnnotatedTypes( IndexedEntity.class );
+	}
 
-		backendMock.verifyExpectationsMet();
-
-		withinTransaction( sessionFactory, session -> {
+	@Before
+	public void initData() {
+		setupHolder.runInTransaction( session -> {
 			session.persist( new IndexedEntity( 1, "text1" ) );
 			session.persist( new IndexedEntity( 2, "text2" ) );
 			session.persist( new IndexedEntity( 3, "text3" ) );
 		} );
 
-		sessionFactory.getCache().evictEntityData( IndexedEntity.class, 1 );
+		setupHolder.sessionFactory().getCache().evictEntityData( IndexedEntity.class, 1 );
 
-		statistics = sessionFactory.getStatistics();
+		statistics = setupHolder.sessionFactory().getStatistics();
 		statistics.setStatisticsEnabled( true );
 		statistics.clear();
 	}
@@ -82,7 +81,7 @@ public class MassIndexingCachingIT {
 	// Note this test used to pass even before fixed HSEARCH-4272, but only because of another bug: HSEARCH-4273
 	@TestForIssue(jiraKey = "HSEARCH-4272")
 	public void default_ignore() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
@@ -119,7 +118,7 @@ public class MassIndexingCachingIT {
 	@Test
 	@Ignore("HSEARCH-4273: MassIndexer.cacheMode is not honored")
 	public void explicit_get() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()
 					.cacheMode( CacheMode.GET );

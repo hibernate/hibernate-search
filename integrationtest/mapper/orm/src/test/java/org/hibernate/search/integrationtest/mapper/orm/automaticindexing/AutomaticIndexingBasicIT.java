@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Consumer;
@@ -14,7 +13,6 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
@@ -25,12 +23,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events for basic fields.
@@ -40,30 +39,29 @@ import org.junit.Test;
  */
 public class AutomaticIndexingBasicIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "indexedField", String.class )
 				.field( "shallowReindexOnUpdateField", String.class )
 				.field( "noReindexOnUpdateField", String.class )
 		);
 
-		sessionFactory = ormSetupHelper.start()
-				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
 	public void directPersistUpdateDelete() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
@@ -79,7 +77,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
@@ -92,7 +90,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
 			session.delete( entity1 );
@@ -106,9 +104,9 @@ public class AutomaticIndexingBasicIT {
 	@Test
 	public void rollback_discardPreparedWorks() {
 		assumeTrue( "This test only makes sense if entities are processed in-session",
-				ormSetupHelper.areEntitiesProcessedInSession() );
+				setupHolder.areEntitiesProcessedInSession() );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.with().runNoTransaction( session -> {
 			Transaction trx = session.beginTransaction();
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -148,7 +146,7 @@ public class AutomaticIndexingBasicIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directValueUpdate_nonIndexedField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setNonIndexedField( "initialValue" );
@@ -164,7 +162,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setNonIndexedField( "updatedValue" );
 
@@ -172,7 +170,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setNonIndexedField( null );
 
@@ -191,7 +189,7 @@ public class AutomaticIndexingBasicIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directValueUpdate_shallowReindexOnUpdateField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setShallowReindexOnUpdateField( "initialValue" );
@@ -207,7 +205,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setShallowReindexOnUpdateField( "updatedValue" );
 
@@ -220,7 +218,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setShallowReindexOnUpdateField( null );
 
@@ -241,7 +239,7 @@ public class AutomaticIndexingBasicIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void directValueUpdate_noReindexOnUpdateField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setNoReindexOnUpdateField( "initialValue" );
@@ -257,7 +255,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setNoReindexOnUpdateField( "updatedValue" );
 
@@ -265,7 +263,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setNoReindexOnUpdateField( null );
 
@@ -276,7 +274,7 @@ public class AutomaticIndexingBasicIT {
 
 	@Test
 	public void sessionClear() {
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			IndexedEntity entity2 = new IndexedEntity( 2, "number2" );
 
@@ -289,7 +287,7 @@ public class AutomaticIndexingBasicIT {
 					.add( "2", expectedValue( "number2" ) );
 
 			session.flush();
-			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+			if ( setupHolder.areEntitiesProcessedInSession() ) {
 				// Entities should be processed and works created on flush
 				backendMock.verifyExpectationsMet();
 			}
@@ -316,7 +314,7 @@ public class AutomaticIndexingBasicIT {
 		// Works should be executed on transaction commit
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity5 = new IndexedEntity( 5, "number5" );
 			IndexedEntity entity6 = new IndexedEntity( 6, "number6" );
 
@@ -330,7 +328,7 @@ public class AutomaticIndexingBasicIT {
 					.add( "6", expectedValue( "number6" ) );
 
 			session.flush();
-			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+			if ( setupHolder.areEntitiesProcessedInSession() ) {
 				// Entities should be processed and works created on flush
 				backendMock.verifyExpectationsMet();
 			}
@@ -366,7 +364,7 @@ public class AutomaticIndexingBasicIT {
 	 */
 	@Test
 	public void sessionUpdate_directValueUpdate_indexedField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
@@ -382,7 +380,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "updatedValue" );
@@ -407,7 +405,7 @@ public class AutomaticIndexingBasicIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void sessionUpdate_directValueUpdate_nonIndexedField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setNonIndexedField( "initialValue" );
@@ -423,7 +421,7 @@ public class AutomaticIndexingBasicIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setNonIndexedField( "updatedValue" );

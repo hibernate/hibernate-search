@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -24,11 +23,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test the compatibility layer between our APIs and JPA APIs
@@ -36,31 +37,30 @@ import org.junit.Test;
  */
 public class ToJpaEntityManagerIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private EntityManagerFactory entityManagerFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		entityManagerFactory = ormSetupHelper.start()
-				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
 	public void toJpaEntityManagerFactory() {
-		SearchMapping searchMapping = Search.mapping( entityManagerFactory );
-		assertThat( searchMapping.toEntityManagerFactory() ).isSameAs( entityManagerFactory );
+		SearchMapping searchMapping = Search.mapping( setupHolder.entityManagerFactory() );
+		assertThat( searchMapping.toEntityManagerFactory() ).isSameAs( setupHolder.entityManagerFactory() );
 	}
 
 	@Test
 	public void toJpaEntityManager() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );
@@ -68,9 +68,9 @@ public class ToJpaEntityManagerIT {
 
 	@Test
 	public void toJpaEntityManager_withClosedEntityManager() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		try {
-			entityManager = entityManagerFactory.createEntityManager();
+			entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		}
 		finally {
 			if ( entityManager != null ) {
@@ -87,7 +87,7 @@ public class ToJpaEntityManagerIT {
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		SearchSession searchSession = Search.session( entityManager );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -101,7 +101,7 @@ public class ToJpaEntityManagerIT {
 
 	@Test
 	public void lazyCreateSearchSessionAfterEntityManagerIsClosed() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityManager entityManager = setupHolder.entityManagerFactory().createEntityManager();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( entityManager );
 		entityManager.close();

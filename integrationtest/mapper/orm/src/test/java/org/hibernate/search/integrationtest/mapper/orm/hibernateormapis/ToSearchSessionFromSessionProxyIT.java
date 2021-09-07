@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -20,7 +19,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.SharedSessionContract;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.hibernate.engine.jdbc.LobCreationContext;
@@ -34,12 +32,14 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * @author Emmanuel Bernard
@@ -57,30 +57,30 @@ public class ToSearchSessionFromSessionProxyIT {
 			SharedSessionContract.class
 	};
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		sessionFactory = setupHelper.start()
+		setupContext
 				// for this test we explicitly set the auto commit mode since we are not explicitly starting a transaction
 				// which could be a problem in some databases.
 				.withProperty( "hibernate.connection.autocommit", "true" )
 				//needed for testThreadBoundSessionWrappingOutOfTransaction
 				.withProperty( "hibernate.current_session_context_class", "thread" )
-				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+				.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
 	public void testSessionWrapper() {
-		with( sessionFactory ).runNoTransaction( s -> {
+		setupHolder.runNoTransaction( s -> {
 			DelegationWrapper wrapper = new DelegationWrapper( s );
 			Session wrapped = (Session) Proxy.newProxyInstance(
 					Session.class.getClassLoader(),
@@ -103,7 +103,7 @@ public class ToSearchSessionFromSessionProxyIT {
 
 	@Test
 	public void testThreadBoundSessionWrappingInTransaction() {
-		final Session sessionFromFirstThread = sessionFactory.getCurrentSession();
+		final Session sessionFromFirstThread = setupHolder.sessionFactory().getCurrentSession();
 		try {
 			OrmUtils.withinTransaction( sessionFromFirstThread, ignored -> {
 				SearchSession searchSessionFromFirstThread = Search.session( sessionFromFirstThread );
@@ -116,7 +116,7 @@ public class ToSearchSessionFromSessionProxyIT {
 				);
 				CompletableFuture<?> future = Futures.runAsync(
 						() -> {
-							Session sessionFromOtherThread = sessionFactory.getCurrentSession();
+							Session sessionFromOtherThread = setupHolder.sessionFactory().getCurrentSession();
 							assertThat( sessionFromOtherThread ).isNotSameAs( sessionFromFirstThread );
 							SearchSession searchSessionFromOtherThread = Search.session( sessionFromOtherThread );
 							assertNotNull( searchSessionFromOtherThread );
@@ -130,13 +130,13 @@ public class ToSearchSessionFromSessionProxyIT {
 		}
 		finally {
 			//clean up after the mess
-			ThreadLocalSessionContext.unbind( sessionFactory );
+			ThreadLocalSessionContext.unbind( setupHolder.sessionFactory() );
 		}
 	}
 
 	@Test
 	public void testThreadBoundSessionWrappingOutOfTransaction() {
-		final Session sessionFromFirstThread = sessionFactory.getCurrentSession();
+		final Session sessionFromFirstThread = setupHolder.sessionFactory().getCurrentSession();
 		try {
 			SearchSession searchSessionFromFirstThread = Search.session( sessionFromFirstThread );
 			assertNotNull( searchSessionFromFirstThread );
@@ -148,7 +148,7 @@ public class ToSearchSessionFromSessionProxyIT {
 			);
 			CompletableFuture<?> future = Futures.runAsync(
 					() -> {
-						Session sessionFromOtherThread = sessionFactory.getCurrentSession();
+						Session sessionFromOtherThread = setupHolder.sessionFactory().getCurrentSession();
 						assertThat( sessionFromOtherThread ).isNotSameAs( sessionFromFirstThread );
 						SearchSession searchSessionFromOtherThread = Search.session( sessionFromOtherThread );
 						assertNotNull( searchSessionFromOtherThread );
@@ -161,7 +161,7 @@ public class ToSearchSessionFromSessionProxyIT {
 		}
 		finally {
 			//clean up after the mess
-			ThreadLocalSessionContext.unbind( sessionFactory );
+			ThreadLocalSessionContext.unbind( setupHolder.sessionFactory() );
 		}
 	}
 

@@ -24,12 +24,15 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.stat.Statistics;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -54,17 +57,19 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		return result;
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
 
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	@Rule
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy;
-
-	private SessionFactory sessionFactory;
 
 	public SearchQueryEntityLoadingCacheLookupIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
@@ -79,23 +84,22 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return sessionFactory;
+		return setupHolder.sessionFactory();
 	}
 
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.SetupParams
+	public List<?> setupParams() {
+		return Arrays.asList( defaultCacheLookupStrategy, mapping, model );
+	}
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( model.getIndexName() );
 
-		sessionFactory = ormSetupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.QUERY_LOADING_CACHE_LOOKUP_STRATEGY,
-						defaultCacheLookupStrategy
-				)
+		setupContext.withProperty( HibernateOrmMapperSettings.QUERY_LOADING_CACHE_LOOKUP_STRATEGY,
+						defaultCacheLookupStrategy )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
-				.withConfiguration( c -> mapping.configure( c, model ) )
-				.setup();
-
-		backendMock.verifyExpectationsMet();
+				.withConfiguration( c -> mapping.configure( c, model ) );
 	}
 
 	@Test
@@ -292,17 +296,18 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 			int expectedSecondLevelCacheHitCount,
 			int expectedPersistenceContextHitCount,
 			boolean expectStatementExecution) {
-		sessionFactory.getStatistics().setStatisticsEnabled( true );
-		sessionFactory.getStatistics().clear();
+		Statistics statistics = setupHolder.sessionFactory().getStatistics();
+		statistics.setStatisticsEnabled( true );
+		statistics.clear();
 		persistThatManyEntities( entityCount );
-		assertThat( sessionFactory.getStatistics().getSecondLevelCachePutCount() )
+		assertThat( statistics.getSecondLevelCachePutCount() )
 				.as( "Test setup sanity check" )
 				.isEqualTo( entityCount );
 
 		// Remove some entities from the second level cache
 		for ( int i = 0; i < entityCount; i++ ) {
 			if ( !entitiesToPutInSecondLevelCache.contains( i ) ) {
-				sessionFactory.getCache().evict( model.getIndexedClass(), i );
+				setupHolder.sessionFactory().getCache().evict( model.getIndexedClass(), i );
 			}
 		}
 
