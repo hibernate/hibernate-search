@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
@@ -27,12 +26,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBindin
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * A very specific non-regression test for a case where Hibernate Search was erroneously considering
@@ -76,16 +76,17 @@ import org.junit.Test;
 @TestForIssue( jiraKey = "HSEARCH-3199")
 public class AutomaticIndexingOverReindexingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( Level1Entity.INDEX, b -> b
 				.field( "property1FromBridge", String.class )
 		);
@@ -96,18 +97,16 @@ public class AutomaticIndexingOverReindexingIT {
 					)
 		);
 
-		sessionFactory = ormSetupHelper.start()
-				.setup(
-						Level1Entity.class,
-						Level2Entity.class,
-						Level3Entity.class
-				);
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes(
+				Level1Entity.class,
+				Level2Entity.class,
+				Level3Entity.class
+		);
 	}
 
 	@Test
 	public void test() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			Level1Entity level1 = new Level1Entity();
 			level1.setId( 1 );
 
@@ -142,7 +141,7 @@ public class AutomaticIndexingOverReindexingIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value that should only affect level 2
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			Level3Entity level3 = session.get( Level3Entity.class, 3 );
 			level3.setProperty2( "updatedValue" );
 
@@ -157,7 +156,7 @@ public class AutomaticIndexingOverReindexingIT {
 
 		// Test updating the value that should only affect level 1
 		// This is what used to fail and we don't want to see regress: it used to reindex level 2 as well, for no good reason.
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			Level3Entity level3 = session.get( Level3Entity.class, 3 );
 			level3.setProperty1( "updatedValue" );
 

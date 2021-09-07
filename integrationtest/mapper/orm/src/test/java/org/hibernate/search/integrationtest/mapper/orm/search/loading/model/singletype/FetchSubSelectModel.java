@@ -68,6 +68,11 @@ final class FetchSubSelectModel extends SingleTypeLoadingModel<FetchSubSelectInd
 	}
 
 	@Override
+	public void clearContainedEager(FetchSubSelectIndexedEntity entity) {
+		entity.setContainedEager( null );
+	}
+
+	@Override
 	public List<?> getContainedLazy(FetchSubSelectIndexedEntity entity) {
 		return entity.getContainedLazy();
 	}

@@ -24,7 +24,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridge;
@@ -41,29 +40,31 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 
 public class ProgrammaticMappingSmokeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( OtherIndexedEntity.NAME, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
@@ -121,20 +122,18 @@ public class ProgrammaticMappingSmokeIT {
 				.field( "myLocalDateField", LocalDate.class )
 		);
 
-		sessionFactory = ormSetupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
-				.setup(
+		setupContext.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
+				.withAnnotatedTypes(
 						IndexedEntity.class,
 						ParentIndexedEntity.class,
 						OtherIndexedEntity.class,
 						YetAnotherIndexedEntity.class
 				);
-		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	public void index() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "this is text (1)" );
@@ -291,7 +290,7 @@ public class ProgrammaticMappingSmokeIT {
 
 	@Test
 	public void search() {
-		backendMock.inLenientMode( () -> OrmUtils.withinTransaction( sessionFactory, session -> {
+		backendMock.inLenientMode( () -> setupHolder.runInTransaction( session -> {
 			IndexedEntity entity0 = new IndexedEntity();
 			entity0.setId( 0 );
 			session.persist( entity0 );
@@ -300,7 +299,7 @@ public class ProgrammaticMappingSmokeIT {
 			session.persist( entity1 );
 		} ) );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			SearchQuery<ParentIndexedEntity> query = searchSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )

@@ -22,7 +22,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -47,14 +46,16 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSort;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test everything related to the search query itself.
@@ -73,30 +74,88 @@ public class SearchQueryBaseIT {
 	private static final String TITLE_AVENUE_OF_MYSTERIES = "Avenue of Mysteries";
 	private static final String AUTHOR_AVENUE_OF_MYSTERIES = "John Irving";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		backendMock.expectAnySchema( Book.NAME );
 		backendMock.expectAnySchema( Author.NAME );
 
-		sessionFactory = ormSetupHelper.start()
-				.setup( Book.class, Author.class );
+		setupContext.withAnnotatedTypes( Book.class, Author.class );
+		dataClearConfig.clearOrder( Book.class, Author.class );
+	}
+
+	@Before
+	public void initData() {
+		setupHolder.runInTransaction( session -> {
+			Author author4321 = new Author( 1, AUTHOR_4_3_2_1 );
+			Author authorCiderHouse = new Author( 2, AUTHOR_CIDER_HOUSE );
+			Author authorAvenueOfMysteries = new Author( 3, AUTHOR_AVENUE_OF_MYSTERIES );
+
+			Book book4321 = new Book( 1, TITLE_4_3_2_1 );
+			book4321.setAuthor( author4321 );
+			author4321.getBooks().add( book4321 );
+
+			Book bookCiderHouse = new Book( 2, TITLE_CIDER_HOUSE );
+			bookCiderHouse.setAuthor( authorCiderHouse );
+			authorCiderHouse.getBooks().add( bookCiderHouse );
+
+			Book bookAvenueOfMysteries = new Book( 3, TITLE_AVENUE_OF_MYSTERIES );
+			bookAvenueOfMysteries.setAuthor( authorAvenueOfMysteries );
+			authorAvenueOfMysteries.getBooks().add( bookAvenueOfMysteries );
+
+			session.persist( author4321 );
+			session.persist( authorCiderHouse );
+			session.persist( authorAvenueOfMysteries );
+			session.persist( book4321 );
+			session.persist( bookCiderHouse );
+			session.persist( bookAvenueOfMysteries );
+
+			backendMock.expectWorks( Book.NAME )
+					.add( "1", b -> b
+							.field( "title", TITLE_4_3_2_1 )
+							.objectField( "author", b2 -> b2
+									.field( "name", AUTHOR_4_3_2_1 )
+							)
+
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_CIDER_HOUSE )
+							.objectField( "author", b2 -> b2
+									.field( "name", AUTHOR_CIDER_HOUSE )
+							)
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_AVENUE_OF_MYSTERIES )
+							.objectField( "author", b2 -> b2
+									.field( "name", AUTHOR_CIDER_HOUSE )
+							)
+					);
+			backendMock.expectWorks( Author.NAME )
+					.add( "1", b -> b
+							.field( "name", AUTHOR_4_3_2_1 )
+					)
+					.add( "2", b -> b
+							.field( "name", AUTHOR_CIDER_HOUSE )
+					)
+					.add( "3", b -> b
+							.field( "name", AUTHOR_AVENUE_OF_MYSTERIES )
+					);
+		} );
 
 		backendMock.verifyExpectationsMet();
-
-		initData();
 	}
 
 	@Test
 	public void target_byClass_singleType() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -125,7 +184,7 @@ public class SearchQueryBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3896")
 	public void target_byClass_singleType_reuseQueryInstance() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -157,7 +216,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byClass_multipleTypes() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
@@ -183,7 +242,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byClass_multipleTypes_entityLoadingTimeout_clientSideTimeout() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			SlowerLoadingListener.registerSlowerLoadingListener( session, 100 );
 
@@ -210,7 +269,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byClass_multipleTypes_entityLoadingTimeout_jdbcTimeout() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			TimeoutLoadingListener.registerTimingOutLoadingListener( session );
 
@@ -237,7 +296,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byClass_invalidClass() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			Class<?> invalidClass = String.class;
@@ -250,7 +309,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byName_singleType() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( searchSession.scope( Book.class, Book.NAME ) )
@@ -278,7 +337,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byName_multipleTypes() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( searchSession.scope(
@@ -306,7 +365,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byName_invalidType() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			Class<?> invalidClass = String.class;
@@ -324,7 +383,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void target_byName_invalidName() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			String invalidName = "foo";
@@ -348,7 +407,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void selectEntity() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -377,7 +436,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void select_searchProjection_single() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
@@ -410,7 +469,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void select_searchProjection_multiple() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
@@ -476,7 +535,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void select_lambda() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
@@ -524,7 +583,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void select_compositeAndLoading() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
@@ -576,7 +635,7 @@ public class SearchQueryBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3671")
 	public void componentsFromMappingWithoutSession() {
-		SearchMapping mapping = Search.mapping( sessionFactory );
+		SearchMapping mapping = Search.mapping( setupHolder.sessionFactory() );
 		SearchScope<Book> scope = mapping.scope( Book.class );
 
 		/*
@@ -601,7 +660,7 @@ public class SearchQueryBaseIT {
 		 * so if a wrong object was passed, the whole query would fail.
 		 */
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "titleAgg" );
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<EntityReference> query = searchSession.search( scope )
@@ -628,66 +687,6 @@ public class SearchQueryBaseIT {
 					EntityReferenceImpl.withName( Book.class, Book.NAME, 3 )
 			);
 		} );
-	}
-
-	private void initData() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			Author author4321 = new Author( 1, AUTHOR_4_3_2_1 );
-			Author authorCiderHouse = new Author( 2, AUTHOR_CIDER_HOUSE );
-			Author authorAvenueOfMysteries = new Author( 3, AUTHOR_AVENUE_OF_MYSTERIES );
-
-			Book book4321 = new Book( 1, TITLE_4_3_2_1 );
-			book4321.setAuthor( author4321 );
-			author4321.getBooks().add( book4321 );
-
-			Book bookCiderHouse = new Book( 2, TITLE_CIDER_HOUSE );
-			bookCiderHouse.setAuthor( authorCiderHouse );
-			authorCiderHouse.getBooks().add( bookCiderHouse );
-
-			Book bookAvenueOfMysteries = new Book( 3, TITLE_AVENUE_OF_MYSTERIES );
-			bookAvenueOfMysteries.setAuthor( authorAvenueOfMysteries );
-			authorAvenueOfMysteries.getBooks().add( bookAvenueOfMysteries );
-
-			session.persist( author4321 );
-			session.persist( authorCiderHouse );
-			session.persist( authorAvenueOfMysteries );
-			session.persist( book4321 );
-			session.persist( bookCiderHouse );
-			session.persist( bookAvenueOfMysteries );
-
-			backendMock.expectWorks( Book.NAME )
-					.add( "1", b -> b
-							.field( "title", TITLE_4_3_2_1 )
-							.objectField( "author", b2 -> b2
-									.field( "name", AUTHOR_4_3_2_1 )
-							)
-
-					)
-					.add( "2", b -> b
-							.field( "title", TITLE_CIDER_HOUSE )
-							.objectField( "author", b2 -> b2
-									.field( "name", AUTHOR_CIDER_HOUSE )
-							)
-					)
-					.add( "3", b -> b
-							.field( "title", TITLE_AVENUE_OF_MYSTERIES )
-							.objectField( "author", b2 -> b2
-									.field( "name", AUTHOR_CIDER_HOUSE )
-							)
-					);
-			backendMock.expectWorks( Author.NAME )
-					.add( "1", b -> b
-							.field( "name", AUTHOR_4_3_2_1 )
-					)
-					.add( "2", b -> b
-							.field( "name", AUTHOR_CIDER_HOUSE )
-					)
-					.add( "3", b -> b
-							.field( "name", AUTHOR_AVENUE_OF_MYSTERIES )
-					);
-		} );
-
-		backendMock.verifyExpectationsMet();
 	}
 
 	@Entity(name = Book.NAME)

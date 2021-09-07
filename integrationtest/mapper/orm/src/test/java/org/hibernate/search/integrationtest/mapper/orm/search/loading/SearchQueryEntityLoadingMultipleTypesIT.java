@@ -52,13 +52,15 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test entity loading when executing a search query
@@ -66,12 +68,14 @@ import org.junit.Test;
  */
 public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQueryEntityLoadingIT {
 
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+
 	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	private SessionFactory sessionFactory;
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	@Override
 	protected BackendMock backendMock() {
@@ -80,11 +84,11 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return sessionFactory;
+		return setupHolder.sessionFactory();
 	}
 
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( Hierarchy1_A_B.NAME );
 		backendMock.expectAnySchema( Hierarchy1_A_C.NAME );
 
@@ -113,9 +117,8 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		backendMock.expectAnySchema( Hierarchy8_A_C_Cacheable.NAME );
 		backendMock.expectAnySchema( Hierarchy8_A_D_Cacheable.NAME );
 
-		sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
-				.setup(
+		setupContext.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
+				.withAnnotatedTypes(
 						Hierarchy1_A__Abstract.class,
 						Hierarchy1_A_B.class,
 						Hierarchy1_A_C.class,
@@ -145,10 +148,42 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						Hierarchy8_A_C_Cacheable.class,
 						Hierarchy8_A_D_Cacheable.class
 				);
+	}
 
-		backendMock.verifyExpectationsMet();
+	@Before
+	public void initData() {
+		// We don't care about what is indexed exactly, so use the lenient mode
+		backendMock.inLenientMode( () -> setupHolder.runInTransaction( session -> {
+			session.persist( new Hierarchy1_A_B( 2 ) );
+			session.persist( new Hierarchy1_A_C( 3 ) );
 
-		initData();
+			session.persist( new Hierarchy2_A__NonAbstract_Indexed( 1 ) );
+			session.persist( new Hierarchy2_A_B( 2 ) );
+			session.persist( new Hierarchy2_A_C( 3 ) );
+
+			session.persist( new Hierarchy3_A__NonAbstract_NonIndexed( 1 ) );
+			session.persist( new Hierarchy3_A_B( 2 ) );
+			session.persist( new Hierarchy3_A_C( 3 ) );
+
+			session.persist( new Hierarchy4_A__NonAbstract_NonIndexed( 1 ) );
+			session.persist( new Hierarchy4_A_B__integer1DocumentId( 2, 42 ) );
+			session.persist( new Hierarchy4_A_C__integer2DocumentId( 3, 43 ) );
+			session.persist( new Hierarchy4_A_D( 4 ) );
+
+			session.persist( new Hierarchy5_A_B_C( 3 ) );
+			session.persist( new Hierarchy5_A_B_D( 4 ) );
+
+			session.persist( new Hierarchy6_A_B_Cacheable( 2 ) );
+			session.persist( new Hierarchy6_A_C_Cacheable( 3 ) );
+
+			session.persist( new Hierarchy7_A_B( 2 ) );
+			session.persist( new Hierarchy7_A_C( 3 ) );
+			session.persist( new Hierarchy7_A_D( 4 ) );
+
+			session.persist( new Hierarchy8_A_B_Cacheable( 2 ) );
+			session.persist( new Hierarchy8_A_C_Cacheable( 3 ) );
+			session.persist( new Hierarchy8_A_D_Cacheable( 4 ) );
+		} ) );
 	}
 
 	/**
@@ -516,43 +551,6 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 				expectedLoadedEntitiesContributor,
 				(assertions, ignored) -> assertionsContributor.accept( assertions ),
 				timeout, timeUnit
-		);
-	}
-
-	private void initData() {
-		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () ->
-				OrmUtils.withinTransaction( sessionFactory, session -> {
-					session.persist( new Hierarchy1_A_B( 2 ) );
-					session.persist( new Hierarchy1_A_C( 3 ) );
-
-					session.persist( new Hierarchy2_A__NonAbstract_Indexed( 1 ) );
-					session.persist( new Hierarchy2_A_B( 2 ) );
-					session.persist( new Hierarchy2_A_C( 3 ) );
-
-					session.persist( new Hierarchy3_A__NonAbstract_NonIndexed( 1 ) );
-					session.persist( new Hierarchy3_A_B( 2 ) );
-					session.persist( new Hierarchy3_A_C( 3 ) );
-
-					session.persist( new Hierarchy4_A__NonAbstract_NonIndexed( 1 ) );
-					session.persist( new Hierarchy4_A_B__integer1DocumentId( 2, 42 ) );
-					session.persist( new Hierarchy4_A_C__integer2DocumentId( 3, 43 ) );
-					session.persist( new Hierarchy4_A_D( 4 ) );
-
-					session.persist( new Hierarchy5_A_B_C( 3 ) );
-					session.persist( new Hierarchy5_A_B_D( 4 ) );
-
-					session.persist( new Hierarchy6_A_B_Cacheable( 2 ) );
-					session.persist( new Hierarchy6_A_C_Cacheable( 3 ) );
-
-					session.persist( new Hierarchy7_A_B( 2 ) );
-					session.persist( new Hierarchy7_A_C( 3 ) );
-					session.persist( new Hierarchy7_A_D( 4 ) );
-
-					session.persist( new Hierarchy8_A_B_Cacheable( 2 ) );
-					session.persist( new Hierarchy8_A_C_Cacheable( 3 ) );
-					session.persist( new Hierarchy8_A_D_Cacheable( 4 ) );
-				} )
 		);
 	}
 

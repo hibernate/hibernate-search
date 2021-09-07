@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -21,28 +18,41 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test usage of the session indexing plan with an entity type whose document ID is not the entity ID.
  */
 public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
+
+		setupContext.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyName.NONE )
+				.withAnnotatedTypes( IndexedEntity.class );
+	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
 	public void simple() {
-		SessionFactory sessionFactory = setup();
-
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, 41, "number1" );
 			IndexedEntity entity2 = new IndexedEntity( 2, 42, "number2" );
 			IndexedEntity entity3 = new IndexedEntity( 3, 43, "number3" );
@@ -64,21 +74,6 @@ public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 					.delete( "47" );
 		} );
 		backendMock.verifyExpectationsMet();
-	}
-
-	private SessionFactory setup() {
-		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
-
-		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyName.NONE
-				)
-				.setup( IndexedEntity.class );
-
-		backendMock.verifyExpectationsMet();
-
-		return sessionFactory;
 	}
 
 	@Entity(name = "indexed")

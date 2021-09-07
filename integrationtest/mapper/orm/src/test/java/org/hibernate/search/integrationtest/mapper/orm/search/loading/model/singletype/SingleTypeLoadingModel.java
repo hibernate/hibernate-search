@@ -43,6 +43,8 @@ public abstract class SingleTypeLoadingModel<T> {
 
 	public abstract Object getContainedEager(T entity);
 
+	public abstract void clearContainedEager(T entity);
+
 	public abstract List<?> getContainedLazy(T entity);
 
 }

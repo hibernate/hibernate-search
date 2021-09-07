@@ -22,7 +22,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 
 	@Test
 	public void failure_single() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
 
@@ -42,7 +42,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 
 	@Test
 	public void failure_multiple() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
 
@@ -67,7 +67,7 @@ public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 
 	@Test
 	public void failure_exception() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
 

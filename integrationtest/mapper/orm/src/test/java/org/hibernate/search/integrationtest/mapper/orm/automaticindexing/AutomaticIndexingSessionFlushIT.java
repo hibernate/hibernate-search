@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -15,17 +14,18 @@ import javax.persistence.Id;
 
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Tests the impact of different kinds of {@link Session#flush()} on automatic indexing.
@@ -34,24 +34,24 @@ import org.junit.Test;
 @TestForIssue( jiraKey = "HSEARCH-3360" )
 public class AutomaticIndexingSessionFlushIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void before() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.INDEX_NAME );
-		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
 	public void onExplicitFlush() {
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			session.setHibernateFlushMode( FlushMode.AUTO );
 			session.persist( entity1 );
@@ -72,7 +72,7 @@ public class AutomaticIndexingSessionFlushIT {
 
 	@Test
 	public void onAutoFlush() {
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "number1" );
 			session.setHibernateFlushMode( FlushMode.AUTO );
 			session.persist( entity1 );
