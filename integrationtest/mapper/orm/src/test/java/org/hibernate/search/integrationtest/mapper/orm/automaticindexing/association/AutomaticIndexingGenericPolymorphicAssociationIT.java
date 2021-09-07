@@ -19,33 +19,34 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events when polymorphic associations using generics are involved.
  */
 public class AutomaticIndexingGenericPolymorphicAssociationIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "child", b3 -> b3
 						.objectField( "containedSingle", b2 -> b2
@@ -54,20 +55,20 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.start()
-				.setup(
-						IndexedEntity.class,
-						ContainingEntity.class,
-						MiddleContainingEntity.class,
-						UnrelatedContainingEntity.class,
-						ContainedEntity.class
-				);
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes(
+				IndexedEntity.class,
+				ContainingEntity.class,
+				MiddleContainingEntity.class,
+				UnrelatedContainingEntity.class,
+				ContainedEntity.class
+		);
+
+		dataClearConfig.clearOrder( IndexedEntity.class, ContainingEntity.class, ContainedEntity.class );
 	}
 
 	@Test
 	public void inversePathHandlesGenericTypes() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedEntity = new IndexedEntity();
 			indexedEntity.setId( 1 );
 
@@ -103,7 +104,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			@SuppressWarnings("unchecked")
 			ContainedEntity<MiddleContainingEntity> containedEntity = session.get( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
@@ -122,7 +123,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 
 	@Test
 	public void inversePathIgnoresUnrelatedTypes() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			UnrelatedContainingEntity unrelatedContainingEntity = new UnrelatedContainingEntity();
 			unrelatedContainingEntity.setId( 1 );
 
@@ -145,7 +146,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			@SuppressWarnings("unchecked")
 			ContainedEntity<UnrelatedContainingEntity> containedEntity = session.get( ContainedEntity.class, 2 );
 			containedEntity.setIncludedInSingle( "updatedValue" );

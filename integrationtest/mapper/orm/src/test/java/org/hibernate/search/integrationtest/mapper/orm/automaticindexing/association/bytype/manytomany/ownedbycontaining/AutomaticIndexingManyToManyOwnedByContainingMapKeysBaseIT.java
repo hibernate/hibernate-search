@@ -41,6 +41,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 
 /**
@@ -59,6 +60,18 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 
 	public AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT() {
 		super( new ModelPrimitivesImpl() );
+	}
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		dataClearConfig.preClear( ContainedEntity.class, contained -> {
+			contained.getContainingAsIndexedEmbedded().clear();
+			contained.getContainingAsNonIndexedEmbedded().clear();
+			contained.getContainingAsIndexedEmbeddedShallowReindexOnUpdate().clear();
+			contained.getContainingAsIndexedEmbeddedNoReindexOnUpdate().clear();
+			contained.getContainingAsUsedInCrossEntityDerivedProperty().clear();
+			contained.getContainingAsIndexedEmbeddedWithCast().clear();
+		} );
 	}
 
 	private static class ModelPrimitivesImpl
