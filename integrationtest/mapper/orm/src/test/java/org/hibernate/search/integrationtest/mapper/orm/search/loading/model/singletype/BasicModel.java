@@ -68,6 +68,11 @@ final class BasicModel extends SingleTypeLoadingModel<BasicIndexedEntity> {
 	}
 
 	@Override
+	public void clearContainedEager(BasicIndexedEntity entity) {
+		entity.setContainedEager( null );
+	}
+
+	@Override
 	public List<?> getContainedLazy(BasicIndexedEntity entity) {
 		return entity.getContainedLazy();
 	}

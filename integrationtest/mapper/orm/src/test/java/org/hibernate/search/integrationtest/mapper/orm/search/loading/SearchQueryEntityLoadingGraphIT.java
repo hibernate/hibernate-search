@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedA
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -22,11 +23,14 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -46,12 +50,14 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		return result;
 	}
 
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+
 	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	private SessionFactory sessionFactory;
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	public SearchQueryEntityLoadingGraphIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		super( model, mapping );
@@ -64,17 +70,25 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return sessionFactory;
+		return setupHolder.sessionFactory();
+	}
+
+	@ReusableOrmSetupHolder.SetupParams
+	public List<?> setupParams() {
+		return Arrays.asList( mapping, model );
+	}
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		backendMock.expectAnySchema( model.getIndexName() );
+		setupContext.withConfiguration( c -> mapping.configure( c, model ) );
+
+		dataClearConfig.preClear( model.getIndexedClass(), model::clearContainedEager );
+		dataClearConfig.clearOrder( model.getContainedClass(), model.getIndexedClass() );
 	}
 
 	@Before
-	public void setup() {
-		backendMock.expectAnySchema( model.getIndexName() );
-
-		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) ).setup();
-
-		backendMock.verifyExpectationsMet();
-
+	public void initData() {
 		// We don't care about what is indexed exactly, so use the lenient mode
 		backendMock.inLenientMode( () -> withinTransaction( sessionFactory(), session -> {
 			session.persist( model.newIndexedWithContained( 0, mapping ) );

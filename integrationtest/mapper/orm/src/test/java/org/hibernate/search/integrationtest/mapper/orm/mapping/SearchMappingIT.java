@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -35,11 +34,14 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
@@ -47,31 +49,35 @@ public class SearchMappingIT {
 
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock defaultBackendMock = new BackendMock();
+
+	@ClassRule
+	public static BackendMock backend2Mock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder;
+	static {
+		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
+		namedBackendMocks.put( BACKEND_2_NAME, backend2Mock );
+		setupHolder = ReusableOrmSetupHolder.withBackendMocks( defaultBackendMock, namedBackendMocks );
+	}
 
 	@Rule
-	public BackendMock backend2Mock = new BackendMock();
-
-	@Rule
-	public OrmSetupHelper ormSetupHelper;
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	private SearchMapping mapping;
 
-	public SearchMappingIT() {
-		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
-		namedBackendMocks.put( BACKEND_2_NAME, backend2Mock );
-		ormSetupHelper = OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks );
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		defaultBackendMock.expectAnySchema( Person.INDEX_NAME );
+		backend2Mock.expectAnySchema( Pet.JPA_ENTITY_NAME );
+		setupContext.withAnnotatedTypes( Person.class, Pet.class, Toy.class );
 	}
 
 	@Before
 	public void before() {
-		defaultBackendMock.expectAnySchema( Person.INDEX_NAME );
-		backend2Mock.expectAnySchema( Pet.JPA_ENTITY_NAME );
-		SessionFactory sessionFactory = ormSetupHelper.start().setup( Person.class, Pet.class, Toy.class );
-		defaultBackendMock.verifyExpectationsMet();
-		backend2Mock.verifyExpectationsMet();
-		mapping = Search.mapping( sessionFactory );
+		mapping = Search.mapping( setupHolder.sessionFactory() );
 	}
 
 	@Test

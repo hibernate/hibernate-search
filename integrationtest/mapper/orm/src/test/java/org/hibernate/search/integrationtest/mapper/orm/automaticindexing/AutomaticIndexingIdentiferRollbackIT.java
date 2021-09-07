@@ -7,25 +7,25 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test that Hibernate Search manages to delete entities even when {@code hibernate.use_identifier_rollback=true}.
@@ -34,30 +34,28 @@ import org.junit.Test;
 @PortedFromSearch5(original = "org.hibernate.search.test.engine.UsingIdentifierRollbackTest")
 public class AutomaticIndexingIdentiferRollbackIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void before() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( EntityWithJpaIdAsDocumentId.NAME );
 		backendMock.expectAnySchema( EntityWithNonJpaIdAsDocumentId.NAME );
-		sessionFactory = ormSetupHelper
-				.start()
-				.withProperty( AvailableSettings.USE_IDENTIFIER_ROLLBACK, "true" )
-				.setup( EntityWithJpaIdAsDocumentId.class, EntityWithNonJpaIdAsDocumentId.class );
-		backendMock.verifyExpectationsMet();
+		setupContext.withProperty( AvailableSettings.USE_IDENTIFIER_ROLLBACK, "true" )
+				.withAnnotatedTypes( EntityWithJpaIdAsDocumentId.class, EntityWithNonJpaIdAsDocumentId.class );
 	}
 
 	@Test
 	public void jpaIdAsDocumentId() {
 		AtomicReference<Integer> entity1Id = new AtomicReference<>();
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			EntityWithJpaIdAsDocumentId entity1 = new EntityWithJpaIdAsDocumentId();
 
 			session.persist( entity1 );
@@ -69,7 +67,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			EntityWithJpaIdAsDocumentId entity1 = session.getReference( EntityWithJpaIdAsDocumentId.class,
 					entity1Id.get() );
 
@@ -90,7 +88,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 	public void nonJpaIdAsDocumentId() {
 		AtomicReference<Integer> entity1Id = new AtomicReference<>();
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			EntityWithNonJpaIdAsDocumentId entity1 = new EntityWithNonJpaIdAsDocumentId();
 			entity1.setDocumentId( "document1" );
 
@@ -103,7 +101,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			EntityWithNonJpaIdAsDocumentId entity1 = session.getReference( EntityWithNonJpaIdAsDocumentId.class,
 					entity1Id.get() );
 

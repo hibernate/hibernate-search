@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,12 +20,14 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -44,12 +47,14 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		return result;
 	}
 
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+
 	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	private SessionFactory sessionFactory;
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	public SearchQueryEntityLoadingBaseIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		super( model, mapping );
@@ -62,16 +67,18 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 	@Override
 	protected SessionFactory sessionFactory() {
-		return sessionFactory;
+		return setupHolder.sessionFactory();
 	}
 
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.SetupParams
+	public List<?> setupParams() {
+		return Arrays.asList( mapping, model );
+	}
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( model.getIndexName() );
-
-		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) ).setup();
-
-		backendMock.verifyExpectationsMet();
+		setupContext.withConfiguration( c -> mapping.configure( c, model ) );
 	}
 
 	/**

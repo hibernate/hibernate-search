@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
@@ -23,24 +22,27 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 public class AutomaticIndexingConcurrentModificationInSameTypeIT {
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "firstName", String.class )
 				.field( "name", String.class )
@@ -50,12 +52,9 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.start().withProperty(
-				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-				AutomaticIndexingStrategyName.NONE
-		).setup( IndexedEntity.class );
-
-		backendMock.verifyExpectationsMet();
+		setupContext.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyName.NONE )
+				.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
@@ -80,7 +79,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 		entity1.setParent( entity2 );
 
 		// First transaction
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			session.persist( entity1 );
 			session.persist( entity2 );
 			session.persist( entity3 );
@@ -89,7 +88,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 		} );
 
 		// Second transaction
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 1 ) );
 			// Add another entity to the indexing plan so that we're not done iterating over all entities

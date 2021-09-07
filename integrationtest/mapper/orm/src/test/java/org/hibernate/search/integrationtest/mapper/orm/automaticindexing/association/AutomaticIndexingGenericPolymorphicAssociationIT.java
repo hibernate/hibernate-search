@@ -63,7 +63,8 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 				ContainedEntity.class
 		);
 
-		dataClearConfig.clearOrder( IndexedEntity.class, ContainingEntity.class, ContainedEntity.class );
+		dataClearConfig.clearOrder( IndexedEntity.class, ContainingEntity.class, MiddleContainingEntity.class,
+				UnrelatedContainingEntity.class, ContainedEntity.class );
 	}
 
 	@Test

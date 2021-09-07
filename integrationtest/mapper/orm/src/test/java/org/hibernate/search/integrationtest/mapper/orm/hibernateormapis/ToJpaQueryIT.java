@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -42,11 +41,14 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test the compatibility layer between our APIs and JPA APIs
@@ -54,23 +56,30 @@ import org.junit.Test;
  */
 public class ToJpaQueryIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private EntityManagerFactory entityManagerFactory;
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		backendMock.expectAnySchema( IndexedEntity.NAME );
+		setupContext.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
+				.withAnnotatedTypes( IndexedEntity.class, ContainedEntity.class );
+
+		dataClearConfig.preClear( ContainedEntity.class, c -> {
+			c.setContainingLazy( null );
+		} );
+		dataClearConfig.clearOrder( IndexedEntity.class, ContainedEntity.class );
+	}
 
 	@Before
-	public void setup() {
-		backendMock.expectAnySchema( IndexedEntity.NAME );
-		entityManagerFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
-				.setup( IndexedEntity.class, ContainedEntity.class );
-		backendMock.verifyExpectationsMet();
-
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+	public void initData() {
+		withinJPATransaction( setupHolder.entityManagerFactory(), entityManager -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );
@@ -131,7 +140,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void toJpaQuery() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -140,7 +149,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void getResultList() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -165,7 +174,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void getSingleResult() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -222,7 +231,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void pagination() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -249,7 +258,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_dsl() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -275,7 +284,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_jpaHint() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -298,7 +307,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_override() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -327,7 +336,7 @@ public class ToJpaQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_fetch() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -343,7 +352,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -364,7 +373,7 @@ public class ToJpaQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_load() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -380,7 +389,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -400,7 +409,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void graph_override_jpaHint() {
-		withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )

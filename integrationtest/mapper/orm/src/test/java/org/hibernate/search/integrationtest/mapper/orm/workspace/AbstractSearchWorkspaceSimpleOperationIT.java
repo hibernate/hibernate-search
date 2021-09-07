@@ -17,42 +17,54 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	private static final String BACKEND2_NAME = "stubBackend2";
 
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock defaultBackendMock = new BackendMock();
 
-	@Rule
-	public BackendMock backend2Mock = new BackendMock();
+	@ClassRule
+	public static BackendMock backend2Mock = new BackendMock();
 
-	@Rule
-	public OrmSetupHelper ormSetupHelper;
-
-	public AbstractSearchWorkspaceSimpleOperationIT() {
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder;
+	static {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
 		namedBackendMocks.put( BACKEND2_NAME, backend2Mock );
-		ormSetupHelper = OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks );
+		setupHolder = ReusableOrmSetupHolder.withBackendMocks( defaultBackendMock, namedBackendMocks );
 	}
 
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	@Rule
+	public StaticCounters counters = new StaticCounters();
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
+		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
+
+		setupContext.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class );
+	}
 
 	@Test
 	public void async_success() {
-		SessionFactory sessionFactory = setup();
-
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -69,9 +81,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Test
 	public void async_failure() {
-		SessionFactory sessionFactory = setup();
-
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -89,9 +99,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Test
 	public void sync_success() {
-		SessionFactory sessionFactory = setup();
-
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -105,9 +113,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Test
 	public void sync_failure() {
-		SessionFactory sessionFactory = setup();
-
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
@@ -125,9 +131,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Test
 	public void multiIndexMultiBackend() {
-		SessionFactory sessionFactory = setup();
-
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchWorkspace workspace = Search.session( session ).workspace();
 
 			CompletableFuture<Object> future1FromBackend = new CompletableFuture<>();
@@ -150,10 +154,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Test
 	public void outOfSession() {
-		SessionFactory sessionFactory = setup();
-
 		SearchWorkspace workspace;
-		try ( Session session = sessionFactory.openSession() ) {
+		try ( Session session = setupHolder.sessionFactory().openSession() ) {
 			workspace = Search.session( session ).workspace( IndexedEntity1.class );
 		}
 
@@ -170,9 +172,8 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Test
 	public void fromMappingWithoutSession() {
-		SessionFactory sessionFactory = setup();
-
-		SearchWorkspace workspace = Search.mapping( sessionFactory ).scope( IndexedEntity1.class ).workspace();
+		SearchWorkspace workspace = Search.mapping( setupHolder.sessionFactory() )
+				.scope( IndexedEntity1.class ).workspace();
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 		expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
@@ -190,19 +191,6 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	protected abstract void executeSync(SearchWorkspace workspace);
 
 	protected abstract CompletionStage<?> executeAsync(SearchWorkspace workspace);
-
-	private SessionFactory setup() {
-		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
-		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
-
-		SessionFactory sessionFactory = ormSetupHelper.start()
-				.setup( IndexedEntity1.class, IndexedEntity2.class );
-
-		defaultBackendMock.verifyExpectationsMet();
-		backend2Mock.verifyExpectationsMet();
-
-		return sessionFactory;
-	}
 
 	@Entity(name = "indexed1")
 	@Indexed(index = IndexedEntity1.INDEX_NAME)

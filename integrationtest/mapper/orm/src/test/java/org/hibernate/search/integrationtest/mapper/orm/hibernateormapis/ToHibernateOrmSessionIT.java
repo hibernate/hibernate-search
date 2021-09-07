@@ -8,14 +8,12 @@ package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinSession;
 
 import java.util.Arrays;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -26,11 +24,13 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test the compatibility layer between our APIs and Hibernate ORM APIs
@@ -38,30 +38,30 @@ import org.junit.Test;
  */
 public class ToHibernateOrmSessionIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
 	public void toHibernateOrmSessionFactory() {
-		SearchMapping searchMapping = Search.mapping( sessionFactory );
-		assertThat( searchMapping.toOrmSessionFactory() ).isSameAs( sessionFactory );
+		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
+		assertThat( searchMapping.toOrmSessionFactory() ).isSameAs( setupHolder.sessionFactory() );
 	}
 
 	@Test
 	public void toHibernateOrmSession() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			assertThat( searchSession.toOrmSession() ).isSameAs( session );
 		} );
@@ -70,7 +70,7 @@ public class ToHibernateOrmSessionIT {
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchSessionAfterOrmSessionIsClosed_noMatching() {
-		Session session = sessionFactory.openSession();
+		Session session = setupHolder.sessionFactory().openSession();
 		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -84,7 +84,7 @@ public class ToHibernateOrmSessionIT {
 
 	@Test
 	public void lazyCreateSearchSessionAfterOrmSessionIsClosed() {
-		Session session = sessionFactory.openSession();
+		Session session = setupHolder.sessionFactory().openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );
 		session.close();
@@ -97,7 +97,7 @@ public class ToHibernateOrmSessionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1857")
 	public void reuseSearchQueryAfterOrmSessionIsClosed() {
-		Session session = sessionFactory.openSession();
+		Session session = setupHolder.sessionFactory().openSession();
 		SearchSession searchSession = Search.session( session );
 		SearchQuery<IndexedEntity> query = createSimpleQuery( searchSession );
 		session.close();
