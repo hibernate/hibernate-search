@@ -28,7 +28,7 @@ class NativePersistenceRunner implements PersistenceRunner<Session, Transaction>
 	}
 
 	@Override
-	public <R> R apply(BiFunction<? super Session, ? super Transaction, R> action) {
+	public <R> R applyInTransaction(BiFunction<? super Session, ? super Transaction, R> action) {
 		return applyNoTransaction( session -> {
 			return OrmUtils.withinTransaction( session, tx -> { return action.apply( session, tx ); } );
 		} );

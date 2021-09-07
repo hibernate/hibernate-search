@@ -35,7 +35,7 @@ class JPAPersistenceRunner implements PersistenceRunner<EntityManager, EntityTra
 	}
 
 	@Override
-	public <R> R apply(BiFunction<? super EntityManager, ? super EntityTransaction, R> action) {
+	public <R> R applyInTransaction(BiFunction<? super EntityManager, ? super EntityTransaction, R> action) {
 		return applyNoTransaction( entityManager -> {
 			return OrmUtils.withinJPATransaction( entityManager, tx -> { return action.apply( entityManager, tx ); } );
 		} );

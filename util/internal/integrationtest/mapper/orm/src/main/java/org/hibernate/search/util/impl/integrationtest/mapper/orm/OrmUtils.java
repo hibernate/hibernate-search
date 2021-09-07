@@ -38,11 +38,11 @@ public final class OrmUtils {
 	}
 
 	public static void withinTransaction(SessionFactory sessionFactory, Consumer<Session> action) {
-		with( sessionFactory ).run( action );
+		with( sessionFactory ).runInTransaction( action );
 	}
 
 	public static void withinJPATransaction(EntityManagerFactory entityManagerFactory, Consumer<EntityManager> action) {
-		with( entityManagerFactory ).run( action );
+		with( entityManagerFactory ).runInTransaction( action );
 	}
 
 	public static void withinTransaction(Session session, Consumer<Transaction> action) {
