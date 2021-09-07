@@ -160,7 +160,7 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 		} );
 
 		// Make events visible one by one, so that they are processed in separate batches.
-		List<Long> eventIds = with( sessionFactory ).apply( outboxEventFinder::findOutboxEventIdsNoFilter );
+		List<Long> eventIds = with( sessionFactory ).applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
 		assertThat( eventIds ).hasSize( 2 );
 		for ( Long eventId : eventIds ) {
 			outboxEventFinder.showOnlyEvents( Collections.singletonList( eventId ) );
