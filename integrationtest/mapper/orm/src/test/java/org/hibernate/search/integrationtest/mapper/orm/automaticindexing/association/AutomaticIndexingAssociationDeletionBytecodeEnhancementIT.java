@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
 
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
@@ -23,10 +24,9 @@ import org.junit.runner.RunWith;
 public class AutomaticIndexingAssociationDeletionBytecodeEnhancementIT
 		extends AutomaticIndexingAssociationDeletionIT {
 
-	@Override
-	protected OrmSetupHelper.SetupContext configure(OrmSetupHelper.SetupContext ctx) {
-		return ctx
-				// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
-				.withTcclLookupPrecedenceBefore();
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
+		setupContext.withTcclLookupPrecedenceBefore();
 	}
 }
