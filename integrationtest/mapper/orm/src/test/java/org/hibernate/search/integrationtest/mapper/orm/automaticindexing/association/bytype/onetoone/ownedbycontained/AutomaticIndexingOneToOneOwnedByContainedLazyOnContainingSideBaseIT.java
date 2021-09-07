@@ -36,6 +36,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
@@ -62,11 +63,10 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 		super( new ModelPrimitivesImpl() );
 	}
 
-	@Override
-	protected OrmSetupHelper.SetupContext configure(OrmSetupHelper.SetupContext setupContext) {
-		return super.configure( setupContext )
-				// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
-				.withTcclLookupPrecedenceBefore();
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
+		setupContext.withTcclLookupPrecedenceBefore();
 	}
 
 	@Override
