@@ -106,9 +106,12 @@ public final class OrmSetupHelper
 			return thisAsC();
 		}
 
+		public SetupContext withAnnotatedTypes(Class<?> ... annotatedTypes) {
+			return withConfiguration( builder -> builder.addAnnotatedClasses( Arrays.asList( annotatedTypes ) ) );
+		}
+
 		public SessionFactory setup(Class<?> ... annotatedTypes) {
-			return withConfiguration( builder -> builder.addAnnotatedClasses( Arrays.asList( annotatedTypes ) ) )
-					.setup();
+			return withAnnotatedTypes( annotatedTypes ).setup();
 		}
 
 		@Override
