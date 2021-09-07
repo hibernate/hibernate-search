@@ -58,7 +58,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 
 	@Test
 	public void reproducer() {
-		with( sessionFactory ).run( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Book book = new Book();
 			book.setTitle( "The Caves Of Steel" );
 
@@ -133,7 +133,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	}
 
 	long countByEditionAndAuthor(String editionLabel, String authorName) {
-		return with( sessionFactory ).apply( session -> {
+		return with( sessionFactory ).applyInTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			return searchSession.search( Book.class )

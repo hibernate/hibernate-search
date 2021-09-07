@@ -31,21 +31,21 @@ public interface PersistenceRunner<C, T> {
 		} );
 	}
 
-	default <R> R apply(Function<? super C, R> action) {
-		return apply( (c, t) -> action.apply( c ) );
+	default <R> R applyInTransaction(Function<? super C, R> action) {
+		return applyInTransaction( (c, t) -> action.apply( c ) );
 	}
 
-	<R> R apply(BiFunction<? super C, ? super T, R> action);
+	<R> R applyInTransaction(BiFunction<? super C, ? super T, R> action);
 
-	default void run(Consumer<? super C> action) {
-		apply( c -> {
+	default void runInTransaction(Consumer<? super C> action) {
+		applyInTransaction( c -> {
 			action.accept( c );
 			return null;
 		} );
 	}
 
-	default void run(BiConsumer<? super C, T> action) {
-		apply( (c, t) -> {
+	default void runInTransaction(BiConsumer<? super C, T> action) {
+		applyInTransaction( (c, t) -> {
 			action.accept( c, t );
 			return null;
 		} );
