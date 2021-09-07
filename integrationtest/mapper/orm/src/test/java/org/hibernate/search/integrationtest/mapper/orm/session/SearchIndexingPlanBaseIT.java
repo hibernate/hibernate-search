@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,9 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -28,36 +26,60 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.After;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 @TestForIssue(jiraKey = "HSEARCH-3049")
 public class SearchIndexingPlanBaseIT {
 
 	private static final String BACKEND2_NAME = "stubBackend2";
 
-	@Rule
-	public BackendMock defaultBackendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock defaultBackendMock = new BackendMock();
 
-	@Rule
-	public BackendMock backend2Mock = new BackendMock();
+	@ClassRule
+	public static BackendMock backend2Mock = new BackendMock();
 
-	@Rule
-	public OrmSetupHelper ormSetupHelper;
-
-	public SearchIndexingPlanBaseIT() {
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder;
+	static {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
 		namedBackendMocks.put( BACKEND2_NAME, backend2Mock );
-		ormSetupHelper = OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks );
+		setupHolder = ReusableOrmSetupHolder.withBackendMocks( defaultBackendMock, namedBackendMocks );
+	}
+
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
+		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
+
+		setupContext.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class );
+	}
+
+	@After
+	public void resetListenerEnabled() {
+		listenerEnabled( true );
+	}
+
+	private void listenerEnabled(boolean enabled) {
+		HibernateOrmMapping mapping = ( (HibernateOrmMapping) Search.mapping( setupHolder.sessionFactory() ) );
+		mapping.listenerEnabled( enabled );
 	}
 
 	@Test
 	public void simple() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
 			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
@@ -83,9 +105,9 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void mergedEvents() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
 			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
@@ -158,11 +180,11 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void purgeByEntityClass_invalidClass() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
 		Class<?> invalidClass = String.class;
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			assertThatThrownBy(
 					() -> indexingPlan.purge( invalidClass, 42, null )
@@ -176,9 +198,9 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void purgeByEntityName() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			indexingPlan.purge( IndexedEntity1.NAME, 42, null ); // Does not exist in database, but may exist in the index
 
@@ -190,11 +212,11 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void purgeByEntityName_invalidName() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
 		String invalidName = "foo";
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			assertThatThrownBy(
 					() -> indexingPlan.purge( invalidName, 42, null )
@@ -218,9 +240,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void earlyProcess() {
-		SessionFactory sessionFactory = setup( true );
-
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
 
@@ -260,9 +280,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void earlyExecute() {
-		SessionFactory sessionFactory = setup( true );
-
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
 
@@ -295,9 +313,7 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void mixedExplicitAndAutomaticIndexing() {
-		SessionFactory sessionFactory = setup( true );
-
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity1 entity2 = new IndexedEntity1( 2, "number2" );
 
@@ -310,7 +326,7 @@ public class SearchIndexingPlanBaseIT {
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = session.getReference( IndexedEntity1.class, 1 );
 			IndexedEntity1 entity2 = session.getReference( IndexedEntity1.class, 2 );
 			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
@@ -333,9 +349,9 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void multiIndexMultiBackend() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
-		withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity1 entity1 = new IndexedEntity1( 1, "number1" );
 			IndexedEntity2 entity2 = new IndexedEntity2( 2, "number2" );
 			IndexedEntity1 entity3 = new IndexedEntity1( 3, "number3" );
@@ -361,11 +377,11 @@ public class SearchIndexingPlanBaseIT {
 
 	@Test
 	public void outOfSession() {
-		SessionFactory sessionFactory = setup( false );
+		listenerEnabled( false );
 
 		SearchIndexingPlan indexingPlan;
 		IndexedEntity1 entity;
-		try ( Session session = sessionFactory.openSession() ) {
+		try ( Session session = setupHolder.sessionFactory().openSession() ) {
 			entity = new IndexedEntity1( 1, "number1" );
 			session.persist( entity );
 			indexingPlan = Search.session( session ).indexingPlan();
@@ -394,20 +410,6 @@ public class SearchIndexingPlanBaseIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session is closed" );
-	}
-
-	private SessionFactory setup(boolean automaticIndexingStrategyEnabled) {
-		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
-		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
-
-		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, automaticIndexingStrategyEnabled )
-				.setup( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class );
-
-		defaultBackendMock.verifyExpectationsMet();
-		backend2Mock.verifyExpectationsMet();
-
-		return sessionFactory;
 	}
 
 	@Entity(name = IndexedEntity1.NAME)

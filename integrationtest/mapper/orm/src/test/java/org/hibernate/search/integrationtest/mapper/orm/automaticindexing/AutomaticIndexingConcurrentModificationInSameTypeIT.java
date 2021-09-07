@@ -11,30 +11,33 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 public class AutomaticIndexingConcurrentModificationInSameTypeIT {
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "firstName", String.class )
 				.field( "name", String.class )
@@ -44,12 +47,12 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class );
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
+	}
 
-		backendMock.verifyExpectationsMet();
-
-		// Data initialization
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+	@Before
+	public void initData() {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setName( "edouard" );
@@ -92,7 +95,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3857")
 	public void updateTriggeringReindexingOfPreviouslyUnknownEntity() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.load( IndexedEntity.class, 1 );
 			entity1.setName( "updated" );
 			// Add another entity to the indexing plan so that we're not done iterating over all entities

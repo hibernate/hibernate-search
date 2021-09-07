@@ -11,7 +11,6 @@ import static org.assertj.core.api.Fail.fail;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
@@ -22,11 +21,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
@@ -34,33 +35,34 @@ import org.junit.Test;
  */
 public class MassIndexingComplexHierarchyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
 
-		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
-				.setup(
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withAnnotatedTypes(
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
 						H2_A_NotIndexed.class, H2_A_C_Indexed.class,
 						H2_B_Indexed.class, H2_B_D_NotIndexed.class
 				);
+	}
 
-		backendMock.verifyExpectationsMet();
-
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+	@Before
+	public void initData() {
+		setupHolder.runInTransaction( session -> {
 			session.persist( new H1_Root_NotIndexed( 1 ) );
 			session.persist( new H1_A_NotIndexed( 2 ) );
 			session.persist( new H1_B_Indexed( 3 ) );
@@ -74,7 +76,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
@@ -101,7 +103,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
@@ -128,7 +130,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
@@ -171,7 +173,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 

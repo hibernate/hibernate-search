@@ -36,6 +36,11 @@ class FilteringOutboxEventFinder {
 	public FilteringOutboxEventFinder() {
 	}
 
+	public synchronized void reset() {
+		filter = true;
+		allowedIds.clear();
+	}
+
 	public OutboxEventFinderProvider provider() {
 		return new Provider();
 	}

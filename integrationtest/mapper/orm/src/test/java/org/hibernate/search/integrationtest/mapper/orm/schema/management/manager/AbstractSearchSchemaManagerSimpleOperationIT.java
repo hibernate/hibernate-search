@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
@@ -23,37 +22,36 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	protected SessionFactory sessionFactory;
-
-	@Before
-	public final void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( IndexedEntity1.NAME );
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
-		this.sessionFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-						SchemaManagementStrategyName.NONE
-				)
-				.setup( IndexedEntity1.class, IndexedEntity2.class );
+		setupContext.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+						SchemaManagementStrategyName.NONE )
+				.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class );
 	}
 
 	@Test
 	public void success_fromMapping_single() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( IndexedEntity1.class )
 				.schemaManager();
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -63,7 +61,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	public void success_fromMapping_all() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -74,7 +72,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	public void success_fromSession_single() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSchemaManager manager = Search.session( session )
 					.schemaManager( IndexedEntity1.class );
 			expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -85,7 +83,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	public void success_fromSession_all() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSchemaManager manager = Search.session( session )
 					.schemaManager();
 			expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
@@ -97,7 +95,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	public void exception_single() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
 
@@ -115,7 +113,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 	@Test
 	public void exception_multiple() {
-		SearchSchemaManager manager = Search.mapping( sessionFactory )
+		SearchSchemaManager manager = Search.mapping( setupHolder.sessionFactory() )
 				.scope( Object.class )
 				.schemaManager();
 

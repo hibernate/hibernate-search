@@ -8,8 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinSession;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +21,6 @@ import javax.persistence.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -37,10 +34,13 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
@@ -53,21 +53,24 @@ public class ToHibernateOrmScrollableResultsIT {
 	private static final int ENTITY_COUNT = 1000;
 	private static final int DEFAULT_FETCH_SIZE = 100;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		backendMock.expectAnySchema( IndexedEntity.NAME );
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
+	}
 
 	@Before
-	public void setup() {
-		backendMock.expectAnySchema( IndexedEntity.NAME );
-		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
-
-		backendMock.inLenientMode( () -> withinTransaction( sessionFactory, session -> {
+	public void initData() {
+		backendMock.inLenientMode( () -> setupHolder.runInTransaction( session -> {
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				IndexedEntity indexed = new IndexedEntity();
 				indexed.setId( i );
@@ -80,7 +83,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void next() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -129,7 +132,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void previous() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -186,7 +189,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void scrollMode_forwardsOnly() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll( ScrollMode.FORWARD_ONLY ) ) {
 				backendMock.verifyExpectationsMet();
@@ -205,7 +208,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void scrollMode_invalid() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			Query<IndexedEntity> query = createSimpleQuery( session );
 
 			assertThatThrownBy( () -> query.scroll( ScrollMode.SCROLL_SENSITIVE ) )
@@ -223,7 +226,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void fetchSize() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			int customFetchSize = 10;
 			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
 					customFetchSize, b -> { } );
@@ -270,7 +273,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void maxResults() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			int maxResults = 200;
 			Query<IndexedEntity> query = Search.toOrmQuery( Search.session( session )
 					.search( IndexedEntity.class )
@@ -316,7 +319,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void scroll() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -441,7 +444,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void scroll_backwards() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -498,7 +501,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void setRowNumber() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -593,7 +596,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void setRowNumber_backwards() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -636,7 +639,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void setRowNumber_relativeToEnd() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -679,7 +682,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void beforeFirst_fromBeforeFirst() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -718,7 +721,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void beforeFirst_fromFirstOrAfter() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -755,7 +758,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void first() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -810,7 +813,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void first_fromAfterFirst() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -841,7 +844,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void last() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -919,7 +922,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void afterLast_fromLastOrBefore() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -950,7 +953,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void afterLast_fromAfterLast() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -1012,7 +1015,7 @@ public class ToHibernateOrmScrollableResultsIT {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void close() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			expectScrollCreate();
 			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
 				backendMock.verifyExpectationsMet();
@@ -1053,7 +1056,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 	@Test
 	public void timeout() {
-		withinSession( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
 					DEFAULT_FETCH_SIZE, b -> b.failAfter( 200, TimeUnit.MILLISECONDS ) );
 			try ( ScrollableResults scroll = createSimpleQuery( session )

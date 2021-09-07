@@ -15,7 +15,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
@@ -27,11 +26,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 public class MassIndexingConditionalExpressionsIT {
 
@@ -50,16 +51,17 @@ public class MassIndexingConditionalExpressionsIT {
 	private static final String KEYWORD_B_1 = "b-1";
 	private static final String KEYWORD_B_2 = "b-2";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectAnySchema( H0_Indexed.NAME );
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
@@ -67,9 +69,9 @@ public class MassIndexingConditionalExpressionsIT {
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
 		backendMock.expectAnySchema( H3_A_Indexed.NAME );
 		backendMock.expectAnySchema( H3_B_Indexed.NAME );
-		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
-				.setup(
+
+		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
+				.withAnnotatedTypes(
 						H0_Indexed.class,
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
@@ -77,9 +79,11 @@ public class MassIndexingConditionalExpressionsIT {
 						H2_B_Indexed.class, H2_B_D_NotIndexed.class,
 						H3_Root.class, H3_A_Indexed.class, H3_B_Indexed.class
 				);
-		backendMock.verifyExpectationsMet();
+	}
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+	@Before
+	public void initData() {
+		setupHolder.runInTransaction( session -> {
 			session.persist( new H0_Indexed( 1, INSTANT_0, INT_0 ) );
 			session.persist( new H0_Indexed( 2, INSTANT_0, INT_2 ) );
 			session.persist( new H0_Indexed( 3, INSTANT_2, INT_0 ) );
@@ -128,7 +132,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void noHierarchy() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
 			indexer.type( H0_Indexed.class ).reindexOnly( "e.number = 2" );
@@ -154,7 +158,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void noHierarchy_withParams() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
 			indexer.type( H0_Indexed.class ).reindexOnly( "e.number < :number and e.moment > :moment" )
@@ -181,7 +185,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnRoot() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 			indexer.type( H1_Root_NotIndexed.class ).reindexOnly( "e.rootNumber = 2" );
@@ -211,7 +215,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_rootField() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
@@ -241,7 +245,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_subclassField() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.bNumber = 2" );
@@ -271,7 +275,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.bNumber = 2" );
@@ -301,7 +305,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
@@ -354,7 +358,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_withParams() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
@@ -406,7 +410,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
@@ -438,7 +442,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void sameFieldName_targetingEachClass() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
 
@@ -474,7 +478,7 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Test
 	public void sameFieldName_targetingInterface() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
 

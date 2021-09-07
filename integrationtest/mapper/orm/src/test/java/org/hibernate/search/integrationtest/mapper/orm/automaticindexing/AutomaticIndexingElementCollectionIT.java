@@ -15,19 +15,19 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events for element collections.
@@ -37,30 +37,29 @@ import org.junit.Test;
  */
 public class AutomaticIndexingElementCollectionIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "indexedElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 				.field( "shallowReindexOnUpdateElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 				.field( "noReindexOnUpdateElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 		);
 
-		sessionFactory = ormSetupHelper.start()
-				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
+		setupContext.withAnnotatedTypes( IndexedEntity.class );
 	}
 
 	@Test
 	public void directValueUpdate_indexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getIndexedElementCollectionField().add( "firstValue" );
@@ -78,7 +77,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
@@ -94,7 +93,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
@@ -119,7 +118,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directValueReplace_indexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getIndexedElementCollectionField().add( "firstValue" );
@@ -136,7 +135,7 @@ public class AutomaticIndexingElementCollectionIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -161,7 +160,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directValueUpdate_nonIndexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getNonIndexedElementCollectionField().add( "firstValue" );
@@ -174,7 +173,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getNonIndexedElementCollectionField().add( "secondValue" );
 
@@ -183,7 +182,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getNonIndexedElementCollectionField().remove( 1 );
 
@@ -202,7 +201,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void directValueReplace_nonIndexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getNonIndexedElementCollectionField().add( "firstValue" );
@@ -214,7 +213,7 @@ public class AutomaticIndexingElementCollectionIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setNonIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -237,7 +236,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directValueUpdate_shallowReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getShallowReindexOnUpdateElementCollectionField().add( "firstValue" );
@@ -252,7 +251,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getShallowReindexOnUpdateElementCollectionField().add( "secondValue" );
 
@@ -265,7 +264,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getShallowReindexOnUpdateElementCollectionField().remove( 1 );
 
@@ -290,7 +289,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directValueReplace_shallowReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getShallowReindexOnUpdateElementCollectionField().add( "firstValue" );
@@ -304,7 +303,7 @@ public class AutomaticIndexingElementCollectionIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setShallowReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"
@@ -326,7 +325,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void directValueUpdate_noReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getNoReindexOnUpdateElementCollectionField().add( "firstValue" );
@@ -341,7 +340,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getNoReindexOnUpdateElementCollectionField().add( "secondValue" );
 
@@ -350,7 +349,7 @@ public class AutomaticIndexingElementCollectionIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.getNoReindexOnUpdateElementCollectionField().remove( 1 );
 
@@ -369,7 +368,7 @@ public class AutomaticIndexingElementCollectionIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void directValueReplace_noReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.getNoReindexOnUpdateElementCollectionField().add( "firstValue" );
@@ -383,7 +382,7 @@ public class AutomaticIndexingElementCollectionIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setNoReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
 					"newFirstValue", "newSecondValue"

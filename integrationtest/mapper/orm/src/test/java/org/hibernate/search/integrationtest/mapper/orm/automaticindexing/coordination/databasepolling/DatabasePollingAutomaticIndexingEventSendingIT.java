@@ -18,7 +18,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -31,28 +30,31 @@ import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 public class DatabasePollingAutomaticIndexingEventSendingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	private static final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
-	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
@@ -74,45 +76,51 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 				.field( "nonIndexedEmbeddedText", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
-		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.processors.indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
-				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
+		setupContext.withProperty( "hibernate.search.coordination.processors.indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class );
-		backendMock.verifyExpectationsMet();
+
+		dataClearConfig.clearOrder( ContainedEntity.class, IndexedAndContainedEntity.class,
+				IndexedAndContainingEntity.class );
+	}
+
+	@Before
+	public void resetFilter() {
+		outboxEventFinder.reset();
 	}
 
 	@Test
 	public void insertUpdateDelete_indexed() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
 			session.delete( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
@@ -123,7 +131,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
 	public void insertUpdateDelete_contained() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -132,7 +140,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			session.persist( contained );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			// There *is* an event when a contained entity is created,
@@ -142,24 +150,24 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainingEntity.NAME, "1", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), ContainedEntity.NAME, "2", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
 			session.delete( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			// When a contained entity is deleted,
@@ -173,7 +181,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
 	public void insertUpdateDelete_indexedAndContained() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity indexedAndContained = new IndexedAndContainedEntity( 2, "initial" );
 			containing.setIndexedAndContained( indexedAndContained );
@@ -182,7 +190,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			session.persist( indexedAndContained );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
@@ -190,24 +198,24 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedAndContainedEntity.NAME, "2", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
 			session.delete( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 5 );
@@ -222,7 +230,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
 	public void updateIndexedEmbeddedField_contained() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -237,25 +245,25 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 						.field( "text", "initial" )
 						.objectField( "contained", b2 -> b2
 								.field( "text", "initial" ) ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
 		// Processing the update event should yield more events for containing entities
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
 				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
@@ -266,7 +274,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
 	public void updateIndexedEmbeddedField_indexedAndContained() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
 			containing.setIndexedAndContained( contained );
@@ -285,22 +293,22 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 				.add( "2", b -> b
 						.field( "text", "initial" )
 						.field( "nonIndexedEmbeddedText", "initial" ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.addOrUpdate( "2", b -> b
 						.field( "text", "updated" )
@@ -308,7 +316,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		backendMock.verifyExpectationsMet();
 		// Processing the update event should yield more events for containing entities
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).hasSize( 1 );
 				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1", null );
@@ -319,7 +327,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
 	public void updateNonIndexedEmbeddedField_contained() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -334,26 +342,26 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 						.field( "text", "initial" )
 						.objectField( "contained", b2 -> b2
 								.field( "text", "initial" ) ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
 
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
@@ -363,7 +371,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4141")
 	public void updateNonIndexedEmbeddedField_indexedAndContained() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
 			containing.setIndexedAndContained( contained );
@@ -382,22 +390,22 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 				.add( "2", b -> b
 						.field( "text", "initial" )
 						.field( "nonIndexedEmbeddedText", "initial" ) );
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
 
-		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.addOrUpdate( "2", b -> b
 						.field( "text", "initial" )
@@ -406,7 +414,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 				assertThat( outboxEntries ).isEmpty();
 			} );
@@ -417,12 +425,12 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 	public void multipleInstances() {
 		for ( int i = 1; i <= 7; i++ ) {
 			IndexedEntity indexedPojo = new IndexedEntity( i, "Using some text here" );
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				session.save( indexedPojo );
 			} );
 		}
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 7 );
@@ -434,17 +442,17 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	public void multipleTypes() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			AnotherIndexedEntity indexedPojo = new AnotherIndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
@@ -455,13 +463,13 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 
 	@Test
 	public void routingKeys() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here",
 					RoutedIndexedEntity.Status.FIRST );
 			session.save( indexedPojo );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
@@ -470,13 +478,13 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 					"FIRST" );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.load( RoutedIndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
 			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );

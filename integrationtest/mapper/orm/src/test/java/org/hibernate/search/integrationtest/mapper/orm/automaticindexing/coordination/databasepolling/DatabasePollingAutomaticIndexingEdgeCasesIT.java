@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -23,50 +21,55 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Extensive tests with edge cases for automatic indexing with {@link CoordinationStrategyNames#DATABASE_POLLING}.
  */
 public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	private static final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
-	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+	@ClassRule
+	public static BackendMock backendMock = new BackendMock();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder()
-			// Disable the filter by default: only some of the tests actually need it.
-			.enableFilter( false );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class )
 				.objectField( "contained", b2 -> b2
 						.field( "text", String.class ) ) );
 		backendMock.expectSchema( IndexedAndContainedEntity.NAME, b -> b
 				.field( "text", String.class ) );
-		sessionFactory = ormSetupHelper.start()
-				.withProperty(
-						"hibernate.search.coordination.processors.indexing.outbox_event_finder.provider",
-						outboxEventFinder.provider()
-				)
-				.setup( IndexedEntity.class, IndexedAndContainedEntity.class );
-		backendMock.verifyExpectationsMet();
+		setupContext
+				.withProperty( "hibernate.search.coordination.processors.indexing.outbox_event_finder.provider",
+						outboxEventFinder.provider() )
+				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class );
+	}
+
+	@Before
+	public void resetFilter() {
+		outboxEventFinder.reset();
+		// Disable the filter by default: only some of the tests actually need it.
+		outboxEventFinder.enableFilter( false );
 	}
 
 	@Test
 	public void multipleChangesSameTransaction() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue I" );
 			session.persist( entity1 );
 
@@ -108,7 +111,7 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 	public void massiveInsert() {
 		for ( int i = 0; i < 5; i++ ) {
 			int finalI = i;
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			setupHolder.runInTransaction( session -> {
 				BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
 
 				for ( int j = 0; j < 500; j++ ) {
@@ -131,7 +134,7 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 
 	@Test
 	public void addIndexedAndContained_addAndUpdateEventsProcessedInDifferentBatches() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity containing = new IndexedEntity( 1, "initialValue" );
 			session.persist( containing );
 			backendMock.expectWorks( IndexedEntity.NAME )
@@ -142,7 +145,7 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 
 		outboxEventFinder.enableFilter( true );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity containing = session.load( IndexedEntity.class, 1 );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initialValue" );
 			containing.setContained( contained );
@@ -160,11 +163,11 @@ public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 		} );
 
 		// Make events visible one by one, so that they are processed in separate batches.
-		List<Long> eventIds = with( sessionFactory ).applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
+		List<Long> eventIds = setupHolder.with().applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
 		assertThat( eventIds ).hasSize( 2 );
 		for ( Long eventId : eventIds ) {
 			outboxEventFinder.showOnlyEvents( Collections.singletonList( eventId ) );
-			outboxEventFinder.awaitUntilNoMoreVisibleEvents( sessionFactory );
+			outboxEventFinder.awaitUntilNoMoreVisibleEvents( setupHolder.sessionFactory() );
 		}
 
 		// If everything goes well, the above will have executed exactly one add work for "contained"
