@@ -85,6 +85,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 		private final List<Configuration<B, R>> configurations = new ArrayList<>();
 
+		private boolean setupCalled;
+
 		protected AbstractSetupContext() {
 		}
 
@@ -150,6 +152,11 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		 * @return The result of setting up Hibernate Search.
 		 */
 		public final R setup() {
+			if ( setupCalled ) {
+				throw new IllegalStateException( "SetupContext#setup() was called multiple times on the same context" );
+			}
+			setupCalled = true;
+
 			B builder = createBuilder();
 
 			configurations.forEach( c -> c.beforeBuild( builder ) );
