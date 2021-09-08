@@ -288,8 +288,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		@ManyToMany
 		@JoinTable(
 				name = "indexed_containedIndexedEmbedded",
-				joinColumns = @JoinColumn(name = "mapHolder"),
-				inverseJoinColumns = @JoinColumn(name = "value")
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained")
 		)
 		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
@@ -299,8 +299,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		@ManyToMany
 		@JoinTable(
 				name = "indexed_containedNonIndexedEmbedded",
-				joinColumns = @JoinColumn(name = "mapHolder"),
-				inverseJoinColumns = @JoinColumn(name = "value")
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained")
 		)
 		@MapKeyColumn(name = "map_key")
 		@SortNatural
@@ -309,8 +309,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		@ManyToMany
 		@JoinTable(
 				name = "indexed_containedIndexedEmbeddedShallowReindexOnUpdate",
-				joinColumns = @JoinColumn(name = "mapHolder"),
-				inverseJoinColumns = @JoinColumn(name = "value")
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained")
 		)
 		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
@@ -321,8 +321,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		@ManyToMany
 		@JoinTable(
 				name = "indexed_containedIndexedEmbeddedNoReindexOnUpdate",
-				joinColumns = @JoinColumn(name = "mapHolder"),
-				inverseJoinColumns = @JoinColumn(name = "value")
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained")
 		)
 		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
@@ -333,8 +333,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		@ManyToMany
 		@JoinTable(
 				name = "indexed_containedUsedInCrossEntityDerivedProperty",
-				joinColumns = @JoinColumn(name = "mapHolder"),
-				inverseJoinColumns = @JoinColumn(name = "value")
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained")
 		)
 		@MapKeyColumn(name = "map_key")
 		@SortNatural
@@ -343,8 +343,8 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		@ManyToMany(targetEntity = ContainedEntity.class)
 		@JoinTable(
 				name = "indexed_containedIndexedEmbeddedWithCast",
-				joinColumns = @JoinColumn(name = "mapHolder"),
-				inverseJoinColumns = @JoinColumn(name = "value")
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained")
 		)
 		@MapKeyColumn(name = "map_key")
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)

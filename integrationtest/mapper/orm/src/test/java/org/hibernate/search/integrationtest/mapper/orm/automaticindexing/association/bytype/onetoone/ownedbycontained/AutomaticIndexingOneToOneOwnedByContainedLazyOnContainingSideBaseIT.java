@@ -324,26 +324,22 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedShallowReindexOnUpdate", fetch = FetchType.LAZY)
 		@LazyToOne(LazyToOneOption.NO_PROXY) // Work around for HHH-13658 (which was only fixed in 5.5+)
-		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private ContainedEntity containedIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedNoReindexOnUpdate", fetch = FetchType.LAZY)
 		@LazyToOne(LazyToOneOption.NO_PROXY) // Work around for HHH-13658 (which was only fixed in 5.5+)
-		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne(mappedBy = "containingAsUsedInCrossEntityDerivedProperty", fetch = FetchType.LAZY)
 		@LazyToOne(LazyToOneOption.NO_PROXY) // Work around for HHH-13658 (which was only fixed in 5.5+)
-		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedWithCast", targetEntity = ContainedEntity.class, fetch = FetchType.LAZY)
 		@LazyToOne(LazyToOneOption.NO_PROXY) // Work around for HHH-13658 (which was only fixed in 5.5+)
-		@JoinColumn(name = "CIndexedEmbeddedCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
 
@@ -466,21 +462,27 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 		private Integer id;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbedded")
 		private ContainingEntity containingAsIndexedEmbedded;
 
 		@OneToOne
+		@JoinColumn(name = "CNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne
+		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(targetEntity = ContainingEntity.class)
+		@JoinColumn(name = "CIndexedEmbeddedCast")
 		private Object containingAsIndexedEmbeddedWithCast;
 
 		@Basic
