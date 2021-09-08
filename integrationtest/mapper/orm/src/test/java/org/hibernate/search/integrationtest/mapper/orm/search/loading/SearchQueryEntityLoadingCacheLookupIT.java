@@ -22,6 +22,8 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
@@ -53,6 +55,11 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	}
 
 	@Rule
+	public BackendMock backendMock = new BackendMock();
+
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+
+	@Rule
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy;
@@ -63,6 +70,16 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
 		super( model, mapping );
 		this.defaultCacheLookupStrategy = defaultCacheLookupStrategy;
+	}
+
+	@Override
+	protected BackendMock backendMock() {
+		return backendMock;
+	}
+
+	@Override
+	protected SessionFactory sessionFactory() {
+		return sessionFactory;
 	}
 
 	@Before
@@ -194,11 +211,6 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 				// Expect no DB statement since everything has been loaded
 				false
 		);
-	}
-
-	@Override
-	protected SessionFactory sessionFactory() {
-		return sessionFactory;
 	}
 
 	private void testLoadingCacheLookupExpectingSkipCacheLookup(
