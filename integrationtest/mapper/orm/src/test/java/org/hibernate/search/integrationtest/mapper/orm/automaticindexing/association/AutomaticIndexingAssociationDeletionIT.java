@@ -546,6 +546,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 
 		@IndexedEmbedded(includePaths = {"basic", "elementCollection"})
 		@ManyToMany(mappedBy = "manyToMany")
+		@OrderBy("id")
 		private List<AssociationOwner> manyToMany = new ArrayList<>();
 
 		AssociationNonOwner() {
