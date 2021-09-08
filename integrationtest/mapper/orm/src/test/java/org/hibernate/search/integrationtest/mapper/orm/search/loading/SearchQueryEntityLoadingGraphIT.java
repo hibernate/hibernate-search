@@ -19,10 +19,13 @@ import org.hibernate.graph.RootGraph;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,10 +46,25 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		return result;
 	}
 
+	@Rule
+	public BackendMock backendMock = new BackendMock();
+
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+
 	private SessionFactory sessionFactory;
 
 	public SearchQueryEntityLoadingGraphIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		super( model, mapping );
+	}
+
+	@Override
+	protected BackendMock backendMock() {
+		return backendMock;
+	}
+
+	@Override
+	protected SessionFactory sessionFactory() {
+		return sessionFactory;
 	}
 
 	@Before
@@ -187,11 +205,6 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		} ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'semantic' must not be null" );
-	}
-
-	@Override
-	protected SessionFactory sessionFactory() {
-		return sessionFactory;
 	}
 
 	private void testLoadingWithEntityGraph(String graphName, GraphSemantic graphSemantic,
