@@ -17,10 +17,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,10 +44,25 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		return result;
 	}
 
+	@Rule
+	public BackendMock backendMock = new BackendMock();
+
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+
 	private SessionFactory sessionFactory;
 
 	public SearchQueryEntityLoadingBaseIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		super( model, mapping );
+	}
+
+	@Override
+	protected BackendMock backendMock() {
+		return backendMock;
+	}
+
+	@Override
+	protected SessionFactory sessionFactory() {
+		return sessionFactory;
 	}
 
 	@Before
@@ -166,11 +184,6 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
-	}
-
-	@Override
-	protected SessionFactory sessionFactory() {
-		return sessionFactory;
 	}
 
 }
