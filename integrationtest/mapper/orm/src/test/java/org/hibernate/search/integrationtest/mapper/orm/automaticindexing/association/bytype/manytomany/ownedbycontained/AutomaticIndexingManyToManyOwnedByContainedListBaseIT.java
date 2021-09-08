@@ -273,26 +273,32 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		private ContainingEntity child;
 
 		@ManyToMany(mappedBy = "containingAsIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containingAsNonIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containingAsIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containingAsIndexedEmbeddedNoReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containingAsUsedInCrossEntityDerivedProperty")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(mappedBy = "containingAsIndexedEmbeddedWithCast", targetEntity = ContainedEntity.class)
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		private List<Object> containedIndexedEmbeddedWithCast = new ArrayList<>();
 
