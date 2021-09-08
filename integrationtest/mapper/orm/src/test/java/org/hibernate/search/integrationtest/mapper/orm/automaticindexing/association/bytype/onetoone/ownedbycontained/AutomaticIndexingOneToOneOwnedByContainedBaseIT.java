@@ -303,23 +303,19 @@ public class AutomaticIndexingOneToOneOwnedByContainedBaseIT
 		private ContainedEntity containedNonIndexedEmbedded;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedShallowReindexOnUpdate")
-		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private ContainedEntity containedIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedNoReindexOnUpdate")
-		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne(mappedBy = "containingAsUsedInCrossEntityDerivedProperty")
-		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(mappedBy = "containingAsIndexedEmbeddedWithCast", targetEntity = ContainedEntity.class)
-		@JoinColumn(name = "CIndexedEmbeddedCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
 
@@ -442,21 +438,27 @@ public class AutomaticIndexingOneToOneOwnedByContainedBaseIT
 		private Integer id;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbedded")
 		private ContainingEntity containingAsIndexedEmbedded;
 
 		@OneToOne
+		@JoinColumn(name = "CNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
 
 		@OneToOne
+		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
 
 		@OneToOne
+		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
 		@OneToOne(targetEntity = ContainingEntity.class)
+		@JoinColumn(name = "CIndexedEmbeddedCast")
 		private Object containingAsIndexedEmbeddedWithCast;
 
 		@Basic
