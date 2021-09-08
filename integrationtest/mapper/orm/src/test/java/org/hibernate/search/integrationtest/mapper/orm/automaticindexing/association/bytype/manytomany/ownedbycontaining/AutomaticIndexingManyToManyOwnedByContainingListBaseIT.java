@@ -273,37 +273,44 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 		private ContainingEntity child;
 
 		@ManyToMany
-		@JoinTable(name = "i_containedIndexedEmbedded")
+		@JoinTable(name = "i_containedIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedNonIndexedEmbedded", joinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"),
-			inverseJoinColumns = @JoinColumn(name = "containedNonIndexedEmbedded"))
+		@JoinTable(name = "i_containedNonIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedShallow",
-			inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedShallow"))
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedNoReindex",
-			inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedNoReindex"))
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedCrossEntityDP", joinColumns = @JoinColumn(name = "containingCrossEntityDP"),
-				inverseJoinColumns = @JoinColumn(name = "containedCrossEntityDP"))
+		@JoinTable(name = "i_containedCrossEntityDP",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
-		@JoinTable(name = "i_containedIndexedEmbeddedCast", joinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"),
-				inverseJoinColumns = @JoinColumn(name = "containedIndexedEmbeddedCast"))
+		@JoinTable(name = "i_containedIndexedEmbeddedCast",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		private List<Object> containedIndexedEmbeddedWithCast = new ArrayList<>();
 

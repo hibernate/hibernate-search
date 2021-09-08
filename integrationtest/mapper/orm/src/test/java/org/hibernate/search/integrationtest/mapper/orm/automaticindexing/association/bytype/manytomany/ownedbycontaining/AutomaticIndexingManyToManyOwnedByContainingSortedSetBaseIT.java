@@ -277,20 +277,24 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 		private ContainingEntity child;
 
 		@ManyToMany
-		@JoinTable(name = "i_containedIndexedEmbedded")
+		@JoinTable(name = "i_containedIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@SortNatural
 		private SortedSet<ContainedEntity> containedIndexedEmbedded = new TreeSet<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedNonIndexedEmbedded", joinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"),
-				inverseJoinColumns = @JoinColumn(name = "containedNonIndexedEmbedded"))
+		@JoinTable(name = "i_containedNonIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@SortNatural
 		private SortedSet<ContainedEntity> containedNonIndexedEmbedded = new TreeSet<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedShallow",
-				inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedShallow"))
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		@SortNatural
@@ -298,21 +302,24 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedNoReindex",
-				inverseJoinColumns = @JoinColumn(name = "indexedEmbeddedNoReindex"))
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		@SortNatural
 		private SortedSet<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new TreeSet<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedCrossEntityDP", joinColumns = @JoinColumn(name = "containingCrossEntityDP"),
-				inverseJoinColumns = @JoinColumn(name = "containedCrossEntityDP"))
+		@JoinTable(name = "i_containedCrossEntityDP",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@SortNatural
 		private SortedSet<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new TreeSet<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
-		@JoinTable(name = "i_containedIndexedEmbeddedCast", joinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"),
-				inverseJoinColumns = @JoinColumn(name = "containedIndexedEmbeddedCast"))
+		@JoinTable(name = "i_containedIndexedEmbeddedCast",
+				joinColumns = @JoinColumn(name = "containing"),
+				inverseJoinColumns = @JoinColumn(name = "contained"))
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		@SortNatural
 		private SortedSet<Object> containedIndexedEmbeddedWithCast = new TreeSet<>();

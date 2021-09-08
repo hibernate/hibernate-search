@@ -412,37 +412,44 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		private Integer id;
 
 		@ManyToMany
-		@JoinTable(name = "i_containedIndexedEmbedded")
+		@JoinTable(name = "i_containedIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedNonIndexedEmbedded", joinColumns = @JoinColumn(name = "containedNonIndexedEmbedded"),
-				inverseJoinColumns = @JoinColumn(name = "containingNonIndexedEmbedded"))
+		@JoinTable(name = "i_containedNonIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedShallow",
-				joinColumns = @JoinColumn(name = "indexedEmbeddedShallow"))
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedNoReindex",
-				joinColumns = @JoinColumn(name = "indexedEmbeddedNoReindex"))
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
-		@JoinTable(name = "i_containedCrossEntityDP", joinColumns = @JoinColumn(name = "containedCrossEntityDP"),
-				inverseJoinColumns = @JoinColumn(name = "containingCrossEntityDP"))
+		@JoinTable(name = "i_containedCrossEntityDP",
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(targetEntity = ContainingEntity.class)
-		@JoinTable(name = "i_containedIndexedEmbeddedCast", joinColumns = @JoinColumn(name = "containedIndexedEmbeddedCast"),
-				inverseJoinColumns = @JoinColumn(name = "containingIndexedEmbeddedCast"))
+		@JoinTable(name = "i_containedIndexedEmbeddedCast",
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
