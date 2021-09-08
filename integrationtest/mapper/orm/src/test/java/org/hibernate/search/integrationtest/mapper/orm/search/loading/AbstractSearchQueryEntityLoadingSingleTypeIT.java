@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +19,6 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends AbstractSearchQueryEntityLoadingIT {
 
@@ -41,7 +42,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 	protected final void persistThatManyEntities(int entityCount) {
 		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () -> OrmUtils.withinTransaction( sessionFactory(), session -> {
+		backendMock().inLenientMode( () -> withinTransaction( sessionFactory(), session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				session.persist( model.newIndexed( i, mapping ) );
 			}

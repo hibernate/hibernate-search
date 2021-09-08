@@ -28,18 +28,11 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
-
-import org.junit.Rule;
 
 public abstract class AbstractSearchQueryEntityLoadingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	protected abstract BackendMock backendMock();
 
 	protected abstract SessionFactory sessionFactory();
 
@@ -129,7 +122,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences,
 			Integer timeout, TimeUnit timeUnit) {
-		backendMock.expectSearchObjects(
+		backendMock().expectSearchObjects(
 				targetIndexes,
 				b -> {
 					if ( timeout != null && timeUnit != null ) {
