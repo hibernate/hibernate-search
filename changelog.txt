@@ -1,6 +1,122 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.0.Alpha1 (2021-09-09)
+-------------------------
+
+** Bug
+    * HSEARCH-4303 No automatic reindexing on insert/delete of contained entity without corresponding update in the containing entity
+    * HSEARCH-4254 AWS request signing producing an incorrect signature in very specific cases involving non-ascii characters
+    * HSEARCH-4239 Credentials error while mass indexing on AWS ES with static credentials: "The request signature we calculated does not match the signature you provided."
+    * HSEARCH-4236 No cleanup of threads, if an connection exception during mass indexation happens
+    * HSEARCH-4185 Return type of session.search() in mapper-javabean does not expose the entity type
+    * HSEARCH-4184 A contained entity with only irrelevant changes may mistakenly trigger reindexing
+    * HSEARCH-4183 SearchResult.took() returns incorrect, very large value with the Lucene backend
+    * HSEARCH-4173 Multi-index Elasticsearch query fails (sometimes silently) when field is present in only one index
+    * HSEARCH-4161 LuceneIndexManager.computeSizeInBytes() may fail if a file is deleted while computing size
+    * HSEARCH-4159 Hibernate Search doesn't properly execute the backend's preStop() operation on shutdown
+    * HSEARCH-4156 Hibernate Search incorrectly adds synthetic Hibernate ORM properties to the metamodel, ultimately leading to a bootstrap failure
+    * HSEARCH-4155 Deleting then re-inserting the same entity in a transaction does not result in an update
+    * HSEARCH-4152 "hibernate.search.backend.dynamic_mapping" is ignored
+    * HSEARCH-4150 Entity loading fails when using FetchMode.SUBSELECT
+    * HSEARCH-4137 Reindexing is skipped when a contained entity change follows a change that is irrelevant to indexing
+    * HSEARCH-4123 Default analyzer not applied by default on programmatic-defined full text fields
+    * HSEARCH-4117 "AssertionFailure: Unexpected duplicate key" when an entity has two getters for the same property
+
+** Improvement
+    * HSEARCH-4289 Ignore database-locked events in outbox automatic indexing processors
+    * HSEARCH-4287 Make processing of outbox events indifferent to processing order
+    * HSEARCH-4279 Upgrade to Hibernate ORM 5.5.6.Final
+    * HSEARCH-4275 Upgrade to Elasticsearch Client 7.13.4
+    * HSEARCH-4268 Configure coordination through a separate, orthogonal set of configuration properties
+    * HSEARCH-4243 Upgrade to Hibernate ORM 5.5.2.Final
+    * HSEARCH-4233 Upgrade to Hibernate ORM 5.5.0.Final
+    * HSEARCH-4230 Preserve the relative order of events for a given entity even in the case of retries
+    * HSEARCH-4229 Use a Long for OutboxEvent identifiers instead of Integer
+    * HSEARCH-4228 Ensure correct processing of events even if their IDs are out of order
+    * HSEARCH-4223 Outbox event background executor should stop as soon as Hibernate Search stops
+    * HSEARCH-4218 When mass indexing, wait for ID producing threads to finish
+    * HSEARCH-4214 hibernate.search.backend.version_check.enabled should be evaluated on backend startup
+    * HSEARCH-4213 Upgrade to Jackson 2.12.x
+    * HSEARCH-4208 Implement the id predicate using a TermInSetQuery instead of a BooleanQuery
+    * HSEARCH-4204 Expose the Elasticsearch index names in the metamodel API
+    * HSEARCH-4198 Transactional outbox event creation with Spring and JTA
+    * HSEARCH-4188 Preserve generic type arguments when casting type models during the mapping phase
+    * HSEARCH-4186 PojoIndexingQueueEventProcessingPlan should only deal with "previous" routes
+    * HSEARCH-4169 Upgrade to Lucene 8.8.1
+    * HSEARCH-4163 Improve behavior when using multi-tenancy in ORM but not in the backend
+    * HSEARCH-4151 Reuse the same Query instance when executing multiple queries during entity loading
+    * HSEARCH-4148 Polymorphic "derivedFrom" definition for derived properties
+    * HSEARCH-4142 Identifier projection
+    * HSEARCH-4141 Move the resolution of containing entities to reindex to background processes
+    * HSEARCH-4139 Rely on BitSet rather than Set<String> to track updated properties
+    * HSEARCH-4138 Avoid unnecessary memory allocations on entity updates
+    * HSEARCH-3880 Configurable QueryCache and QueryCachingPolicy in the Lucene backend
+    * HSEARCH-3878 Maximize utilization of database connections during mass indexing
+    * HSEARCH-3863 Specify a replacement for missing values in distance sorts
+    * HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
+    * HSEARCH-2599 Allow finer-grained configuration of the HTTP client for Elasticsearch
+    * HSEARCH-2589 Add syntactic sugar to the QueryDSL for simple multiple-term keyword matches
+
+** New Feature
+    * HSEARCH-4245 Explicit creation of DSL factories (SearchPredicateFactory, etc.) that accept relative paths
+    * HSEARCH-4231 Static sharding of automatic indexing outbox event queues
+    * HSEARCH-4215 SearchSession#isOpen() in the javabean mapper
+    * HSEARCH-4212 Official, documented compatibility with OpenSearch
+    * HSEARCH-4180 Mass indexing in mapper-javabean
+    * HSEARCH-4134 Implement background polling service that retrieves entity change events from an outbox table and reindexes (initial impl, assume 1 app instance)
+    * HSEARCH-4065 Expose Lucene's low-level IndexReader/IndexWriter through API
+    * HSEARCH-3934 Custom index settings for Elasticsearch indexes created by Hibernate Search
+    * HSEARCH-3884 Regexp predicates
+    * HSEARCH-3556 Configuration of the max window size in Elasticsearch
+    * HSEARCH-3325 NamedPredicates, similar to Hibernate Search 5's full-text filters
+    * HSEARCH-499 Allow to filter elements to be indexed when mass-indexing
+
+** Task
+    * HSEARCH-4312 Fix a few typos in the documentation
+    * HSEARCH-4310 Disable tests for dynamic BigDecimal fields on Elasticsearch 5.6
+    * HSEARCH-4309 Document deprecated/changed API/SPI/configuration in 6.1.0.Alpha1
+    * HSEARCH-4300 Fix build timeout after 1 hour when testing against DB2
+    * HSEARCH-4298 Fix unfinished sentence in schema management documentation
+    * HSEARCH-4296 Make sure assertion errors in background threads caused by unexpected works will fail a test
+    * HSEARCH-4292 Stop testing against Open Distro for Elasticsearch in local mode
+    * HSEARCH-4291 Remove invalid dependencies from hibernate-search-util-common
+    * HSEARCH-4288 Resume testing against MS SQL Server in CI
+    * HSEARCH-4284 Use a different JDK for running Maven than for compiling tests in JDK CI jobs
+    * HSEARCH-4281 Fix tests for outbox event processing using different databases
+    * HSEARCH-4278 Test against OpenSearch 1.0.0
+    * HSEARCH-4277 Upgrade to Awaitily 4.1.0
+    * HSEARCH-4276 Upgrade to the latest version of the Elasticsearch servers for tests
+    * HSEARCH-4274 Set up SSH config as part of the Jenkinsfile
+    * HSEARCH-4272 Restore the previous default of CacheMode.IGNORE in the mass indexer
+    * HSEARCH-4269 Fix assertion error on rollback being reported before the assertion error that triggered the rollback
+    * HSEARCH-4267 Fix variable interpolation in Jenkinsfile
+    * HSEARCH-4265 Fix flaky tests with MS-SQL and Oracle
+    * HSEARCH-4264 Disable extra database builds (postgres, oracle) by default for builds of topic branches in forks
+    * HSEARCH-4263 Switch to dockerhub to retrieve Elasticsearch container images
+    * HSEARCH-4260 Display Java version during builds
+    * HSEARCH-4257 Upgrade to JUnit 4.13.2
+    * HSEARCH-4255 Test Hibernate Search against JDK 18
+    * HSEARCH-4251 Clarify in the docs that Spring Boot requires that you prefix Hibernate Search properties with "spring.jpa.properties."
+    * HSEARCH-4250 Deprecate ElasticsearcAwsCredentialsProvider and make it extend a new ElasticsearchAwsCredentialsProvider
+    * HSEARCH-4249 Test AWS Elasticsearch Service 7.10
+    * HSEARCH-4248 Remove locks from ProgressiveCharBufferWriter 
+    * HSEARCH-4246 Upgrade jboss-logging 3.4.2.Final
+    * HSEARCH-4244 Migration guide from 6.0 to 6.1
+    * HSEARCH-4242 Test more databases
+    * HSEARCH-4237 Work around Surefire clearing the interrupt status when forwarding stdout/stderr
+
+** 
+    *  
+
+** Task
+    * HSEARCH-4235 Add support for Elasticsearch 7.13
+    * HSEARCH-4227 Safer work expectations in backend mock
+    * HSEARCH-4226 Stop testing against JDK15
+    * HSEARCH-4220 Remove horizontal scrolling from the reference documentation
+    * HSEARCH-4219 Upgrade to Hibernate ORM 5.4.31.Final
+    * HSEARCH-4217 Move code related to index schema representation to the engine from the Elasticsearch and Lucene backends
+
 6.0.0.Final (10-12-2020)
 -------------------------
 
