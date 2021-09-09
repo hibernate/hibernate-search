@@ -356,7 +356,12 @@ public final class HibernateOrmMapperSettings {
 
 		public static final boolean ENABLED = true;
 		public static final boolean AUTOMATIC_INDEXING_ENABLED = true;
-		@SuppressWarnings("deprecation")
+		/**
+		 * @deprecated Use the new configuration property instead:
+		 * {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY},
+		 * (caution: it expects a boolean value, and its default is {@link #ENABLED}).
+		 */
+		@Deprecated
 		public static final org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION;
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
