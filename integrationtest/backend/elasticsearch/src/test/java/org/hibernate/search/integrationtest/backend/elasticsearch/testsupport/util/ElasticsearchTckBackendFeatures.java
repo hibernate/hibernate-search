@@ -101,6 +101,12 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			// It's fixed in Elasticsearch 7.3, though.
 			return ! dialect.hasBugForBigIntegerValuesForDynamicField();
 		}
+		else if ( BigDecimal.class.equals( javaType ) ) {
+			// For some reason, ES 5.6 sometimes fails to index BigDecimal values
+			// in dynamic fields.
+			// See https://hibernate.atlassian.net/browse/HSEARCH-4310.
+			return ! dialect.hasBugForBigDecimalValuesForDynamicField();
+		}
 		else {
 			return true;
 		}

@@ -148,6 +148,11 @@ public class Elasticsearch710TestDialect implements ElasticsearchTestDialect {
 	}
 
 	@Override
+	public boolean hasBugForBigDecimalValuesForDynamicField() {
+		return false;
+	}
+
+	@Override
 	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
 		return true;
 	}
