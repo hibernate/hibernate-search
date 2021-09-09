@@ -148,6 +148,11 @@ public class Elasticsearch712TestDialect implements ElasticsearchTestDialect {
 	}
 
 	@Override
+	public boolean hasBugForBigDecimalValuesForDynamicField() {
+		return false;
+	}
+
+	@Override
 	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
 		// In ES 7.7 through 7.11, wildcard predicates on analyzed fields get their pattern normalized,
 		// but that was deemed a bug and fixed in 7.12.2+: https://github.com/elastic/elasticsearch/pull/53127

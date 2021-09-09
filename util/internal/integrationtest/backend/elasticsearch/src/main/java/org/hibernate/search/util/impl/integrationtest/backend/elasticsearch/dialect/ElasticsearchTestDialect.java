@@ -72,6 +72,8 @@ public interface ElasticsearchTestDialect {
 
 	boolean hasBugForBigIntegerValuesForDynamicField();
 
+	boolean hasBugForBigDecimalValuesForDynamicField();
+
 	boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField();
 
 	boolean supportsSkipOrLimitingTotalHitCount();

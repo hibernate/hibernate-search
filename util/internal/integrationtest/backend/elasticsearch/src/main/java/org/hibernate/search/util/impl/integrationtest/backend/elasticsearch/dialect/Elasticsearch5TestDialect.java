@@ -26,6 +26,11 @@ public class Elasticsearch5TestDialect extends Elasticsearch60TestDialect {
 	}
 
 	@Override
+	public boolean hasBugForBigDecimalValuesForDynamicField() {
+		return true;
+	}
+
+	@Override
 	public boolean supportMoreThan1024Terms() {
 		return false;
 	}
