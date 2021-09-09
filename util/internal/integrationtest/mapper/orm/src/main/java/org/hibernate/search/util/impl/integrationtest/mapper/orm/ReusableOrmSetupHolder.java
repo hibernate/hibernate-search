@@ -84,7 +84,7 @@ import org.jboss.logging.Logger;
  * </p>
  */
 public class ReusableOrmSetupHolder implements TestRule {
-	private static final Logger log = Logger.getLogger( SimpleSessionFactoryBuilder.class.getName() );
+	private static final Logger log = Logger.getLogger( ReusableOrmSetupHolder.class.getName() );
 
 	/**
 	 * When applied to a public instance method in a test,
