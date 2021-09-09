@@ -258,7 +258,7 @@ To implement this architecture, use the following Maven dependencies:
 [[architecture-examples-database-polling-elasticsearch-description]]
 ==== Description
 
-With Hibernate Search's <<coordination-database-polling>>,
+With Hibernate Search's <<coordination-database-polling,`database-polling` coordination strategy>>,
 entity change events are not processed immediately in the ORM session where they arise,
 but are pushed to a database table.
 

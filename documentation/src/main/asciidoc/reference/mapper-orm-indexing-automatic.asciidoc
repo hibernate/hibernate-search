@@ -102,7 +102,7 @@ include::components/writing-reading-intro-note.asciidoc[]
 ====
 Indexing synchronization is only relevant when <<coordination-none,coordination is disabled>>.
 
-With coordination strategies such as <<coordination-database-polling>>,
+With coordination strategies such as <<coordination-database-polling,`database-polling`>>,
 indexing happens in background threads and is always asynchronous.
 ====
 
@@ -135,10 +135,10 @@ Below is a reference of all available strategies and their guarantees.
 h|Changes applied (with or without <<concepts-commit-refresh,commit>>)
 h|Changes safe from crash/power loss (<<concepts-commit-refresh,commit>>)
 h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
-|Best|`async`|No guarantee|No guarantee|No guarantee
-|Medium|`write-sync` (**default**)|Guaranteed|Guaranteed|No guarantee
-|Medium to <<mapper-orm-indexing-automatic-synchronization-refresh-throughput,worst>>|`read-sync`|Guaranteed|No guarantee|Guaranteed
-|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>|`sync`|Guaranteed|Guaranteed|Guaranteed
+|`async`|Best|No guarantee|No guarantee|No guarantee
+|`write-sync` (**default**)|Medium|Guaranteed|Guaranteed|No guarantee
+|`read-sync`|Medium to <<mapper-orm-indexing-automatic-synchronization-refresh-throughput,worst>>|Guaranteed|No guarantee|Guaranteed
+|`sync`|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>|Guaranteed|Guaranteed|Guaranteed
 |====
 
 [[mapper-orm-indexing-automatic-synchronization-refresh-throughput]]
