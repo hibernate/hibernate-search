@@ -65,7 +65,7 @@ Hibernate Search Changelog
     * HSEARCH-4212 Official, documented compatibility with OpenSearch
     * HSEARCH-4180 Mass indexing in mapper-javabean
     * HSEARCH-4134 Implement background polling service that retrieves entity change events from an outbox table and reindexes (initial impl, assume 1 app instance)
-    * HSEARCH-4065 Expose Lucene's low-level IndexReader/IndexWriter through API
+    * HSEARCH-4065 Expose Lucene's low-level IndexReader through API
     * HSEARCH-3934 Custom index settings for Elasticsearch indexes created by Hibernate Search
     * HSEARCH-3884 Regexp predicates
     * HSEARCH-3556 Configuration of the max window size in Elasticsearch
