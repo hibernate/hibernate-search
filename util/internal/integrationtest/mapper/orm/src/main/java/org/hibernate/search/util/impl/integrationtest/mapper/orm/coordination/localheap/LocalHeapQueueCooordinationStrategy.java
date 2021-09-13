@@ -60,6 +60,11 @@ public class LocalHeapQueueCooordinationStrategy implements CooordinationStrateg
 	}
 
 	@Override
+	public CompletableFuture<?> completion() {
+		return executor.completion();
+	}
+
+	@Override
 	public CompletableFuture<?> preStop(CoordinationStrategyPreStopContext context) {
 		acceptEvents = false;
 		return executor.completion();

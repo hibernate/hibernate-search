@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.timing.Deadline;
@@ -30,7 +31,8 @@ public abstract class StubBackendBehavior {
 	protected StubBackendBehavior() {
 	}
 
-	public abstract void onCreateBackend(BackendBuildContext context);
+	public abstract void onCreateBackend(BackendBuildContext context,
+			CompletionStage<BackendMappingHandle> mappingHandlePromise);
 
 	public abstract void onStopBackend();
 

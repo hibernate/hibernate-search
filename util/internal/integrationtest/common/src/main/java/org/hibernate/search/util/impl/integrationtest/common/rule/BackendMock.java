@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
@@ -61,6 +63,7 @@ public class BackendMock implements TestRule {
 					if ( started ) {
 						resetExpectations();
 						started = false;
+						backendBehavior.resetBackends();
 					}
 				}
 			}
@@ -72,8 +75,8 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
-	public StubBackendFactory factory() {
-		return new StubBackendFactory( backendBehavior );
+	public StubBackendFactory factory(CompletionStage<BackendMappingHandle> mappingHandlePromise) {
+		return new StubBackendFactory( backendBehavior, mappingHandlePromise );
 	}
 
 	public void indexingWorkExpectations(BackendIndexingWorkExpectations expectations) {

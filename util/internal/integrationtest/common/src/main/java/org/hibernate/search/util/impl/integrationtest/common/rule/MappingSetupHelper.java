@@ -11,12 +11,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -41,7 +43,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	}
 
 	public C start() {
-		return backendSetupStrategy.start( createSetupContext(), configurationProvider );
+		C setupContext = createSetupContext();
+		return backendSetupStrategy.start( setupContext, configurationProvider, setupContext.backendMappingHandlePromise );
 	}
 
 	@Override
@@ -84,6 +87,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 	public abstract class AbstractSetupContext {
 
 		private final List<Configuration<B, R>> configurations = new ArrayList<>();
+		final CompletableFuture<BackendMappingHandle> backendMappingHandlePromise = new CompletableFuture<>();
 
 		private boolean setupCalled;
 
@@ -161,17 +165,28 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 			configurations.forEach( c -> c.beforeBuild( builder ) );
 
-			R result = build( builder );
-			toClose.add( result );
+			try {
+				R result = build( builder );
+				toClose.add( result );
+				backendMappingHandlePromise.complete( toBackendMappingHandle( result ) );
 
-			configurations.forEach( c -> c.afterBuild( result ) );
+				configurations.forEach( c -> c.afterBuild( result ) );
 
-			return result;
+				return result;
+			}
+			catch (Throwable t) {
+				// If the future was not complete, backendMock.verifyExpectationsMet()
+				// would assume there was some test setup issue; avoid that.
+				backendMappingHandlePromise.complete( null );
+				throw t;
+			}
 		}
 
 		protected abstract B createBuilder();
 
 		protected abstract R build(B builder);
+
+		protected abstract BackendMappingHandle toBackendMappingHandle(R result);
 
 		protected abstract C thisAsC();
 	}

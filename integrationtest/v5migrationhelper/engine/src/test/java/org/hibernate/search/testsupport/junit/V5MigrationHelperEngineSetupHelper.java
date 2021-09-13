@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMappingBuilder;
 import org.hibernate.search.testsupport.configuration.V5MigrationHelperTestLuceneBackendConfiguration;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class V5MigrationHelperEngineSetupHelper
@@ -96,6 +97,11 @@ public final class V5MigrationHelperEngineSetupHelper
 		@Override
 		protected CloseableSearchMapping build(SearchMappingBuilder builder) {
 			return builder.build();
+		}
+
+		@Override
+		protected BackendMappingHandle toBackendMappingHandle(CloseableSearchMapping result) {
+			return new V5MigrationHelperEngineMappingHandle();
 		}
 
 		@Override

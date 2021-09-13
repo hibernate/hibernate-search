@@ -20,6 +20,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class JavaBeanMappingSetupHelper
@@ -127,6 +128,11 @@ public final class JavaBeanMappingSetupHelper
 		@Override
 		protected CloseableSearchMapping build(SearchMappingBuilder builder) {
 			return builder.build();
+		}
+
+		@Override
+		protected BackendMappingHandle toBackendMappingHandle(CloseableSearchMapping result) {
+			return new JavaBeanMappingHandle();
 		}
 
 		@Override

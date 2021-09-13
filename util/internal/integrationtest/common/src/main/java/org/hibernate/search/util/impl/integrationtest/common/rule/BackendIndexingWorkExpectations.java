@@ -11,6 +11,7 @@ import static org.awaitility.Awaitility.await;
 import static org.awaitility.pollinterval.IterativePollInterval.iterative;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.util.common.impl.Throwables;
@@ -57,10 +58,24 @@ public final class BackendIndexingWorkExpectations {
 			}
 		}
 		else {
-			await().pollDelay( Duration.ZERO )
+			await( "Waiting for indexing assertions" )
+					.pollDelay( Duration.ZERO )
 					.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
 					.atMost( Duration.ofSeconds( 15 ) )
 					.untilAsserted( assertions );
+		}
+	}
+
+	public void awaitBackgroundIndexingCompletion(CompletableFuture<?> completion) {
+		if ( sync ) {
+			return;
+		}
+		else {
+			await( "Waiting for background process completion" )
+					.pollDelay( Duration.ZERO )
+					.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
+					.atMost( Duration.ofSeconds( 15 ) )
+					.until( completion::isDone );
 		}
 	}
 

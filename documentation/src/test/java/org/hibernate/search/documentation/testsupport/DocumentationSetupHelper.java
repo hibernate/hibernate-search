@@ -21,7 +21,9 @@ import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrateg
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
 public final class DocumentationSetupHelper
@@ -136,6 +138,11 @@ public final class DocumentationSetupHelper
 		@Override
 		protected SessionFactory build(SimpleSessionFactoryBuilder builder) {
 			return builder.build();
+		}
+
+		@Override
+		protected BackendMappingHandle toBackendMappingHandle(SessionFactory result) {
+			return new HibernateOrmMappingHandle( result );
 		}
 
 		@Override

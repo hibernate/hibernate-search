@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -15,12 +16,16 @@ import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.data.impl.Murmur3HashFunction;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Note the hash function / table implementations MUST NOT CHANGE,
 	// otherwise existing indexes will no longer work correctly.
@@ -83,6 +88,7 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 				}
 			}
 			currentSession.flush();
+			log.tracef( "Persisted %d outbox events: '%s'", events.size(), events );
 			return CompletableFuture.completedFuture( builder.build() );
 		}
 		finally {

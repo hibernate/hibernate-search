@@ -7,8 +7,10 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 class BackendMockSetupStrategy implements BackendSetupStrategy {
 	private final BackendMock defaultBackendMock;
@@ -21,12 +23,13 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 
 	@Override
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
-			TestConfigurationProvider configurationProvider) {
-		setupContext = setupContext.withBackendProperty( "type",
-				defaultBackendMock.factory() );
+			TestConfigurationProvider configurationProvider,
+			CompletionStage<BackendMappingHandle> mappingHandlePromise) {
+		setupContext = setupContext.withBackendProperty( "type", defaultBackendMock.factory( mappingHandlePromise ) );
 		for ( Map.Entry<String, BackendMock> entry : namedBackendMocks.entrySet() ) {
+			BackendMock backendMock = entry.getValue();
 			setupContext = setupContext.withBackendProperty( entry.getKey(),
-					"type", entry.getValue().factory() );
+					"type", backendMock.factory( mappingHandlePromise ) );
 		}
 		return setupContext;
 	}
