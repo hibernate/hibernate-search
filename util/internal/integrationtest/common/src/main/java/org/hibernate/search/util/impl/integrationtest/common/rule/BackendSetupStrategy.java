@@ -9,8 +9,10 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 import org.junit.rules.TestRule;
 
@@ -21,7 +23,8 @@ public interface BackendSetupStrategy {
 	}
 
 	<C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
-			TestConfigurationProvider configurationProvider);
+			TestConfigurationProvider configurationProvider,
+			CompletionStage<BackendMappingHandle> mappingHandlePromise);
 
 	static BackendSetupStrategy withSingleBackendMock(BackendMock defaultBackendMock) {
 		return new BackendMockSetupStrategy( defaultBackendMock, Collections.emptyMap() );

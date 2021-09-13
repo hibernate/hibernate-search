@@ -7,16 +7,18 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 
 public class StubBackend implements BackendImplementor, Backend {
@@ -26,11 +28,12 @@ public class StubBackend implements BackendImplementor, Backend {
 	private final TimingSource timingSource;
 
 	StubBackend(EventContext eventContext, BackendBuildContext context, StubBackendBehavior behavior,
+			CompletionStage<BackendMappingHandle> mappingHandlePromise,
 			TimingSource timingSource) {
 		this.eventContext = eventContext;
 		this.behavior = behavior;
 		this.timingSource = timingSource;
-		behavior.onCreateBackend( context );
+		behavior.onCreateBackend( context, mappingHandlePromise );
 	}
 
 	@Override

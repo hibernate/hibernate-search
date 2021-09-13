@@ -42,6 +42,12 @@ public interface CooordinationStrategy {
 	CompletableFuture<?> start(CoordinationStrategyStartContext context);
 
 	/**
+	 * @return A future that completes when all works submitted to background executors so far are completely executed.
+	 * Works submitted to the executors after entering this method may delay the wait.
+	 */
+	CompletableFuture<?> completion();
+
+	/**
 	 * Prepares for {@link #stop()},
 	 * executing any operations that need to be executed before shutdown.
 	 * <p>

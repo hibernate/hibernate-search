@@ -26,6 +26,12 @@ public class NoCoordinationStrategy implements CooordinationStrategy {
 	}
 
 	@Override
+	public CompletableFuture<?> completion() {
+		// Nothing operation in progress
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
 	public CompletableFuture<?> preStop(CoordinationStrategyPreStopContext context) {
 		// Nothing to do
 		return CompletableFuture.completedFuture( null );

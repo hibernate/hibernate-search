@@ -74,6 +74,10 @@ public class OutboxEventBackgroundProcessor {
 		processingTask.ensureScheduled();
 	}
 
+	public CompletableFuture<?> completion() {
+		return processingTask.completion();
+	}
+
 	public CompletableFuture<?> preStop() {
 		status.set( Status.STOPPED );
 		return processingTask.completion();

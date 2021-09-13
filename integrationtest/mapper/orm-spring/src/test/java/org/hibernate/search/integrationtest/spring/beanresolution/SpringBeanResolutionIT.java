@@ -12,16 +12,20 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -37,12 +41,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,12 +66,19 @@ public class SpringBeanResolutionIT {
 	@EntityScan
 	@ComponentScan(basePackageClasses = SpringBeanResolutionIT.class)
 	public static class SpringConfig {
+		private final CompletableFuture<BackendMappingHandle> mappingHandlePromise = new CompletableFuture<>();
+
 		@Bean
 		public HibernatePropertiesCustomizer backendMockPropertiesCustomizer(ApplicationContext applicationContext) {
 			BackendMock backendMock = applicationContext.getEnvironment()
 					.getProperty( "test.backendMock", BackendMock.class );
 			return hibernateProperties ->
-					hibernateProperties.put( "hibernate.search.backend.type", backendMock.factory() );
+					hibernateProperties.put( "hibernate.search.backend.type", backendMock.factory( mappingHandlePromise ) );
+		}
+
+		@EventListener(ApplicationReadyEvent.class)
+		public void initBackendMappingHandle(ApplicationReadyEvent event) {
+			mappingHandlePromise.complete( new HibernateOrmMappingHandle( event.getApplicationContext().getBean( SessionFactory.class ) ) );
 		}
 	}
 

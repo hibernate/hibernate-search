@@ -24,6 +24,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
@@ -174,6 +175,11 @@ public final class OrmSetupHelper
 		@Override
 		protected SessionFactory build(SimpleSessionFactoryBuilder builder) {
 			return builder.build();
+		}
+
+		@Override
+		protected BackendMappingHandle toBackendMappingHandle(SessionFactory result) {
+			return new HibernateOrmMappingHandle( result );
 		}
 
 		@Override

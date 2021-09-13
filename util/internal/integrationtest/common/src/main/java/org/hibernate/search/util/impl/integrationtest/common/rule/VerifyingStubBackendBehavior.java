@@ -16,9 +16,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.timing.Deadline;
@@ -31,6 +33,7 @@ import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -44,6 +47,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Supplier<BackendIndexingWorkExpectations> indexingWorkExpectationsSupplier;
+	private final List<CompletionStage<BackendMappingHandle>> mappingHandlePromises = new ArrayList<>();
 
 	private final CallQueue.Settings indexingCallQueueSettings;
 	private final CallQueue.Settings nonIndexingCallQueueSettings;
@@ -165,6 +169,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return nextScrollCalls;
 	}
 
+	public void resetBackends() {
+		mappingHandlePromises.clear();
+	}
+
 	void resetExpectations() {
 		indexFieldAddBehaviors.clear();
 		createBackendBehaviors.clear();
@@ -186,15 +194,17 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	void verifyExpectationsMet() {
+		BackendIndexingWorkExpectations indexingWorkExpectations = indexingWorkExpectationsSupplier.get();
+
 		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		indexScaleWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
-		indexingWorkExpectationsSupplier.get().awaitIndexingAssertions(
+		indexingWorkExpectations.awaitIndexingAssertions(
 				() -> documentWorkCreateCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		indexingWorkExpectationsSupplier.get().awaitIndexingAssertions(
+		indexingWorkExpectations.awaitIndexingAssertions(
 				() -> documentWorkDiscardCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		indexingWorkExpectationsSupplier.get().awaitIndexingAssertions(
+		indexingWorkExpectations.awaitIndexingAssertions(
 				() -> documentWorkExecuteCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
 		searchCalls.verifyExpectationsMet();
 		countCalls.verifyExpectationsMet();
@@ -204,13 +214,49 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		scrollCalls.verifyExpectationsMet();
 		closeScrollCalls.verifyExpectationsMet();
 		nextScrollCalls.verifyExpectationsMet();
+
+		if ( indexingWorkExpectations.allowDuplicateIndexing() ) {
+			// Wait for async processing to finish, so that all duplicate indexing works
+			// are executed *before the test makes any other change* to entities.
+			// This is to avoid this scenario:
+			// - test executes transaction T1: makes changes, pushes a few change events to a queue
+			// - test verifies indexing (waits for indexing to happen)
+			// - HSearch processes the first few events, indexes entity A
+			// - test resumes
+			// - test executes transaction T2:
+			//   makes changes to entity B in such a way that it wouldn't normally trigger reindexing of A
+			//   (e.g. ReindexOnUpdate.SHALLOW, or asymmetric association updates, ...)
+			// - HSearch starts processing the next few events, reindexes entity A... with the new content!
+			// - test fails because we never expected reindexing of A with the new content.
+			//   We did expect A to be indexed, potentially multiple times, but with its old content from T1.
+			indexingWorkExpectations.awaitBackgroundIndexingCompletion( CompletableFuture.allOf(
+					backendMappingHandles()
+							.map( BackendMappingHandle::backgroundIndexingCompletion )
+							.toArray( CompletableFuture[]::new )
+			) );
+		}
+	}
+
+	private Stream<BackendMappingHandle> backendMappingHandles() {
+		return mappingHandlePromises.stream()
+				.map( CompletionStage::toCompletableFuture )
+				.map( future -> {
+					if ( !future.isDone() ) {
+						throw new IllegalStateException( "Future " + future + " was not completed as expected" );
+					}
+					return future.getNow( null );
+				} )
+				// The handle may be null if startup failed
+				.filter( Objects::nonNull );
 	}
 
 	@Override
-	public void onCreateBackend(BackendBuildContext context) {
+	public void onCreateBackend(BackendBuildContext context,
+			CompletionStage<BackendMappingHandle> mappingHandlePromise) {
 		for ( ParameterizedCallBehavior<BackendBuildContext, Void> behavior : createBackendBehaviors ) {
 			behavior.execute( context );
 		}
+		mappingHandlePromises.add( mappingHandlePromise );
 	}
 
 	@Override

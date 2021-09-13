@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -51,7 +53,9 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 
 	@Override
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
-			TestConfigurationProvider configurationProvider) {
+			TestConfigurationProvider configurationProvider,
+			// The mapping handle is not used by actual backends (only by BackendMock).
+			CompletionStage<BackendMappingHandle> mappingHandlePromise) {
 		if ( defaultBackendConfiguration != null ) {
 			setupContext = defaultBackendConfiguration.setup( setupContext, null, configurationProvider );
 		}

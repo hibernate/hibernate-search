@@ -316,6 +316,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		this.listenerEnabled = enabled;
 	}
 
+	// For tests
+	public CompletableFuture<?> backgroundIndexingCompletion() {
+		return coordinationStrategyHolder.get().completion();
+	}
+
 	@Override
 	public PojoIndexingPlan currentIndexingPlan(SessionImplementor session,
 			boolean createIfDoesNotExist) {

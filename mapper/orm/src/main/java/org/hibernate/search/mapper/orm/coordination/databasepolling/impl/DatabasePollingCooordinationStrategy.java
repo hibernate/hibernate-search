@@ -188,6 +188,21 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 	}
 
 	@Override
+	public CompletableFuture<?> completion() {
+		if ( indexingProcessors == null ) {
+			// Nothing to do
+			return CompletableFuture.completedFuture( null );
+		}
+		CompletableFuture<?>[] futures = new CompletableFuture[assignedShardIndices.size()];
+		int i = 0;
+		for ( int shardIndex : assignedShardIndices ) {
+			futures[i] = indexingProcessors.get( shardIndex ).completion();
+			i++;
+		}
+		return CompletableFuture.allOf( futures );
+	}
+
+	@Override
 	public CompletableFuture<?> preStop(CoordinationStrategyPreStopContext context) {
 		if ( indexingProcessors == null ) {
 			// Nothing to do

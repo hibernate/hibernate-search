@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -38,7 +39,9 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
@@ -83,7 +86,8 @@ public class HibernateOrmIntegrationBooterIT {
 	@Test
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void twoPhaseBoot() throws Exception {
-		HibernateOrmIntegrationBooter booter = createBooter( IndexedEntity.class );
+		CompletableFuture<BackendMappingHandle> mappingHandlePromise = new CompletableFuture<>();
+		HibernateOrmIntegrationBooter booter = createBooter( mappingHandlePromise, IndexedEntity.class );
 		Map<String, Object> booterGeneratedProperties = new LinkedHashMap<>();
 
 		// Pre-booting should lead to a schema definition in the backend.
@@ -121,6 +125,8 @@ public class HibernateOrmIntegrationBooterIT {
 		backendMock.expectSchemaManagementWorks( INDEX_NAME )
 				.work( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE );
 		try ( SessionFactory sessionFactory = builder.build() ) {
+			mappingHandlePromise.complete( new HibernateOrmMappingHandle( sessionFactory ) );
+
 			/*
 			 * Building the session should NOT lead to a second schema creation in the backend:
 			 * that would mean the pre-boot was ignored...
@@ -146,13 +152,14 @@ public class HibernateOrmIntegrationBooterIT {
 		}
 	}
 
-	private HibernateOrmIntegrationBooter createBooter(Class<?> ... entityClasses) {
+	private HibernateOrmIntegrationBooter createBooter(CompletableFuture<BackendMappingHandle> mappingHandlePromise,
+			Class<?> ... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 
 		// Configure the backend
 		registryBuilder.applySetting(
 				EngineSettings.BACKEND + "." + BackendSettings.TYPE,
-				backendMock.factory()
+				backendMock.factory( mappingHandlePromise )
 		);
 
 		StandardServiceRegistry serviceRegistry = registryBuilder.build();
