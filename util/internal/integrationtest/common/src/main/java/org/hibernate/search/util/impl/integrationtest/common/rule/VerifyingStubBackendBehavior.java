@@ -43,7 +43,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
-	private final Supplier<BackendIndexingWorkExpectations> indexingWorkThreadingExpectationsSupplier;
+	private final Supplier<BackendIndexingWorkExpectations> indexingWorkExpectationsSupplier;
+
+	private final CallQueue.Settings indexingCallQueueSettings;
+	private final CallQueue.Settings nonIndexingCallQueueSettings;
 
 	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new ConcurrentHashMap<>();
 
@@ -61,22 +64,35 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	private final Map<DocumentKey, CallQueue<DocumentWorkDiscardCall>> documentWorkDiscardCalls = new ConcurrentHashMap<>();
 	private final Map<DocumentKey, CallQueue<DocumentWorkExecuteCall>> documentWorkExecuteCalls = new ConcurrentHashMap<>();
 
-	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
-
-	private final CallQueue<CountWorkCall> countCalls = new CallQueue<>();
-
-	private final CallQueue<ScrollWorkCall<?>> scrollCalls = new CallQueue<>();
-
-	private final CallQueue<CloseScrollWorkCall> closeScrollCalls = new CallQueue<>();
-
-	private final CallQueue<NextScrollWorkCall<?>> nextScrollCalls = new CallQueue<>();
+	private final CallQueue<SearchWorkCall<?>> searchCalls;
+	private final CallQueue<CountWorkCall> countCalls;
+	private final CallQueue<ScrollWorkCall<?>> scrollCalls;
+	private final CallQueue<CloseScrollWorkCall> closeScrollCalls;
+	private final CallQueue<NextScrollWorkCall<?>> nextScrollCalls;
 
 	private volatile boolean lenient = false;
 
 	private volatile boolean ignoreSchema = false;
 
-	VerifyingStubBackendBehavior(Supplier<BackendIndexingWorkExpectations> indexingWorkThreadingExpectationsSupplier) {
-		this.indexingWorkThreadingExpectationsSupplier = indexingWorkThreadingExpectationsSupplier;
+	VerifyingStubBackendBehavior(Supplier<BackendIndexingWorkExpectations> indexingWorkExpectationsSupplier) {
+		this.indexingWorkExpectationsSupplier = indexingWorkExpectationsSupplier;
+		indexingCallQueueSettings = new CallQueue.Settings() {
+			@Override
+			public boolean allowDuplicates() {
+				return indexingWorkExpectationsSupplier.get().allowDuplicateIndexing();
+			}
+		};
+		nonIndexingCallQueueSettings = new CallQueue.Settings() {
+			@Override
+			public boolean allowDuplicates() {
+				return false;
+			}
+		};
+		this.searchCalls = new CallQueue<>( nonIndexingCallQueueSettings );
+		this.countCalls = new CallQueue<>( nonIndexingCallQueueSettings );
+		this.scrollCalls = new CallQueue<>( nonIndexingCallQueueSettings );
+		this.closeScrollCalls = new CallQueue<>( nonIndexingCallQueueSettings );
+		this.nextScrollCalls = new CallQueue<>( nonIndexingCallQueueSettings );
 	}
 
 	void lenient(boolean lenient) {
@@ -100,27 +116,33 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	CallQueue<SchemaDefinitionCall> getSchemaDefinitionCalls(String indexName) {
-		return schemaDefinitionCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+		return schemaDefinitionCalls.computeIfAbsent( indexName,
+				ignored -> new CallQueue<>( nonIndexingCallQueueSettings ) );
 	}
 
 	CallQueue<SchemaManagementWorkCall> getSchemaManagementWorkCalls(String indexName) {
-		return schemaManagementWorkCall.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+		return schemaManagementWorkCall.computeIfAbsent( indexName,
+				ignored -> new CallQueue<>( nonIndexingCallQueueSettings ) );
 	}
 
 	CallQueue<DocumentWorkCreateCall> getDocumentWorkCreateCalls(DocumentKey documentKey) {
-		return documentWorkCreateCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
+		return documentWorkCreateCalls.computeIfAbsent( documentKey,
+				ignored -> new CallQueue<>( indexingCallQueueSettings ) );
 	}
 
 	CallQueue<DocumentWorkDiscardCall> getDocumentWorkDiscardCalls(DocumentKey documentKey) {
-		return documentWorkDiscardCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
+		return documentWorkDiscardCalls.computeIfAbsent( documentKey,
+				ignored -> new CallQueue<>( indexingCallQueueSettings ) );
 	}
 
 	CallQueue<DocumentWorkExecuteCall> getDocumentWorkExecuteCalls(DocumentKey documentKey) {
-		return documentWorkExecuteCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
+		return documentWorkExecuteCalls.computeIfAbsent( documentKey,
+				ignored -> new CallQueue<>( indexingCallQueueSettings ) );
 	}
 
 	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls(String indexName) {
-		return indexScaleWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+		return indexScaleWorkCalls.computeIfAbsent( indexName,
+				ignored -> new CallQueue<>( nonIndexingCallQueueSettings ) );
 	}
 
 	CallQueue<SearchWorkCall<?>> getSearchWorkCalls() {
@@ -168,11 +190,11 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		indexScaleWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
-		indexingWorkThreadingExpectationsSupplier.get().awaitIndexingAssertions(
+		indexingWorkExpectationsSupplier.get().awaitIndexingAssertions(
 				() -> documentWorkCreateCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		indexingWorkThreadingExpectationsSupplier.get().awaitIndexingAssertions(
+		indexingWorkExpectationsSupplier.get().awaitIndexingAssertions(
 				() -> documentWorkDiscardCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		indexingWorkThreadingExpectationsSupplier.get().awaitIndexingAssertions(
+		indexingWorkExpectationsSupplier.get().awaitIndexingAssertions(
 				() -> documentWorkExecuteCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
 		searchCalls.verifyExpectationsMet();
 		countCalls.verifyExpectationsMet();
@@ -232,7 +254,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void createDocumentWork(String indexName, StubDocumentWork work) {
-		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
+		indexingWorkExpectationsSupplier.get().checkCurrentThread( work );
 		DocumentWorkCreateCall call = new DocumentWorkCreateCall( indexName, work );
 		CallQueue<DocumentWorkCreateCall> callQueue = getDocumentWorkCreateCalls( call.documentKey() );
 		callQueue.verify( call, DocumentWorkCreateCall::verify, noExpectationsBehavior( () -> null ) );
@@ -240,7 +262,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void discardDocumentWork(String indexName, StubDocumentWork work) {
-		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
+		indexingWorkExpectationsSupplier.get().checkCurrentThread( work );
 		DocumentWorkDiscardCall call = new DocumentWorkDiscardCall( indexName, work );
 		CallQueue<DocumentWorkDiscardCall> callQueue = getDocumentWorkDiscardCalls( call.documentKey() );
 		callQueue.verify( call, DocumentWorkDiscardCall::verify, noExpectationsBehavior( () -> null ) );
@@ -248,7 +270,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
-		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
+		indexingWorkExpectationsSupplier.get().checkCurrentThread( work );
 		DocumentWorkExecuteCall call = new DocumentWorkExecuteCall( indexName, work );
 		CallQueue<DocumentWorkExecuteCall> callQueue = getDocumentWorkExecuteCalls( call.documentKey() );
 		return callQueue.verify( call, DocumentWorkExecuteCall::verify,

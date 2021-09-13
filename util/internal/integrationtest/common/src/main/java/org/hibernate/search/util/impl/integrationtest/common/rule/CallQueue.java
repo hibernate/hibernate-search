@@ -25,14 +25,28 @@ public class CallQueue<C extends Call<? super C>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public interface Settings {
+		boolean allowDuplicates();
+	}
+
+	private final Settings settings;
+
 	private final Deque<C> callsExpectedInOrder = new LinkedList<>();
+	private C lastMatchingCallInOrder;
 	private final List<C> callsExpectedOutOfOrder = new ArrayList<>();
+	private final List<C> lastMatchingCallsOutOfOrder = new ArrayList<>();
 	private C lastMatchingCall;
 	private volatile AssertionError lastVerifyFailure;
 
+	public CallQueue(Settings settings) {
+		this.settings = settings;
+	}
+
 	public void reset() {
 		callsExpectedInOrder.clear();
+		lastMatchingCallInOrder = null;
 		callsExpectedOutOfOrder.clear();
+		lastMatchingCallsOutOfOrder.clear();
 		lastMatchingCall = null;
 		lastVerifyFailure = null;
 	}
@@ -61,52 +75,42 @@ public class CallQueue<C extends Call<? super C>> {
 
 	private synchronized <C2 extends C, T> T tryVerify(C2 actualCall, BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
 			Function<C2, T> noExpectationBehavior) {
-		if ( callsExpectedInOrder.isEmpty() && callsExpectedOutOfOrder.isEmpty() ) {
-			return noExpectationBehavior.apply( actualCall );
-		}
+		boolean allowDuplicates = settings.allowDuplicates();
 
+		CallBehavior<T> behavior;
 		List<AssertionError> matchingErrors = new ArrayList<>();
 
 		// First try to match against the calls expected in order
-		if ( !callsExpectedInOrder.isEmpty() ) {
-			C expectedCall = callsExpectedInOrder.getFirst();
-			CallBehavior<T> behavior = null;
-			try {
-				behavior = callVerifyFunction.apply( expectedCall, actualCall );
-			}
-			catch (AssertionError e) {
-				// No match. Save the error for later and check the out-of-order expected calls.
-				matchingErrors.add( e );
-			}
+		behavior = tryMatchInOrder( callsExpectedInOrder, actualCall, callVerifyFunction, matchingErrors );
+		if ( behavior != null ) {
+			return behavior.execute();
+		}
+
+		// If the above failed, try to match against the calls expected out of order
+		behavior = tryMatchOutOfOrder( callsExpectedOutOfOrder, actualCall, callVerifyFunction, matchingErrors );
+		if ( behavior != null ) {
+			return behavior.execute();
+		}
+
+		// Maybe this is just a duplicate call?
+		// If duplicate calls are allowed, try to match against last matching calls.
+		if ( allowDuplicates ) {
+			behavior = tryMatchInOrder( lastMatchingCallInOrder, actualCall, callVerifyFunction, matchingErrors );
 			if ( behavior != null ) {
-				// MATCH! Stop looking for a matching call.
-				callsExpectedInOrder.remove( expectedCall );
-				lastMatchingCall = expectedCall;
+				return behavior.execute();
+			}
+
+			behavior = tryMatchOutOfOrder( lastMatchingCallsOutOfOrder, actualCall, callVerifyFunction, matchingErrors );
+			if ( behavior != null ) {
 				return behavior.execute();
 			}
 		}
 
-		// If the above failed, try to match against the calls expected out of order
-		if ( !callsExpectedOutOfOrder.isEmpty() ) {
-			for ( C expectedCall : callsExpectedOutOfOrder ) {
-				if ( expectedCall.isSimilarTo( actualCall ) ) {
-					// The call looks similar, let's try to match against it...
-					CallBehavior<T> behavior = null;
-					try {
-						behavior = callVerifyFunction.apply( expectedCall, actualCall );
-					}
-					catch (AssertionError e) {
-						// No match. Save the error for later and continue the loop.
-						matchingErrors.add( e );
-					}
-					if ( behavior != null ) {
-						// MATCH! Stop looking for a matching call.
-						callsExpectedOutOfOrder.remove( expectedCall );
-						lastMatchingCall = expectedCall;
-						return behavior.execute();
-					}
-				}
-			}
+		if ( callsExpectedInOrder.isEmpty() && callsExpectedOutOfOrder.isEmpty() ) {
+			// No match, not even "duplicate" call matches,
+			// but then there were no expectations to begin with.
+			// Just apply "noExpectationBehavior".
+			return noExpectationBehavior.apply( actualCall );
 		}
 
 		if ( !matchingErrors.isEmpty() ) {
@@ -124,6 +128,68 @@ public class CallQueue<C extends Call<? super C>> {
 			// We didn't find any similar call
 			throw createFailure( "Unexpected call: " + actualCall );
 		}
+	}
+
+	private <C2 extends C, T> CallBehavior<T> tryMatchInOrder(Deque<C> callsExpected, C2 actualCall,
+			BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
+			List<AssertionError> matchingErrors) {
+		if ( callsExpected.isEmpty() ) {
+			return null;
+		}
+		return tryMatchInOrder( callsExpected.getFirst(), actualCall, callVerifyFunction, matchingErrors );
+	}
+
+	private <C2 extends C, T> CallBehavior<T> tryMatchInOrder(C expectedCall, C2 actualCall,
+			BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
+			List<AssertionError> matchingErrors) {
+		if ( expectedCall == null ) {
+			return null;
+		}
+		CallBehavior<T> behavior = null;
+		try {
+			behavior = callVerifyFunction.apply( expectedCall, actualCall );
+		}
+		catch (AssertionError e) {
+			// No match. Save the error for later and check the out-of-order expected calls.
+			matchingErrors.add( e );
+		}
+		if ( behavior != null ) {
+			// MATCH! Stop looking for a matching call.
+			callsExpectedInOrder.remove( expectedCall );
+			lastMatchingCallInOrder = expectedCall;
+			lastMatchingCall = expectedCall;
+			return behavior;
+		}
+		return null;
+	}
+
+	private <C2 extends C, T> CallBehavior<T> tryMatchOutOfOrder(List<C> callsExpected, C2 actualCall,
+			BiFunction<C, C2, CallBehavior<T>> callVerifyFunction,
+			List<AssertionError> matchingErrors) {
+		if ( callsExpected.isEmpty() ) {
+			return null;
+		}
+		for ( C expectedCall : callsExpected ) {
+			if ( expectedCall.isSimilarTo( actualCall ) ) {
+				// The call looks similar, let's try to match against it...
+				CallBehavior<T> behavior = null;
+				try {
+					behavior = callVerifyFunction.apply( expectedCall, actualCall );
+				}
+				catch (AssertionError e) {
+					// No match. Save the error for later and continue the loop.
+					matchingErrors.add( e );
+				}
+				if ( behavior != null ) {
+					// MATCH! Stop looking for a matching call.
+					callsExpected.remove( expectedCall );
+					lastMatchingCallsOutOfOrder.add( expectedCall );
+					lastMatchingCall = expectedCall;
+					return behavior;
+				}
+			}
+		}
+		return null;
 	}
 
 	private AssertionError createFailure(String message) {
