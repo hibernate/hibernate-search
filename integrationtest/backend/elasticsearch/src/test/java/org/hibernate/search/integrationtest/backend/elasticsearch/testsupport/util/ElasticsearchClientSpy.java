@@ -30,7 +30,12 @@ import org.junit.runners.model.Statement;
 public class ElasticsearchClientSpy implements TestRule {
 	private final AtomicInteger createdClientCount = new AtomicInteger();
 	private final AtomicInteger requestCount = new AtomicInteger();
-	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>();
+	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>( new CallQueue.Settings() {
+		@Override
+		public boolean allowDuplicates() {
+			return false;
+		}
+	} );
 
 	@Override
 	public Statement apply(Statement base, Description description) {

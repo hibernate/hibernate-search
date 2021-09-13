@@ -43,6 +43,10 @@ public final class BackendIndexingWorkExpectations {
 		this.addWorkType = addWorkType;
 	}
 
+	public boolean allowDuplicateIndexing() {
+		return !sync;
+	}
+
 	public void awaitIndexingAssertions(ThrowingRunnable assertions) {
 		if ( sync ) {
 			try {
