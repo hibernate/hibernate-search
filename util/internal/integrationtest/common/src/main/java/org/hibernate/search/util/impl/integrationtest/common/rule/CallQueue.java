@@ -34,6 +34,7 @@ public class CallQueue<C extends Call<? super C>> {
 		callsExpectedInOrder.clear();
 		callsExpectedOutOfOrder.clear();
 		lastMatchingCall = null;
+		lastVerifyFailure = null;
 	}
 
 	public void expectInOrder(C expectedCall) {
