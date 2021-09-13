@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -509,6 +510,73 @@ public class MassIndexingConditionalExpressionsIT {
 				fail( "Unexpected InterruptedException: " + e.getMessage() );
 			}
 		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4266")
+	public void orCondition_filterIndexedTypeOnly() {
+		setupHolder.runNoTransaction( session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
+
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = :number or e.rootMoment > :moment" )
+					.param( "number", INT_2 )
+					.param( "moment", INSTANT_0 );
+
+			// If the OR condition was not handled properly, we would get two kinds of error:
+			// 1. The mass indexer would try to index non-indexed entities, leading to errors which would make this test failing
+			// 2. The mass indexer would try to index subclasses indexed entities more than once, leading to errors which would make this test failing.
+			// Therefore, we can rely on this test to check that an `OR` condition is handled properly.
+			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "2", b -> b.field( "rootText", "text2" ) )
+					.add( "3", b -> b.field( "rootText", "text3" ) )
+					.add( "4", b -> b.field( "rootText", "text4" ) );
+			backendMock.expectWorks( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "10", b -> b.field( "rootText", "text10" )
+							.field( "aText", "text10" )
+							.field( "cText", "text10" ) )
+					.add( "11", b -> b.field( "rootText", "text11" )
+							.field( "aText", "text11" )
+							.field( "cText", "text11" ) )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "aText", "text12" )
+							.field( "cText", "text12" ) );
+			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "14", b -> b
+							.field( "rootText", "text14" )
+							.field( "bText", "text14" ) )
+					.add( "15", b -> b
+							.field( "rootText", "text15" )
+							.field( "bText", "text15" ) )
+					.add( "16", b -> b
+							.field( "rootText", "text16" )
+							.field( "bText", "text16" ) );
+
+			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Entity(name = H0_Indexed.NAME)
