@@ -651,7 +651,7 @@ Hibernate Search provides an adapter to JPA and Hibernate ORM's native APIs,
 i.e. a way to turn a `SearchQuery` into a `javax.persistence.TypedQuery` (JPA)
 or a `org.hibernate.query.Query` (native ORM API):
 
-.Getting a `SearchQuery` object
+.Turning a `SearchQuery` into a JPA or Hibernate ORM query
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----

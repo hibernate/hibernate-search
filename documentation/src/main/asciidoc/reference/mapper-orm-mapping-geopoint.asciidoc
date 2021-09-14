@@ -126,7 +126,7 @@ It is possible to handle multiple sets of coordinates by applying the annotation
 and setting the `markerSet` attribute to a unique value:
 
 [[spatial-multiplecoordinates]]
-.Mapping spatial coordinates using `@GeoPointBinding` on a property
+.Mapping multiple sets of spatial coordinates using `@GeoPointBinding`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----

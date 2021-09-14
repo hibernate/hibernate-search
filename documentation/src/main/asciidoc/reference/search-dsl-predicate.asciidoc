@@ -1089,7 +1089,7 @@ to require two or more inner predicates to match _the same object_.
 This is how you ensure that `authors.firstname:isaac AND authors.lastname:asimov`
 will not match a book whose authors are "Jane Asimov" and "Isaac Deutscher".
 
-.Matching a simple pattern
+.Matching multiple predicates against a single nested object
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
