@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
  * Tests suite for automatic indexing with {@link CoordinationStrategyNames#DATABASE_POLLING}.
  */
 @RunWith(ClasspathSuite.class)
+@ClasspathSuite.IncludeJars(true)
 @ClasspathSuite.ClassnameFilters({
 		// Just execute all automatic indexing tests
 		"org.hibernate.search.integrationtest.mapper.orm.automaticindexing..*",
