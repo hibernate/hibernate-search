@@ -153,6 +153,17 @@ The `database-polling` strategy can be enabled with the following settings:
 hibernate.search.coordination.strategy = database-polling
 ----
 
+You will also need to add this dependency:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
 include::components/dynamic-sharding-not-implemented-warning.asciidoc[]
 
 include::components/coordination-comparison-note.asciidoc[]
