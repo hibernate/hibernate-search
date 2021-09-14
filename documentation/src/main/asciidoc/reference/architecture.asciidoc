@@ -314,6 +314,7 @@ to hold the data necessary for coordination.
 [[architecture-examples-database-polling-elasticsearch-getting-started]]
 ==== Getting started
 
+The database polling coordination strategy requires an extra dependency.
 To implement this architecture, use the following Maven dependencies:
 
 [source, XML, subs="+attributes"]
@@ -321,6 +322,11 @@ To implement this architecture, use the following Maven dependencies:
 <dependency>
    <groupId>org.hibernate.search</groupId>
    <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
