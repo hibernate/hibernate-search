@@ -14,7 +14,6 @@ import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.DatabasePollingCooordinationStrategy;
 
 public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	@Override
@@ -23,11 +22,6 @@ public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 				CooordinationStrategy.class,
 				CoordinationStrategyNames.NONE,
 				BeanReference.ofInstance( new NoCoordinationStrategy() )
-		);
-		context.define(
-				CooordinationStrategy.class,
-				CoordinationStrategyNames.DATABASE_POLLING,
-				BeanReference.ofInstance( new DatabasePollingCooordinationStrategy() )
 		);
 
 		context.define(
