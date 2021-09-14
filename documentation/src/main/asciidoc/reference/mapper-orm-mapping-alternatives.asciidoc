@@ -107,7 +107,7 @@ then writes the value to index to that field.
 You can apply `AlternativeBinder` through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
 Behavior and options are identical to annotation-based mapping.
 
-.Mapping a property to a different index field based on a `language` property using `AlternativeBinder`
+.Applying an `AlternativeBinder` with `.binder(...)`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----

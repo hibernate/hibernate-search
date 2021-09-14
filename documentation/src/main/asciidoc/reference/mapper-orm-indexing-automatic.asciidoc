@@ -19,7 +19,7 @@ on the configured <<coordination,coordination strategy>>.
 Follow the links for more details.
 
 [cols="h,2*^",options="header"]
-.Comparison of architectures
+.Comparison of automatic indexing depending on the coordination strategy
 |===
 |Coordination strategy
 |<<coordination-none,No coordination>> (default)
