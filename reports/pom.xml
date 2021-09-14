@@ -66,6 +66,10 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
         </dependency>
         <dependency>
@@ -125,6 +129,11 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-coordination-database-polling</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

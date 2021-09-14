@@ -163,6 +163,7 @@
         <module>mapper/pojo-base</module>
         <module>mapper/javabean</module>
         <module>mapper/orm</module>
+        <module>mapper/orm-coordination-database-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>
         <module>mapper/orm-batch-jsr352/jberet</module>
         <module>v5migrationhelper/engine</module>
@@ -691,6 +692,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-documentation</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -748,6 +754,11 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-integrationtest-mapper-orm-coordination-database-polling</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
