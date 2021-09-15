@@ -283,6 +283,7 @@
         <version.com.github.tomakehurst.wiremock>2.26.3</version.com.github.tomakehurst.wiremock>
         <version.org.apache.commons.lang3>3.10</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.2</version.org.apache.commons.math3>
+        <version.org.apache.avro>1.10.2</version.org.apache.avro>
         <version.org.jboss.weld>3.1.5.SP1</version.org.jboss.weld>
 
         <!-- >>> Performance tests -->
@@ -910,6 +911,13 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.org.slf4j}</version>
+            </dependency>
+
+            <!-- Apache Avro used to serialize/deserialize objects in database polling coordination -->
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${version.org.apache.avro}</version>
             </dependency>
 
             <!-- JBeret used by batch-jsr352 jberet module -->
@@ -1864,6 +1872,11 @@
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${version.docker.maven.plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro-maven-plugin</artifactId>
+                    <version>${version.org.apache.avro}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
