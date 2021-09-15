@@ -12,7 +12,7 @@ import javax.persistence.LockModeType;
 import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.common.impl.TransactionHelper;
+import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
 
