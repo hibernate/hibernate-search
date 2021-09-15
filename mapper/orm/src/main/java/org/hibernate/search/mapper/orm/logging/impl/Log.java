@@ -41,7 +41,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX),
+		@ValidIdRange(min = MessageConstants.MAPPER_ORM_ID_RANGE_MIN, max = MessageConstants.MAPPER_ORM_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5 (engine module)
 		@ValidIdRange(min = 34, max = 34),
 		@ValidIdRange(min = 36, max = 36),
@@ -79,7 +79,7 @@ public interface Log extends BasicLogger {
 	// -----------------------------------
 	// New messages from Search 6 onwards
 	// -----------------------------------
-	int ID_OFFSET = MessageConstants.ORM_ID_RANGE_MIN;
+	int ID_OFFSET = MessageConstants.MAPPER_ORM_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET + 1,
 			value = "Hibernate Search was not initialized.")
