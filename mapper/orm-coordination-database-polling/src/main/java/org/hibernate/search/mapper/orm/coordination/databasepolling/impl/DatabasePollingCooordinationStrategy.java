@@ -85,7 +85,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 	@Override
 	public void configureAutomaticIndexing(AutomaticIndexingConfigurationContext context) {
-		context.sendIndexingEventsTo( ctx -> new OutboxEventSendingPlan( ctx.session() ), true );
+		context.sendIndexingEventsTo( ctx -> new DatabasePollingOutboxEventSendingPlan( ctx.session() ), true );
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 				.newScheduledExecutor( this.assignedShardIndices.size(), PROCESSOR_NAME_PREFIX );
 		// Note the hash function / table implementations MUST NOT CHANGE,
 		// otherwise existing indexes will no longer work correctly.
-		RangeCompatibleHashFunction hashFunction = OutboxEventSendingPlan.HASH_FUNCTION;
+		RangeCompatibleHashFunction hashFunction = DatabasePollingOutboxEventSendingPlan.HASH_FUNCTION;
 		indexingProcessors = new RangeHashTable<>( hashFunction, totalShardCount );
 		for ( int shardIndex : this.assignedShardIndices ) {
 			Optional<OutboxEventPredicate> predicate = totalShardCount == 1

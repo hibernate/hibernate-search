@@ -62,8 +62,8 @@ public class OutboxEventBackgroundProcessor {
 		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
 				name,
-				new HibernateOrmOutboxWorker( mapping.sessionFactory() ),
-				new HibernateOrmOutboxScheduler( executor ),
+				new DatabasePollingOutboxWorker( mapping.sessionFactory() ),
+				new DatabasePollingHibernateOrmOutboxScheduler( executor ),
 				failureHandler
 		);
 	}
@@ -88,11 +88,11 @@ public class OutboxEventBackgroundProcessor {
 		processingTask.stop();
 	}
 
-	private class HibernateOrmOutboxWorker implements SingletonTask.Worker {
+	private class DatabasePollingOutboxWorker implements SingletonTask.Worker {
 
 		private final TransactionHelper transactionHelper;
 
-		public HibernateOrmOutboxWorker(SessionFactoryImplementor sessionFactory) {
+		public DatabasePollingOutboxWorker(SessionFactoryImplementor sessionFactory) {
 			transactionHelper = new TransactionHelper( sessionFactory );
 		}
 
@@ -178,10 +178,10 @@ public class OutboxEventBackgroundProcessor {
 		}
 	}
 
-	private class HibernateOrmOutboxScheduler implements SingletonTask.Scheduler {
+	private class DatabasePollingHibernateOrmOutboxScheduler implements SingletonTask.Scheduler {
 		private final ScheduledExecutorService delegate;
 
-		private HibernateOrmOutboxScheduler(ScheduledExecutorService delegate) {
+		private DatabasePollingHibernateOrmOutboxScheduler(ScheduledExecutorService delegate) {
 			this.delegate = delegate;
 		}
 

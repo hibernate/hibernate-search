@@ -261,6 +261,7 @@
                         WHEN 'hibernate-search-mapper-pojo-base' THEN 'Pojo'
                         WHEN 'hibernate-search-mapper-javabean' THEN 'JavaBean'
                         WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
+                        WHEN 'hibernate-search-mapper-orm-coordination-database-polling' THEN 'DatabasePolling'
                         WHEN 'hibernate-search-mapper-orm-batch-jsr352-jberet' THEN 'JBeret'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
                     END

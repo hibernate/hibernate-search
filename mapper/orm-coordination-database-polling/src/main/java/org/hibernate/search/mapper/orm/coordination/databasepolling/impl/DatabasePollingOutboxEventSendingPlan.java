@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
+public class DatabasePollingOutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,7 +34,7 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 	private final Session session;
 	private final List<OutboxEvent> events = new ArrayList<>();
 
-	public OutboxEventSendingPlan(Session session) {
+	public DatabasePollingOutboxEventSendingPlan(Session session) {
 		this.session = session;
 	}
 
@@ -42,7 +42,7 @@ public class OutboxEventSendingPlan implements AutomaticIndexingQueueEventSendin
 	public void append(String entityName, Object identifier, String serializedId,
 			PojoIndexingQueueEventPayload payload) {
 		events.add( new OutboxEvent( entityName, serializedId,
-				OutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
+				DatabasePollingOutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
 				SerializationUtils.serialize( payload ),
 				identifier
 		) );
