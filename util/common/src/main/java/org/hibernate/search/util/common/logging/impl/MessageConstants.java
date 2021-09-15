@@ -67,8 +67,8 @@ public final class MessageConstants {
 	public static final int MAPPER_JAVABEAN_ID_RANGE_MIN = 750000;
 	public static final int MAPPER_JAVABEAN_ID_RANGE_MAX = 759999;
 
-	public static final int ORM_ID_RANGE_MIN = 800000;
-	public static final int ORM_ID_RANGE_MAX = 809999;
+	public static final int MAPPER_ORM_ID_RANGE_MIN = 800000;
+	public static final int MAPPER_ORM_ID_RANGE_MAX = 809999;
 
 	public static final int MAPPER_ORM_DATABASE_POLLING_ID_RANGE_MIN = 850000;
 	public static final int MAPPER_ORM_DATABASE_POLLING_ID_RANGE_MAX = 859999;
