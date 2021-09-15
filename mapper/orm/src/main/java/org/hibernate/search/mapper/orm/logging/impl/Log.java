@@ -14,8 +14,6 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.OptimisticLockException;
-
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
@@ -231,55 +229,8 @@ public interface Log extends BasicLogger {
 			+ " the selected automatic indexing strategy always processes events asynchronously, through a queue.")
 	SearchException cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 43, value = "Outbox-generated entity mapping: %1$s")
-	void outboxGeneratedEntityMapping(String xmlMappingDefinition);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 44, value = "Session factory closed while processing outbox events. Assuming Hibernate Search is shutting down.")
-	void sessionFactoryIsClosedOnOutboxProcessing();
-
-	@Message(id = ID_OFFSET + 45, value = "Max '%1$s' retries exhausted to process the event. Event will be lost.")
-	SearchException maxRetryExhausted(int retries);
-
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 46, value = "Automatic indexing failed for event #%1$s on entity of type '%2$s' with ID '%3$s'."
-			+ " Will try again soon. Attempts so far: %4$d.")
-	void automaticIndexingRetry(Long eventId, String entityName, String entityId, int attempts);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 47, value = "Starting outbox event processor '%1$s'")
-	void startingOutboxEventProcessor(String name);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 48, value = "Stopping outbox event processor '%1$s'")
-	void stoppingOutboxEventProcessor(String name);
-
-	@Message(id = ID_OFFSET + 49,
-			value = "The total shard count must be strictly positive.")
-	SearchException invalidTotalShardCount();
-
-	@Message(id = ID_OFFSET + 50,
-			value = "Shard indices must be between 0 (inclusive) and %1d (exclusive, set by '%2$s').")
-	SearchException invalidShardIndex(int totalShardCount, String totalShardCountPropertyKey);
-
-	@Message(id = ID_OFFSET + 51,
-			value = "When using static sharding, this property must be set."
-	)
-	SearchException missingPropertyForStaticSharding();
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 52, value = "The indexing processor is disabled. "
-			+ " Events will accumulate in the queue and indexes will not be updated,"
-			+ " unless another application node connects to the same database with their indexing processor enabled.")
-	void indexingProcessorDisabled();
-
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 53, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
 	void automaticIndexingStrategyIsDeprecated(String resolveOrRaw, String resolveOrRaw1);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 54, value = "'%1$s' failed to obtain a lock on events to process; will try again later.")
-	void outboxEventProcessorUnableToLock(String name, @Cause OptimisticLockException lockException);
 
 }
