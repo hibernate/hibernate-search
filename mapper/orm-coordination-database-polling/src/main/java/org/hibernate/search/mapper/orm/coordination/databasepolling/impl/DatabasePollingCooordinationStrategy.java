@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStra
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmMapperImplSettings;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.impl.HibernateOrmMapperDatabasePollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.data.impl.RangeHashTable;
@@ -72,7 +72,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER =
-			ConfigurationProperty.forKey( HibernateOrmMapperImplSettings.CoordinationRadicals.PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingImplSettings.CoordinationRadicals.PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER )
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
