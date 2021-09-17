@@ -78,4 +78,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 11, value = "'%1$s' failed to obtain a lock on events to process; will try again later.")
 	void outboxEventProcessorUnableToLock(String name, @Cause OptimisticLockException lockException);
 
+	@Message(id = ID_OFFSET + 12, value = "Unable to serialize Outbox Entity data with Avro")
+	SearchException unableToSerializeWithAvro(@Cause Throwable e);
+
+	@Message(id = ID_OFFSET + 13, value = "Unable to deserialize Outbox Entity data with Avro")
+	SearchException unableToDeserializeWithAvro(@Cause Throwable e);
+
 }
