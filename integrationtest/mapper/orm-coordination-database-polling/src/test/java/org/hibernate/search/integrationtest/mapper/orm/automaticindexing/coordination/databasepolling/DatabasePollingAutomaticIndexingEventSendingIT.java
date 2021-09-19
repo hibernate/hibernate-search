@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.AvroSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -26,7 +27,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
-import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -501,8 +501,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			softly.assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
 			softly.assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
 
-			PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
-					PojoIndexingQueueEventPayload.class, outboxEvent.getPayload() );
+			PojoIndexingQueueEventPayload payload = AvroSerializationUtils.deserialize( outboxEvent.getPayload() );
 			DocumentRoutesDescriptor routesDescriptor = payload.routes;
 
 			softly.assertThat( routesDescriptor ).isNotNull();
