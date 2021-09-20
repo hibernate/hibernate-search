@@ -614,6 +614,7 @@ stage('Non-default environments') {
 						mavenNonDefaultBuild buildEnv, """ \
 								-pl ${[
 									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm',
+									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-coordination-database-polling',
 									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers',
 									'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
 									'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-realbackend'
