@@ -30,6 +30,7 @@ import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackend
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -77,8 +78,13 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private static final OptionalConfigurationProperty<String> SCHEMA_MANAGEMENT_SETTINGS_FILE =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE )
-			.asString()
-			.build();
+					.asString()
+					.build();
+
+	private static final OptionalConfigurationProperty<String> SCHEMA_MANAGEMENT_MAPPINGS_FILE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPINGS_FILE )
+					.asString()
+					.build();
 
 	private final EventContext eventContext;
 
@@ -193,6 +199,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName,
 						analysisDefinitionRegistry,
 						customIndexSettings( buildContext, propertySource, indexEventContext ),
+						customIndexMappings( buildContext, propertySource, indexEventContext ),
 						DYNAMIC_MAPPING.get( propertySource ) ),
 				createDocumentMetadataContributors( mappedTypeName )
 		);
@@ -229,7 +236,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private ElasticsearchIndexRootBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			IndexSettings customIndexSettings, RootTypeMapping customIndexMappings,
 			DynamicMapping dynamicMapping) {
 
 		ElasticsearchIndexRootBuilder builder = new ElasticsearchIndexRootBuilder(
@@ -237,7 +245,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				indexEventContext,
 				indexNames,
 				mappedTypeName,
-				analysisDefinitionRegistry, customIndexSettings,
+				analysisDefinitionRegistry,
+				customIndexSettings, customIndexMappings,
 				dynamicMapping
 		);
 
@@ -303,6 +312,31 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		}
 		catch (JsonSyntaxException e) {
 			throw log.customIndexSettingsJsonSyntaxErrors( filePath, e, indexEventContext );
+		}
+	}
+
+	private RootTypeMapping customIndexMappings(BackendBuildContext buildContext,
+			ConfigurationPropertySource propertySource, EventContext indexEventContext) {
+
+		Optional<String> schemaManagementMappingsFile = SCHEMA_MANAGEMENT_MAPPINGS_FILE.get( propertySource );
+		if ( !schemaManagementMappingsFile.isPresent() ) {
+			return null;
+		}
+
+		String filePath = schemaManagementMappingsFile.get();
+		try ( InputStream inputStream = buildContext.resourceResolver().locateResourceStream( filePath ) ) {
+			if ( inputStream == null ) {
+				throw log.customIndexMappingsFileNotFound( filePath, indexEventContext );
+			}
+			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
+				return link.getGsonProvider().getGson().fromJson( reader, RootTypeMapping.class );
+			}
+		}
+		catch (IOException e) {
+			throw log.customIndexMappingsErrorOnLoading( filePath, e, indexEventContext );
+		}
+		catch (JsonSyntaxException e) {
+			throw log.customIndexMappingsJsonSyntaxErrors( filePath, e, indexEventContext );
 		}
 	}
 }
