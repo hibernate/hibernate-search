@@ -22,7 +22,8 @@ public final class Version {
 	 * @return A string representation of the version of Hibernate Search.
 	 */
 	public static String versionString() {
-		return Version.class.getPackage().getImplementationVersion();
+		// This implementation is replaced during the build with another one that returns the correct value.
+		return "UNKNOWN";
 	}
 
 	/**

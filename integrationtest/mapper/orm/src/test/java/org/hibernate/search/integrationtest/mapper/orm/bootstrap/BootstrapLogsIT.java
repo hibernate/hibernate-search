@@ -61,7 +61,8 @@ public class BootstrapLogsIT {
 
 	@Test
 	public void noSuspiciousLogEvents() {
-		logged.expectEvent( suspiciousLogEventMatcher() ).never(); // Also fails if a higher severity event (e.g. error) is logged
+		logged.expectEvent( suspiciousLogEventMatcher() )
+				.never(); // Also fails if a higher severity event (e.g. error) is logged
 
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
@@ -72,6 +73,13 @@ public class BootstrapLogsIT {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void version() {
+		if ( Version.versionString().equals( "UNKNOWN" ) ) {
+			throw new IllegalStateException( "Tests seem to be running from an IDE,"
+					+ " or the code was compiled by an IDE."
+					+ " This test won't work, because it requires Version.java to be injected with some bytecode"
+					+ " through a Maven plugin that IDEs don't know about." );
+		}
+
 		String propertyKey = "org.hibernate.search.version";
 		String expectedHibernateSearchVersion = System.getProperty( propertyKey );
 		if ( expectedHibernateSearchVersion == null ) {
@@ -80,7 +88,8 @@ public class BootstrapLogsIT {
 		}
 
 		logged.expectMessage( "HSEARCH000034",
-				"Hibernate Search version", expectedHibernateSearchVersion ).once();
+				"Hibernate Search version", expectedHibernateSearchVersion
+		).once();
 
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
@@ -95,11 +104,13 @@ public class BootstrapLogsIT {
 	private static Matcher<? extends LogEvent> suspiciousLogEventMatcher() {
 		return new TypeSafeMatcher<LogEvent>() {
 			private final Level level = Level.WARN;
+
 			@Override
 			public void describeTo(Description description) {
 				description.appendText( "a LogEvent with " ).appendValue( level ).appendText( " level or higher" )
 						.appendText( " (ignoring known test-only warnings)" );
 			}
+
 			@Override
 			protected boolean matchesSafely(LogEvent item) {
 				return item.getLevel().isMoreSpecificThan( level )
