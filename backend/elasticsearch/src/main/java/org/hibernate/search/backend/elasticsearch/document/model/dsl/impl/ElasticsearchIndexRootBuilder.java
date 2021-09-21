@@ -53,6 +53,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final IndexSettings customIndexSettings;
+	private final RootTypeMapping customIndexMappings;
 	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
@@ -62,7 +63,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	public ElasticsearchIndexRootBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			IndexSettings customIndexSettings, RootTypeMapping customIndexMappings,
 			DynamicMapping dynamicMapping) {
 		super( new ElasticsearchIndexCompositeNodeType.Builder( ObjectStructure.FLATTENED ) );
 		this.typeFactoryProvider = typeFactoryProvider;
@@ -71,6 +73,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.customIndexSettings = customIndexSettings;
+		this.customIndexMappings = customIndexMappings;
 		this.defaultDynamicType = DynamicType.create( dynamicMapping );
 	}
 
@@ -107,16 +110,10 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	public ElasticsearchIndexModel build() {
 		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
 
-		RootTypeMapping mapping = new RootTypeMapping();
-		if ( routing != null ) {
-			mapping.setRouting( routing );
-		}
-
+		RootTypeMapping mapping = rootTypeMapping();
 		for ( IndexSchemaRootContributor schemaRootContributor : schemaRootContributors ) {
 			schemaRootContributor.contribute( mapping );
 		}
-
-		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
 
 		Map<String, ElasticsearchIndexField> staticFields = new HashMap<>();
 		List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
@@ -150,6 +147,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 		Map<String, ElasticsearchIndexField> staticChildrenByName = new TreeMap<>();
 		ElasticsearchIndexRoot rootNode = new ElasticsearchIndexRoot( typeBuilder.build(), staticChildrenByName );
+		// TODO HSEARCH-4253 Merge fields
 		contributeChildren( mapping, rootNode, collector, staticChildrenByName );
 
 		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
@@ -169,5 +167,18 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	EventContext getIndexEventContext() {
 		return indexEventContext;
+	}
+
+	private RootTypeMapping rootTypeMapping() {
+		if ( customIndexMappings != null ) {
+			return customIndexMappings;
+		}
+
+		RootTypeMapping mapping = new RootTypeMapping();
+		if ( routing != null ) {
+			mapping.setRouting( routing );
+		}
+		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
+		return mapping;
 	}
 }

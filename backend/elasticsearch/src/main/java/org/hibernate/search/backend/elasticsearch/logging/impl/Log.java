@@ -698,4 +698,15 @@ public interface Log extends BasicLogger {
 			value = "Param with name '%1$s' has not been defined for the named predicate '%2$s'.")
 	SearchException paramNotDefined(String name, String predicateName, @Param EventContext context);
 
+	@Message(id = ID_OFFSET + 151, value = "Unable to find the given custom index mappings file: '%1$s'.")
+	SearchException customIndexMappingsFileNotFound(String filePath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 152, value = "Error on loading the given custom index mappings file: '%1$s'.")
+	SearchException customIndexMappingsErrorOnLoading(String filePath, @Cause Exception cause,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 153, value = "There are some JSON syntax errors on the given custom index mappings file: '%1$s'.")
+	SearchException customIndexMappingsJsonSyntaxErrors(String filePath, @Cause Exception cause,
+			@Param EventContext context);
+
 }
