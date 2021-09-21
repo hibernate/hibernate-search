@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.regex.Pattern;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -67,13 +70,26 @@ public class BootstrapLogsIT {
 	}
 
 	@Test
-	public void versionLogEvent() {
-		logged.expectMessage( "HSEARCH000034", "Hibernate Search version" ).once();
+	@SuppressWarnings("deprecation")
+	public void version() {
+		String propertyKey = "org.hibernate.search.version";
+		String expectedHibernateSearchVersion = System.getProperty( propertyKey );
+		if ( expectedHibernateSearchVersion == null ) {
+			throw new IllegalStateException( "This test can only be executed, because system property '"
+					+ propertyKey + "' was not defined." );
+		}
+
+		logged.expectMessage( "HSEARCH000034",
+				"Hibernate Search version", expectedHibernateSearchVersion ).once();
 
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
 		ormSetupHelper.start()
 				.setup( IndexedEntity.class, ContainedEntity.class );
+
+		// Also check that retrieving the version string explicitly returns the right version string.
+		assertThat( Version.versionString() ).isEqualTo( expectedHibernateSearchVersion );
+		assertThat( Version.getVersionString() ).isEqualTo( expectedHibernateSearchVersion );
 	}
 
 	private static Matcher<? extends LogEvent> suspiciousLogEventMatcher() {
