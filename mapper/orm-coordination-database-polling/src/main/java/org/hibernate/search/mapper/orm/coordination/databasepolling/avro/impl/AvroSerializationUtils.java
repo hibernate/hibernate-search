@@ -41,7 +41,7 @@ public final class AvroSerializationUtils {
 			writer.write( DtoConverterUtils.convert( payload ), encoder );
 			encoder.flush();
 		}
-		catch (IOException e) {
+		catch (IOException | RuntimeException e) {
 			throw log.unableToSerializeWithAvro( e );
 		}
 
@@ -58,7 +58,7 @@ public final class AvroSerializationUtils {
 		try {
 			return ModelConverterUtils.convert( reader.read( null, decoder ) );
 		}
-		catch (IOException e) {
+		catch (IOException | RuntimeException e) {
 			throw log.unableToDeserializeWithAvro( e );
 		}
 	}
