@@ -283,42 +283,42 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override // No generics, see unwrap() (same issue)
 	public FullTextQueryImpl setParameter(Parameter tParameter, Object t) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override // No generics, see unwrap() (same issue)
 	public FullTextQueryImpl setParameter(Parameter calendarParameter, Calendar calendar, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override // No generics, see unwrap() (same issue)
 	public FullTextQueryImpl setParameter(Parameter dateParameter, Date date, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public FullTextQueryImpl setParameter(String name, Object value) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public FullTextQueryImpl setParameter(String name, Date value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public FullTextQueryImpl setParameter(String name, Calendar value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public FullTextQueryImpl setParameter(int position, Object value) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public FullTextQueryImpl setParameter(int position, Date value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
@@ -329,52 +329,56 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	protected QueryParameterBindings getQueryParameterBindings() {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public FullTextQueryImpl setParameter(int position, Calendar value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public QueryParameter<?> getParameter(String name) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public QueryParameter<?> getParameter(int position) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override // No generics, see unwrap() (same issue)
 	public QueryParameter getParameter(String name, Class type) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override // No generics, see unwrap() (same issue)
 	public QueryParameter getParameter(int position, Class type) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override // No generics, see unwrap() (same issue)
 	public boolean isBound(Parameter param) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override // No generics, see unwrap() (same issue)
 	public Object getParameterValue(Parameter param) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public Object getParameterValue(String name) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
 	}
 
 	@Override
 	public Object getParameterValue(int position) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
+		throw parametersNoSupported();
+	}
+
+	private UnsupportedOperationException parametersNoSupported() {
+		return new UnsupportedOperationException( "Parameters are not supported in Hibernate Search queries" );
 	}
 
 	@Override
@@ -394,7 +398,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public QueryImplementor setLockOptions(LockOptions lockOptions) {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Deprecated
@@ -432,17 +436,21 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public FullTextQueryImpl setLockMode(LockModeType lockModeType) {
-		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Override
 	public LockModeType getLockMode() {
-		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Override
 	public LockOptions getLockOptions() {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
+	}
+
+	private UnsupportedOperationException lockOptionsNotSupported() {
+		return new UnsupportedOperationException( "Lock options are not supported in Hibernate Search queries" );
 	}
 
 	@Override
@@ -452,11 +460,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public QueryImplementor setLockMode(String alias, LockMode lockMode) {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
-	}
-
-	protected Map getLockModes() {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Override
