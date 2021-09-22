@@ -22,7 +22,6 @@
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
             <artifactId>com.ibm.jbatch-runtime</artifactId>
-            <version>${version.com.ibm.jbatch}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
