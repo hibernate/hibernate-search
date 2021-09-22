@@ -58,7 +58,7 @@ public final class DtoConverterUtils {
 	}
 
 	private static List<DocumentRouteDescriptorDto> convertRoutes(Collection<DocumentRouteDescriptor> routes) {
-		return routes.stream().map( route -> convert( route ) ).collect( Collectors.toList() );
+		return routes.stream().map( DtoConverterUtils::convert ).collect( Collectors.toList() );
 	}
 
 	private static DocumentRouteDescriptorDto convert(DocumentRouteDescriptor route) {
