@@ -171,6 +171,7 @@
         <module>util/internal/integrationtest</module>
         <module>parents/integrationtest</module>
         <module>integrationtest</module>
+        <module>jakarta</module>
         <module>documentation</module>
     </modules>
 
@@ -253,19 +254,31 @@
         <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
+        <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0.1</version.javax.batch>
+        <version.jakarta.batch>2.0.0</version.jakarta.batch>
         <version.org.jberet>1.4.0.Final</version.org.jberet>
+        <version.org.jberet.jakarta>2.0.2.Final</version.org.jberet.jakarta>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
         <version.javax.inject>1</version.javax.inject>
+        <version.jakarta.inject-api>2.0.0</version.jakarta.inject-api>
         <version.javax.enterprise>2.0</version.javax.enterprise>
+        <version.jakarta.enterprise>3.0.0</version.jakarta.enterprise>
         <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
+        <version.jakarta.annotation>2.0.0</version.jakarta.annotation>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
+        <!-- We need dependency management on these ones to avoid a dependency divergence created by Hibernate ORM
+             Ideally, we should remove this dependency management when Hibernate ORM fixes that dependency divergence.
+         -->
+        <version.jakarta.xml.bind>3.0.1</version.jakarta.xml.bind>
+        <version.jakarta.activation>2.0.1</version.jakarta.activation>
         <!-- This is used to generate a link to the Java EE javadoc -->
         <javadoc.javaee.url>https://javaee.github.io/javaee-spec/javadocs/</javadoc.javaee.url>
+        <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.0/apidocs/</javadoc.jakarta.batch.url>
 
         <!-- Test dependencies -->
 
@@ -285,12 +298,14 @@
         <version.org.apache.commons.math3>3.2</version.org.apache.commons.math3>
         <version.org.apache.avro>1.10.2</version.org.apache.avro>
         <version.org.jboss.weld>3.1.5.SP1</version.org.jboss.weld>
+        <version.org.jboss.weld.jakarta>4.0.2.Final</version.org.jboss.weld.jakarta>
 
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.23</version.org.openjdk.jmh>
 
         <!-- >>> JSR 352: JBatch runtime -->
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
+        <version.com.ibm.jbatch.jakarta>2.0.0</version.com.ibm.jbatch.jakarta>
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
         <!-- >>> JSR 352: JBeret SE dependencies -->
@@ -667,6 +682,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-jakarta</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -677,7 +697,17 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-v5migrationhelper-orm-jakarta</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -687,7 +717,17 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet-jakarta</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-orm-coordination-database-polling-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -774,7 +814,17 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core-jakarta</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-envers</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-envers-jakarta</artifactId>
                 <version>${version.org.hibernate}</version>
             </dependency>
             <dependency>
@@ -847,7 +897,11 @@
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
                 <version>${version.javax.persistence}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.persistence</groupId>
+                <artifactId>jakarta.persistence-api</artifactId>
+                <version>${version.jakarta.persistence}</version>
             </dependency>
             <dependency>
                 <groupId>javax.enterprise</groupId>
@@ -856,10 +910,19 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>jakarta.enterprise</groupId>
+                <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                <version>${version.jakarta.enterprise}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>${version.javax.inject}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>${version.jakarta.inject-api}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.annotation</groupId>
@@ -878,6 +941,24 @@
                 <artifactId>javax.batch-api</artifactId>
                 <version>${version.javax.batch}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.batch</groupId>
+                <artifactId>jakarta.batch-api</artifactId>
+                <version>${version.jakarta.batch}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Fixes for dependency divergence in Hibernate ORM -->
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${version.jakarta.xml.bind}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.activation</groupId>
+                <artifactId>jakarta.activation</artifactId>
+                <version>${version.jakarta.activation}</version>
             </dependency>
 
             <!-- Jackson: used by the Elasticsearch REST client and in tests (wiremock, ...) -->
@@ -1037,12 +1118,29 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-testing-jakarta</artifactId>
+                <version>${version.org.hibernate}</version>
+                <exclusions>
+                    <!-- we use Log4J 2 -->
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
             <!-- JBatch runtime -->
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
                 <artifactId>com.ibm.jbatch-runtime</artifactId>
                 <version>${version.com.ibm.jbatch}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.jbatch</groupId>
+                <artifactId>com.ibm.jbatch.container</artifactId>
+                <version>${version.com.ibm.jbatch.jakarta}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
@@ -1475,6 +1573,8 @@
                                 <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
                                 <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
                                 <compilerArguments>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
+                                <!-- Necessary for the Jakarta artifacts, where sources are copied from other modules -->
+                                <addCompileSourceRoots>true</addCompileSourceRoots>
                             </configuration>
                         </execution>
                     </executions>
@@ -1991,6 +2091,10 @@
                             <version>${version.org.codehaus.groovy-jsr223}</version> <!-- look for latest -->
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.0.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
