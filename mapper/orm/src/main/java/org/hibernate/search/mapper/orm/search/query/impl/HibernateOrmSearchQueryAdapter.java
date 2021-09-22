@@ -343,12 +343,12 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	private UnsupportedOperationException parametersNoSupported() {
-		return new UnsupportedOperationException( "parameters not supported in Hibernate Search queries" );
+		return new UnsupportedOperationException( "Parameters are not supported in Hibernate Search queries" );
 	}
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setLockOptions(LockOptions lockOptions) {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Deprecated
@@ -364,12 +364,12 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setLockMode(LockModeType lockModeType) {
-		throw new UnsupportedOperationException( "lock modes not supported in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Override
 	public LockModeType getLockMode() {
-		throw new UnsupportedOperationException( "lock modes not supported in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Override
@@ -383,6 +383,10 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		return null;
 	}
 
+	private UnsupportedOperationException lockOptionsNotSupported() {
+		return new UnsupportedOperationException( "Lock options are not supported in Hibernate Search queries" );
+	}
+
 	@Override
 	public int executeUpdate() {
 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
@@ -390,7 +394,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lockMode) {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
+		throw lockOptionsNotSupported();
 	}
 
 	@Deprecated
