@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingCo
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.impl.HibernateOrmMapperDatabasePollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
@@ -37,38 +37,38 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> SHARDS_STATIC =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CoordinationRadicals.SHARDS_STATIC )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.SHARDS_STATIC )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.COORDINATION_SHARDS_STATIC )
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_SHARDS_STATIC )
 					.build();
 
 	private static final OptionalConfigurationProperty<Integer> SHARDS_TOTAL_COUNT =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CoordinationRadicals.SHARDS_TOTAL_COUNT )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.SHARDS_TOTAL_COUNT )
 					.asInteger()
 					.build();
 
 	private static final OptionalConfigurationProperty<List<Integer>> SHARDS_ASSIGNED =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CoordinationRadicals.SHARDS_ASSIGNED )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.SHARDS_ASSIGNED )
 					.asInteger()
 					.multivalued()
 					.build();
 
 	private static final ConfigurationProperty<Boolean> PROCESSORS_INDEXING_ENABLED =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CoordinationRadicals.PROCESSORS_INDEXING_ENABLED )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_ENABLED )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_ENABLED )
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_POLLING_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CoordinationRadicals.PROCESSORS_INDEXING_POLLING_INTERVAL )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_POLLING_INTERVAL )
 					.asInteger()
-					.withDefault( HibernateOrmMapperSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL )
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_BATCH_SIZE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE )
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE )
 					.asInteger()
-					.withDefault( HibernateOrmMapperSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE )
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER =
