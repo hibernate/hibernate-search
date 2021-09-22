@@ -570,40 +570,6 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		}
 	}
 
-	private static final class ResultTransformerScrollHitExtractor
-			implements ScrollHitExtractor<Object[]> {
-
-		private final ResultTransformer resultTransformer;
-		private final String[] aliases;
-
-		private ResultTransformerScrollHitExtractor(ResultTransformer resultTransformer, String[] aliases) {
-			this.resultTransformer = resultTransformer;
-			this.aliases = aliases;
-		}
-
-		@Override
-		public Object[] toArray(Object[] hit) {
-			Object transformed = resultTransformer.transformTuple( hit, aliases );
-			if ( transformed instanceof Object[] ) {
-				return (Object[]) transformed;
-			}
-			else {
-				return new Object[] { transformed };
-			}
-		}
-
-		@Override
-		public Object toElement(Object[] hit, int index) {
-			Object transformed = resultTransformer.transformTuple( hit, aliases );
-			if ( transformed instanceof Object[] ) {
-				return ((Object[]) transformed)[index];
-			}
-			else {
-				return transformed;
-			}
-		}
-	}
-
 	private static int hintValueToInteger(Object value) {
 		if ( value instanceof Number ) {
 			return ( (Number) value ).intValue();
