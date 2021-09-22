@@ -16,6 +16,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +40,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
-			List list = fullTextSession.createCriteria( BusStop.class ).list();
+			List list = OrmUtils.listAll( fullTextSession, BusStop.class );
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
 			BusStop busStop = (BusStop) list.get( 1 );
@@ -59,7 +61,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
-			List list = fullTextSession.createCriteria( BusStop.class ).list();
+			List list = OrmUtils.listAll( fullTextSession, BusStop.class );
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
 			BusStop busStop = (BusStop) list.get( 1 );

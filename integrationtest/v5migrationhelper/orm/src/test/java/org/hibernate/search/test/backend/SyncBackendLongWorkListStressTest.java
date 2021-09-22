@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
@@ -20,6 +19,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
@@ -44,9 +44,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
 		Transaction tx = s.beginTransaction();
 		// count of entities in database needs to be checked before SF is closed (HSQLDB will forget the entities)
-		Number count = (Number) s.createCriteria( Clock.class )
-				.setProjection( Projections.rowCount() )
-				.uniqueResult();
+		Number count = OrmUtils.countAll( s, Clock.class );
 		assertEquals( NUM_SAVED_ENTITIES, count.intValue() );
 		tx.commit();
 		s.close();

@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 
-import org.hibernate.Criteria;
 import org.hibernate.Transaction;
 
+import org.hibernate.query.Query;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
@@ -155,11 +155,10 @@ public class PurgeTest extends SearchTestBase {
 		};
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T> T getSingleInstanceOfType(FullTextSession fullTextSession, Class<T> type) {
-		Criteria criteria = fullTextSession.createCriteria( type );
-		criteria.setMaxResults( 1 );
-		return ( (List<T>) criteria.list() ).get( 0 );
+		Query<T> query = fullTextSession.createQuery( "select e from " + type.getName() + " e", type );
+		query.setMaxResults( 1 );
+		return query.list().get( 0 );
 	}
 
 	private void assertNumberOfIndexedEntitiesForTypes(int expectedCount, Class<?>... types) {

@@ -7,7 +7,6 @@
 
 package org.hibernate.search.test.embedded.nested.containedIn;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.LongPoint;
@@ -19,6 +18,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Test;
 
@@ -68,10 +69,10 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		tx.commit();
 
 		tx = fts.beginTransaction();
-		for ( Entity2ForDoc0 e : (List<Entity2ForDoc0>) fts.createCriteria( Entity2ForDoc0.class ).list() ) {
+		for ( Entity2ForDoc0 e : OrmUtils.listAll( fts, Entity2ForDoc0.class ) ) {
 			fts.delete( e );
 		}
-		for ( Entity1ForDoc0 e : (List<Entity1ForDoc0>) fts.createCriteria( Entity1ForDoc0.class ).list() ) {
+		for ( Entity1ForDoc0 e : OrmUtils.listAll( fts, Entity1ForDoc0.class ) ) {
 			fts.delete( e );
 		}
 		tx.commit();
@@ -133,10 +134,10 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 				fts.createFullTextQuery( new TermQuery( new Term( "entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
 
 		tx = fts.beginTransaction();
-		for ( Entity2ForUnindexed e : (List<Entity2ForUnindexed>) fts.createCriteria( Entity2ForUnindexed.class ).list() ) {
+		for ( Entity2ForUnindexed e : OrmUtils.listAll( fts, Entity2ForUnindexed.class ) ) {
 			fts.delete( e );
 		}
-		for ( Entity1ForUnindexed e : (List<Entity1ForUnindexed>) fts.createCriteria( Entity1ForUnindexed.class ).list() ) {
+		for ( Entity1ForUnindexed e : OrmUtils.listAll( fts, Entity1ForUnindexed.class ) ) {
 			fts.delete( e );
 		}
 		tx.commit();

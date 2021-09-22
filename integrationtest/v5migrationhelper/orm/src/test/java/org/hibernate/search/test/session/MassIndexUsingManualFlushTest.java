@@ -20,6 +20,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -53,7 +55,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestBase {
 		//check non created object does get found!!1
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
-		ScrollableResults results = s.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );
+		ScrollableResults results = OrmUtils.queryAll( s, Email.class ).scroll( ScrollMode.FORWARD_ONLY );
 		int index = 0;
 		while ( results.next() ) {
 			index++;

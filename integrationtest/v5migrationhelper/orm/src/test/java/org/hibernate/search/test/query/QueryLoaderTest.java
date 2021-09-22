@@ -19,6 +19,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -90,7 +92,7 @@ public class QueryLoaderTest extends SearchTestBase {
 		music.getAuthors().clear();
 		music2.getAuthors().clear();
 
-		for ( Object o : s.createCriteria( Object.class ).list() ) {
+		for ( Object o : OrmUtils.listAll( s, Object.class ) ) {
 			s.delete( o );
 		}
 

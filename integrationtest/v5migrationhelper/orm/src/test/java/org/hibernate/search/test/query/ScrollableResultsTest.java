@@ -19,6 +19,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

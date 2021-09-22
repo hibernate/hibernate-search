@@ -23,6 +23,7 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
@@ -186,7 +187,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 		indexingSwitch.enable( false ); // disable processing of index updates
 		Transaction tx = session.beginTransaction();
-		List list = session.createCriteria( Kernel.class ).list();
+		List list = OrmUtils.listAll( session, Kernel.class );
 		assertThat( list ).hasSize( 2 );
 		session.delete( list.get( 0 ) );
 		tx.commit();
