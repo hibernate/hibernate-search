@@ -40,7 +40,9 @@
     <build>
         <plugins>
             <plugin>
-                <!-- We generate the pojos just to validate the schema -->
+                <!-- We use Avro-generated DTOs instead of GenericRecord,
+                       because that allows us to write type-safe code
+                       to convert between Hibernate Search objects and Avro objects (DTOs) -->
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
                 <executions>

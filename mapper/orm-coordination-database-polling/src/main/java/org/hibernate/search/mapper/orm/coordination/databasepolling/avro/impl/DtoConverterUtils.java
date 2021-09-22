@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,7 @@ public final class DtoConverterUtils {
 	static PojoIndexingQueueEventPayloadDto convert(PojoIndexingQueueEventPayload payload) {
 		return PojoIndexingQueueEventPayloadDto.newBuilder()
 				.setDirtiness( convert( payload.dirtiness ) )
-				.setRoutes( covert( payload.routes ) )
+				.setRoutes( convert( payload.routes ) )
 				.build();
 	}
 
@@ -46,10 +47,10 @@ public final class DtoConverterUtils {
 			return null;
 		}
 
-		return dirtyPaths.stream().collect( Collectors.toList() );
+		return new ArrayList( dirtyPaths );
 	}
 
-	private static DocumentRoutesDescriptorDto covert(DocumentRoutesDescriptor routes) {
+	private static DocumentRoutesDescriptorDto convert(DocumentRoutesDescriptor routes) {
 		return DocumentRoutesDescriptorDto.newBuilder()
 				.setCurrentRoute( convert( routes.currentRoute() ) )
 				.setPreviousRoutes( convertRoutes( routes.previousRoutes() ) )
