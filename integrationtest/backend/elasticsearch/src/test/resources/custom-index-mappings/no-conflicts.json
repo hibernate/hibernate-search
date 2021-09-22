@@ -1,0 +1,12 @@
+{
+  "_source": {
+    "enabled": false
+  },
+  "properties":{
+    "integer":{
+      "type":"integer",
+      "index":true,
+      "doc_values":false
+    }
+  }
+}
