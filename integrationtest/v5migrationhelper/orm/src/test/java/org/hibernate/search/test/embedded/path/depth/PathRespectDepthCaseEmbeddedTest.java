@@ -19,6 +19,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -107,7 +108,7 @@ public class PathRespectDepthCaseEmbeddedTest extends SearchTestBase {
 	private void deleteAll(Session s, Class<?>... classes) {
 		Transaction tx = s.beginTransaction();
 		for ( Class<?> each : classes ) {
-			List<?> list = s.createCriteria( each ).list();
+			List<?> list = OrmUtils.listAll( s, each );
 			for ( Object object : list ) {
 				s.delete( object );
 			}

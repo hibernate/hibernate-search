@@ -12,6 +12,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -73,7 +75,7 @@ public class RollbackTransactionTest extends SearchTestBase {
 	public int countBusLineByDatabaseCount() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		int count = fullTextSession.createCriteria( BusLine.class ).list().size();
+		int count = OrmUtils.listAll( fullTextSession, BusLine.class ).size();
 		tx.commit();
 		fullTextSession.close();
 		return count;

@@ -12,11 +12,9 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SharedSessionContract;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.engine.jdbc.LobCreationContext;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.EventSource;
@@ -60,21 +58,6 @@ public class SessionTest extends SearchTestBase {
 			fail( e.toString() );
 		}
 		wrapped.close();
-	}
-
-	@Test
-	public void testDetachedCriteria() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		DetachedCriteria dc = DetachedCriteria.forClass( Email.class );
-		try {
-			Criteria c = dc.getExecutableCriteria( s ).setMaxResults( 10 );
-			c.list();
-		}
-		catch (ClassCastException e) {
-			e.printStackTrace();
-			fail( e.toString() );
-		}
-		s.close();
 	}
 
 	@Test

@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
@@ -27,6 +26,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -110,7 +110,7 @@ public class IndexingGeneratedCorpusTest {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
-			List<Book> allBooks = fullTextSession.createCriteria( Book.class ).list();
+			List<Book> allBooks = fullTextSession.createQuery( "select b from " + Book.class.getName() + " b", Book.class ).list();
 			Nation italy = fullTextSession.load( Nation.class, 1 );
 			italy.getLibrariesHave().addAll( allBooks );
 			tx.commit();
@@ -232,10 +232,7 @@ public class IndexingGeneratedCorpusTest {
 		try {
 			Transaction tx = session.beginTransaction();
 			try {
-				Number countAsNumber = (Number) session
-						.createCriteria( type )
-						.setProjection( Projections.rowCount() )
-						.uniqueResult();
+				Number countAsNumber = OrmUtils.countAll( session, type );
 				return countAsNumber.longValue();
 			}
 			finally {

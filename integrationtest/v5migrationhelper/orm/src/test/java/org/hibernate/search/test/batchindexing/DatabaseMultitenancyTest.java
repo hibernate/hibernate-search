@@ -20,6 +20,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.hibernate.testing.RequiresDialect;
 import org.junit.After;
@@ -233,8 +234,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 
 	private void deleteClocks(Session session) {
 		session.beginTransaction();
-		@SuppressWarnings("unchecked")
-		List<Clock> clocks = session.createCriteria( Clock.class ).list();
+		List<Clock> clocks = OrmUtils.listAll( session, Clock.class );
 		for ( Clock clock : clocks ) {
 			session.delete( clock );
 		}

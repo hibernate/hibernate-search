@@ -23,6 +23,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -85,7 +87,7 @@ public class MassIndexTest extends SearchTestBase {
 		parser = new QueryParser( "noDefaultField", TestConstants.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
-		result = s.createCriteria( Email.class ).list();
+		result = OrmUtils.listAll( s, Email.class );
 		for ( int i = 0; i < loop / 2; i++ ) {
 			s.index( result.get( i ) );
 		}
@@ -147,7 +149,8 @@ public class MassIndexTest extends SearchTestBase {
 		s.close();
 
 		s = getSessionWithAutoCommit();
-		Iterator it = s.createQuery( "from Entite where id = :id" ).setParameter( "id", ent.getId() ).iterate();
+		Iterator it = s.createQuery( "from Entite where id = :id" ).setParameter( "id", ent.getId() )
+				.stream().iterator();
 		session = Search.getFullTextSession( s );
 		while ( it.hasNext() ) {
 			ent = (Entite) it.next();

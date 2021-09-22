@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
@@ -15,6 +16,7 @@ import javax.persistence.EntityTransaction;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 public final class OrmUtils {
 
@@ -127,4 +129,17 @@ public final class OrmUtils {
 		}
 	}
 
+	public static Number countAll(EntityManager entityManager, Class<?> entityType) {
+		return (Number) entityManager.createQuery( "select count(*) from " + entityType.getName() )
+				.getSingleResult();
+	}
+
+	public static <T> List<T> listAll(EntityManager entityManager, Class<T> entityType) {
+		return queryAll( entityManager, entityType ).getResultList();
+	}
+
+	public static <T> Query<T> queryAll(EntityManager entityManager, Class<T> entityType) {
+		return entityManager.unwrap( Session.class )
+				.createQuery( "select e from " + entityType.getName() + " e", entityType );
+	}
 }
