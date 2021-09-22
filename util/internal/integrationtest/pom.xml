@@ -3,28 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-integrationtest</artifactId>
         <version>6.1.0-SNAPSHOT</version>
-        <relativePath>../../..</relativePath>
+        <relativePath>../../../parents/integrationtest</relativePath>
     </parent>
-    <artifactId>hibernate-search-util-internal-integrationtest-parent</artifactId>
+    <artifactId>hibernate-search-util-internal-integrationtest</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Utils - Internal - ITs - Parent POM</name>
-    <description>Parent POM of Hibernate Search integration testing utilities</description>
-
-    <properties>
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <!-- Skip javadoc generation (forced by releases) -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-
-        <!--
-            Consider all sources as tests during Sonar analysis.
-            This is important because some analysis rules do not apply to test code.
-         -->
-        <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
-        <sonar.tests>${project.basedir}/src</sonar.tests>
-    </properties>
+    <name>Hibernate Search Utils - Internal - ITs - Aggregator POM</name>
+    <description>Aggregator POM of Hibernate Search integration testing utilities</description>
 
     <modules>
         <module>common</module>
@@ -36,38 +23,5 @@
         <module>jbatch-runtime</module>
         <module>jberet-se</module>
     </modules>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>de.thetaphi</groupId>
-                    <artifactId>forbiddenapis</artifactId>
-                    <!-- Override the executions defined in the parent module -->
-                    <executions>
-                        <execution>
-                            <id>verify-forbidden-apis</id>
-                            <!-- Do not use the main rules at all in integration test utils, see below -->
-                            <phase>none</phase>
-                        </execution>
-                        <execution>
-                            <id>verify-forbidden-test-apis</id>
-                            <goals>
-                                <!-- Apply the test rules to all code in integration test utils, even to code from src/main -->
-                                <goal>check</goal>
-                                <goal>testCheck</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>
 
