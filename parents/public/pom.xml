@@ -91,6 +91,11 @@
                                 <url>${javadoc.javaee.url}</url>
                                 <location>${javadoc.packagelists.directory}/batch-api</location>
                             </offlineLink>
+                            <!-- For jakarta.batch in the JSR 352 modules -->
+                            <offlineLink>
+                                <url>${javadoc.jakarta.batch.url}</url>
+                                <location>${javadoc.packagelists.directory}/batch-api</location>
+                            </offlineLink>
                         </offlineLinks>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
