@@ -32,6 +32,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -252,24 +253,25 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public FullTextQuery setHint(String hintName, Object value) {
 		hints.put( hintName, value );
-		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
-			if ( value == null ) {
-				//nothing
-			}
-			else if ( value instanceof String ) {
-				setTimeout( Long.parseLong( (String) value ), TimeUnit.MILLISECONDS );
-			}
-			else if ( value instanceof Number ) {
-				setTimeout( ( (Number) value ).longValue(), TimeUnit.MILLISECONDS );
-			}
-		}
-		else if ( "javax.persistence.fetchgraph".equals( hintName ) ) {
-			applyGraph( (RootGraph) value, GraphSemantic.FETCH );
-		}
-		else if ( "javax.persistence.loadgraph".equals( hintName ) ) {
-			applyGraph( (RootGraph) value, GraphSemantic.LOAD );
+		switch ( hintName ) {
+			case QueryHints.SPEC_HINT_TIMEOUT:
+				setTimeout( hintValueToInteger( value ), TimeUnit.MILLISECONDS );
+				break;
+			case QueryHints.HINT_TIMEOUT:
+				setTimeout( hintValueToInteger( value ) );
+				break;
+			case "javax.persistence.fetchgraph":
+				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
+				break;
+			case "javax.persistence.loadgraph":
+				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
+				break;
+			default:
+				handleUnrecognizedHint( hintName, value );
+				break;
 		}
 		return this;
 	}
@@ -600,5 +602,18 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 				return transformed;
 			}
 		}
+	}
+
+	private static int hintValueToInteger(Object value) {
+		if ( value instanceof Number ) {
+			return ( (Number) value ).intValue();
+		}
+		else {
+			return Integer.parseInt( String.valueOf( value ) );
+		}
+	}
+
+	private static RootGraph<?> hintValueToEntityGraph(Object value) {
+		return (RootGraph) value;
 	}
 }
