@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.cfg;
 
-import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 
@@ -19,7 +18,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * The prefix expected for the key of every Hibernate Search configuration property
 	 * when using the Hibernate ORM mapper.
 	 */
-	public static final String PREFIX = EngineSettings.PREFIX;
+	public static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 
 	/**
 	 * Whether shards are static, i.e. configured explicitly for each node, with a fixed number of shards/nodes.
@@ -140,8 +139,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		private Radicals() {
 		}
 
-		public static final String COORDINATION = "coordination";
-		public static final String COORDINATION_PREFIX = COORDINATION + ".";
+		public static final String COORDINATION_PREFIX = HibernateOrmMapperSettings.Radicals.COORDINATION_PREFIX;
 		public static final String COORDINATION_SHARDS_STATIC = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_STATIC;
 		public static final String COORDINATION_SHARDS_TOTAL_COUNT = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_TOTAL_COUNT;
 		public static final String COORDINATION_SHARDS_ASSIGNED = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_ASSIGNED;
