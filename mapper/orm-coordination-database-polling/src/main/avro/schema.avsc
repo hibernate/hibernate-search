@@ -24,13 +24,10 @@
          },
          {
             "name":"previousRoutes",
-            "type":[
-               {
-                  "type":"array",
-                  "items":"org.hibernate.search.mapper.orm.coordination.databasepolling.avro.generated.impl.DocumentRouteDescriptorDto"
-               },
-               "null"
-            ]
+            "type":{
+               "type":"array",
+               "items":"org.hibernate.search.mapper.orm.coordination.databasepolling.avro.generated.impl.DocumentRouteDescriptorDto"
+            }
          }
       ]
    },
