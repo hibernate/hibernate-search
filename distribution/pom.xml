@@ -73,6 +73,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -149,6 +154,8 @@
                                 ${basedir}/../backend/elasticsearch/src/main/java;
                                 ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
+                                ${basedir}/../mapper/lucene/src/main/java;
+                                ${basedir}/../mapper/orm-coordination-database-polling/src/main/java;
                                 ${basedir}/../mapper/orm-batch-jsr352/core/src/main/java;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
