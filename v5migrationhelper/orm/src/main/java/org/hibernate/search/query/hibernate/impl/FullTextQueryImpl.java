@@ -32,7 +32,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
-import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -44,6 +43,7 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.impl.V5MigrationOrmSearchIntegratorAdapter;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
@@ -257,16 +257,16 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	public FullTextQuery setHint(String hintName, Object value) {
 		hints.put( hintName, value );
 		switch ( hintName ) {
-			case QueryHints.SPEC_HINT_TIMEOUT:
+			case HibernateOrmSearchQueryHints.TIMEOUT_JPA:
 				setTimeout( hintValueToInteger( value ), TimeUnit.MILLISECONDS );
 				break;
-			case QueryHints.HINT_TIMEOUT:
+			case HibernateOrmSearchQueryHints.TIMEOUT_HIBERNATE:
 				setTimeout( hintValueToInteger( value ) );
 				break;
-			case "javax.persistence.fetchgraph":
+			case HibernateOrmSearchQueryHints.FETCHGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
 				break;
-			case "javax.persistence.loadgraph":
+			case HibernateOrmSearchQueryHints.LOADGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 				break;
 			default:

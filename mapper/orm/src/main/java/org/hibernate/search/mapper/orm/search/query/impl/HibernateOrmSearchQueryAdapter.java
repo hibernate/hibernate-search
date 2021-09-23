@@ -30,7 +30,6 @@ import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
-import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.Query;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
@@ -42,6 +41,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.loading.impl.EntityGraphHint;
 import org.hibernate.search.mapper.orm.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
 import org.hibernate.search.util.common.SearchTimeoutException;
@@ -166,19 +166,18 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
 		switch ( hintName ) {
-			case QueryHints.SPEC_HINT_TIMEOUT:
+			case HibernateOrmSearchQueryHints.TIMEOUT_JPA:
 				delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
 				break;
-			case QueryHints.HINT_TIMEOUT:
+			case HibernateOrmSearchQueryHints.TIMEOUT_HIBERNATE:
 				setTimeout( hintValueToInteger( value ) );
 				break;
-			case "javax.persistence.fetchgraph":
+			case HibernateOrmSearchQueryHints.FETCHGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
 				break;
-			case "javax.persistence.loadgraph":
+			case HibernateOrmSearchQueryHints.LOADGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 				break;
 			default:
