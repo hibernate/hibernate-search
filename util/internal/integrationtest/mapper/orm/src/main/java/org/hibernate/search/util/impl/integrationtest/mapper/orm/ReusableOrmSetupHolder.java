@@ -43,6 +43,7 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 import org.hibernate.testing.junit4.CustomParameterized;
@@ -64,7 +65,7 @@ import org.jboss.logging.Logger;
  * before each method would take too much time, in particular when testing against some
  * databases that are slow to create schemas (Oracle, DB2, ...).
  * <p>
- * Usage:
+ * Usage with BackendMock:
  * <pre>{@code
  * 	@ClassRule
  * 	public static BackendMock backendMock = new BackendMock();
@@ -81,7 +82,22 @@ import org.jboss.logging.Logger;
  * 		...
  * 	}
  * }</pre>
- * </p>
+ * <p>
+ * Usage with real backends:
+ * <pre>{@code
+ *  @ClassRule
+ *  public static ReusableOrmSetupHolder setupHolder =
+ *  		ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+ *
+ * 	@Rule
+ * 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+ *
+ * 	@ReusableOrmSetupHolder.Setup
+ * 	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+ * 	    // configure setupContext here, but do NOT call setupContext.setup(); the rule will do that.
+ * 		...
+ * 	}
+ * }</pre>
  */
 public class ReusableOrmSetupHolder implements TestRule {
 	private static final Logger log = Logger.getLogger( ReusableOrmSetupHolder.class.getName() );
@@ -137,7 +153,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 
 	public static ReusableOrmSetupHolder withBackendMock(BackendMock backendMock) {
 		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMock( backendMock ),
-				Collections.singletonList( backendMock ) );
+				Collections.singletonList( backendMock ), IndexDataClearStrategy.NONE );
 	}
 
 	public static ReusableOrmSetupHolder withBackendMocks(BackendMock defaultBackendMock,
@@ -146,11 +162,17 @@ public class ReusableOrmSetupHolder implements TestRule {
 		allBackendMocks.add( defaultBackendMock );
 		allBackendMocks.addAll( namedBackendMocks.values() );
 		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks ),
-				allBackendMocks );
+				allBackendMocks, IndexDataClearStrategy.NONE );
+	}
+
+	public static ReusableOrmSetupHolder withSingleBackend(BackendConfiguration backendConfiguration) {
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withSingleBackend( backendConfiguration ),
+				Collections.emptyList(), IndexDataClearStrategy.DROP_AND_CREATE_SCHEMA );
 	}
 
 	private final OrmSetupHelper setupHelper;
 	private final List<BackendMock> allBackendMocks;
+	private final IndexDataClearStrategy indexDataClearStrategy;
 
 	private boolean inClassStatement;
 	private boolean inMethodStatement;
@@ -158,9 +180,11 @@ public class ReusableOrmSetupHolder implements TestRule {
 	private SessionFactory sessionFactory;
 	private Collection<?> testParamsForSessionFactory;
 
-	private ReusableOrmSetupHolder(OrmSetupHelper setupHelper, List<BackendMock> allBackendMocks) {
+	private ReusableOrmSetupHolder(OrmSetupHelper setupHelper, List<BackendMock> allBackendMocks,
+			IndexDataClearStrategy indexDataClearStrategy) {
 		this.setupHelper = setupHelper;
 		this.allBackendMocks = allBackendMocks;
+		this.indexDataClearStrategy = indexDataClearStrategy;
 	}
 
 	// We need the class rule and test rule to be two separate objects, unfortunately.
@@ -348,6 +372,14 @@ public class ReusableOrmSetupHolder implements TestRule {
 		// Must re-clear the caches as they may have been re-populated
 		// while executing queries in clearDatabase().
 		sessionFactory.getCache().evictAllRegions();
+
+		switch ( indexDataClearStrategy ) {
+			case NONE:
+				break;
+			case DROP_AND_CREATE_SCHEMA:
+				Search.mapping( sessionFactory ).scope( Object.class ).schemaManager().dropAndCreate();
+				break;
+		}
 	}
 
 	private void clearDatabase(SessionFactory sessionFactory, HibernateOrmMapping mapping) {
@@ -554,5 +586,10 @@ public class ReusableOrmSetupHolder implements TestRule {
 			Collections.addAll( entityClearOrder, entityClasses );
 			return this;
 		}
+	}
+
+	private enum IndexDataClearStrategy {
+		NONE,
+		DROP_AND_CREATE_SCHEMA;
 	}
 }
