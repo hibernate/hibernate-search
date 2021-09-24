@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
+import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.junit.Assert.assertEquals;
-import static org.hibernate.search.integrationtest.batch.jsr352.massindexing.AbstractBatchIndexingIT.JOB_TIMEOUT_MS;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,22 +16,29 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
-import javax.persistence.EntityManager;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
-import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.SimulatedFailureCompany;
-import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.SimulatedFailure;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.work.SearchWorkspace;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * @author Mincong Huang
@@ -40,16 +47,27 @@ public class RestartChunkIT {
 
 	private static final int CHECKPOINT_INTERVAL = 10;
 
-	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
-
 	protected static final long DB_COMP_ROWS = 150;
 
-	private JobOperator jobOperator;
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
 	private EntityManagerFactory emf;
+	private JobOperator jobOperator;
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.withAnnotatedTypes( SimulatedFailureCompany.class )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+	}
 
 	@Before
-	public void setup() {
+	public void initData() {
 		SimulatedFailure.reset();
+		emf = setupHolder.entityManagerFactory();
 		jobOperator = JobTestUtil.getAndCheckRuntime();
 
 		String[] str = new String[] {
@@ -60,20 +78,11 @@ public class RestartChunkIT {
 				"Amazon"
 		};
 
-		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
-
-		EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-		for ( int i = 0; i < DB_COMP_ROWS; i++ ) {
-			em.persist( new SimulatedFailureCompany( str[i % 5] + "-" + i ) );
-		}
-		em.getTransaction().commit();
-		em.close();
-	}
-
-	@After
-	public void shutdownJPA() {
-		emf.close();
+		setupHolder.runInTransaction( s -> {
+			for ( int i = 0; i < DB_COMP_ROWS; i++ ) {
+				s.persist( new SimulatedFailureCompany( str[i % 5] + "-" + i ) );
+			}
+		} );
 	}
 
 	@Test
@@ -118,11 +127,6 @@ public class RestartChunkIT {
 	}
 
 	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
-		SearchWorkspace workspace = Search.mapping( emf ).scope( SimulatedFailureCompany.class ).workspace();
-		workspace.purge();
-		workspace.refresh();
-		workspace.flush();
-
 		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
 		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
 		assertEquals( 0, google.size() );
@@ -134,7 +138,6 @@ public class RestartChunkIT {
 			builder = builder.restrictedBy( hql );
 		}
 		Properties parameters = builder
-				.entityManagerFactoryReference( PERSISTENCE_UNIT_NAME )
 				.checkpointInterval( CHECKPOINT_INTERVAL )
 				.build();
 		long execId1 = jobOperator.start(
@@ -171,4 +174,52 @@ public class RestartChunkIT {
 		return null;
 	}
 
+	@Entity(name = "SimulatedFailureCompany")
+	@Access(value = AccessType.PROPERTY) // Necessary to hook the getters on EntityWriter phase
+	@Indexed
+	public static class SimulatedFailureCompany {
+
+		private int id;
+
+		private String name;
+
+		public SimulatedFailureCompany() {
+			// Called by Hibernate ORM entity loading, which in turn
+			// is called by the EntityReader phase of the batch.
+			SimulatedFailure.read();
+		}
+
+		public SimulatedFailureCompany(String name) {
+			this.name = name;
+		}
+
+		@Id
+		@GeneratedValue
+		public int getId() {
+			// Called by Hibernate Search indexer#addOrUpdate, which in turn
+			// is called by the EntityWriter phase of the batch.
+			SimulatedFailure.write();
+
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		@FullTextField
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return "SimulatedFailureCompany [id=" + id + ", name=" + name + "]";
+		}
+
+	}
 }
