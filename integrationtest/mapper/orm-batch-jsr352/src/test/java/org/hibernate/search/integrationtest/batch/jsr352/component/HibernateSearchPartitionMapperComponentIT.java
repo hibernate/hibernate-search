@@ -15,21 +15,25 @@ import java.util.Arrays;
 import java.util.Properties;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.runtime.context.JobContext;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Single-component test for partition plan validation.
@@ -42,32 +46,36 @@ public class HibernateSearchPartitionMapperComponentIT {
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
 	private EntityManagerFactory emf;
 
 	private JobContext mockedJobContext;
 
 	private HibernateSearchPartitionMapper partitionMapper;
 
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.withAnnotatedTypes( Company.class, Person.class )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+	}
+
 	@Before
-	public void setUp() {
-		EntityManager em = null;
-		try {
-			emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
-			em = emf.createEntityManager();
-			em.getTransaction().begin();
+	public void init() {
+		emf = setupHolder.entityManagerFactory();
+
+		setupHolder.runInTransaction( session -> {
 			for ( int i = 1; i <= COMP_ROWS; i++ ) {
-				em.persist( new Company( "C" + i ) );
+				session.persist( new Company( "C" + i ) );
 			}
 			for ( int i = 1; i <= PERS_ROWS; i++ ) {
-				em.persist( new Person( "P" + i, "", "" ) );
+				session.persist( new Person( "P" + i, "", "" ) );
 			}
-			em.getTransaction().commit();
-		}
-		finally {
-			if ( em != null ) {
-				em.close();
-			}
-		}
+		} );
 
 		final String fetchSize = String.valueOf( 200 * 1000 );
 		final String hql = null;
@@ -85,13 +93,6 @@ public class HibernateSearchPartitionMapperComponentIT {
 				null,
 				mockedJobContext
 		);
-	}
-
-	@After
-	public void shutDown() {
-		if ( emf.isOpen() ) {
-			emf.close();
-		}
 	}
 
 	/**

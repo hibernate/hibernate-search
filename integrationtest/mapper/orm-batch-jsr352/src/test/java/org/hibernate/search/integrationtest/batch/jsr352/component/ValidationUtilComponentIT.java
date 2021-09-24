@@ -10,41 +10,36 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
-import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * @author Mincong Huang
  */
 public class ValidationUtilComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private static final String EMF_SCOPE = "persistence-unit-name";
-
-	private static EntityManagerFactory emf;
-
-	@BeforeClass
-	public static void setUp() {
-		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
-	}
-
-	@AfterClass
-	public static void tearDown() {
-		if ( emf != null ) {
-			emf.close();
-			emf = null;
-		}
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.withAnnotatedTypes( Company.class, Person.class )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
 	}
 
 	@Test
@@ -54,7 +49,7 @@ public class ValidationUtilComponentIT {
 				.map( Class::getName )
 				.collect( Collectors.joining( "," ) );
 
-		ValidationUtil.validateEntityTypes( null, EMF_SCOPE, PERSISTENCE_UNIT_NAME, serializedEntityTypes );
+		ValidationUtil.validateEntityTypes( null, null, null, serializedEntityTypes );
 	}
 
 	@Test
@@ -64,7 +59,7 @@ public class ValidationUtilComponentIT {
 				.map( Class::getName )
 				.collect( Collectors.joining( "," ) );
 
-		assertThatThrownBy( () -> ValidationUtil.validateEntityTypes( null, EMF_SCOPE, PERSISTENCE_UNIT_NAME, serializedEntityTypes ) )
+		assertThatThrownBy( () -> ValidationUtil.validateEntityTypes( null, null, null, serializedEntityTypes ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "The following selected entity types aren't indexable: "
 						+ NotIndexed.class.getName() + ". Check whether they are annotated with '@Indexed'." );

@@ -35,6 +35,8 @@ public final class JobTestUtil {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static final int JOB_TIMEOUT_MS = 30_000;
+
 	private static final int THREAD_SLEEP_MS = 100;
 	private static final String JSR325_TYPE_FOR_IDE_TESTS = "jbatch";
 

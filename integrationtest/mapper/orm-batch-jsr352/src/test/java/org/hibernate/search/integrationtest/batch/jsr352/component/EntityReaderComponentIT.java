@@ -16,22 +16,24 @@ import java.util.Arrays;
 import java.util.List;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.spi.EntityReader;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
-import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -44,13 +46,17 @@ import org.mockito.quality.Strictness;
  */
 public class EntityReaderComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
-
 	private static final List<Company> COMPANIES = Arrays.asList(
 			new Company( "Red Hat" ),
 			new Company( "Google" ),
 			new Company( "Microsoft" )
 	);
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -63,21 +69,17 @@ public class EntityReaderComponentIT {
 
 	private EntityReader entityReader;
 
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.withAnnotatedTypes( Company.class )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
+	}
+
 	@Before
-	public void setUp() {
-		EntityManager em = null;
-		try {
-			emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
-			em = emf.createEntityManager();
-			em.getTransaction().begin();
-			COMPANIES.forEach( em::persist );
-			em.getTransaction().commit();
-		}
-		finally {
-			if ( em != null ) {
-				em.close();
-			}
-		}
+	public void init() {
+		emf = setupHolder.entityManagerFactory();
+
+		setupHolder.runInTransaction( session -> COMPANIES.forEach( session::persist ) );
 
 		final String cacheMode = CacheMode.IGNORE.name();
 		final String entityName = Company.class.getName();
@@ -104,13 +106,6 @@ public class EntityReaderComponentIT {
 				IndexScope.FULL_ENTITY.name(),
 				mockedJobContext,
 				mockedStepContext );
-	}
-
-	@After
-	public void shutDown() {
-		if ( emf.isOpen() ) {
-			emf.close();
-		}
 	}
 
 	@Test
