@@ -7,28 +7,46 @@
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.batch.jsr352.massindexing.AbstractBatchIndexingIT.JOB_TIMEOUT_MS;
+import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.JOB_TIMEOUT_MS;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
-import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.EntityWithEmbeddedId;
-import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.EntityWithIdClass;
-import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * Tests that mass indexing job can handle entity having
@@ -40,17 +58,28 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-2615")
 public class MassIndexingJobWithCompositeIdIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
-
 	private static final LocalDate START = LocalDate.of( 2017, 6, 1 );
 
 	private static final LocalDate END = LocalDate.of( 2017, 8, 1 );
 
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
 	private EntityManagerFactory emf;
 
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.withAnnotatedTypes( EntityWithIdClass.class, EntityWithEmbeddedId.class )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyName.NONE );
+	}
+
 	@Before
-	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
+	public void initData() throws Exception {
+		emf = setupHolder.entityManagerFactory();
 
 		OrmUtils.withinJPATransaction( emf, ( entityManager ) -> {
 			for ( LocalDate d = START; d.isBefore( END ); d = d.plusDays( 1 ) ) {
@@ -61,22 +90,6 @@ public class MassIndexingJobWithCompositeIdIT {
 
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, EntityWithIdClass.class ) ).isEqualTo( 0 );
 		assertThat( JobTestUtil.nbDocumentsInIndex( emf, EntityWithEmbeddedId.class ) ).isEqualTo( 0 );
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		OrmUtils.withinJPATransaction( emf, ( entityManager ) -> {
-			entityManager.createQuery( "delete from " + EntityWithIdClass.class.getSimpleName() )
-					.executeUpdate();
-			entityManager.createQuery( "delete from " + EntityWithEmbeddedId.class.getSimpleName() )
-					.executeUpdate();
-
-			SearchSession searchSession = Search.session( entityManager );
-			searchSession.workspace( EntityWithIdClass.class ).purge();
-			searchSession.workspace( EntityWithEmbeddedId.class ).purge();
-		} );
-
-		emf.close();
 	}
 
 	@Test
@@ -139,5 +152,321 @@ public class MassIndexingJobWithCompositeIdIT {
 		int expectedDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 7, 1 ), END );
 		int actualDays = JobTestUtil.nbDocumentsInIndex( emf, EntityWithEmbeddedId.class );
 		assertThat( actualDays ).isEqualTo( expectedDays );
+	}
+
+	/**
+	 * @author Mincong Huang
+	 */
+	@Entity(name = "EntityWithEmbeddedId")
+	@Indexed
+	public static class EntityWithEmbeddedId {
+
+		@EmbeddedId
+		@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DateIdBridge.class))
+		private EmbeddableDateId embeddableDateId;
+
+		@FullTextField
+		private String value;
+
+		public EntityWithEmbeddedId() {
+		}
+
+		public EntityWithEmbeddedId(LocalDate d) {
+			this.embeddableDateId = new EmbeddableDateId( d );
+			this.value = DateTimeFormatter.ofPattern( "yyyyMMdd", Locale.ROOT ).format( d );
+		}
+
+		public EmbeddableDateId getEmbeddableDateId() {
+			return embeddableDateId;
+		}
+
+		public void setEmbeddableDateId(EmbeddableDateId embeddableDateId) {
+			this.embeddableDateId = embeddableDateId;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		@Override
+		public String toString() {
+			return "MyDate [embeddableDateId=" + embeddableDateId + ", value=" + value + "]";
+		}
+
+		/**
+		 * Primary key for {@link EntityWithEmbeddedId}.
+		 *
+		 * @author Mincong Huang
+		 */
+		@Embeddable
+		public static class EmbeddableDateId implements Serializable {
+
+			private static final long serialVersionUID = 1L;
+
+			private int year;
+
+			private int month;
+
+			private int day;
+
+			public EmbeddableDateId() {
+
+			}
+
+			public EmbeddableDateId(LocalDate d) {
+				this.year = d.getYear();
+				this.month = d.getMonthValue();
+				this.day = d.getDayOfMonth();
+			}
+
+			public int getYear() {
+				return year;
+			}
+
+			public void setYear(int year) {
+				this.year = year;
+			}
+
+			public int getMonth() {
+				return month;
+			}
+
+			public void setMonth(int month) {
+				this.month = month;
+			}
+
+			public int getDay() {
+				return day;
+			}
+
+			public void setDay(int day) {
+				this.day = day;
+			}
+
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + day;
+				result = prime * result + month;
+				result = prime * result + year;
+				return result;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if ( this == obj ) {
+					return true;
+				}
+				if ( obj == null ) {
+					return false;
+				}
+				if ( getClass() != obj.getClass() ) {
+					return false;
+				}
+				EmbeddableDateId that = (EmbeddableDateId) obj;
+				if ( day != that.day ) {
+					return false;
+				}
+				if ( month != that.month ) {
+					return false;
+				}
+				if ( year != that.year ) {
+					return false;
+				}
+				return true;
+			}
+
+			@Override
+			public String toString() {
+				return String.format( Locale.ROOT, "%04d-%02d-%02d", year, month, day );
+			}
+
+		}
+	}
+
+	/**
+	 * Entity containing multiple {@link Id} attributes.
+	 *
+	 * @author Mincong Huang
+	 */
+	@Entity(name = "EntityWithIdClass")
+	@Indexed
+	@IdClass( EntityWithIdClass.DatePK.class )
+	public static class EntityWithIdClass implements Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		private int year;
+
+		private int month;
+
+		private int day;
+
+		private int documentId;
+
+		public EntityWithIdClass() {
+		}
+
+		public EntityWithIdClass(LocalDate d) {
+			year = d.getYear();
+			month = d.getMonthValue();
+			day = d.getDayOfMonth();
+			documentId = year * 1_00_00 + month * 1_00 + day;
+		}
+
+		public void setYear(int year) {
+			this.year = year;
+		}
+
+		@Id
+		public int getYear() {
+			return year;
+		}
+
+		public void setMonth(int month) {
+			this.month = month;
+		}
+
+		@Id
+		public int getMonth() {
+			return month;
+		}
+
+		public void setDay(int day) {
+			this.day = day;
+		}
+
+		@Id
+		public int getDay() {
+			return day;
+		}
+
+		@DocumentId
+		public int getDocumentId() {
+			return documentId;
+		}
+
+		public void setDocumentId(int documentId) {
+			this.documentId = documentId;
+		}
+
+		/**
+		 * Primary key for {@link EntityWithIdClass}.
+		 *
+		 * @author Mincong Huang
+		 */
+		public static class DatePK implements Serializable {
+
+			private static final long serialVersionUID = 1L;
+
+			private int year;
+
+			private int month;
+
+			private int day;
+
+			public DatePK() {
+
+			}
+
+			public void setYear(int year) {
+				this.year = year;
+			}
+
+			public int getYear() {
+				return year;
+			}
+
+			public void setMonth(int month) {
+				this.month = month;
+			}
+
+			public int getMonth() {
+				return month;
+			}
+
+			public void setDay(int day) {
+				this.day = day;
+			}
+
+			public int getDay() {
+				return day;
+			}
+
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + day;
+				result = prime * result + month;
+				result = prime * result + year;
+				return result;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if ( this == obj ) {
+					return true;
+				}
+				if ( obj == null ) {
+					return false;
+				}
+				if ( getClass() != obj.getClass() ) {
+					return false;
+				}
+				DatePK that = (DatePK) obj;
+				if ( day != that.day ) {
+					return false;
+				}
+				if ( month != that.month ) {
+					return false;
+				}
+				if ( year != that.year ) {
+					return false;
+				}
+				return true;
+			}
+
+			@Override
+			public String toString() {
+				return String.format( Locale.ROOT, "%04d-%02d-%02d", year, month, day );
+			}
+
+		}
+	}
+
+	public static class DateIdBridge implements IdentifierBridge<EntityWithEmbeddedId.EmbeddableDateId> {
+
+		private static final Pattern DATE_PATTERN = Pattern.compile( "^\\d{4}-\\d{2}-\\d{2}$" );
+
+		@Override
+		public String toDocumentIdentifier(EntityWithEmbeddedId.EmbeddableDateId propertyValue,
+				IdentifierBridgeToDocumentIdentifierContext context) {
+
+			return String.format( Locale.ROOT, "%04d-%02d-%02d",
+					propertyValue.getYear(), propertyValue.getMonth(), propertyValue.getDay()
+			);
+		}
+
+		@Override
+		public EntityWithEmbeddedId.EmbeddableDateId fromDocumentIdentifier(String documentIdentifier,
+				IdentifierBridgeFromDocumentIdentifierContext context) {
+
+			Matcher matcher = DATE_PATTERN.matcher( documentIdentifier );
+			if ( !matcher.find() ) {
+				throw new RuntimeException( "Date does not match the pattern d{4}-d{2}-d{2}: " + documentIdentifier );
+			}
+
+			EntityWithEmbeddedId.EmbeddableDateId result = new EntityWithEmbeddedId.EmbeddableDateId();
+			result.setYear( Integer.parseInt( matcher.group( 1 ) ) );
+			result.setMonth( Integer.parseInt( matcher.group( 2 ) ) );
+			result.setDay( Integer.parseInt( matcher.group( 3 ) ) );
+			return result;
+		}
 	}
 }

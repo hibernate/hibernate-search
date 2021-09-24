@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -15,10 +16,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
-import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -27,23 +29,40 @@ import javax.persistence.criteria.Root;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.StepProgress;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.CompanyGroup;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.WhoAmI;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * @author Mincong Huang
  */
-public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
+public class BatchIndexingJobIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	protected static final int INSTANCES_PER_DATA_TEMPLATE = 100;
+
+	// We have three data templates per entity type (see setup)
+	protected static final int INSTANCE_PER_ENTITY_TYPE = INSTANCES_PER_DATA_TEMPLATE * 3;
 
 	/*
 	 * Make sure to have more than one checkpoint,
@@ -52,6 +71,53 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 	private static final int CHECKPOINT_INTERVAL = INSTANCES_PER_DATA_TEMPLATE / 2;
 
 	private static final String MAIN_STEP_NAME = "produceLuceneDoc";
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
+
+	private EntityManagerFactory emf;
+	private JobOperator jobOperator;
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		setupContext.withAnnotatedTypes( Company.class, Person.class, WhoAmI.class, CompanyGroup.class )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyName.NONE );
+
+		dataClearConfig.clearOrder( CompanyGroup.class, Company.class );
+	}
+
+	@Before
+	public void initData() {
+		emf = setupHolder.entityManagerFactory();
+		jobOperator = JobTestUtil.getAndCheckRuntime();
+		List<Company> companies = new ArrayList();
+		List<Person> people = new ArrayList();
+		List<WhoAmI> whos = new ArrayList();
+		for ( int i = 0; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
+			int index1 = i;
+			int index2 = i + 1;
+			int index3 = i + 2;
+			companies.add( new Company( "Google " + index1 ) );
+			companies.add( new Company( "Red Hat " + index2 ) );
+			companies.add( new Company( "Microsoft " + index3 ) );
+			people.add( new Person( "BG " + index1, "Bill", "Gates" ) );
+			people.add( new Person( "LT " + index2, "Linus", "Torvalds" ) );
+			people.add( new Person( "SJ " + index3, "Steven", "Jobs" ) );
+			whos.add( new WhoAmI( "cid01 " + index1, "id01 " + index1, "uid01 " + index1 ) );
+			whos.add( new WhoAmI( "cid02 " + index2, "id02 " + index2, "uid02 " + index2 ) );
+			whos.add( new WhoAmI( "cid03 " + index3, "id03 " + index3, "uid03 " + index3 ) );
+		}
+
+		setupHolder.runInTransaction( session -> {
+			companies.forEach( session::persist );
+			people.forEach( session::persist );
+			whos.forEach( session::persist );
+		} );
+	}
 
 	@Test
 	public void simple() throws InterruptedException,
@@ -120,11 +186,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 	@TestForIssue(jiraKey = "HSEARCH-2637")
 	public void indexedEmbeddedCollection() throws InterruptedException,
 			IOException {
-		EntityManager em = null;
-
-		try {
-			em = emf.createEntityManager();
-			em.getTransaction().begin();
+		setupHolder.runInTransaction( em -> {
 			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery( Company.class );
 			Root<Company> root = criteria.from( Company.class );
@@ -141,13 +203,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 				groups.add( new CompanyGroup( "group" + index3, companies.get( index3 ) ) );
 			}
 			groups.forEach( em::persist );
-			em.getTransaction().commit();
-		}
-		finally {
-			if ( em != null ) {
-				em.close();
-			}
-		}
+		} );
 
 		List<CompanyGroup> groupsContainingGoogle = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Google" );
 		List<CompanyGroup> groupsContainingRedHat = JobTestUtil.findIndexedResults( emf, CompanyGroup.class, "companies.name", "Red Hat" );
@@ -358,5 +414,22 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 			}
 		}
 		throw new AssertionFailure( "Missing step progress for step '" + MAIN_STEP_NAME + "'" );
+	}
+
+	protected final void indexSomeCompanies(int count) {
+		setupHolder.runInTransaction( em -> {
+			CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+			CriteriaQuery<Company> criteria = criteriaBuilder.createQuery( Company.class );
+			Root<Company> root = criteria.from( Company.class );
+			Path<Integer> id = root.get( root.getModel().getId( int.class ) );
+			criteria.orderBy( criteriaBuilder.asc( id ) );
+			List<Company> companies = em.createQuery( criteria ).setMaxResults( count ).getResultList();
+			SearchSession session = Search.session( em );
+
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+			for ( Company company : companies ) {
+				indexingPlan.addOrUpdate( company );
+			}
+		} );
 	}
 }

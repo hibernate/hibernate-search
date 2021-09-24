@@ -7,46 +7,46 @@
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.JOB_TIMEOUT_MS;
 import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.findIndexedResultsInTenant;
-import static org.hibernate.search.integrationtest.batch.jsr352.massindexing.AbstractBatchIndexingIT.JOB_TIMEOUT_MS;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 
 /**
  * @author Mincong Huang
  */
 public class MassIndexingJobWithMultiTenancyIT {
 
-	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration() );
-
 	private static final String TARGET_TENANT_ID = "targetTenant";
 
 	private static final String UNUSED_TENANT_ID = "unusedTenant";
 
-	private SessionFactory sessionFactory;
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder =
+			ReusableOrmSetupHolder.withSingleBackend( BackendConfigurations.simple() );
+	@Rule
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	private JobOperator jobOperator;
 
@@ -56,23 +56,29 @@ public class MassIndexingJobWithMultiTenancyIT {
 			new Company( "Microsoft" )
 	);
 
-	@Before
-	public void setUp() throws Exception {
-		jobOperator = JobTestUtil.getAndCheckRuntime();
-		sessionFactory = ormSetupHelper
-				.start()
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		setupContext.withAnnotatedTypes( Company.class )
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
 						AutomaticIndexingStrategyName.NONE )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
-				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID )
-				.setup( Company.class );
+				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID );
+	}
 
-		persist( TARGET_TENANT_ID, companies );
-		purgeAll( TARGET_TENANT_ID, Company.class );
+	@Before
+	public void initData() {
+		jobOperator = JobTestUtil.getAndCheckRuntime();
+
+		setupHolder.with( TARGET_TENANT_ID )
+				.runInTransaction( session -> companies.forEach( session::persist ) );
+		setupHolder.with( TARGET_TENANT_ID )
+				.runNoTransaction( session -> Search.session( session ).workspace( Company.class ).purge() );
 	}
 
 	@Test
 	public void shouldHandleTenantIds() throws Exception {
+		SessionFactory sessionFactory = setupHolder.sessionFactory();
+
 		long executionId = jobOperator.start(
 				MassIndexingJob.NAME,
 				MassIndexingJob.parameters()
@@ -92,28 +98,5 @@ public class MassIndexingJobWithMultiTenancyIT {
 		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Google", UNUSED_TENANT_ID ) ).isEmpty();
 		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Red Hat", UNUSED_TENANT_ID ) ).isEmpty();
 		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Microsoft", UNUSED_TENANT_ID ) ).isEmpty();
-	}
-
-	private <T> void persist(String tenantId, List<T> entities) {
-		try ( Session session = openSessionWithTenantId( tenantId ) ) {
-			session.getTransaction().begin();
-			entities.forEach( session::persist );
-			session.getTransaction().commit();
-		}
-	}
-
-	private void purgeAll(String tenantId, Class<?> entityType) throws IOException {
-		try ( Session session = openSessionWithTenantId( tenantId ) ) {
-			Search.session( session ).workspace( entityType ).purge();
-		}
-	}
-
-	private Session openSessionWithTenantId(String tenantId) {
-		return sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
-	}
-
-	private static BackendConfiguration backendConfiguration() {
-		return ( BackendConfiguration.isElasticsearch() ) ? new ElasticsearchBackendConfiguration() :
-				new LuceneBackendConfiguration();
 	}
 }
