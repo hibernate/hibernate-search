@@ -60,6 +60,23 @@ public class ElasticsearchCustomIndexMappingsIT {
 		} );
 	}
 
+	@Test
+	public void simpleConflicts() {
+		verify( "simple-conflicts.json", mappings -> {
+			JsonObject properties = new JsonObject();
+			JsonObject integer = new JsonObject();
+			properties.add( "string", integer );
+			integer.addProperty( "type", "keyword" );
+			integer.addProperty( "index", true );
+
+			// If the value (leaf) property is already present on both sides,
+			// we will take the one from the user:
+			integer.addProperty( "doc_values", true );
+			integer.addProperty( "norms", true );
+			mappings.add( "properties", properties );
+		} );
+	}
+
 	public void verify(String mappingsFile, Consumer<JsonObject> expectedMappings) {
 		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(),

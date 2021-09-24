@@ -1,0 +1,10 @@
+{
+  "properties":{
+    "string":{
+      "type":"keyword",
+      "index":true,
+      "norms":true,
+      "doc_values":true
+    }
+  }
+}
