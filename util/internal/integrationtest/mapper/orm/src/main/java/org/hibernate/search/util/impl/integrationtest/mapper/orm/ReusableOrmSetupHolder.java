@@ -229,6 +229,10 @@ public class ReusableOrmSetupHolder implements TestRule {
 		return OrmUtils.with( sessionFactory() );
 	}
 
+	public PersistenceRunner<Session, Transaction> with(String tenantId) {
+		return OrmUtils.with( sessionFactory(), tenantId );
+	}
+
 	public void runInTransaction(Consumer<? super Session> action) {
 		with().runInTransaction( action );
 	}

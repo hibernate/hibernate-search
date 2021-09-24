@@ -15,15 +15,24 @@ import org.hibernate.Transaction;
 
 class NativePersistenceRunner implements PersistenceRunner<Session, Transaction> {
 	private final SessionFactory sessionFactory;
+	private final String tenantId;
 
-	NativePersistenceRunner(SessionFactory sessionFactory) {
+	NativePersistenceRunner(SessionFactory sessionFactory, String tenantId) {
 		this.sessionFactory = sessionFactory;
+		this.tenantId = tenantId;
 	}
 
 	@Override
 	public <R> R applyNoTransaction(Function<? super Session, R> action) {
-		try ( Session session = sessionFactory.openSession() ) {
-			return action.apply( session );
+		if ( tenantId != null ) {
+			try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+				return action.apply( session );
+			}
+		}
+		else {
+			try ( Session session = sessionFactory.openSession() ) {
+				return action.apply( session );
+			}
 		}
 	}
 
