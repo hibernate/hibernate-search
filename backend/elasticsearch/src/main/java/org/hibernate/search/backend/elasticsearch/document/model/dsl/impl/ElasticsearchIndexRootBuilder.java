@@ -147,7 +147,6 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 		Map<String, ElasticsearchIndexField> staticChildrenByName = new TreeMap<>();
 		ElasticsearchIndexRoot rootNode = new ElasticsearchIndexRoot( typeBuilder.build(), staticChildrenByName );
-		// TODO HSEARCH-4253 Merge fields
 		contributeChildren( mapping, rootNode, collector, staticChildrenByName );
 
 		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
