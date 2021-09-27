@@ -1413,6 +1413,16 @@
                             <versionString>${version.javax.persistence}</versionString>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>parse-jakarta-persistence-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.jakarta.persistence</propertyPrefix>
+                            <versionString>${version.jakarta.persistence}</versionString>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Skip the deploy plugin explicitly: we use nexus-staging-maven-plugin instead -->

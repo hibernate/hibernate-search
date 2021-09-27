@@ -9,23 +9,31 @@ to integrate Hibernate Search into your application.
 
 .Compatibility
 
-[cols="h,1", stripes=none]
+[cols="h,^1,1", stripes=none]
 |===============
+| h|Version h|Note
 |Java Runtime
-|Java *8* or greater.
+|8, 11 or 17
+|
 |Hibernate ORM (for the ORM mapper)
-|Hibernate ORM *{hibernateVersion}*.
-|JPA (for the ORM mapper)
-|JPA *{jpaVersion}*.
+|{hibernateVersion}
+|
+|JPA (Java EE) (for the ORM mapper)
+|{jpaVersion}
+|
+|Jakarta Persistence (for the ORM mapper)
+|{jakartaPersistenceVersion}
+|Need to use <<other-integrations-jakarta,different Maven artifacts>>.
 |Apache Lucene (for the Lucene backend)
-|Lucene *{luceneVersion}*.
+|{luceneVersion}
+|
 |Elasticsearch server (for the Elasticsearch backend)
-|Elasticsearch *{elasticsearchCompatibleVersions}*.
-Other minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) may work
+|{elasticsearchCompatibleVersions}
+|Other minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) may work
 but are not given priority for bugfixes and new features.
 |OpenSearch server (for the Elasticsearch backend)
-|OpenSearch *{openSearchCompatibleVersions}*.
-Other minor versions may work
+|{openSearchCompatibleVersions}
+|Other minor versions may work
 but are not given priority for bugfixes and new features.
 |===============
 
