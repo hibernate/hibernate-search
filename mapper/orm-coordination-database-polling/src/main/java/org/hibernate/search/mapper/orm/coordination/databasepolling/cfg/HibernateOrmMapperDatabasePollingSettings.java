@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.coordination.databasepolling.cfg;
 
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 
 public final class HibernateOrmMapperDatabasePollingSettings {
 
@@ -21,6 +20,20 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	public static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 
 	/**
+	 * The name of the database polling strategy,
+	 * to be set on the {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY}
+	 * configuration property in order to use this strategy.
+	 * <p>
+	 * With database polling, one or multiple application nodes exist,
+	 * and they coordinate with each other by pushing data to additional tables in the database
+	 * and polling these tables.
+	 * <p>
+	 * See the reference documentation for a comparison of all available coordination strategies
+	 * and possible architectures.
+	 */
+	public static final String COORDINATION_STRATEGY_NAME = "database-polling";
+
+	/**
 	 * Whether shards are static, i.e. configured explicitly for each node, with a fixed number of shards/nodes.
 	 * <p>
 	 * <strong>WARNING:</strong> This property must have the same value for all application nodes,
@@ -29,7 +42,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@link CoordinationStrategyNames#DATABASE_POLLING}.
+	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed to such Boolean value.
@@ -47,7 +60,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@link CoordinationStrategyNames#DATABASE_POLLING}
+	 * {@value #COORDINATION_STRATEGY_NAME}
 	 * and {@link #COORDINATION_SHARDS_STATIC} is {@code true}.
 	 * <p>
 	 * Expects an Integer value of at least {@code 2},
@@ -65,7 +78,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY} is
-	 * {@link CoordinationStrategyNames#DATABASE_POLLING}
+	 * {@value #COORDINATION_STRATEGY_NAME}
 	 * and {@link #COORDINATION_SHARDS_STATIC} is {@code true}.
 	 * <p>
 	 * Expects a shard index, i.e. an Integer value between {@code 0} (inclusive) and the
@@ -82,7 +95,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * Whether the application will process entity change events.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@link CoordinationStrategyNames#DATABASE_POLLING}.
+	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed to such Boolean value.
@@ -101,7 +114,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * after a query didn't return any event, in milliseconds.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@link CoordinationStrategyNames#DATABASE_POLLING}.
+	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Hibernate Search will wait that long before polling again if the last polling didn't return any event:
 	 * <ul>
@@ -121,7 +134,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * In the background indexing processor, how many outbox events, at most, are processed in a single transaction.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@link CoordinationStrategyNames#DATABASE_POLLING}.
+	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a positive Integer value, such as {@code 50},
 	 * or a String that can be parsed into such Integer value.

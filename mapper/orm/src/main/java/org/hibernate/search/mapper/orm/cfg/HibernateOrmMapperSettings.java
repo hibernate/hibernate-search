@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.orm.cfg;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -59,7 +59,6 @@ public final class HibernateOrmMapperSettings {
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_STRATEGY}.
 	 *
-	 * @see CoordinationStrategyNames
 	 * @deprecated Use {@link #AUTOMATIC_INDEXING_ENABLED} instead (caution: it expects a boolean value).
 	 */
 	@Deprecated
@@ -151,12 +150,11 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The strategy for coordinating between nodes of a distributed application.
 	 * <p>
-	 * Expects one of the strings defined in {@link CoordinationStrategyNames},
-	 * or a different string for a strategy provided by an external module.
+	 * Expects a reference to a coordination strategy;
+	 * see the reference documentation for available strategies
+	 * and the relevant Maven dependencies.
 	 * <p>
 	 * Defaults to {@link Defaults#COORDINATION_STRATEGY}.
-	 *
-	 * @see CoordinationStrategyNames
 	 */
 	public static final String COORDINATION_STRATEGY = PREFIX + Radicals.COORDINATION_STRATEGY;
 
@@ -245,7 +243,7 @@ public final class HibernateOrmMapperSettings {
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final BeanReference<CooordinationStrategy> COORDINATION_STRATEGY =
-				BeanReference.of( CooordinationStrategy.class, CoordinationStrategyNames.NONE );
+				BeanReference.of( CooordinationStrategy.class, NoCoordinationStrategy.NAME );
 	}
 
 }
