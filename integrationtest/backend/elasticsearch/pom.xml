@@ -15,7 +15,6 @@
     <properties>
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
 
-        <surefire.executing-module>it-elasticsearch</surefire.executing-module>
         <!-- By default we don't exclude tests because of the version, but profiles override this -->
         <failsafe.excludedGroups.elasticsearch.version />
         <!-- By default AWS is not enabled, which means we need to exclude these categories -->
