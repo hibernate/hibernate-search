@@ -39,6 +39,8 @@ include::backend-elasticsearch.asciidoc[]
 
 include::coordination.asciidoc[]
 
+include::integrations.asciidoc[]
+
 include::limitations.asciidoc[]
 
 include::troubleshooting.asciidoc[]
