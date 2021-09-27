@@ -10,11 +10,6 @@
     <persistence-unit name="lucene_pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
-            <property name="hibernate.dialect" value="${db.dialect}" />
-            <property name="hibernate.connection.driver_class" value="${jdbc.driver}" />
-            <property name="hibernate.connection.url" value="${jdbc.url}" />
-            <property name="hibernate.connection.user" value="${jdbc.user}" />
-            <property name="hibernate.connection.password" value="${jdbc.pass}" />
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
             <property name="hibernate.session_factory_name" value="primary_session_factory" />
             <property name="hibernate.session_factory_name_is_jndi" value="false" />
@@ -27,11 +22,6 @@
     <persistence-unit name="elasticsearch_pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
-            <property name="hibernate.dialect" value="${db.dialect}" />
-            <property name="hibernate.connection.driver_class" value="${jdbc.driver}" />
-            <property name="hibernate.connection.url" value="${jdbc.url}" />
-            <property name="hibernate.connection.user" value="${jdbc.user}" />
-            <property name="hibernate.connection.password" value="${jdbc.pass}" />
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
             <property name="hibernate.session_factory_name" value="primary_session_factory" />
             <property name="hibernate.session_factory_name_is_jndi" value="false" />
@@ -39,14 +29,6 @@
             <property name="hibernate.search.automatic_indexing.enabled" value="false"/>
             <property name="hibernate.search.schema_management.strategy" value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backend.type" value="elasticsearch" />
-            <property name="hibernate.search.backend.uris" value="${test.elasticsearch.connection.uris}" />
-            <property name="hibernate.search.backend.username" value="${test.elasticsearch.connection.username}" />
-            <property name="hibernate.search.backend.password" value="${test.elasticsearch.connection.password}" />
-            <property name="hibernate.search.backend.aws.signing.enabled" value="${test.elasticsearch.connection.aws.signing.enabled}" />
-            <property name="hibernate.search.backend.aws.region" value="${test.elasticsearch.connection.aws.region}" />
-            <property name="hibernate.search.backend.aws.credentials.type" value="${test.elasticsearch.connection.aws.credentials.type}" />
-            <property name="hibernate.search.backend.aws.credentials.access_key_id" value="${test.elasticsearch.connection.aws.credentials.access_key_id}" />
-            <property name="hibernate.search.backend.aws.credentials.secret_access_key" value="${test.elasticsearch.connection.aws.credentials.secret_access_key}" />
 
             <property name="hibernate.search.backend.log.json_pretty_printing" value="true" />
         </properties>
@@ -54,11 +36,6 @@
     <persistence-unit name="unused_pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
-            <property name="hibernate.dialect" value="${db.dialect}" />
-            <property name="hibernate.connection.driver_class" value="${jdbc.driver}" />
-            <property name="hibernate.connection.url" value="${jdbc.url}" />
-            <property name="hibernate.connection.user" value="${jdbc.user}" />
-            <property name="hibernate.connection.password" value="${jdbc.pass}" />
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
             <property name="hibernate.session_factory_name" value="unused_session_factory" />
             <property name="hibernate.session_factory_name_is_jndi" value="false" />

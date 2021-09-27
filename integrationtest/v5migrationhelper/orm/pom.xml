@@ -77,20 +77,8 @@
     <build>
         <testResources>
             <testResource>
-                <filtering>true</filtering>
-                <directory>src/test/resources</directory>
-                <excludes>
-                    <exclude>**/*.pdf</exclude>
-                    <exclude>**/*.mp3</exclude>
-                </excludes>
-            </testResource>
-            <testResource>
                 <filtering>false</filtering>
                 <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*.pdf</include>
-                    <include>**/*.mp3</include>
-                </includes>
             </testResource>
         </testResources>
         <plugins>
