@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling.FilteringOutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.AvroSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;

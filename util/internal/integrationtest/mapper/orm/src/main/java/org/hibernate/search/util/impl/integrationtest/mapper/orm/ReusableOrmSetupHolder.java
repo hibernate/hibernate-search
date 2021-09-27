@@ -42,6 +42,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -367,7 +368,19 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	private void clearAllData(SessionFactory sessionFactory) {
-		HibernateOrmMapping mapping = ( (HibernateOrmMapping) Search.mapping( sessionFactory ) );
+		HibernateOrmMapping mapping;
+		try {
+			mapping = ( (HibernateOrmMapping) Search.mapping( sessionFactory ) );
+		}
+		catch (SearchException e) {
+			if ( e.getMessage().contains( "not initialized" ) ) {
+				// Hibernate Search is simply disabled.
+				mapping = null;
+			}
+			else {
+				throw e;
+			}
+		}
 
 		sessionFactory.getCache().evictAllRegions();
 
@@ -377,20 +390,26 @@ public class ReusableOrmSetupHolder implements TestRule {
 		// while executing queries in clearDatabase().
 		sessionFactory.getCache().evictAllRegions();
 
-		switch ( indexDataClearStrategy ) {
-			case NONE:
-				break;
-			case DROP_AND_CREATE_SCHEMA:
-				Search.mapping( sessionFactory ).scope( Object.class ).schemaManager().dropAndCreate();
-				break;
+		if ( mapping != null ) {
+			switch ( indexDataClearStrategy ) {
+				case NONE:
+					break;
+				case DROP_AND_CREATE_SCHEMA:
+					Search.mapping( sessionFactory ).scope( Object.class ).schemaManager().dropAndCreate();
+					break;
+			}
 		}
 	}
 
 	private void clearDatabase(SessionFactory sessionFactory, HibernateOrmMapping mapping) {
 		for ( Consumer<Session> preClear : config.preClear ) {
-			mapping.listenerEnabled( false );
+			if ( mapping != null ) {
+				mapping.listenerEnabled( false );
+			}
 			withinTransaction( sessionFactory, preClear );
-			mapping.listenerEnabled( true );
+			if ( mapping != null ) {
+				mapping.listenerEnabled( true );
+			}
 		}
 
 		Set<String> clearedEntityNames = new HashSet<>();
@@ -437,7 +456,9 @@ public class ReusableOrmSetupHolder implements TestRule {
 				// Workaround until https://hibernate.atlassian.net/browse/HHH-14814 gets fixed
 				|| hasEntitySubclass( sessionFactory, entityType )
 		) {
-			mapping.listenerEnabled( false );
+			if ( mapping != null ) {
+				mapping.listenerEnabled( false );
+			}
 			try {
 				withinTransaction( sessionFactory, s -> {
 					Query<?> query = selectAllOfSpecificType( entityType, s );
@@ -451,7 +472,9 @@ public class ReusableOrmSetupHolder implements TestRule {
 				} );
 			}
 			finally {
-				mapping.listenerEnabled( true );
+				if ( mapping != null ) {
+					mapping.listenerEnabled( true );
+				}
 			}
 		}
 		else {
