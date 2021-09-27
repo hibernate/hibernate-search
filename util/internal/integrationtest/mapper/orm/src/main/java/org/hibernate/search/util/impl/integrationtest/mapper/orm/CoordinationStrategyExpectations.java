@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.coordination.localheap.LocalHeapQueueCooordinationStrategy;
@@ -22,7 +21,7 @@ public final class CoordinationStrategyExpectations {
 	}
 
 	public static CoordinationStrategyExpectations outboxPolling() {
-		return async( CoordinationStrategyNames.DATABASE_POLLING, ".*Outbox event processor.*" );
+		return async( "database-polling", ".*Outbox event processor.*" );
 	}
 
 	private static CoordinationStrategyExpectations async(String strategyName, String threadNamePattern) {

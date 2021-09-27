@@ -14,6 +14,9 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrat
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 
 public class NoCoordinationStrategy implements CooordinationStrategy {
+
+	public static final String NAME = "none";
+
 	@Override
 	public CompletableFuture<?> start(CoordinationStrategyStartContext context) {
 		// Nothing to do

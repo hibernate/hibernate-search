@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 
 public class DatabasePollingBeanConfigurer implements BeanConfigurer {
 
@@ -18,7 +18,7 @@ public class DatabasePollingBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				CooordinationStrategy.class,
-				CoordinationStrategyNames.DATABASE_POLLING,
+				HibernateOrmMapperDatabasePollingSettings.COORDINATION_STRATEGY_NAME,
 				BeanReference.ofInstance( new DatabasePollingCooordinationStrategy() )
 		);
 	}

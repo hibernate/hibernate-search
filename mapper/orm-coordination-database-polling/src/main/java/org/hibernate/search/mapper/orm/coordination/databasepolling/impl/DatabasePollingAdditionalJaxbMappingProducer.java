@@ -21,8 +21,8 @@ import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.ServiceRegistry;
@@ -68,7 +68,7 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 		ConfigurationService service = serviceRegistry.getService( ConfigurationService.class );
 
 		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.COORDINATION_STRATEGY );
-		if ( !CoordinationStrategyNames.DATABASE_POLLING.equals( customIndexingStrategy ) ) {
+		if ( !HibernateOrmMapperDatabasePollingSettings.COORDINATION_STRATEGY_NAME.equals( customIndexingStrategy ) ) {
 			return Collections.emptyList();
 		}
 

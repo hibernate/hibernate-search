@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.mapper.orm.coordination.CoordinationStrategyNames;
 import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
@@ -20,7 +19,7 @@ public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				CooordinationStrategy.class,
-				CoordinationStrategyNames.NONE,
+				NoCoordinationStrategy.NAME,
 				BeanReference.ofInstance( new NoCoordinationStrategy() )
 		);
 
