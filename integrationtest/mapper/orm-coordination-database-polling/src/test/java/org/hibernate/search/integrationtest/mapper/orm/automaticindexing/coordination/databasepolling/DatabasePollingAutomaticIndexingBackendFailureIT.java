@@ -19,6 +19,7 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling.FilteringOutboxEventFinder;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;

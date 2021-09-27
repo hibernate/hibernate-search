@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling;
+package org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxE
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEventPredicate;
 
-class FilteringOutboxEventFinder {
+public class FilteringOutboxEventFinder {
 
 	private boolean filter = true;
 	private final Set<Long> allowedIds = new HashSet<>();

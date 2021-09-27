@@ -25,6 +25,7 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling.FilteringOutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
