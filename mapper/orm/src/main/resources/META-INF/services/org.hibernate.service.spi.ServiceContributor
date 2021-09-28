@@ -1,1 +1,2 @@
 org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderServiceContributor
+org.hibernate.search.mapper.orm.bootstrap.impl.HibernateSearchPreIntegrationService$Contributor

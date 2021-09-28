@@ -17,7 +17,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -58,18 +58,15 @@ public final class SearchMappingBuilder {
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final Map<String, Object> properties = new HashMap<>();
 	private final ConfigurationPropertySource propertySource;
-	private final SearchIntegrationBuilder integrationBuilder;
 	private final JavaBeanMappingKey mappingKey;
 	private final JavaBeanMappingInitiator mappingInitiator;
 
 	SearchMappingBuilder(MethodHandles.Lookup lookup) {
 		propertyChecker = ConfigurationPropertyChecker.create();
 		propertySource = getPropertySource( properties, propertyChecker );
-		integrationBuilder = SearchIntegration.builder( propertySource, propertyChecker );
 		JavaBeanBootstrapIntrospector introspector = JavaBeanBootstrapIntrospector.create( lookup );
 		mappingKey = new JavaBeanMappingKey();
 		mappingInitiator = new JavaBeanMappingInitiator( introspector );
-		integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
 		// Enable annotated type discovery by default
 		mappingInitiator.annotatedTypeDiscoveryEnabled( true );
 	}
@@ -186,12 +183,21 @@ public final class SearchMappingBuilder {
 	}
 
 	public CloseableSearchMapping build() {
-		BEAN_PROVIDER.get( propertySource ).ifPresent( integrationBuilder::beanManagerBeanProvider );
-
-		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
+		SearchIntegrationEnvironment environment = null;
+		SearchIntegrationPartialBuildState integrationPartialBuildState = null;
 		SearchIntegration integration;
 		SearchMapping mapping;
 		try {
+			SearchIntegrationEnvironment.Builder environmentBuilder =
+					SearchIntegrationEnvironment.builder( propertySource, propertyChecker );
+			BEAN_PROVIDER.get( propertySource ).ifPresent( environmentBuilder::beanProvider );
+			environment = environmentBuilder.build();
+
+			SearchIntegration.Builder integrationBuilder = SearchIntegration.builder( environment );
+			integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
+
+			integrationPartialBuildState = integrationBuilder.prepareBuild();
+
 			SearchIntegrationFinalizer finalizer =
 					integrationPartialBuildState.finalizer( propertySource, propertyChecker );
 			mapping = finalizer.finalizeMapping(
@@ -202,6 +208,7 @@ public final class SearchMappingBuilder {
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
+					.push( environment )
 					.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState );
 			throw e;
 		}

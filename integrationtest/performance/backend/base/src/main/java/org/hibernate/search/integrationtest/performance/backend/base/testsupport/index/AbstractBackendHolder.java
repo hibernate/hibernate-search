@@ -12,12 +12,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
@@ -61,8 +61,11 @@ public abstract class AbstractBackendHolder {
 
 		ConfigurationPropertyChecker unusedPropertyChecker = ConfigurationPropertyChecker.create();
 
-		SearchIntegrationBuilder integrationBuilder =
-				SearchIntegration.builder( propertySource, unusedPropertyChecker );
+		SearchIntegrationEnvironment environment =
+				SearchIntegrationEnvironment.builder( propertySource, unusedPropertyChecker ).build();
+
+		SearchIntegration.Builder integrationBuilder =
+				SearchIntegration.builder( environment );
 
 		StubMappingInitiator initiator = new StubMappingInitiator( TenancyMode.SINGLE_TENANCY );
 		StubMappingKey mappingKey = new StubMappingKey();

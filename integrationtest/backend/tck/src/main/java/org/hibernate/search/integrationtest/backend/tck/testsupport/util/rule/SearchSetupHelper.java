@@ -23,7 +23,7 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -56,6 +56,7 @@ public class SearchSetupHelper implements TestRule {
 	private final TckBackendSetupStrategy<?> setupStrategy;
 	private final TestRule delegateRule;
 
+	private final List<SearchIntegrationEnvironment> environments = new ArrayList<>();
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<SearchIntegration> integrations = new ArrayList<>();
 	private TckBackendAccessor backendAccessor;
@@ -137,12 +138,12 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	private void cleanUp(Closer<IOException> closer) {
-		closer.pushAll(
-				SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates
-		);
-		integrationPartialBuildStates.clear();
 		closer.pushAll( SearchIntegration::close, integrations );
 		integrations.clear();
+		closer.pushAll( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
+		integrationPartialBuildStates.clear();
+		closer.pushAll( SearchIntegrationEnvironment::close, environments );
+		environments.clear();
 		closer.push( TckBackendAccessor::close, backendAccessor );
 		backendAccessor = null;
 	}
@@ -154,10 +155,10 @@ public class SearchSetupHelper implements TestRule {
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
-		// Disable the bean-manager-based bean provider by default,
-		// so that we detect code that relies on beans from the bean manager
+		// Disable the bean provider by default,
+		// so that we detect code that relies on beans from the bean provider
 		// whereas it should rely on reflection or built-in beans.
-		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
+		private BeanProvider beanProvider = new ForbiddenBeanProvider();
 
 		private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 		private TenancyMode tenancyMode = TenancyMode.SINGLE_TENANCY;
@@ -170,7 +171,7 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public SetupContext expectCustomBeans() {
-			beanManagerBeanProvider = null;
+			beanProvider = null;
 			return this;
 		}
 
@@ -229,10 +230,13 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public PartialSetup setupFirstPhaseOnly() {
-			SearchIntegrationBuilder integrationBuilder =
-					SearchIntegration.builder( propertySource, unusedPropertyChecker );
+			SearchIntegrationEnvironment environment =
+					SearchIntegrationEnvironment.builder( propertySource, unusedPropertyChecker )
+							.beanProvider( beanProvider )
+							.build();
+			environments.add( environment );
 
-			integrationBuilder.beanManagerBeanProvider( beanManagerBeanProvider );
+			SearchIntegration.Builder integrationBuilder = SearchIntegration.builder( environment );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
 			mappedIndexes.forEach( initiator::add );

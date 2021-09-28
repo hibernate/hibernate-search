@@ -8,9 +8,10 @@ package org.hibernate.search.engine.common.spi;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl;
+import org.hibernate.search.engine.common.impl.SearchIntegrationBuilder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 
 public interface SearchIntegration extends AutoCloseable {
 
@@ -23,8 +24,16 @@ public interface SearchIntegration extends AutoCloseable {
 	@Override
 	void close();
 
-	static SearchIntegrationBuilder builder(ConfigurationPropertySource propertySource,
-			ConfigurationPropertyChecker propertyChecker) {
-		return new SearchIntegrationBuilderImpl( propertySource, propertyChecker );
+	static Builder builder(SearchIntegrationEnvironment environment) {
+		return new SearchIntegrationBuilder( environment );
+	}
+
+	interface Builder {
+
+		<PBM extends MappingPartialBuildState> Builder addMappingInitiator(
+				MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator);
+
+		SearchIntegrationPartialBuildState prepareBuild();
+
 	}
 }
