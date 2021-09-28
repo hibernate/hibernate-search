@@ -19,8 +19,10 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 /**
  * A helper to abstract away all the complexity of starting transactions in different environments
@@ -35,10 +37,11 @@ public final class TransactionHelper {
 	private final boolean useJta;
 
 	public TransactionHelper(SessionFactoryImplementor sessionFactory) {
-		transactionManager = sessionFactory.getServiceRegistry().getService( JtaPlatform.class )
+		ServiceRegistryImplementor serviceRegistry = sessionFactory.getServiceRegistry();
+		transactionManager = HibernateOrmUtils.getServiceOrFail( serviceRegistry, JtaPlatform.class )
 				.retrieveTransactionManager();
 		TransactionCoordinatorBuilder transactionCoordinatorBuilder =
-				sessionFactory.getServiceRegistry().getService( TransactionCoordinatorBuilder.class );
+				HibernateOrmUtils.getServiceOrFail( serviceRegistry, TransactionCoordinatorBuilder.class );
 		this.useJta = shouldUseJta( transactionManager, transactionCoordinatorBuilder );
 	}
 

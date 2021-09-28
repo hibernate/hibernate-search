@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.common.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -19,7 +20,12 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.service.Service;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.spi.ServiceBinding;
+import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public final class HibernateOrmUtils {
 
@@ -137,4 +143,34 @@ public final class HibernateOrmUtils {
 		return concreteSubTypesCount == targetConcreteSubTypes.size();
 	}
 
+	@SuppressForbiddenApis(reason = "Safer wrapper")
+	public static <T extends Service> T getServiceOrFail(ServiceRegistry serviceRegistry,
+			Class<T> serviceClass) {
+		T service = serviceRegistry.getService( serviceClass );
+		if ( service == null ) {
+			throw new org.hibernate.search.util.common.AssertionFailure( "A required service was missing. Missing service: " + serviceClass );
+		}
+		return service;
+	}
+
+	@SuppressForbiddenApis(reason = "Safer wrapper")
+	public static <T extends Service> Optional<T> getServiceOrEmpty(ServiceRegistry serviceRegistry,
+			Class<T> serviceClass) {
+		/*
+		 * First check the service binding, because if it does not exist,
+		 * a call to serviceRegistry.getService would throw an exception.
+ 		 */
+		ServiceBinding<T> binding = ( (ServiceRegistryImplementor) serviceRegistry )
+				.locateServiceBinding( serviceClass );
+		if ( binding == null ) {
+			// The service binding does not exist, so the service does not exist
+			return Optional.empty();
+		}
+		else {
+			// The service binding exists, so the service may exist
+			// Retrieve it from the service registry, not from the binding, to be sure it's initialized
+			// Note the service may be null, even if the binding is defined
+			return Optional.ofNullable( serviceRegistry.getService( serviceClass ) );
+		}
+	}
 }

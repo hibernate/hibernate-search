@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
@@ -23,7 +24,7 @@ public final class HibernateSearchContextProviderService
 		implements Service, AutoCloseable, Supplier<HibernateOrmMapping> {
 
 	public static HibernateSearchContextProviderService get(SessionFactoryImplementor sessionFactory) {
-		return sessionFactory.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
+		return HibernateOrmUtils.getServiceOrFail( sessionFactory.getServiceRegistry(), HibernateSearchContextProviderService.class );
 	}
 
 	private volatile SearchIntegration integration;

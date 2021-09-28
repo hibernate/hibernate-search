@@ -35,6 +35,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooterBehavior;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
@@ -46,10 +47,7 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
-import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.spi.ServiceBinding;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
@@ -60,7 +58,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			ConfigurationPropertyChecker propertyChecker) {
 		return propertyChecker.wrap(
 				AllAwareConfigurationPropertySource.fromMap(
-						serviceRegistry.getService( ConfigurationService.class )
+						HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class )
 								.getSettings()
 				)
 		);
@@ -72,7 +70,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 					.build();
 
 	private final Metadata metadata;
-	private final ServiceRegistryImplementor serviceRegistry;
+	private final ServiceRegistry serviceRegistry;
 	private final ReflectionManager reflectionManager;
 	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final ConfigurationService ormConfigurationService;
@@ -84,16 +82,17 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
-		this.serviceRegistry = (ServiceRegistryImplementor) builder.bootstrapContext.getServiceRegistry();
+		this.serviceRegistry = builder.bootstrapContext.getServiceRegistry();
 		this.reflectionManager = builder.bootstrapContext.getReflectionManager();
 		this.valueReadHandleFactory = builder.valueReadHandleFactory != null ? builder.valueReadHandleFactory
 				: ValueReadHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
 		this.propertyChecker = builder.propertyChecker != null ? builder.propertyChecker : ConfigurationPropertyChecker.create();
 		this.rootPropertySource = builder.rootPropertySource != null ? builder.rootPropertySource
 				: getPropertySource( serviceRegistry, propertyChecker );
-		this.ormConfigurationService = serviceRegistry.getService( ConfigurationService.class );
+		this.ormConfigurationService = HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
 
-		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer = getOrmServiceOrEmpty( EnvironmentSynchronizer.class );
+		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer =
+				HibernateOrmUtils.getServiceOrEmpty( serviceRegistry, EnvironmentSynchronizer.class );
 		if ( providedEnvironmentSynchronizer.isPresent() ) {
 			// Allow integrators to override the environment synchronizer with an ORM Service
 			this.environmentSynchronizer = providedEnvironmentSynchronizer;
@@ -241,8 +240,9 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 					metadata, reflectionManager, valueReadHandleFactory, ormConfigurationService );
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
-			ClassLoaderService hibernateOrmClassLoaderService = getOrmServiceOrFail( ClassLoaderService.class );
-			Optional<ManagedBeanRegistry> managedBeanRegistryService = getOrmServiceOrEmpty( ManagedBeanRegistry.class );
+			ClassLoaderService hibernateOrmClassLoaderService = HibernateOrmUtils.getServiceOrFail( serviceRegistry, ClassLoaderService.class );
+			Optional<ManagedBeanRegistry> managedBeanRegistryService =
+					HibernateOrmUtils.getServiceOrEmpty( serviceRegistry, ManagedBeanRegistry.class );
 			HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver classAndResourceAndServiceResolver =
 					new HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver( hibernateOrmClassLoaderService );
 			builder.classResolver( classAndResourceAndServiceResolver );
@@ -292,36 +292,10 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		 * and to the index event listener.
 		 */
 		HibernateSearchContextProviderService contextService =
-				sessionFactoryImplementor.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
+				HibernateSearchContextProviderService.get( sessionFactoryImplementor );
 		contextService.initialize( integration, mapping );
 
 		return contextService;
-	}
-
-	private <T extends Service> T getOrmServiceOrFail(Class<T> serviceClass) {
-		T service = serviceRegistry.getService( serviceClass );
-		if ( service == null ) {
-			throw new AssertionFailure( "A required service was missing. Missing service: " + serviceClass );
-		}
-		return service;
-	}
-
-	private <T extends Service> Optional<T> getOrmServiceOrEmpty(Class<T> serviceClass) {
-		/*
-		 * First check the service binding, because if it does not exist,
-		 * a call to serviceRegistry.getService would throw an exception.
- 		 */
-		ServiceBinding<T> binding = serviceRegistry.locateServiceBinding( serviceClass );
-		if ( binding == null ) {
-			// The service binding does not exist, so the service does not exist
-			return Optional.empty();
-		}
-		else {
-			// The service binding exists, so the service may exist
-			// Retrieve it from the service registry, not from the binding, to be sure it's initialized
-			// Note the service may be null, even if the binding is defined
-			return Optional.ofNullable( serviceRegistry.getService( serviceClass ) );
-		}
 	}
 
 	private static final class HibernateOrmIntegrationPartialBuildState {
