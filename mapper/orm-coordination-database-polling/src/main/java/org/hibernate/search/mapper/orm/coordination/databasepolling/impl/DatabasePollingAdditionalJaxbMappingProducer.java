@@ -22,6 +22,7 @@ import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -68,7 +69,7 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
 		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
-		ConfigurationService service = serviceRegistry.getService( ConfigurationService.class );
+		ConfigurationService service = HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
 
 		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.COORDINATION_STRATEGY );
 		if ( !HibernateOrmMapperDatabasePollingSettings.COORDINATION_STRATEGY_NAME.equals( customIndexingStrategy ) ) {
