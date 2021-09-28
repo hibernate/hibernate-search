@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.engine.common.spi;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface SearchIntegrationPartialBuildState {
 
@@ -19,9 +20,14 @@ public interface SearchIntegrationPartialBuildState {
 	void closeOnFailure();
 
 	/**
+	 * @return The bean resolver used in the first phase of the integration.
+	 */
+	BeanResolver beanResolver();
+
+	/**
 	 * @param propertySource The configuration property source,
-	 * which may hold additional configuration compared to the one passed to
-	 * {@link SearchIntegration#builder(ConfigurationPropertySource, ConfigurationPropertyChecker)}.
+	 * which may hold additional configuration compared to the environment passed to
+	 * {@link SearchIntegration#builder(SearchIntegrationEnvironment)}.
 	 * @param propertyChecker The configuration property checker
 	 * tracking the given {@code configurationPropertySource}.
 	 * @return An object allowing the finalization of the search integration.

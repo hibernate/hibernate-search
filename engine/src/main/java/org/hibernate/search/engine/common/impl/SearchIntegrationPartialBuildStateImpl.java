@@ -16,6 +16,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
@@ -97,10 +98,15 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	}
 
 	@Override
+	public BeanResolver beanResolver() {
+		return beanResolver;
+	}
+
+	@Override
 	public SearchIntegrationFinalizer finalizer(ConfigurationPropertySource propertySource,
 			ConfigurationPropertyChecker configurationPropertyChecker) {
 		return new SearchIntegrationFinalizerImpl(
-				propertySource.withMask( "hibernate.search" ),
+				propertySource.withMask( SearchIntegrationEnvironment.CONFIGURATION_PROPERTIES_MASK ),
 				configurationPropertyChecker
 		);
 	}

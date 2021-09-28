@@ -98,15 +98,17 @@ mainly based on the Infinispan needs.
 [[overall-bootstrap]]
 === Bootstrap
 
-Bootstrap starts by creating at least two components:
+Bootstrap starts by creating at least three components:
 
-* The `SearchIntegrationBuilder`, which allows to setup all the mapper-independent configuration:
-bean resolver, configuration property sources for the backends, ...
+* The `SearchIntegration.Builder`, which allows configuring the engine parts of Hibernate Search.
+* The `SearchIntegrationEnvironment`, which gets passed to the `SearchIntegration.Builder`
+and allows configuring the environment:
+bean resolver, configuration property sources for the backends, class resolution, ...
 * At least one `MappingInitiator` instance, of a type provided by the mapper module,
-which will register itself to the `SearchIntegrationBuilder`.
+which will register itself to the `SearchIntegration.Builder`.
 From the point of view of the engine, it is a callback that will come into play later.
 
-The idea is that the `SearchIntegrationBuilder` will allow one or more initiators
+The idea is that the `SearchIntegration.Builder` will allow one or more initiators
 to provide configuration about their mapping, in particular metadata
 about various "mappable" types (in short, the types manipulated by the user).
 Then the builder will organize this metadata, check the consistency to some extent,
@@ -114,7 +116,7 @@ create backends and index manager builders as necessary,
 and then provide the (organized) metadata back to the mapper module along with handles to index manager builders
 so that it can start its own bootstrapping.
 
-To sum up: the `SearchIntegrationBuilder` is a facilitator,
+To sum up: the `SearchIntegration.Builder` is a facilitator,
 allowing to start mapper bootstrapping with everything that is necessary:
 
 * engine services and components (`BuildContext`);

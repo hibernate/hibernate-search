@@ -14,30 +14,21 @@ import java.util.Map;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.common.timing.impl.DefaultTimingSource;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.bean.impl.BeanResolverImpl;
-import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
-import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
-import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
-import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
@@ -57,7 +48,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
-public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
+public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 
 	private static final ConfigurationProperty<BeanReference<? extends FailureHandler>> BACKGROUND_FAILURE_HANDLER =
 			ConfigurationProperty.forKey( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER )
@@ -71,49 +62,18 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					.withDefault( EngineSpiSettings.Defaults.THREAD_PROVIDER )
 					.build();
 
-	private final ConfigurationPropertyChecker propertyChecker;
-	private final ConfigurationPropertySource propertySource;
+	private final SearchIntegrationEnvironment environment;
 	private final Map<MappingKey<?, ?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
-	private ClassResolver classResolver;
-	private ResourceResolver resourceResolver;
-	private ServiceResolver serviceResolver;
-	private BeanProvider beanManagerBeanProvider;
 	private boolean frozen = false;
 
-	public SearchIntegrationBuilderImpl(ConfigurationPropertySource propertySource,
-			ConfigurationPropertyChecker propertyChecker) {
-		this.propertyChecker = propertyChecker;
-		this.propertySource = propertySource.withMask( "hibernate.search" );
-		propertyChecker.beforeBoot();
+	public SearchIntegrationBuilder(SearchIntegrationEnvironment environment) {
+		this.environment = environment;
+		environment.propertyChecker().beforeBoot();
 	}
 
 	@Override
-	public SearchIntegrationBuilder classResolver(ClassResolver classResolver) {
-		this.classResolver = classResolver;
-		return this;
-	}
-
-	@Override
-	public SearchIntegrationBuilder resourceResolver(ResourceResolver resourceResolver) {
-		this.resourceResolver = resourceResolver;
-		return this;
-	}
-
-	@Override
-	public SearchIntegrationBuilder serviceResolver(ServiceResolver serviceResolver) {
-		this.serviceResolver = serviceResolver;
-		return this;
-	}
-
-	@Override
-	public SearchIntegrationBuilder beanManagerBeanProvider(BeanProvider beanProvider) {
-		this.beanManagerBeanProvider = beanProvider;
-		return this;
-	}
-
-	@Override
-	public <PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
+	public <PBM extends MappingPartialBuildState> SearchIntegration.Builder addMappingInitiator(
 			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator) {
 		if ( frozen ) {
 			throw new AssertionFailure(
@@ -135,6 +95,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	@Override
 	public SearchIntegrationPartialBuildState prepareBuild() {
+		ConfigurationPropertySource propertySource = environment.propertySource();
+		BeanResolver beanResolver = environment.beanResolver();
 		BeanHolder<? extends FailureHandler> failureHandlerHolder = null;
 		BeanHolder<? extends ThreadProvider> threadProviderHolder = null;
 		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
@@ -149,30 +111,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		try {
 			frozen = true;
 
-			AggregatedClassLoader aggregatedClassLoader = null;
-
-			if ( classResolver == null ) {
-				aggregatedClassLoader = AggregatedClassLoader.createDefault();
-				classResolver = DefaultClassResolver.create( aggregatedClassLoader );
-			}
-
-			if ( resourceResolver == null ) {
-				if ( aggregatedClassLoader == null ) {
-					aggregatedClassLoader = AggregatedClassLoader.createDefault();
-				}
-				resourceResolver = DefaultResourceResolver.create( aggregatedClassLoader );
-			}
-
-			if ( serviceResolver == null ) {
-				if ( aggregatedClassLoader == null ) {
-					aggregatedClassLoader = AggregatedClassLoader.createDefault();
-				}
-				serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
-			}
-
-			BeanResolver beanResolver = BeanResolverImpl.create( classResolver, serviceResolver,
-					beanManagerBeanProvider, propertySource );
-
 			failureHandlerHolder = BACKGROUND_FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
 			// Wrap the failure handler to prevent it from throwing exceptions
 			failureHandlerHolder = BeanHolder.of( new FailSafeFailureHandlerWrapper( failureHandlerHolder.get() ) )
@@ -186,7 +124,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
-					classResolver, resourceResolver, beanResolver,
+					environment.classResolver(), environment.resourceResolver(), beanResolver,
 					failureCollector, threadPoolProvider, failureHandler,
 					engineThreads, timingSource
 			);
@@ -250,13 +188,13 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			return new SearchIntegrationPartialBuildStateImpl(
-					beanManagerBeanProvider, beanResolver,
+					environment.beanProvider(), beanResolver,
 					failureHandlerHolder,
 					threadPoolProvider,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendNonStartedStates(),
 					indexManagerBuildingStateHolder.getIndexManagersNonStartedStates(),
-					propertyChecker,
+					environment.propertyChecker(),
 					engineThreads, timingSource
 			);
 		}
@@ -297,7 +235,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
 			// Close environment resources before aborting
 			closer.pushAll( BeanHolder::close, threadProviderHolder );
-			closer.pushAll( BeanProvider::close, beanManagerBeanProvider );
+			closer.pushAll( SearchIntegrationEnvironment::close, environment );
 			closer.push( EngineThreads::onStop, engineThreads );
 			closer.push( TimingSource::stop, timingSource );
 
