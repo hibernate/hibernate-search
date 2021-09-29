@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long> {
+public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long, Long> {
 
 	public static final BoxedLongPropertyTypeDescriptor INSTANCE = new BoxedLongPropertyTypeDescriptor();
 
@@ -25,20 +24,20 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 	}
 
 	@Override
+	protected PropertyValues<Long, Long> createValues() {
+		return PropertyValues.<Long>passThroughBuilder()
+				.add( Long.MIN_VALUE, String.valueOf( Long.MIN_VALUE ) )
+				.add( -1L, "-1" )
+				.add( 0L, "0" )
+				.add( 1L, "1" )
+				.add( 42L, "42" )
+				.add( Long.MAX_VALUE, String.valueOf( Long.MAX_VALUE ) )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Long>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Long>() {
-
-			@Override
-			public List<Long> getEntityIdentifierValues() {
-				return Arrays.asList( Long.MIN_VALUE, -1L, 0L, 1L, 42L, Long.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						String.valueOf( Long.MIN_VALUE ), "-1", "0", "1", "42", String.valueOf( Long.MAX_VALUE )
-				);
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -66,16 +65,6 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 			@Override
 			public Class<Long> getIndexFieldJavaType() {
 				return Long.class;
-			}
-
-			@Override
-			public List<Long> getEntityPropertyValues() {
-				return Arrays.asList( Long.MIN_VALUE, -1L, 0L, 1L, 42L, Long.MAX_VALUE );
-			}
-
-			@Override
-			public List<Long> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

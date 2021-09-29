@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte> {
+public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte, Byte> {
 
 	public static final BoxedBytePropertyTypeDescriptor INSTANCE = new BoxedBytePropertyTypeDescriptor();
 
@@ -25,20 +24,20 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 	}
 
 	@Override
+	protected PropertyValues<Byte, Byte> createValues() {
+		return PropertyValues.<Byte>passThroughBuilder()
+				.add( Byte.MIN_VALUE, String.valueOf( Byte.MIN_VALUE ) )
+				.add( (byte) -1, "-1" )
+				.add( (byte) 0, "0" )
+				.add( (byte) 1, "1" )
+				.add( (byte) 42, "42" )
+				.add( Byte.MAX_VALUE, String.valueOf( Byte.MAX_VALUE ) )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Byte>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Byte>() {
-
-			@Override
-			public List<Byte> getEntityIdentifierValues() {
-				return Arrays.asList( Byte.MIN_VALUE, (byte)-1, (byte)0, (byte)1, (byte)42, Byte.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						String.valueOf( Byte.MIN_VALUE ), "-1", "0", "1", "42", String.valueOf( Byte.MAX_VALUE )
-				);
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -66,16 +65,6 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 			@Override
 			public Class<Byte> getIndexFieldJavaType() {
 				return Byte.class;
-			}
-
-			@Override
-			public List<Byte> getEntityPropertyValues() {
-				return Arrays.asList( Byte.MIN_VALUE, (byte)-1, (byte)0, (byte)1, (byte)42, Byte.MAX_VALUE );
-			}
-
-			@Override
-			public List<Byte> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

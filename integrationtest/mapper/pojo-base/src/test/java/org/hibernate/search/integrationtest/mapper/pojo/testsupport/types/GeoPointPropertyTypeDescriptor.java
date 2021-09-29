@@ -6,23 +6,33 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPoint> {
+public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPoint, GeoPoint> {
 
 	public static final GeoPointPropertyTypeDescriptor INSTANCE = new GeoPointPropertyTypeDescriptor();
 
 	private GeoPointPropertyTypeDescriptor() {
 		super( GeoPoint.class );
+	}
+
+	@Override
+	protected PropertyValues<GeoPoint, GeoPoint> createValues() {
+		return PropertyValues.<GeoPoint>passThroughBuilder()
+				.add( GeoPoint.of( 0.0, 0.0 ) )
+				.add( GeoPoint.of( 100.123, 200.234 ) )
+				.add( GeoPoint.of( 41.89193, 12.51133 ) )
+				.add( GeoPoint.of( -26.4390917, 133.281323 ) )
+				.add( GeoPoint.of( -14.2400732, -53.1805017 ) )
+				.build();
 	}
 
 	@Override
@@ -37,23 +47,6 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 			@Override
 			public Class<GeoPoint> getIndexFieldJavaType() {
 				return GeoPoint.class;
-			}
-
-			@Override
-			public List<GeoPoint> getEntityPropertyValues() {
-				List<GeoPoint> geoPoints = Arrays.asList(
-						GeoPoint.of( 0.0, 0.0 ),
-						GeoPoint.of( 100.123, 200.234 ),
-						GeoPoint.of( 41.89193, 12.51133 ),
-						GeoPoint.of( -26.4390917, 133.281323 ),
-						GeoPoint.of( -14.2400732, -53.1805017 )
-				);
-				return geoPoints;
-			}
-
-			@Override
-			public List<GeoPoint> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

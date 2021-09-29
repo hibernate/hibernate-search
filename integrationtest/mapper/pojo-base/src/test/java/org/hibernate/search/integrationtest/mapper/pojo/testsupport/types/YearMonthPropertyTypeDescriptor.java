@@ -9,22 +9,32 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<YearMonth> {
+public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<YearMonth, YearMonth> {
 
 	public static final YearMonthPropertyTypeDescriptor INSTANCE = new YearMonthPropertyTypeDescriptor();
 
 	private YearMonthPropertyTypeDescriptor() {
 		super( YearMonth.class );
+	}
+
+	@Override
+	protected PropertyValues<YearMonth, YearMonth> createValues() {
+		return PropertyValues.<YearMonth>passThroughBuilder()
+				.add( YearMonth.of( Year.MIN_VALUE, Month.NOVEMBER ) )
+				.add( YearMonth.of( 2019, Month.JANUARY ) )
+				.add( YearMonth.of( 2019, Month.FEBRUARY ) )
+				.add( YearMonth.of( 2317, Month.NOVEMBER ) )
+				.add( YearMonth.of( Year.MAX_VALUE, Month.NOVEMBER ) )
+				.build();
 	}
 
 	@Override
@@ -39,22 +49,6 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 			@Override
 			public Class<YearMonth> getIndexFieldJavaType() {
 				return YearMonth.class;
-			}
-
-			@Override
-			public List<YearMonth> getEntityPropertyValues() {
-				return Arrays.asList(
-						YearMonth.of( Year.MIN_VALUE, Month.NOVEMBER ),
-						YearMonth.of( 2019, Month.JANUARY ),
-						YearMonth.of( 2019, Month.FEBRUARY ),
-						YearMonth.of( 2317, Month.NOVEMBER ),
-						YearMonth.of( Year.MAX_VALUE, Month.NOVEMBER )
-				);
-			}
-
-			@Override
-			public List<YearMonth> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

@@ -59,12 +59,12 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<I> typeDescriptor;
+	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
 	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
 	private StubIndexSchemaNode rootSchemaNode;
 
-	public DocumentIdDefaultBridgeOverridingIT(PropertyTypeDescriptor<I> typeDescriptor,
+	public DocumentIdDefaultBridgeOverridingIT(PropertyTypeDescriptor<I, ?> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
 		assumeTrue(
 				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()
@@ -150,7 +150,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	}
 
 	private I getEntityIdentifierValue() {
-		return expectations.getEntityIdentifierValues().get( 0 );
+		return typeDescriptor.values().entityModelValues.get( 0 );
 	}
 
 	private String getDocumentIdentifierValue() {

@@ -9,22 +9,33 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<OffsetTime> {
+public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<OffsetTime, OffsetTime> {
 
 	public static final OffsetTimePropertyTypeDescriptor INSTANCE = new OffsetTimePropertyTypeDescriptor();
 
 	private OffsetTimePropertyTypeDescriptor() {
 		super( OffsetTime.class );
+	}
+
+	@Override
+	protected PropertyValues<OffsetTime, OffsetTime> createValues() {
+		return PropertyValues.<OffsetTime>passThroughBuilder()
+				.add( OffsetTime.MIN )
+				.add( LocalTime.of( 7, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ) )
+				.add( LocalTime.of( 12, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ) )
+				.add( LocalTime.of( 12, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ) )
+				.add( LocalTime.of( 12, 0, 1 ).atOffset( ZoneOffset.ofHours( -6 ) ) )
+				.add( OffsetTime.MAX )
+				.build();
 	}
 
 	@Override
@@ -39,23 +50,6 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 			@Override
 			public Class<OffsetTime> getIndexFieldJavaType() {
 				return OffsetTime.class;
-			}
-
-			@Override
-			public List<OffsetTime> getEntityPropertyValues() {
-				return Arrays.asList(
-						OffsetTime.MIN,
-						LocalTime.of( 7, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-						LocalTime.of( 12, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-						LocalTime.of( 12, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-						LocalTime.of( 12, 0, 1 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-						OffsetTime.MAX
-				);
-			}
-
-			@Override
-			public List<OffsetTime> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

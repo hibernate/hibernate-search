@@ -8,22 +8,32 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<MonthDay> {
+public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<MonthDay, MonthDay> {
 
 	public static final MonthDayPropertyTypeDescriptor INSTANCE = new MonthDayPropertyTypeDescriptor();
 
 	private MonthDayPropertyTypeDescriptor() {
 		super( MonthDay.class );
+	}
+
+	@Override
+	protected PropertyValues<MonthDay, MonthDay> createValues() {
+		return PropertyValues.<MonthDay>passThroughBuilder()
+				.add( MonthDay.of( Month.JANUARY, 1 ) )
+				.add( MonthDay.of( Month.MARCH, 1 ) )
+				.add( MonthDay.of( Month.MARCH, 2 ) )
+				.add( MonthDay.of( Month.NOVEMBER, 21 ) )
+				.add( MonthDay.of( Month.DECEMBER, 31 ) )
+				.build();
 	}
 
 	@Override
@@ -38,22 +48,6 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 			@Override
 			public Class<MonthDay> getIndexFieldJavaType() {
 				return MonthDay.class;
-			}
-
-			@Override
-			public List<MonthDay> getEntityPropertyValues() {
-				return Arrays.asList(
-						MonthDay.of( Month.JANUARY, 1 ),
-						MonthDay.of( Month.MARCH, 1 ),
-						MonthDay.of( Month.MARCH, 2 ),
-						MonthDay.of( Month.NOVEMBER, 21 ),
-						MonthDay.of( Month.DECEMBER, 31 )
-				);
-			}
-
-			@Override
-			public List<MonthDay> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

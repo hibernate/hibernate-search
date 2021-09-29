@@ -8,22 +8,32 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalDateTime> {
+public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalDateTime, LocalDateTime> {
 
 	public static final LocalDateTimePropertyTypeDescriptor INSTANCE = new LocalDateTimePropertyTypeDescriptor();
 
 	private LocalDateTimePropertyTypeDescriptor() {
 		super( LocalDateTime.class );
+	}
+
+	@Override
+	protected PropertyValues<LocalDateTime, LocalDateTime> createValues() {
+		return PropertyValues.<LocalDateTime>passThroughBuilder()
+				.add( LocalDateTime.MIN )
+				.add( LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ) )
+				.add( LocalDateTime.of( 1970, Month.JANUARY, 9, 7, 0, 0 ) )
+				.add( LocalDateTime.of( 2017, Month.JANUARY, 9, 7, 0, 0 ) )
+				.add( LocalDateTime.MAX )
+				.build();
 	}
 
 	@Override
@@ -38,22 +48,6 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			@Override
 			public Class<LocalDateTime> getIndexFieldJavaType() {
 				return LocalDateTime.class;
-			}
-
-			@Override
-			public List<LocalDateTime> getEntityPropertyValues() {
-				return Arrays.asList(
-						LocalDateTime.MIN,
-						LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ),
-						LocalDateTime.of( 1970, Month.JANUARY, 9, 7, 0, 0 ),
-						LocalDateTime.of( 2017, Month.JANUARY, 9, 7, 0, 0 ),
-						LocalDateTime.MAX
-				);
-			}
-
-			@Override
-			public List<LocalDateTime> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

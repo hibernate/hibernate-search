@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations;
 
-import java.util.List;
-
 public interface DefaultValueBridgeExpectations<V, F> {
 	String TYPE_WITH_VALUE_BRIDGE_1_NAME = "TypeWithValueBridge1Name";
 	String TYPE_WITH_VALUE_BRIDGE_2_NAME = "TypeWithValueBridge2Name";
@@ -16,13 +14,9 @@ public interface DefaultValueBridgeExpectations<V, F> {
 
 	Class<F> getIndexFieldJavaType();
 
-	List<V> getEntityPropertyValues();
-
-	default List<V> getProjectionValues() {
-		return getEntityPropertyValues();
+	default V toProjectedValue(V indexedValue) {
+		return indexedValue;
 	}
-
-	List<F> getDocumentFieldValues();
 
 	Class<?> getTypeWithValueBridge1();
 

@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<Boolean> {
+public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<Boolean, Boolean> {
 
 	public static final PrimitiveBooleanPropertyTypeDescriptor INSTANCE = new PrimitiveBooleanPropertyTypeDescriptor();
 
@@ -25,18 +24,13 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
+	protected PropertyValues<Boolean, Boolean> createValues() {
+		return BoxedBooleanPropertyTypeDescriptor.INSTANCE.values();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Boolean>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Boolean>() {
-
-			@Override
-			public List<Boolean> getEntityIdentifierValues() {
-				return Arrays.asList( true, false );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList( "true", "false" );
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -64,16 +58,6 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 			@Override
 			public Class<Boolean> getIndexFieldJavaType() {
 				return Boolean.class;
-			}
-
-			@Override
-			public List<Boolean> getEntityPropertyValues() {
-				return Arrays.asList( true, false );
-			}
-
-			@Override
-			public List<Boolean> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

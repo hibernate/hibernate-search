@@ -7,22 +7,33 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Year;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
+public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year, Year> {
 
 	public static final YearPropertyTypeDescriptor INSTANCE = new YearPropertyTypeDescriptor();
 
 	private YearPropertyTypeDescriptor() {
 		super( Year.class );
+	}
+
+	@Override
+	protected PropertyValues<Year, Year> createValues() {
+		return PropertyValues.<Year>passThroughBuilder()
+				.add( Year.of( Year.MIN_VALUE ) )
+				.add( Year.of( -1 ) )
+				.add( Year.of( 0 ) )
+				.add( Year.of( 1 ) )
+				.add( Year.of( 42 ) )
+				.add( Year.of( Year.MAX_VALUE ) )
+				.build();
 	}
 
 	@Override
@@ -37,18 +48,6 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 			@Override
 			public Class<Year> getIndexFieldJavaType() {
 				return Year.class;
-			}
-
-			@Override
-			public List<Year> getEntityPropertyValues() {
-				return Arrays.asList(
-						Year.of( Year.MIN_VALUE ), Year.of( -1 ), Year.of( 0 ), Year.of( 1 ), Year.of( 42 ), Year.of( Year.MAX_VALUE )
-				);
-			}
-
-			@Override
-			public List<Year> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

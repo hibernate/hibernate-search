@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Integer> {
+public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Integer, Integer> {
 
 	public static final PrimitiveIntegerPropertyTypeDescriptor INSTANCE = new PrimitiveIntegerPropertyTypeDescriptor();
 
@@ -25,20 +24,13 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
+	protected PropertyValues<Integer, Integer> createValues() {
+		return BoxedIntegerPropertyTypeDescriptor.INSTANCE.values();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Integer>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Integer>() {
-
-			@Override
-			public List<Integer> getEntityIdentifierValues() {
-				return Arrays.asList( Integer.MIN_VALUE, -1, 0, 1, 42, Integer.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						String.valueOf( Integer.MIN_VALUE ), "-1", "0", "1", "42", String.valueOf( Integer.MAX_VALUE )
-				);
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -67,16 +59,6 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 			@Override
 			public Class<Integer> getIndexFieldJavaType() {
 				return Integer.class;
-			}
-
-			@Override
-			public List<Integer> getEntityPropertyValues() {
-				return Arrays.asList( Integer.MIN_VALUE, -1, 0, 1, 42, Integer.MAX_VALUE );
-			}
-
-			@Override
-			public List<Integer> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override
