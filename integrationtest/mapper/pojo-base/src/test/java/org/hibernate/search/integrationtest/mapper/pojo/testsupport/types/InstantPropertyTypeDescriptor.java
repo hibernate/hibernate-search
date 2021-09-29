@@ -7,22 +7,32 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instant> {
+public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instant, Instant> {
 
 	public static final InstantPropertyTypeDescriptor INSTANCE = new InstantPropertyTypeDescriptor();
 
 	private InstantPropertyTypeDescriptor() {
 		super( Instant.class );
+	}
+
+	@Override
+	protected PropertyValues<Instant, Instant> createValues() {
+		return PropertyValues.<Instant>passThroughBuilder()
+				.add( Instant.MIN )
+				.add( Instant.parse( "1970-01-01T00:00:00.00Z" ) )
+				.add( Instant.parse( "1970-01-09T13:28:59.00Z" ) )
+				.add( Instant.parse( "2017-11-06T19:19:00.54Z" ) )
+				.add( Instant.MAX )
+				.build();
 	}
 
 	@Override
@@ -37,22 +47,6 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {
 				return Instant.class;
-			}
-
-			@Override
-			public List<Instant> getEntityPropertyValues() {
-				return Arrays.asList(
-						Instant.MIN,
-						Instant.parse( "1970-01-01T00:00:00.00Z" ),
-						Instant.parse( "1970-01-09T13:28:59.00Z" ),
-						Instant.parse( "2017-11-06T19:19:00.54Z" ),
-						Instant.MAX
-				);
-			}
-
-			@Override
-			public List<Instant> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

@@ -7,22 +7,32 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalTime> {
+public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalTime, LocalTime> {
 
 	public static final LocalTimePropertyTypeDescriptor INSTANCE = new LocalTimePropertyTypeDescriptor();
 
 	private LocalTimePropertyTypeDescriptor() {
 		super( LocalTime.class );
+	}
+
+	@Override
+	protected PropertyValues<LocalTime, LocalTime> createValues() {
+		return PropertyValues.<LocalTime>passThroughBuilder()
+				.add( LocalTime.MIN )
+				.add( LocalTime.of( 7, 0, 0 ) )
+				.add( LocalTime.of( 12, 0, 0 ) )
+				.add( LocalTime.of( 12, 0, 1 ) )
+				.add( LocalTime.MAX )
+				.build();
 	}
 
 	@Override
@@ -37,22 +47,6 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 			@Override
 			public Class<LocalTime> getIndexFieldJavaType() {
 				return LocalTime.class;
-			}
-
-			@Override
-			public List<LocalTime> getEntityPropertyValues() {
-				return Arrays.asList(
-						LocalTime.MIN,
-						LocalTime.of( 7, 0, 0 ),
-						LocalTime.of( 12, 0, 0 ),
-						LocalTime.of( 12, 0, 1 ),
-						LocalTime.MAX
-				);
-			}
-
-			@Override
-			public List<LocalTime> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

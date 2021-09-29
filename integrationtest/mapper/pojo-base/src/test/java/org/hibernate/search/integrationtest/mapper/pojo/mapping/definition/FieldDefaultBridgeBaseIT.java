@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
@@ -63,13 +64,13 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<V> typeDescriptor;
+	private final PropertyTypeDescriptor<V, F> typeDescriptor;
 	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
 	private StubIndexNode index1Field;
 	private StubIndexNode index2Field;
 
-	public FieldDefaultBridgeBaseIT(PropertyTypeDescriptor<V> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+	public FieldDefaultBridgeBaseIT(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		this.typeDescriptor = typeDescriptor;
 		this.expectations = expectations;
 	}
@@ -261,7 +262,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	}
 
 	private List<V> getPropertyValues() {
-		List<V> propertyValues = new ArrayList<>( expectations.getEntityPropertyValues() );
+		List<V> propertyValues = new ArrayList<>( typeDescriptor.values().entityModelValues );
 		if ( typeDescriptor.isNullable() ) {
 			propertyValues.add( null );
 		}
@@ -269,7 +270,9 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	}
 
 	private List<V> getProjectionValues() {
-		List<V> values = new ArrayList<>( expectations.getProjectionValues() );
+		List<V> values = typeDescriptor.values().entityModelValues.stream()
+				.map( expectations::toProjectedValue )
+				.collect( Collectors.toList() );
 		if ( typeDescriptor.isNullable() ) {
 			values.add( null );
 		}
@@ -277,7 +280,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	}
 
 	private List<F> getDocumentFieldValues() {
-		List<F> documentFieldValues = new ArrayList<>( expectations.getDocumentFieldValues() );
+		List<F> documentFieldValues = new ArrayList<>( typeDescriptor.values().documentFieldValues );
 		if ( typeDescriptor.isNullable() ) {
 			documentFieldValues.add( null );
 		}

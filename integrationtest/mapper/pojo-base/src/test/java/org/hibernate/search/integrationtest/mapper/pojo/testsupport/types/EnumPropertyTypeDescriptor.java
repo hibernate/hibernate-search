@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPropertyTypeDescriptor.MyEnum> {
+public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPropertyTypeDescriptor.MyEnum, String> {
 
 	public static final EnumPropertyTypeDescriptor INSTANCE = new EnumPropertyTypeDescriptor();
 
@@ -25,18 +24,16 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	}
 
 	@Override
+	protected PropertyValues<MyEnum, String> createValues() {
+		return PropertyValues.<MyEnum>stringBasedBuilder()
+				.add( MyEnum.VALUE1, "VALUE1" )
+				.add( MyEnum.VALUE2, "VALUE2" )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<MyEnum>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<MyEnum>() {
-
-			@Override
-			public List<MyEnum> getEntityIdentifierValues() {
-				return Arrays.asList( MyEnum.VALUE1, MyEnum.VALUE2 );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList( "VALUE1", "VALUE2" );
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -64,16 +61,6 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<MyEnum> getEntityPropertyValues() {
-				return Arrays.asList( MyEnum.VALUE1, MyEnum.VALUE2 );
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return Arrays.asList( "VALUE1", "VALUE2" );
 			}
 
 			@Override

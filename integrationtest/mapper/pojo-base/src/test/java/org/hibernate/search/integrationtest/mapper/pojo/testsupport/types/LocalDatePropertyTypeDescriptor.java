@@ -7,22 +7,32 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalDate> {
+public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalDate, LocalDate> {
 
 	public static final LocalDatePropertyTypeDescriptor INSTANCE = new LocalDatePropertyTypeDescriptor();
 
 	private LocalDatePropertyTypeDescriptor() {
 		super( LocalDate.class );
+	}
+
+	@Override
+	protected PropertyValues<LocalDate, LocalDate> createValues() {
+		return PropertyValues.<LocalDate>passThroughBuilder()
+				.add( LocalDate.MIN )
+				.add( LocalDate.parse( "1970-01-01" ) )
+				.add( LocalDate.parse( "1970-01-09" ) )
+				.add( LocalDate.parse( "2017-11-06" ) )
+				.add( LocalDate.MAX )
+				.build();
 	}
 
 	@Override
@@ -37,22 +47,6 @@ public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 			@Override
 			public Class<LocalDate> getIndexFieldJavaType() {
 				return LocalDate.class;
-			}
-
-			@Override
-			public List<LocalDate> getEntityPropertyValues() {
-				return Arrays.asList(
-						LocalDate.MIN,
-						LocalDate.parse( "1970-01-01" ),
-						LocalDate.parse( "1970-01-09" ),
-						LocalDate.parse( "2017-11-06" ),
-						LocalDate.MAX
-				);
-			}
-
-			@Override
-			public List<LocalDate> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

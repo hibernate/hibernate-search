@@ -7,22 +7,34 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<BigDecimal> {
+public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<BigDecimal, BigDecimal> {
 
 	public static final BigDecimalPropertyTypeDescriptor INSTANCE = new BigDecimalPropertyTypeDescriptor();
 
 	private BigDecimalPropertyTypeDescriptor() {
 		super( BigDecimal.class );
+	}
+
+	@Override
+	protected PropertyValues<BigDecimal, BigDecimal> createValues() {
+		return PropertyValues.<BigDecimal>passThroughBuilder()
+				.add( BigDecimal.valueOf( -100000.0 ) )
+				.add( BigDecimal.valueOf( -1.0 ) )
+				.add( BigDecimal.ZERO )
+				.add( BigDecimal.ONE )
+				.add( BigDecimal.TEN )
+				.add( BigDecimal.valueOf( 100000.0 ) )
+				.add( BigDecimal.valueOf( 42571524, 231254 ) )
+				.build();
 	}
 
 	@Override
@@ -37,17 +49,6 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			@Override
 			public Class<BigDecimal> getIndexFieldJavaType() {
 				return BigDecimal.class;
-			}
-
-			@Override
-			public List<BigDecimal> getEntityPropertyValues() {
-				return Arrays.asList( BigDecimal.valueOf( -100000.0 ), BigDecimal.valueOf( -1.0 ), BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.TEN,
-						BigDecimal.valueOf( 100000.0 ), BigDecimal.valueOf( 42571524, 231254 ) );
-			}
-
-			@Override
-			public List<BigDecimal> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

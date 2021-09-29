@@ -7,36 +7,41 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI> {
-
-	private static final String[] STRING_URLS = {
-			"https://www.google.com",
-			"https://twitter.com/Hibernate/status/1093118957194801152",
-			"https://twitter.com/Hibernate/status/1092803949533507584",
-			"https://access.redhat.com/",
-			"https://access.redhat.com/products",
-			"https://access.redhat.com/products/red-hat-fuse/",
-			"https://access.redhat.com/products/red-hat-openshift-container-platform/",
-			"mailto:java-net@java.sun.com",
-			"urn:isbn:096139210x",
-			"file:///~calendar"
-	};
+public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI, String> {
 
 	public static final JavaNetURIPropertyTypeDescriptor INSTANCE = new JavaNetURIPropertyTypeDescriptor();
 
 	private JavaNetURIPropertyTypeDescriptor() {
 		super( URI.class );
+	}
+
+	@Override
+	protected PropertyValues<URI, String> createValues() {
+		PropertyValues.Builder<URI, String> builder = PropertyValues.builder();
+		for ( String string : new String[] {
+				"https://www.google.com",
+				"https://twitter.com/Hibernate/status/1093118957194801152",
+				"https://twitter.com/Hibernate/status/1092803949533507584",
+				"https://access.redhat.com/",
+				"https://access.redhat.com/products",
+				"https://access.redhat.com/products/red-hat-fuse/",
+				"https://access.redhat.com/products/red-hat-openshift-container-platform/",
+				"mailto:java-net@java.sun.com",
+				"urn:isbn:096139210x",
+				"file:///~calendar"
+		} ) {
+			builder.add( URI.create( string ), string );
+		}
+		return builder.build();
 	}
 
 	@Override
@@ -51,16 +56,6 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<URI> getEntityPropertyValues() {
-				return Arrays.stream( STRING_URLS ).map( s -> URI.create( s ) ).collect( Collectors.toList() );
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return Arrays.asList( STRING_URLS );
 			}
 
 			@Override

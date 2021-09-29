@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Float> {
+public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Float, Float> {
 
 	public static final PrimitiveFloatPropertyTypeDescriptor INSTANCE = new PrimitiveFloatPropertyTypeDescriptor();
 
@@ -25,18 +24,13 @@ public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor
 	}
 
 	@Override
+	protected PropertyValues<Float, Float> createValues() {
+		return BoxedFloatPropertyTypeDescriptor.INSTANCE.values();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Float>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Float>() {
-
-			@Override
-			public List<Float> getEntityIdentifierValues() {
-				return Arrays.asList( Float.MIN_VALUE, -1.0f, 0.0f, 1.0f, 42.0f, Float.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList( "1.4E-45", "-1.0", "0.0", "1.0", "42.0", "3.4028235E38" );
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -64,16 +58,6 @@ public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor
 			@Override
 			public Class<Float> getIndexFieldJavaType() {
 				return Float.class;
-			}
-
-			@Override
-			public List<Float> getEntityPropertyValues() {
-				return Arrays.asList( Float.MIN_VALUE, -1.0f, 0.0f, 1.0f, 42.0f, Float.MAX_VALUE );
-			}
-
-			@Override
-			public List<Float> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

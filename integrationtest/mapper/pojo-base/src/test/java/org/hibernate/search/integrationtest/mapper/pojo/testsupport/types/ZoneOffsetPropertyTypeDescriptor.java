@@ -7,22 +7,33 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneOffset> {
+public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneOffset, Integer> {
 
 	public static final ZoneOffsetPropertyTypeDescriptor INSTANCE = new ZoneOffsetPropertyTypeDescriptor();
 
 	private ZoneOffsetPropertyTypeDescriptor() {
 		super( ZoneOffset.class );
+	}
+
+	@Override
+	protected PropertyValues<ZoneOffset, Integer> createValues() {
+		return PropertyValues.<ZoneOffset, Integer>builder()
+				.add( ZoneOffset.MIN, -18 * 3600 )
+				.add( ZoneOffset.ofHours( -1 ), -1 * 3600 )
+				.add( ZoneOffset.UTC, 0 )
+				.add( ZoneOffset.ofHours( 1 ), 1 * 3600 )
+				.add( ZoneOffset.ofHours( 7 ), 7 * 3600 )
+				.add( ZoneOffset.MAX, 18 * 3600 )
+				.build();
 	}
 
 	@Override
@@ -37,30 +48,6 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 			@Override
 			public Class<Integer> getIndexFieldJavaType() {
 				return Integer.class;
-			}
-
-			@Override
-			public List<ZoneOffset> getEntityPropertyValues() {
-				return Arrays.asList(
-						ZoneOffset.MIN,
-						ZoneOffset.ofHours( -1 ),
-						ZoneOffset.UTC,
-						ZoneOffset.ofHours( 1 ),
-						ZoneOffset.ofHours( 7 ),
-						ZoneOffset.MAX
-				);
-			}
-
-			@Override
-			public List<Integer> getDocumentFieldValues() {
-				return Arrays.asList(
-						ZoneOffset.MIN.getTotalSeconds(),
-						ZoneOffset.ofHours( -1 ).getTotalSeconds(),
-						ZoneOffset.UTC.getTotalSeconds(),
-						ZoneOffset.ofHours( 1 ).getTotalSeconds(),
-						ZoneOffset.ofHours( 7 ).getTotalSeconds(),
-						ZoneOffset.MAX.getTotalSeconds()
-				);
 			}
 
 			@Override

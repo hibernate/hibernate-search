@@ -10,22 +10,35 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<OffsetDateTime> {
+public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<OffsetDateTime, OffsetDateTime> {
 
 	public static final OffsetDateTimePropertyTypeDescriptor INSTANCE = new OffsetDateTimePropertyTypeDescriptor();
 
 	private OffsetDateTimePropertyTypeDescriptor() {
 		super( OffsetDateTime.class );
+	}
+
+	@Override
+	protected PropertyValues<OffsetDateTime, OffsetDateTime> createValues() {
+		return PropertyValues.<OffsetDateTime>passThroughBuilder()
+				.add( OffsetDateTime.of( LocalDateTime.MIN, ZoneOffset.ofHours( 1 ) ) )
+				.add( OffsetDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ),
+						ZoneOffset.ofHours( 1 ) ) )
+				.add( OffsetDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ),
+						ZoneOffset.ofHours( 1 ) ) )
+				.add( OffsetDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ),
+						ZoneOffset.ofHours( -6 ) ) )
+				.add( OffsetDateTime.of( LocalDateTime.MAX, ZoneOffset.ofHours( 1 ) ) )
+				.build();
 	}
 
 	@Override
@@ -40,22 +53,6 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 			@Override
 			public Class<OffsetDateTime> getIndexFieldJavaType() {
 				return OffsetDateTime.class;
-			}
-
-			@Override
-			public List<OffsetDateTime> getEntityPropertyValues() {
-				return Arrays.asList(
-						OffsetDateTime.of( LocalDateTime.MIN, ZoneOffset.ofHours( 1 ) ),
-						OffsetDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ), ZoneOffset.ofHours( 1 ) ),
-						OffsetDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ), ZoneOffset.ofHours( 1 ) ),
-						OffsetDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ), ZoneOffset.ofHours( -6 ) ),
-						OffsetDateTime.of( LocalDateTime.MAX, ZoneOffset.ofHours( 1 ) )
-				);
-			}
-
-			@Override
-			public List<OffsetDateTime> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override
