@@ -21,16 +21,12 @@ public class PrimitiveLongPropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public static final PrimitiveLongPropertyTypeDescriptor INSTANCE = new PrimitiveLongPropertyTypeDescriptor();
 
 	private PrimitiveLongPropertyTypeDescriptor() {
-		super( long.class );
+		super( long.class, Long.class );
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Long>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Long>() {
-			@Override
-			public Class<Long> getProjectionType() {
-				return Long.class;
-			}
 
 			@Override
 			public List<Long> getEntityIdentifierValues() {
@@ -67,10 +63,6 @@ public class PrimitiveLongPropertyTypeDescriptor extends PropertyTypeDescriptor<
 	@Override
 	public DefaultValueBridgeExpectations<Long, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Long, Long>() {
-			@Override
-			public Class<Long> getProjectionType() {
-				return Long.class;
-			}
 
 			@Override
 			public Class<Long> getIndexFieldJavaType() {

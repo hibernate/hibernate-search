@@ -114,7 +114,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 	public void projection() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<V> query = session.search( expectations.getTypeWithValueBridge1() )
-					.select( f -> f.field( FIELD_NAME, expectations.getProjectionType() ) )
+					.select( f -> f.field( FIELD_NAME, typeDescriptor.getBoxedJavaType() ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 

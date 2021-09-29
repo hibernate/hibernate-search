@@ -41,10 +41,6 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 	@Override
 	public DefaultValueBridgeExpectations<Calendar, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Calendar, ZonedDateTime>() {
-			@Override
-			public Class<Calendar> getProjectionType() {
-				return Calendar.class;
-			}
 
 			@Override
 			public Class<ZonedDateTime> getIndexFieldJavaType() {

@@ -27,10 +27,6 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<MyEnum>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<MyEnum>() {
-			@Override
-			public Class<MyEnum> getProjectionType() {
-				return MyEnum.class;
-			}
 
 			@Override
 			public List<MyEnum> getEntityIdentifierValues() {
@@ -64,10 +60,6 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	@Override
 	public DefaultValueBridgeExpectations<MyEnum, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<MyEnum, String>() {
-			@Override
-			public Class<MyEnum> getProjectionType() {
-				return MyEnum.class;
-			}
 
 			@Override
 			public Class<String> getIndexFieldJavaType() {

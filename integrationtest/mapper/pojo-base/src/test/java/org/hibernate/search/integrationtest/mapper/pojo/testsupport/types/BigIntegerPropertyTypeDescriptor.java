@@ -29,11 +29,6 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	public Optional<DefaultIdentifierBridgeExpectations<BigInteger>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<BigInteger>() {
 			@Override
-			public Class<BigInteger> getProjectionType() {
-				return BigInteger.class;
-			}
-
-			@Override
 			public List<BigInteger> getEntityIdentifierValues() {
 				return takeBigIntegerSequence();
 			}
@@ -67,10 +62,6 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	@Override
 	public DefaultValueBridgeExpectations<BigInteger, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<BigInteger, BigInteger>() {
-			@Override
-			public Class<BigInteger> getProjectionType() {
-				return BigInteger.class;
-			}
 
 			@Override
 			public Class<BigInteger> getIndexFieldJavaType() {

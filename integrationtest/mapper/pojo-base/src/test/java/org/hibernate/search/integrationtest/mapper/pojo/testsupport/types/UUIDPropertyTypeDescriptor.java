@@ -28,10 +28,6 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<UUID>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<UUID>() {
-			@Override
-			public Class<UUID> getProjectionType() {
-				return UUID.class;
-			}
 
 			@Override
 			public List<UUID> getEntityIdentifierValues() {
@@ -65,10 +61,6 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	@Override
 	public DefaultValueBridgeExpectations<UUID, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<UUID, String>() {
-			@Override
-			public Class<UUID> getProjectionType() {
-				return UUID.class;
-			}
 
 			@Override
 			public Class<String> getIndexFieldJavaType() {

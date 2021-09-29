@@ -33,10 +33,6 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	@Override
 	public DefaultValueBridgeExpectations<BigDecimal, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<BigDecimal, BigDecimal>() {
-			@Override
-			public Class<BigDecimal> getProjectionType() {
-				return BigDecimal.class;
-			}
 
 			@Override
 			public Class<BigDecimal> getIndexFieldJavaType() {

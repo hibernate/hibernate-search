@@ -27,10 +27,6 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Long>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Long>() {
-			@Override
-			public Class<Long> getProjectionType() {
-				return Long.class;
-			}
 
 			@Override
 			public List<Long> getEntityIdentifierValues() {
@@ -66,10 +62,6 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 	@Override
 	public DefaultValueBridgeExpectations<Long, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Long, Long>() {
-			@Override
-			public Class<Long> getProjectionType() {
-				return Long.class;
-			}
 
 			@Override
 			public Class<Long> getIndexFieldJavaType() {

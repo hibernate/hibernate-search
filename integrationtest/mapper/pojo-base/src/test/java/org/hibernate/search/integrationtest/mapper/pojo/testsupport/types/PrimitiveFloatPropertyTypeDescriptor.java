@@ -21,16 +21,12 @@ public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor
 	public static final PrimitiveFloatPropertyTypeDescriptor INSTANCE = new PrimitiveFloatPropertyTypeDescriptor();
 
 	private PrimitiveFloatPropertyTypeDescriptor() {
-		super( float.class );
+		super( float.class, Float.class );
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Float>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Float>() {
-			@Override
-			public Class<Float> getProjectionType() {
-				return Float.class;
-			}
 
 			@Override
 			public List<Float> getEntityIdentifierValues() {
@@ -64,10 +60,6 @@ public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor
 	@Override
 	public DefaultValueBridgeExpectations<Float, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Float, Float>() {
-			@Override
-			public Class<Float> getProjectionType() {
-				return Float.class;
-			}
 
 			@Override
 			public Class<Float> getIndexFieldJavaType() {
