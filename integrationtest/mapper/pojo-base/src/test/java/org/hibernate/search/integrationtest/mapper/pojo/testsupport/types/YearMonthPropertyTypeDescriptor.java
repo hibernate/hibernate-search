@@ -31,8 +31,8 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<YearMonth, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<YearMonth, YearMonth>() {
+	public DefaultValueBridgeExpectations<YearMonth, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<YearMonth, YearMonth>() {
 			@Override
 			public Class<YearMonth> getProjectionType() {
 				return YearMonth.class;
@@ -86,7 +86,7 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 			public YearMonth getNullAsValueBridge2() {
 				return YearMonth.of( 2100, Month.NOVEMBER );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

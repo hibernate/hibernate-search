@@ -60,8 +60,8 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Boolean, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Boolean, Boolean>() {
+	public DefaultValueBridgeExpectations<Boolean, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Boolean, Boolean>() {
 			@Override
 			public Class<Boolean> getProjectionType() {
 				return Boolean.class;
@@ -110,7 +110,7 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 			public Boolean getNullAsValueBridge2() {
 				return true;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

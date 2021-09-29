@@ -63,8 +63,8 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Integer, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Integer, Integer>() {
+	public DefaultValueBridgeExpectations<Integer, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Integer, Integer>() {
 			@Override
 			public Class<Integer> getProjectionType() {
 				return Integer.class;
@@ -113,7 +113,7 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 			public Integer getNullAsValueBridge2() {
 				return 0;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

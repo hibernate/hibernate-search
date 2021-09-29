@@ -30,8 +30,8 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<LocalDateTime, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<LocalDateTime, LocalDateTime>() {
+	public DefaultValueBridgeExpectations<LocalDateTime, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<LocalDateTime, LocalDateTime>() {
 			@Override
 			public Class<LocalDateTime> getProjectionType() {
 				return LocalDateTime.class;
@@ -85,7 +85,7 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public LocalDateTime getNullAsValueBridge2() {
 				return LocalDateTime.of( 2030, Month.NOVEMBER, 21, 15, 15, 15 );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -32,8 +32,8 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<URL, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<URL, String>() {
+	public DefaultValueBridgeExpectations<URL, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<URL, String>() {
 			@Override
 			public Class<URL> getProjectionType() {
 				return URL.class;
@@ -99,7 +99,7 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 			public String getNullAsValueBridge2() {
 				return "https://hibernate.org";
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

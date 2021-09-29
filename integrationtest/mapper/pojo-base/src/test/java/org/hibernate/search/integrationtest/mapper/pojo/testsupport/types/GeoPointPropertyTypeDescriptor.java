@@ -29,8 +29,8 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<GeoPoint, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<GeoPoint, GeoPoint>() {
+	public DefaultValueBridgeExpectations<GeoPoint, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<GeoPoint, GeoPoint>() {
 			@Override
 			public Class<GeoPoint> getProjectionType() {
 				return GeoPoint.class;
@@ -85,7 +85,7 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 			public GeoPoint getNullAsValueBridge2() {
 				return GeoPoint.of( 100.123, 200.234 );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

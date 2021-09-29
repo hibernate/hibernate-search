@@ -29,8 +29,8 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<LocalTime, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<LocalTime, LocalTime>() {
+	public DefaultValueBridgeExpectations<LocalTime, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<LocalTime, LocalTime>() {
 			@Override
 			public Class<LocalTime> getProjectionType() {
 				return LocalTime.class;
@@ -84,7 +84,7 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 			public LocalTime getNullAsValueBridge2() {
 				return LocalTime.of( 12, 30, 15 );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

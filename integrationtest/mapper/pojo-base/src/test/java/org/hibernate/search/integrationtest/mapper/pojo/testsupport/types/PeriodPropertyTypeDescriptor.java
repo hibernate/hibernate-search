@@ -29,8 +29,8 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Period, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Period, String>() {
+	public DefaultValueBridgeExpectations<Period, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Period, String>() {
 			@Override
 			public Class<Period> getProjectionType() {
 				return Period.class;
@@ -90,7 +90,7 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 			public String getNullAsValueBridge2() {
 				return "+0000001900+0000000012+0000000021";
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

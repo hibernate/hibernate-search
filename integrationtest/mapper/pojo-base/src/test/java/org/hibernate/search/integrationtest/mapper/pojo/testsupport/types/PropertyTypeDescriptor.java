@@ -85,7 +85,7 @@ public abstract class PropertyTypeDescriptor<V> {
 
 	public abstract Optional<DefaultIdentifierBridgeExpectations<V>> getDefaultIdentifierBridgeExpectations();
 
-	public abstract Optional<DefaultValueBridgeExpectations<V, ?>> getDefaultValueBridgeExpectations();
+	public abstract DefaultValueBridgeExpectations<V, ?> getDefaultValueBridgeExpectations();
 
 	@Override
 	public String toString() {

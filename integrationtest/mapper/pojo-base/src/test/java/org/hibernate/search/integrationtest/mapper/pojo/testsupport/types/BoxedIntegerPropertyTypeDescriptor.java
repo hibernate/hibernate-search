@@ -62,8 +62,8 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Integer, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Integer, Integer>() {
+	public DefaultValueBridgeExpectations<Integer, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Integer, Integer>() {
 			@Override
 			public Class<Integer> getProjectionType() {
 				return Integer.class;
@@ -111,7 +111,7 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 			public Integer getNullAsValueBridge2() {
 				return 739;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

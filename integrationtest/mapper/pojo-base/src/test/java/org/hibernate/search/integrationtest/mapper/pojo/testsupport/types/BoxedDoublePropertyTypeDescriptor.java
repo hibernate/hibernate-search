@@ -60,8 +60,8 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Double, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Double, Double>() {
+	public DefaultValueBridgeExpectations<Double, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Double, Double>() {
 			@Override
 			public Class<Double> getProjectionType() {
 				return Double.class;
@@ -109,7 +109,7 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 			public Double getNullAsValueBridge2() {
 				return 739739.739;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
