@@ -21,12 +21,13 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public static final PrimitiveBytePropertyTypeDescriptor INSTANCE = new PrimitiveBytePropertyTypeDescriptor();
 
 	private PrimitiveBytePropertyTypeDescriptor() {
-		super( byte.class );
+		super( byte.class, Byte.class );
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Byte>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Byte>() {
+
 			@Override
 			public List<Byte> getEntityIdentifierValues() {
 				return Arrays.asList( Byte.MIN_VALUE, (byte)-1, (byte)0, (byte)1, (byte)42, Byte.MAX_VALUE );
@@ -61,10 +62,6 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	@Override
 	public DefaultValueBridgeExpectations<Byte, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Byte, Byte>() {
-			@Override
-			public Class<Byte> getProjectionType() {
-				return Byte.class;
-			}
 
 			@Override
 			public Class<Byte> getIndexFieldJavaType() {

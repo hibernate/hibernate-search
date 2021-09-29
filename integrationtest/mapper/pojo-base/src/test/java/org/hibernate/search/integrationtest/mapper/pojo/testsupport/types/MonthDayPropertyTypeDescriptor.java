@@ -34,10 +34,6 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 	@Override
 	public DefaultValueBridgeExpectations<MonthDay, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<MonthDay, MonthDay>() {
-			@Override
-			public Class<MonthDay> getProjectionType() {
-				return MonthDay.class;
-			}
 
 			@Override
 			public Class<MonthDay> getIndexFieldJavaType() {

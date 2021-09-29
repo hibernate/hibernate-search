@@ -36,10 +36,6 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 	@Override
 	public DefaultValueBridgeExpectations<URL, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<URL, String>() {
-			@Override
-			public Class<URL> getProjectionType() {
-				return URL.class;
-			}
 
 			@Override
 			public Class<String> getIndexFieldJavaType() {

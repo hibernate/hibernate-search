@@ -33,10 +33,6 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 	@Override
 	public DefaultValueBridgeExpectations<Duration, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Duration, Long>() {
-			@Override
-			public Class<Duration> getProjectionType() {
-				return Duration.class;
-			}
 
 			@Override
 			public Class<Long> getIndexFieldJavaType() {

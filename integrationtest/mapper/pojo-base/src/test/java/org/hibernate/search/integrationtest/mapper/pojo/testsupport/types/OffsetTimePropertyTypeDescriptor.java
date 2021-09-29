@@ -35,10 +35,6 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 	@Override
 	public DefaultValueBridgeExpectations<OffsetTime, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<OffsetTime, OffsetTime>() {
-			@Override
-			public Class<OffsetTime> getProjectionType() {
-				return OffsetTime.class;
-			}
 
 			@Override
 			public Class<OffsetTime> getIndexFieldJavaType() {

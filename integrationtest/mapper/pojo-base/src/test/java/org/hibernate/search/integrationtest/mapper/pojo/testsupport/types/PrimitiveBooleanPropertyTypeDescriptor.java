@@ -21,12 +21,13 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 	public static final PrimitiveBooleanPropertyTypeDescriptor INSTANCE = new PrimitiveBooleanPropertyTypeDescriptor();
 
 	private PrimitiveBooleanPropertyTypeDescriptor() {
-		super( boolean.class );
+		super( boolean.class, Boolean.class );
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Boolean>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Boolean>() {
+
 			@Override
 			public List<Boolean> getEntityIdentifierValues() {
 				return Arrays.asList( true, false );
@@ -59,10 +60,6 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 	@Override
 	public DefaultValueBridgeExpectations<Boolean, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Boolean, Boolean>() {
-			@Override
-			public Class<Boolean> getProjectionType() {
-				return Boolean.class;
-			}
 
 			@Override
 			public Class<Boolean> getIndexFieldJavaType() {

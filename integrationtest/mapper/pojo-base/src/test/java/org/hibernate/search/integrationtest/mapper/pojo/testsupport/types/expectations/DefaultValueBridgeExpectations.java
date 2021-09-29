@@ -14,8 +14,6 @@ public interface DefaultValueBridgeExpectations<V, F> {
 	String TYPE_WITH_VALUE_BRIDGE_FIELD_NAME = "myProperty";
 	String TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME = "indexNullAsProperty";
 
-	Class<V> getProjectionType();
-
 	Class<F> getIndexFieldJavaType();
 
 	List<V> getEntityPropertyValues();

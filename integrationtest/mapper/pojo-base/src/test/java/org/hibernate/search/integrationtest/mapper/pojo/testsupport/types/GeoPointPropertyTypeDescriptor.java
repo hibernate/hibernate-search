@@ -33,10 +33,6 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 	@Override
 	public DefaultValueBridgeExpectations<GeoPoint, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<GeoPoint, GeoPoint>() {
-			@Override
-			public Class<GeoPoint> getProjectionType() {
-				return GeoPoint.class;
-			}
 
 			@Override
 			public Class<GeoPoint> getIndexFieldJavaType() {

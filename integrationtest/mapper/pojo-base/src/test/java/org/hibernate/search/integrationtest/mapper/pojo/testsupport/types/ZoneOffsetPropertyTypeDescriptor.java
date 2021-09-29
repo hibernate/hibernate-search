@@ -33,10 +33,6 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 	@Override
 	public DefaultValueBridgeExpectations<ZoneOffset, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<ZoneOffset, Integer>() {
-			@Override
-			public Class<ZoneOffset> getProjectionType() {
-				return ZoneOffset.class;
-			}
 
 			@Override
 			public Class<Integer> getIndexFieldJavaType() {
