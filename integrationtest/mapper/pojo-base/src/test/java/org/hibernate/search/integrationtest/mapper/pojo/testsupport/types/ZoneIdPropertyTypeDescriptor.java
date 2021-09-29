@@ -20,7 +20,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId> {
 
-	ZoneIdPropertyTypeDescriptor() {
+	public static final ZoneIdPropertyTypeDescriptor INSTANCE = new ZoneIdPropertyTypeDescriptor();
+
+	private ZoneIdPropertyTypeDescriptor() {
 		super( ZoneId.class );
 	}
 

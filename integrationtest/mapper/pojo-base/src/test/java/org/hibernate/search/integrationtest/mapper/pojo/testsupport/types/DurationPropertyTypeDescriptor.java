@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Duration> {
 
-	DurationPropertyTypeDescriptor() {
+	public static final DurationPropertyTypeDescriptor INSTANCE = new DurationPropertyTypeDescriptor();
+
+	private DurationPropertyTypeDescriptor() {
 		super( Duration.class );
 	}
 

@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Short> {
 
-	BoxedShortPropertyTypeDescriptor() {
+	public static final BoxedShortPropertyTypeDescriptor INSTANCE = new BoxedShortPropertyTypeDescriptor();
+
+	private BoxedShortPropertyTypeDescriptor() {
 		super( Short.class );
 	}
 

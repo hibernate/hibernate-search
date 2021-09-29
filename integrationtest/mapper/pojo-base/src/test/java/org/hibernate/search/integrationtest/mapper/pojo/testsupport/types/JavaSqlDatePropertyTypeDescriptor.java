@@ -24,7 +24,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class JavaSqlDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Date> {
 
-	JavaSqlDatePropertyTypeDescriptor() {
+	public static final JavaSqlDatePropertyTypeDescriptor INSTANCE = new JavaSqlDatePropertyTypeDescriptor();
+
+	private JavaSqlDatePropertyTypeDescriptor() {
 		super( Date.class );
 	}
 

@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String> {
 
-	StringPropertyTypeDescriptor() {
+	public static final StringPropertyTypeDescriptor INSTANCE = new StringPropertyTypeDescriptor();
+
+	private StringPropertyTypeDescriptor() {
 		super( String.class );
 	}
 

@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Float> {
 
-	BoxedFloatPropertyTypeDescriptor() {
+	public static final BoxedFloatPropertyTypeDescriptor INSTANCE = new BoxedFloatPropertyTypeDescriptor();
+
+	private BoxedFloatPropertyTypeDescriptor() {
 		super( Float.class );
 	}
 
