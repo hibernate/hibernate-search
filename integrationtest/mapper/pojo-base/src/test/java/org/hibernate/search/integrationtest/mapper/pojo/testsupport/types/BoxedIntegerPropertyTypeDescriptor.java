@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Integer> {
+public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Integer, Integer> {
 
 	public static final BoxedIntegerPropertyTypeDescriptor INSTANCE = new BoxedIntegerPropertyTypeDescriptor();
 
@@ -25,20 +24,20 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 	}
 
 	@Override
+	protected PropertyValues<Integer, Integer> createValues() {
+		return PropertyValues.<Integer>passThroughBuilder()
+				.add( Integer.MIN_VALUE, String.valueOf( Integer.MIN_VALUE ) )
+				.add( -1, "-1" )
+				.add( 0, "0" )
+				.add( 1, "1" )
+				.add( 42, "42" )
+				.add( Integer.MAX_VALUE, String.valueOf( Integer.MAX_VALUE ) )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Integer>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Integer>() {
-
-			@Override
-			public List<Integer> getEntityIdentifierValues() {
-				return Arrays.asList( Integer.MIN_VALUE, -1, 0, 1, 42, Integer.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						String.valueOf( Integer.MIN_VALUE ), "-1", "0", "1", "42", String.valueOf( Integer.MAX_VALUE )
-				);
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -66,16 +65,6 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 			@Override
 			public Class<Integer> getIndexFieldJavaType() {
 				return Integer.class;
-			}
-
-			@Override
-			public List<Integer> getEntityPropertyValues() {
-				return Arrays.asList( Integer.MIN_VALUE, -1, 0, 1, 42, Integer.MAX_VALUE );
-			}
-
-			@Override
-			public List<Integer> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

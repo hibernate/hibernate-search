@@ -58,12 +58,12 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<V> typeDescriptor;
+	private final PropertyTypeDescriptor<V, F> typeDescriptor;
 	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
 	private StubIndexSchemaNode fieldSchemaNode;
 
-	public FieldDefaultBridgeOverridingIT(PropertyTypeDescriptor<V> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+	public FieldDefaultBridgeOverridingIT(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		this.typeDescriptor = typeDescriptor;
 		this.expectations = expectations;
 	}
@@ -148,7 +148,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 	}
 
 	private V getPropertyValue() {
-		return expectations.getEntityPropertyValues().get( 0 );
+		return typeDescriptor.values().entityModelValues.get( 0 );
 	}
 
 	private FieldTypeForOverridingDefaultBridge getFieldValue() {

@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String> {
+public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String, String> {
 
 	public static final StringPropertyTypeDescriptor INSTANCE = new StringPropertyTypeDescriptor();
 
@@ -25,18 +24,19 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String>
 	}
 
 	@Override
+	protected PropertyValues<String, String> createValues() {
+		PropertyValues.StringBasedBuilder<String> builder = PropertyValues.stringBasedBuilder();
+		for ( String value : new String[] {
+				"", "a", "AaaA", "Some words", "\000", "http://foo", "yop@yopmail.com"
+		} ) {
+			builder.add( value, value );
+		}
+		return builder.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<String>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<String>() {
-
-			@Override
-			public List<String> getEntityIdentifierValues() {
-				return Arrays.asList( "", "a", "AaaA", "Some words", "\000", "http://foo", "yop@yopmail.com" );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return getEntityIdentifierValues();
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -64,16 +64,6 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String>
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<String> getEntityPropertyValues() {
-				return Arrays.asList( "", "a", "AaaA", "Some words", "\000", "http://foo", "yop@yopmail.com" );
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

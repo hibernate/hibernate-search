@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Short> {
+public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Short, Short> {
 
 	public static final BoxedShortPropertyTypeDescriptor INSTANCE = new BoxedShortPropertyTypeDescriptor();
 
@@ -25,20 +24,20 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 	}
 
 	@Override
+	protected PropertyValues<Short, Short> createValues() {
+		return PropertyValues.<Short>passThroughBuilder()
+				.add( Short.MIN_VALUE, String.valueOf( Short.MIN_VALUE ) )
+				.add( (short)-1, "-1" )
+				.add( (short)0, "0" )
+				.add( (short)1, "1" )
+				.add( (short)42, "42" )
+				.add( Short.MAX_VALUE, String.valueOf( Short.MAX_VALUE ) )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Short>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Short>() {
-
-			@Override
-			public List<Short> getEntityIdentifierValues() {
-				return Arrays.asList( Short.MIN_VALUE, (short)-1, (short)0, (short)1, (short)42, Short.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						String.valueOf( Short.MIN_VALUE ), "-1", "0", "1", "42", String.valueOf( Short.MAX_VALUE )
-				);
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -66,16 +65,6 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 			@Override
 			public Class<Short> getIndexFieldJavaType() {
 				return Short.class;
-			}
-
-			@Override
-			public List<Short> getEntityPropertyValues() {
-				return Arrays.asList( Short.MIN_VALUE, (short)-1, (short)0, (short)1, (short)42, Short.MAX_VALUE );
-			}
-
-			@Override
-			public List<Short> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

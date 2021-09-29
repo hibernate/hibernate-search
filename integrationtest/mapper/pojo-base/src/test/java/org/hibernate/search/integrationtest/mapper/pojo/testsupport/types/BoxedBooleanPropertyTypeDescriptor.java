@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<Boolean> {
+public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<Boolean, Boolean> {
 
 	public static final BoxedBooleanPropertyTypeDescriptor INSTANCE = new BoxedBooleanPropertyTypeDescriptor();
 
@@ -25,18 +24,16 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 	}
 
 	@Override
+	protected PropertyValues<Boolean, Boolean> createValues() {
+		return PropertyValues.<Boolean>passThroughBuilder()
+				.add( Boolean.TRUE, "true" )
+				.add( Boolean.FALSE, "false" )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Boolean>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Boolean>() {
-			@Override
-			public List<Boolean> getEntityIdentifierValues() {
-				return Arrays.asList( true, false );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList( "true", "false" );
-			}
-
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -63,16 +60,6 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 			@Override
 			public Class<Boolean> getIndexFieldJavaType() {
 				return Boolean.class;
-			}
-
-			@Override
-			public List<Boolean> getEntityPropertyValues() {
-				return Arrays.asList( Boolean.TRUE, Boolean.FALSE );
-			}
-
-			@Override
-			public List<Boolean> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

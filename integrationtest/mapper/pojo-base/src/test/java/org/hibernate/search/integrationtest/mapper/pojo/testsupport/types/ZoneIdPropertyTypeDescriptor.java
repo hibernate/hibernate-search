@@ -8,22 +8,33 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId> {
+public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId, String> {
 
 	public static final ZoneIdPropertyTypeDescriptor INSTANCE = new ZoneIdPropertyTypeDescriptor();
 
 	private ZoneIdPropertyTypeDescriptor() {
 		super( ZoneId.class );
+	}
+
+	@Override
+	protected PropertyValues<ZoneId, String> createValues() {
+		return PropertyValues.<ZoneId>stringBasedBuilder()
+				.add( ZoneOffset.MIN, "-18:00" )
+				.add( ZoneId.of( "America/Los_Angeles" ), "America/Los_Angeles" )
+				.add( ZoneOffset.UTC, "Z" )
+				.add( ZoneId.of( "Europe/Paris" ), "Europe/Paris" )
+				.add( ZoneOffset.ofHours( 7 ), "+07:00" )
+				.add( ZoneOffset.MAX, "+18:00" )
+				.build();
 	}
 
 	@Override
@@ -38,30 +49,6 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<ZoneId> getEntityPropertyValues() {
-				return Arrays.asList(
-						ZoneOffset.MIN,
-						ZoneId.of( "America/Los_Angeles" ),
-						ZoneOffset.UTC,
-						ZoneId.of( "Europe/Paris" ),
-						ZoneOffset.ofHours( 7 ),
-						ZoneOffset.MAX
-				);
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return Arrays.asList(
-						ZoneOffset.MIN.getId(),
-						ZoneId.of( "America/Los_Angeles" ).getId(),
-						ZoneOffset.UTC.getId(),
-						ZoneId.of( "Europe/Paris" ).getId(),
-						ZoneOffset.ofHours( 7 ).getId(),
-						ZoneOffset.MAX.getId()
-				);
 			}
 
 			@Override

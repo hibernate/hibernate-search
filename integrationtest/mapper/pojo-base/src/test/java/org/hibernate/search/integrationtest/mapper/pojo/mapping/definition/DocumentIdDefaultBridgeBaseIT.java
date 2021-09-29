@@ -56,16 +56,18 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private DefaultIdentifierBridgeExpectations<I> expectations;
+	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
+	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
 	private StubIndexSchemaNode index1RootSchemaNode;
 	private StubIndexSchemaNode index2RootSchemaNode;
 
-	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I> typeDescriptor,
+	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I, ?> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
 		assumeTrue(
 				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()
 		);
+		this.typeDescriptor = typeDescriptor;
 		this.expectations = expectations.get();
 	}
 
@@ -91,7 +93,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void indexing() {
 		try ( SearchSession session = mapping.createSession() ) {
-			for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
+			for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
 				Object entity = expectations.instantiateTypeWithIdentifierBridge1( entityIdentifierValue );
 				session.indexingPlan().add( entity );
 			}
@@ -99,7 +101,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
 					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME
 			);
-			for ( String expectedDocumentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+			for ( String expectedDocumentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				expectationSetter.add( expectedDocumentIdentifierValue, b -> { } );
 			}
 		}
@@ -109,8 +111,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void projection() {
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
-			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+			Iterator<I> entityIdentifierIterator = typeDescriptor.values().entityModelValues.iterator();
+			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchReferences(
 						Collections.singletonList(
@@ -161,8 +163,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 				.isFalse();
 
 		// convert and convertUnknown must behave appropriately on valid input
-		Iterator<String> documentIdentifierIterator = expectations.getDocumentIdentifierValues().iterator();
-		for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
+		Iterator<String> documentIdentifierIterator = typeDescriptor.values().documentIdentifierValues.iterator();
+		for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
 			String documentIdentifierValue = documentIdentifierIterator.next();
 			assertThat(
 					dslToIndexConverter.convert( entityIdentifierValue, convertContext )

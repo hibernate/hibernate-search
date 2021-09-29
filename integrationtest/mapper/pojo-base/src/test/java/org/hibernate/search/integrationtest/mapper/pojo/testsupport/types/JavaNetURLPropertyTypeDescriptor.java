@@ -10,22 +10,38 @@ import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL> {
+public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL, String> {
 
 	public static final JavaNetURLPropertyTypeDescriptor INSTANCE = new JavaNetURLPropertyTypeDescriptor();
 
 	private JavaNetURLPropertyTypeDescriptor() {
 		super( URL.class );
+	}
+
+	@Override
+	protected PropertyValues<URL, String> createValues() {
+		PropertyValues.Builder<URL, String> builder = PropertyValues.builder();
+		for ( String string : new String[] {
+				"https://www.google.com",
+				"https://twitter.com/Hibernate/status/1093118957194801152",
+				"https://twitter.com/Hibernate/status/1092803949533507584",
+				"https://access.redhat.com/",
+				"https://access.redhat.com/products",
+				"https://access.redhat.com/products/red-hat-fuse/",
+				"https://access.redhat.com/products/red-hat-openshift-container-platform/"
+		} ) {
+			builder.add( url( string ), string );
+		}
+		return builder.build();
 	}
 
 	@Override
@@ -40,34 +56,6 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<URL> getEntityPropertyValues() {
-				List<URL> urls = Arrays.asList(
-						url( "https://www.google.com" ),
-						url( "https://twitter.com/Hibernate/status/1093118957194801152" ),
-						url( "https://twitter.com/Hibernate/status/1092803949533507584" ),
-						url( "https://access.redhat.com/" ),
-						url( "https://access.redhat.com/products" ),
-						url( "https://access.redhat.com/products/red-hat-fuse/" ),
-						url( "https://access.redhat.com/products/red-hat-openshift-container-platform/" )
-				);
-				return urls;
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				List<String> stringList = Arrays.asList(
-						"https://www.google.com",
-						"https://twitter.com/Hibernate/status/1093118957194801152",
-						"https://twitter.com/Hibernate/status/1092803949533507584",
-						"https://access.redhat.com/",
-						"https://access.redhat.com/products",
-						"https://access.redhat.com/products/red-hat-fuse/",
-						"https://access.redhat.com/products/red-hat-openshift-container-platform/"
-				);
-				return stringList;
 			}
 
 			@Override
