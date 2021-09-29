@@ -36,6 +36,13 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core-jakarta</artifactId>
+            <!-- Use `jakarta.activation:jakarta.activation-api` instead of `com.sun.activation:jakarta.activation` in Jakarta EE 10 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jakarta.persistence</groupId>
