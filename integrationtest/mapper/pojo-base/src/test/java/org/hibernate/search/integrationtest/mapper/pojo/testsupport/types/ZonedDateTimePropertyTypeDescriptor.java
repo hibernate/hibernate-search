@@ -32,8 +32,8 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<ZonedDateTime, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<ZonedDateTime, ZonedDateTime>() {
+	public DefaultValueBridgeExpectations<ZonedDateTime, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<ZonedDateTime, ZonedDateTime>() {
 			@Override
 			public Class<ZonedDateTime> getProjectionType() {
 				return ZonedDateTime.class;
@@ -87,7 +87,7 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public ZonedDateTime getNullAsValueBridge2() {
 				return ZonedDateTime.of( LocalDateTime.of( 1999, Month.MAY, 31, 9, 30, 10 ), ZoneId.of( "America/Chicago" ) );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

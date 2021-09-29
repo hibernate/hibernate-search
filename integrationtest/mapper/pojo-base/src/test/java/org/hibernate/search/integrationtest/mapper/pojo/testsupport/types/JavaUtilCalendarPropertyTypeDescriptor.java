@@ -37,8 +37,8 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Calendar, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Calendar, ZonedDateTime>() {
+	public DefaultValueBridgeExpectations<Calendar, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Calendar, ZonedDateTime>() {
 			@Override
 			public Class<Calendar> getProjectionType() {
 				return Calendar.class;
@@ -127,7 +127,7 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 			public ZonedDateTime getNullAsValueBridge2() {
 				return ZonedDateTime.of( LocalDateTime.of( 2017, Month.NOVEMBER, 5, 19, 0, 54 ), ZoneId.of( "Europe/Paris" ) );
 			}
-		} );
+		};
 	}
 
 	private static ZonedDateTime zonedDateTime(long epochMilli, String zoneId) {

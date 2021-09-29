@@ -31,8 +31,8 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<OffsetTime, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<OffsetTime, OffsetTime>() {
+	public DefaultValueBridgeExpectations<OffsetTime, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<OffsetTime, OffsetTime>() {
 			@Override
 			public Class<OffsetTime> getProjectionType() {
 				return OffsetTime.class;
@@ -87,7 +87,7 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 			public OffsetTime getNullAsValueBridge2() {
 				return LocalTime.of( 12, 30, 55 ).atOffset( ZoneOffset.ofHours( -3 ) );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

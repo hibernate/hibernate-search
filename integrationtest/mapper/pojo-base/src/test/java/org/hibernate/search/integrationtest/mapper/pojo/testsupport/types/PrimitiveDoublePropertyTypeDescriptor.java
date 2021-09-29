@@ -60,8 +60,8 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Double, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Double, Double>() {
+	public DefaultValueBridgeExpectations<Double, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Double, Double>() {
 			@Override
 			public Class<Double> getProjectionType() {
 				return Double.class;
@@ -110,7 +110,7 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 			public Double getNullAsValueBridge2() {
 				return 7.739;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

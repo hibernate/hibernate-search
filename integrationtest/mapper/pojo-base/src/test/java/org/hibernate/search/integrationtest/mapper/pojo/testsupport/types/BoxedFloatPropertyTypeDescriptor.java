@@ -60,8 +60,8 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Float, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Float, Float>() {
+	public DefaultValueBridgeExpectations<Float, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Float, Float>() {
 			@Override
 			public Class<Float> getProjectionType() {
 				return Float.class;
@@ -109,7 +109,7 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 			public Float getNullAsValueBridge2() {
 				return 37.33379f;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

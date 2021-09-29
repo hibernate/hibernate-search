@@ -43,8 +43,8 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<URI, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<URI, String>() {
+	public DefaultValueBridgeExpectations<URI, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<URI, String>() {
 			@Override
 			public Class<URI> getProjectionType() {
 				return URI.class;
@@ -97,7 +97,7 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 			public String getUnparsableNullAsValue() {
 				return "http://www.wrong.uri.com?param1=0 param7=0";
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

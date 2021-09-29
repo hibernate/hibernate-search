@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assume.assumeNotNull;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -33,8 +32,6 @@ public class IndexNullAsErrorIT<V, F> {
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] types() {
 		return PropertyTypeDescriptor.getAll().stream()
-				// do not test types that do not have a default value bridge
-				.filter( type -> type.getDefaultValueBridgeExpectations().isPresent() )
 				.filter( type -> type.isNullable() )
 				.map( type -> new Object[] { type, type.getDefaultValueBridgeExpectations() } )
 				.toArray();
@@ -46,10 +43,10 @@ public class IndexNullAsErrorIT<V, F> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private DefaultValueBridgeExpectations<V, F> expectations;
+	private final DefaultValueBridgeExpectations<V, F> expectations;
 
-	public IndexNullAsErrorIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
-		this.expectations = expectations.get();
+	public IndexNullAsErrorIT(PropertyTypeDescriptor<V> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		this.expectations = expectations;
 	}
 
 	@Test
