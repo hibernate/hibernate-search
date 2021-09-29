@@ -70,13 +70,26 @@ public abstract class PropertyTypeDescriptor<V> {
 	}
 
 	private final Class<V> javaType;
+	private final Class<V> boxedJavaType;
 
 	protected PropertyTypeDescriptor(Class<V> javaType) {
+		this( javaType, javaType );
+	}
+
+	protected PropertyTypeDescriptor(Class<V> javaType, Class<V> boxedJavaType) {
 		this.javaType = javaType;
+		this.boxedJavaType = boxedJavaType;
+		if ( boxedJavaType.isPrimitive() ) {
+			throw new IllegalArgumentException( "For primitive types, boxedJavaType must be provided" );
+		}
 	}
 
 	public final Class<V> getJavaType() {
 		return javaType;
+	}
+
+	public final Class<V> getBoxedJavaType() {
+		return boxedJavaType;
 	}
 
 	public boolean isNullable() {

@@ -59,10 +59,6 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 	@Override
 	public DefaultValueBridgeExpectations<Boolean, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Boolean, Boolean>() {
-			@Override
-			public Class<Boolean> getProjectionType() {
-				return Boolean.class;
-			}
 
 			@Override
 			public Class<Boolean> getIndexFieldJavaType() {

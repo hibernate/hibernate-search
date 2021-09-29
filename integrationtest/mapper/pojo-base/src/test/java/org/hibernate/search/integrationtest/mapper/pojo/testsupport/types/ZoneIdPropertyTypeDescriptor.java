@@ -34,10 +34,6 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 	@Override
 	public DefaultValueBridgeExpectations<ZoneId, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<ZoneId, String>() {
-			@Override
-			public Class<ZoneId> getProjectionType() {
-				return ZoneId.class;
-			}
 
 			@Override
 			public Class<String> getIndexFieldJavaType() {

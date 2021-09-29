@@ -33,10 +33,6 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 	@Override
 	public DefaultValueBridgeExpectations<Instant, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Instant, Instant>() {
-			@Override
-			public Class<Instant> getProjectionType() {
-				return Instant.class;
-			}
 
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {

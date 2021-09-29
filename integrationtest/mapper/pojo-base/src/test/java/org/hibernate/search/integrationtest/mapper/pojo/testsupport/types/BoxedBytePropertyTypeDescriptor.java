@@ -27,6 +27,7 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Byte>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Byte>() {
+
 			@Override
 			public List<Byte> getEntityIdentifierValues() {
 				return Arrays.asList( Byte.MIN_VALUE, (byte)-1, (byte)0, (byte)1, (byte)42, Byte.MAX_VALUE );
@@ -61,10 +62,6 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 	@Override
 	public DefaultValueBridgeExpectations<Byte, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Byte, Byte>() {
-			@Override
-			public Class<Byte> getProjectionType() {
-				return Byte.class;
-			}
 
 			@Override
 			public Class<Byte> getIndexFieldJavaType() {

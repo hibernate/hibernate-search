@@ -33,10 +33,6 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	@Override
 	public DefaultValueBridgeExpectations<LocalTime, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<LocalTime, LocalTime>() {
-			@Override
-			public Class<LocalTime> getProjectionType() {
-				return LocalTime.class;
-			}
 
 			@Override
 			public Class<LocalTime> getIndexFieldJavaType() {

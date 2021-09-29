@@ -38,10 +38,6 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 	@Override
 	public DefaultValueBridgeExpectations<Time, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Time, Instant>() {
-			@Override
-			public Class<Time> getProjectionType() {
-				return Time.class;
-			}
 
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {

@@ -36,10 +36,6 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	@Override
 	public DefaultValueBridgeExpectations<ZonedDateTime, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<ZonedDateTime, ZonedDateTime>() {
-			@Override
-			public Class<ZonedDateTime> getProjectionType() {
-				return ZonedDateTime.class;
-			}
 
 			@Override
 			public Class<ZonedDateTime> getIndexFieldJavaType() {
