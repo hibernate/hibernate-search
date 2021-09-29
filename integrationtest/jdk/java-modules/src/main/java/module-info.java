@@ -16,8 +16,9 @@ module org.hibernate.search.integrationtest.java.module {
 	requires org.hibernate.search.mapper.orm;
 	requires org.hibernate.search.backend.elasticsearch;
 
-	// TODO HSEARCH-4304 This should be re-exported transitively by org.hibernate.search.mapper.orm
-	// since org.hibernate.search.mapper.orm is still an automatic module
+	// This should be re-exported transitively by org.hibernate.search.mapper.orm
+	// but currently isn't, because org.hibernate.search.mapper.orm
+	// is still an automatic module
 	requires org.hibernate.search.engine;
 	requires org.hibernate.search.mapper.pojo;
 
