@@ -3,35 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-internal</artifactId>
         <version>6.1.0-SNAPSHOT</version>
-        <relativePath>../../..</relativePath>
+        <relativePath>../../../parents/internal</relativePath>
     </parent>
     <artifactId>hibernate-search-util-internal-test</artifactId>
 
     <name>Hibernate Search Utils - Internal - Test</name>
     <description>Hibernate Search common test utilities</description>
-
-    <properties>
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <!--
-             Skip javadoc generation for this module: we don't want to publish it.
-             Note this shouldn't be necessary because we don't even use the maven-javadoc-plugin
-             in this module.
-             However, the maven-javadoc-plugin sometimes invokes the javadoc goal on this module explicitly
-             from other (published) modules; probably because it tries to generate the javadoc of dependencies,
-             even test dependencies.
-             Whatever the reason, this triggers errors, so we better just disable the plugin explicitly.
-         -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-
-        <!--
-            Consider all sources as tests during Sonar analysis.
-            This is important because some analysis rules do not apply to test code.
-         -->
-        <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
-        <sonar.tests>${project.basedir}/src</sonar.tests>
-    </properties>
 
     <dependencies>
         <dependency>

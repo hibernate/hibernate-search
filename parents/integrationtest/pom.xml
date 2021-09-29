@@ -10,9 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-internal</artifactId>
         <version>6.1.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../internal</relativePath>
     </parent>
     <artifactId>hibernate-search-parent-integrationtest</artifactId>
     <packaging>pom</packaging>
@@ -21,10 +21,6 @@
     <description>Common build configuration for all integration test artifacts (including documentation)</description>
 
     <properties>
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <!-- Skip javadoc generation (forced by releases) -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-
         <!-- Apply the test JDK release settings to all code in integration tests, even code in src/main -->
         <java-version.main.release>${java-version.test.release}</java-version.main.release>
         <java-version.main.compiler.java_home>${java-version.test.compiler.java_home}</java-version.main.compiler.java_home>
@@ -43,13 +39,6 @@
             -Dhibernate.connection.isolation=${jdbc.isolation}
         </failsafe.jvm.args.hibernate-orm>
 
-        <!--
-            Consider all sources as tests during Sonar analysis.
-            This is important because some analysis rules do not apply to test code.
-         -->
-        <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
-        <sonar.tests>${project.basedir}/src</sonar.tests>
-
         <!-- For some reason, the failsafe plugin uses the modulepath
              even when we didn't define a module-info.java,
              and many things fail because of the modulepath.
@@ -67,47 +56,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-mapper-stub</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-v5migrationhelper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-jberet-se</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- JDBC drivers -->
             <!-- Profile-specific driver, used in most database-sensitive integration tests -->
             <dependency>
@@ -121,26 +69,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>de.thetaphi</groupId>
-                    <artifactId>forbiddenapis</artifactId>
-                    <!-- Override the executions defined in the parent module -->
-                    <executions>
-                        <execution>
-                            <id>verify-forbidden-apis</id>
-                            <!-- Do not use the main rules at all in integration tests, see below -->
-                            <phase>none</phase>
-                        </execution>
-                        <execution>
-                            <id>verify-forbidden-test-apis</id>
-                            <goals>
-                                <!-- Apply the test rules to all code in integration tests, even code in src/main -->
-                                <goal>check</goal>
-                                <goal>testCheck</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
                 <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
@@ -419,16 +347,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>

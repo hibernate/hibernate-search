@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent-integrationtest</artifactId>
+        <artifactId>hibernate-search-parent-internal</artifactId>
         <version>6.1.0-SNAPSHOT</version>
-        <relativePath>../../../parents/integrationtest</relativePath>
+        <relativePath>../../../parents/internal</relativePath>
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest</artifactId>
     <packaging>pom</packaging>
