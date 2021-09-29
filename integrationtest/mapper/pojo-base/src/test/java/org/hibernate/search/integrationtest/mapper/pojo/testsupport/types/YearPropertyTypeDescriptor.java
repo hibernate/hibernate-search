@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 
-	YearPropertyTypeDescriptor() {
+	public static final YearPropertyTypeDescriptor INSTANCE = new YearPropertyTypeDescriptor();
+
+	private YearPropertyTypeDescriptor() {
 		super( Year.class );
 	}
 

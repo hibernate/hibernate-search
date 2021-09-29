@@ -24,7 +24,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescriptor<Timestamp> {
 
-	JavaSqlTimestampPropertyTypeDescriptor() {
+	public static final JavaSqlTimestampPropertyTypeDescriptor INSTANCE = new JavaSqlTimestampPropertyTypeDescriptor();
+
+	private JavaSqlTimestampPropertyTypeDescriptor() {
 		super( Timestamp.class );
 	}
 

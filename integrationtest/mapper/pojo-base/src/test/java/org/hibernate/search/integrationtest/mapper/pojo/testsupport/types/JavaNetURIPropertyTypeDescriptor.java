@@ -33,7 +33,9 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 			"file:///~calendar"
 	};
 
-	JavaNetURIPropertyTypeDescriptor() {
+	public static final JavaNetURIPropertyTypeDescriptor INSTANCE = new JavaNetURIPropertyTypeDescriptor();
+
+	private JavaNetURIPropertyTypeDescriptor() {
 		super( URI.class );
 	}
 

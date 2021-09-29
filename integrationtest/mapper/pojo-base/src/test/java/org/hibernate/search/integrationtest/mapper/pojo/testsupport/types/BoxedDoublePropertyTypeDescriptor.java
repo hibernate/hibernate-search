@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Double> {
 
-	BoxedDoublePropertyTypeDescriptor() {
+	public static final BoxedDoublePropertyTypeDescriptor INSTANCE = new BoxedDoublePropertyTypeDescriptor();
+
+	private BoxedDoublePropertyTypeDescriptor() {
 		super( Double.class );
 	}
 

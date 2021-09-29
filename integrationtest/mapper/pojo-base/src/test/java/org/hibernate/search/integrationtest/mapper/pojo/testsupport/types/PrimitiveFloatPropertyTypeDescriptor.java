@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Float> {
 
-	PrimitiveFloatPropertyTypeDescriptor() {
+	public static final PrimitiveFloatPropertyTypeDescriptor INSTANCE = new PrimitiveFloatPropertyTypeDescriptor();
+
+	private PrimitiveFloatPropertyTypeDescriptor() {
 		super( float.class );
 	}
 

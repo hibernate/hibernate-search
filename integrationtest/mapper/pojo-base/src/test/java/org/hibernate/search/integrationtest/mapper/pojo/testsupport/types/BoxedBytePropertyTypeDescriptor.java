@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte> {
 
-	BoxedBytePropertyTypeDescriptor() {
+	public static final BoxedBytePropertyTypeDescriptor INSTANCE = new BoxedBytePropertyTypeDescriptor();
+
+	private BoxedBytePropertyTypeDescriptor() {
 		super( Byte.class );
 	}
 

@@ -22,7 +22,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<ZonedDateTime> {
 
-	ZonedDateTimePropertyTypeDescriptor() {
+	public static final ZonedDateTimePropertyTypeDescriptor INSTANCE = new ZonedDateTimePropertyTypeDescriptor();
+
+	private ZonedDateTimePropertyTypeDescriptor() {
 		super( ZonedDateTime.class );
 	}
 

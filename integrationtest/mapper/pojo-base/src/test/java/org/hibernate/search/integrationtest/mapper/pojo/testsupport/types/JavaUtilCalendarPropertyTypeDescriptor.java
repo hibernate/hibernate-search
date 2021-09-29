@@ -27,7 +27,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescriptor<Calendar> {
 
-	JavaUtilCalendarPropertyTypeDescriptor() {
+	public static final JavaUtilCalendarPropertyTypeDescriptor INSTANCE = new JavaUtilCalendarPropertyTypeDescriptor();
+
+	private JavaUtilCalendarPropertyTypeDescriptor() {
 		super( Calendar.class );
 	}
 

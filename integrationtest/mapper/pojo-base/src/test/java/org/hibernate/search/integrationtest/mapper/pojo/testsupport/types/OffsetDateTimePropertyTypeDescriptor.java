@@ -22,7 +22,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<OffsetDateTime> {
 
-	OffsetDateTimePropertyTypeDescriptor() {
+	public static final OffsetDateTimePropertyTypeDescriptor INSTANCE = new OffsetDateTimePropertyTypeDescriptor();
+
+	private OffsetDateTimePropertyTypeDescriptor() {
 		super( OffsetDateTime.class );
 	}
 

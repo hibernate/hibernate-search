@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 
-	UUIDPropertyTypeDescriptor() {
+	public static final UUIDPropertyTypeDescriptor INSTANCE = new UUIDPropertyTypeDescriptor();
+
+	private UUIDPropertyTypeDescriptor() {
 		super( UUID.class );
 	}
 

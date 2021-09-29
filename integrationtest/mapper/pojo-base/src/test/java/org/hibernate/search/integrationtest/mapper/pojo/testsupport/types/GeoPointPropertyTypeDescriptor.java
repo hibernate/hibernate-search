@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPoint> {
 
-	GeoPointPropertyTypeDescriptor() {
+	public static final GeoPointPropertyTypeDescriptor INSTANCE = new GeoPointPropertyTypeDescriptor();
+
+	private GeoPointPropertyTypeDescriptor() {
 		super( GeoPoint.class );
 	}
 

@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Integer> {
 
-	BoxedIntegerPropertyTypeDescriptor() {
+	public static final BoxedIntegerPropertyTypeDescriptor INSTANCE = new BoxedIntegerPropertyTypeDescriptor();
+
+	private BoxedIntegerPropertyTypeDescriptor() {
 		super( Integer.class );
 	}
 

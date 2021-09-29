@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<BigDecimal> {
 
-	BigDecimalPropertyTypeDescriptor() {
+	public static final BigDecimalPropertyTypeDescriptor INSTANCE = new BigDecimalPropertyTypeDescriptor();
+
+	private BigDecimalPropertyTypeDescriptor() {
 		super( BigDecimal.class );
 	}
 

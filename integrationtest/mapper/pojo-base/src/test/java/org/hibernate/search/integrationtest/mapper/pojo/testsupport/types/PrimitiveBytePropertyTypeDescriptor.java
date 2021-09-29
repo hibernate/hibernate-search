@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte> {
 
-	PrimitiveBytePropertyTypeDescriptor() {
+	public static final PrimitiveBytePropertyTypeDescriptor INSTANCE = new PrimitiveBytePropertyTypeDescriptor();
+
+	private PrimitiveBytePropertyTypeDescriptor() {
 		super( byte.class );
 	}
 

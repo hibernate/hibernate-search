@@ -20,7 +20,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<MonthDay> {
 
-	MonthDayPropertyTypeDescriptor() {
+	public static final MonthDayPropertyTypeDescriptor INSTANCE = new MonthDayPropertyTypeDescriptor();
+
+	private MonthDayPropertyTypeDescriptor() {
 		super( MonthDay.class );
 	}
 
