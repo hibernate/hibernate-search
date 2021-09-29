@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPropertyTypeDescriptor.MyEnum> {
 
-	EnumPropertyTypeDescriptor() {
+	public static final EnumPropertyTypeDescriptor INSTANCE = new EnumPropertyTypeDescriptor();
+
+	private EnumPropertyTypeDescriptor() {
 		super( MyEnum.class );
 	}
 

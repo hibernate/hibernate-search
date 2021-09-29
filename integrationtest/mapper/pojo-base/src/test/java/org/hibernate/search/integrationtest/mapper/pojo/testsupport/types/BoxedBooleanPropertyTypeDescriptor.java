@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<Boolean> {
 
-	BoxedBooleanPropertyTypeDescriptor() {
+	public static final BoxedBooleanPropertyTypeDescriptor INSTANCE = new BoxedBooleanPropertyTypeDescriptor();
+
+	private BoxedBooleanPropertyTypeDescriptor() {
 		super( Boolean.class );
 	}
 

@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<BigInteger> {
 
-	BigIntegerPropertyTypeDescriptor() {
+	public static final BigIntegerPropertyTypeDescriptor INSTANCE = new BigIntegerPropertyTypeDescriptor();
+
+	private BigIntegerPropertyTypeDescriptor() {
 		super( BigInteger.class );
 	}
 

@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalTime> {
 
-	LocalTimePropertyTypeDescriptor() {
+	public static final LocalTimePropertyTypeDescriptor INSTANCE = new LocalTimePropertyTypeDescriptor();
+
+	private LocalTimePropertyTypeDescriptor() {
 		super( LocalTime.class );
 	}
 

@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period> {
 
-	PeriodPropertyTypeDescriptor() {
+	public static final PeriodPropertyTypeDescriptor INSTANCE = new PeriodPropertyTypeDescriptor();
+
+	private PeriodPropertyTypeDescriptor() {
 		super( Period.class );
 	}
 

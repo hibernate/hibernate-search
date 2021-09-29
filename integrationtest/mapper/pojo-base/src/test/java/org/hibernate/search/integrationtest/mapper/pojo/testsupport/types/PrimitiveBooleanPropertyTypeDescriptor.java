@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<Boolean> {
 
-	PrimitiveBooleanPropertyTypeDescriptor() {
+	public static final PrimitiveBooleanPropertyTypeDescriptor INSTANCE = new PrimitiveBooleanPropertyTypeDescriptor();
+
+	private PrimitiveBooleanPropertyTypeDescriptor() {
 		super( boolean.class );
 	}
 
