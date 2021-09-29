@@ -27,10 +27,6 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Float>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Float>() {
-			@Override
-			public Class<Float> getProjectionType() {
-				return Float.class;
-			}
 
 			@Override
 			public List<Float> getEntityIdentifierValues() {
@@ -64,10 +60,6 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 	@Override
 	public DefaultValueBridgeExpectations<Float, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Float, Float>() {
-			@Override
-			public Class<Float> getProjectionType() {
-				return Float.class;
-			}
 
 			@Override
 			public Class<Float> getIndexFieldJavaType() {

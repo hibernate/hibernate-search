@@ -33,10 +33,6 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 	@Override
 	public DefaultValueBridgeExpectations<Period, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Period, String>() {
-			@Override
-			public Class<Period> getProjectionType() {
-				return Period.class;
-			}
 
 			@Override
 			public Class<String> getIndexFieldJavaType() {

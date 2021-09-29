@@ -21,16 +21,12 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 	public static final PrimitiveDoublePropertyTypeDescriptor INSTANCE = new PrimitiveDoublePropertyTypeDescriptor();
 
 	private PrimitiveDoublePropertyTypeDescriptor() {
-		super( double.class );
+		super( double.class, Double.class );
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Double>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Double>() {
-			@Override
-			public Class<Double> getProjectionType() {
-				return Double.class;
-			}
 
 			@Override
 			public List<Double> getEntityIdentifierValues() {
@@ -64,10 +60,6 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 	@Override
 	public DefaultValueBridgeExpectations<Double, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Double, Double>() {
-			@Override
-			public Class<Double> getProjectionType() {
-				return Double.class;
-			}
 
 			@Override
 			public Class<Double> getIndexFieldJavaType() {

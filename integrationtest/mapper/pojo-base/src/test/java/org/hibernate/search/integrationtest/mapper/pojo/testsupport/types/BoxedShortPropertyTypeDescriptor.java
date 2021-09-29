@@ -27,10 +27,6 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Short>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Short>() {
-			@Override
-			public Class<Short> getProjectionType() {
-				return Short.class;
-			}
 
 			@Override
 			public List<Short> getEntityIdentifierValues() {
@@ -66,10 +62,6 @@ public class BoxedShortPropertyTypeDescriptor extends PropertyTypeDescriptor<Sho
 	@Override
 	public DefaultValueBridgeExpectations<Short, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Short, Short>() {
-			@Override
-			public Class<Short> getProjectionType() {
-				return Short.class;
-			}
 
 			@Override
 			public Class<Short> getIndexFieldJavaType() {

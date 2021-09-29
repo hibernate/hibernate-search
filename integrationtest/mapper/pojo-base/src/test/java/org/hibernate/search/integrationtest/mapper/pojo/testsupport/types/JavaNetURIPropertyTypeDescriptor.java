@@ -47,10 +47,6 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 	@Override
 	public DefaultValueBridgeExpectations<URI, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<URI, String>() {
-			@Override
-			public Class<URI> getProjectionType() {
-				return URI.class;
-			}
 
 			@Override
 			public Class<String> getIndexFieldJavaType() {

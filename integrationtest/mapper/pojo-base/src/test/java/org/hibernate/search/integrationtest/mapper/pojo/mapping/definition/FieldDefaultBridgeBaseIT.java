@@ -136,7 +136,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	public void projection() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<V> query = session.search( expectations.getTypeWithValueBridge1() )
-					.select( f -> f.field( FIELD_NAME, expectations.getProjectionType() ) )
+					.select( f -> f.field( FIELD_NAME, typeDescriptor.getBoxedJavaType() ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -227,14 +227,15 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		assertThatCode( () -> projectionConverter.withConvertedType( Object.class,
 				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.doesNotThrowAnyException();
-		assertThatCode( () -> projectionConverter.withConvertedType( expectations.getProjectionType(), () -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+		assertThatCode( () -> projectionConverter.withConvertedType( typeDescriptor.getBoxedJavaType(),
+				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.doesNotThrowAnyException();
 		assertThatThrownBy( () -> projectionConverter.withConvertedType( IncompatibleType.class,
 				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid type for returned values: '" + IncompatibleType.class.getName() + "'",
-						"Expected '" + expectations.getProjectionType().getName() + "' or a supertype",
+						"Expected '" + typeDescriptor.getBoxedJavaType().getName() + "' or a supertype",
 						"Context: field 'foo'"
 				);
 

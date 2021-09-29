@@ -38,10 +38,6 @@ public class JavaSqlDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Da
 	@Override
 	public DefaultValueBridgeExpectations<Date, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Date, Instant>() {
-			@Override
-			public Class<Date> getProjectionType() {
-				return Date.class;
-			}
 
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {

@@ -12,12 +12,6 @@ public interface DefaultIdentifierBridgeExpectations<I> {
 	String TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME = "TypeWithIdentifierBridge1Name";
 	String TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME = "TypeWithIdentifierBridge2Name";
 
-	/**
-	 * @return The type returned by projections. For primitive types, this is the corresponding boxed type.
-	 * For other types, this is the type itself.
-	 */
-	Class<I> getProjectionType();
-
 	List<I> getEntityIdentifierValues();
 
 	List<String> getDocumentIdentifierValues();

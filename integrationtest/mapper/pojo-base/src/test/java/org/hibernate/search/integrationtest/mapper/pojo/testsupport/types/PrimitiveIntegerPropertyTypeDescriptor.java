@@ -21,16 +21,12 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 	public static final PrimitiveIntegerPropertyTypeDescriptor INSTANCE = new PrimitiveIntegerPropertyTypeDescriptor();
 
 	private PrimitiveIntegerPropertyTypeDescriptor() {
-		super( int.class );
+		super( int.class, Integer.class );
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Integer>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Integer>() {
-			@Override
-			public Class<Integer> getProjectionType() {
-				return Integer.class;
-			}
 
 			@Override
 			public List<Integer> getEntityIdentifierValues() {
@@ -67,10 +63,6 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 	@Override
 	public DefaultValueBridgeExpectations<Integer, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Integer, Integer>() {
-			@Override
-			public Class<Integer> getProjectionType() {
-				return Integer.class;
-			}
 
 			@Override
 			public Class<Integer> getIndexFieldJavaType() {

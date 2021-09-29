@@ -27,10 +27,6 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Integer>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Integer>() {
-			@Override
-			public Class<Integer> getProjectionType() {
-				return Integer.class;
-			}
 
 			@Override
 			public List<Integer> getEntityIdentifierValues() {
@@ -66,10 +62,6 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 	@Override
 	public DefaultValueBridgeExpectations<Integer, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Integer, Integer>() {
-			@Override
-			public Class<Integer> getProjectionType() {
-				return Integer.class;
-			}
 
 			@Override
 			public Class<Integer> getIndexFieldJavaType() {

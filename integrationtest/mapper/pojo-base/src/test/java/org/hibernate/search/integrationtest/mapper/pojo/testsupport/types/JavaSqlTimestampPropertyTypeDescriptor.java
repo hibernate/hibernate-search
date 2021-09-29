@@ -38,10 +38,6 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 	@Override
 	public DefaultValueBridgeExpectations<Timestamp, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Timestamp, Instant>() {
-			@Override
-			public Class<Timestamp> getProjectionType() {
-				return Timestamp.class;
-			}
 
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {

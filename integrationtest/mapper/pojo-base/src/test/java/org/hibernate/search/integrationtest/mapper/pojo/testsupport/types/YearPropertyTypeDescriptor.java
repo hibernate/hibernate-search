@@ -33,10 +33,6 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 	@Override
 	public DefaultValueBridgeExpectations<Year, ?> getDefaultValueBridgeExpectations() {
 		return new DefaultValueBridgeExpectations<Year, Year>() {
-			@Override
-			public Class<Year> getProjectionType() {
-				return Year.class;
-			}
 
 			@Override
 			public Class<Year> getIndexFieldJavaType() {
