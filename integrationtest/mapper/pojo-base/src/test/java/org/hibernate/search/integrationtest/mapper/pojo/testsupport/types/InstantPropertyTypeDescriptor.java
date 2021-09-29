@@ -29,8 +29,8 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Instant, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Instant, Instant>() {
+	public DefaultValueBridgeExpectations<Instant, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Instant, Instant>() {
 			@Override
 			public Class<Instant> getProjectionType() {
 				return Instant.class;
@@ -84,7 +84,7 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 			public Instant getNullAsValueBridge2() {
 				return Instant.parse( "2017-11-06T19:19:03.54Z" );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

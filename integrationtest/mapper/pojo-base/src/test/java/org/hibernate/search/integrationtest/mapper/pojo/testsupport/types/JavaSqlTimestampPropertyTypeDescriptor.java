@@ -34,8 +34,8 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Timestamp, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Timestamp, Instant>() {
+	public DefaultValueBridgeExpectations<Timestamp, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Timestamp, Instant>() {
 			@Override
 			public Class<Timestamp> getProjectionType() {
 				return Timestamp.class;
@@ -105,7 +105,7 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 			public Instant getNullAsValueBridge2() {
 				return Instant.parse( "2017-11-06T19:19:00.54Z" );
 			}
-		} );
+		};
 	}
 
 	private static Timestamp date(long epochMilli) {

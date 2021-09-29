@@ -29,8 +29,8 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<ZoneOffset, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<ZoneOffset, Integer>() {
+	public DefaultValueBridgeExpectations<ZoneOffset, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<ZoneOffset, Integer>() {
 			@Override
 			public Class<ZoneOffset> getProjectionType() {
 				return ZoneOffset.class;
@@ -92,7 +92,7 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 			public Integer getNullAsValueBridge2() {
 				return ZoneOffset.ofHoursMinutesSeconds( -8, -30, -52 ).getTotalSeconds();
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

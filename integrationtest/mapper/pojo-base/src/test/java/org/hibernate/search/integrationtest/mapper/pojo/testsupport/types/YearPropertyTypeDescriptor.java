@@ -29,8 +29,8 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Year, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Year, Year>() {
+	public DefaultValueBridgeExpectations<Year, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Year, Year>() {
 			@Override
 			public Class<Year> getProjectionType() {
 				return Year.class;
@@ -80,7 +80,7 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year> {
 			public Year getNullAsValueBridge2() {
 				return Year.of( 2020 );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -29,8 +29,8 @@ public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<LocalDate, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<LocalDate, LocalDate>() {
+	public DefaultValueBridgeExpectations<LocalDate, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<LocalDate, LocalDate>() {
 			@Override
 			public Class<LocalDate> getProjectionType() {
 				return LocalDate.class;
@@ -84,7 +84,7 @@ public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 			public LocalDate getNullAsValueBridge2() {
 				return LocalDate.parse( "2017-11-06" );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -58,8 +58,8 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<BigInteger, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<BigInteger, BigInteger>() {
+	public DefaultValueBridgeExpectations<BigInteger, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<BigInteger, BigInteger>() {
 			@Override
 			public Class<BigInteger> getProjectionType() {
 				return BigInteger.class;
@@ -107,7 +107,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			public BigInteger getNullAsValueBridge2() {
 				return BigInteger.valueOf( -10301 );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

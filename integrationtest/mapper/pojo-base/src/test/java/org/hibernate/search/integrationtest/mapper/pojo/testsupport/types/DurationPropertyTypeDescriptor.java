@@ -29,8 +29,8 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Duration, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Duration, Long>() {
+	public DefaultValueBridgeExpectations<Duration, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Duration, Long>() {
 			@Override
 			public Class<Duration> getProjectionType() {
 				return Duration.class;
@@ -90,7 +90,7 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			public Long getNullAsValueBridge2() {
 				return Duration.ofSeconds( 1, 123L ).toNanos();
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
