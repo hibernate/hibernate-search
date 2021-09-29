@@ -85,6 +85,25 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-module-infos</id>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <requires>
+                                        static jakarta.cdi;
+                                        *;
+                                    </requires>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
