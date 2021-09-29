@@ -7,22 +7,32 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Period;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period> {
+public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period, String> {
 
 	public static final PeriodPropertyTypeDescriptor INSTANCE = new PeriodPropertyTypeDescriptor();
 
 	private PeriodPropertyTypeDescriptor() {
 		super( Period.class );
+	}
+
+	@Override
+	protected PropertyValues<Period, String> createValues() {
+		return PropertyValues.<Period, String>builder()
+				.add( Period.ZERO, "+0000000000+0000000000+0000000000" )
+				.add( Period.ofDays( 1 ), "+0000000000+0000000000+0000000001" )
+				.add( Period.ofMonths( 4 ), "+0000000000+0000000004+0000000000" )
+				.add( Period.ofYears( 2050 ), "+0000002050+0000000000+0000000000" )
+				.add( Period.of( 1900, 12, 21 ), "+0000001900+0000000012+0000000021" )
+				.build();
 	}
 
 	@Override
@@ -37,28 +47,6 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<Period> getEntityPropertyValues() {
-				return Arrays.asList(
-						Period.ZERO,
-						Period.ofDays( 1 ),
-						Period.ofMonths( 4 ),
-						Period.ofYears( 2050 ),
-						Period.of( 1900, 12, 21 )
-				);
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return Arrays.asList(
-						"+0000000000+0000000000+0000000000",
-						"+0000000000+0000000000+0000000001",
-						"+0000000000+0000000004+0000000000",
-						"+0000002050+0000000000+0000000000",
-						"+0000001900+0000000012+0000000021"
-				);
 			}
 
 			@Override

@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Double> {
+public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Double, Double> {
 
 	public static final BoxedDoublePropertyTypeDescriptor INSTANCE = new BoxedDoublePropertyTypeDescriptor();
 
@@ -25,18 +24,20 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 	}
 
 	@Override
+	protected PropertyValues<Double, Double> createValues() {
+		return PropertyValues.<Double>passThroughBuilder()
+				.add( Double.MIN_VALUE, "4.9E-324" )
+				.add( -1.0, "-1.0" )
+				.add( 0.0, "0.0" )
+				.add( 1.0, "1.0" )
+				.add( 42.0, "42.0" )
+				.add( Double.MAX_VALUE, "1.7976931348623157E308" )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Double>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Double>() {
-
-			@Override
-			public List<Double> getEntityIdentifierValues() {
-				return Arrays.asList( Double.MIN_VALUE, -1.0, 0.0, 1.0, 42.0, Double.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList( "4.9E-324", "-1.0", "0.0", "1.0", "42.0", "1.7976931348623157E308" );
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -64,16 +65,6 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 			@Override
 			public Class<Double> getIndexFieldJavaType() {
 				return Double.class;
-			}
-
-			@Override
-			public List<Double> getEntityPropertyValues() {
-				return Arrays.asList( Double.MIN_VALUE, -1.0, 0.0, 1.0, 42.0, Double.MAX_VALUE );
-			}
-
-			@Override
-			public List<Double> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override

@@ -7,17 +7,16 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<BigInteger> {
+public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<BigInteger, BigInteger> {
 
 	public static final BigIntegerPropertyTypeDescriptor INSTANCE = new BigIntegerPropertyTypeDescriptor();
 
@@ -26,20 +25,22 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 
 	@Override
+	protected PropertyValues<BigInteger, BigInteger> createValues() {
+		return PropertyValues.<BigInteger>passThroughBuilder()
+				.add( BigInteger.valueOf( -10000 ), "-10000" )
+				.add( BigInteger.valueOf( -1 ), "-1" )
+				.add( BigInteger.ZERO, "0" )
+				.add( BigInteger.ONE, "1" )
+				.add( BigInteger.TEN, "10" )
+				.add( BigInteger.valueOf( 10000 ), "10000" )
+				.add( BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 1000 ) ),
+						"9223372036854775807000" )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<BigInteger>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<BigInteger>() {
-			@Override
-			public List<BigInteger> getEntityIdentifierValues() {
-				return takeBigIntegerSequence();
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						"-10000", "-1", "0", "1", "10", "10000", "9223372036854775807000" // Long.MAX_VALUE*1000
-				);
-			}
-
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -66,16 +67,6 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			@Override
 			public Class<BigInteger> getIndexFieldJavaType() {
 				return BigInteger.class;
-			}
-
-			@Override
-			public List<BigInteger> getEntityPropertyValues() {
-				return takeBigIntegerSequence();
-			}
-
-			@Override
-			public List<BigInteger> getDocumentFieldValues() {
-				return takeBigIntegerSequence();
 			}
 
 			@Override
@@ -137,14 +128,5 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 		BigInteger myProperty;
 		@GenericField(indexNullAs = "-10301")
 		BigInteger indexNullAsProperty;
-	}
-
-	private List<BigInteger> takeBigIntegerSequence() {
-		return Arrays.asList(
-				BigInteger.valueOf( -10000 ), BigInteger.valueOf( -1 ),
-				BigInteger.ZERO, BigInteger.ONE, BigInteger.TEN,
-				BigInteger.valueOf( 10000 ),
-				BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 1000 ) )
-		);
 	}
 }

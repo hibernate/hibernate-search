@@ -64,13 +64,13 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<I> typeDescriptor;
+	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
 	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
 	private StubIndexModel index1Model;
 	private StubIndexModel index2Model;
 
-	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I> typeDescriptor,
+	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I, ?> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
 		assumeTrue(
 				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()
@@ -101,7 +101,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void indexing() {
 		try ( SearchSession session = mapping.createSession() ) {
-			for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
+			for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
 				Object entity = expectations.instantiateTypeWithIdentifierBridge1( entityIdentifierValue );
 				session.indexingPlan().add( entity );
 			}
@@ -109,7 +109,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
 					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME
 			);
-			for ( String expectedDocumentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+			for ( String expectedDocumentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				expectationSetter.add( expectedDocumentIdentifierValue, b -> { } );
 			}
 		}
@@ -119,8 +119,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void projection_entityReference() {
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
-			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+			Iterator<I> entityIdentifierIterator = typeDescriptor.values().entityModelValues.iterator();
+			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchReferences(
 						Collections.singletonList(
@@ -153,8 +153,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void projection_id() {
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
-			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+			Iterator<I> entityIdentifierIterator = typeDescriptor.values().entityModelValues.iterator();
+			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchIds(
 						Collections.singletonList(
@@ -202,8 +202,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		assertThat( dslConverter.isCompatibleWith( incompatibleDslConverter ) ).isFalse();
 
 		// conversion methods must behave appropriately on valid input
-		Iterator<String> documentIdentifierIterator = expectations.getDocumentIdentifierValues().iterator();
-		for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
+		Iterator<String> documentIdentifierIterator = typeDescriptor.values().documentIdentifierValues.iterator();
+		for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
 			String documentIdentifierValue = documentIdentifierIterator.next();
 			assertThat(
 					dslConverter.toDocumentValue( entityIdentifierValue, convertContext )
@@ -262,8 +262,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 					new FromDocumentValueConvertContextImpl(
 							BridgeTestUtils.toBackendSessionContext( searchSession )
 					);
-			Iterator<I> projectionValuesIterator = expectations.getEntityIdentifierValues().iterator();
-			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+			Iterator<I> projectionValuesIterator = typeDescriptor.values().entityModelValues.iterator();
+			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I projectionValue = projectionValuesIterator.next();
 				assertThat(
 						projectionConverter.fromDocumentValue( documentIdentifierValue, fromDocumentConvertContext )

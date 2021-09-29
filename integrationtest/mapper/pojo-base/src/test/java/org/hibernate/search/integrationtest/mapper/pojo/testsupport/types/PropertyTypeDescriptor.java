@@ -13,12 +13,13 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 
-public abstract class PropertyTypeDescriptor<V> {
+public abstract class PropertyTypeDescriptor<V, F> {
 
-	private static List<PropertyTypeDescriptor<?>> all;
+	private static List<PropertyTypeDescriptor<?, ?>> all;
 
-	public static List<PropertyTypeDescriptor<?>> getAll() {
+	public static List<PropertyTypeDescriptor<?, ?>> getAll() {
 		if ( all == null ) {
 			all = Collections.unmodifiableList( Arrays.asList(
 					StringPropertyTypeDescriptor.INSTANCE,
@@ -72,6 +73,8 @@ public abstract class PropertyTypeDescriptor<V> {
 	private final Class<V> javaType;
 	private final Class<V> boxedJavaType;
 
+	private final PropertyValues<V, F> values = createValues();
+
 	protected PropertyTypeDescriptor(Class<V> javaType) {
 		this( javaType, javaType );
 	}
@@ -95,6 +98,12 @@ public abstract class PropertyTypeDescriptor<V> {
 	public boolean isNullable() {
 		return !javaType.isPrimitive();
 	}
+
+	public PropertyValues<V, F> values() {
+		return values;
+	}
+
+	protected abstract PropertyValues<V, F> createValues();
 
 	public abstract Optional<DefaultIdentifierBridgeExpectations<V>> getDefaultIdentifierBridgeExpectations();
 

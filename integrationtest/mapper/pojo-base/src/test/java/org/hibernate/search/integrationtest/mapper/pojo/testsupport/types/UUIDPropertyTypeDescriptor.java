@@ -6,18 +6,17 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
+public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID, String> {
 
 	public static final UUIDPropertyTypeDescriptor INSTANCE = new UUIDPropertyTypeDescriptor();
 
@@ -26,18 +25,22 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	}
 
 	@Override
+	protected PropertyValues<UUID, String> createValues() {
+		return PropertyValues.<UUID>stringBasedBuilder()
+				.add( new UUID( Long.MIN_VALUE, Long.MIN_VALUE ), "80000000-0000-0000-8000-000000000000" )
+				.add( new UUID( Long.MIN_VALUE, -1L ), "80000000-0000-0000-ffff-ffffffffffff" )
+				.add( new UUID( Long.MIN_VALUE, 0L ), "80000000-0000-0000-0000-000000000000" )
+				.add( new UUID( Long.MIN_VALUE, 1L ), "80000000-0000-0000-0000-000000000001" )
+				.add( new UUID( Long.MAX_VALUE, Long.MIN_VALUE ), "7fffffff-ffff-ffff-8000-000000000000" )
+				.add( new UUID( Long.MAX_VALUE, Long.MAX_VALUE ), "7fffffff-ffff-ffff-7fff-ffffffffffff" )
+				.add( UUID.fromString( "8cea97f9-9696-4299-9f05-636a208b6c1f" ),
+						"8cea97f9-9696-4299-9f05-636a208b6c1f" )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<UUID>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<UUID>() {
-
-			@Override
-			public List<UUID> getEntityIdentifierValues() {
-				return getSequence();
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return getStrings();
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -65,16 +68,6 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<UUID> getEntityPropertyValues() {
-				return getSequence();
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return getStrings();
 			}
 
 			@Override
@@ -137,29 +130,5 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		UUID myProperty;
 		@GenericField(indexNullAs = "8cea97f9-9696-4299-9f05-636a208b6c1f")
 		UUID indexNullAsProperty;
-	}
-
-	public static List<UUID> getSequence() {
-		return Arrays.asList(
-				new UUID( Long.MIN_VALUE, Long.MIN_VALUE ),
-				new UUID( Long.MIN_VALUE, -1L ),
-				new UUID( Long.MIN_VALUE, 0L ),
-				new UUID( Long.MIN_VALUE, 1L ),
-				new UUID( Long.MAX_VALUE, Long.MIN_VALUE ),
-				new UUID( Long.MAX_VALUE, Long.MAX_VALUE ),
-				UUID.fromString( "8cea97f9-9696-4299-9f05-636a208b6c1f" )
-		);
-	}
-
-	public static List<String> getStrings() {
-		return Arrays.asList(
-				"80000000-0000-0000-8000-000000000000",
-				"80000000-0000-0000-ffff-ffffffffffff",
-				"80000000-0000-0000-0000-000000000000",
-				"80000000-0000-0000-0000-000000000001",
-				"7fffffff-ffff-ffff-8000-000000000000",
-				"7fffffff-ffff-ffff-7fff-ffffffffffff",
-				"8cea97f9-9696-4299-9f05-636a208b6c1f"
-		);
 	}
 }

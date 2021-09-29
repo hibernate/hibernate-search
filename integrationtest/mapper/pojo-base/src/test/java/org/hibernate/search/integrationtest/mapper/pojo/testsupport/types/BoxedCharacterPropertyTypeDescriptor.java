@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor<Character> {
+public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor<Character, String> {
 
 	public static final BoxedCharacterPropertyTypeDescriptor INSTANCE = new BoxedCharacterPropertyTypeDescriptor();
 
@@ -25,20 +24,20 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 	}
 
 	@Override
+	protected PropertyValues<Character, String> createValues() {
+		return PropertyValues.<Character>stringBasedBuilder()
+				.add( Character.MIN_VALUE, String.valueOf( Character.MIN_VALUE ) )
+				.add( '7', "7" )
+				.add( 'A', "A" )
+				.add( 'a', "a" )
+				.add( 'f', "f" )
+				.add( Character.MAX_VALUE, String.valueOf( Character.MAX_VALUE ) )
+				.build();
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Character>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Character>() {
-
-			@Override
-			public List<Character> getEntityIdentifierValues() {
-				return Arrays.asList( Character.MIN_VALUE, '7', 'A', 'a', 'f', Character.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentIdentifierValues() {
-				return Arrays.asList(
-						String.valueOf( Character.MIN_VALUE ), "7", "A", "a", "f", String.valueOf( Character.MAX_VALUE )
-				);
-			}
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -66,16 +65,6 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 			@Override
 			public Class<String> getIndexFieldJavaType() {
 				return String.class;
-			}
-
-			@Override
-			public List<Character> getEntityPropertyValues() {
-				return Arrays.asList( Character.MIN_VALUE, '7', 'A', 'a', 'f', Character.MAX_VALUE );
-			}
-
-			@Override
-			public List<String> getDocumentFieldValues() {
-				return Arrays.asList( Character.toString( Character.MIN_VALUE ), "7", "A", "a", "f", Character.toString( Character.MAX_VALUE ) );
 			}
 
 			@Override

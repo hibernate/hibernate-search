@@ -7,22 +7,32 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Duration> {
+public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Duration, Long> {
 
 	public static final DurationPropertyTypeDescriptor INSTANCE = new DurationPropertyTypeDescriptor();
 
 	private DurationPropertyTypeDescriptor() {
 		super( Duration.class );
+	}
+
+	@Override
+	protected PropertyValues<Duration, Long> createValues() {
+		return PropertyValues.<Duration, Long>builder()
+				.add( Duration.ZERO, 0L )
+				.add( Duration.ofNanos( 1L ), 1L )
+				.add( Duration.ofSeconds( 1, 123L ), 1_000_000_123L )
+				.add( Duration.ofHours( 3 ), 3 * 3_600 * 1_000_000_000L )
+				.add( Duration.ofDays( 7 ), 7 * 24 * 60 * 60 * 1_000_000_000L )
+				.build();
 	}
 
 	@Override
@@ -37,28 +47,6 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			@Override
 			public Class<Long> getIndexFieldJavaType() {
 				return Long.class;
-			}
-
-			@Override
-			public List<Duration> getEntityPropertyValues() {
-				return Arrays.asList(
-						Duration.ZERO,
-						Duration.ofNanos( 1L ),
-						Duration.ofSeconds( 1, 123L ),
-						Duration.ofHours( 3 ),
-						Duration.ofDays( 7 )
-				);
-			}
-
-			@Override
-			public List<Long> getDocumentFieldValues() {
-				return Arrays.asList(
-						Duration.ZERO.toNanos(),
-						1L,
-						Duration.ofSeconds( 1, 123L ).toNanos(),
-						Duration.ofHours( 3 ).toNanos(),
-						Duration.ofDays( 7 ).toNanos()
-				);
 			}
 
 			@Override

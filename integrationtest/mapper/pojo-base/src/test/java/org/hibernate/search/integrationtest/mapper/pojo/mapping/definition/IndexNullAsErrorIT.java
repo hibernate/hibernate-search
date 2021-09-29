@@ -45,7 +45,7 @@ public class IndexNullAsErrorIT<V, F> {
 
 	private final DefaultValueBridgeExpectations<V, F> expectations;
 
-	public IndexNullAsErrorIT(PropertyTypeDescriptor<V> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+	public IndexNullAsErrorIT(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		this.expectations = expectations;
 	}
 

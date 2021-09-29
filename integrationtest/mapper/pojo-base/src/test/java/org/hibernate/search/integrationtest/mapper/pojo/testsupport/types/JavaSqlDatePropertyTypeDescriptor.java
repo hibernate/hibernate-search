@@ -8,26 +8,48 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.sql.Date;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class JavaSqlDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Date> {
+public class JavaSqlDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Date, Instant> {
 
 	public static final JavaSqlDatePropertyTypeDescriptor INSTANCE = new JavaSqlDatePropertyTypeDescriptor();
 
 	private JavaSqlDatePropertyTypeDescriptor() {
 		super( Date.class );
+	}
+
+	@Override
+	protected PropertyValues<Date, Instant> createValues() {
+		return PropertyValues.<Date, Instant>builder()
+				.add( date( Long.MIN_VALUE ), Instant.ofEpochMilli( Long.MIN_VALUE ) )
+				.add( date( 1970, 1, 1, 0, 0, 0, 0 ),
+						Instant.parse( "1970-01-01T00:00:00.00Z" ) )
+				.add( date( 1970, 1, 9, 13, 28, 59, 0 ),
+						Instant.parse( "1970-01-09T13:28:59.00Z" ) )
+				.add( date( 2017, 11, 6, 19, 19, 0, 540 ),
+						Instant.parse( "2017-11-06T19:19:00.54Z" ) )
+				.add( date( Long.MAX_VALUE ), Instant.ofEpochMilli( Long.MAX_VALUE ) )
+
+				// A february 29th on a leap year
+				.add( date( 2000, 2, 29, 12, 0, 0, 0 ),
+						Instant.parse( "2000-02-29T12:00:00.0Z" ) )
+				// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
+				.add( date( 1500, 2, 29, 12, 0, 0, 0 ),
+						// The Julian calendar is 10 days late at this point
+						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
+						Instant.parse( "1500-03-10T12:00:00.0Z" ) )
+				.build();
 	}
 
 	@Override
@@ -42,38 +64,6 @@ public class JavaSqlDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Da
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {
 				return Instant.class;
-			}
-
-			@Override
-			public List<Date> getEntityPropertyValues() {
-				return Arrays.asList(
-						date( Long.MIN_VALUE ),
-						date( 1970, 1, 1, 0, 0, 0, 0 ),
-						date( 1970, 1, 9, 13, 28, 59, 0 ),
-						date( 2017, 11, 6, 19, 19, 0, 540 ),
-						date( Long.MAX_VALUE ),
-
-						// A february 29th on a leap year
-						date( 2000, 2, 29, 12, 0, 0, 0 ),
-						// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
-						date( 1500, 2, 29, 12, 0, 0, 0 )
-				);
-			}
-
-			@Override
-			public List<Instant> getDocumentFieldValues() {
-				return Arrays.asList(
-						Instant.ofEpochMilli( Long.MIN_VALUE ),
-						Instant.parse( "1970-01-01T00:00:00.00Z" ),
-						Instant.parse( "1970-01-09T13:28:59.00Z" ),
-						Instant.parse( "2017-11-06T19:19:00.54Z" ),
-						Instant.ofEpochMilli( Long.MAX_VALUE ),
-
-						Instant.parse( "2000-02-29T12:00:00.0Z" ),
-						// The Julian calendar is 10 days late at this point
-						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
-						Instant.parse( "1500-03-10T12:00:00.0Z" )
-				);
 			}
 
 			@Override

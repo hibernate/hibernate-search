@@ -10,22 +10,37 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<ZonedDateTime> {
+public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<ZonedDateTime, ZonedDateTime> {
 
 	public static final ZonedDateTimePropertyTypeDescriptor INSTANCE = new ZonedDateTimePropertyTypeDescriptor();
 
 	private ZonedDateTimePropertyTypeDescriptor() {
 		super( ZonedDateTime.class );
+	}
+
+	@Override
+	protected PropertyValues<ZonedDateTime, ZonedDateTime> createValues() {
+		return PropertyValues.<ZonedDateTime>passThroughBuilder()
+				.add( ZonedDateTime.of( LocalDateTime.MIN, ZoneId.of( "Europe/Paris" ) ) )
+				.add( ZonedDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ),
+						ZoneId.of( "Europe/Paris" ) ) )
+				.add( ZonedDateTime.of(
+						LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ),
+						ZoneId.of( "Europe/Paris" ) ) )
+				.add( ZonedDateTime.of(
+						LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ),
+						ZoneId.of( "America/Chicago" ) ) )
+				.add( ZonedDateTime.of( LocalDateTime.MAX, ZoneId.of( "Europe/Paris" ) ) )
+				.build();
 	}
 
 	@Override
@@ -40,22 +55,6 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			@Override
 			public Class<ZonedDateTime> getIndexFieldJavaType() {
 				return ZonedDateTime.class;
-			}
-
-			@Override
-			public List<ZonedDateTime> getEntityPropertyValues() {
-				return Arrays.asList(
-						ZonedDateTime.of( LocalDateTime.MIN, ZoneId.of( "Europe/Paris" ) ),
-						ZonedDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ), ZoneId.of( "Europe/Paris" ) ),
-						ZonedDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ), ZoneId.of( "Europe/Paris" ) ),
-						ZonedDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ), ZoneId.of( "America/Chicago" ) ),
-						ZonedDateTime.of( LocalDateTime.MAX, ZoneId.of( "Europe/Paris" ) )
-				);
-			}
-
-			@Override
-			public List<ZonedDateTime> getDocumentFieldValues() {
-				return getEntityPropertyValues();
 			}
 
 			@Override
