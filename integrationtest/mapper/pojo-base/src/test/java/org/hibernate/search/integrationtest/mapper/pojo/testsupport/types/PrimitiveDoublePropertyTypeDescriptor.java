@@ -18,7 +18,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Double> {
 
-	PrimitiveDoublePropertyTypeDescriptor() {
+	public static final PrimitiveDoublePropertyTypeDescriptor INSTANCE = new PrimitiveDoublePropertyTypeDescriptor();
+
+	private PrimitiveDoublePropertyTypeDescriptor() {
 		super( double.class );
 	}
 

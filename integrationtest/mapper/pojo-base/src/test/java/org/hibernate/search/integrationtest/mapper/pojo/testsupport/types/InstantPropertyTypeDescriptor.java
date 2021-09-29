@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instant> {
 
-	InstantPropertyTypeDescriptor() {
+	public static final InstantPropertyTypeDescriptor INSTANCE = new InstantPropertyTypeDescriptor();
+
+	private InstantPropertyTypeDescriptor() {
 		super( Instant.class );
 	}
 

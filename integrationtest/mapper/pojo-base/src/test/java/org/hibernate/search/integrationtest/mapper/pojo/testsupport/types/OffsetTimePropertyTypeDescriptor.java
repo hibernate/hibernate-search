@@ -21,7 +21,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<OffsetTime> {
 
-	OffsetTimePropertyTypeDescriptor() {
+	public static final OffsetTimePropertyTypeDescriptor INSTANCE = new OffsetTimePropertyTypeDescriptor();
+
+	private OffsetTimePropertyTypeDescriptor() {
 		super( OffsetTime.class );
 	}
 

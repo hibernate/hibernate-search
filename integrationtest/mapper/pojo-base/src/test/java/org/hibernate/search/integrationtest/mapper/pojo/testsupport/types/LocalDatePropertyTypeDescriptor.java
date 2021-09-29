@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<LocalDate> {
 
-	LocalDatePropertyTypeDescriptor() {
+	public static final LocalDatePropertyTypeDescriptor INSTANCE = new LocalDatePropertyTypeDescriptor();
+
+	private LocalDatePropertyTypeDescriptor() {
 		super( LocalDate.class );
 	}
 

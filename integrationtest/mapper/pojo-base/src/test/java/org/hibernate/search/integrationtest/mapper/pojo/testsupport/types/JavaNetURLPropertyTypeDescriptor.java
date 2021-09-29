@@ -22,7 +22,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL> {
 
-	JavaNetURLPropertyTypeDescriptor() {
+	public static final JavaNetURLPropertyTypeDescriptor INSTANCE = new JavaNetURLPropertyTypeDescriptor();
+
+	private JavaNetURLPropertyTypeDescriptor() {
 		super( URL.class );
 	}
 

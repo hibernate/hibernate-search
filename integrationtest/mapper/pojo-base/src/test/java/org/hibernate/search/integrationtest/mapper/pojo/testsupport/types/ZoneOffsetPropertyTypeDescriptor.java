@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneOffset> {
 
-	ZoneOffsetPropertyTypeDescriptor() {
+	public static final ZoneOffsetPropertyTypeDescriptor INSTANCE = new ZoneOffsetPropertyTypeDescriptor();
+
+	private ZoneOffsetPropertyTypeDescriptor() {
 		super( ZoneOffset.class );
 	}
 
