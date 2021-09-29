@@ -55,8 +55,8 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String>
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<String, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<String, String>() {
+	public DefaultValueBridgeExpectations<String, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<String, String>() {
 			@Override
 			public Class<String> getProjectionType() {
 				return String.class;
@@ -110,7 +110,7 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String>
 				// Every string is valid
 				return null;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

@@ -56,8 +56,8 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<UUID, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<UUID, String>() {
+	public DefaultValueBridgeExpectations<UUID, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<UUID, String>() {
 			@Override
 			public Class<UUID> getProjectionType() {
 				return UUID.class;
@@ -105,7 +105,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 			public String getNullAsValueBridge2() {
 				return "8cea97f9-9696-4299-9f05-636a208b6c1f";
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

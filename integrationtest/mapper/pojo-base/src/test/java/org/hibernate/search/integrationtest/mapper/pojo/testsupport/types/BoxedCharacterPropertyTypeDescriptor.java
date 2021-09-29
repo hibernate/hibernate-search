@@ -57,8 +57,8 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Character, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Character, String>() {
+	public DefaultValueBridgeExpectations<Character, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Character, String>() {
 			@Override
 			public Class<Character> getProjectionType() {
 				return Character.class;
@@ -106,7 +106,7 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 			public String getNullAsValueBridge2() {
 				return "F";
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

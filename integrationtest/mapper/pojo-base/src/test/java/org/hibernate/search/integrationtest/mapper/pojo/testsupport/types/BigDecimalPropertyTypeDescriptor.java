@@ -29,8 +29,8 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<BigDecimal, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<BigDecimal, BigDecimal>() {
+	public DefaultValueBridgeExpectations<BigDecimal, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<BigDecimal, BigDecimal>() {
 			@Override
 			public Class<BigDecimal> getProjectionType() {
 				return BigDecimal.class;
@@ -79,7 +79,7 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			public BigDecimal getNullAsValueBridge2() {
 				return BigDecimal.valueOf( 42571524, 231254 );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

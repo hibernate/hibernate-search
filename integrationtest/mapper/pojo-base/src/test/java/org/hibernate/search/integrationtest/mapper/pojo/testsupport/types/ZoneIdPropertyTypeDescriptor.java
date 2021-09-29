@@ -30,8 +30,8 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<ZoneId, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<ZoneId, String>() {
+	public DefaultValueBridgeExpectations<ZoneId, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<ZoneId, String>() {
 			@Override
 			public Class<ZoneId> getProjectionType() {
 				return ZoneId.class;
@@ -93,7 +93,7 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 			public String getNullAsValueBridge2() {
 				return ZoneId.of( "Europe/Paris" ).getId();
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

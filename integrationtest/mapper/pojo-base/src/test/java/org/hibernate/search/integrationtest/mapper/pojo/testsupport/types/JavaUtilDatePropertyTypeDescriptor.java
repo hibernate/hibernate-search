@@ -35,8 +35,8 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Date, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Date, Instant>() {
+	public DefaultValueBridgeExpectations<Date, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Date, Instant>() {
 			@Override
 			public Class<Date> getProjectionType() {
 				return Date.class;
@@ -150,7 +150,7 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 			public Instant getNullAsValueBridge2() {
 				return Instant.parse( "2012-02-29T12:10:01.12Z" );
 			}
-		} );
+		};
 	}
 
 	private static Date date(long epochMilli) {

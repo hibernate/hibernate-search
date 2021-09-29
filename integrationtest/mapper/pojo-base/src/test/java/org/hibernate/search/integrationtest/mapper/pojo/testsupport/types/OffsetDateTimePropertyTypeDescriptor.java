@@ -32,8 +32,8 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<OffsetDateTime, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<OffsetDateTime, OffsetDateTime>() {
+	public DefaultValueBridgeExpectations<OffsetDateTime, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<OffsetDateTime, OffsetDateTime>() {
 			@Override
 			public Class<OffsetDateTime> getProjectionType() {
 				return OffsetDateTime.class;
@@ -87,7 +87,7 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 			public OffsetDateTime getNullAsValueBridge2() {
 				return OffsetDateTime.of( LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 30, 59 ), ZoneOffset.ofHours( -6 ) );
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -34,8 +34,8 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Time, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Time, Instant>() {
+	public DefaultValueBridgeExpectations<Time, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Time, Instant>() {
 			@Override
 			public Class<Time> getProjectionType() {
 				return Time.class;
@@ -105,7 +105,7 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 			public Instant getNullAsValueBridge2() {
 				return Instant.parse( "2001-03-31T02:59:01.99Z" );
 			}
-		} );
+		};
 	}
 
 	private static Time date(long epochMilli) {

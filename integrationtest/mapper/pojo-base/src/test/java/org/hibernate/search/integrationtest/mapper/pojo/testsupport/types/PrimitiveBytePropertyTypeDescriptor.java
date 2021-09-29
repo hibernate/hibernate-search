@@ -57,8 +57,8 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Byte, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Byte, Byte>() {
+	public DefaultValueBridgeExpectations<Byte, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Byte, Byte>() {
 			@Override
 			public Class<Byte> getProjectionType() {
 				return Byte.class;
@@ -107,7 +107,7 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public Byte getNullAsValueBridge2() {
 				return -64;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)

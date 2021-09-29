@@ -55,8 +55,8 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<MyEnum, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<MyEnum, String>() {
+	public DefaultValueBridgeExpectations<MyEnum, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<MyEnum, String>() {
 			@Override
 			public Class<MyEnum> getProjectionType() {
 				return MyEnum.class;
@@ -104,7 +104,7 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 			public String getNullAsValueBridge2() {
 				return "VALUE2";
 			}
-		} );
+		};
 	}
 
 	public enum MyEnum {

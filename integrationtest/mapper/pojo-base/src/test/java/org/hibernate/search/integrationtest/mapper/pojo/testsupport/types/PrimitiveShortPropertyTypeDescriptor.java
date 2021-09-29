@@ -58,8 +58,8 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 	}
 
 	@Override
-	public Optional<DefaultValueBridgeExpectations<Short, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Short, Short>() {
+	public DefaultValueBridgeExpectations<Short, ?> getDefaultValueBridgeExpectations() {
+		return new DefaultValueBridgeExpectations<Short, Short>() {
 			@Override
 			public Class<Short> getProjectionType() {
 				return Short.class;
@@ -108,7 +108,7 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 			public Short getNullAsValueBridge2() {
 				return 739;
 			}
-		} );
+		};
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
