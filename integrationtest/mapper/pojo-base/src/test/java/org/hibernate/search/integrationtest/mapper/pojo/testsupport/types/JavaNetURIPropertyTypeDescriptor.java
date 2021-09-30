@@ -37,16 +37,35 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 				"https://access.redhat.com/products/red-hat-openshift-container-platform/",
 				"mailto:java-net@java.sun.com",
 				"urn:isbn:096139210x",
-				"file:///~calendar"
+				"file:///~calendar",
+				// No normalization is expected
+				"https://www.google.com/./foo/bar/../bar"
 		} ) {
-			builder.add( URI.create( string ), string );
+			builder.add( URI.create( string ), string, string );
 		}
 		return builder.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<URI>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<URI>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(URI identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -91,6 +110,18 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 				return "http://www.wrong.uri.com?param1=0 param7=0";
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		URI id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		URI id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

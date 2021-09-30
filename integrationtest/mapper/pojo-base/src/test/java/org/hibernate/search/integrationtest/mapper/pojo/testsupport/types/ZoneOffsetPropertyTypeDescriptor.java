@@ -27,18 +27,35 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 	@Override
 	protected PropertyValues<ZoneOffset, Integer> createValues() {
 		return PropertyValues.<ZoneOffset, Integer>builder()
-				.add( ZoneOffset.MIN, -18 * 3600 )
-				.add( ZoneOffset.ofHours( -1 ), -1 * 3600 )
-				.add( ZoneOffset.UTC, 0 )
-				.add( ZoneOffset.ofHours( 1 ), 1 * 3600 )
-				.add( ZoneOffset.ofHours( 7 ), 7 * 3600 )
-				.add( ZoneOffset.MAX, 18 * 3600 )
+				.add( ZoneOffset.MIN, -18 * 3600, "-18:00" )
+				.add( ZoneOffset.ofHours( -1 ), -1 * 3600, "-01:00" )
+				.add( ZoneOffset.UTC, 0, "Z" )
+				.add( ZoneOffset.ofHours( 1 ), 1 * 3600, "+01:00" )
+				.add( ZoneOffset.ofHours( 7 ), 7 * 3600, "+07:00" )
+				.add( ZoneOffset.MAX, 18 * 3600, "+18:00" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<ZoneOffset>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<ZoneOffset>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(ZoneOffset identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -78,6 +95,18 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 				return ZoneOffset.ofHoursMinutesSeconds( -8, -30, -52 ).getTotalSeconds();
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		ZoneOffset id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		ZoneOffset id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

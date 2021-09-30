@@ -42,32 +42,55 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigDecimalIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBooleanIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultByteIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDoubleIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultFloatIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultGeoPointIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultInstantIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURIIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURIValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlDateIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlDateValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlTimeIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlTimeValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlTimestampIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlTimestampValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalDateIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalDateTimeIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLocalTimeIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultMonthDayIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultOffsetDateTimeIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultOffsetTimeIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultPeriodIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultPeriodValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultStringIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultYearIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultYearMonthIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneIdIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneIdValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneOffsetIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneOffsetValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZonedDateTimeIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgesConfigurationContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.DefaultBinderDefinitionStep;
@@ -238,66 +261,88 @@ public final class BridgeResolver {
 					.valueBinder( new PassThroughValueBridge.Binder<>( BigInteger.class, ConvertUtils::convertBigInteger ) )
 					.identifierBridge( new DefaultBigIntegerIdentifierBridge() );
 			exactType( BigDecimal.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) )
+					.identifierBridge( new DefaultBigDecimalIdentifierBridge() );
 
 			// java.time
 			exactType( LocalDate.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( LocalDate.class, ParseUtils::parseLocalDate ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( LocalDate.class, ParseUtils::parseLocalDate ) )
+					.identifierBridge( new DefaultLocalDateIdentifierBridge() );
 			exactType( Instant.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Instant.class, ParseUtils::parseInstant ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( Instant.class, ParseUtils::parseInstant ) )
+					.identifierBridge( new DefaultInstantIdentifierBridge() );
 			exactType( LocalDateTime.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( LocalDateTime.class, ParseUtils::parseLocalDateTime ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( LocalDateTime.class, ParseUtils::parseLocalDateTime ) )
+					.identifierBridge( new DefaultLocalDateTimeIdentifierBridge() );
 			exactType( LocalTime.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( LocalTime.class, ParseUtils::parseLocalTime ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( LocalTime.class, ParseUtils::parseLocalTime ) )
+					.identifierBridge( new DefaultLocalTimeIdentifierBridge() );
 			exactType( ZonedDateTime.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( ZonedDateTime.class, ParseUtils::parseZonedDateTime ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( ZonedDateTime.class, ParseUtils::parseZonedDateTime ) )
+					.identifierBridge( new DefaultZonedDateTimeIdentifierBridge() );
 			exactType( Year.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Year.class, ParseUtils::parseYear ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( Year.class, ParseUtils::parseYear ) )
+					.identifierBridge( new DefaultYearIdentifierBridge() );
 			exactType( YearMonth.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( YearMonth.class, ParseUtils::parseYearMonth ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( YearMonth.class, ParseUtils::parseYearMonth ) )
+					.identifierBridge( new DefaultYearMonthIdentifierBridge() );
 			exactType( MonthDay.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( MonthDay.class, ParseUtils::parseMonthDay ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( MonthDay.class, ParseUtils::parseMonthDay ) )
+					.identifierBridge( new DefaultMonthDayIdentifierBridge() );
 			exactType( OffsetDateTime.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( OffsetDateTime.class, ParseUtils::parseOffsetDateTime ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( OffsetDateTime.class, ParseUtils::parseOffsetDateTime ) )
+					.identifierBridge( new DefaultOffsetDateTimeIdentifierBridge() );
 			exactType( OffsetTime.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( OffsetTime.class, ParseUtils::parseOffsetTime ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( OffsetTime.class, ParseUtils::parseOffsetTime ) )
+					.identifierBridge( new DefaultOffsetTimeIdentifierBridge() );
 			exactType( ZoneOffset.class )
-					.valueBridge( new DefaultZoneOffsetValueBridge() );
+					.valueBridge( new DefaultZoneOffsetValueBridge() )
+					.identifierBridge( new DefaultZoneOffsetIdentifierBridge() );
 			exactType( ZoneId.class )
-					.valueBridge( new DefaultZoneIdValueBridge() );
-			exactType( ZoneId.class )
-					.valueBridge( new DefaultZoneIdValueBridge() );
+					.valueBridge( new DefaultZoneIdValueBridge() )
+					.identifierBridge( new DefaultZoneIdIdentifierBridge() );
 			exactType( Period.class )
-					.valueBridge( new DefaultPeriodValueBridge() );
+					.valueBridge( new DefaultPeriodValueBridge() )
+					.identifierBridge( new DefaultPeriodIdentifierBridge() );
 			exactType( Duration.class )
-					.valueBridge( new DefaultDurationValueBridge() );
+					.valueBridge( new DefaultDurationValueBridge() )
+					.identifierBridge( new DefaultDurationIdentifierBridge() );
 
 			// java.util
 			exactType( UUID.class )
 					.valueBridge( new DefaultUUIDValueBridge() )
 					.identifierBridge( new DefaultUUIDIdentifierBridge() );
 			exactType( Date.class )
-					.valueBridge( new DefaultJavaUtilDateValueBridge() );
+					.valueBridge( new DefaultJavaUtilDateValueBridge() )
+					.identifierBridge( new DefaultJavaUtilDateIdentifierBridge() );
 			exactType( Calendar.class )
-					.valueBridge( new DefaultJavaUtilCalendarValueBridge() );
+					.valueBridge( new DefaultJavaUtilCalendarValueBridge() )
+					.identifierBridge( new DefaultJavaUtilCalendarIdentifierBridge() );
 
 			// java.sql
 			exactType( java.sql.Date.class )
-					.valueBridge( new DefaultJavaSqlDateValueBridge() );
+					.valueBridge( new DefaultJavaSqlDateValueBridge() )
+					.identifierBridge( new DefaultJavaSqlDateIdentifierBridge() );
 			exactType( Timestamp.class )
-					.valueBridge( new DefaultJavaSqlTimestampValueBridge() );
+					.valueBridge( new DefaultJavaSqlTimestampValueBridge() )
+					.identifierBridge( new DefaultJavaSqlTimestampIdentifierBridge() );
 			exactType( Time.class )
-					.valueBridge( new DefaultJavaSqlTimeValueBridge() );
+					.valueBridge( new DefaultJavaSqlTimeValueBridge() )
+					.identifierBridge( new DefaultJavaSqlTimeIdentifierBridge() );
 
 			// java.net
 			exactType( URI.class )
-					.valueBridge( new DefaultJavaNetURIValueBridge() );
+					.valueBridge( new DefaultJavaNetURIValueBridge() )
+					.identifierBridge( new DefaultJavaNetURIIdentifierBridge() );
 			exactType( URL.class )
-					.valueBridge( new DefaultJavaNetURLValueBridge() );
+					.valueBridge( new DefaultJavaNetURLValueBridge() )
+					.identifierBridge( new DefaultJavaNetURLIdentifierBridge() );
 
 			// org.hibernate.search
 			subTypesOf( GeoPoint.class )
 					.valueBinder( new PassThroughValueBridge.Binder<>( GeoPoint.class, ParseUtils::parseGeoPoint ) );
+			exactType( GeoPoint.class )
+					.identifierBridge( new DefaultGeoPointIdentifierBridge() );
 		}
 
 		private class TypePatternDefaultBinderDefinitionStep

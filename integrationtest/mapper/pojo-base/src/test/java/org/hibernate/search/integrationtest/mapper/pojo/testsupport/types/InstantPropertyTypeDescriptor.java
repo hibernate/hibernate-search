@@ -27,17 +27,34 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 	@Override
 	protected PropertyValues<Instant, Instant> createValues() {
 		return PropertyValues.<Instant>passThroughBuilder()
-				.add( Instant.MIN )
-				.add( Instant.parse( "1970-01-01T00:00:00.00Z" ) )
-				.add( Instant.parse( "1970-01-09T13:28:59.00Z" ) )
-				.add( Instant.parse( "2017-11-06T19:19:00.54Z" ) )
-				.add( Instant.MAX )
+				.add( Instant.MIN, "-1000000000-01-01T00:00:00Z" )
+				.add( Instant.parse( "1970-01-01T00:00:00.00Z" ), "1970-01-01T00:00:00Z" )
+				.add( Instant.parse( "1970-01-09T13:28:59.00Z" ), "1970-01-09T13:28:59Z" )
+				.add( Instant.parse( "2017-11-06T19:19:00.54Z" ), "2017-11-06T19:19:00.540Z" )
+				.add( Instant.MAX, "+1000000000-12-31T23:59:59.999999999Z" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Instant>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Instant>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Instant identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -77,6 +94,18 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 				return Instant.parse( "2017-11-06T19:19:03.54Z" );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Instant id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Instant id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -27,21 +27,17 @@ public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, Stri
 
 	@Override
 	public String toIndexedValue(URI value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toString();
+		return to( value );
 	}
 
 	@Override
 	public URI fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : toURI( value );
+		return from( value );
 	}
 
 	@Override
 	public String parse(String value) {
-		if ( value == null ) {
-			return null;
-		}
-
-		toURI( value );
+		from( value );
 		return value;
 	}
 
@@ -50,7 +46,14 @@ public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, Stri
 		return getClass().equals( other.getClass() );
 	}
 
-	private static URI toURI(String value) {
+	static String to(URI value) {
+		return value == null ? null : value.toString();
+	}
+
+	static URI from(String value) {
+		if ( value == null ) {
+			return null;
+		}
 		try {
 			return new URI( value );
 		}

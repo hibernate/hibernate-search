@@ -23,12 +23,12 @@ public final class DefaultJavaSqlDateValueBridge implements ValueBridge<Date, In
 
 	@Override
 	public Instant toIndexedValue(Date value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+		return to( value );
 	}
 
 	@Override
 	public Date fromIndexedValue(Instant value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : new Date( value.toEpochMilli() );
+		return from( value );
 	}
 
 	@Override
@@ -39,6 +39,14 @@ public final class DefaultJavaSqlDateValueBridge implements ValueBridge<Date, In
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
+	}
+
+	static Instant to(Date value) {
+		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+	}
+
+	static Date from(Instant value) {
+		return value == null ? null : new Date( value.toEpochMilli() );
 	}
 
 }

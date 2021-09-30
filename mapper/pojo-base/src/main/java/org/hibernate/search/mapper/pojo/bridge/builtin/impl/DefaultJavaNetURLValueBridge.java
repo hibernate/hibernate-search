@@ -27,21 +27,17 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 
 	@Override
 	public String toIndexedValue(URL value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toExternalForm();
+		return to( value );
 	}
 
 	@Override
 	public URL fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : toURL( value );
+		return from( value );
 	}
 
 	@Override
 	public String parse(String value) {
-		if ( value == null ) {
-			return null;
-		}
-
-		toURL( value );
+		from( value );
 		return value;
 	}
 
@@ -50,7 +46,14 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 		return getClass().equals( other.getClass() );
 	}
 
-	private static URL toURL(String value) {
+	static String to(URL value) {
+		return value == null ? null : value.toExternalForm();
+	}
+
+	static URL from(String value) {
+		if ( value == null ) {
+			return null;
+		}
 		try {
 			return new URL( value );
 		}

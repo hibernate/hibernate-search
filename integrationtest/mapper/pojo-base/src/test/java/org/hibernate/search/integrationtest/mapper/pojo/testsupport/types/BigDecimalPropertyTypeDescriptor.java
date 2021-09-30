@@ -27,19 +27,36 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	@Override
 	protected PropertyValues<BigDecimal, BigDecimal> createValues() {
 		return PropertyValues.<BigDecimal>passThroughBuilder()
-				.add( BigDecimal.valueOf( -100000.0 ) )
-				.add( BigDecimal.valueOf( -1.0 ) )
-				.add( BigDecimal.ZERO )
-				.add( BigDecimal.ONE )
-				.add( BigDecimal.TEN )
-				.add( BigDecimal.valueOf( 100000.0 ) )
-				.add( BigDecimal.valueOf( 42571524, 231254 ) )
+				.add( BigDecimal.valueOf( -100000.0 ), "-100000.0" )
+				.add( BigDecimal.valueOf( -1.0 ), "-1.0" )
+				.add( BigDecimal.ZERO, "0" )
+				.add( BigDecimal.ONE, "1" )
+				.add( BigDecimal.TEN, "10" )
+				.add( BigDecimal.valueOf( 100000.0 ), "100000.0" )
+				.add( BigDecimal.valueOf( 42571524, 231254 ), "4.2571524E-231247" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<BigDecimal>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<BigDecimal>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(BigDecimal identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -79,6 +96,18 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 				return BigDecimal.valueOf( 42571524, 231254 );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		BigDecimal id;
+
+	}
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		BigDecimal id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

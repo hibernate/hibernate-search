@@ -27,17 +27,34 @@ public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	@Override
 	protected PropertyValues<LocalDate, LocalDate> createValues() {
 		return PropertyValues.<LocalDate>passThroughBuilder()
-				.add( LocalDate.MIN )
-				.add( LocalDate.parse( "1970-01-01" ) )
-				.add( LocalDate.parse( "1970-01-09" ) )
-				.add( LocalDate.parse( "2017-11-06" ) )
-				.add( LocalDate.MAX )
+				.add( LocalDate.MIN, "-999999999-01-01" )
+				.add( LocalDate.parse( "1970-01-01" ), "1970-01-01" )
+				.add( LocalDate.parse( "1970-01-09" ), "1970-01-09" )
+				.add( LocalDate.parse( "2017-11-06" ), "2017-11-06" )
+				.add( LocalDate.MAX, "+999999999-12-31" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<LocalDate>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<LocalDate>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(LocalDate identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -77,6 +94,18 @@ public class LocalDatePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 				return LocalDate.parse( "2017-11-06" );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		LocalDate id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		LocalDate id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
