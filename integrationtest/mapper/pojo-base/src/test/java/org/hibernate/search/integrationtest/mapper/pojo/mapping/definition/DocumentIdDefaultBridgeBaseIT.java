@@ -102,17 +102,14 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 
 	@Test
 	public void indexing() {
-		try ( SearchSession session = mapping.createSession() ) {
-			for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
+		Iterator<String> documentIdentifierIterator = typeDescriptor.values().documentIdentifierValues.iterator();
+		for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
+			try ( SearchSession session = mapping.createSession() ) {
 				Object entity = expectations.instantiateTypeWithIdentifierBridge1( entityIdentifierValue );
 				session.indexingPlan().add( entity );
-			}
 
-			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
-					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME
-			);
-			for ( String expectedDocumentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
-				expectationSetter.add( expectedDocumentIdentifierValue, b -> { } );
+				backendMock.expectWorks( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
+						.add( documentIdentifierIterator.next(), b -> { } );
 			}
 		}
 		backendMock.verifyExpectationsMet();
