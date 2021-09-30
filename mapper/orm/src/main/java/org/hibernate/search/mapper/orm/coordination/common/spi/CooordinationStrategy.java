@@ -8,8 +8,6 @@ package org.hibernate.search.mapper.orm.coordination.common.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingConfigurationContext;
-
 /**
  * The strategy for coordinating between threads of a single-node application,
  * or between nodes of a distributed application.
@@ -22,19 +20,18 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingCo
 public interface CooordinationStrategy {
 
 	/**
-	 * Configures automatic indexing.
+	 * Configures coordination.
 	 * <p>
-	 * Called once during bootstrap,
-	 * after backends and index managers were started.
+	 * Called once during bootstrap, before anything (mapper, backends, index managers) is started.
 	 *
 	 * @param context The configuration context.
 	 */
-	void configureAutomaticIndexing(AutomaticIndexingConfigurationContext context);
+	void configure(CoordinationConfigurationContext context);
 
 	/**
 	 * Configures this strategy and starts processing events in the background.
 	 * <p>
-	 * Called once during bootstrap, after {@link #configureAutomaticIndexing(AutomaticIndexingConfigurationContext)}.
+	 * Called once during bootstrap, after {@link #configure(CoordinationConfigurationContext)}.
 	 *
 	 * @param context The start context.
 	 * @return A future that completes when the strategy is completely started.

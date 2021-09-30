@@ -19,7 +19,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.HibernateOrmIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingConfigurationContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
@@ -67,9 +66,11 @@ public final class ConfiguredAutomaticIndexingStrategy {
 	private BeanHolder<? extends AutomaticIndexingSynchronizationStrategy> defaultSynchronizationStrategyHolder;
 	private ConfiguredAutomaticIndexingSynchronizationStrategy defaultSynchronizationStrategy;
 
-	private ConfiguredAutomaticIndexingStrategy(Builder builder) {
-		senderFactory = builder.senderFactory;
-		enlistsInTransaction = builder.enlistsInTransaction;
+	public ConfiguredAutomaticIndexingStrategy(
+			Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
+			boolean enlistsInTransaction) {
+		this.senderFactory = senderFactory;
+		this.enlistsInTransaction = enlistsInTransaction;
 	}
 
 	public boolean usesEventQueue() {
@@ -187,29 +188,6 @@ public final class ConfiguredAutomaticIndexingStrategy {
 						mappingContext.entityReferenceFactory() );
 		synchronizationStrategy.apply( builder );
 		return builder.build();
-	}
-
-	public static final class Builder implements AutomaticIndexingConfigurationContext {
-		private Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
-		private boolean enlistsInTransaction = false;
-
-		@Override
-		public void reindexInSession() {
-			this.senderFactory = null;
-			this.enlistsInTransaction = false;
-		}
-
-		@Override
-		public void sendIndexingEventsTo(
-				Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
-				boolean enlistsInTransaction) {
-			this.senderFactory = senderFactory;
-			this.enlistsInTransaction = enlistsInTransaction;
-		}
-
-		public ConfiguredAutomaticIndexingStrategy build() {
-			return new ConfiguredAutomaticIndexingStrategy( this );
-		}
 	}
 
 }

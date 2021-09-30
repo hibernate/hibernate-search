@@ -4,11 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.automaticindexing.spi;
+package org.hibernate.search.mapper.orm.coordination.common.spi;
 
 import java.util.function.Function;
 
-public interface AutomaticIndexingConfigurationContext {
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
+
+public interface CoordinationConfigurationContext {
 
 	/**
 	 * Requests that indexing events be processed directly in the current session.
@@ -28,5 +31,12 @@ public interface AutomaticIndexingConfigurationContext {
 	 */
 	void sendIndexingEventsTo(Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory,
 			boolean enlistsInTransaction);
+
+	/**
+	 * Adds a mapping producer, to register entities automatically without user intervention.
+	 * @param producer A mapping producer.
+	 */
+	@SuppressWarnings("deprecation")
+	void mappingProducer(org.hibernate.boot.spi.AdditionalJaxbMappingProducer producer);
 
 }
