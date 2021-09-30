@@ -14,7 +14,9 @@ import static org.junit.Assume.assumeTrue;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
@@ -119,7 +121,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void projection_entityReference() {
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = typeDescriptor.values().entityModelValues.iterator();
+			Iterator<I> entityIdentifierIterator = getProjectionValues().iterator();
 			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchReferences(
@@ -153,7 +155,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void projection_id() {
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = typeDescriptor.values().entityModelValues.iterator();
+			Iterator<I> entityIdentifierIterator = getProjectionValues().iterator();
 			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchIds(
@@ -271,6 +273,12 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 						.isEqualTo( projectionValue );
 			}
 		}
+	}
+
+	private List<I> getProjectionValues() {
+		return typeDescriptor.values().entityModelValues.stream()
+				.map( typeDescriptor::toProjectedValue )
+				.collect( Collectors.toList() );
 	}
 
 	/**
