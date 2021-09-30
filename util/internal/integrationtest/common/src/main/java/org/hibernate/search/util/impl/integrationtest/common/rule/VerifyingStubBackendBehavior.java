@@ -33,6 +33,7 @@ import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
@@ -196,24 +197,32 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	void verifyExpectationsMet() {
 		BackendIndexingWorkExpectations indexingWorkExpectations = indexingWorkExpectationsSupplier.get();
 
-		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
-		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
-		indexScaleWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
-		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
-		indexingWorkExpectations.awaitIndexingAssertions(
-				() -> documentWorkCreateCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		indexingWorkExpectations.awaitIndexingAssertions(
-				() -> documentWorkDiscardCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		indexingWorkExpectations.awaitIndexingAssertions(
-				() -> documentWorkExecuteCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
-		searchCalls.verifyExpectationsMet();
-		countCalls.verifyExpectationsMet();
-		scrollCalls.verifyExpectationsMet();
-		closeScrollCalls.verifyExpectationsMet();
-		nextScrollCalls.verifyExpectationsMet();
-		scrollCalls.verifyExpectationsMet();
-		closeScrollCalls.verifyExpectationsMet();
-		nextScrollCalls.verifyExpectationsMet();
+		// The Closer we make sure that all lines in the try-with-resources block below are executed,
+		// even if one of the assertions fails;
+		// the first AssertionError is thrown at the end of the block,
+		// with additional AssertionErrors added as suppressed exceptions.
+		// That way, when multiple expectations are not met,
+		// we also report the additional ones as suppressed exceptions.
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
+			closer.pushAll( CallQueue::verifyExpectationsMet, schemaDefinitionCalls.values() );
+			closer.pushAll( CallQueue::verifyExpectationsMet, indexScaleWorkCalls.values() );
+			closer.pushAll( CallQueue::verifyExpectationsMet, schemaManagementWorkCall.values() );
+			// For async indexing, allow a slight delay for indexing assertions to be met.
+			closer.push(
+					expectations -> expectations.awaitIndexingAssertions( () -> {
+						try ( Closer<RuntimeException> indexingCloser = new Closer<>() ) {
+							indexingCloser.pushAll( CallQueue::verifyExpectationsMet, documentWorkCreateCalls.values() );
+							indexingCloser.pushAll( CallQueue::verifyExpectationsMet, documentWorkDiscardCalls.values() );
+							indexingCloser.pushAll( CallQueue::verifyExpectationsMet, documentWorkExecuteCalls.values() );
+						}
+					} ),
+					indexingWorkExpectations
+			);
+			closer.pushAll( CallQueue::verifyExpectationsMet,
+					searchCalls, countCalls,
+					scrollCalls, closeScrollCalls, nextScrollCalls, closeScrollCalls );
+		}
 
 		if ( indexingWorkExpectations.allowDuplicateIndexing() ) {
 			// Wait for async processing to finish, so that all duplicate indexing works
