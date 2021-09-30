@@ -1008,6 +1008,43 @@ Hibernate Search will use this value to limit the returning hits size
 if no limit has been defined on the query by the user.
 In this case if Hibernate Search notices there are more results, a warning will be logged.
 
+== Custom index mappings
+
+Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
+Should you need to set some link:{elasticsearchDocUrl}/mapping.html[custom index mappings], it is possible to provide these mappings to Hibernate Search: it will include them when creating an index.
+If the index already exists, these mappings will be passed to the Elasticsearch server, which will validate the changes.
+Thus, the user provided mappings will not be validated by Hibernate Search.
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.schema_management.mappings_file = custom/index-mappings.json
+# To configure a specific index:
+hibernate.search.backend.indexes.<index name>.schema_management.mappings_file = custom/index-mappings.json
+----
+
+.Possible content of `custom/index-mappings.json` file
+====
+[source, JSON, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/custom/index-settings.json[]
+----
+====
+
+[WARNING]
+====
+Properties that are only defined in the custom mappings file but not mapped by Hibernate Search
+will not be visible to Hibernate Search.
+====
+
+[IMPORTANT]
+====
+When this property is used Hibernate Search will try to merge the mappings created by the framework
+for the mapped fields with the mappings provided by the user.
+In case of conflicts, which happens when some properties overlap, the mappings provided will take precedence.
+Which means that it is possible to break the mappings for the purposes of Hibernate Search functions.
+====
+
 [[backend-elasticsearch-threads]]
 == Threads
 
