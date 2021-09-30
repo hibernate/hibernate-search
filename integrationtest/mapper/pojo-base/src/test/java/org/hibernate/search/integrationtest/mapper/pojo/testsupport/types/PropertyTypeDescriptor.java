@@ -50,6 +50,7 @@ public abstract class PropertyTypeDescriptor<V> {
 					new LocalTimePropertyTypeDescriptor(),
 					new ZonedDateTimePropertyTypeDescriptor(),
 					new YearPropertyTypeDescriptor(),
+					new YearMonthPropertyTypeDescriptor(),
 					new MonthDayPropertyTypeDescriptor(),
 					new OffsetDateTimePropertyTypeDescriptor(),
 					new OffsetTimePropertyTypeDescriptor(),
