@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -232,25 +231,25 @@ public final class BridgeResolver {
 					.valueBridge( new DefaultCharacterValueBridge() )
 					.identifierBridge( new DefaultCharacterIdentifierBridge() );
 			exactType( Boolean.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Boolean.class, ConvertUtils::convertBoolean ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Boolean.class, ParseUtils::parseBoolean ) )
 					.identifierBridge( new DefaultBooleanIdentifierBridge() );
 			exactType( Byte.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Byte.class, ConvertUtils::convertByte ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Byte.class, ParseUtils::parseByte ) )
 					.identifierBridge( new DefaultByteIdentifierBridge() );
 			exactType( Short.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Short.class, ConvertUtils::convertShort ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Short.class, ParseUtils::parseShort ) )
 					.identifierBridge( new DefaultShortIdentifierBridge() );
 			exactType( Integer.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Integer.class, ConvertUtils::convertInteger ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Integer.class, ParseUtils::parseInteger ) )
 					.identifierBridge( new DefaultIntegerIdentifierBridge() );
 			exactType( Long.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Long.class, ConvertUtils::convertLong ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Long.class, ParseUtils::parseLong ) )
 					.identifierBridge( new DefaultLongIdentifierBridge() );
 			exactType( Float.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Float.class, ConvertUtils::convertFloat ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Float.class, ParseUtils::parseFloat ) )
 					.identifierBridge( new DefaultFloatIdentifierBridge() );
 			exactType( Double.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Double.class, ConvertUtils::convertDouble ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( Double.class, ParseUtils::parseDouble ) )
 					.identifierBridge( new DefaultDoubleIdentifierBridge() );
 			strictSubTypesOf( Enum.class )
 					.valueBinder( new DefaultEnumValueBridge.Binder() )
@@ -258,10 +257,10 @@ public final class BridgeResolver {
 
 			// java.math
 			exactType( BigInteger.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( BigInteger.class, ConvertUtils::convertBigInteger ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( BigInteger.class, ParseUtils::parseBigInteger ) )
 					.identifierBridge( new DefaultBigIntegerIdentifierBridge() );
 			exactType( BigDecimal.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( BigDecimal.class, ConvertUtils::convertBigDecimal ) )
+					.valueBinder( new PassThroughValueBridge.Binder<>( BigDecimal.class, ParseUtils::parseBigDecimal ) )
 					.identifierBridge( new DefaultBigDecimalIdentifierBridge() );
 
 			// java.time
