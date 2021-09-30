@@ -7,11 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -65,12 +63,9 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	private StubIndexSchemaNode rootSchemaNode;
 
 	public DocumentIdDefaultBridgeOverridingIT(PropertyTypeDescriptor<I, ?> typeDescriptor,
-			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
-		assumeTrue(
-				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()
-		);
+			DefaultIdentifierBridgeExpectations<I> expectations) {
 		this.typeDescriptor = typeDescriptor;
-		this.expectations = expectations.get();
+		this.expectations = expectations;
 	}
 
 	@Before

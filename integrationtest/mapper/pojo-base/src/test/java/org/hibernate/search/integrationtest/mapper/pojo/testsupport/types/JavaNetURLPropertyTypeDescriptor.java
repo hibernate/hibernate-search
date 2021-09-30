@@ -10,7 +10,6 @@ import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -47,8 +46,8 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<URL>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<URL>() {
+	public DefaultIdentifierBridgeExpectations<URL> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<URL>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -65,7 +64,7 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Optional;
-
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
@@ -36,8 +34,8 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<Float>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<Float>() {
+	public DefaultIdentifierBridgeExpectations<Float> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<Float>() {
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -55,7 +53,7 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override
