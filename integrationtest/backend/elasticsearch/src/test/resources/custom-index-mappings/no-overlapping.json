@@ -1,0 +1,17 @@
+{
+  "properties":{
+    "userField":{
+      "type":"keyword",
+      "index":true,
+      "norms":true,
+      "doc_values":true
+    },
+    "userObject":{
+      "dynamic":"true",
+      "type":"object"
+    }
+  },
+  "_source": {
+    "enabled": false
+  }
+}
