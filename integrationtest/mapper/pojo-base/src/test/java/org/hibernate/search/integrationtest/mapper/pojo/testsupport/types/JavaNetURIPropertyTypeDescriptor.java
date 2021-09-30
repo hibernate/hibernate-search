@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.net.URI;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -47,8 +46,8 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<URI>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<URI>() {
+	public DefaultIdentifierBridgeExpectations<URI> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<URI>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -65,7 +64,7 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

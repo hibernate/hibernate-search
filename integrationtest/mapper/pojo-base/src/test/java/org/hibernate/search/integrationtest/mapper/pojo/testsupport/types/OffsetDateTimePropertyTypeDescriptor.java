@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -44,8 +43,8 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<OffsetDateTime>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<OffsetDateTime>() {
+	public DefaultIdentifierBridgeExpectations<OffsetDateTime> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<OffsetDateTime>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -62,7 +61,7 @@ public class OffsetDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

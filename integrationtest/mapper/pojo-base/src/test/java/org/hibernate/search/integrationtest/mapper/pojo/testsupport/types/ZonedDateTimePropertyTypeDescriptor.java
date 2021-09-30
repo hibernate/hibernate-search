@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -51,8 +50,8 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<ZonedDateTime>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<ZonedDateTime>() {
+	public DefaultIdentifierBridgeExpectations<ZonedDateTime> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<ZonedDateTime>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -69,7 +68,7 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

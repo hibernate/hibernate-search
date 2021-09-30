@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Optional;
-
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
@@ -32,8 +30,8 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<MyEnum>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<MyEnum>() {
+	public DefaultIdentifierBridgeExpectations<MyEnum> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<MyEnum>() {
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -51,7 +49,7 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

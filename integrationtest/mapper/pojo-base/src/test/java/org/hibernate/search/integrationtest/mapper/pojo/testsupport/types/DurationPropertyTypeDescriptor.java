@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Duration;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -39,8 +38,8 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<Duration>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<Duration>() {
+	public DefaultIdentifierBridgeExpectations<Duration> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<Duration>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -57,7 +56,7 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override
