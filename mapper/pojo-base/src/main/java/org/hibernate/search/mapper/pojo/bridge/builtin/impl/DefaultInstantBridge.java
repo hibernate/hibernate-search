@@ -13,6 +13,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultInstantBridge extends AbstractPassThroughDefaultBridge<Instant> {
 
+	public static final DefaultInstantBridge INSTANCE = new DefaultInstantBridge();
+
+	private DefaultInstantBridge() {
+	}
+
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
 	@Override

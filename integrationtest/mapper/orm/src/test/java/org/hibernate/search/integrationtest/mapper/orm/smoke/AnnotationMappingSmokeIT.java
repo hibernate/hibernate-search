@@ -32,12 +32,10 @@ import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStr
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
@@ -443,7 +441,7 @@ public class AnnotationMappingSmokeIT {
 		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeRef(type = IntegerAsStringValueBridge.class))
 		private Integer numeric;
 
-		@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DefaultIntegerBridge.class))
+		@DocumentId
 		public Integer getId() {
 			return id;
 		}

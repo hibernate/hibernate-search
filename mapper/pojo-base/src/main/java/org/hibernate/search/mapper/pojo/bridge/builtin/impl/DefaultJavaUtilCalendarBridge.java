@@ -17,8 +17,10 @@ import java.util.TimeZone;
 
 public final class DefaultJavaUtilCalendarBridge extends AbstractConvertingDelegatingDefaultBridge<Calendar, ZonedDateTime> {
 
+	public static final DefaultJavaUtilCalendarBridge INSTANCE = new DefaultJavaUtilCalendarBridge();
+
 	public DefaultJavaUtilCalendarBridge() {
-		super( new DefaultZonedDateTimeBridge() );
+		super( DefaultZonedDateTimeBridge.INSTANCE );
 	}
 
 	@Override

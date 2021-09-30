@@ -13,8 +13,13 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultMonthDayBridge extends AbstractPassThroughDefaultBridge<MonthDay> {
 
+	public static final DefaultMonthDayBridge INSTANCE = new DefaultMonthDayBridge();
+
 	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
 	private static final DateTimeFormatter FORMATTER = ParseUtils.ISO_MONTH_DAY;
+
+	private DefaultMonthDayBridge() {
+	}
 
 	@Override
 	protected String toString(MonthDay value) {

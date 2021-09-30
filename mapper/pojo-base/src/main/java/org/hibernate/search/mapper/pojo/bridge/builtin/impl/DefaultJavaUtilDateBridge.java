@@ -11,8 +11,10 @@ import java.util.Date;
 
 public final class DefaultJavaUtilDateBridge extends AbstractConvertingDelegatingDefaultBridge<Date, Instant> {
 
+	public static final DefaultJavaUtilDateBridge INSTANCE = new DefaultJavaUtilDateBridge();
+
 	public DefaultJavaUtilDateBridge() {
-		super( new DefaultInstantBridge() );
+		super( DefaultInstantBridge.INSTANCE );
 	}
 
 	@Override

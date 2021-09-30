@@ -209,123 +209,123 @@ public final class BridgeResolver {
 		private void addDefaults() {
 			// java.lang
 			exactType( String.class )
-					.valueBridge( new DefaultStringBridge() )
-					.identifierBridge( new DefaultStringBridge() );
+					.valueBridge( DefaultStringBridge.INSTANCE )
+					.identifierBridge( DefaultStringBridge.INSTANCE );
 			exactType( Character.class )
-					.valueBridge( new DefaultCharacterBridge() )
-					.identifierBridge( new DefaultCharacterBridge() );
+					.valueBridge( DefaultCharacterBridge.INSTANCE )
+					.identifierBridge( DefaultCharacterBridge.INSTANCE );
 			exactType( Boolean.class )
-					.valueBridge( new DefaultBooleanBridge() )
-					.identifierBridge( new DefaultBooleanBridge() );
+					.valueBridge( DefaultBooleanBridge.INSTANCE )
+					.identifierBridge( DefaultBooleanBridge.INSTANCE );
 			exactType( Byte.class )
-					.valueBridge( new DefaultByteBridge() )
-					.identifierBridge( new DefaultByteBridge() );
+					.valueBridge( DefaultByteBridge.INSTANCE )
+					.identifierBridge( DefaultByteBridge.INSTANCE );
 			exactType( Short.class )
-					.valueBridge( new DefaultShortBridge() )
-					.identifierBridge( new DefaultShortBridge() );
+					.valueBridge( DefaultShortBridge.INSTANCE )
+					.identifierBridge( DefaultShortBridge.INSTANCE );
 			exactType( Integer.class )
-					.valueBridge( new DefaultIntegerBridge() )
-					.identifierBridge( new DefaultIntegerBridge() );
+					.valueBridge( DefaultIntegerBridge.INSTANCE )
+					.identifierBridge( DefaultIntegerBridge.INSTANCE );
 			exactType( Long.class )
-					.valueBridge( new DefaultLongBridge() )
-					.identifierBridge( new DefaultLongBridge() );
+					.valueBridge( DefaultLongBridge.INSTANCE )
+					.identifierBridge( DefaultLongBridge.INSTANCE );
 			exactType( Float.class )
-					.valueBridge( new DefaultFloatBridge() )
-					.identifierBridge( new DefaultFloatBridge() );
+					.valueBridge( DefaultFloatBridge.INSTANCE )
+					.identifierBridge( DefaultFloatBridge.INSTANCE );
 			exactType( Double.class )
-					.valueBridge( new DefaultDoubleBridge() )
-					.identifierBridge( new DefaultDoubleBridge() );
+					.valueBridge( DefaultDoubleBridge.INSTANCE )
+					.identifierBridge( DefaultDoubleBridge.INSTANCE );
 			strictSubTypesOf( Enum.class )
-					.valueBinder( new DefaultEnumBridge.Binder() )
-					.identifierBinder( new DefaultEnumBridge.Binder() );
+					.valueBinder( DefaultEnumBridge.Binder.INSTANCE )
+					.identifierBinder( DefaultEnumBridge.Binder.INSTANCE );
 
 			// java.math
 			exactType( BigInteger.class )
-					.valueBridge( new DefaultBigIntegerBridge() )
-					.identifierBridge( new DefaultBigIntegerBridge() );
+					.valueBridge( DefaultBigIntegerBridge.INSTANCE )
+					.identifierBridge( DefaultBigIntegerBridge.INSTANCE );
 			exactType( BigDecimal.class )
-					.valueBridge( new DefaultBigDecimalBridge() )
-					.identifierBridge( new DefaultBigDecimalBridge() );
+					.valueBridge( DefaultBigDecimalBridge.INSTANCE )
+					.identifierBridge( DefaultBigDecimalBridge.INSTANCE );
 
 			// java.time
 			exactType( LocalDate.class )
-					.valueBridge( new DefaultLocalDateBridge() )
-					.identifierBridge( new DefaultLocalDateBridge() );
+					.valueBridge( DefaultLocalDateBridge.INSTANCE )
+					.identifierBridge( DefaultLocalDateBridge.INSTANCE );
 			exactType( Instant.class )
-					.valueBridge( new DefaultInstantBridge() )
-					.identifierBridge( new DefaultInstantBridge() );
+					.valueBridge( DefaultInstantBridge.INSTANCE )
+					.identifierBridge( DefaultInstantBridge.INSTANCE );
 			exactType( LocalDateTime.class )
-					.valueBridge( new DefaultLocalDateTimeBridge() )
-					.identifierBridge( new DefaultLocalDateTimeBridge() );
+					.valueBridge( DefaultLocalDateTimeBridge.INSTANCE )
+					.identifierBridge( DefaultLocalDateTimeBridge.INSTANCE );
 			exactType( LocalTime.class )
-					.valueBridge( new DefaultLocalTimeBridge() )
-					.identifierBridge( new DefaultLocalTimeBridge() );
+					.valueBridge( DefaultLocalTimeBridge.INSTANCE )
+					.identifierBridge( DefaultLocalTimeBridge.INSTANCE );
 			exactType( ZonedDateTime.class )
-					.valueBridge( new DefaultZonedDateTimeBridge() )
-					.identifierBridge( new DefaultZonedDateTimeBridge() );
+					.valueBridge( DefaultZonedDateTimeBridge.INSTANCE )
+					.identifierBridge( DefaultZonedDateTimeBridge.INSTANCE );
 			exactType( Year.class )
-					.valueBridge( new DefaultYearBridge() )
-					.identifierBridge( new DefaultYearBridge() );
+					.valueBridge( DefaultYearBridge.INSTANCE )
+					.identifierBridge( DefaultYearBridge.INSTANCE );
 			exactType( YearMonth.class )
-					.valueBridge( new DefaultYearMonthBridge() )
-					.identifierBridge( new DefaultYearMonthBridge() );
+					.valueBridge( DefaultYearMonthBridge.INSTANCE )
+					.identifierBridge( DefaultYearMonthBridge.INSTANCE );
 			exactType( MonthDay.class )
-					.valueBridge( new DefaultMonthDayBridge() )
-					.identifierBridge( new DefaultMonthDayBridge() );
+					.valueBridge( DefaultMonthDayBridge.INSTANCE )
+					.identifierBridge( DefaultMonthDayBridge.INSTANCE );
 			exactType( OffsetDateTime.class )
-					.valueBridge( new DefaultOffsetDateTimeBridge() )
-					.identifierBridge( new DefaultOffsetDateTimeBridge() );
+					.valueBridge( DefaultOffsetDateTimeBridge.INSTANCE )
+					.identifierBridge( DefaultOffsetDateTimeBridge.INSTANCE );
 			exactType( OffsetTime.class )
-					.valueBridge( new DefaultOffsetTimeBridge() )
-					.identifierBridge( new DefaultOffsetTimeBridge() );
+					.valueBridge( DefaultOffsetTimeBridge.INSTANCE )
+					.identifierBridge( DefaultOffsetTimeBridge.INSTANCE );
 			exactType( ZoneOffset.class )
-					.valueBridge( new DefaultZoneOffsetBridge() )
-					.identifierBridge( new DefaultZoneOffsetBridge() );
+					.valueBridge( DefaultZoneOffsetBridge.INSTANCE )
+					.identifierBridge( DefaultZoneOffsetBridge.INSTANCE );
 			exactType( ZoneId.class )
-					.valueBridge( new DefaultZoneIdBridge() )
-					.identifierBridge( new DefaultZoneIdBridge() );
+					.valueBridge( DefaultZoneIdBridge.INSTANCE )
+					.identifierBridge( DefaultZoneIdBridge.INSTANCE );
 			exactType( Period.class )
-					.valueBridge( new DefaultPeriodBridge() )
-					.identifierBridge( new DefaultPeriodBridge() );
+					.valueBridge( DefaultPeriodBridge.INSTANCE )
+					.identifierBridge( DefaultPeriodBridge.INSTANCE );
 			exactType( Duration.class )
-					.valueBridge( new DefaultDurationBridge() )
-					.identifierBridge( new DefaultDurationBridge() );
+					.valueBridge( DefaultDurationBridge.INSTANCE )
+					.identifierBridge( DefaultDurationBridge.INSTANCE );
 
 			// java.util
 			exactType( UUID.class )
-					.valueBridge( new DefaultUUIDBridge() )
-					.identifierBridge( new DefaultUUIDBridge() );
+					.valueBridge( DefaultUUIDBridge.INSTANCE )
+					.identifierBridge( DefaultUUIDBridge.INSTANCE );
 			exactType( Date.class )
-					.valueBridge( new DefaultJavaUtilDateBridge() )
-					.identifierBridge( new DefaultJavaUtilDateBridge() );
+					.valueBridge( DefaultJavaUtilDateBridge.INSTANCE )
+					.identifierBridge( DefaultJavaUtilDateBridge.INSTANCE );
 			exactType( Calendar.class )
-					.valueBridge( new DefaultJavaUtilCalendarBridge() )
-					.identifierBridge( new DefaultJavaUtilCalendarBridge() );
+					.valueBridge( DefaultJavaUtilCalendarBridge.INSTANCE )
+					.identifierBridge( DefaultJavaUtilCalendarBridge.INSTANCE );
 
 			// java.sql
 			exactType( java.sql.Date.class )
-					.valueBridge( new DefaultJavaSqlDateBridge() )
-					.identifierBridge( new DefaultJavaSqlDateBridge() );
+					.valueBridge( DefaultJavaSqlDateBridge.INSTANCE )
+					.identifierBridge( DefaultJavaSqlDateBridge.INSTANCE );
 			exactType( Timestamp.class )
-					.valueBridge( new DefaultJavaSqlTimestampBridge() )
-					.identifierBridge( new DefaultJavaSqlTimestampBridge() );
+					.valueBridge( DefaultJavaSqlTimestampBridge.INSTANCE )
+					.identifierBridge( DefaultJavaSqlTimestampBridge.INSTANCE );
 			exactType( Time.class )
-					.valueBridge( new DefaultJavaSqlTimeBridge() )
-					.identifierBridge( new DefaultJavaSqlTimeBridge() );
+					.valueBridge( DefaultJavaSqlTimeBridge.INSTANCE )
+					.identifierBridge( DefaultJavaSqlTimeBridge.INSTANCE );
 
 			// java.net
 			exactType( URI.class )
-					.valueBridge( new DefaultJavaNetURIBridge() )
-					.identifierBridge( new DefaultJavaNetURIBridge() );
+					.valueBridge( DefaultJavaNetURIBridge.INSTANCE )
+					.identifierBridge( DefaultJavaNetURIBridge.INSTANCE );
 			exactType( URL.class )
-					.valueBridge( new DefaultJavaNetURLBridge() )
-					.identifierBridge( new DefaultJavaNetURLBridge() );
+					.valueBridge( DefaultJavaNetURLBridge.INSTANCE )
+					.identifierBridge( DefaultJavaNetURLBridge.INSTANCE );
 
 			// org.hibernate.search
 			subTypesOf( GeoPoint.class )
-					.valueBinder( new StaticValueBinder<>( GeoPoint.class, new DefaultGeoPointBridge() ) );
+					.valueBinder( new StaticValueBinder<>( GeoPoint.class, DefaultGeoPointBridge.INSTANCE ) );
 			exactType( GeoPoint.class )
-					.identifierBridge( new DefaultGeoPointBridge() );
+					.identifierBridge( DefaultGeoPointBridge.INSTANCE );
 		}
 
 		private class TypePatternDefaultBinderDefinitionStep

@@ -11,8 +11,10 @@ import java.time.Instant;
 
 public final class DefaultJavaSqlTimestampBridge extends AbstractConvertingDelegatingDefaultBridge<Timestamp, Instant> {
 
+	public static final DefaultJavaSqlTimestampBridge INSTANCE = new DefaultJavaSqlTimestampBridge();
+
 	public DefaultJavaSqlTimestampBridge() {
-		super( new DefaultInstantBridge() );
+		super( DefaultInstantBridge.INSTANCE );
 	}
 
 	@Override

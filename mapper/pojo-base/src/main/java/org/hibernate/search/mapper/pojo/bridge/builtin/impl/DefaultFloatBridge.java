@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultFloatBridge extends AbstractPassThroughDefaultBridge<Float> {
 
+	public static final DefaultFloatBridge INSTANCE = new DefaultFloatBridge();
+
+	private DefaultFloatBridge() {
+	}
+
 	@Override
 	protected String toString(Float value) {
 		return value.toString();

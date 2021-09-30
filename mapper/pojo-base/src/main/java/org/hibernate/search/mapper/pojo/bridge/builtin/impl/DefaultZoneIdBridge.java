@@ -12,6 +12,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultZoneIdBridge extends AbstractStringBasedDefaultBridge<ZoneId> {
 
+	public static final DefaultZoneIdBridge INSTANCE = new DefaultZoneIdBridge();
+
+	private DefaultZoneIdBridge() {
+	}
+
 	@Override
 	protected String toString(ZoneId value) {
 		return value.getId();
