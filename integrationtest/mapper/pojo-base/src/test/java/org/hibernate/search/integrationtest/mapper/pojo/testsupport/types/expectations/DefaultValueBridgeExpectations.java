@@ -14,10 +14,6 @@ public interface DefaultValueBridgeExpectations<V, F> {
 
 	Class<F> getIndexFieldJavaType();
 
-	default V toProjectedValue(V indexedValue) {
-		return indexedValue;
-	}
-
 	Class<?> getTypeWithValueBridge1();
 
 	Object instantiateTypeWithValueBridge1(int identifier, V propertyValue);

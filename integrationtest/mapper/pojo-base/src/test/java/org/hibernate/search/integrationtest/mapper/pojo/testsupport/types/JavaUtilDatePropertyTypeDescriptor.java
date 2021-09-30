@@ -73,6 +73,20 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 	}
 
 	@Override
+	public Date toProjectedValue(Date indexedValue) {
+		if ( indexedValue.getClass().equals( Date.class ) ) {
+			return indexedValue;
+		}
+		else {
+			/*
+			 * The bridge always returns a java.util.Date,
+			 * even if the original value was a subtype from the java.sql package.
+			 */
+			return new Date( indexedValue.getTime() );
+		}
+	}
+
+	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Date>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.empty();
 	}
@@ -84,20 +98,6 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 			@Override
 			public Class<Instant> getIndexFieldJavaType() {
 				return Instant.class;
-			}
-
-			@Override
-			public Date toProjectedValue(Date indexedValue) {
-				if ( indexedValue.getClass().equals( Date.class ) ) {
-					return indexedValue;
-				}
-				else {
-					/*
-					 * The bridge always returns a java.util.Date,
-					 * even if the original value was a subtype from the java.sql package.
-					 */
-					return new Date( indexedValue.getTime() );
-				}
 			}
 
 			@Override

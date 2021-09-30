@@ -13,7 +13,9 @@ import static org.junit.Assume.assumeTrue;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
@@ -111,7 +113,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Test
 	public void projection() {
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = typeDescriptor.values().entityModelValues.iterator();
+			Iterator<I> entityIdentifierIterator = getProjectionValues().iterator();
 			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchReferences(
@@ -182,6 +184,12 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 				"convertUnknown on invalid input"
 		)
 				.isInstanceOf( RuntimeException.class );
+	}
+
+	private List<I> getProjectionValues() {
+		return typeDescriptor.values().entityModelValues.stream()
+				.map( typeDescriptor::toProjectedValue )
+				.collect( Collectors.toList() );
 	}
 
 	private static class IncompatibleToDocumentIdentifierValueConverter
