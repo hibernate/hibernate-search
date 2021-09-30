@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultCharacterBridge extends AbstractStringBasedDefaultBridge<Character> {
 
+	public static final DefaultCharacterBridge INSTANCE = new DefaultCharacterBridge();
+
+	private DefaultCharacterBridge() {
+	}
+
 	@Override
 	protected String toString(Character value) {
 		// The character is turned into a one character String

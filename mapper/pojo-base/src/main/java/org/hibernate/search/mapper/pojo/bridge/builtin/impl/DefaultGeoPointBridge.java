@@ -11,6 +11,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public final class DefaultGeoPointBridge extends AbstractPassThroughDefaultBridge<GeoPoint> {
 
+	public static final DefaultGeoPointBridge INSTANCE = new DefaultGeoPointBridge();
+
+	private DefaultGeoPointBridge() {
+	}
+
 	@Override
 	protected String toString(GeoPoint value) {
 		return value.latitude() + ", " + value.longitude();

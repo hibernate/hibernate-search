@@ -12,6 +12,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultBigIntegerBridge extends AbstractPassThroughDefaultBridge<BigInteger> {
 
+	public static final DefaultBigIntegerBridge INSTANCE = new DefaultBigIntegerBridge();
+
+	private DefaultBigIntegerBridge() {
+	}
+
 	@Override
 	protected String toString(BigInteger value) {
 		return value.toString();

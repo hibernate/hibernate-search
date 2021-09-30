@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultShortBridge extends AbstractPassThroughDefaultBridge<Short> {
 
+	public static final DefaultShortBridge INSTANCE = new DefaultShortBridge();
+
+	private DefaultShortBridge() {
+	}
+
 	@Override
 	protected String toString(Short value) {
 		return value.toString();

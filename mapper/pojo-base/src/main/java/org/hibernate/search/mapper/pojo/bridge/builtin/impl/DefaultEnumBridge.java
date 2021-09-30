@@ -56,6 +56,11 @@ public final class DefaultEnumBridge<T extends Enum<T>> extends AbstractStringBa
 	}
 
 	public static class Binder implements IdentifierBinder, ValueBinder {
+		public static final Binder INSTANCE = new Binder();
+
+		private Binder() {
+		}
+
 		@Override
 		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 		public void bind(IdentifierBindingContext<?> context) {

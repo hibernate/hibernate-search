@@ -48,12 +48,12 @@ abstract class AbstractSimpleDefaultBridge<V, F> implements ValueBridge<V, F>, I
 
 	@Override
 	public boolean isCompatibleWith(IdentifierBridge<?> other) {
-		return getClass().equals( other.getClass() );
+		return other == this || getClass().equals( other.getClass() );
 	}
 
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
-		return getClass().equals( other.getClass() );
+		return other == this || getClass().equals( other.getClass() );
 	}
 
 	protected abstract V fromString(String value);

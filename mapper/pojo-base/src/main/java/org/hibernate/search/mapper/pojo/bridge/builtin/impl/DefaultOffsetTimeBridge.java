@@ -15,6 +15,11 @@ public final class DefaultOffsetTimeBridge extends AbstractPassThroughDefaultBri
 
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_TIME;
 
+	public static final DefaultOffsetTimeBridge INSTANCE = new DefaultOffsetTimeBridge();
+
+	private DefaultOffsetTimeBridge() {
+	}
+
 	@Override
 	protected String toString(OffsetTime value) {
 		return FORMATTER.format( value );

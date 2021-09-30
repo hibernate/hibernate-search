@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultByteBridge extends AbstractPassThroughDefaultBridge<Byte> {
 
+	public static final DefaultByteBridge INSTANCE = new DefaultByteBridge();
+
+	private DefaultByteBridge() {
+	}
+
 	@Override
 	protected String toString(Byte value) {
 		return value.toString();

@@ -21,6 +21,11 @@ public final class DefaultPeriodBridge extends AbstractConvertingDefaultBridge<P
 	private static final int PADDING = 11;
 	private static final String INDEXED_FORMAT = "%+0" + PADDING + "d%+0" + PADDING + "d%+0" + PADDING + "d";
 
+	public static final DefaultPeriodBridge INSTANCE = new DefaultPeriodBridge();
+
+	private DefaultPeriodBridge() {
+	}
+
 	@Override
 	protected String toString(Period value) {
 		return value.toString();

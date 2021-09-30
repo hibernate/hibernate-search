@@ -12,6 +12,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultUUIDBridge extends AbstractStringBasedDefaultBridge<UUID> {
 
+	public static final DefaultUUIDBridge INSTANCE = new DefaultUUIDBridge();
+
+	private DefaultUUIDBridge() {
+	}
+
 	@Override
 	protected String toString(UUID value) {
 		return value.toString();

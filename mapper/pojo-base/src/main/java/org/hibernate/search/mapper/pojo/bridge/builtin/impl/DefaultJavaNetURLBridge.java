@@ -15,7 +15,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class DefaultJavaNetURLBridge extends AbstractStringBasedDefaultBridge<URL> {
 
+	public static final DefaultJavaNetURLBridge INSTANCE = new DefaultJavaNetURLBridge();
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private DefaultJavaNetURLBridge() {
+	}
 
 	@Override
 	protected String toString(URL value) {

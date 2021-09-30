@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultDoubleBridge extends AbstractPassThroughDefaultBridge<Double> {
 
+	public static final DefaultDoubleBridge INSTANCE = new DefaultDoubleBridge();
+
+	private DefaultDoubleBridge() {
+	}
+
 	@Override
 	protected String toString(Double value) {
 		return value.toString();

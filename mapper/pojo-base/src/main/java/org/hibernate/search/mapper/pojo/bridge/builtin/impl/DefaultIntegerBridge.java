@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultIntegerBridge extends AbstractPassThroughDefaultBridge<Integer> {
 
+	public static final DefaultIntegerBridge INSTANCE = new DefaultIntegerBridge();
+
+	private DefaultIntegerBridge() {
+	}
+
 	@Override
 	protected String toString(Integer value) {
 		return value.toString();

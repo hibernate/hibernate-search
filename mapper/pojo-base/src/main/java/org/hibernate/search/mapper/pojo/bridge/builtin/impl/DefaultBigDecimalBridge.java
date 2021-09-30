@@ -12,6 +12,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultBigDecimalBridge extends AbstractPassThroughDefaultBridge<BigDecimal> {
 
+	public static final DefaultBigDecimalBridge INSTANCE = new DefaultBigDecimalBridge();
+
+	private DefaultBigDecimalBridge() {
+	}
+
 	@Override
 	protected String toString(BigDecimal value) {
 		return value.toString();

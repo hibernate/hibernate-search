@@ -13,7 +13,12 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultZonedDateTimeBridge extends AbstractPassThroughDefaultBridge<ZonedDateTime> {
 
+	public static final DefaultZonedDateTimeBridge INSTANCE = new DefaultZonedDateTimeBridge();
+
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+
+	private DefaultZonedDateTimeBridge() {
+	}
 
 	@Override
 	protected String toString(ZonedDateTime value) {

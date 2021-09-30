@@ -10,6 +10,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultLongBridge extends AbstractPassThroughDefaultBridge<Long> {
 
+	public static final DefaultLongBridge INSTANCE = new DefaultLongBridge();
+
+	private DefaultLongBridge() {
+	}
+
 	@Override
 	protected String toString(Long value) {
 		return value.toString();

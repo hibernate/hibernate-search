@@ -15,7 +15,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class DefaultDurationBridge extends AbstractConvertingDefaultBridge<Duration, Long> {
 
+	public static final DefaultDurationBridge INSTANCE = new DefaultDurationBridge();
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private DefaultDurationBridge() {
+	}
 
 	@Override
 	protected String toString(Duration value) {

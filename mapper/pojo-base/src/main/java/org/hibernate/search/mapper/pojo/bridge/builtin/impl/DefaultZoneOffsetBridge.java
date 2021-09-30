@@ -12,6 +12,11 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultZoneOffsetBridge extends AbstractConvertingDefaultBridge<ZoneOffset, Integer> {
 
+	public static final DefaultZoneOffsetBridge INSTANCE = new DefaultZoneOffsetBridge();
+
+	private DefaultZoneOffsetBridge() {
+	}
+
 	@Override
 	protected String toString(ZoneOffset value) {
 		return value.getId();

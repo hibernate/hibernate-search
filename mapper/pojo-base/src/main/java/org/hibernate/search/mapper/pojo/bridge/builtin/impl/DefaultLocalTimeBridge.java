@@ -13,7 +13,12 @@ import org.hibernate.search.engine.cfg.spi.ParseUtils;
 
 public final class DefaultLocalTimeBridge extends AbstractPassThroughDefaultBridge<LocalTime> {
 
+	public static final DefaultLocalTimeBridge INSTANCE = new DefaultLocalTimeBridge();
+
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME;
+
+	private DefaultLocalTimeBridge() {
+	}
 
 	@Override
 	protected String toString(LocalTime value) {
