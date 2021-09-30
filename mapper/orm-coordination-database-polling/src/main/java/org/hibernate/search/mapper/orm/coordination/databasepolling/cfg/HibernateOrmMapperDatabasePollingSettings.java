@@ -145,6 +145,25 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE;
 
 	/**
+	 * In the background indexing processor, the timeout for transactions processing outbox events.
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Only effective when a JTA transaction manager is configured.
+	 * <p>
+	 * Expects a positive Integer value in seconds, such as {@code 10},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE}.
+	 * <p>
+	 * When using JTA and this property is not set,
+	 * Hibernate Search will use whatever default transaction timeout configured in the JTA transaction manager.
+	 */
+	public static final String COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT =
+			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -159,6 +178,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final String COORDINATION_PROCESSORS_INDEXING_ENABLED = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_ENABLED;
 		public static final String COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_POLLING_INTERVAL;
 		public static final String COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE;
+		public static final String COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_TRANSACTION_TIMEOUT;
 	}
 
 	/**
@@ -177,6 +197,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final String PROCESSORS_INDEXING_ENABLED = PROCESSORS_INDEXING_PREFIX + "enabled";
 		public static final String PROCESSORS_INDEXING_POLLING_INTERVAL = PROCESSORS_INDEXING_PREFIX + "polling_interval";
 		public static final String PROCESSORS_INDEXING_BATCH_SIZE = PROCESSORS_INDEXING_PREFIX + "batch_size";
+		public static final String PROCESSORS_INDEXING_TRANSACTION_TIMEOUT = PROCESSORS_INDEXING_PREFIX + "transaction_timeout";
 	}
 
 	/**

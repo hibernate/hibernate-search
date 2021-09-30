@@ -45,6 +45,7 @@ public class OutboxEventBackgroundProcessor {
 	private final OutboxEventFinder finder;
 	private final int pollingInterval;
 	private final int batchSize;
+	private final Integer transactionTimeout;
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
 	private final FailureHandler failureHandler;
 	private final SingletonTask processingTask;
@@ -52,12 +53,14 @@ public class OutboxEventBackgroundProcessor {
 	public OutboxEventBackgroundProcessor(String name,
 			AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
 			OutboxEventFinder finder,
-			int pollingInterval, int batchSize) {
+			int pollingInterval, int batchSize,
+			Integer transactionTimeout) {
 		this.name = name;
 		this.mapping = mapping;
 		this.finder = finder;
 		this.pollingInterval = pollingInterval;
 		this.batchSize = batchSize;
+		this.transactionTimeout = transactionTimeout;
 
 		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
@@ -107,7 +110,7 @@ public class OutboxEventBackgroundProcessor {
 			}
 
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
-				transactionHelper.begin( session, null );
+				transactionHelper.begin( session, transactionTimeout );
 				try {
 					List<OutboxEvent> events;
 					try {
@@ -227,6 +230,4 @@ public class OutboxEventBackgroundProcessor {
 		session.flush();
 		session.clear();
 	}
-
 }
-
