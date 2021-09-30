@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.LocalTime;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -36,8 +35,8 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<LocalTime>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<LocalTime>() {
+	public DefaultIdentifierBridgeExpectations<LocalTime> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<LocalTime>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -54,7 +53,7 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

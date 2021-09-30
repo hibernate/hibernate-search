@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -38,8 +37,8 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<BigDecimal>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<BigDecimal>() {
+	public DefaultIdentifierBridgeExpectations<BigDecimal> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<BigDecimal>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -56,7 +55,7 @@ public class BigDecimalPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

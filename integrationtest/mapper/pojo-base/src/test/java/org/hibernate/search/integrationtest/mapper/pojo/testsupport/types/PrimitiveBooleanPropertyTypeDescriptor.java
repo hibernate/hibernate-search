@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Optional;
-
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
@@ -29,8 +27,8 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<Boolean>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<Boolean>() {
+	public DefaultIdentifierBridgeExpectations<Boolean> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<Boolean>() {
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -48,7 +46,7 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.TimeZone;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -54,8 +53,8 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<Timestamp>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<Timestamp>() {
+	public DefaultIdentifierBridgeExpectations<Timestamp> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<Timestamp>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -72,7 +71,7 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

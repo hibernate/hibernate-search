@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -38,8 +37,8 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<YearMonth>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<YearMonth>() {
+	public DefaultIdentifierBridgeExpectations<YearMonth> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<YearMonth>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -56,7 +55,7 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

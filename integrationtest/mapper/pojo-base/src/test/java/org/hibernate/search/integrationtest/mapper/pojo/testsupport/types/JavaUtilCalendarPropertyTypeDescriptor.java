@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.TimeZone;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -87,8 +86,8 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<Calendar>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<Calendar>() {
+	public DefaultIdentifierBridgeExpectations<Calendar> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<Calendar>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -105,7 +104,7 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -43,8 +42,8 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<OffsetTime>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<OffsetTime>() {
+	public DefaultIdentifierBridgeExpectations<OffsetTime> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<OffsetTime>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -61,7 +60,7 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

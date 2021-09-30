@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -38,8 +37,8 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId,
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<ZoneId>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<ZoneId>() {
+	public DefaultIdentifierBridgeExpectations<ZoneId> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<ZoneId>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -56,7 +55,7 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId,
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

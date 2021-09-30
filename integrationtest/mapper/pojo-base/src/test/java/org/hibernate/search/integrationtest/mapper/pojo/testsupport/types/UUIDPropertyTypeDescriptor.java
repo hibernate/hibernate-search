@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -39,8 +38,8 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID, Str
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<UUID>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<UUID>() {
+	public DefaultIdentifierBridgeExpectations<UUID> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<UUID>() {
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -58,7 +57,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID, Str
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override
