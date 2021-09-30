@@ -1045,6 +1045,23 @@ In case of conflicts, which happens when some properties overlap, the mappings p
 Which means that it is possible to break the mappings for the purposes of Hibernate Search functions.
 ====
 
+=== Disable `_source`
+
+Using this feature it is possible to link:{elasticsearchDocUrl}/mapping-source-field.html[disable the `_source` field].
+For instance you could pass a `custom/index-mappings.json` file like the following:
+
+.Possible content of `custom/index-mappings.json` file to disable the `_source` field
+====
+[source, JSON, indent=0, subs="+callouts"]
+----
+{
+  "_source": {
+    "enabled": false
+  }
+}
+----
+====
+
 [[backend-elasticsearch-threads]]
 == Threads
 
