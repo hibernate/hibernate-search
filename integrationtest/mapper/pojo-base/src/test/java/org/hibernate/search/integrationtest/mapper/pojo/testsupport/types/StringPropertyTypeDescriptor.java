@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Optional;
-
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.values.PropertyValues;
@@ -35,8 +33,8 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String,
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<String>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<String>() {
+	public DefaultIdentifierBridgeExpectations<String> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<String>() {
 
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
@@ -54,7 +52,7 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String,
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

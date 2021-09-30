@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
-import java.util.Optional;
-
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -36,8 +34,8 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<GeoPoint>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<GeoPoint>() {
+	public DefaultIdentifierBridgeExpectations<GeoPoint> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<GeoPoint>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -54,7 +52,7 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

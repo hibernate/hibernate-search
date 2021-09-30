@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -109,7 +108,7 @@ public abstract class PropertyTypeDescriptor<V, F> {
 		return indexedValue;
 	}
 
-	public abstract Optional<DefaultIdentifierBridgeExpectations<V>> getDefaultIdentifierBridgeExpectations();
+	public abstract DefaultIdentifierBridgeExpectations<V> getDefaultIdentifierBridgeExpectations();
 
 	public abstract DefaultValueBridgeExpectations<V, ?> getDefaultValueBridgeExpectations();
 

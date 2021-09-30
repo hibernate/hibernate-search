@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.math.BigInteger;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -39,8 +38,8 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<BigInteger>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<BigInteger>() {
+	public DefaultIdentifierBridgeExpectations<BigInteger> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<BigInteger>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -57,7 +56,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override

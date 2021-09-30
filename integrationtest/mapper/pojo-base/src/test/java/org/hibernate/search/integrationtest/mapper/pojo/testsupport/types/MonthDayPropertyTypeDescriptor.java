@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -37,8 +36,8 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 	}
 
 	@Override
-	public Optional<DefaultIdentifierBridgeExpectations<MonthDay>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.of( new DefaultIdentifierBridgeExpectations<MonthDay>() {
+	public DefaultIdentifierBridgeExpectations<MonthDay> getDefaultIdentifierBridgeExpectations() {
+		return new DefaultIdentifierBridgeExpectations<MonthDay>() {
 			@Override
 			public Class<?> getTypeWithIdentifierBridge1() {
 				return TypeWithIdentifierBridge1.class;
@@ -55,7 +54,7 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 			public Class<?> getTypeWithIdentifierBridge2() {
 				return TypeWithIdentifierBridge2.class;
 			}
-		} );
+		};
 	}
 
 	@Override
