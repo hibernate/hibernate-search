@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -19,7 +20,7 @@ public final class DefaultBooleanIdentifierBridge implements IdentifierBridge<Bo
 
 	@Override
 	public Boolean fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context) {
-		return Boolean.parseBoolean( documentIdentifier );
+		return ParseUtils.parseBoolean( documentIdentifier );
 	}
 
 	@Override

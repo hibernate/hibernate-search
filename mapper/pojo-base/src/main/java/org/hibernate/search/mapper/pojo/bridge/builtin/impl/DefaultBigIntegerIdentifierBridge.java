@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.math.BigInteger;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -21,7 +22,7 @@ public final class DefaultBigIntegerIdentifierBridge implements IdentifierBridge
 
 	@Override
 	public BigInteger fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context) {
-		return new BigInteger( documentIdentifier );
+		return ParseUtils.parseBigInteger( documentIdentifier );
 	}
 
 	@Override

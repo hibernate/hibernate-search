@@ -65,14 +65,7 @@ public final class ConvertUtils {
 				return (Boolean) value;
 			}
 			if ( value instanceof String ) {
-				String string = (String) value;
-				// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
-				if ( "false".equalsIgnoreCase( string ) ) {
-					return false;
-				}
-				else if ( "true".equalsIgnoreCase( string ) ) {
-					return true;
-				}
+				return ParseUtils.parseBoolean( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -95,7 +88,7 @@ public final class ConvertUtils {
 				return ( (Number) value ).intValue();
 			}
 			if ( value instanceof String ) {
-				return Integer.parseInt( (String) value );
+				return ParseUtils.parseInteger( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -118,7 +111,7 @@ public final class ConvertUtils {
 				return ( (Number) value ).longValue();
 			}
 			if ( value instanceof String ) {
-				return Long.parseLong( (String) value );
+				return ParseUtils.parseLong( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -141,7 +134,7 @@ public final class ConvertUtils {
 				return ( (Number) value ).byteValue();
 			}
 			if ( value instanceof String ) {
-				return Byte.parseByte( (String) value );
+				return ParseUtils.parseByte( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -164,7 +157,7 @@ public final class ConvertUtils {
 				return ( (Number) value ).shortValue();
 			}
 			if ( value instanceof String ) {
-				return Short.parseShort( (String) value );
+				return ParseUtils.parseShort( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -187,7 +180,7 @@ public final class ConvertUtils {
 				return ( (Number) value ).floatValue();
 			}
 			if ( value instanceof String ) {
-				return Float.parseFloat( (String) value );
+				return ParseUtils.parseFloat( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -210,7 +203,7 @@ public final class ConvertUtils {
 				return ( (Number) value ).doubleValue();
 			}
 			if ( value instanceof String ) {
-				return Double.parseDouble( (String) value );
+				return ParseUtils.parseDouble( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -236,7 +229,7 @@ public final class ConvertUtils {
 				return BigDecimal.valueOf( ( (Number) value ).doubleValue() );
 			}
 			if ( value instanceof String ) {
-				return new BigDecimal( (String) value );
+				return ParseUtils.parseBigDecimal( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -262,7 +255,7 @@ public final class ConvertUtils {
 				return BigInteger.valueOf( ( (Number) value ).longValue() );
 			}
 			if ( value instanceof String ) {
-				return new BigInteger( (String) value );
+				return ParseUtils.parseBigInteger( (String) value );
 			}
 		}
 		catch (RuntimeException e) {

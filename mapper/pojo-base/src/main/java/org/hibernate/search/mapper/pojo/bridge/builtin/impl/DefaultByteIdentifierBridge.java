@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -19,7 +20,7 @@ public final class DefaultByteIdentifierBridge implements IdentifierBridge<Byte>
 
 	@Override
 	public Byte fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context) {
-		return Byte.parseByte( documentIdentifier );
+		return ParseUtils.parseByte( documentIdentifier );
 	}
 
 	@Override

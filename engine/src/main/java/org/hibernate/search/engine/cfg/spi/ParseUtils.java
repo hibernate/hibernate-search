@@ -11,6 +11,8 @@ import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.YEAR;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
@@ -74,6 +76,89 @@ public final class ParseUtils {
 
 	public static String parseString(String value) {
 		return value;
+	}
+
+	public static Boolean parseBoolean(String value) {
+		// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
+		if ( "false".equalsIgnoreCase( value ) ) {
+			return false;
+		}
+		else if ( "true".equalsIgnoreCase( value ) ) {
+			return true;
+		}
+		throw log.invalidStringForType( value, Boolean.class, "", null );
+	}
+
+	public static Integer parseInteger(String value) {
+		try {
+			return Integer.parseInt( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, Integer.class, e.getMessage(), e );
+		}
+	}
+
+	public static Long parseLong(String value) {
+		try {
+			return Long.parseLong( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, Long.class, e.getMessage(), e );
+		}
+	}
+
+	public static Byte parseByte(String value) {
+		try {
+			return Byte.parseByte( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, Byte.class, e.getMessage(), e );
+		}
+	}
+
+	public static Short parseShort(String value) {
+		try {
+			return Short.parseShort( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, Short.class, e.getMessage(), e );
+		}
+	}
+
+	public static Float parseFloat(String value) {
+		try {
+			return Float.parseFloat( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, Float.class, e.getMessage(), e );
+		}
+	}
+
+	public static Double parseDouble(String value) {
+		try {
+			return Double.parseDouble( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, Double.class, e.getMessage(), e );
+		}
+	}
+
+	public static BigDecimal parseBigDecimal(String value) {
+		try {
+			return new BigDecimal( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, BigDecimal.class, e.getMessage(), e );
+		}
+	}
+
+	public static BigInteger parseBigInteger(String value) {
+		try {
+			return new BigInteger( value );
+		}
+		catch (RuntimeException e) {
+			throw log.invalidStringForType( value, BigInteger.class, e.getMessage(), e );
+		}
 	}
 
 	public static Instant parseInstant(String value) {
