@@ -31,6 +31,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooterBehavior;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.coordination.impl.CoordinationConfigurationContextImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
@@ -163,6 +164,8 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final ConfigurationPropertySource propertySource;
 
+	private CoordinationConfigurationContextImpl coordinationStrategyConfiguration;
+
 	protected HibernateSearchPreIntegrationService(ConfigurationPropertyChecker propertyChecker,
 			ConfigurationPropertySource propertySource) {
 		this.propertyChecker = propertyChecker;
@@ -177,18 +180,24 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 	}
 
 	protected void doClose(Closer<RuntimeException> closer) {
-		// TODO HSEARCH-4182 close coordinations strategy here
+		closer.push( CoordinationConfigurationContextImpl::close, coordinationStrategyConfiguration );
 	}
 
 	ConfigurationPropertySource propertySource() {
 		return propertySource;
 	}
 
+	public CoordinationConfigurationContextImpl coordinationStrategyConfiguration() {
+		if ( coordinationStrategyConfiguration == null ) {
+			coordinationStrategyConfiguration = CoordinationConfigurationContextImpl.configure( propertySource, beanResolver() );
+		}
+		return coordinationStrategyConfiguration;
+	}
+
 	ConfigurationPropertyChecker propertyChecker() {
 		return propertyChecker;
 	}
 
-	// TODO HSEARCH-4182 take advantage of the bean resolver to create the coordination strategy early
 	abstract BeanResolver beanResolver();
 
 	abstract HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
@@ -229,9 +238,8 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 				SearchIntegration.Builder builder = SearchIntegration.builder( environment );
 
 				HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
-				ConfigurationService ormConfigurationService = HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
 				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, reflectionManager,
-						valueReadHandleFactory, ormConfigurationService );
+						valueReadHandleFactory, serviceRegistry );
 				builder.addMappingInitiator( mappingKey, mappingInitiator );
 
 				searchIntegrationPartialBuildState = builder.prepareBuild();

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingConfigurationContext;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
@@ -84,7 +84,8 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 	private RangeHashTable<OutboxEventBackgroundProcessor> indexingProcessors;
 
 	@Override
-	public void configureAutomaticIndexing(AutomaticIndexingConfigurationContext context) {
+	public void configure(CoordinationConfigurationContext context) {
+		context.mappingProducer( new DatabasePollingAdditionalJaxbMappingProducer() );
 		context.sendIndexingEventsTo( ctx -> new DatabasePollingOutboxEventSendingPlan( ctx.session() ), true );
 	}
 

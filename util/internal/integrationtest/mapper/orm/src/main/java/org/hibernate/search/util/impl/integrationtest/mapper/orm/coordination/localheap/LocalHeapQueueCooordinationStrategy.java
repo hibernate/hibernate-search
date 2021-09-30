@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingConfigurationContext;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
@@ -51,7 +51,7 @@ public class LocalHeapQueueCooordinationStrategy implements CooordinationStrateg
 	}
 
 	@Override
-	public void configureAutomaticIndexing(AutomaticIndexingConfigurationContext context) {
+	public void configure(CoordinationConfigurationContext context) {
 		context.sendIndexingEventsTo( this::createSendingPlan, false );
 	}
 

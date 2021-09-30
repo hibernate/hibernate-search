@@ -20,14 +20,9 @@ import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.service.ServiceRegistry;
 
 import org.jboss.jandex.IndexView;
 
@@ -68,14 +63,6 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 			+ " and there's nothing we can do about it")
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
-		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
-		ConfigurationService service = HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
-
-		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.COORDINATION_STRATEGY );
-		if ( !HibernateOrmMapperDatabasePollingSettings.COORDINATION_STRATEGY_NAME.equals( customIndexingStrategy ) ) {
-			return Collections.emptyList();
-		}
-
 		log.outboxGeneratedEntityMapping( OUTBOX_ENTITY_DEFINITION );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
 

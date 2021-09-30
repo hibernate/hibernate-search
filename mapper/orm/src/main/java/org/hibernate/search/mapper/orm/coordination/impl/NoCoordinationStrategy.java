@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.coordination.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingConfigurationContext;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
@@ -24,7 +24,7 @@ public class NoCoordinationStrategy implements CooordinationStrategy {
 	}
 
 	@Override
-	public void configureAutomaticIndexing(AutomaticIndexingConfigurationContext context) {
+	public void configure(CoordinationConfigurationContext context) {
 		context.reindexInSession();
 	}
 
