@@ -32,43 +32,45 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 	@Override
 	protected PropertyValues<Date, Instant> createValues() {
 		return PropertyValues.<Date, Instant>builder()
-				.add( date( Long.MIN_VALUE ), Instant.ofEpochMilli( Long.MIN_VALUE ) )
+				.add( date( Long.MIN_VALUE ), Instant.ofEpochMilli( Long.MIN_VALUE ),
+						"-292275055-05-16T16:47:04.192Z" )
 				.add( date( 1970, 1, 1, 0, 0, 0, 0 ),
-						Instant.parse( "1970-01-01T00:00:00.00Z" ) )
+						Instant.parse( "1970-01-01T00:00:00.00Z" ), "1970-01-01T00:00:00Z" )
 				.add( date( 1970, 1, 9, 13, 28, 59, 0 ),
-						Instant.parse( "1970-01-09T13:28:59.00Z" ) )
+						Instant.parse( "1970-01-09T13:28:59.00Z" ), "1970-01-09T13:28:59Z" )
 				.add( date( 2017, 11, 6, 19, 19, 0, 540 ),
-						Instant.parse( "2017-11-06T19:19:00.54Z" ) )
-				.add( date( Long.MAX_VALUE ), Instant.ofEpochMilli( Long.MAX_VALUE ) )
+						Instant.parse( "2017-11-06T19:19:00.54Z" ), "2017-11-06T19:19:00.540Z" )
+				.add( date( Long.MAX_VALUE ), Instant.ofEpochMilli( Long.MAX_VALUE ),
+						"+292278994-08-17T07:12:55.807Z" )
 
 				// A february 29th on a leap year
 				.add( date( 2000, 2, 29, 12, 0, 0, 0 ),
-						Instant.parse( "2000-02-29T12:00:00.0Z" ) )
+						Instant.parse( "2000-02-29T12:00:00.0Z" ), "2000-02-29T12:00:00Z" )
 				// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
 				.add( date( 1500, 2, 29, 12, 0, 0, 0 ),
 						// The Julian calendar is 10 days late at this point
 						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
-						Instant.parse( "1500-03-10T12:00:00.0Z" ) )
+						Instant.parse( "1500-03-10T12:00:00.0Z" ), "1500-03-10T12:00:00Z" )
 
 				// Adding some sql dates. See HSEARCH-3670
 				.add( JavaSqlDatePropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 ),
-						Instant.parse( "2017-11-06T19:19:00.54Z" ) )
+						Instant.parse( "2017-11-06T19:19:00.54Z" ), "2017-11-06T19:19:00.540Z" )
 				// A february 29th on a leap year
 				.add( JavaSqlDatePropertyTypeDescriptor.date( 2000, 2, 29, 12, 0, 0, 0 ),
-						Instant.parse( "2000-02-29T12:00:00.0Z" ) )
+						Instant.parse( "2000-02-29T12:00:00.0Z" ), "2000-02-29T12:00:00Z" )
 				// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
 				.add( JavaSqlDatePropertyTypeDescriptor.date( 1500, 2, 29, 12, 0, 0, 0 ),
 						// The Julian calendar is 10 days late at this point
 						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
-						Instant.parse( "1500-03-10T12:00:00.0Z" ) )
+						Instant.parse( "1500-03-10T12:00:00.0Z" ), "1500-03-10T12:00:00Z" )
 
 				// Adding a sql time. See HSEARCH-3670
 				.add( JavaSqlTimePropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 ),
-						Instant.parse( "2017-11-06T19:19:00.54Z" ) )
+						Instant.parse( "2017-11-06T19:19:00.54Z" ), "2017-11-06T19:19:00.540Z" )
 
 				// Adding a sql timestamp. See HSEARCH-3670
 				.add( JavaSqlTimestampPropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 ),
-						Instant.parse( "2017-11-06T19:19:00.54Z" ) )
+						Instant.parse( "2017-11-06T19:19:00.54Z" ), "2017-11-06T19:19:00.540Z" )
 				.build();
 	}
 
@@ -88,7 +90,24 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Date>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Date>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Date identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -140,6 +159,18 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 		calendar.set( year, month - 1, day, hour, minute, second );
 		calendar.set( Calendar.MILLISECOND, millisecond );
 		return calendar.getTime();
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Date id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Date id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -27,18 +27,35 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year, Yea
 	@Override
 	protected PropertyValues<Year, Year> createValues() {
 		return PropertyValues.<Year>passThroughBuilder()
-				.add( Year.of( Year.MIN_VALUE ) )
-				.add( Year.of( -1 ) )
-				.add( Year.of( 0 ) )
-				.add( Year.of( 1 ) )
-				.add( Year.of( 42 ) )
-				.add( Year.of( Year.MAX_VALUE ) )
+				.add( Year.of( Year.MIN_VALUE ), "-999999999" )
+				.add( Year.of( -1 ), "-0001" )
+				.add( Year.of( 0 ), "0000" )
+				.add( Year.of( 1 ), "0001" )
+				.add( Year.of( 42 ), "0042" )
+				.add( Year.of( Year.MAX_VALUE ), "+999999999" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Year>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Year>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Year identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -78,6 +95,18 @@ public class YearPropertyTypeDescriptor extends PropertyTypeDescriptor<Year, Yea
 				return Year.of( 2020 );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Year id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Year id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

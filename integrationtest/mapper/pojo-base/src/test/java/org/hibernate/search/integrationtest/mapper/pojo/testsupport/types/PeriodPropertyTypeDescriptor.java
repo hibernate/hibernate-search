@@ -27,17 +27,35 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period,
 	@Override
 	protected PropertyValues<Period, String> createValues() {
 		return PropertyValues.<Period, String>builder()
-				.add( Period.ZERO, "+0000000000+0000000000+0000000000" )
-				.add( Period.ofDays( 1 ), "+0000000000+0000000000+0000000001" )
-				.add( Period.ofMonths( 4 ), "+0000000000+0000000004+0000000000" )
-				.add( Period.ofYears( 2050 ), "+0000002050+0000000000+0000000000" )
-				.add( Period.of( 1900, 12, 21 ), "+0000001900+0000000012+0000000021" )
+				.add( Period.ZERO, "+0000000000+0000000000+0000000000", "P0D" )
+				.add( Period.ofDays( 1 ), "+0000000000+0000000000+0000000001", "P1D" )
+				.add( Period.ofMonths( 4 ), "+0000000000+0000000004+0000000000", "P4M" )
+				.add( Period.ofYears( 2050 ), "+0000002050+0000000000+0000000000", "P2050Y" )
+				.add( Period.of( 1900, 12, 21 ), "+0000001900+0000000012+0000000021", "P1900Y12M21D" )
+				.add( Period.ofMonths( 24 ), "+0000000000+0000000024+0000000000", "P24M" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Period>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Period>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Period identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -77,6 +95,18 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period,
 				return "+0000001900+0000000012+0000000021";
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Period id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Period id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

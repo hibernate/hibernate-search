@@ -29,6 +29,25 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 
 	@Override
 	public ZonedDateTime toIndexedValue(Calendar value, ValueBridgeToIndexedValueContext context) {
+		return to( value );
+	}
+
+	@Override
+	public Calendar fromIndexedValue(ZonedDateTime value, ValueBridgeFromIndexedValueContext context) {
+		return from( value );
+	}
+
+	@Override
+	public ZonedDateTime parse(String value) {
+		return ParseUtils.parseZonedDateTime( value );
+	}
+
+	@Override
+	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
+		return getClass().equals( other.getClass() );
+	}
+
+	static ZonedDateTime to(Calendar value) {
 		if ( value == null ) {
 			return null;
 		}
@@ -45,22 +64,11 @@ public final class DefaultJavaUtilCalendarValueBridge implements ValueBridge<Cal
 		return value.toInstant().atZone( ZoneId.of( "UTC" ) );
 	}
 
-	@Override
-	public Calendar fromIndexedValue(ZonedDateTime value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : from( value );
-	}
+	static Calendar from(ZonedDateTime value) {
+		if ( value == null ) {
+			return null;
+		}
 
-	@Override
-	public ZonedDateTime parse(String value) {
-		return ParseUtils.parseZonedDateTime( value );
-	}
-
-	@Override
-	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
-		return getClass().equals( other.getClass() );
-	}
-
-	private static Calendar from(ZonedDateTime value) {
 		// We had some troubles using `GregorianCalendar.from( value )`:
 		// it seems that the method calculates firstDayOfWeek and minimalDaysInFirstWeek
 		// in a different way GregorianCalendar.getInstance does.

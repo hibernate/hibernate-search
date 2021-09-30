@@ -23,12 +23,12 @@ public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Tim
 
 	@Override
 	public Instant toIndexedValue(Timestamp value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+		return to( value );
 	}
 
 	@Override
 	public Timestamp fromIndexedValue(Instant value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : new Timestamp( value.toEpochMilli() );
+		return from( value );
 	}
 
 	@Override
@@ -39,6 +39,14 @@ public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Tim
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
+	}
+
+	static Instant to(Timestamp value) {
+		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+	}
+
+	static Timestamp from(Instant value) {
+		return value == null ? null : new Timestamp( value.toEpochMilli() );
 	}
 
 }

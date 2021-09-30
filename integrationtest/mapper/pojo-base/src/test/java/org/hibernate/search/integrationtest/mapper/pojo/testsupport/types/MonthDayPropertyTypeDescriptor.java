@@ -28,17 +28,34 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 	@Override
 	protected PropertyValues<MonthDay, MonthDay> createValues() {
 		return PropertyValues.<MonthDay>passThroughBuilder()
-				.add( MonthDay.of( Month.JANUARY, 1 ) )
-				.add( MonthDay.of( Month.MARCH, 1 ) )
-				.add( MonthDay.of( Month.MARCH, 2 ) )
-				.add( MonthDay.of( Month.NOVEMBER, 21 ) )
-				.add( MonthDay.of( Month.DECEMBER, 31 ) )
+				.add( MonthDay.of( Month.JANUARY, 1 ), "--01-01" )
+				.add( MonthDay.of( Month.MARCH, 1 ), "--03-01" )
+				.add( MonthDay.of( Month.MARCH, 2 ), "--03-02" )
+				.add( MonthDay.of( Month.NOVEMBER, 21 ), "--11-21" )
+				.add( MonthDay.of( Month.DECEMBER, 31 ), "--12-31" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<MonthDay>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<MonthDay>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(MonthDay identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -78,6 +95,18 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 				return MonthDay.of( Month.NOVEMBER, 21 );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		MonthDay id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		MonthDay id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
