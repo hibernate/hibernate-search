@@ -272,7 +272,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 
 	private List<V> getProjectionValues() {
 		List<V> values = typeDescriptor.values().entityModelValues.stream()
-				.map( expectations::toProjectedValue )
+				.map( typeDescriptor::toProjectedValue )
 				.collect( Collectors.toList() );
 		if ( typeDescriptor.isNullable() ) {
 			values.add( null );
