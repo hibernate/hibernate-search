@@ -76,6 +76,11 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
+	private static final OptionalConfigurationProperty<Integer> PROCESSORS_INDEXING_TRANSACTION_TIMEOUT =
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_TRANSACTION_TIMEOUT )
+					.asInteger()
+					.build();
+
 	public static final String PROCESSOR_NAME_PREFIX = "Outbox event processor";
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
@@ -147,6 +152,8 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 		int pollingInterval = PROCESSORS_INDEXING_POLLING_INTERVAL.get( configurationSource );
 		int batchSize = PROCESSORS_INDEXING_BATCH_SIZE.get( configurationSource );
+		Integer transactionTimeout = PROCESSORS_INDEXING_TRANSACTION_TIMEOUT.get( configurationSource )
+				.orElse( null );
 
 		scheduledExecutor = context.threadPoolProvider()
 				.newScheduledExecutor( this.assignedShardIndices.size(), PROCESSOR_NAME_PREFIX );
@@ -161,7 +168,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 			OutboxEventFinder finder = finderProviderHolder.get().create( predicate );
 			OutboxEventBackgroundProcessor processor = new OutboxEventBackgroundProcessor(
 					PROCESSOR_NAME_PREFIX + " - " + shardIndex,
-					context.mapping(), scheduledExecutor, finder, pollingInterval, batchSize );
+					context.mapping(), scheduledExecutor, finder, pollingInterval, batchSize, transactionTimeout );
 			indexingProcessors.set( shardIndex, processor );
 		}
 		for ( int processedShardIndex : this.assignedShardIndices ) {
