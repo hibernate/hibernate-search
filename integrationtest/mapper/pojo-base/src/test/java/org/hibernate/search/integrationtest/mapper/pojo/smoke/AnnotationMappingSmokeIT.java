@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -603,7 +603,7 @@ public class AnnotationMappingSmokeIT {
 
 		private Integer numeric;
 
-		@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DefaultIntegerIdentifierBridge.class))
+		@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DefaultIntegerBridge.class))
 		public Integer getId() {
 			return id;
 		}

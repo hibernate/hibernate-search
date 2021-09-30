@@ -25,6 +25,7 @@ import java.time.OffsetTime;
 import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,7 @@ import java.time.format.SignStyle;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -76,6 +78,13 @@ public final class ParseUtils {
 
 	public static String parseString(String value) {
 		return value;
+	}
+
+	public static char parseCharacter(String value) {
+		if ( value.length() != 1 ) {
+			throw log.invalidStringForType( value, Character.class, "", null );
+		}
+		return value.charAt( 0 );
 	}
 
 	public static Boolean parseBoolean(String value) {
@@ -268,6 +277,15 @@ public final class ParseUtils {
 		}
 	}
 
+	public static ZoneId parseZoneId(String value) {
+		try {
+			return ZoneId.of( value );
+		}
+		catch (DateTimeException ex) {
+			throw log.invalidStringForType( value, ZoneId.class, ex.getMessage(), ex );
+		}
+	}
+
 	public static ZoneOffset parseZoneOffset(String value) {
 		try {
 			return ZoneOffset.of( value );
@@ -292,6 +310,24 @@ public final class ParseUtils {
 		}
 		catch (DateTimeParseException e) {
 			throw log.invalidStringForType( value, Duration.class, e.getMessage(), e );
+		}
+	}
+
+	public static UUID parseUUID(String value) {
+		try {
+			return UUID.fromString( value );
+		}
+		catch (IllegalArgumentException ex) {
+			throw log.invalidStringForType( value, UUID.class, ex.getMessage(), ex );
+		}
+	}
+
+	public static <E extends Enum<E>> E parseEnum(Class<E> enumType, String value) {
+		try {
+			return Enum.valueOf( enumType, value );
+		}
+		catch (IllegalArgumentException ex) {
+			throw log.invalidStringForEnum( value, enumType, ex );
 		}
 	}
 

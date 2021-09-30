@@ -222,7 +222,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 58, value = "Invalid %1$s value: expected either a Number or a String that can be parsed into a %1$s. %2$s")
 	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type, String nestedErrorMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 59, value = "Invalid value for type '%2$s': '%1$s'. %3$s")
+	@Message(id = ID_OFFSET + 59, value = "Invalid string for type '%2$s': '%1$s'. %3$s")
 	SearchException invalidStringForType(String value, @FormatWith(ClassFormatter.class) Class<?> type,
 			String causeMessage, @Cause Exception cause);
 
