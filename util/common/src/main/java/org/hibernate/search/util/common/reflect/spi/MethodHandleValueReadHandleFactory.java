@@ -10,8 +10,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.reflect.impl.MethodHandleValueReadHandle;
 
+@SuppressForbiddenApis(reason = "MethodHandles don't always work, but usage of this class is configurable,"
+		+ " so it should only be used in contexts where MethodHandles actually work.")
 final class MethodHandleValueReadHandleFactory implements ValueReadHandleFactory {
 
 	private final MethodHandles.Lookup lookup;

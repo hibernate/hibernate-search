@@ -20,6 +20,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+
 
 public final class Futures {
 
@@ -185,6 +187,7 @@ public final class Futures {
 	 * @return The result returned by the future.
 	 * @throws RuntimeException If the future fails.
 	 */
+	@SuppressForbiddenApis(reason = "Safer wrapper")
 	public static <T> T unwrappedExceptionJoin(CompletableFuture<T> future) {
 		try {
 			return future.join();

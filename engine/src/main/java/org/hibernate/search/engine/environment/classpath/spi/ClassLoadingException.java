@@ -8,6 +8,7 @@ package org.hibernate.search.engine.environment.classpath.spi;
 
 
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 /**
  * Indicates a problem performing class loading.
@@ -22,6 +23,7 @@ public class ClassLoadingException extends SearchException {
 	 * @param message A message explaining the exception condition.
 	 * @param cause The underlying cause
 	 */
+	@SuppressForbiddenApis(reason = SEARCH_EXCEPTION_AND_SUBCLASSES_CAN_USE_CONSTRUCTOR)
 	public ClassLoadingException(String message, Throwable cause) {
 		super( message, cause );
 	}
