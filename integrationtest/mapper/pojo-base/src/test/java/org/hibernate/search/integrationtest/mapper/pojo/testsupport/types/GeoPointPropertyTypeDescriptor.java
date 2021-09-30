@@ -27,17 +27,34 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 	@Override
 	protected PropertyValues<GeoPoint, GeoPoint> createValues() {
 		return PropertyValues.<GeoPoint>passThroughBuilder()
-				.add( GeoPoint.of( 0.0, 0.0 ) )
-				.add( GeoPoint.of( 100.123, 200.234 ) )
-				.add( GeoPoint.of( 41.89193, 12.51133 ) )
-				.add( GeoPoint.of( -26.4390917, 133.281323 ) )
-				.add( GeoPoint.of( -14.2400732, -53.1805017 ) )
+				.add( GeoPoint.of( 0.0, 0.0 ), "0.0, 0.0" )
+				.add( GeoPoint.of( 100.123, 200.234 ), "100.123, 200.234" )
+				.add( GeoPoint.of( 41.89193, 12.51133 ), "41.89193, 12.51133" )
+				.add( GeoPoint.of( -26.4390917, 133.281323 ), "-26.4390917, 133.281323" )
+				.add( GeoPoint.of( -14.2400732, -53.1805017 ), "-14.2400732, -53.1805017" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<GeoPoint>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<GeoPoint>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(GeoPoint identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -77,6 +94,18 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 				return GeoPoint.of( 100.123, 200.234 );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		GeoPoint id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		GeoPoint id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

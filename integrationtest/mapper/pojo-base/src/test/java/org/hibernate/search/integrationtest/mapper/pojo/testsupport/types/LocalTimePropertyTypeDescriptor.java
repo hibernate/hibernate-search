@@ -27,17 +27,34 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 	@Override
 	protected PropertyValues<LocalTime, LocalTime> createValues() {
 		return PropertyValues.<LocalTime>passThroughBuilder()
-				.add( LocalTime.MIN )
-				.add( LocalTime.of( 7, 0, 0 ) )
-				.add( LocalTime.of( 12, 0, 0 ) )
-				.add( LocalTime.of( 12, 0, 1 ) )
-				.add( LocalTime.MAX )
+				.add( LocalTime.MIN, "00:00:00" )
+				.add( LocalTime.of( 7, 0, 0 ), "07:00:00" )
+				.add( LocalTime.of( 12, 0, 0 ), "12:00:00" )
+				.add( LocalTime.of( 12, 0, 1 ), "12:00:01" )
+				.add( LocalTime.MAX, "23:59:59.999999999" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<LocalTime>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<LocalTime>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(LocalTime identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -77,6 +94,18 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 				return LocalTime.of( 12, 30, 15 );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		LocalTime id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		LocalTime id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

@@ -29,17 +29,34 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 	@Override
 	protected PropertyValues<YearMonth, YearMonth> createValues() {
 		return PropertyValues.<YearMonth>passThroughBuilder()
-				.add( YearMonth.of( Year.MIN_VALUE, Month.NOVEMBER ) )
-				.add( YearMonth.of( 2019, Month.JANUARY ) )
-				.add( YearMonth.of( 2019, Month.FEBRUARY ) )
-				.add( YearMonth.of( 2317, Month.NOVEMBER ) )
-				.add( YearMonth.of( Year.MAX_VALUE, Month.NOVEMBER ) )
+				.add( YearMonth.of( Year.MIN_VALUE, Month.NOVEMBER ), "-999999999-11" )
+				.add( YearMonth.of( 2019, Month.JANUARY ), "2019-01" )
+				.add( YearMonth.of( 2019, Month.FEBRUARY ), "2019-02" )
+				.add( YearMonth.of( 2317, Month.NOVEMBER ), "2317-11" )
+				.add( YearMonth.of( Year.MAX_VALUE, Month.NOVEMBER ), "+999999999-11" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<YearMonth>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<YearMonth>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(YearMonth identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -79,6 +96,18 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 				return YearMonth.of( 2100, Month.NOVEMBER );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		YearMonth id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		YearMonth id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

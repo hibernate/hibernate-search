@@ -23,12 +23,12 @@ public final class DefaultJavaSqlTimeValueBridge implements ValueBridge<Time, In
 
 	@Override
 	public Instant toIndexedValue(Time value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+		return to( value );
 	}
 
 	@Override
 	public Time fromIndexedValue(Instant value, ValueBridgeFromIndexedValueContext context) {
-		return value == null ? null : new Time( value.toEpochMilli() );
+		return from( value );
 	}
 
 	@Override
@@ -39,6 +39,14 @@ public final class DefaultJavaSqlTimeValueBridge implements ValueBridge<Time, In
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
 		return getClass().equals( other.getClass() );
+	}
+
+	static Instant to(Time value) {
+		return value == null ? null : Instant.ofEpochMilli( value.getTime() );
+	}
+
+	static Time from(Instant value) {
+		return value == null ? null : new Time( value.toEpochMilli() );
 	}
 
 }

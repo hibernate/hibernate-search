@@ -29,7 +29,7 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 
 	@Override
 	protected PropertyValues<URL, String> createValues() {
-		PropertyValues.Builder<URL, String> builder = PropertyValues.builder();
+		PropertyValues.StringBasedBuilder<URL> builder = PropertyValues.stringBasedBuilder();
 		for ( String string : new String[] {
 				"https://www.google.com",
 				"https://twitter.com/Hibernate/status/1093118957194801152",
@@ -37,7 +37,9 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 				"https://access.redhat.com/",
 				"https://access.redhat.com/products",
 				"https://access.redhat.com/products/red-hat-fuse/",
-				"https://access.redhat.com/products/red-hat-openshift-container-platform/"
+				"https://access.redhat.com/products/red-hat-openshift-container-platform/",
+				// No normalization is expected
+				"https://www.google.com/./foo/bar/../bar"
 		} ) {
 			builder.add( url( string ), string );
 		}
@@ -46,7 +48,24 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<URL>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<URL>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(URL identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -86,6 +105,18 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 				return "https://hibernate.org";
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		URL id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		URL id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

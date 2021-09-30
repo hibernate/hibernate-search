@@ -39,7 +39,24 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId,
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<ZoneId>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<ZoneId>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(ZoneId identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -79,6 +96,18 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId,
 				return ZoneId.of( "Europe/Paris" ).getId();
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		ZoneId id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		ZoneId id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
