@@ -105,6 +105,10 @@ public abstract class PropertyTypeDescriptor<V, F> {
 
 	protected abstract PropertyValues<V, F> createValues();
 
+	public V toProjectedValue(V indexedValue) {
+		return indexedValue;
+	}
+
 	public abstract Optional<DefaultIdentifierBridgeExpectations<V>> getDefaultIdentifierBridgeExpectations();
 
 	public abstract DefaultValueBridgeExpectations<V, ?> getDefaultValueBridgeExpectations();
