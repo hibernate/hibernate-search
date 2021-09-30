@@ -45,10 +45,13 @@ import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryH
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
+@SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
+		+ " in order to implement a org.hibernate.query.Query")
 public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {

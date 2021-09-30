@@ -24,6 +24,7 @@ import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.ServiceRegistry;
 
@@ -62,6 +63,8 @@ public class DatabasePollingAdditionalJaxbMappingProducer implements org.hiberna
 	"</hibernate-mapping>\n";
 
 	@Override
+	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
+			+ " and there's nothing we can do about it")
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
 		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();

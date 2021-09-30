@@ -19,6 +19,7 @@ import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.classloading.internal.TcclLookupPrecedence;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.service.ServiceRegistry;
@@ -34,6 +35,8 @@ public final class SimpleSessionFactoryBuilder {
 	private final List<Consumer<MetadataImplementor>> metadataContributors = new ArrayList<>();
 	private final List<Consumer<SessionFactoryBuilder>> sessionFactoryBuilderContributors = new ArrayList<>();
 
+	@SuppressForbiddenApis(reason = "Strangely, this API involves the internal TcclLookupPrecedence class,"
+			+ " and there's nothing we can do about it")
 	public SimpleSessionFactoryBuilder setTcclLookupPrecedenceBefore() {
 		return onBootstraServiceRegistryBuilder( builder -> builder.applyTcclLookupPrecedence( TcclLookupPrecedence.BEFORE ) );
 	}
