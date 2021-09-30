@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -368,7 +368,7 @@ public class ProgrammaticMappingSmokeIT {
 			TypeMappingStep otherIndexedEntityMapping = secondMapping.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.NAME );
 			otherIndexedEntityMapping.property( "id" )
-					.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class );
+					.documentId().identifierBridge( DefaultIntegerBridge.class );
 			otherIndexedEntityMapping.property( "numeric" )
 					.genericField()
 					.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
