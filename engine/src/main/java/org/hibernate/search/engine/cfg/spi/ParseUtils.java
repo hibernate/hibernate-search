@@ -47,6 +47,7 @@ public final class ParseUtils {
 
 	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
 	private static final DateTimeFormatter ISO_YEAR = new DateTimeFormatterBuilder()
+			.parseLenient() // Accept "-1" instead of requiring -0001
 			.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
 			.toFormatter();
 
@@ -151,7 +152,7 @@ public final class ParseUtils {
 		DateTimeFormatter formatter = ISO_YEAR;
 
 		try {
-			return Year.parse( value );
+			return Year.parse( value, formatter );
 		}
 		catch (DateTimeParseException e) {
 			throw log.unableToParseTemporal( Year.class, value, formatter, e );
