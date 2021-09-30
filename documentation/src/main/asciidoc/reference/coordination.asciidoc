@@ -389,6 +389,7 @@ These processors can be configured using the following configuration properties:
 hibernate.search.backend.processors.indexing.enabled = true
 hibernate.search.backend.processors.indexing.polling_interval = 100
 hibernate.search.backend.processors.indexing.batch_size = 50
+hibernate.search.coordination.processors.indexing.transaction_timeout = 10
 ----
 
 * `processors.indexing.enabled` defines whether the background processor responsible for indexing entities is enabled,
@@ -409,3 +410,9 @@ The default for this property is `50`.
 Higher values will reduce the number of transactions opened by the background process
 and may increase performance thanks to the first-level cache (persistence context),
 but will increase memory usage and in extreme cases may lead to `OutOfMemoryErrors`.
+but will increase memory usage and in extreme cases may lead to `OutOfMemoryErrors`.
+* `processors.indexing.transaction_timeout` defines the timeout for transactions processing outbox events
+as an <<configuration-property-types,integer value>> in seconds.
+Only effective when a JTA transaction manager is configured.
+The default for this property is `null`, meaning that the default value will be use,
+which value may depend on the transaction manager in use.
