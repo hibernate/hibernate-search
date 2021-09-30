@@ -95,6 +95,8 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 		Integer id;
 		@GenericField
 		YearMonth myProperty;
+		@GenericField(indexNullAs = "2019-02")
+		YearMonth indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
@@ -103,5 +105,7 @@ public class YearMonthPropertyTypeDescriptor extends PropertyTypeDescriptor<Year
 		Integer id;
 		@GenericField
 		YearMonth myProperty;
+		@GenericField(indexNullAs = "2100-11")
+		YearMonth indexNullAsProperty;
 	}
 }
