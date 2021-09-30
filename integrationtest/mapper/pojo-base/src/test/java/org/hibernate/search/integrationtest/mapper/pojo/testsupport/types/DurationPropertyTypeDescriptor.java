@@ -27,17 +27,37 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 	@Override
 	protected PropertyValues<Duration, Long> createValues() {
 		return PropertyValues.<Duration, Long>builder()
-				.add( Duration.ZERO, 0L )
-				.add( Duration.ofNanos( 1L ), 1L )
-				.add( Duration.ofSeconds( 1, 123L ), 1_000_000_123L )
-				.add( Duration.ofHours( 3 ), 3 * 3_600 * 1_000_000_000L )
-				.add( Duration.ofDays( 7 ), 7 * 24 * 60 * 60 * 1_000_000_000L )
+				.add( Duration.ZERO, 0L, "PT0S" )
+				.add( Duration.ofNanos( 1L ), 1L, "PT0.000000001S" )
+				.add( Duration.ofSeconds( 1, 123L ), 1_000_000_123L,
+						"PT1.000000123S" )
+				.add( Duration.ofHours( 3 ), 3 * 60 * 60 * 1_000_000_000L,
+						"PT3H" )
+				.add( Duration.ofDays( 7 ), 7 * 24 * 60 * 60 * 1_000_000_000L,
+						"PT168H" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Duration>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Duration>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Duration identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -77,6 +97,18 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 				return Duration.ofSeconds( 1, 123L ).toNanos();
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Duration id;
+
+	}
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Duration id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)

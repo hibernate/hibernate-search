@@ -49,11 +49,6 @@ public class PropertyValues<EV, DV> {
 			return this;
 		}
 
-		// TODO HSEARCH-4331 Remove this and use version with identifier everywhere
-		public Builder<EV, DV> add(EV entityModelValue, DV documentFieldValue) {
-			return add( entityModelValue, documentFieldValue, null );
-		}
-
 		public PropertyValues<EV, DV> build() {
 			return new PropertyValues<>( tuples );
 		}
@@ -68,11 +63,6 @@ public class PropertyValues<EV, DV> {
 		public PassThroughBuilder<EV> add(EV entityModelValue, String documentIdentifierValue) {
 			tuples.add( new SingleValue<>( entityModelValue, entityModelValue, documentIdentifierValue ) );
 			return this;
-		}
-
-		// TODO HSEARCH-4331 Remove this and use version with identifier everywhere
-		public PassThroughBuilder<EV> add(EV entityModelValue) {
-			return add( entityModelValue, null );
 		}
 
 		public PropertyValues<EV, EV> build() {

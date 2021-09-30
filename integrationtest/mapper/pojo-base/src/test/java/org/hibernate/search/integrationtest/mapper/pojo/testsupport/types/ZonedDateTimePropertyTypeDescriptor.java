@@ -30,22 +30,46 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	@Override
 	protected PropertyValues<ZonedDateTime, ZonedDateTime> createValues() {
 		return PropertyValues.<ZonedDateTime>passThroughBuilder()
-				.add( ZonedDateTime.of( LocalDateTime.MIN, ZoneId.of( "Europe/Paris" ) ) )
+				.add( ZonedDateTime.of( LocalDateTime.MIN, ZoneId.of( "Europe/Paris" ) ),
+						"-999999999-01-01T00:00:00+00:09:21[Europe/Paris]" )
 				.add( ZonedDateTime.of( LocalDateTime.of( 1970, Month.JANUARY, 1, 7, 0, 0 ),
-						ZoneId.of( "Europe/Paris" ) ) )
+						ZoneId.of( "Europe/Paris" ) ), "1970-01-01T07:00:00+01:00[Europe/Paris]" )
 				.add( ZonedDateTime.of(
 						LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ),
-						ZoneId.of( "Europe/Paris" ) ) )
+						ZoneId.of( "Europe/Paris" ) ), "1999-01-01T07:00:00+01:00[Europe/Paris]" )
 				.add( ZonedDateTime.of(
 						LocalDateTime.of( 1999, Month.JANUARY, 1, 7, 0, 0 ),
-						ZoneId.of( "America/Chicago" ) ) )
-				.add( ZonedDateTime.of( LocalDateTime.MAX, ZoneId.of( "Europe/Paris" ) ) )
+						ZoneId.of( "America/Chicago" ) ), "1999-01-01T07:00:00-06:00[America/Chicago]" )
+				.add( ZonedDateTime.of( LocalDateTime.MAX, ZoneId.of( "Europe/Paris" ) ),
+						"+999999999-12-31T23:59:59.999999999+01:00[Europe/Paris]" )
+				// Two date/times that could be ambiguous due to a daylight saving time switch
+				.add( LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) ).withEarlierOffsetAtOverlap(),
+						"2011-10-30T02:50:00+02:00[CET]" )
+				.add( LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) ).withLaterOffsetAtOverlap(),
+						"2011-10-30T02:50:00+01:00[CET]" )
 				.build();
 	}
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<ZonedDateTime>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<ZonedDateTime>() {
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(ZonedDateTime identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -85,6 +109,18 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 				return ZonedDateTime.of( LocalDateTime.of( 1999, Month.MAY, 31, 9, 30, 10 ), ZoneId.of( "America/Chicago" ) );
 			}
 		};
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		ZonedDateTime id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		ZonedDateTime id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
