@@ -1,7 +1,7 @@
 [[mapper-orm-entityindexmapping]]
 = Entity/index mapping
 
-== [[_basics]] Basics
+== Basics
 
 In order to index an entity, it must be annotated with `@Indexed`.
 
