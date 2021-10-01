@@ -1,6 +1,7 @@
 [[mapper-orm-bridge-bridgedelement-dependencies]]
 = Declaring dependencies to bridged elements
 
+[[mapper-orm-bridge-bridgedelement-dependencies-basics]]
 == Basics
 
 In order to keep the index synchronized,

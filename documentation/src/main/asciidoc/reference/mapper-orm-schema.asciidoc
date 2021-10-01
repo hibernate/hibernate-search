@@ -1,6 +1,7 @@
 [[mapper-orm-schema-management]]
 = Managing the index schema
 
+[[mapper-orm-schema-management-basics]]
 == Basics
 
 Before indexes can be used for indexing or searching, they must be created on disk (Lucene) or in the remote cluster (Elasticsearch).

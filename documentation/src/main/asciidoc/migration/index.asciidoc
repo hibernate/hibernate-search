@@ -9,6 +9,7 @@
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
+[[introduction]]
 == [[_introduction]] Introduction
 
 The aim of this guide is to assist you migrating
