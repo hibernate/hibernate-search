@@ -1,7 +1,5 @@
 [[search-dsl-predicate]]
-= Predicate DSL
-// Search 5 anchors backward compatibility
-[[query-predicate]]
+= [[query-predicate]] Predicate DSL
 
 [[search-dsl-predicate-concepts]]
 == Basics
@@ -111,9 +109,7 @@ to `matching(...)`/`matchingAny(...)`, see <<search-dsl-argument-type>>.
 but can be <<search-dsl-predicate-common-boost,boosted with `.boost(...)`>>.
 
 [[search-dsl-predicate-match]]
-== `match`: match a value
-// Search 5 anchors backward compatibility
-[[_keyword_queries]]
+== [[_keyword_queries]] `match`: match a value
 
 The `match` predicate matches documents for which a given field has a given value.
 
@@ -213,9 +209,7 @@ you want to expose to your users.
 ====
 
 [[search-dsl-predicate-match-fuzzy]]
-=== `fuzzy`: match a text value approximately
-// Search 5 anchors backward compatibility
-[[_fuzzy_queries]]
+=== [[_fuzzy_queries]] `fuzzy`: match a text value approximately
 
 The `.fuzzy()` option allows for approximate matches,
 i.e. it allows matching documents for which a given field has a value that is not exactly the value passed to `matching(...)`,
@@ -270,9 +264,7 @@ of targeted fields to analyze searched text by default,
 but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
 [[search-dsl-predicate-range]]
-== `range`: match a range of values
-// Search 5 anchors backward compatibility
-[[_range_queries]]
+== [[_range_queries]] `range`: match a range of values
 
 The `range` predicate matches documents for which a given field has a value within a given range.
 
@@ -372,9 +364,7 @@ either on a per-field basis with a call to `.boost(...)` just after `.field(...)
 or for the whole predicate with a call to `.boost(...)` after `.between(...)`/`atLeast(...)`/etc.
 
 [[search-dsl-predicate-phrase]]
-== `phrase`: match a sequence of words
-// Search 5 anchors backward compatibility
-[[_phrase_queries]]
+== [[_phrase_queries]] `phrase`: match a sequence of words
 
 The `phrase` predicate matches documents for which a given field contains a given sequence of words, in the given order.
 
@@ -487,9 +477,7 @@ on object fields that are known to have at least one inner field that is never n
 but can be <<search-dsl-predicate-common-boost,boosted with a call to `.boost(...)`>>.
 
 [[search-dsl-predicate-wildcard]]
-== `wildcard`: match a simple pattern
-// Search 5 anchors backward compatibility
-[[_wildcard_queries]]
+== [[_wildcard_queries]] `wildcard`: match a simple pattern
 
 The `wildcard` predicate matches documents for which a given field contains a word matching the given pattern.
 
@@ -725,9 +713,7 @@ either on a per-field basis with a call to `.boost(...)` just after `.field(...)
 or for the whole predicate with a call to `.boost(...)` after `.matchingAny(...)` or `.matchingAll(...)`.
 
 [[search-dsl-predicate-boolean]]
-== `bool`: combine predicates (or/and/...)
-// Search 5 anchors backward compatibility
-[[_combining_queries]]
+== [[_combining_queries]] `bool`: combine predicates (or/and/...)
 
 The `bool` predicate matches documents that match one or more inner predicates, called "clauses".
 It can be used in particular to build `AND`/`OR` operators.
@@ -939,9 +925,7 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 with a call to `.boost(...)`.
 
 [[search-dsl-predicate-simple-query-string]]
-== `simpleQueryString`: match a user-provided query string
-// Search 5 anchors backward compatibility
-[[_simple_query_string_queries]]
+== [[_simple_query_string_queries]] `simpleQueryString`: match a user-provided query string
 
 The `simpleQueryString` predicate matches documents according to a structured query given as a string.
 
@@ -1132,9 +1116,7 @@ will match, because we apply the nested predicate *separately* to *each match* p
 ====
 
 [[search-dsl-predicate-spatial-within]]
-== `within`: match points within a circle, box, polygon
-// Search 5 anchors backward compatibility
-[[spatial-queries]]
+== [[spatial-queries]] `within`: match points within a circle, box, polygon
 
 The `within` predicate matches documents for which a given field is a geo-point
 contained within a given circle, bounding-box or polygon.
@@ -1223,9 +1205,7 @@ after `.circle(...)`/`.boundingBox(...)`/`.polygon(...)`.
 
 
 [[search-dsl-predicate-named]]
-== `named`: call a predicate defined in the mapping
-// Search 5 anchors backward compatibility
-[[query-filter-fulltext]]
+== [[query-filter-fulltext]] `named`: call a predicate defined in the mapping
 
 A `named` predicate, i.e. a predicate defined in the mapping,
 can be called and included in a query.
@@ -1309,9 +1289,7 @@ but using the Lucene extension so that Lucene-specific options are available.
 ====
 
 [[search-dsl-predicate-common]]
-== Options common to multiple predicate types
-// Search 5 anchors backward compatibility
-[[_query_options]]
+== [[_query_options]] Options common to multiple predicate types
 
 [[search-dsl-predicate-common-multiple-fields]]
 === Targeting multiple fields in one predicate

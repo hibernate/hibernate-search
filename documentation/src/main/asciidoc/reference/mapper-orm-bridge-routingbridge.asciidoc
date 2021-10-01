@@ -1,7 +1,5 @@
 [[mapper-orm-bridge-routingbridge]]
-= Routing bridge
-// Legacy anchor from earlier 6.0 beta versions
-[[mapper-orm-bridge-routingkeybridge]]
+= [[mapper-orm-bridge-routingkeybridge]] Routing bridge
 
 == Basics
 
@@ -29,9 +27,7 @@ In the sections below, you will find examples for the main use cases:
 * <<mapper-orm-bridge-routingbridge-routingkey>>
 
 [[mapper-orm-bridge-routingbridge-conditionalindexing]]
-== Using a routing bridge for conditional indexing
-// Search 5 anchors backward compatibility
-[[example-search-mapping-indexinginterceptor-blog]]
+== [[example-search-mapping-indexinginterceptor-blog]] Using a routing bridge for conditional indexing
 
 Below is a first example of a custom routing bridge that
 disables indexing for instances of the `Book` class if their status is `ARCHIVED`.
@@ -159,9 +155,7 @@ but not for `ARCHIVED`.
 ====
 
 [[mapper-orm-bridge-routingbridge-parameters]]
-== Passing parameters
-// Legacy anchor from earlier 6.0 beta versions
-[[mapper-orm-bridge-routingkeybridge-parameters]]
+== [[mapper-orm-bridge-routingkeybridge-parameters]] Passing parameters
 
 There are two ways to pass parameters to routing bridges:
 
@@ -206,9 +200,7 @@ also exposes a `beanResolver()` method to access the bean resolver and instantia
 See <<configuration-bean-injection>> for more details.
 
 [[mapper-orm-bridge-routingbridge-programmatic]]
-== Programmatic mapping
-// Legacy anchor from earlier 6.0 beta versions
-[[mapper-orm-bridge-routingkeybridge-programmatic]]
+== [[mapper-orm-bridge-routingkeybridge-programmatic]] Programmatic mapping
 
 You can apply a routing key bridge through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
 Just pass an instance of the binder.

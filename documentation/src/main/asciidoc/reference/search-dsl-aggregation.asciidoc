@@ -1,7 +1,5 @@
 [[search-dsl-aggregation]]
-= Aggregation DSL
-// Search 5 anchors backward compatibility
-[[query-faceting]]
+= [[query-faceting]] Aggregation DSL
 
 [[search-dsl-aggregation-concepts]]
 == Basics
@@ -81,9 +79,7 @@ To learn more about the `terms` aggregation, and all the other types of aggregat
 refer to the following sections.
 
 [[search-dsl-aggregation-terms]]
-== `terms`: group by the value of a field
-// Search 5 anchors backward compatibility
-[[discrete-faceting-request]]
+== [[discrete-faceting-request]] `terms`: group by the value of a field
 
 The `terms` aggregation returns a count of documents for each term value of a given field.
 
@@ -229,9 +225,7 @@ link:{elasticsearchDocUrl}/search-aggregations-bucket-terms-aggregation.html#sea
 but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.
 
 [[search-dsl-aggregation-range]]
-== `range`: grouped by ranges of values for a field
-// Search 5 anchors backward compatibility
-[[range-faceting-request]]
+== [[range-faceting-request]] `range`: grouped by ranges of values for a field
 
 The `range` aggregation returns a count of documents for given ranges of values of a given field.
 

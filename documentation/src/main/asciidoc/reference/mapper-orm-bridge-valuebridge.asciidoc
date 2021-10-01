@@ -1,7 +1,5 @@
 [[mapper-orm-bridge-valuebridge]]
-= Value bridge
-// Search 5 anchors backward compatibility
-[[_stringbridge]]
+= [[_stringbridge]] Value bridge
 
 == Basics
 
@@ -130,9 +128,7 @@ for the specific constraints of each annotation.
 Attempts to use a bridge that declares an incompatible type will trigger exceptions at bootstrap.
 
 [[mapper-orm-bridge-valuebridge-projection]]
-== Supporting projections with `fromIndexedValue()`
-// Search 5 anchors backward compatibility
-[[section-two-way-bridge]]
+== [[section-two-way-bridge]] Supporting projections with `fromIndexedValue()`
 
 By default, any attempt to project on a field using a custom bridge will result in an exception,
 because Hibernate Search doesn't know how to convert

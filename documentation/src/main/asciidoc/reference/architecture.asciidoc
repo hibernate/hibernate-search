@@ -1,12 +1,8 @@
 [[architecture]]
-= Architecture
-// Search 5 anchors backward compatibility
-[[search-architecture]]
+= [[search-architecture]] Architecture
 
 [[architecture-hsearch-components]]
-== Components of Hibernate Search
-// Search 5 anchors backward compatibility
-[[_overview]]
+== [[_overview]] Components of Hibernate Search
 
 From the user's perspective, Hibernate Search consists of two components:
 
@@ -66,9 +62,7 @@ The entities are then returned by the query.
 See <<search-dsl>> for details.
 
 [[architecture-examples]]
-== Examples of architectures
-// Search 5 anchors backward compatibility
-[[_backend]]
+== [[_backend]] Examples of architectures
 
 [[architecture-examples-overview]]
 === Overview
@@ -121,11 +115,7 @@ See <<search-dsl>> for details.
 |===
 
 [[architecture-examples-single-node-lucene]]
-=== Single-node application with the Lucene backend
-// Search 5 anchors backward compatibility
-[[_lucene]]
-// Old Search 6 anchors backward compatibility
-[[architecture-examples-lucene]]
+=== [[architecture-examples-lucene]] [[_lucene]] Single-node application with the Lucene backend
 
 [[architecture-examples-single-node-lucene-description]]
 ==== Description
@@ -184,8 +174,7 @@ To implement this architecture, use the following Maven dependencies:
 ----
 
 [[architecture-examples-no-coordination-elasticsearch]]
-=== Single-node or multi-node application, without coordination and with the Elasticsearch backend
-[[architecture-examples-elasticsearch]]
+=== [[architecture-examples-elasticsearch]] Single-node or multi-node application, without coordination and with the Elasticsearch backend
 
 [[architecture-examples-no-coordination-elasticsearch-description]]
 ==== Description
@@ -251,9 +240,7 @@ To implement this architecture, use the following Maven dependencies:
 ----
 
 [[architecture-examples-database-polling-elasticsearch]]
-=== Multi-node application with database polling and Elasticsearch backend
-// Search 5 anchors backward compatibility
-[[_elasticsearch]]
+=== [[_elasticsearch]] Multi-node application with database polling and Elasticsearch backend
 
 [[architecture-examples-database-polling-elasticsearch-description]]
 ==== Description

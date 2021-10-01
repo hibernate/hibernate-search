@@ -1,7 +1,5 @@
 [[mapper-orm-indexedembedded]]
-= Mapping associated elements with `@IndexedEmbedded`
-// Search 5 anchors backward compatibility
-[[search-mapping-associated]]
+= [[search-mapping-associated]] Mapping associated elements with `@IndexedEmbedded`
 
 [[mapper-orm-indexedembedded-basics]]
 == Basics
@@ -128,9 +126,7 @@ To address this, see <<mapper-orm-indexedembedded-filtering>>.
 ====
 
 [[mapper-orm-indexedembedded-null]]
-== `@IndexedEmbedded` and `null` values
-// Search 5 anchors backward compatibility
-[[_indexing_null_embeddeds]]
+== [[_indexing_null_embeddeds]] `@IndexedEmbedded` and `null` values
 
 When properties targeted by an `@IndexedEmbedded` contain `null` elements,
 these elements are simply not indexed.
@@ -227,9 +223,7 @@ and lead to indexing failure.
 ====
 
 [[mapper-orm-indexedembedded-reindexing]]
-== Reindexing when embedded elements change
-// Search 5 anchors backward compatibility
-[[_associated_objects_building_a_dependency_graph_with_containedin]]
+== [[_associated_objects_building_a_dependency_graph_with_containedin]] Reindexing when embedded elements change
 
 When the "embedded" entity changes,
 Hibernate Search will handle reindexing of the "embedding" entity.
@@ -243,9 +237,7 @@ it will throw an exception on bootstrap.
 If this happens, refer to <<mapper-orm-reindexing-basics>> to know more.
 
 [[mapper-orm-indexedembedded-filtering]]
-== Filtering embedded fields and breaking `@IndexedEmbedded` cycles
-// Search 5 anchors backward compatibility
-[[search-mapping-associated-viapaths]]
+== [[search-mapping-associated-viapaths]] Filtering embedded fields and breaking `@IndexedEmbedded` cycles
 
 By default, `@IndexedEmbedded` will "embed" everything:
 every field encountered in the indexed-embedded element,
@@ -370,9 +362,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedd
 ====
 
 [[mapper-orm-indexedembedded-structure]]
-== Structuring embedded elements as nested documents using `structure`
-// Anchor backward compatibility
-[[mapper-orm-indexedembedded-storage]]
+== [[mapper-orm-indexedembedded-storage]] Structuring embedded elements as nested documents using `structure`
 
 Indexed-embedded fields can be structured in one of two ways,
 configured through the `structure` attribute of the `@IndexedEmbedded` annotation.
@@ -391,9 +381,7 @@ and its `authors` property is annotated with  `@IndexedEmbedded`:
 **** lastName = Frank
 
 [[mapper-orm-indexedembedded-structure-flattened]]
-=== `DEFAULT` or `FLATTENED` structure
-// Anchor backward compatibility
-[[mapper-orm-indexedembedded-storage-flattened]]
+=== [[mapper-orm-indexedembedded-storage-flattened]] `DEFAULT` or `FLATTENED` structure
 
 By default, indexed-embedded fields are "flattened",
 meaning that the tree structure is not preserved.
@@ -417,9 +405,7 @@ would show up as a match to a query such as `authors.firstname:Ty AND authors.la
 even though "Ty Abraham" is not one of this book's authors.
 
 [[mapper-orm-indexedembedded-structure-nested]]
-=== `NESTED` structure
-// Anchor backward compatibility
-[[mapper-orm-indexedembedded-storage-nested]]
+=== [[mapper-orm-indexedembedded-storage-nested]] `NESTED` structure
 
 When indexed-embedded elements are "nested",
 the tree structure is preserved by transparently creating one separate "nested" document

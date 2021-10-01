@@ -1,7 +1,5 @@
 [[mapper-orm-bridge-typebridge]]
-= Type bridge
-// Search 5 anchors backward compatibility
-[[_classbridge]]
+= [[_classbridge]] Type bridge
 
 == Basics
 

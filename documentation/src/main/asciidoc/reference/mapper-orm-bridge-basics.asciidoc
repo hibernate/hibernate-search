@@ -1,7 +1,5 @@
 [[mapper-orm-bridge-basics]]
-= Basics
-// Search 5 anchors backward compatibility
-[[section-custom-bridges]]
+= [[section-custom-bridges]] Basics
 
 In Hibernate Search, bridges are the components responsible for converting pieces of data
 from the entity model to the document model.

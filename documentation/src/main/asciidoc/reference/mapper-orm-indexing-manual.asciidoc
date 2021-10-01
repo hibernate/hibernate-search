@@ -1,12 +1,8 @@
 [[mapper-orm-indexing-manual]]
-= Manual indexing
-// Search 5 anchors backward compatibility
-[[manual-index-changes]]
+= [[manual-index-changes]] Manual indexing
 
 [[mapper-orm-indexing-manual-basics]]
-== Basics
-// Search 5 anchors backward compatibility
-[[search-batchindex]]
+== [[search-batchindex]] Basics
 
 While <<mapper-orm-indexing-automatic,automatic indexing>> and
 the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
@@ -25,9 +21,7 @@ these APIs only affect the Hibernate Search indexes:
 they do not write anything to the database.
 
 [[mapper-orm-indexing-manual-indexingplan-process-execute]]
-== Controlling entity reads and index writes with `SearchIndexingPlan`
-// Search 5 anchors backward compatibility
-[[search-batchindex-flushtoindexes]]
+== [[search-batchindex-flushtoindexes]] Controlling entity reads and index writes with `SearchIndexingPlan`
 
 A fairly common use case when manipulating large datasets with JPA
 is the link:{hibernateDocUrl}#batch-session-batch-insert[periodic "flush-clear" pattern],
@@ -162,9 +156,7 @@ The remaining entities that were not flushed/cleared will be flushed and indexed
 
 
 [[mapper-orm-indexing-manual-indexingplan-writes]]
-== Explicitly indexing and deleting specific documents
-// Search 5 anchors backward compatibility
-[[_adding_instances_to_the_index]]
+== [[_adding_instances_to_the_index]] Explicitly indexing and deleting specific documents
 //[[_deleting_instances_from_the_index]] // There can only be one anchor per paragraph, unfortunately...
 
 When <<mapper-orm-indexing-automatic,automatic indexing>> is disabled,

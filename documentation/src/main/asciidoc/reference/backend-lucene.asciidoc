@@ -1,7 +1,5 @@
 [[backend-lucene]]
-= Lucene backend
-// Search 5 anchors backward compatibility
-[[search-lucene-native]]
+= [[search-lucene-native]] Lucene backend
 
 [[backend-lucene-configuration]]
 == Basic configuration
@@ -18,9 +16,7 @@ You can find a full reference of available properties in the Hibernate Search ja
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
 
 [[backend-lucene-configuration-directory]]
-== Index storage (`Directory`)
-// Search 5 anchors backward compatibility
-[[search-configuration-directory]]
+== [[search-configuration-directory]] Index storage (`Directory`)
 
 The component responsible for index storage in Lucene is the `org.apache.lucene.store.Directory`.
 The implementation of the directory determines where the index will be stored:
@@ -161,9 +157,7 @@ The `local-heap` directory does not offer any specific option
 beyond the <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
 
 [[backend-lucene-configuration-directory-locking-strategy]]
-=== Locking strategy
-// Search 5 anchors backward compatibility
-[[search-configuration-directory-lockfactories]]
+=== [[search-configuration-directory-lockfactories]] Locking strategy
 
 In order to write to an index, Lucene needs to acquire a lock to ensure no other application instance
 writes to the same index concurrently.
@@ -220,9 +214,7 @@ Test your application carefully and make sure you know what it means.
 See `org.apache.lucene.store.NoLockFactory`.
 
 [[backend-lucene-configuration-sharding]]
-== Sharding
-// Search 5 anchors backward compatibility
-[[advanced-features-sharding]]
+== [[advanced-features-sharding]] Sharding
 
 [[backend-lucene-configuration-sharding-basics]]
 === Basics
@@ -523,9 +515,7 @@ other annotations such as `@GenericField` will fail.
 ====
 
 [[backend-lucene-multi-tenancy]]
-=== Multi-tenancy
-// Search 5 anchors backward compatibility
-[[section-multi-tenancy]]
+=== [[section-multi-tenancy]] Multi-tenancy
 
 Multi-tenancy is supported and handled transparently,
 according to the tenant ID defined in the current session:
@@ -691,9 +681,7 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedLuceneA
 ====
 
 [[backend-lucene-analysis-similarity]]
-=== Similarity
-// Search 5 anchors backward compatibility
-[[section-custom-similarity]]
+=== [[section-custom-similarity]] Similarity
 
 When searching, scores are assigned to documents based on statistics recorded at index time, using a specific formula.
 Those statistics and the formula are defined by a single component called the similarity,
@@ -931,9 +919,7 @@ hibernate.search.backend.indexes.<index name>.io.refresh_interval = 0
 The default for this property is `0`.
 
 [[backend-lucene-io-writer]]
-=== `IndexWriter` settings
-// Search 5 anchors backward compatibility
-[[lucene-indexing-performance]]
+=== [[lucene-indexing-performance]] `IndexWriter` settings
 
 Lucene's `IndexWriter`, used by Hibernate Search to write to indexes,
 exposes several settings that can be tweaked to better fit your application,
@@ -998,9 +984,7 @@ for more information about the settings and their defaults.
 ====
 
 [[backend-lucene-io-merge]]
-=== Merge settings
-// Search 5 anchors backward compatibility
-[[search-optimize]]
+=== [[search-optimize]] Merge settings
 
 A Lucene index is not stored in a single, continuous file.
 Instead, each flush to the index will generate a small file containing all the documents added to the index.

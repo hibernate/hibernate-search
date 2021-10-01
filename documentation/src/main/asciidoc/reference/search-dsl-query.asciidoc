@@ -1,12 +1,8 @@
 [[search-dsl-query]]
-= Query DSL
-// Search 5 anchors backward compatibility
-[[search-query]]
+= [[search-query]] Query DSL
 
 [[search-dsl-query-generality]]
-== Basics
-// Search 5 anchors backward compatibility
-[[_building_a_hibernate_search_query]]
+== [[_building_a_hibernate_search_query]] Basics
 
 Preparing and executing a query requires just a few lines:
 
@@ -106,14 +102,10 @@ expecting those entity types to implement the `Person` interface (Hibernate Sear
 ====
 
 [[search-dsl-query-fetching-results]]
-== Fetching results
-// Search 5 anchors backward compatibility
-[[_retrieving_the_results]]
+== [[_retrieving_the_results]] Fetching results
 
 [[search-dsl-query-fetching-results-basics]]
-=== Basics
-// Search 5 anchors backward compatibility
-[[_result_size]]
+=== [[_result_size]] Basics
 
 In Hibernate Search, the default search result is a little bit more complicated than just "a list of hits".
 This is why the default methods return a composite `SearchResult` object offering getters
@@ -270,9 +262,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 ====
 
 [[search-dsl-query-fetching-results-pagination]]
-=== Pagination
-// Search 5 anchors backward compatibility
-[[_pagination]]
+=== [[_pagination]] Pagination
 
 Pagination is the concept of splitting hits in successive "pages",
 all pages containing a fixed number of elements (except potentially the last one).
@@ -316,9 +306,7 @@ If you're running a batch process and want to avoid this, use <<search-dsl-query
 ====
 
 [[search-dsl-query-fetching-results-scrolling]]
-=== Scrolling
-// Search 5 anchors backward compatibility
-[[_performance_considerations]]
+=== [[_performance_considerations]] Scrolling
 
 Scrolling is the concept of keeping a cursor on the search query at the lowest level,
 and advancing that cursor progressively to collect subsequent "chunks" of search hits.
@@ -360,9 +348,7 @@ to ensure entities don't stay in the session taking more and more memory.
 ====
 
 [[search-dsl-query-routing]]
-== Routing
-// Search 5 anchors backward compatibility
-[[query-filter-shard]]
+== [[query-filter-shard]] Routing
 
 include::components/sharding-intro-note.asciidoc[]
 
@@ -408,9 +394,7 @@ that are returned as part of the hits of a search query.
 This section presents all available options related to entity loading in search queries.
 
 [[search-dsl-query-cache-lookup-strategy]]
-=== Cache lookup strategy
-// Search 5 anchors backward compatibility
-[[_customizing_object_initialization_strategies]]
+=== [[_customizing_object_initialization_strategies]] Cache lookup strategy
 
 By default, Hibernate Search will load entities from the database directly,
 without looking at any cache.
@@ -493,9 +477,7 @@ etc.
 ====
 
 [[search-dsl-query-entity-graph]]
-=== Entity graph
-// Search 5 anchors backward compatibility
-[[_fetching_strategy]]
+=== [[_fetching_strategy]] Entity graph
 
 By default, Hibernate Search will load associations according to the defaults of your mappings:
 associations marked as lazy won't be loaded,
@@ -543,9 +525,7 @@ All managers loaded by this search query will have their `associates` associatio
 ====
 
 [[search-dsl-query-timeout]]
-== Timeout
-// Search 5 anchors backward compatibility
-[[_limiting_the_time_of_a_query]]
+== [[_limiting_the_time_of_a_query]] Timeout
 
 You can limit the time it takes for a search query to execute in two ways:
 
@@ -558,9 +538,7 @@ Currently, the two approaches are incompatible:
 trying to set both `failAfter` and `truncateAfter` will result in unspecified behavior.
 ====
 
-=== `failAfter()`: Aborting the query after a given amount of time
-// Search 5 anchors backward compatibility
-[[_raise_an_exception_on_time_limit]]
+=== [[_raise_an_exception_on_time_limit]] `failAfter()`: Aborting the query after a given amount of time
 
 By calling `failAfter(...)` when building the query,
 it is possible to set a time limit for the query execution.
@@ -588,9 +566,7 @@ this method is used for debugging purposes and in particular to find out why a q
 ====
 
 [[limit_the_number_of_results_when_the_time_limit_is_reached]]
-=== `truncateAfter()`: Truncating the results after a given amount of time
-// Search 5 anchors backward compatibility
-[[_limit_the_number_of_results_when_the_time_limit_is_reached]]
+=== [[_limit_the_number_of_results_when_the_time_limit_is_reached]] `truncateAfter()`: Truncating the results after a given amount of time
 
 By calling `truncateAfter(...)` when building the query,
 it is possible to set a time limit for the collection of search results.
@@ -740,9 +716,7 @@ you can instead use the Elasticsearch extension on the `SearchQuery` to convert 
 ====
 
 [[search-dsl-query-took-timedout]]
-== `took` and `timedOut`: finding out how long the query took
-// Legacy anchors backward compatibility
-[[search-dsl-query-debugging-took-timedout]]
+== [[search-dsl-query-debugging-took-timedout]] `took` and `timedOut`: finding out how long the query took
 
 .Returning query execution time and whether a timeout occurred
 ====
