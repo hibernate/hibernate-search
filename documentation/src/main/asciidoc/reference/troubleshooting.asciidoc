@@ -50,9 +50,7 @@ you must also enable the infostream using a <<backend-lucene-io-writer-infostrea
 == Frequently asked questions
 
 [[troubleshooting-faq-search-matches]]
-=== Unexpected or missing documents in search hits
-// Legacy anchors backward compatibility
-[[search-dsl-query-debugging-matches]]
+=== [[search-dsl-query-debugging-matches]] Unexpected or missing documents in search hits
 
 When some documents unexpectedly match or don't match a query,
 you will need information about the exact query being executed,
@@ -69,9 +67,7 @@ https://medium.com/@mocobeta/luke-become-an-apache-lucene-module-as-of-lucene-8-
 distributed as part of the https://lucene.apache.org/core/downloads.html[Lucene binary packages].
 
 [[troubleshooting-faq-search-score]]
-=== Unsatisfying order of search hits when sorting by score
-// Legacy anchors backward compatibility
-[[_understanding_results]]
+=== [[_understanding_results]] Unsatisfying order of search hits when sorting by score
 [[search-dsl-query-debugging-score]]
 
 When sorting by score, if the documents don't appear in the order you expect,

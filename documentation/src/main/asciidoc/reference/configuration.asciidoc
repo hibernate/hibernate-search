@@ -1,7 +1,5 @@
 [[configuration]]
-= Configuration
-// Search 5 anchors backward compatibility
-[[search-configuration]]
+= [[search-configuration]] Configuration
 
 == Configuration sources
 
@@ -148,9 +146,7 @@ include::{sourcedir}/org/hibernate/search/documentation/configuration/Elasticsea
 ====
 
 [[configuration-property-checking]]
-== Configuration property checking
-// Backward compatibility with an older version of the documentation
-[[configuration-property-tracking]]
+== [[configuration-property-tracking]] Configuration property checking
 
 Hibernate Search will track the parts of the provided configuration that are actually used
 and will log a warning if any configuration property starting with "hibernate.search." is never used,
@@ -237,9 +233,7 @@ to be instantiated through its public, no-argument constructor.
 This will ignore built-in beans and will not try to instantiate the class through Spring/CDI.
 
 [[configuration-bean-resolution]]
-=== Bean resolution
-// Search 5 anchors backward compatibility
-[[section-services]]
+=== [[section-services]] Bean resolution
 
 Bean resolution (i.e. the process of turning this reference into an object instance)
 happens as follows by default:
@@ -291,9 +285,7 @@ when referencing a bean from configuration properties.
 ====
 
 [[configuration-bean-injection]]
-=== Bean injection
-// Search 5 anchors backward compatibility
-[[section-bridge-dependency-injection]]
+=== [[section-bridge-dependency-injection]] Bean injection
 
 All beans <<configuration-bean-resolution,resolved by Hibernate Search>>
 using a <<configuration-bean-frameworks,supported framework>>
@@ -346,9 +338,7 @@ using a <<configuration-bean-frameworks,supported framework>>
 can take advantage of injection features of this framework.
 
 [[configuration-background-failure-handling]]
-== Background failure handling
-// Search 5 anchors backward compatibility
-[[exception-handling]]
+== [[exception-handling]] Background failure handling
 
 Hibernate Search generally propagates exceptions occurring in background threads to the user thread,
 but in some cases, such as Lucene segment merging failures,

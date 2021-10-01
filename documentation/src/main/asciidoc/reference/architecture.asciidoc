@@ -1,12 +1,8 @@
 [[architecture]]
-= Architecture
-// Search 5 anchors backward compatibility
-[[search-architecture]]
+= [[search-architecture]] Architecture
 
 [[architecture-hsearch-components]]
-== Components of Hibernate Search
-// Search 5 anchors backward compatibility
-[[_overview]]
+== [[_overview]] Components of Hibernate Search
 
 From the user's perspective, Hibernate Search consists of two components:
 
@@ -64,14 +60,10 @@ The entities are then returned by the query.
 See <<search-dsl>> for details.
 
 [[architecture-examples]]
-== Examples of architectures
-// Search 5 anchors backward compatibility
-[[_backend]]
+== [[_backend]] Examples of architectures
 
 [[architecture-examples-lucene]]
-=== Single-node application with the Lucene backend
-// Search 5 anchors backward compatibility
-[[_lucene]]
+=== [[_lucene]] Single-node application with the Lucene backend
 
 With the <<backend-lucene,Lucene backend>>, indexes are local to a given node (JVM).
 They are accessed through direct calls to the Lucene library,
@@ -115,9 +107,7 @@ To implement this architecture, use the following Maven dependencies:
 ----
 
 [[architecture-examples-elasticsearch]]
-=== Single-node or multi-node application with the Elasticsearch backend
-// Search 5 anchors backward compatibility
-[[_elasticsearch]]
+=== [[_elasticsearch]] Single-node or multi-node application with the Elasticsearch backend
 
 With the <<backend-elasticsearch,Elasticsearch backend>>, indexes are not tied to the application.
 They are managed by a separate cluster of Elasticsearch nodes,

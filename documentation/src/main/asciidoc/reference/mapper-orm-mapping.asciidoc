@@ -1,7 +1,5 @@
 [[mapper-orm-mapping]]
-= Mapping Hibernate ORM entities to indexes
-// Search 5 anchors backward compatibility
-[[search-mapping]]
+= [[search-mapping]] Mapping Hibernate ORM entities to indexes
 
 :leveloffset: +1
 

@@ -1,7 +1,5 @@
 [[mapper-orm-mapping-inspect]]
-= Inspecting the mapping
-// Search 5 anchors backward compatibility
-[[_metadata_api]]
+= [[_metadata_api]] Inspecting the mapping
 
 After Hibernate Search has successfully booted, the `SearchMapping` can be used
 to get a list of indexed entities and get more direct access to the corresponding indexes,

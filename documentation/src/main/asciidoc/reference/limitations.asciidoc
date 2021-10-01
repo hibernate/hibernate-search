@@ -1,7 +1,5 @@
 [[limitations]]
-= Limitations
-// Search 5 anchors backward compatibility
-[[elasticsearch-limitations]]
+= [[elasticsearch-limitations]] Limitations
 
 [[limitations-parallel-embedded-update]]
 == In rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes

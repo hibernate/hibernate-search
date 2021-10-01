@@ -1,7 +1,5 @@
 [[mapper-orm-programmatic-mapping]]
-= Programmatic mapping
-// Search 5 anchors backward compatibility
-[[hsearch-mapping-programmaticapi]]
+= [[hsearch-mapping-programmaticapi]] Programmatic mapping
 
 == Basics
 

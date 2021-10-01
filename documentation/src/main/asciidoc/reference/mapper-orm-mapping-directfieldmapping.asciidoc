@@ -277,9 +277,7 @@ a default `decimalScale` is taken automatically from the underlying `scale` valu
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
 
 [[mapper-orm-directfieldmapping-supported-types]]
-== Supported property types
-// Search 5 anchors backward compatibility
-[[section-built-in-bridges]]
+== [[section-built-in-bridges]] Supported property types
 
 Below is a table listing all types with built-in value bridges,
 i.e. property types that are supported out of the box

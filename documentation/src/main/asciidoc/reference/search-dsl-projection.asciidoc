@@ -1,7 +1,5 @@
 [[search-dsl-projection]]
-= Projection DSL
-// Search 5 anchors backward compatibility
-[[projections]]
+= [[projections]] Projection DSL
 
 [[search-dsl-projection-concepts]]
 == Basics

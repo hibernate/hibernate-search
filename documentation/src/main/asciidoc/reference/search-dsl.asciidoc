@@ -1,7 +1,5 @@
 [[search-dsl]]
-= Searching
-// Search 5 anchors backward compatibility
-[[search-query-querydsl]]
+= [[search-query-querydsl]] Searching
 
 Beyond simply indexing, Hibernate Search also exposes high-level APIs to search these indexes
 without having to resort to native APIs.

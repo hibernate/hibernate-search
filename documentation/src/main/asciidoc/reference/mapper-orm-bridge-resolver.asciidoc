@@ -1,7 +1,5 @@
 [[mapper-orm-bridge-resolver]]
-= Assigning default bridges with the bridge resolver
-// Search 5 anchors backward compatibility
-[[_bridgeprovider_associate_a_bridge_to_a_given_return_type]]
+= [[_bridgeprovider_associate_a_bridge_to_a_given_return_type]] Assigning default bridges with the bridge resolver
 
 == Basics
 
