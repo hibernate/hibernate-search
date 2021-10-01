@@ -100,22 +100,6 @@
                                 </target>
                             </configuration>
                         </execution>
-                        <execution>
-                            <id>replace-javax-with-jakarta</id>
-                            <phase>initialize</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <!-- WARNING: if you update this, make sure to update the "integrationtest" parent POM, too -->
-                                <target name="replace-javax" if="transform.output.present">
-                                    <!-- https://ant.apache.org/manual/Tasks/replace.html -->
-                                    <replace dir="${transform.output.root.path}" token="javax.persistence" value="jakarta.persistence" />
-                                    <replace dir="${transform.output.root.path}" token="javax.transaction" value="jakarta.transaction" />
-                                    <replace dir="${transform.output.root.path}" token="javax.enterprise" value="jakarta.enterprise" />
-                                </target>
-                            </configuration>
-                        </execution>
                     </executions>
                 </plugin>
             </plugins>
