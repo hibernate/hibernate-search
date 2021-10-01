@@ -13,6 +13,7 @@ the entity identifier is used as a document identifier by default.
 Provided the entity identifier has a <<mapper-orm-identifiermapping-supported-types,supported type>>,
 identifier mapping will work out of the box and no explicit mapping is necessary.
 
+[[mapper-orm-identifiermapping-explicit]]
 == [[_explicit_identifier_mapping]] Explicit identifier mapping
 
 Explicit identifier mapping is required in the following cases:

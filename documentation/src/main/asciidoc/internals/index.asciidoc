@@ -137,6 +137,7 @@ to build an internal representation of the index schema, which will be used for 
 for example initializing a remote Elasticsearch index
 or inferring the required type of parameters to a range query on a given field.
 
+[[overall-indexing]]
 === [[_indexing]] Indexing
 
 The entry point for indexing is specific to each mapper,
@@ -164,6 +165,7 @@ Thus the mapper should instantiate a new indexing plan whenever this context cha
 NOTE: Index-scale operations such as flush, merge-segments, etc. are unavailable from indexing plans.
 They are accessed through a separate class, `IndexWorkspace`.
 
+[[overall-searching]]
 === [[_searching]] Searching
 
 Searching is a bit different from indexing,
@@ -185,6 +187,7 @@ such as `SearchPredicateFactory` or `FieldSortBuilder`.
 Also, the SPIs implemented by backends allow mappers to inject a "loading context" (see `SearchQueryBuilderFactory.selectEntity`)
 that will essentially transform document references into the entity that was initially indexed.
 
+[[pojo-base]]
 == [[_pojo_mapper]] POJO mapper
 
 What we call the POJO mapper is in fact an abstract basis for implementing mappers from Java objects to a full-text index.
@@ -197,8 +200,8 @@ we do not expect much real-life usage.
 The following sections do not address everything in the POJO mapper,
 but instead focus on the more complex parts.
 
-[[pojo-metamodel]]
-=== Representation of the POJO metamodel
+[[pojo-base-metamodel]]
+=== [[pojo-metamodel]] Representation of the POJO metamodel
 
 The bootstrapping process of the POJO mapper relies heavily on the POJO metamodel
 to infer what will have to be done at runtime.
@@ -248,10 +251,10 @@ and to allow users to get "accessors" so that they can extract information from 
 +
 NOTE: When retrieving accessors, users indirectly declare what parts of the POJO model
 they will extract and use in their bridge, and Hibernate Search actually makes use of this information
-(see <<pojo-reindexingresolvers>>).
+(see <<pojo-base-reindexingresolvers>>).
 
-[[pojo-indexingprocessors]]
-=== Indexing processors
+[[pojo-base-indexingprocessors]]
+=== [[pojo-indexingprocessors]] Indexing processors
 
 Indexing processors are the objects responsible for extracting data from a POJO and pushing it to a document.
 
@@ -286,6 +289,7 @@ NOTE: Indexing processors are logged at the debug level during bootstrap.
 Enable this level of logging for the Hibernate Search classes if you want to understand the indexing processor
 tree that was generated for a given mapping.
 
+[[pojo-base-indexingprocessors-bootstrap]]
 ==== Bootstrap
 
 For each indexed type, the building process consists in creating a root `PojoIndexingProcessorOriginalTypeNode` builder,
@@ -339,8 +343,8 @@ The builder node was created when applying and interpreting metadata,
 but it turns out the node does not have any child nor any bridge.
 As a result, this node will be ignored when creating the indexing processor.
 
-[[pojo-reindexingresolvers]]
-=== Implicit reindexing resolvers
+[[pojo-base-reindexingresolvers]]
+=== [[pojo-reindexingresolvers]] Implicit reindexing resolvers
 
 Reindexing resolvers are the objects responsible for determining, whenever an entity changes,
 which other entities include that changed entity in their indexed form and should thus be reindexed.
@@ -385,6 +389,7 @@ NOTE: Reindexing resolvers are logged at the debug level during bootstrap.
 Enable this level of logging for the Hibernate Search classes if you want to understand the reindexing resolver
 tree that was generated for a given mapping.
 
+[[pojo-base-reindexingresolvers-bootstrap]]
 ==== Bootstrap
 
 One reindexing resolver tree is built during bootstrap for each indexed or contained type.
@@ -400,7 +405,7 @@ if the indexing processor for entity `A` references entity `B` at some point,
 then you can be sure that the reindexing resolver for entity `B` will reference entity `A` at some point.
 
 As an example, let's consider the indexing processor builder tree
-from the previous section (<<pojo-indexingprocessors>>):
+from the previous section (<<pojo-base-indexingprocessors>>):
 
 image::internals-mapper-pojo-indexingprocessor-example1-builder.svg[Indexing processor node builder tree used as an input,align="center"]
 
@@ -466,7 +471,7 @@ This path represents an association between two entity types: `EmbeddedEntityCla
 and `SecondLevelEmbeddedEntityClass` on the contained side.
 In order to complete the reindexing resolver tree, we need to *invert* this association,
 i.e. find out the inverse path from `SecondLevelEmbeddedEntityClass` to `EmbeddedEntityClass`.
-This is done in `PojoAssociationPathInverter` using the "additional metadata" mentioned in <<pojo-metamodel>>.
+This is done in `PojoAssociationPathInverter` using the "additional metadata" mentioned in <<pojo-base-metamodel>>.
 
 Once the path is successfully inverted, the dependency collector value node can add new children
 to the reindexing resolver builder:
@@ -537,7 +542,7 @@ and put breakpoints in the `collectDependency`/`markForReindexing` methods of de
 and in the `resolveEntitiesToReindex` method of `PojoImplicitReindexingResolverDirtinessFilterNode`
 (to see what happens at runtime).
 
-
+[[json]]
 == [[_json_mapper]] JSON mapper
 
 The JSON mapper does not currently exist, but there are plans to work on it.

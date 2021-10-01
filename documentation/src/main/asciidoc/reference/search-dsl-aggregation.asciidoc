@@ -98,6 +98,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 <2> The result is a map from field value to document count.
 ====
 
+[[search-dsl-aggregation-terms-skipping-conversion]]
 === Skipping conversion
 
 By default, the values returned by the `terms` aggregation have the same type as
@@ -219,6 +220,7 @@ When ordering entries by ascending count in a `terms` aggregation,
 link:{elasticsearchDocUrl}/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order[hit counts are approximate].
 ====
 
+[[search-dsl-aggregation-terms-other]]
 === Other options
 
 * For fields in nested objects, all nested objects are considered by default,
@@ -247,6 +249,7 @@ Other syntaxes exist to define different bound inclusion (see other examples bel
 <3> `null` means "to infinity".
 ====
 
+[[search-dsl-aggregation-range-range-argument]]
 === [[_passing_range_arguments]] Passing `Range` arguments
 
 Instead of passing two arguments for each range (a lower and upper bound),
@@ -288,6 +291,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 ----
 ====
 
+[[search-dsl-aggregation-range-skipping-conversion]]
 === Skipping conversion
 
 By default, the bounds of ranges accepted by the `range` aggregation must have the same type as
@@ -312,6 +316,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 See <<search-dsl-argument-type>> for more information.
 
+[[search-dsl-aggregation-range-other]]
 === Other options
 
 * For fields in nested objects, all nested objects are considered by default,

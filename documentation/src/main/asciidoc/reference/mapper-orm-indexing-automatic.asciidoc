@@ -131,6 +131,7 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
+[[mapper-orm-indexing-automatic-synchronization-basics]]
 === Basics
 
 include::components/writing-reading-intro-note.asciidoc[]
@@ -201,6 +202,7 @@ forwards the failure to the <<configuration-background-failure-handling,failure 
 which by default will simply log the failure.
 ====
 
+[[mapper-orm-indexing-automatic-synchronization-override-per-session]]
 === [[_per_session_override]] Per-session override
 
 While the configuration property mentioned above defines a default,
@@ -228,6 +230,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 even though the query was executed _just after_ the transaction commit.
 ====
 
+[[mapper-orm-indexing-automatic-synchronization-custom]]
 === [[_custom_strategy]] Custom strategy
 
 You can also implement custom strategy.

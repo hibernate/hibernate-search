@@ -1,3 +1,4 @@
+[[concepts]]
 = [[_concepts]] Concepts
 
 [[concepts-full-text]]

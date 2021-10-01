@@ -1,6 +1,7 @@
 [[mapper-orm-bridge-propertybridge]]
 = [[section-field-bridge]] Property bridge
 
+[[mapper-orm-bridge-propertybridge-basics]]
 == Basics
 
 A property bridge, like a <<mapper-orm-bridge-valuebridge,value bridge>>,
@@ -174,6 +175,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/proper
 setting the `fieldName` parameter.
 ====
 
+[[mapper-orm-bridge-propertybridge-parameters-access-orm]]
 == Accessing the ORM session from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session.
@@ -188,6 +190,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/proper
 <2> Retrieve the `Session` from the extended context.
 ====
 
+[[mapper-orm-bridge-propertybridge-parameters-injecting-beans]]
 == Injecting beans into the binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
@@ -220,6 +223,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/proper
 ----
 ====
 
+[[mapper-orm-bridge-propertybridge-parameters-incubating]]
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]

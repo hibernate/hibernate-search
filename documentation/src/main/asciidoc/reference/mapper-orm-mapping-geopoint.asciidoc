@@ -1,6 +1,7 @@
 [[mapper-orm-geopoint]]
 = [[spatial]] Mapping geo-point types
 
+[[mapper-orm-geopoint-basics]]
 == Basics
 
 Hibernate Search provides a variety of spatial features
