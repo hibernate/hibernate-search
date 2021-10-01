@@ -1,7 +1,5 @@
 [[mapper-orm-bridge-propertybridge]]
-= Property bridge
-// Search 5 anchors backward compatibility
-[[section-field-bridge]]
+= [[section-field-bridge]] Property bridge
 
 == Basics
 
@@ -119,9 +117,7 @@ Here is an example of what an indexed document would look like, with the Elastic
 ====
 
 [[mapper-orm-bridge-propertybridge-parameters]]
-== Passing parameters
-// Search 5 anchors backward compatibility
-[[_parameterized_bridge]]
+== [[_parameterized_bridge]] Passing parameters
 
 There are two ways to pass parameters to property bridges:
 

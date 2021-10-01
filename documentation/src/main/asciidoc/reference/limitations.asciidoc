@@ -1,7 +1,5 @@
 [[limitations]]
-= Known issues and limitations
-// Search 5 anchors backward compatibility
-[[elasticsearch-limitations]]
+= [[elasticsearch-limitations]] Known issues and limitations
 
 [[limitations-parallel-embedded-update]]
 == Without coordination, in rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
@@ -124,9 +122,7 @@ This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3513[HSEARCH-3
 but is long-term goal.
 
 [[limitations-changes-asymmetric-association-updates]]
-== Automatic indexing ignores asymmetric association updates
-// Old anchors backwards compatibility
-[[mapper-orm-indexing-automatic-concepts-session-consistency]]
+== [[mapper-orm-indexing-automatic-concepts-session-consistency]] Automatic indexing ignores asymmetric association updates
 
 === Description
 

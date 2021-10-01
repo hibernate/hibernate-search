@@ -1,7 +1,5 @@
 [[mapper-orm-indexing-jsr352]]
-= Reindexing large volumes of data with the JSR-352 integration
-// Search 5 anchors backward compatibility
-[[jsr352-integration]]
+= [[jsr352-integration]] Reindexing large volumes of data with the JSR-352 integration
 
 Hibernate Search provides a JSR-352 job to perform mass indexing. It covers not only the existing
 functionality of the mass indexer described above, but also benefits from some powerful standard

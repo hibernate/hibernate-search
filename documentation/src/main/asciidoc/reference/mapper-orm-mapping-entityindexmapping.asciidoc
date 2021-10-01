@@ -78,9 +78,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 ====
 
 [[mapper-orm-entityindexmapping-conditional-and-routing]]
-== Conditional indexing and routing
-// Search 5 anchors backward compatibility
-[[search-mapping-indexinginterceptor]]
+== [[search-mapping-indexinginterceptor]] Conditional indexing and routing
 
 The mapping of an entity to an index is not always as straightforward as "this entity type goes to this index".
 For many reasons, but mainly for performance reasons,

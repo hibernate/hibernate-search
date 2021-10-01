@@ -1,9 +1,7 @@
 [[mapper-orm-mapping-configuration]]
 = Configuration
 
-== Enabling/disabling Hibernate Search
-// Search 5 anchors backward compatibility
-[[search-configuration-event]]
+== [[search-configuration-event]] Enabling/disabling Hibernate Search
 
 The Hibernate Search integration into Hibernate ORM is enabled by default as soon as it is present in the classpath.
 If for some reason you need to disable it,

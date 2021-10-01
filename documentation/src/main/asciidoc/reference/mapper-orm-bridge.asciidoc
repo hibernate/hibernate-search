@@ -1,7 +1,5 @@
 [[mapper-orm-bridge]]
-= Bridges
-// Search 5 anchors backward compatibility
-[[search-mapping-bridge]]
+= [[search-mapping-bridge]] Bridges
 
 :leveloffset: +1
 
