@@ -4,7 +4,7 @@
 [[limitations-parallel-embedded-update]]
 == In rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
 
-=== [[_description]] Description
+=== Description
 
 If two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
 and these two entity instance are updated in parallel transactions,
@@ -34,7 +34,7 @@ will lead to an out of date index:
 
 This chain of events ends with the index containing a version of A where C is updated, but B is not.
 
-=== [[_workaround]] Workaround
+=== Workaround
 
 The following solutions can help circumvent this limitation:
 
@@ -43,7 +43,7 @@ This is only possible in very specific setups.
 2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
-=== [[_roadmap]] Roadmap
+=== Roadmap
 
 This problem cannot be solved using
 link:{elasticsearchDocUrl}/optimistic-concurrency-control.html[Elasticsearch's optimistic concurrency control]:
@@ -79,7 +79,7 @@ However, we intend to provide a basic solution relying on the database exclusive
 [[limitations-indexing-plan-serialization]]
 == Automatic indexing is not compatible with `Session` serialization
 
-=== [[_description]] Description
+=== Description
 
 When <<mapper-orm-indexing-automatic,automatic indexing>> is enabled,
 Hibernate Search collects entity change events
@@ -96,11 +96,11 @@ and Hibernate Search will likely "forget" to reindex some entities.
 This is fine in most applications, since they do not rely on serializing the session,
 but it might be a problem with some JEE applications relying on Bean Passivation.
 
-=== [[_workaround]] Workaround
+=== Workaround
 
 Avoid serializing an ORM `EntityManager`/`Session` after changing entities.
 
-=== [[_roadmap]] Roadmap
+=== Roadmap
 
 There are no plans to address this limitation.
 We do not intend to support `Session` serialization when Hibernate Search is enabled.

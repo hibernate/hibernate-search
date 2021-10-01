@@ -1,7 +1,7 @@
 [[mapper-orm-containerextractor]]
 = Mapping container types with container extractors
 
-== [[_basics]] Basics
+== Basics
 
 Most built-in annotations applied to properties will work transparently when applied to container types:
 
