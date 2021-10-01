@@ -17,8 +17,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.apache.lucene.util.Version;
+
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
-import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.search.test.testsupport.V5MigrationHelperJPASetupHelper;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Before;
@@ -43,10 +44,6 @@ public abstract class JPATestCase {
 
 	protected String getPersistenceUnitName() {
 		return getClass().getSimpleName() + "PU";
-	}
-
-	public String[] getEjb3DD() {
-		return new String[] { };
 	}
 
 	public Map<Class, String> getCachedClasses() {
@@ -97,13 +94,8 @@ public abstract class JPATestCase {
 					entry.getValue()
 			);
 		}
-		if ( getEjb3DD().length > 0 ) {
-			ArrayList<String> dds = new ArrayList<String>();
-			dds.addAll( Arrays.asList( getEjb3DD() ) );
-			config.put( AvailableSettings.XML_FILE_NAMES, dds );
-		}
 
-		config.put( AvailableSettings.ENTITY_MANAGER_FACTORY_NAME, "Test" + getClass() );
+		config.put( AvailableSettings.SESSION_FACTORY_NAME, "Test" + getClass() );
 
 		//Search config
 		configure( config );
