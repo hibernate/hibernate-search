@@ -1,4 +1,0 @@
-[IMPORTANT]
-====
-This section is incomplete. It will be completed during the Alpha/Beta phases of Hibernate Search 6.0.0.
-====
