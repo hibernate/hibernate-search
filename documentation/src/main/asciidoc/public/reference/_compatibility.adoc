@@ -18,9 +18,6 @@ but requires <<other-integrations-orm6,different Maven artifacts>>.
 |Jakarta Persistence (for the <<mapper-orm,Hibernate ORM mapper>>
 |{jakartaPersistenceVersion}
 |
-|JPA (Java EE) (for the <<mapper-orm,Hibernate ORM mapper>>
-|{jpaVersion}
-|Requires <<other-integrations-javaee,different Maven artifacts>>.
 |Apache Lucene (for the <<backend-lucene,Lucene backend>>)
 |{luceneVersion}
 |
