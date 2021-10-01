@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentMap;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.jpa.AvailableSettings;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
