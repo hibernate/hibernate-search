@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-index-field-type-dsl]]
 = Defining index field types
 
-== [[_basics]] Basics
+== Basics
 
 A specificity of Lucene-based search engines (including Elasticsearch) is that field types
 are much more complex than just a data type ("string", "integer", ...).
