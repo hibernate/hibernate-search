@@ -1,7 +1,5 @@
 [[mapper-orm-geopoint]]
-= Mapping geo-point types
-// Search 5 anchors backward compatibility
-[[spatial]]
+= [[spatial]] Mapping geo-point types
 
 == Basics
 
@@ -28,9 +26,7 @@ as explained <<mapper-orm-geopoint-genericfield, here>>.
 as explained <<mapper-orm-geopoint-geopointbinding, here>>.
 
 [[mapper-orm-geopoint-genericfield]]
-== Using `@GenericField` and the `GeoPoint` interface
-// Search 5 anchors backward compatibility
-[[spatial-coordinatesinterface]]
+== [[spatial-coordinatesinterface]] Using `@GenericField` and the `GeoPoint` interface
 
 When geo-points are represented in your entity model by a dedicated, *immutable* type,
 you can simply make that type implement the `GeoPoint` interface,
@@ -76,10 +72,7 @@ converting between the custom geo-point type and `GeoPoint`.
 ====
 
 [[mapper-orm-geopoint-geopointbinding]]
-== Using `@GeoPointBinding`, `@Latitude` and `@Longitude`
-// Search 5 anchors backward compatibility
-[[spatial-indexing-range]]
-[[spatial-indexing-spatialHash]]
+== [[spatial-indexing-range]] [[spatial-indexing-spatialHash]] Using `@GeoPointBinding`, `@Latitude` and `@Longitude`
 
 For cases where coordinates are stored in a mutable object,
 the solution is the `@GeoPointBinding` annotation.

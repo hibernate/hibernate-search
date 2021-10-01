@@ -1,7 +1,5 @@
 [[backend-elasticsearch]]
-= Elasticsearch backend
-// Search 5 anchors backward compatibility
-[[elasticsearch-integration]]
+= [[elasticsearch-integration]] Elasticsearch backend
 
 [[backend-elasticsearch-compatibility]]
 == Compatibility
@@ -46,9 +44,7 @@ make Hibernate Search re-create the indexes along with their schema,
 and <<mapper-orm-indexing-massindexer,reindex your data>>.
 
 [[backend-elasticsearch-configuration]]
-== Basic configuration
-// Search 5 anchors backward compatibility
-[[elasticsearch-integration-configuration]]
+== [[elasticsearch-integration-configuration]] Basic configuration
 
 All configuration properties of the Elasticsearch backend are optional,
 but the defaults might not suit everyone.
@@ -61,9 +57,7 @@ You can find a full reference of available properties in the Hibernate Search ja
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
 
-== Configuration of the Elasticsearch cluster
-// Search 5 anchors backward compatibility
-[[elasticsearch-integration-server-configuration]]
+== [[elasticsearch-integration-server-configuration]] Configuration of the Elasticsearch cluster
 
 Most of the time, Hibernate Search does not require any specific configuration
 to be applied by hand to the Elasticsearch cluster,
@@ -186,9 +180,7 @@ your password will be transmitted in clear text over the network.
 ====
 
 [[backend-elasticsearch-configuration-aws]]
-=== Authentication on Amazon Web Services
-// Search 5 anchors backward compatibility
-[[elasticsearch-integration-configuration-aws]]
+=== [[elasticsearch-integration-configuration-aws]] Authentication on Amazon Web Services
 
 The Hibernate Search Elasticsearch backend, once configured, will work just fine in most setups.
 However, if you need to use Amazon's https://docs.aws.amazon.com/elasticsearch-service/[managed Elasticsearch service],
@@ -297,9 +289,7 @@ The default for this property is `10`.
 These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
 
 [[backend-elasticsearch-configuration-version]]
-=== Version
-// Keep the old anchor to avoid dead links
-[[backend-elasticsearch-configuration-dialect]]
+=== [[backend-elasticsearch-configuration-dialect]] Version
 
 Different versions of Elasticsearch expose slightly different APIs.
 As a result, Hibernate Search needs to be aware of the version of Elasticsearch it is talking to
@@ -330,9 +320,7 @@ This can be helpful while developing, in particular.
 ====
 
 [[backend-elasticsearch-configuration-logging]]
-=== Logging
-// Search 5 anchors backward compatibility
-[[elasticsearch-log-json-pretty-printing]]
+=== [[elasticsearch-log-json-pretty-printing]] Logging
 
 The `hibernate.search.backend.log.json_pretty_printing` <<configuration-property-types,boolean property>>
 defines whether JSON included in <<troubleshooting-logging,logs>> should be pretty-printed (indented, with line breaks).
@@ -348,9 +336,7 @@ To enable it,
 link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
 
 [[backend-elasticsearch-index-lifecycle]]
-== Index lifecycle
-// Search 5 anchors backward compatibility
-[[elasticsearch-schema-management-strategy]]
+== [[elasticsearch-schema-management-strategy]] Index lifecycle
 
 Elasticsearch indexes need to be created before they can be used for indexing and searching;
 see <<mapper-orm-schema-management>> for more information about how to create indexes and their schema
@@ -782,9 +768,7 @@ to only return search hits for the current tenant.
 The ID field is used to retrieve the original document IDs.
 
 [[backend-elasticsearch-analysis]]
-== Analysis
-// Search 5 anchors backward compatibility
-[[elasticsearch-mapping-analyzer]]
+== [[elasticsearch-mapping-analyzer]] Analysis
 
 [[backend-elasticsearch-analysis-basics]]
 === Basics
@@ -1077,9 +1061,7 @@ hibernate.search.backend.scroll_timeout = 60
 The default for this property is `60`.
 
 [[backend-elasticsearch-access-client]]
-== Retrieving the REST client
-// Search 5 anchors backward compatibility
-[[elasticsearch-client-access]]
+== [[elasticsearch-client-access]] Retrieving the REST client
 
 When writing complex applications with advanced requirements,
 it may be necessary from time to time to send requests to the Elasticsearch cluster directly,

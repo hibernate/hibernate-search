@@ -1,7 +1,5 @@
 [[search-dsl-sort]]
-= Sort DSL
-// Search 5 anchors backward compatibility
-[[query-sorting]]
+= [[query-sorting]] Sort DSL
 
 [[search-dsl-sort-concepts]]
 == Basics
@@ -289,9 +287,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDs
 ====
 
 [[search-dsl-sort-extensions-lucene-from-lucene-sort-field]]
-=== Lucene: `fromLuceneSortField`
-// Search 5 anchors backward compatibility
-[[_using_native_sorts_within_the_sort_dsl]]
+=== [[_using_native_sorts_within_the_sort_dsl]] Lucene: `fromLuceneSortField`
 
 `.fromLuceneSortField(...)` turns a native Lucene `SortField` into a Hibernate Search sort.
 
@@ -369,9 +365,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ====
 
 [[search-dsl-sort-common-missing]]
-=== Missing values
-// Search 5 anchors backward compatibility
-[[_handling_missing_values]]
+=== [[_handling_missing_values]] Missing values
 
 Documents that do not have any value for a sort field will appear in the last position by default.
 

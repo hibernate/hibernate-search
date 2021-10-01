@@ -80,9 +80,7 @@ in particular by returning hits as entities instead of just document identifiers
 see <<search-dsl>>.
 
 [[concepts-analysis]]
-== Analysis
-// Search 5 anchors backward compatibility
-[[analyzer]]
+== [[analyzer]] Analysis
 
 As mentioned in <<concepts-full-text>>,
 the full-text engine works on tokens,

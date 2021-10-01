@@ -1,12 +1,8 @@
 [[mapper-orm-identifiermapping]]
-= Mapping the document identifier
-// Search 5 anchors backward compatibility
-[[id-annotation]]
+= [[id-annotation]] Mapping the document identifier
 
 [[mapper-orm-identifiermapping-basics]]
-== Basics
-// Search 5 anchors backward compatibility
-[[example-document-id-default-orm]]
+== [[example-document-id-default-orm]] Basics
 
 Index documents, much like entities, need to be assigned an identifier
 so that Hibernate Search can handle updates and deletion.
@@ -50,9 +46,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermap
 ====
 
 [[mapper-orm-identifiermapping-supported-types]]
-== Supported identifier property types
-// Search 5 anchors backward compatibility
-[[_supported_identifier_types]]
+== [[_supported_identifier_types]] Supported identifier property types
 
 Below is a table listing all types with built-in identifier bridges,
 i.e. property types that are supported out of the box

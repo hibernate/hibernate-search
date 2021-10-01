@@ -1,7 +1,5 @@
 [[mapper-orm-alternatives]]
-= Mapping multiple alternatives
-// Search 5 anchors backward compatibility
-[[_dynamic_analyzer_selection]]
+= [[_dynamic_analyzer_selection]] Mapping multiple alternatives
 
 == Basics
 
