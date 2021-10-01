@@ -270,7 +270,6 @@
         <version.javax.enterprise>2.0</version.javax.enterprise>
         <version.jakarta.enterprise>3.0.0</version.jakarta.enterprise>
         <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
-        <version.jakarta.annotation>2.0.0</version.jakarta.annotation>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <!-- We need dependency management on these ones to avoid a dependency divergence created by Hibernate ORM
              Ideally, we should remove this dependency management when Hibernate ORM fixes that dependency divergence.
