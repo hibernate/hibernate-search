@@ -21,14 +21,14 @@
         <module>mapper/pojo-standalone-realbackend</module>
         <module>mapper/orm</module>
         <module>mapper/orm-cdi</module>
-        <module>mapper/orm-spring</module>
-        <module>mapper/orm-spring-uberjar</module>
+        <!--<module>mapper/orm-spring</module>-->
+        <!--<module>mapper/orm-spring-uberjar</module>-->
         <module>mapper/orm-envers</module>
         <module>mapper/orm-realbackend</module>
         <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352</module>
         <module>performance</module>
-        <module>showcase/library</module>
+<!--        <module>showcase/library</module>-->
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
     </modules>
