@@ -1,7 +1,7 @@
 [[mapper-orm-alternatives]]
 = [[_dynamic_analyzer_selection]] Mapping multiple alternatives
 
-== [[_basics]] Basics
+== Basics
 
 In some situations, it is necessary for a particular property to be indexed differently
 depending on the value of another property.

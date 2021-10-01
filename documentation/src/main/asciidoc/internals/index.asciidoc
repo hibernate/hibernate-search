@@ -286,7 +286,7 @@ NOTE: Indexing processors are logged at the debug level during bootstrap.
 Enable this level of logging for the Hibernate Search classes if you want to understand the indexing processor
 tree that was generated for a given mapping.
 
-==== [[_bootstrap]] Bootstrap
+==== Bootstrap
 
 For each indexed type, the building process consists in creating a root `PojoIndexingProcessorOriginalTypeNode` builder,
 and applying metadata contributors to this builder (see <<overall-bootstrap>>),
@@ -385,7 +385,7 @@ NOTE: Reindexing resolvers are logged at the debug level during bootstrap.
 Enable this level of logging for the Hibernate Search classes if you want to understand the reindexing resolver
 tree that was generated for a given mapping.
 
-==== [[_bootstrap]] Bootstrap
+==== Bootstrap
 
 One reindexing resolver tree is built during bootstrap for each indexed or contained type.
 The entry point to building these resolvers may not be obvious: it is the indexing resolver building process.

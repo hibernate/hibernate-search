@@ -18,7 +18,7 @@ If you want to ignore these annotations, set `hibernate.search.mapping.process_a
 
 To configure the mapping programmatically, see <<mapper-orm-programmatic-mapping>>.
 
-== [[_other_configuration_properties]] Other configuration properties
+== Other configuration properties
 
 Other configuration properties are mentioned in the relevant parts of this documentation.
 You can find a full reference of available properties in the Hibernate Search javadoc:

@@ -98,7 +98,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 <2> The result is a map from field value to document count.
 ====
 
-=== [[_skipping_conversion]] Skipping conversion
+=== Skipping conversion
 
 By default, the values returned by the `terms` aggregation have the same type as
 the entity property corresponding to the target field.
@@ -219,7 +219,7 @@ When ordering entries by ascending count in a `terms` aggregation,
 link:{elasticsearchDocUrl}/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order[hit counts are approximate].
 ====
 
-=== [[_other_options]] Other options
+=== Other options
 
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.
@@ -288,7 +288,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 ----
 ====
 
-=== [[_skipping_conversion]] Skipping conversion
+=== Skipping conversion
 
 By default, the bounds of ranges accepted by the `range` aggregation must have the same type as
 the entity property corresponding to the target field.
@@ -312,7 +312,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 See <<search-dsl-argument-type>> for more information.
 
-=== [[_other_options]] Other options
+=== Other options
 
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.

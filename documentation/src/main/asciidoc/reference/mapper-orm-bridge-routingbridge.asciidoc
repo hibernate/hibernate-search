@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-routingbridge]]
 = [[mapper-orm-bridge-routingkeybridge]] Routing bridge
 
-== [[_basics]] Basics
+== Basics
 
 A routing bridge is a pluggable component that defines, at runtime,
 whether an entity should be indexed and <<concepts-sharding-routing,to which shard the corresponding indexed document should be routed>>.

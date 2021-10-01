@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-valuebridge]]
 = [[_stringbridge]] Value bridge
 
-== [[_basics]] Basics
+== Basics
 
 A value bridge is a pluggable component that implements
 the mapping of a property to an index field.
@@ -90,7 +90,7 @@ A custom value bridge can do more:
 
 See the next sections for more information.
 
-== [[_type_resolution]] Type resolution
+== Type resolution
 
 By default, the value bridge's property type and index field type are determined automatically,
 using reflection to extract the generic type arguments of the `ValueBridge` interface:
@@ -186,7 +186,7 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 <4> Set `indexNullAs` to a valid value.
 ====
 
-== [[_compatibility_across_indexes_with_iscompatiblewith]] Compatibility across indexes with `isCompatibleWith()`
+== Compatibility across indexes with `isCompatibleWith()`
 
 A value bridges is involved in indexing,
 but also in the various search DSLs,
@@ -345,7 +345,7 @@ the annotation can be transparently applied to containers.
 Here, the bridge will be applied successively to each value in the map.
 ====
 
-== [[_accessing_the_orm_session_or_session_factory_from_the_bridge]] Accessing the ORM session or session factory from the bridge
+== Accessing the ORM session or session factory from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.
 

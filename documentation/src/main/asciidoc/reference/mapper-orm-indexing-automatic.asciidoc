@@ -131,7 +131,7 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
-=== [[_basics]] Basics
+=== Basics
 
 include::components/writing-reading-intro-note.asciidoc[]
 

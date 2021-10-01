@@ -136,7 +136,7 @@ so that Hibernate Search doesn't even try to use Spring to retrieve the componen
 and thus avoids the deadlock in Spring.
 See <<configuration-bean-reference-parsing,this section>> for more information.
 
-=== [[_other]] Other
+=== Other
 
 If your framework of choice is not mentioned in the previous sections, don't worry:
 Hibernate Search works just fine with plenty of other frameworks.

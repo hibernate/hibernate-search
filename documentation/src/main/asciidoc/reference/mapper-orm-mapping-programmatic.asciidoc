@@ -1,7 +1,7 @@
 [[mapper-orm-programmatic-mapping]]
 = [[hsearch-mapping-programmaticapi]] Programmatic mapping
 
-== [[_basics]] Basics
+== Basics
 
 Most examples in this documentation use annotation-based mapping,
 which is generally enough for most applications.

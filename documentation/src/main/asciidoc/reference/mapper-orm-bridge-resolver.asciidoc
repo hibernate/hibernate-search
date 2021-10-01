@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-resolver]]
 = [[_bridgeprovider_associate_a_bridge_to_a_given_return_type]] Assigning default bridges with the bridge resolver
 
-== [[_basics]] Basics
+== Basics
 
 Both the <<mapper-orm-directfieldmapping-supported-types,`@*Field` annotations>>
 and the <<mapper-orm-identifiermapping-supported-types,`@DocumentId` annotation>>

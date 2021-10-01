@@ -134,7 +134,7 @@ Implementations offering better performance
 also bring issues of their own.
 ====
 
-==== [[_other_configuration_options]] Other configuration options
+==== Other configuration options
 
 The `local-filesystem` directory also allows configuring a
 <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.

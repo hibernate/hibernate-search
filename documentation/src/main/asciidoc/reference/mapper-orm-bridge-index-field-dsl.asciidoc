@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-index-field-dsl]]
 = Declaring and writing to index fields
 
-== [[_basics]] Basics
+== Basics
 
 When implementing a <<mapper-orm-bridge-propertybridge,`PropertyBinder`>>
 or <<mapper-orm-bridge-typebridge,`TypeBinder`>>,

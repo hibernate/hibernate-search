@@ -171,7 +171,7 @@ You should move to the Hibernate Search 6 metamodel APIs, as explained in <<meta
 [[configuration]]
 == Configuration changes
 
-=== [[_basics]] Basics
+=== Basics
 
 Most configuration properties changed in Hibernate Search 6.
 In most cases it's only a matter of changing the prefix of a configuration property
@@ -675,7 +675,7 @@ Instead, rely on link:{hibernateSearchDocUrl}#search-dsl-predicate-common-boost[
 [[facet]]
 ==== `@Facet`, `@Facets`
 
-===== [[_basics]] Basics
+===== Basics
 
 Facets are now called aggregations, which are a generalization of the concept of faceting.
 
@@ -995,7 +995,7 @@ See <<full-text-filter>>.
 [[indexed]]
 ==== `@Indexed`
 
-===== [[_basics]] Basics
+===== Basics
 
 `@Indexed` is still available in Hibernate Search 6, but moved to a different package:
 `org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed`.
@@ -1020,7 +1020,7 @@ See <<entity-indexing-interceptors>>.
 [[indexedembeded]]
 ==== `@IndexedEmbedded`
 
-===== [[_basics]] Basics
+===== Basics
 
 `@IndexedEmbedded` is still available in Hibernate Search 6, but moved to a different package:
 `org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded`.
@@ -1274,7 +1274,7 @@ but `title_sort` when creating link:{hibernateSearchDocUrl}#search-dsl-sort-fiel
 [[spatial]]
 ==== `@Spatial`, `@Spatials`
 
-===== [[_basics]] Basics
+===== Basics
 
 `@Spatial` has no direct equivalent in Hibernate Search 6.
 
@@ -1591,7 +1591,7 @@ for more information.
 [[fulltextsession]]
 === `FullTextEntityManager`/`FullTextSession`
 
-==== [[_basics]] Basics
+==== Basics
 
 The equivalent to Hibernate Search 5's `FullTextEntityManager`/`FullTextSession` is Hibernate Search 6's `SearchSession`.
 
@@ -1705,7 +1705,7 @@ See <<massindexer>>.
 [[searching-fulltextquery]]
 ==== `FullTextQuery` => DSL
 
-===== [[_basics]] Basics
+===== Basics
 
 Search APIs have changed significantly, in order to implement several improvements, in particular:
 
@@ -2334,7 +2334,7 @@ you will just need to rely on the link:{hibernateSearchDocUrl}#search-dsl-sort-e
 [[projections]]
 ==== Projections
 
-===== [[_basics]] Basics
+===== Basics
 
 Projections gain a full-blown DSL in Hibernate Search 6, allowing more complex projections,
 as explained in link:{hibernateSearchDocUrl}#search-dsl-sort[the dedicated section of the documentation].
@@ -2802,7 +2802,7 @@ or drop a comment link:{hibernateSearchJiraUrl}/HSEARCH-3313[here].
 
 === [[_searchfactory]] `SearchFactory`
 
-==== [[_basics]] Basics
+==== Basics
 
 The equivalent to Hibernate Search 5's `SearchFactory` is Hibernate Search 6's `SearchMapping`,
 but some operations are more conveniently accessible directly from `SearchSession`.
@@ -2951,7 +2951,7 @@ for an equivalent solution in Hibernate Search 6.
 [[massindexer]]
 === `MassIndexer`
 
-==== [[_basics]] Basics
+==== Basics
 
 The `MassIndexer` mostly stays the same in Hibernate Search 6, but it moved to a different package:
 `org.hibernate.search.mapper.orm.massindexing.MassIndexer`.
