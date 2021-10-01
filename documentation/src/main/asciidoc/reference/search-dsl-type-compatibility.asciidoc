@@ -174,6 +174,7 @@ or they are both `LocalDate` with the same date format, etc.
 
 The following sections describe all the possible incompatibilities, and how to solve them.
 
+[[search-dsl-multiple-fields-incompatible-codec]]
 === [[_incompatible_codec]] Incompatible codec
 
 In a search query targeting multiple indexes,
@@ -199,6 +200,7 @@ to the two fields in a single query:
 you will have to create one predicate per field
 and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
 
+[[search-dsl-multiple-fields-incompatible-dsl-converter]]
 === [[_incompatible_dsl_converters]] Incompatible DSL converters
 
 Incompatible DSL converters are only a problem when you need to pass an argument to the DSL in certain methods:
@@ -214,6 +216,7 @@ you can still use these methods, but you will need to disable the DSL converter
 as explained in <<search-dsl-argument-type>>:
 you will just pass the "index" value to the DSL (using the same example, a `String`).
 
+[[search-dsl-multiple-fields-incompatible-projection-converter]]
 === [[_incompatible_projection_converters]] Incompatible projection converters
 
 If, in a search query targeting multiple indexes,
@@ -224,6 +227,7 @@ you can still project on this field, but you will need to disable the projection
 as explained in <<search-dsl-projected-value-type>>:
 the projection will return the "index", unconverted value (using the same example, a `String`).
 
+[[search-dsl-multiple-fields-incompatible-analyzer]]
 === [[_incompatible_analyzer]] Incompatible analyzer
 
 Incompatible analyzers are only a problem with full-text predicates:

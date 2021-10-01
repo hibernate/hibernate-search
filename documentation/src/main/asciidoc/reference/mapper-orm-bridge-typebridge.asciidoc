@@ -1,6 +1,7 @@
 [[mapper-orm-bridge-typebridge]]
 = [[_classbridge]] Type bridge
 
+[[mapper-orm-bridge-typebridge-basics]]
 == Basics
 
 A type bridge is a pluggable component that implements
@@ -105,6 +106,7 @@ There are two ways to pass parameters to type bridges:
 * One is (mostly) limited to string parameters, but is trivial to implement.
 * The other can allow any type of parameters, but requires you to declare your own annotations.
 
+[[mapper-orm-bridge-typebridge-parameters-string]]
 === Simple, string parameters
 
 You can pass string parameters to the `@TypeBinderRef` annotation and then use them later in the binder:
@@ -133,6 +135,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 setting the `sortField` parameter.
 ====
 
+[[mapper-orm-bridge-typebridge-parameters-custom-annotation]]
 === Parameters with custom annotations
 
 You can pass parameters of any type to the bridge by defining
@@ -184,6 +187,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 setting the `sortField` parameter.
 ====
 
+[[mapper-orm-bridge-typebridge-access-orm]]
 == Accessing the ORM session from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session.
@@ -198,6 +202,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 <2> Retrieve the `Session` from the extended context.
 ====
 
+[[mapper-orm-bridge-typebridge-injecting-beans]]
 == Injecting beans into the binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
@@ -230,6 +235,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 ----
 ====
 
+[[mapper-orm-bridge-typebridge-incubating]]
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]

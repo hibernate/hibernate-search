@@ -85,6 +85,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 NOTE: The entity does not get loaded as part of the projection.
 If you want the actual entity instance, use the <<search-dsl-projection-entity,`entity` projection>>
 
+[[search-dsl-projection-id]]
 == [[_id_return_identifiers_of_matched_entities]] `id`: return identifiers of matched entities
 
 The `identifier` projection returns the identifier of the matched entity.
@@ -134,6 +135,7 @@ The total hit count, however, will not take this omission into account.
 
 The `field` projection returns the value of a given field for the matched document.
 
+[[search-dsl-projection-field-prerequisites]]
 === Prerequisites
 
 In order for the `field` projection to be available on a given field,
@@ -181,6 +183,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+[[search-dsl-projection-field-skipping-conversion]]
 === Skipping conversion
 
 By default, the values returned by the `field` projection have the same type as
@@ -236,6 +239,7 @@ into what's wrong with displaying the score as a percentage, specifically.
 The `distance` projection returns the distance between a given point
 and the geo-point value of a given field for the matched document.
 
+[[search-dsl-projection-distance-prerequisites]]
 === Prerequisites
 
 In order for the `distance` projection to be available on a given field,

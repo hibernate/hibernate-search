@@ -1,6 +1,7 @@
 [[mapper-orm-bridge-routingbridge]]
 = [[mapper-orm-bridge-routingkeybridge]] Routing bridge
 
+[[mapper-orm-bridge-routingbridge-basics]]
 == Basics
 
 A routing bridge is a pluggable component that defines, at runtime,

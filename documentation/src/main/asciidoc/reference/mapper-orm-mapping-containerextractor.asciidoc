@@ -1,6 +1,7 @@
 [[mapper-orm-containerextractor]]
 = Mapping container types with container extractors
 
+[[mapper-orm-containerextractor-basics]]
 == Basics
 
 Most built-in annotations applied to properties will work transparently when applied to container types:
@@ -18,6 +19,7 @@ as well as `@IndexedEmbedded` in particular.
 What happens behind the scenes is that Hibernate Search will inspect the property type
 and attempt to apply "container extractors", picking the first that works.
 
+[[mapper-orm-containerextractor-explicit]]
 == [[_explicit_container_extraction]] Explicit container extraction
 
 In some cases, you will want to pick the container extractors to use explicitly.
@@ -55,6 +57,7 @@ so the corresponding property must <<mapper-orm-reindexing-reindexonupdate,have 
 See https://hibernate.atlassian.net/browse/HSEARCH-3688[HSEARCH-3688] for more information.
 ====
 
+[[mapper-orm-containerextractor-disabling]]
 == [[_disabling_container_extraction]] Disabling container extraction
 
 In some rare cases, container extraction is not wanted,

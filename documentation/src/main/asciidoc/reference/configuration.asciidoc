@@ -1,6 +1,7 @@
 [[configuration]]
 = [[search-configuration]] Configuration
 
+[[configuration-sources]]
 == [[_configuration_sources]] Configuration sources
 
 When using Hibernate Search within Hibernate ORM,

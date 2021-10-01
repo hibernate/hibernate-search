@@ -61,6 +61,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-match-all-other]]
 === Other options
 
 * The score of a `matchAll` predicate is constant and equal to 1 by default,
@@ -103,6 +104,7 @@ This should generally be what you want,
 but if you ever need to bypass conversion and pass an unconverted argument (of type `String`)
 to `matching(...)`/`matchingAny(...)`, see <<search-dsl-argument-type>>.
 
+[[search-dsl-predicate-id-other]]
 === Other options
 
 * The score of an `id` predicate is constant and equal to 1 by default,
@@ -252,6 +254,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-match-other]]
 === Other options
 
 * The score of a `match` predicate is variable for text fields by default,
@@ -356,6 +359,7 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-range-other]]
 === Other options
 
 * The score of a `range` predicate is constant and equal to 1 by default,
@@ -408,6 +412,7 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-phrase-other]]
 === Other options
 
 * The score of a `phrase` predicate is variable by default,
@@ -471,6 +476,7 @@ Because of this, it is preferable to use the `exists` predicate
 on object fields that are known to have at least one inner field that is never null: an identifier, a name, ...
 ====
 
+[[search-dsl-predicate-exists-other]]
 === Other options
 
 * The score of an `exists` predicate is constant and equal to 1 by default,
@@ -528,6 +534,7 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-wildcard-other]]
 === Other options
 
 * The score of a `wildcard` predicate is constant and equal to 1 by default,
@@ -548,6 +555,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-regexp-analysis]]
 === [[_regexp_predicates_and_analysis]] Regexp predicates and analysis
 
 NOTE: For an introduction to analysis and how to configure it,
@@ -604,6 +612,7 @@ For example, for a field whose normalizer replaces the characters `*` and `?` wi
 the regexp `Robots?` will be normalized to `Robots_` and will probably never match anything.
 ====
 
+[[search-dsl-predicate-regexp-multiple-fields]]
 === Targeting multiple fields
 
 Optionally, the predicate can target multiple fields.
@@ -611,6 +620,7 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-regexp-other]]
 === Other options
 
 * The score of a `regexp` predicate is constant and equal to 1 by default,
@@ -684,6 +694,7 @@ but only when using the Elasticsearch backend.
 When using the Lucene backend, only the term `cat` could match `cat`.
 ====
 
+[[search-dsl-predicate-terms-argument-type]]
 === [[_expected_type_of_arguments]] Expected type of arguments
 
 By default, the `terms` predicate expects arguments to the `matchingAny(...)` or `matchingAll(...)` methods
@@ -698,6 +709,7 @@ but if you ever need to bypass conversion and pass an unconverted argument
 (of type `String` in the example above)
 to `.matchingAny(...)` or `.matchingAll(...)`, see <<search-dsl-argument-type>>.
 
+[[search-dsl-predicate-terms-multiple-fields]]
 === Targeting multiple fields
 
 Optionally, the predicate can target multiple fields.
@@ -705,6 +717,7 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-terms-other]]
 === Other options
 
 * The score of a `terms` predicate is constant and equal to 1 by default,
@@ -917,6 +930,7 @@ In this case, we only add clauses if the relevant parameter was filled in by the
 <5> The hits will match the clauses added by the lambda expression.
 ====
 
+[[search-dsl-predicate-boolean-other]]
 === Other options
 
 * The score of a `bool` predicate is variable by default,
@@ -1054,6 +1068,7 @@ IMPORTANT: If targeted fields have different analyzers, an exception will be thr
 You can avoid this by <<search-dsl-predicate-common-overriding-analysis,picking an analyzer explicitly>>,
 but make sure you know what you're doing.
 
+[[search-dsl-predicate-simpleQueryString-other]]
 === Other options
 
 * The score of a `simpleQueryString` predicate is variable by default,
@@ -1090,6 +1105,7 @@ and *another* of which has a last name matching `asimov`,
 will *not* match.
 ====
 
+[[search-dsl-predicate-nested-implicit]]
 === [[_implicit_nesting]] Implicit nesting
 
 Hibernate Search automatically wraps a nested predicates around other predicates when necessary.
@@ -1097,7 +1113,7 @@ However, this is done for each single predicate,
 so implicit nesting will not give the same behavior as explicit nesting grouping multiple inner predicates.
 See below for an example.
 
-[[search-dsl-predicate-nested-implicit]]
+[[search-dsl-predicate-nested-implicit-example]]
 .Use the implicit nested form
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -1195,6 +1211,7 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-spatial-within-other]]
 === Other options
 
 * The score of a `within` predicate is constant and equal to 1 by default,
