@@ -4,6 +4,7 @@
 [[limitations-parallel-embedded-update]]
 == In rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
 
+[[limitations-parallel-embedded-update-description]]
 === Description
 
 If two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
@@ -34,6 +35,7 @@ will lead to an out of date index:
 
 This chain of events ends with the index containing a version of A where C is updated, but B is not.
 
+[[limitations-parallel-embedded-update-solution]]
 === Workaround
 
 The following solutions can help circumvent this limitation:
@@ -43,6 +45,7 @@ This is only possible in very specific setups.
 2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
+[[limitations-parallel-embedded-update-roadmap]]
 === Roadmap
 
 This problem cannot be solved using
@@ -79,6 +82,7 @@ However, we intend to provide a basic solution relying on the database exclusive
 [[limitations-indexing-plan-serialization]]
 == Automatic indexing is not compatible with `Session` serialization
 
+[[limitations-indexing-plan-serialization-description]]
 === Description
 
 When <<mapper-orm-indexing-automatic,automatic indexing>> is enabled,
@@ -96,10 +100,12 @@ and Hibernate Search will likely "forget" to reindex some entities.
 This is fine in most applications, since they do not rely on serializing the session,
 but it might be a problem with some JEE applications relying on Bean Passivation.
 
+[[limitations-indexing-plan-serialization-solution]]
 === Workaround
 
 Avoid serializing an ORM `EntityManager`/`Session` after changing entities.
 
+[[limitations-indexing-plan-serialization-roadmap]]
 === Roadmap
 
 There are no plans to address this limitation.

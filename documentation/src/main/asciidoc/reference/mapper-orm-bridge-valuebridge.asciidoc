@@ -1,6 +1,7 @@
 [[mapper-orm-bridge-valuebridge]]
 = [[_stringbridge]] Value bridge
 
+[[mapper-orm-bridge-valuebridge-basics]]
 == Basics
 
 A value bridge is a pluggable component that implements
@@ -90,6 +91,7 @@ A custom value bridge can do more:
 
 See the next sections for more information.
 
+[[mapper-orm-bridge-valuebridge-type-resolution]]
 == Type resolution
 
 By default, the value bridge's property type and index field type are determined automatically,
@@ -186,6 +188,7 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 <4> Set `indexNullAs` to a valid value.
 ====
 
+[[mapper-orm-bridge-valuebridge-iscompatiblewith]]
 == Compatibility across indexes with `isCompatibleWith()`
 
 A value bridges is involved in indexing,
@@ -345,6 +348,7 @@ the annotation can be transparently applied to containers.
 Here, the bridge will be applied successively to each value in the map.
 ====
 
+[[mapper-orm-bridge-valuebridge-access-orm]]
 == Accessing the ORM session or session factory from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.

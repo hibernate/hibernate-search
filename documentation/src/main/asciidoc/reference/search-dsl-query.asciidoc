@@ -538,6 +538,7 @@ Currently, the two approaches are incompatible:
 trying to set both `failAfter` and `truncateAfter` will result in unspecified behavior.
 ====
 
+[[search-dsl-query-timeout-failafter]]
 === [[_raise_an_exception_on_time_limit]] `failAfter()`: Aborting the query after a given amount of time
 
 By calling `failAfter(...)` when building the query,

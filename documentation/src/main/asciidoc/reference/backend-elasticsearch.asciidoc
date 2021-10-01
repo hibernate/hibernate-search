@@ -28,6 +28,7 @@ The following table details those differences.
 |`indexNullAs` on `geo_point` fields |Not available 2+|Available
 |===============
 
+[[backend-elasticsearch-upgrading]]
 === [[_upgrading_elasticsearch]] Upgrading Elasticsearch
 
 When upgrading your Elasticsearch cluster, some
@@ -57,6 +58,7 @@ You can find a full reference of available properties in the Hibernate Search ja
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
 
+[[backend-elasticsearch-configuration-elasticsearch-cluster]]
 == [[elasticsearch-integration-server-configuration]] Configuration of the Elasticsearch cluster
 
 Most of the time, Hibernate Search does not require any specific configuration
@@ -248,6 +250,7 @@ http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[secre
 Expects a string value.
 This property has no default and must be provided when the credentials type is set to `static`.
 
+[[backend-elasticsearch-configuration-connection-tuning]]
 === [[_connection_tuning]] Connection tuning
 
 Timeouts::
@@ -448,6 +451,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/la
 ----
 ====
 
+[[backend-elasticsearch-indexlayout-metamodel]]
 === [[_retrieving_the_read_and_write_index_names]] Retrieving the read and write index names
 
 Index or alias names used to read and write can be retrieved from the <<mapper-orm-mapping-inspect,metamodel>>.

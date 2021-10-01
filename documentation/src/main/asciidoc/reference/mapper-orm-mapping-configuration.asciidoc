@@ -1,12 +1,14 @@
 [[mapper-orm-mapping-configuration]]
 = Configuration
 
+[[mapper-orm-mapping-configuration-enabling-disabling]]
 == [[search-configuration-event]] Enabling/disabling Hibernate Search
 
 The Hibernate Search integration into Hibernate ORM is enabled by default as soon as it is present in the classpath.
 If for some reason you need to disable it,
 set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
 
+[[mapper-orm-mapping-configuration-mapping]]
 == [[_configuring_the_mapping]] Configuring the mapping
 
 By default, Hibernate Search will automatically process mapping annotations for entity types,
@@ -18,6 +20,7 @@ If you want to ignore these annotations, set `hibernate.search.mapping.process_a
 
 To configure the mapping programmatically, see <<mapper-orm-programmatic-mapping>>.
 
+[[mapper-orm-mapping-configuration-other]]
 == Other configuration properties
 
 Other configuration properties are mentioned in the relevant parts of this documentation.

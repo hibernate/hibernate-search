@@ -59,6 +59,7 @@ others because of more fundamental changes
 [[gettingstarted-framework]]
 == Framework support
 
+[[gettingstarted-framework-quarkus]]
 === [[_quarkus]] Quarkus
 
 link:{quarkusUrl}[Quarkus] has an official extension for Hibernate Search with Elasticsearch.
@@ -66,11 +67,13 @@ We recommend you follow Quarkus's https://quarkus.io/guides/hibernate-search-ela
 it is a great hands-on introduction to Hibernate Search,
 _and_ it covers the specifics of Quarkus (different dependencies, different configuration properties, ...).
 
+[[gettingstarted-framework-spring-boot]]
 === [[_spring_boot]] Spring Boot
 
 Hibernate Search can easily be integrated into a link:{springBootUrl}[Spring Boot] application.
 Just read about Spring Boot's specifics below, then follow the getting started guide.
 
+[[gettingstarted-framework-spring-boot-configuration-properties]]
 ==== [[_configuration_properties]] Configuration properties
 
 `application.properties`/`application.yaml` are Spring Boot configuration files,
@@ -88,6 +91,7 @@ For example:
 spring.jpa.properties.hibernate.search.backend.hosts = elasticsearch.mycompany.com
 ----
 
+[[gettingstarted-framework-spring-boot-dependency-versions]]
 ==== [[_dependency_versions]] Dependency versions
 
 Spring Boot automatically sets the version of dependencies without your knowledge.
@@ -116,6 +120,7 @@ there will probably be a mistmatch,
 and generally overriding Spring Boot's version to match Hibernate Search's version will work fine.
 ====
 
+[[gettingstarted-framework-spring-boot-application-hanging]]
 ==== [[_application_hanging_on_startup]] Application hanging on startup
 
 Spring Boot 2.3.x and above is affected by a bug that causes the application to hang on startup
@@ -136,6 +141,7 @@ so that Hibernate Search doesn't even try to use Spring to retrieve the componen
 and thus avoids the deadlock in Spring.
 See <<configuration-bean-reference-parsing,this section>> for more information.
 
+[[gettingstarted-framework-other]]
 === Other
 
 If your framework of choice is not mentioned in the previous sections, don't worry:
@@ -333,6 +339,7 @@ some initialization may be required:
 * The indexes and their schema need to be created.
 * Data already present in the database (if any) needs to be indexed.
 
+[[getting-started-initialization-schema-management]]
 === [[_schema_management]] Schema management
 
 Before indexing can take place, indexes and their schema need to be created,
@@ -353,6 +360,7 @@ This will require some special handling, though it can easily be solved by dropp
 See <<mapper-orm-mapping-changes>> for more information.
 ====
 
+[[getting-started-initialization-indexing]]
 === [[_initial_indexing]] Initial indexing
 
 As we'll see later, Hibernate Search takes care of triggering indexing
@@ -607,6 +615,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 ====
 
+[[getting-started-whats-next]]
 == [[_whats_next]] What's next
 
 The above paragraphs gave you an overview of Hibernate Search.

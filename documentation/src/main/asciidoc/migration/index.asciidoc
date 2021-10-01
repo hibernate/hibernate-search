@@ -9,6 +9,7 @@
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
+[[introduction]]
 == [[_introduction]] Introduction
 
 The aim of this guide is to assist you migrating
@@ -84,6 +85,7 @@ so that Hibernate Search will automatically pick the right predicate/sort depend
 [[migration-helper]]
 == Migration helper
 
+[[migration-helper-purpose]]
 === [[_purpose]] Purpose
 
 Hibernate Search 6 includes a temporary additional "migration helper" module
@@ -115,6 +117,7 @@ All APIs defined in the migration helper are deprecated and will be removed in t
 of Hibernate Search.
 ====
 
+[[migration-helper-howto]]
 === [[_how_to_use_the_migration_helper]] How to use the migration helper
 
 To use the migration helper, add the following dependency to your project:
@@ -171,6 +174,7 @@ You should move to the Hibernate Search 6 metamodel APIs, as explained in <<meta
 [[configuration]]
 == Configuration changes
 
+[[configuration-basics]]
 === Basics
 
 Most configuration properties changed in Hibernate Search 6.
@@ -187,6 +191,7 @@ see the link:{hibernateSearchDocUrl}#configuration[main "configuration" section 
 For a complete list of Hibernate Search 5 properties and their equivalent in Hibernate Search 6,
 refer to the section below.
 
+[[configuration-contants]]
 === [[_constants_for_property_keys]] Constants for property keys
 
 In Hibernate Search 5, constants for configuration property keys used to be provided through
@@ -203,6 +208,7 @@ In Hibernate Search 6, constants are provided through classes whose name ends wi
 * `org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings`
 * `org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings`
 
+[[configuration-property-reference]]
 === [[_configuration_property_reference]] Configuration property reference
 
 Below is a list of Hibernate Search 5 properties in alphabetical order,
@@ -675,6 +681,7 @@ Instead, rely on link:{hibernateSearchDocUrl}#search-dsl-predicate-common-boost[
 [[facet]]
 ==== `@Facet`, `@Facets`
 
+[[facet-basics]]
 ===== Basics
 
 Facets are now called aggregations, which are a generalization of the concept of faceting.
@@ -722,6 +729,7 @@ Just make sure to use the correct field name when searching:
 but `category_aggregation` when creating link:{hibernateSearchDocUrl}#search-dsl-aggregation-terms[aggregations].
 ====
 
+[[facet-encoding]]
 ===== [[_facet_encoding]] `@Facet.encoding`
 
 The facet encoding options no longer exists:
@@ -995,6 +1003,7 @@ See <<full-text-filter>>.
 [[indexed]]
 ==== `@Indexed`
 
+[[indexed-basics]]
 ===== Basics
 
 `@Indexed` is still available in Hibernate Search 6, but moved to a different package:
@@ -1006,10 +1015,12 @@ However, in Hibernate Search 6:
 * <<indexed-is-inherited,`@Indexed` is inherited>>.
 * <<index-exclusive,each indexed type has its own index>>.
 
+[[indexed-index]]
 ===== [[_indexed_index]] `@Indexed.index`
 
 `@Indexed.index` stays the same in Hibernate Search 6.
 
+[[indexed-interceptor]]
 ===== [[_indexed_interceptor]] `@Indexed.interceptor`
 
 Entity indexing interceptors have no direct equivalent in Hibernate Search 6,
@@ -1020,11 +1031,13 @@ See <<entity-indexing-interceptors>>.
 [[indexedembeded]]
 ==== `@IndexedEmbedded`
 
+[[indexedembeded-basics]]
 ===== Basics
 
 `@IndexedEmbedded` is still available in Hibernate Search 6, but moved to a different package:
 `org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded`.
 
+[[indexedembeded-depth]]
 ===== [[_indexedembedded_depth]] `@IndexedEmbedded.depth`
 
 `@IndexedEmbedded.depth` was renamed to `includeDepth` in Hibernate Search 6:
@@ -1050,6 +1063,7 @@ See <<entity-indexing-interceptors>>.
 ----
 |====
 
+[[indexedembeded-includePaths]]
 ===== [[_indexedembedded_includepaths]] `@IndexedEmbedded.includePaths`
 
 `@IndexedEmbedded.includePaths` stays the same in Hibernate Search 6.
@@ -1059,6 +1073,7 @@ so you can no longer use `@IndexedEmbedded(includePaths = "id")` (for example)
 to embed another entity's ID, unless you explicitly add a `@GenericField` annotation on the id property.
 See <<document-id-is-not-a-field>> for more information.
 
+[[indexedembeded-prefix]]
 ===== [[_indexedembedded_prefix]] `@IndexedEmbedded.prefix`
 
 `@IndexedEmbedded.prefix` is still available in Hibernate Search 6, but is deprecated for removal in the next major version.
@@ -1093,6 +1108,7 @@ which doesn't prepend a prefix to the embedded fields, but instead creates an ob
 ----
 |====
 
+[[indexedembeded-targetElement]]
 ===== [[_indexedembedded_targetelement]] `@IndexedEmbedded.targetElement`
 
 `@IndexedEmbedded.targetElement` was renamed to `targetType` in Hibernate Search 6:
@@ -1110,6 +1126,7 @@ which doesn't prepend a prefix to the embedded fields, but instead creates an ob
 ----
 |====
 
+[[indexedembeded-indexNullAs]]
 ===== [[_indexedembedded_indexnullas]] `@IndexedEmbedded.indexNullAs`
 
 `@IndexedEmbedded.indexNullAs` has no equivalent in Hibernate Search 6.
@@ -1117,6 +1134,7 @@ which doesn't prepend a prefix to the embedded fields, but instead creates an ob
 To search for documents where an object field is present (or absent),
 use the link:{hibernateSearchDocUrl}#search-dsl-predicate-exists[`exists` predicate].
 
+[[indexedembeded-includeEmbeddedObjectId]]
 ===== [[_indexedembedded_includeembeddedobjectid]] `@IndexedEmbedded.includeEmbeddedObjectId`
 
 `@IndexedEmbedded.includeEmbeddedObjectId` stays the same in Hibernate Search 6.
@@ -1126,6 +1144,7 @@ used to be indexed as string values by default in Hibernate Search 5,
 but are indexed as numeric values by default in Hibernate Search 6.
 See <<more-numeric-by-default>>.
 
+[[indexedembeded-containerextraction]]
 ===== [[_using_indexedembedded_to_request_container_extraction]] Using `@IndexedEmbedded` to request container extraction
 
 A little-known and undocumented feature of `@IndexedEmbedded` was to combine it with `@Field`
@@ -1206,6 +1225,7 @@ Instead, implement an analysis configurer:
 see link:{hibernateSearchDocUrl}#backend-lucene-analysis-analyzers[here for Lucene],
 or link:{hibernateSearchDocUrl}#backend-elasticsearch-analysis-analyzers[here for Elasticsearch].
 
+[[numericfield]]
 ==== [[_numericfield_numericfields]] `@NumericField`, `@NumericFields`
 
 `@NumericField` no longer exists in Hibernate Search 6.
@@ -1214,6 +1234,7 @@ Numeric types are indexed as numeric values by default, so this annotation can s
 
 See also <<more-numeric-by-default>>.
 
+[[providedid]]
 ==== [[_providedid]] `@ProvidedId`
 
 `@ProvidedId` was deprecated in Hibernate Search 5.
@@ -1274,6 +1295,7 @@ but `title_sort` when creating link:{hibernateSearchDocUrl}#search-dsl-sort-fiel
 [[spatial]]
 ==== `@Spatial`, `@Spatials`
 
+[[spatial-basics]]
 ===== Basics
 
 `@Spatial` has no direct equivalent in Hibernate Search 6.
@@ -1591,6 +1613,7 @@ for more information.
 [[fulltextsession]]
 === `FullTextEntityManager`/`FullTextSession`
 
+[[fulltextsession-basics]]
 ==== Basics
 
 The equivalent to Hibernate Search 5's `FullTextEntityManager`/`FullTextSession` is Hibernate Search 6's `SearchSession`.
@@ -1705,6 +1728,7 @@ See <<massindexer>>.
 [[searching-fulltextquery]]
 ==== `FullTextQuery` => DSL
 
+[[searching-fulltextquery-basics]]
 ===== Basics
 
 Search APIs have changed significantly, in order to implement several improvements, in particular:
@@ -2334,6 +2358,7 @@ you will just need to rely on the link:{hibernateSearchDocUrl}#search-dsl-sort-e
 [[projections]]
 ==== Projections
 
+[[projections-basics]]
 ===== Basics
 
 Projections gain a full-blown DSL in Hibernate Search 6, allowing more complex projections,
@@ -2499,6 +2524,7 @@ NOTE: One difference with Hibernate Search 5 is that Hibernate Search 6 aggregat
 no longer allow drill-down (`.selectFacets(...)`).
 See <<searching-facets-selectfacets>>.
 
+[[searching-facet-discrete-faceting]]
 ===== [[_discrete_faceting]] Discrete faceting
 
 Let's consider the query below:
@@ -2553,6 +2579,7 @@ Map<Genre, Long> countByGenre = result.aggregation( countByGenreKey );
 
 See link:{hibernateSearchDocUrl}#search-dsl-aggregation-terms[this section of the documentation] for more information.
 
+[[searching-facet-range-faceting]]
 ===== [[_range_faceting]] Range faceting
 
 Let's consider the query below:
@@ -2800,8 +2827,10 @@ If your application absolutely requires it,
 link:https://hibernate.org/community[contact us] so we can discuss how to best address your needs,
 or drop a comment link:{hibernateSearchJiraUrl}/HSEARCH-3313[here].
 
+[[searchfactory]]
 === [[_searchfactory]] `SearchFactory`
 
+[[searchfactory-basics]]
 ==== Basics
 
 The equivalent to Hibernate Search 5's `SearchFactory` is Hibernate Search 6's `SearchMapping`,
@@ -2951,6 +2980,7 @@ for an equivalent solution in Hibernate Search 6.
 [[massindexer]]
 === `MassIndexer`
 
+[[massindexer-basics]]
 ==== Basics
 
 The `MassIndexer` mostly stays the same in Hibernate Search 6, but it moved to a different package:
@@ -3050,6 +3080,7 @@ We will be glad to help, so feel free to link:https://hibernate.org/community[co
 [[behavior]]
 == Behavior changes
 
+[[behavior-default-bridge-java-util-class]]
 === [[_no_default_bridge_for_java_util_class]] No default bridge for `java.util.Class`
 
 There is no longer a builtin, default bridge for `java.util.Class`.
