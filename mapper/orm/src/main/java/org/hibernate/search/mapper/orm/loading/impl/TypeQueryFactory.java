@@ -12,7 +12,7 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
@@ -23,9 +23,9 @@ public interface TypeQueryFactory<E, I> {
 	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
 			String uniquePropertyName) {
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		EntityTypeDescriptor<?> typeDescriptorOrNull = metamodel.entity( entityPersister.getEntityName() );
-		if ( typeDescriptorOrNull != null ) {
-			return CriteriaTypeQueryFactory.create( typeDescriptorOrNull, uniquePropertyName );
+		EntityDomainType<?> typeOrNull = metamodel.entity( entityPersister.getEntityName() );
+		if ( typeOrNull != null ) {
+			return CriteriaTypeQueryFactory.create( typeOrNull, uniquePropertyName );
 		}
 		else {
 			// Most likely this is a dynamic-map entity; they don't have a representation in the JPA metamodel
