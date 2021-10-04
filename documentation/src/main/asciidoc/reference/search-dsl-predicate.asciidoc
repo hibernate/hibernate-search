@@ -1108,7 +1108,7 @@ will *not* match.
 [[search-dsl-predicate-nested-implicit]]
 === [[_implicit_nesting]] Implicit nesting
 
-Hibernate Search automatically wraps a nested predicates around other predicates when necessary.
+Hibernate Search automatically wraps a nested predicate around other predicates when necessary.
 However, this is done for each single predicate,
 so implicit nesting will not give the same behavior as explicit nesting grouping multiple inner predicates.
 See below for an example.
