@@ -22,7 +22,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.Property;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -78,12 +78,12 @@ public final class HibernateOrmUtils {
 		 * where A and C are entity types and B is a mapped superclass.
 		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
 		 */
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMetamodel();
 		String rootEntityName = entityType.getRootEntityName();
-		return metamodel.entityPersister( rootEntityName );
+		return metamodel.getEntityDescriptor( rootEntityName );
 	}
 
-	public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
+	public static EntityPersister toMostSpecificCommonEntitySuperType(MappingMetamodel metamodel,
 			EntityPersister type1, EntityPersister type2) {
 		/*
 		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
@@ -97,7 +97,7 @@ public final class HibernateOrmUtils {
 			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
 			superTypeCandidate = superSuperTypeEntityName == null
 					? null
-					: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
+					: metamodel.getEntityDescriptor( superSuperTypeEntityName ).getEntityPersister();
 		}
 		if ( superTypeCandidate == null ) {
 			throw new AssertionFailure(
@@ -118,10 +118,10 @@ public final class HibernateOrmUtils {
 			return true;
 		}
 
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMetamodel();
 		int concreteSubTypesCount = 0;
 		for ( String subClassEntityName : subClassEntityNames ) {
-			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
+			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
 				++concreteSubTypesCount;
 			}
 		}
