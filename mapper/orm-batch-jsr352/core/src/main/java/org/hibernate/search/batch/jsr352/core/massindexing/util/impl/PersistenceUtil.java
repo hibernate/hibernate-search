@@ -19,7 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.StatelessSessionBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
 import org.hibernate.search.util.common.impl.StringHelper;
@@ -96,15 +96,15 @@ public final class PersistenceUtil {
 	public static List<EntityTypeDescriptor> createDescriptors(EntityManagerFactory entityManagerFactory, Set<Class<?>> types) {
 		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
 		List<EntityTypeDescriptor> result = new ArrayList<>( types.size() );
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMetamodel();
 		for ( Class<?> type : types ) {
 			result.add( createDescriptor( metamodel, type ) );
 		}
 		return result;
 	}
 
-	private static <T> EntityTypeDescriptor createDescriptor(MetamodelImplementor metamodel, Class<T> type) {
-		EntityPersister entityPersister = metamodel.entityPersister( type );
+	private static <T> EntityTypeDescriptor createDescriptor(MappingMetamodel metamodel, Class<T> type) {
+		EntityPersister entityPersister = metamodel.findEntityDescriptor( type );
 		IdOrder idOrder = createIdOrder( entityPersister );
 		return new EntityTypeDescriptor( type, idOrder );
 	}
