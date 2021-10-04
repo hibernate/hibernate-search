@@ -7,7 +7,7 @@ The Hibernate Search integration into Hibernate ORM is enabled by default as soo
 If for some reason you need to disable it,
 set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
 
-== Configuring the mapping
+== [[_configuring_the_mapping]] Configuring the mapping
 
 By default, Hibernate Search will automatically process mapping annotations for entity types,
 as well as nested types in those entity types, for instance embedded types.
@@ -18,7 +18,7 @@ If you want to ignore these annotations, set `hibernate.search.mapping.process_a
 
 To configure the mapping programmatically, see <<mapper-orm-programmatic-mapping>>.
 
-== Other configuration properties
+== [[_other_configuration_properties]] Other configuration properties
 
 Other configuration properties are mentioned in the relevant parts of this documentation.
 You can find a full reference of available properties in the Hibernate Search javadoc:

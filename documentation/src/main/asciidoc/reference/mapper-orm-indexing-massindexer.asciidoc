@@ -1,7 +1,7 @@
 [[mapper-orm-indexing-massindexer]]
 = [[search-batchindex-massindexer]] Reindexing large volumes of data with the `MassIndexer`
 
-== Basics
+== [[_basics]] Basics
 
 There are cases where automatic indexing is not enough,
 because a pre-existing database has to be indexed:
@@ -275,7 +275,7 @@ Implementations of `MassIndexingFailureHandler` must be thread-safe.
 [[mapper-orm-indexing-massindexer-tuning]]
 == Tuning the `MassIndexer` for best performance
 
-=== Basics
+=== [[_basics]] Basics
 
 The `MassIndexer` was designed to finish the re-indexing task as quickly as possible,
 but there is no one-size-fits-all solution,

@@ -9,7 +9,7 @@
 :docinfo: shared,private
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
-== Introduction
+== [[_introduction]] Introduction
 
 The aim of this guide is to assist you migrating
 an existing application using any version `{hibernateSearchPreviousStableVersionShort}.x` of Hibernate Search
