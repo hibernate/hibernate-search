@@ -7,6 +7,7 @@
 package org.hibernate.search.batch.jsr352.core.context.jpa.impl;
 
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -17,7 +18,8 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 public class ActiveSessionFactoryRegistryUpdater implements Integrator {
 
 	@Override
-	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+	public void integrate(Metadata metadata, BootstrapContext bootstrapContext,
+			SessionFactoryImplementor sessionFactory) {
 		ActiveSessionFactoryRegistry.getInstance().register( sessionFactory );
 	}
 

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.hibernate.AssertionFailure;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -149,7 +149,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 
 	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
 			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
-		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
+		MappingMetamodel metamodel = session.getSessionFactory().getMetamodel();
 		EntityPersister result = null;
 		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
 			EntityPersister type = targetTypeContext.entityPersister();

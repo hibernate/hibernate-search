@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
-import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.Integrator;
 
@@ -30,19 +29,16 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
-	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry) {
+	public void integrate(Metadata metadata, BootstrapContext bootstrapContext,
+			SessionFactoryImplementor sessionFactory) {
 		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
-				HibernateOrmUtils.getServiceOrEmpty( serviceRegistry, HibernateSearchPreIntegrationService.class );
+				HibernateOrmUtils.getServiceOrEmpty( bootstrapContext.getServiceRegistry(), HibernateSearchPreIntegrationService.class );
 
 		if ( !preIntegrationServiceOptional.isPresent() ) {
 			// Hibernate Search is disabled
 			return;
 		}
 
-		// TODO When we'll move to Hibernate ORM 6, use the bootstrapContext parameter passed to the integrate() method
-		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
-				.getMetadataBuildingContext().getBootstrapContext();
 		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl.BuilderImpl( metadata, bootstrapContext )
 				.build();
 		// Orchestrate bootstrap and shutdown
