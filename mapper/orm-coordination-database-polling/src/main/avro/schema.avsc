@@ -46,13 +46,10 @@
          },
          {
             "name":"dirtyPaths",
-            "type":[
-               {
-                  "type":"array",
-                  "items":"string"
-               },
-               "null"
-            ]
+            "type": {
+               "type":"array",
+               "items":"string"
+            }
          },
          {
             "name":"updateBecauseOfContained",

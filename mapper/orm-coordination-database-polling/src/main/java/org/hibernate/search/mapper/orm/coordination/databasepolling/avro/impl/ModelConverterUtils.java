@@ -37,11 +37,7 @@ public final class ModelConverterUtils {
 	}
 
 	private static Set<String> convertDirtyPaths(List<CharSequence> dirtyPaths) {
-		if ( dirtyPaths == null ) {
-			return null;
-		}
-
-		return dirtyPaths.stream().map( charSequence -> charSequence.toString() ).collect( Collectors.toSet() );
+		return dirtyPaths.stream().map( CharSequence::toString ).collect( Collectors.toSet() );
 	}
 
 	static DocumentRoutesDescriptor convert(DocumentRoutesDescriptorDto routes) {
