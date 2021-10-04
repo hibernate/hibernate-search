@@ -43,11 +43,7 @@ public final class DtoConverterUtils {
 	}
 
 	private static List<CharSequence> convertDirtyPaths(Set<String> dirtyPaths) {
-		if ( dirtyPaths == null ) {
-			return null;
-		}
-
-		return new ArrayList( dirtyPaths );
+		return new ArrayList<>( dirtyPaths );
 	}
 
 	private static DocumentRoutesDescriptorDto convert(DocumentRoutesDescriptor routes) {

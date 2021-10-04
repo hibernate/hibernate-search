@@ -50,7 +50,7 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 				// See org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexingPlanIndexOrEventQueueDelegate.addOrUpdate
 				dirtiness.updatedBecauseOfContained() || dirtiness.forceSelfDirty(),
 				dirtiness.forceContainingDirty(),
-				dirtiness.dirtyPaths() == null ? null : typeContext.pathOrdinals().toPathSelection( dirtiness.dirtyPaths() )
+				typeContext.pathOrdinals().toPathSelection( dirtiness.dirtyPaths() )
 		);
 	}
 

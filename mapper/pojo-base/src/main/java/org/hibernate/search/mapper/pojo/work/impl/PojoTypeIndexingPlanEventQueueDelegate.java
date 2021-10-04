@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -54,7 +55,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
 		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
 				true, true,
-				null,
+				Collections.emptySet(),
 				false
 		);
 		sendingPlan.append( typeContext.entityName(), identifier,
@@ -68,7 +69,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 			boolean updatedBecauseOfContained, boolean updateBecauseOfDirty) {
 		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
 				forceSelfDirty, forceContainingDirty,
-				dirtyPaths == null ? null : typeContext.pathOrdinals().toPathSet( dirtyPaths ),
+				typeContext.pathOrdinals().toPathSet( dirtyPaths ),
 				updatedBecauseOfContained
 		);
 		sendingPlan.append(
@@ -85,7 +86,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 		// In that case, we expect the entity itself to be reindexed.
 		DirtinessDescriptor dirtiness = new DirtinessDescriptor(
 				true, false,
-				null,
+				Collections.emptySet(),
 				false
 		);
 		sendingPlan.append( typeContext.entityName(), identifier,
