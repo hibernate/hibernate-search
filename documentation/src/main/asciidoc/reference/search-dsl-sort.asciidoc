@@ -73,7 +73,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-=== Options
+=== [[_options]] Options
 
 * You can sort by ascending score by <<search-dsl-sort-common-order,changing the sort order>>.
 However, this means the least relevant hits will appear first,
@@ -129,7 +129,7 @@ Remember you can <<mapper-orm-directfieldmapping-basics,map a single property to
 so you can have a full-text field for predicates along with a keyword field for sorts,
 all for the same property.
 
-=== Syntax
+=== [[_syntax]] Syntax
 
 .Sorting by field values
 ====
@@ -139,7 +139,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-=== Options
+=== [[_options]] Options
 
 * The sort order is ascending by default,
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
@@ -164,7 +164,7 @@ but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.fil
 In order for the `distance` sort to be available on a given field,
 you need to mark the field as <<mapper-orm-directfieldmapping-sortable,sortable>> in the mapping.
 
-=== Syntax
+=== [[_syntax]] Syntax
 
 .Sorting by distance to a point
 ====
@@ -174,7 +174,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-=== Options
+=== [[_options]] Options
 
 * The sort order is ascending by default,
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.

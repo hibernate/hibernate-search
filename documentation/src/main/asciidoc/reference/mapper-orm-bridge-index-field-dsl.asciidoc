@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-index-field-dsl]]
 = Declaring and writing to index fields
 
-== Basics
+== [[_basics]] Basics
 
 When implementing a <<mapper-orm-bridge-propertybridge,`PropertyBinder`>>
 or <<mapper-orm-bridge-typebridge,`TypeBinder`>>,
@@ -44,7 +44,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 <1> In the bridge, use the reference obtained above to add a value to the field for the current document.
 ====
 
-== Type objects
+== [[_type_objects]] Type objects
 
 The lambda syntax to declare the type of each field is convenient,
 but sometimes gets in the way,
@@ -66,7 +66,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 <4> Pass the type directly instead of using a lambda when defining the field.
 ====
 
-== Multi-valued fields
+== [[_multi_valued_fields]] Multi-valued fields
 
 Fields are considered single-valued by default:
 if you attempt to add multiple values to a single-valued field during indexing,
@@ -140,7 +140,7 @@ and get a reference to that object.
 Note we're calling `addValue` on the object we just added, not on `target`.
 ====
 
-== Object structure
+== [[_object_structure]] Object structure
 
 By default, object fields are flattened,
 meaning that the tree structure is not preserved.

@@ -1,7 +1,7 @@
 [[configuration]]
 = [[search-configuration]] Configuration
 
-== Configuration sources
+== [[_configuration_sources]] Configuration sources
 
 When using Hibernate Search within Hibernate ORM,
 configuration properties are retrieved from Hibernate ORM.

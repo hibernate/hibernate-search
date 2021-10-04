@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-identifierbridge]]
 = Identifier bridge
 
-== Basics
+== [[_basics]] Basics
 
 An identifier bridge is a pluggable component that implements
 the mapping of an entity property to a document identifier.
@@ -44,7 +44,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identi
 It is also possible to reference the bridge by its name, in the case of a CDI/Spring bean.
 ====
 
-== Type resolution
+== [[_type_resolution]] Type resolution
 
 By default, the identifier bridge's property type is determined automatically,
 using reflection to extract the generic type argument of the `IdentifierBridge` interface.
@@ -64,7 +64,7 @@ If you need more complex types,
 you can bypass the automatic resolution and specify types explicitly
 using an <<mapper-orm-bridge-identifierbridge-identifierbinder,`IdentifierBinder`>>.
 
-== Compatibility across indexes with `isCompatibleWith()`
+== [[_compatibility_across_indexes_with_iscompatiblewith]] Compatibility across indexes with `isCompatibleWith()`
 
 An identifier bridge is involved in indexing,
 but also in the search DSLs,
@@ -129,7 +129,7 @@ Note the use of `identifierBinder` instead of `identifierBridge`.
 It is also possible to reference the binder by its name, in the case of a CDI/Spring bean.
 ====
 
-== Passing parameters
+== [[_passing_parameters]] Passing parameters
 
 The identifier bridges are usually applied with the built-in <<mapper-orm-identifiermapping-basics,`@DocumentId` annotation>>.
 which does not accept any parameter other than the identifier bridge/binder.
@@ -184,7 +184,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identi
 setting the parameter.
 ====
 
-== Accessing the ORM session or session factory from the bridge
+== [[_accessing_the_orm_session_or_session_factory_from_the_bridge]] Accessing the ORM session or session factory from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.
 
@@ -201,7 +201,7 @@ The `Session` is not available here.
 <4> Retrieve the `Session` from the extended context.
 ====
 
-== Injecting beans into the bridge or binder
+== [[_injecting_beans_into_the_bridge_or_binder]] Injecting beans into the bridge or binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injection of beans into both the `IdentifierBridge` and the `IdentifierBinder`.
@@ -239,7 +239,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identi
 ----
 ====
 
-== Incubating features
+== [[_incubating_features]] Incubating features
 
 include::components/incubating-warning.asciidoc[]
 

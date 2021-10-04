@@ -110,7 +110,7 @@ The total hit count, however, will not take this omission into account.
 
 The `field` projection returns the value of a given field for the matched document.
 
-=== Prerequisites
+=== [[_prerequisites]] Prerequisites
 
 In order for the `field` projection to be available on a given field,
 you need to mark the field as <<mapper-orm-directfieldmapping-projectable,projectable>> in the mapping.
@@ -157,7 +157,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-=== Skipping conversion
+=== [[_skipping_conversion]] Skipping conversion
 
 By default, the values returned by the `field` projection have the same type as
 the entity property corresponding to the target field.
@@ -212,7 +212,7 @@ into what's wrong with displaying the score as a percentage, specifically.
 The `distance` projection returns the distance between a given point
 and the geo-point value of a given field for the matched document.
 
-=== Prerequisites
+=== [[_prerequisites]] Prerequisites
 
 In order for the `distance` projection to be available on a given field,
 you need to mark the field as <<mapper-orm-directfieldmapping-projectable,projectable>> in the mapping.

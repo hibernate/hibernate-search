@@ -95,7 +95,7 @@ If that entity is explicitly assigned the index name `orders`
 it will instead be indexed in directory
 `/path/to/my/root/orders/`.
 
-==== Filesystem access strategy
+==== [[_filesystem_access_strategy]] Filesystem access strategy
 
 The default strategy for accessing the filesystem is determined automatically
 based on the operating system and architecture.
@@ -134,7 +134,7 @@ Implementations offering better performance
 also bring issues of their own.
 ====
 
-==== Other configuration options
+==== [[_other_configuration_options]] Other configuration options
 
 The `local-filesystem` directory also allows configuring a
 <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
@@ -313,7 +313,7 @@ each shard is assigned a positive integer, from `0` to the chosen number of shar
 * For the <<backend-lucene-configuration-sharding-strategy-explicit,`explicit`>> strategy,
 each shard is assigned one of the identifiers defined with the `shard_identifiers` property.
 
-== Index format compatibility
+== [[_index_format_compatibility]] Index format compatibility
 
 While Hibernate Search strives to offer a backwards compatible API,
 making it easy to port your application to newer versions,

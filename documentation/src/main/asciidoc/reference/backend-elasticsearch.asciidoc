@@ -28,7 +28,7 @@ The following table details those differences.
 |`indexNullAs` on `geo_point` fields |Not available 2+|Available
 |===============
 
-=== Upgrading Elasticsearch
+=== [[_upgrading_elasticsearch]] Upgrading Elasticsearch
 
 When upgrading your Elasticsearch cluster, some
 https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html[administrative tasks]
@@ -248,7 +248,7 @@ http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[secre
 Expects a string value.
 This property has no default and must be provided when the credentials type is set to `static`.
 
-=== Connection tuning
+=== [[_connection_tuning]] Connection tuning
 
 Timeouts::
 +
@@ -448,7 +448,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/la
 ----
 ====
 
-=== Retrieving the read and write index names
+=== [[_retrieving_the_read_and_write_index_names]] Retrieving the read and write index names
 
 Index or alias names used to read and write can be retrieved from the <<mapper-orm-mapping-inspect,metamodel>>.
 

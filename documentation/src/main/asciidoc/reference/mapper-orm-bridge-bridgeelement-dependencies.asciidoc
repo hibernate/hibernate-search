@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-bridgedelement-dependencies]]
 = Declaring dependencies to bridged elements
 
-== Basics
+== [[_basics]] Basics
 
 In order to keep the index synchronized,
 Hibernate Search needs to be aware of all the entity properties that are used to produce indexed documents,
