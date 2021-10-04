@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.metamodel.MappingMetamodel;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
@@ -44,8 +44,8 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
 		this.typeIdentifier = builder.typeIdentifier;
 		this.jpaEntityName = builder.jpaEntityName;
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
+		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+		this.entityPersister = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
 		this.ascendingSuperTypes = builder.ascendingSuperTypes;
 		if ( builder.documentIdSourcePropertyName != null ) {
 			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
