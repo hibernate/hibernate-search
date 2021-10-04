@@ -14,7 +14,20 @@ you can set Hibernate Search properties:
 * In `persistence.xml`, if you bootstrap Hibernate ORM with the JPA APIs
 * In JVM system properties (`-DmyProperty=myValue` passed to the `java` command)
 * In the configuration file of your framework,
-for example `application.yaml`/`application.properties` for Spring Boot.
+for example `application.yaml`/`application.properties`.
+
+[NOTE]
+====
+When setting properties through the configuration file of your framework,
+the keys of configuration properties will likely be different from
+the keys mentioned in this documentation.
+
+For example `hibernate.search.backend.hosts` will become
+`quarkus.hibernate-search-orm.elasticsearch.hosts` in Quarkus
+or `spring.jpa.properties.hibernate.search.backend.hosts` in Spring.
+
+See <<gettingstarted-framework>> for more information.
+====
 
 [[configuration-structure]]
 == Structure of configuration properties
