@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-index-field-type-dsl]]
 = Defining index field types
 
-== Basics
+== [[_basics]] Basics
 
 A specificity of Lucene-based search engines (including Elasticsearch) is that field types
 are much more complex than just a data type ("string", "integer", ...).
@@ -59,7 +59,7 @@ passed to the `field` method of
 the <<mapper-orm-bridge-index-field-dsl,field declaration DSL>>.
 ====
 
-== Available data types
+== [[_available_data_types]] Available data types
 
 All available data types have a dedicated `as*()` method in `IndexFieldTypeFactory`.
 For details, see the javadoc of `IndexFieldTypeFactory`,
@@ -68,7 +68,7 @@ or the backend-specific documentation:
 * <<backend-lucene-field-types-available,available data types in the Lucene backend>>
 * <<backend-elasticsearch-field-types-available,available data types in the Elasticsearch backend>>
 
-== Available type options
+== [[_available_type_options]] Available type options
 
 Most of the options available in the index field type DSL are identical
 to the options exposed by `@*Field` annotations.
@@ -76,7 +76,7 @@ See <<mapper-orm-directfieldmapping-annotation-attributes>> for details about th
 
 Other options are explained in the following sections.
 
-== DSL converter
+== [[_dsl_converter]] DSL converter
 
 [NOTE]
 ====
@@ -125,7 +125,7 @@ accept `ISBN` values by default.
 NOTE: DSL converters can be disabled in the various DSLs where necessary.
 See <<search-dsl-argument-type>>.
 
-== Projection converter
+== [[_projection_converter]] Projection converter
 
 [NOTE]
 ====
@@ -173,7 +173,7 @@ fields using our type are projected to an `ISBN` by default.
 NOTE: Projection converters can be disabled in the projection DSL where necessary.
 See <<search-dsl-projected-value-type>>.
 
-== Backend-specific types
+== [[_backend_specific_types]] Backend-specific types
 
 Backends define extensions to this DSL
 to define backend-specific types.

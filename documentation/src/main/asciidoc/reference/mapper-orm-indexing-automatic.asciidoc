@@ -92,7 +92,7 @@ regardless of the entity properties that changed.
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
-=== Basics
+=== [[_basics]] Basics
 
 include::components/writing-reading-intro-note.asciidoc[]
 
@@ -170,7 +170,7 @@ forwards the failure to the <<configuration-background-failure-handling,failure 
 which by default will simply log the failure.
 ====
 
-=== Per-session override
+=== [[_per_session_override]] Per-session override
 
 While the configuration property mentioned above defines a default,
 it is possible to override this default on a particular session
@@ -197,7 +197,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 even though the query was executed _just after_ the transaction commit.
 ====
 
-=== Custom strategy
+=== [[_custom_strategy]] Custom strategy
 
 You can also implement custom strategy.
 The custom strategy can then be set just like the built-in strategies:

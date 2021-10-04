@@ -4,7 +4,7 @@
 [[limitations-parallel-embedded-update]]
 == Without coordination, in rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
 
-=== Description
+=== [[_description]] Description
 
 With the default settings (<<coordination-none,no coordination>>),
 if two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
@@ -35,7 +35,7 @@ will lead to an out of date index:
 
 This chain of events ends with the index containing a version of A where C is updated, but B is not.
 
-=== Solutions and workarounds
+=== [[_solutions_and_workarounds]] Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
@@ -47,7 +47,7 @@ This is only possible in very specific setups.
 3. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
-=== Roadmap
+=== [[_roadmap]] Roadmap
 
 This limitation is caused directly by the lack of coordination between threads or application nodes,
 so it can only be addressed completely by configuring <<coordination,coordination>>.
@@ -57,7 +57,7 @@ There are no other solutions currently on the roadmap.
 [[limitations-backend-indexing-error]]
 == Without coordination, backend errors during automatic indexing may lead to out-of sync indexes
 
-=== Description
+=== [[_description]] Description
 
 With the default settings (<<coordination-none,no coordination>>),
 <<mapper-orm-indexing-automatic,automatic indexing>>
@@ -73,7 +73,7 @@ Errors occurring in user code (getters, custom <<mapper-orm-bridge,bridges>>, ..
 will safely cancel the whole database transaction without indexing anything,
 ensuring that indexes are still in sync with the database.
 
-=== Solutions and workarounds
+=== [[_solutions_and_workarounds]] Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
@@ -83,7 +83,7 @@ See in particular <<architecture-examples>>.
 2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
-=== Roadmap
+=== [[_roadmap]] Roadmap
 
 This limitation is caused directly by the lack of persistence of entity change events,
 so it can only be addressed completely by persisting those events,
@@ -97,7 +97,7 @@ and they are not currently on the roadmap.
 [[limitations-changes-in-session]]
 == Automatic indexing only considers changes applied directly to entity instances in Hibernate ORM sessions
 
-=== Description
+=== [[_description]] Description
 
 Due to <<mapper-orm-indexing-automatic-concepts-changes-in-session,how Hibernate Search uses internal events of Hibernate ORM>>
 in order to detect changes,
@@ -107,13 +107,13 @@ be it SQL or JPQL/HQL queries.
 This is because queries are executed on the database side,
 without Hibernate ORM or Search having any knowledge of which entities are actually created, deleted or updated.
 
-=== Solutions and workarounds
+=== [[_solutions_and_workarounds]] Solutions and workarounds
 
 One workaround is to reindex explicitly after you run JPQL/SQL queries,
 either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
 
-=== Roadmap
+=== [[_roadmap]] Roadmap
 
 One solution to actually detect these changes would be to source entity change events
 directly from the database, using for example Debezium.
@@ -124,7 +124,7 @@ but is long-term goal.
 [[limitations-changes-asymmetric-association-updates]]
 == [[mapper-orm-indexing-automatic-concepts-session-consistency]] Automatic indexing ignores asymmetric association updates
 
-=== Description
+=== [[_description]] Description
 
 Hibernate ORM is able to handle asymmetric updates of associations,
 where only the owning side of association is updated and the other side is ignored.
@@ -154,7 +154,7 @@ In the end, the only way for Hibernate Search to know that `A` needs to be reind
 is to also set `A.b` to `null`, which will cause Hibernate Search to detect that `A.b` changed,
 and thus that `A` changed too.
 
-=== Solutions and workarounds
+=== [[_solutions_and_workarounds]] Solutions and workarounds
 
 The following solutions can help circumvent this limitation:
 
@@ -165,7 +165,7 @@ reindex affected entities explicitly after the association update,
 either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
 
-=== Roadmap
+=== [[_roadmap]] Roadmap
 
 Hibernate Search may handle asymmetric association updates in the future,
 by keeping tracks of entities added to / removed from an association.
@@ -181,7 +181,7 @@ but is long-term goal.
 [[limitations-indexing-plan-serialization]]
 == Automatic indexing is not compatible with `Session` serialization
 
-=== Description
+=== [[_description]] Description
 
 When <<mapper-orm-indexing-automatic,automatic indexing>> is enabled,
 Hibernate Search collects entity change events
@@ -198,11 +198,11 @@ and Hibernate Search will likely "forget" to reindex some entities.
 This is fine in most applications, since they do not rely on serializing the session,
 but it might be a problem with some JEE applications relying on Bean Passivation.
 
-=== Solutions and workarounds
+=== [[_solutions_and_workarounds]] Solutions and workarounds
 
 Avoid serializing an ORM `EntityManager`/`Session` after changing entities.
 
-=== Roadmap
+=== [[_roadmap]] Roadmap
 
 There are no plans to address this limitation.
 We do not intend to support `Session` serialization when Hibernate Search is enabled.

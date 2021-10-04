@@ -174,7 +174,7 @@ or they are both `LocalDate` with the same date format, etc.
 
 The following sections describe all the possible incompatibilities, and how to solve them.
 
-=== Incompatible codec
+=== [[_incompatible_codec]] Incompatible codec
 
 In a search query targeting multiple indexes,
 if a field is encoded differently in each index,
@@ -199,7 +199,7 @@ to the two fields in a single query:
 you will have to create one predicate per field
 and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
 
-=== Incompatible DSL converters
+=== [[_incompatible_dsl_converters]] Incompatible DSL converters
 
 Incompatible DSL converters are only a problem when you need to pass an argument to the DSL in certain methods:
 `matching(Object)`/`between(Object)`/`atLeast(Object)`/`greaterThan(Object)`/etc. in the predicate DSL,
@@ -214,7 +214,7 @@ you can still use these methods, but you will need to disable the DSL converter
 as explained in <<search-dsl-argument-type>>:
 you will just pass the "index" value to the DSL (using the same example, a `String`).
 
-=== Incompatible projection converters
+=== [[_incompatible_projection_converters]] Incompatible projection converters
 
 If, in a search query targeting multiple indexes,
 a field is encoded in a compatible way in every indexes (for example both as `String`),
@@ -224,7 +224,7 @@ you can still project on this field, but you will need to disable the projection
 as explained in <<search-dsl-projected-value-type>>:
 the projection will return the "index", unconverted value (using the same example, a `String`).
 
-=== Incompatible analyzer
+=== [[_incompatible_analyzer]] Incompatible analyzer
 
 Incompatible analyzers are only a problem with full-text predicates:
 match predicate on a text field, phrase predicate, simple query string predicate, ...

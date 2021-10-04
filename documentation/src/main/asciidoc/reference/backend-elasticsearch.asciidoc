@@ -31,7 +31,7 @@ The following table details those differences.
 |`indexNullAs` on `geo_point` fields |Not available 3+|Available
 |===============
 
-=== Upgrading Elasticsearch
+=== [[_upgrading_elasticsearch]] Upgrading Elasticsearch
 
 When upgrading your Elasticsearch cluster, some
 https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html[administrative tasks]
@@ -251,7 +251,7 @@ http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[secre
 Expects a string value.
 This property has no default and must be provided when the credentials type is set to `static`.
 
-=== Connection tuning
+=== [[_connection_tuning]] Connection tuning
 
 Timeouts::
 +
@@ -291,7 +291,7 @@ The default for this property is `10`.
 +
 These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
 
-=== Custom HTTP client configurations
+=== [[_custom_http_client_configurations]] Custom HTTP client configurations
 
 It is possible to configure the HTTP client directly
 using an instance of `org.apache.http.impl.nio.client.HttpAsyncClientBuilder`.
@@ -966,7 +966,7 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
 ====
 
-== Custom index settings
+== [[_custom_index_settings]] Custom index settings
 
 Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
 Should you need to set some link:{elasticsearchDocUrl}/index-modules.html#index-modules-settings[custom index settings], it is possible to provide these settings to Hibernate Search: it will include them when creating an index and take them into account when validating an index.
@@ -995,7 +995,7 @@ When analysis is configured both through an <<backend-elasticsearch-analysis-ana
 Custom index setting must be provided in the simplified form, the one without the attribute the `index` attribute.
 ====
 
-=== Max result window size
+=== [[_max_result_window_size]] Max result window size
 
 If the setting `index.max_result_window` is used,
 Hibernate Search will use this value to limit the returning hits size

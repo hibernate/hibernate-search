@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-valuebridge]]
 = [[_stringbridge]] Value bridge
 
-== Basics
+== [[_basics]] Basics
 
 A value bridge is a pluggable component that implements
 the mapping of a property to an index field.
@@ -90,7 +90,7 @@ A custom value bridge can do more:
 
 See the next sections for more information.
 
-== Type resolution
+== [[_type_resolution]] Type resolution
 
 By default, the value bridge's property type and index field type are determined automatically,
 using reflection to extract the generic type arguments of the `ValueBridge` interface:
@@ -186,7 +186,7 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 <4> Set `indexNullAs` to a valid value.
 ====
 
-== Compatibility across indexes with `isCompatibleWith()`
+== [[_compatibility_across_indexes_with_iscompatiblewith]] Compatibility across indexes with `isCompatibleWith()`
 
 A value bridges is involved in indexing,
 but also in the various search DSLs,
@@ -288,7 +288,7 @@ There are two ways to pass parameters to value bridges:
 * One is (mostly) limited to string parameters, but is trivial to implement.
 * The other can allow any type of parameters, but requires you to declare your own annotations.
 
-=== Simple, string parameters
+=== [[_simple_string_parameters]] Simple, string parameters
 
 You can define string parameters to the `@ValueBinderRef` annotation and then use them later in the binder:
 
@@ -323,7 +323,7 @@ the annotation can be transparently applied to containers.
 Here, the bridge will be applied successively to each value in the map.
 ====
 
-=== Parameters with custom annotations
+=== [[_parameters_with_custom_annotations]] Parameters with custom annotations
 
 You can pass parameters of any type to the bridge by defining
 a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
@@ -387,7 +387,7 @@ the annotation can be transparently applied to containers.
 Here, the bridge will be applied successively to each value in the map.
 ====
 
-== Accessing the ORM session or session factory from the bridge
+== [[_accessing_the_orm_session_or_session_factory_from_the_bridge]] Accessing the ORM session or session factory from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.
 

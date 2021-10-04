@@ -1,4 +1,4 @@
-= Concepts
+= [[_concepts]] Concepts
 
 [[concepts-full-text]]
 == Full-text search

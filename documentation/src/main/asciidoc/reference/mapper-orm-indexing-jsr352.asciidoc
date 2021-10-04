@@ -50,7 +50,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <4> Start the job.
 ====
 
-== Job Parameters
+== [[_job_parameters]] Job Parameters
 
 The following table contains all the job parameters you can use to customize the mass-indexing job.
 
@@ -197,7 +197,7 @@ Because of those limitations, we suggest you use this approach only for indexing
 and only if you know that no entities matching the query will be created during indexing.
 ====
 
-== Parallel indexing
+== [[_parallel_indexing]] Parallel indexing
 
 For better performance, indexing is performed in parallel using multiple threads. The set of
 entities to index is split into multiple partitions. Each thread processes one partition at a time.
@@ -212,7 +212,7 @@ is highly dependent on your overall architecture, database design and even data 
 You should experiment with these settings to find out what's best in your particular case.
 ====
 
-=== Threads
+=== [[_threads]] Threads
 
 The maximum number of threads used by the job execution is defined through method `maxThreads()`.
 Within the N threads given, there’s 1 thread reserved for the core, so only N - 1 threads are
@@ -236,7 +236,7 @@ use as many as possible up to the requested maximum (JSR352 v1.0 Final Release, 
 batch jobs share the same thread pool, so it's not always a good idea to execute jobs concurrently.
 ====
 
-=== Rows per partition
+=== [[_rows_per_partition]] Rows per partition
 
 Each partition consists of a fixed number of elements to index. You may tune exactly how many elements
 a partition will hold with `rowsPerPartition`.
@@ -410,7 +410,7 @@ For instance this can be achieved in Spring DI using the `@ComponentScan` annota
 3. You must register a single bean in the dependency injection context
 that will implement the `EntityManagerFactoryRegistry` interface.
 
-=== Plain Java environment (no dependency injection at all)
+=== [[_plain_java_environment_no_dependency_injection_at_all]] Plain Java environment (no dependency injection at all)
 
 The following will work only if your JSR-352 runtime does not support dependency injection at all,
 i.e. it ignores `@Inject` annotations in batch artifacts.

@@ -139,7 +139,7 @@ to build an internal representation of the index schema, which will be used for 
 for example initializing a remote Elasticsearch index
 or inferring the required type of parameters to a range query on a given field.
 
-=== Indexing
+=== [[_indexing]] Indexing
 
 The entry point for indexing is specific to each mapper,
 and so are the upper levels of each mapper implementation.
@@ -166,7 +166,7 @@ Thus the mapper should instantiate a new indexing plan whenever this context cha
 NOTE: Index-scale operations such as flush, merge-segments, etc. are unavailable from indexing plans.
 They are accessed through a separate class, `IndexWorkspace`.
 
-=== Searching
+=== [[_searching]] Searching
 
 Searching is a bit different from indexing,
 in that users are presented with APIs focused on the index rather than the mapped objects.
@@ -187,7 +187,7 @@ such as `SearchPredicateFactory` or `FieldSortBuilder`.
 Also, the SPIs implemented by backends allow mappers to inject a "loading context" (see `SearchQueryBuilderFactory.selectEntity`)
 that will essentially transform document references into the entity that was initially indexed.
 
-== POJO mapper
+== [[_pojo_mapper]] POJO mapper
 
 What we call the POJO mapper is in fact an abstract basis for implementing mappers from Java objects to a full-text index.
 This module implements most of the necessary logic, and defines SPIs to implement the bits that are specific to each mapper.
@@ -288,7 +288,7 @@ NOTE: Indexing processors are logged at the debug level during bootstrap.
 Enable this level of logging for the Hibernate Search classes if you want to understand the indexing processor
 tree that was generated for a given mapping.
 
-==== Bootstrap
+==== [[_bootstrap]] Bootstrap
 
 For each indexed type, the building process consists in creating a root `PojoIndexingProcessorOriginalTypeNode` builder,
 and applying metadata contributors to this builder (see <<overall-bootstrap>>),
@@ -387,7 +387,7 @@ NOTE: Reindexing resolvers are logged at the debug level during bootstrap.
 Enable this level of logging for the Hibernate Search classes if you want to understand the reindexing resolver
 tree that was generated for a given mapping.
 
-==== Bootstrap
+==== [[_bootstrap]] Bootstrap
 
 One reindexing resolver tree is built during bootstrap for each indexed or contained type.
 The entry point to building these resolvers may not be obvious: it is the indexing resolver building process.
@@ -540,6 +540,6 @@ and in the `resolveEntitiesToReindex` method of `PojoImplicitReindexingResolverD
 (to see what happens at runtime).
 
 
-== JSON mapper
+== [[_json_mapper]] JSON mapper
 
 The JSON mapper does not currently exist, but there are plans to work on it.
