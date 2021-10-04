@@ -1,7 +1,7 @@
 [[mapper-orm-geopoint]]
 = [[spatial]] Mapping geo-point types
 
-== Basics
+== [[_basics]] Basics
 
 Hibernate Search provides a variety of spatial features
 such as <<search-dsl-predicate-spatial-within,a distance predicate>>

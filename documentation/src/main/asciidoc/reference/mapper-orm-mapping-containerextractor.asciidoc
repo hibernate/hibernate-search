@@ -1,7 +1,7 @@
 [[mapper-orm-containerextractor]]
 = Mapping container types with container extractors
 
-== Basics
+== [[_basics]] Basics
 
 Most built-in annotations applied to properties will work transparently when applied to container types:
 
@@ -18,7 +18,7 @@ as well as `@IndexedEmbedded` in particular.
 What happens behind the scenes is that Hibernate Search will inspect the property type
 and attempt to apply "container extractors", picking the first that works.
 
-== Explicit container extraction
+== [[_explicit_container_extraction]] Explicit container extraction
 
 In some cases, you will want to pick the container extractors to use explicitly.
 This is the case when a map's keys must be indexed, instead of the values.
@@ -55,7 +55,7 @@ so the corresponding property must <<mapper-orm-reindexing-reindexonupdate,have 
 See https://hibernate.atlassian.net/browse/HSEARCH-3688[HSEARCH-3688] for more information.
 ====
 
-== Disabling container extraction
+== [[_disabling_container_extraction]] Disabling container extraction
 
 In some rare cases, container extraction is not wanted,
 and the `@GenericField`/`@IndexedEmbedded` is meant to be applied to the `List`/`Optional`/etc. directly.

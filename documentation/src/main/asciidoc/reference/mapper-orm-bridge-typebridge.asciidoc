@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-typebridge]]
 = [[_classbridge]] Type bridge
 
-== Basics
+== [[_basics]] Basics
 
 A type bridge is a pluggable component that implements
 the mapping of a whole type to one or more index fields.
@@ -152,7 +152,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 setting the `sortField` parameter.
 ====
 
-== Accessing the ORM session from the bridge
+== [[_accessing_the_orm_session_from_the_bridge]] Accessing the ORM session from the bridge
 
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session.
 
@@ -166,7 +166,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 <2> Retrieve the `Session` from the extended context.
 ====
 
-== Injecting beans into the binder
+== [[_injecting_beans_into_the_binder]] Injecting beans into the binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
 Hibernate Search supports injecting beans into:
@@ -198,7 +198,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 ----
 ====
 
-== Incubating features
+== [[_incubating_features]] Incubating features
 
 include::components/incubating-warning.asciidoc[]
 

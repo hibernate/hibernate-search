@@ -1,11 +1,11 @@
-= Further reading
+= [[_further_reading]] Further reading
 
-== Elasticsearch
+== [[_elasticsearch]] Elasticsearch
 
 link:{elasticsearchDocUrl}[Elasticsearch's reference documentation] is an excellent starting point
 to learn more about Elasticsearch.
 
-== Lucene
+== [[_lucene]] Lucene
 
 To learn more about Lucene,
 you can get a copy to link:$$http://www.manning.com/hatcher3/$$[Lucene in Action (Second Edition)],
@@ -13,13 +13,13 @@ though it covers an older version of Lucene.
 
 Otherwise, you can always try your luck with link:{luceneJavadocUrl}[Lucene's Javadoc].
 
-== Hibernate ORM
+== [[_hibernate_orm]] Hibernate ORM
 
 If you want to deepen your knowledge of Hibernate ORM,
 start with the link:$$http://hibernate.org/orm/documentation/$$[online documentation] or get hold
 of a copy of link:$$http://www.manning.com/bauer3/$$[Java Persistence with Hibernate, Second Edition].
 
-== Other
+== [[_other]] Other
 
 If you have any further questions or feedback regarding Hibernate Search,
 reach out to the https://hibernate.org/community/[Hibernate community].

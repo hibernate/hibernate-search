@@ -1,7 +1,7 @@
 [[mapper-orm-bridge-resolver]]
 = [[_bridgeprovider_associate_a_bridge_to_a_given_return_type]] Assigning default bridges with the bridge resolver
 
-== Basics
+== [[_basics]] Basics
 
 Both the <<mapper-orm-directfieldmapping-supported-types,`@*Field` annotations>>
 and the <<mapper-orm-identifiermapping-supported-types,`@DocumentId` annotation>>
@@ -37,7 +37,7 @@ so that additional settings can be tuned.
 Here we're assigning the "isbn" normalizer every time we map an ISBN to an index field.
 ====
 
-== Assigning a single binder to multiple types
+== [[_assigning_a_single_binder_to_multiple_types]] Assigning a single binder to multiple types
 
 include::components/incubating-warning.asciidoc[]
 
