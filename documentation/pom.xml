@@ -310,6 +310,7 @@
                         <hibernateSearchPreviousStableVersionShort>${parsed-version.org.hibernate.search.previous-stable.majorVersion}.${parsed-version.org.hibernate.search.previous-stable.minorVersion}</hibernateSearchPreviousStableVersionShort>
                         <hibernateSearchJavadocUrl>${javadoc.org.hibernate.search.url}</hibernateSearchJavadocUrl>
                         <hibernateSearchDocUrl>https://docs.jboss.org/hibernate/search/${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}/reference/en-US/html_single/</hibernateSearchDocUrl>
+                        <hibernateSearch6_1DocUrl>https://docs.jboss.org/hibernate/search/6.1/reference/en-US/html_single/</hibernateSearch6_1DocUrl>
                         <hibernateSearchPreviousStableDocUrl>https://docs.jboss.org/hibernate/search/${parsed-version.org.hibernate.search.previous-stable.majorVersion}.${parsed-version.org.hibernate.search.previous-stable.minorVersion}/reference/en-US/html_single/</hibernateSearchPreviousStableDocUrl>
                         <hibernateSearchJiraUrl>https://hibernate.atlassian.net/browse</hibernateSearchJiraUrl>
                         <hibernateSearchMigrationGuidesIndexUrl>https://hibernate.org/search/documentation/migrate/</hibernateSearchMigrationGuidesIndexUrl>

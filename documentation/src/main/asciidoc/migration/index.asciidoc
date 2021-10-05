@@ -448,9 +448,17 @@ Hibernate Search 6 equivalent: `hibernate.search.background_failure_handler`.
 +
 IMPORTANT: A different interface should be implemented: see <<error-handler>>.
 `hibernate.search.filter.cache_docidresults.size`::
-No equivalent in Hibernate Search 6. See <<full-text-filter>>.
+No equivalent in Hibernate Search 6.0. See <<full-text-filter>>.
++
+If you need caching for some of your Lucene queries,
+consider upgrading directly to Hibernate Search 6.1,
+which provides configurable link:{hibernateSearch6_1DocUrl}#backend-lucene-search-caching[Low-level hit caching].
 `hibernate.search.filter.cache_strategy`::
-No equivalent in Hibernate Search 6. See <<full-text-filter>>.
+No equivalent in Hibernate Search 6.0. See <<full-text-filter>>.
++
+If you need caching for some of your Lucene queries,
+consider upgrading directly to Hibernate Search 6.1,
+which provides configurable link:{hibernateSearch6_1DocUrl}#backend-lucene-search-caching[Low-level hit caching].
 `hibernate.search.generate_statistics`::
 No equivalent in Hibernate Search 6. See <<searchfactory-getstatistics>>.
 `hibernate.search.index_uninverting_allowed`::
@@ -511,10 +519,14 @@ nor does it support the related `filesystem-master`/`filesystem-slave`/`infinisp
 If you need to scale your application to multiple nodes,
 consider switching to the link:{hibernateSearchDocUrl}#architecture-examples-elasticsearch[Elasticsearch backend].
 
-The roadmap for Hibernate Search 6.1 will focus on restoring support for clustered application
-(link:{hibernateSearchJiraUrl}/HSEARCH-3281[HSEARCH-3281])
-probably by offering out-of-session, fully-asynchronous indexing (re-loading entities in a separate background thread).
-This should improve the scalability and robustness of clustered applications relying on an Elasticsearch backend.
+To ensure robustness of distributed indexing,
+consider upgrading directly to Hibernate Search 6.1,
+which provides a feature called link:{hibernateSearch6_1DocUrl}#coordination[coordination],
+and in particular the link:{hibernateSearch6_1DocUrl}#coordination-database-polling[`database-polling` coordination strategy].
+When used together with the Elasticsearch backend,
+the `database-polling` coordination strategy enables distributed applications,
+as the JMS/JGroups backends in Hibernate Search 5 do,
+though through a different implementation relying on the database instead of JMS/JGroups queues.
 
 [[api]]
 == API changes
@@ -2690,7 +2702,7 @@ More information link:{hibernateSearchDocUrl}#configuration-background-failure-h
 [[full-text-filter]]
 === Full-text filter
 
-Hibernate Search 6 does not support named full-text filters at the moment.
+Hibernate Search 6.0 does not support named full-text filters at the moment.
 In most cases, you can replace them with static methods.
 
 For example, let's take this filter from a Hibernate Search 5 application:
@@ -2782,7 +2794,8 @@ List<Book> hits = searchSession.search( Driver.class )
 
 NOTE: If you have needs that can be addressed only with named full-text filters,
 and cannot be solved with the solution above,
-feel free to drop a comment to explain your use case on link:{hibernateSearchJiraUrl}/HSEARCH-3325[HSEARCH-3325].
+consider upgrading directly to Hibernate Search 6.1,
+which provides a similar feature called link:{hibernateSearch6_1DocUrl}#mapper-orm-bridge-named-predicate[named predicates].
 
 [[factory]]
 === `@Factory`
@@ -2959,10 +2972,11 @@ feel free to link:https://hibernate.org/community[contact us].
 [[searchfactory-getindexreaderaccessor]]
 ==== Accessing Lucene index readers: `SearchFactory.getIndexReaderAccessor`
 
-Hibernate Search 6 does not provide direct access to the index reader.
+Hibernate Search 6.0 does not provide direct access to the index reader.
 
-If you were using this feature and still need it in Hibernate Search 6,
-let us know by dropping a comment link:{hibernateSearchJiraUrl}/HSEARCH-4065[here].
+If you need direct access to an index reader,
+consider upgrading directly to Hibernate Search 6.1,
+which provides link:{hibernateSearch6_1DocUrl}#_retrieving_a_lucene_indexreader[just that feature].
 
 [[metamodel]]
 ==== Metamodel: `SearchFactory.getIndexedTypeDescriptor`, `SearchFactory.getIndexedTypes`
