@@ -326,17 +326,17 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		String filePath = schemaManagementMappingsFile.get();
 		try ( InputStream inputStream = buildContext.resourceResolver().locateResourceStream( filePath ) ) {
 			if ( inputStream == null ) {
-				throw log.customIndexMappingsFileNotFound( filePath, indexEventContext );
+				throw log.customIndexMappingFileNotFound( filePath, indexEventContext );
 			}
 			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
 				return link.getGsonProvider().getGson().fromJson( reader, RootTypeMapping.class );
 			}
 		}
 		catch (IOException e) {
-			throw log.customIndexMappingsErrorOnLoading( filePath, e, indexEventContext );
+			throw log.customIndexMappingErrorOnLoading( filePath, e, indexEventContext );
 		}
 		catch (JsonSyntaxException e) {
-			throw log.customIndexMappingsJsonSyntaxErrors( filePath, e, indexEventContext );
+			throw log.customIndexMappingJsonSyntaxErrors( filePath, e, indexEventContext );
 		}
 	}
 }
