@@ -673,6 +673,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			);
 			if ( analyzerReference != null ) {
 				typeMetadataBuilder.analyzerReference( analyzerReference );
+				if ( configContext.isHibernateSearch6DeprecationWarningsEnabled() ) {
+					log.analyzerAnnotationOnType( clazz );
+				}
 			}
 		}
 
@@ -1581,6 +1584,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						context,
 						parseContext.getIndexManagerType()
 				);
+				if ( analyzerReference != null && configContext.isHibernateSearch6DeprecationWarningsEnabled() ) {
+					log.analyzerAnnotationOnMember( member.getDeclaringClass(), member );
+				}
 			}
 		}
 
@@ -1908,6 +1914,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						);
 				if ( analyzerReference == null ) {
 					analyzerReference = typeMetadataBuilder.getAnalyzerReference();
+				}
+				else if ( configContext.isHibernateSearch6DeprecationWarningsEnabled() ) {
+					log.analyzerAnnotationOnMember( member.getDeclaringClass(), member );
 				}
 				embeddedTypeMetadataBuilder.analyzerReference( analyzerReference );
 			}
