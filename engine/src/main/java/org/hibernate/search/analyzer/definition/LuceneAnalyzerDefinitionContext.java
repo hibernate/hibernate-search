@@ -10,10 +10,6 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 
 /**
  * @author Yoann Rodiere
- *
- * @hsearch.experimental The specific API of this DSL is a prototype.
- * Please let us know what you like and what you don't like, and bear in mind
- * that this will likely change in any future version.
  */
 public interface LuceneAnalyzerDefinitionContext extends LuceneAnalysisDefinitionRegistryBuilder {
 
