@@ -67,6 +67,10 @@ public class FieldBridgeMapping {
 		return fieldMapping.boost( boost );
 	}
 
+	/**
+	 * @deprecated See {@link FieldMapping#analyzer(Class)}
+	 */
+	@Deprecated
 	public FieldMapping analyzer(Class<?> analyzerClass) {
 		return fieldMapping.analyzer( analyzerClass );
 	}
