@@ -25,6 +25,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.HibernateSearch6DeprecationHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.integration.impl.SearchIntegration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -75,6 +76,7 @@ public final class ConfigContext {
 	private final SearchMapping searchMapping;
 	private final ServiceManager serviceManager;
 	private final SearchConfiguration searchConfiguration;
+	private final boolean hibernateSearch6DeprecationWarningsEnabled;
 
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext) {
 		this( searchConfiguration, buildContext, null, null );
@@ -97,6 +99,8 @@ public final class ConfigContext {
 				indexManagerTypeConfigContexts.put( type, context );
 			}
 		}
+		this.hibernateSearch6DeprecationWarningsEnabled =
+				HibernateSearch6DeprecationHelper.isWarningEnabled( searchConfiguration.getProperties() );
 	}
 
 	public ServiceManager getServiceManager() {
@@ -281,6 +285,10 @@ public final class ConfigContext {
 
 	public boolean isJpaPresent() {
 		return jpaPresent;
+	}
+
+	public boolean isHibernateSearch6DeprecationWarningsEnabled() {
+		return hibernateSearch6DeprecationWarningsEnabled;
 	}
 
 	/**

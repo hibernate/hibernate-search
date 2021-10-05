@@ -37,6 +37,7 @@ import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.HibernateSearch6DeprecationHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.impl.ConfigContext;
@@ -687,5 +688,9 @@ public class SearchIntegratorBuilder {
 			return factoryState.isMultitenancyEnabled();
 		}
 
+		@Override
+		public boolean isHibernateSearch6DeprecationWarningsEnabled() {
+			return HibernateSearch6DeprecationHelper.isWarningEnabled( factoryState.getConfigurationProperties() );
+		}
 	}
 }
