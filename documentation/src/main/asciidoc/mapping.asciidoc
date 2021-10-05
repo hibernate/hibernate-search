@@ -1232,12 +1232,6 @@ This property can be set to the fully-qualified name of a class with a public, n
 This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider` directly
 or expose a `@Factory`-annotated method that returns such implementation.
 
-[IMPORTANT]
-====
-This feature is considered experimental.
-The builder in particular could be altered in the future.
-====
-
 [[example-programmatic-analyzer-def]]
 .Analyzer definition using a LuceneAnalysisDefinitionProvider
 ====
