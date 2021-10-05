@@ -14,7 +14,11 @@ import java.util.Set;
  * Lucene query time and object loading time.
  *
  * @author Hardy Ferentschik
+ *
+ * @deprecated Statistics will be removed in Hibernate Search 6 without replacement.
+ * See <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#searchfactory-getstatistics">this section of the migration guide</a>.
  */
+@Deprecated
 public interface Statistics {
 
 	/**
