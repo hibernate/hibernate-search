@@ -1325,12 +1325,12 @@ Normalizers solve exactly this issue: they are analyzers, but without a tokenize
 and with some runtime checks that prevent the analysis to produce multiple tokens,
 thereby ensuring your sorts will always be consistent.
 
-Hibernate Search provides normalizer equivalent for relevant analyzer annotations:
+Hibernate Search provides normalizer equivalents for relevant analyzer annotations:
 `@Normalizer`, `@NormalizerDef`, `@NormalizerDefs`.
-As with analyzer, you can use implementations directly
+As with analyzers, you can use implementations directly
 (for instance `@Normalizer(impl = MyCollactionKeyAnalyzer.class)`)
 or named normalizers (for instance `@Normalizer(definition = "myNormalizer")`
-with `@NormalizerDef(filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class))`.
+with `@NormalizerDef(name = "myNormalizer", filters = @TokenFilterDef(factory = LowerCaseFilterFactory.class))`).
 
 [IMPORTANT]
 ====
