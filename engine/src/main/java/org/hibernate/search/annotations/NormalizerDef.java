@@ -27,11 +27,14 @@ import java.lang.annotation.Documented;
  * Filters are applied in the order they are defined.
  *
  * @author Emmanuel Bernard
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 @Repeatable(NormalizerDefs.class)
+@Deprecated
 public @interface NormalizerDef {
 	/**
 	 * @return Reference name to be used on {@link org.hibernate.search.annotations.Normalizer}

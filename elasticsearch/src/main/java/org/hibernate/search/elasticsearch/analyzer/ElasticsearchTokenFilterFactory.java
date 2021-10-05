@@ -27,7 +27,10 @@ import org.hibernate.search.annotations.AnalyzerDef;
  * 		}
  * )
  * </code></pre>
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
+@Deprecated
 public abstract class ElasticsearchTokenFilterFactory extends TokenFilterFactory {
 
 	private ElasticsearchTokenFilterFactory() {

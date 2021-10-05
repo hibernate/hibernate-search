@@ -23,11 +23,16 @@ import java.lang.annotation.Documented;
  * Filters are applied in the order they are defined.
  *
  * @author Emmanuel Bernard
+ *
+ * @deprecated Support for annotation-based analyzer or normalizer definitions will be removed in Hibernate Search 6.
+ * Use a {@link org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider},
+ * or a {@code org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 @Repeatable(AnalyzerDefs.class)
+@Deprecated
 public @interface AnalyzerDef {
 	/**
 	 * @return Reference name to be used on {#org.hibernate.search.annotations.Analyzer}
