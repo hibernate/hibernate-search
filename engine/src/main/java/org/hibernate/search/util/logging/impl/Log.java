@@ -1033,4 +1033,16 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " use @Indexed(index = \"someUniqueName\") on non-root classes." )
 	void multipleTypesInSingleIndex(String indexName, IndexedTypeSet indexedTypes);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 356, value = "Type '%1$s' is annotated with @Analyzer."
+			+ " Support for @Analyzer on types is going to be removed in Hibernate Search 6."
+			+ " Assign an analyzer to each index field separately using @Field(analyzer = @Analyzer(...)) instead." )
+	void analyzerAnnotationOnType(XClass type);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 357, value = "Member '%2$s' of type '%1$s' is annotated with @Analyzer."
+			+ " Support for @Analyzer on fields or getters is going to be removed in Hibernate Search 6."
+			+ " Assign an analyzer to each index field separately using @Field(analyzer = @Analyzer(...)) instead." )
+	void analyzerAnnotationOnMember(XClass type, XMember member);
+
 }
