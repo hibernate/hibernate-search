@@ -445,12 +445,10 @@ public class Tweet {
     @GeneratedValue
     private Integer id;
 
-    @Field
-    @Analyzer(definition = "english") // Elasticsearch built-in analyzer
+    @Field(analyzer = @Analyzer(definition = "english")) // Elasticsearch built-in analyzer
     private String englishTweet;
 
-    @Field
-    @Analyzer(definition = "whitespace") // Elasticsearch built-in analyzer
+    @Field(analyzer = @Analyzer(definition = "whitespace")) // Elasticsearch built-in analyzer
     private String whitespaceTweet;
 
     @Field(name = "tweetNotAnalyzed", analyzer = Analyze.NO, store = Store.YES)
@@ -495,12 +493,10 @@ public class Tweet {
     @GeneratedValue
     private Integer id;
 
-    @Field
-    @Analyzer(impl = EnglishAnalyzer.class) // Elasticsearch built-in "english" analyzer
+    @Field(analyzer = @Analyzer(impl = EnglishAnalyzer.class)) // Elasticsearch built-in "english" analyzer
     private String englishTweet;
 
-    @Field
-    @Analyzer(impl = WhitespaceAnalyzer.class) // Elasticsearch built-in "whitespace" analyzer
+    @Field(analyzer = @Analyzer(impl = WhitespaceAnalyzer.class)) // Elasticsearch built-in "whitespace" analyzer
     private String whitespaceTweet;
 
 }
@@ -625,8 +621,7 @@ public class Tweet {
     @GeneratedValue
     private Integer id;
 
-    @Field
-    @Analyzer(definition = "tweet_analyzer")
+    @Field(analyzer = @Analyzer(definition = "tweet_analyzer"))
     private String content;
 }
 --
@@ -694,8 +689,7 @@ public class Tweet {
     @GeneratedValue
     private Integer id;
 
-    @Field
-    @Analyzer(definition = "tweet_analyzer")
+    @Field(analyzer = @Analyzer(definition = "tweet_analyzer"))
     private String content;
 }
 --

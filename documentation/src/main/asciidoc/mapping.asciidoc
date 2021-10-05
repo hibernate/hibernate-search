@@ -1093,6 +1093,13 @@ The default analyzer class used to index tokenized fields is configurable throug
 You can also define the analyzer class per entity, property and even per `@Field` (useful when
 multiple fields are indexed from a single property).
 
+[WARNING]
+====
+Support for `@Analyzer` on entity types and properties is deprecated and is going to be removed in Hibernate Search 6.
+
+Assign an analyzer to each index field separately using `@Field(analyzer = @Analyzer(...))` instead.
+====
+
 .Different ways of using @Analyzer
 ====
 [source, JAVA]
@@ -1292,8 +1299,7 @@ public class Team {
     @Field
     private String location;
 
-    @Field
-    @Analyzer(definition = "customanalyzer")
+    @Field(analyzer = @Analyzer(definition = "customanalyzer"))
     private String description;
 }
 ----
