@@ -12,7 +12,10 @@ package org.hibernate.search.stat.spi;
  * Statistics SPI for the Search. This is essentially the "statistic collector" API.
  *
  * @author Hardy Ferentschik
+ *
+ * @deprecated See {@link org.hibernate.search.stat.Statistics}
  */
+@Deprecated
 public interface StatisticsImplementor {
 	/**
 	 * Callback for number of object loaded from the db.

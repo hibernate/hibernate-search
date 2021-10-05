@@ -72,7 +72,10 @@ public interface SearchFactory {
 	 * Retrieve the statistics instance for this factory.
 	 *
 	 * @return The statistics.
+	 *
+	 * @deprecated See {@link Statistics}
 	 */
+	@Deprecated
 	Statistics getStatistics();
 
 	/**
