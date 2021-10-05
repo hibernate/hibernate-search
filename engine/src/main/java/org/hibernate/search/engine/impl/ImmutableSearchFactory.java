@@ -25,6 +25,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.HibernateSearch6DeprecationHelper;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -647,6 +648,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public boolean enlistWorkerInTransaction() {
 		return enlistWorkerInTransaction;
+	}
+
+	@Override
+	public boolean isHibernateSearch6DeprecationWarningsEnabled() {
+		return HibernateSearch6DeprecationHelper.isWarningEnabled( getConfigurationProperties() );
 	}
 
 	@Override

@@ -334,6 +334,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public boolean isHibernateSearch6DeprecationWarningsEnabled() {
+		return delegate.isHibernateSearch6DeprecationWarningsEnabled();
+	}
+
+	@Override
 	public IndexFamily getIndexFamily(IndexFamilyType indexFamilyType) {
 		return delegate.getIndexFamily( indexFamilyType );
 	}

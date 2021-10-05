@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
+import org.hibernate.search.cfg.spi.HibernateSearch6DeprecationHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -164,5 +165,10 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 	 * type is not an indexed entity.
 	 */
 	ScopedAnalyzerReference getAnalyzerReference(IndexedTypeIdentifier type);
+
+	/**
+	 * @return The value of {@link HibernateSearch6DeprecationHelper#isWarningEnabled(Properties)}.
+	 */
+	boolean isHibernateSearch6DeprecationWarningsEnabled();
 
 }
