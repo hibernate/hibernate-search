@@ -1,0 +1,26 @@
+{
+  "properties":{
+    "_entity_type":{ // <1>
+      "type":"keyword",
+      "index":false,
+      "doc_values":true
+    },
+    "name":{ // <2>
+      "type":"text",
+      "index":true,
+      "analyzer":"default",
+      "term_vector":"no",
+      "norms":true
+    },
+    "userField":{
+      "type":"keyword",
+      "index":true,
+      "norms":true,
+      "doc_values":true
+    },
+    "userObject":{
+      "dynamic":"true",
+      "type":"object"
+    }
+  }
+}
