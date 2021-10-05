@@ -18,10 +18,13 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * Define a <code>TokenFilterFactory</code> and its parameters.
  *
  * @author Emmanuel Bernard
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
+@Deprecated
 public @interface TokenFilterDef {
 
 	/**

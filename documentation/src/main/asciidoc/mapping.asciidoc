@@ -1177,9 +1177,52 @@ Prior to Hibernate Search 5 it was required to add the Apache Solr dependency to
 well; this is no longer required.
 ====
 
+[[section-programmatic-analyzer-definition]]
+===== Programmatic analyzer definition
+
+The first way to define analyzers is programmatically.
+You can of course use the <<hsearch-mapping-programmaticapi,programmatic mapping API>> to do so,
+but an easier way may be to use the `hibernate.search.lucene.analysis_definition_provider`
+configuration property.
+
+This property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
+This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider` directly
+or expose a `@Factory`-annotated method that returns such implementation.
+
+[[example-programmatic-analyzer-def]]
+.Analyzer definition using a LuceneAnalysisDefinitionProvider
+====
+[source, JAVA]
+----
+public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {
+    @Override
+    public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
+        builder
+                .analyzer( "myAnalyzer" )
+                        .tokenizer( StandardTokenizerFactory.class )
+                        .charFilter( MappingCharFilterFactory.class )
+                                .param( "mapping", "org/hibernate/search/test/analyzer/mapping-chars.properties" )
+                        .tokenFilter( ASCIIFoldingFilterFactory.class )
+                        .tokenFilter( LowerCaseFilterFactory.class )
+                        .tokenFilter( StopFilterFactory.class )
+                                .param( "mapping", "org/hibernate/search/test/analyzer/stoplist.properties" )
+                                .param( "ignoreCase", "true" );
+    }
+}
+----
+====
+
 ===== Analyzer definition through annotations
 
-The first way to define analyzers is by applying `@AnalyzerDef` annotations to your indexed classes.
+[WARNING]
+====
+Support for defining analyzers or normalizers through annotations is deprecated,
+and will be removed in Hibernate Search 6.
+
+Use <<section-programmatic-analyzer-definition,a definition provider>> instead.
+====
+
+The second way to define analyzers is by applying `@AnalyzerDef` annotations to your indexed classes.
 Which class you choose to put the annotation on does not matter: the definitions are globally scoped,
 so you will be able to reference them from any entity mapping.
 
@@ -1214,41 +1257,6 @@ The filter is also expected to ignore case.
 })
 public class Team {
     // ...
-}
-----
-====
-
-[[section-programmatic-analyzer-definition]]
-===== Programmatic analyzer definition
-
-The other way to define analyzers is programmatically.
-You can of course use the <<hsearch-mapping-programmaticapi,programmatic mapping API>> to do so,
-but an easier way may be to use the `hibernate.search.lucene.analysis_definition_provider`
-configuration property.
-
-This property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
-This class must either implement `org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider` directly
-or expose a `@Factory`-annotated method that returns such implementation.
-
-[[example-programmatic-analyzer-def]]
-.Analyzer definition using a LuceneAnalysisDefinitionProvider
-====
-[source, JAVA]
-----
-public static class CustomAnalyzerProvider implements LuceneAnalysisDefinitionProvider {
-    @Override
-    public void register(LuceneAnalyzerDefinitionRegistryBuilder builder) {
-        builder
-                .analyzer( "myAnalyzer" )
-                        .tokenizer( StandardTokenizerFactory.class )
-                        .charFilter( MappingCharFilterFactory.class )
-                                .param( "mapping", "org/hibernate/search/test/analyzer/mapping-chars.properties" )
-                        .tokenFilter( ASCIIFoldingFilterFactory.class )
-                        .tokenFilter( LowerCaseFilterFactory.class )
-                        .tokenFilter( StopFilterFactory.class )
-                                .param( "mapping", "org/hibernate/search/test/analyzer/stoplist.properties" )
-                                .param( "ignoreCase", "true" );
-    }
 }
 ----
 ====

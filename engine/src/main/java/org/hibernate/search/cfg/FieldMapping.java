@@ -182,14 +182,26 @@ public class FieldMapping {
 		return new DateBridgeMapping( mapping, entity, property, resolution );
 	}
 
+	/**
+	 * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
+	 */
+	@Deprecated
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return analyzerDef( name, "", tokenizerFactory );
 	}
 
+	/**
+	 * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
+	 */
+	@Deprecated
 	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, mapping );
 	}
 
+	/**
+	 * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
+	 */
+	@Deprecated
 	public NormalizerDefMapping normalizerDef(String name) {
 		return new NormalizerDefMapping( name, mapping );
 	}

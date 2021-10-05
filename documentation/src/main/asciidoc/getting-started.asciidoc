@@ -448,6 +448,15 @@ whereas the snowball filter finally applies language specific stemming.
 Generally, when using the Analyzer Framework you have to start with a tokenizer followed by an
 arbitrary number of filters.
 
+[WARNING]
+====
+Support for defining analyzers or normalizers through annotations is deprecated,
+and will be removed in Hibernate Search 6,
+so the following example is out of date.
+
+Use <<section-programmatic-analyzer-definition,a definition provider>> instead.
+====
+
 
 .Using `@AnalyzerDef` and the Analyzer Framework to define and use an analyzer
 ====
