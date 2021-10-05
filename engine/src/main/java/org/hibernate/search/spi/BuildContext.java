@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.spi;
 
+import java.util.Properties;
+
+import org.hibernate.search.cfg.spi.HibernateSearch6DeprecationHelper;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
@@ -71,4 +74,11 @@ public interface BuildContext {
 	 * @return the configured {@code ErrorHandler}
 	 */
 	ErrorHandler getErrorHandler();
+
+	/**
+	 * @return The value of {@link HibernateSearch6DeprecationHelper#isWarningEnabled(Properties)}.
+	 */
+	default boolean isHibernateSearch6DeprecationWarningsEnabled() {
+		return false;
+	}
 }
