@@ -23,6 +23,20 @@ import java.lang.annotation.Documented;
 @Target({})
 @Documented
 public @interface Normalizer {
+	/**
+	 * @return An {@link org.apache.lucene.analysis.Analyzer} implementation.
+	 * @deprecated Support for direct references to analyzer implementations
+	 * by class will be removed in Hibernate Search 6.
+	 * Use {@link #definition()} instead.
+	 */
+	@Deprecated
 	Class<?> impl() default void.class;
+
+	/**
+	 * @return The name of a normalizer defined using
+	 * a {@link org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider},
+	 * or a {@code org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider},
+	 * or the deprecated {@link NormalizerDef}.
+	 */
 	String definition() default "";
 }

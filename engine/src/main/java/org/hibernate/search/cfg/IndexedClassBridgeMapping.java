@@ -88,6 +88,10 @@ public class IndexedClassBridgeMapping {
 		return this;
 	}
 
+	/**
+	 * @deprecated See {@link FieldMapping#analyzer(Class)}
+	 */
+	@Deprecated
 	public IndexedClassBridgeMapping analyzer(Class<?> analyzerClass) {
 		final Map<String, Object> analyzer = new HashMap<String, Object>();
 		analyzer.put( "impl", analyzerClass );
