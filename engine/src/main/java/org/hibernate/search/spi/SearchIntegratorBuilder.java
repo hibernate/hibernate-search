@@ -467,6 +467,15 @@ public class SearchIntegratorBuilder {
 				documentBuildersContainedEntities
 		);
 
+		if ( HibernateSearch6DeprecationHelper.isWarningEnabled( searchConfiguration.getProperties() ) ) {
+			for ( IndexManager indexManager : indexesFactory.getIndexManagers() ) {
+				IndexedTypeSet indexedTypes = indexManager.getContainedTypes();
+				if ( indexedTypes.size() > 1 ) {
+					log.multipleTypesInSingleIndex( indexManager.getIndexName(), indexedTypes );
+				}
+			}
+		}
+
 		factoryState.addFilterDefinitions( configContext.initFilters() );
 		factoryState.addIntegrations( configContext.initIntegrations( indexesFactory ) );
 	}
