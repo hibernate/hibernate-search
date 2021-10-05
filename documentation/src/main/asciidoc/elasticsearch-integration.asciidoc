@@ -466,6 +466,14 @@ public class Tweet {
 You may also reference a built-in Lucene analyzer implementation using the `@Analyzer.impl` attribute:
 Hibernate Search will translate the implementation to an equivalent Elasticsearch built-in type, if possible.
 
+[WARNING]
+====
+Support for `@Analyzer.impl`/`@Normalizer.impl` is deprecated,
+and will be removed in Hibernate Search 6.
+
+Use `@Analyzer.definition` instead, as explained above.
+====
+
 [NOTE]
 ====
 Using the `@Analyzer.impl` attribute is not recommended with Elasticsearch because it will

@@ -86,6 +86,10 @@ public class ClassBridgeMapping {
 		return this;
 	}
 
+	/**
+	 * @deprecated See {@link FieldMapping#analyzer(Class)}
+	 */
+	@Deprecated
 	public ClassBridgeMapping analyzer(Class<?> analyzerClass) {
 		final Map<String, Object> analyzer = new HashMap<String, Object>();
 		analyzer.put( "impl", analyzerClass );

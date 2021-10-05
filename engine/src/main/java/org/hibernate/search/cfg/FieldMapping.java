@@ -112,6 +112,13 @@ public class FieldMapping {
 		return new FieldBridgeMapping( impl, field, this, property, entity, mapping );
 	}
 
+	/**
+	 * @return An {@link org.apache.lucene.analysis.Analyzer} implementation.
+	 * @deprecated Support for direct references to analyzer implementations
+	 * by class will be removed in Hibernate Search 6.
+	 * Use {@link #analyzer(String)} instead.
+	 */
+	@Deprecated
 	public FieldMapping analyzer(Class<?> analyzerClass) {
 		final Map<String, Object> analyzer = new HashMap<String, Object>();
 		analyzer.put( "impl", analyzerClass );
@@ -126,6 +133,13 @@ public class FieldMapping {
 		return this;
 	}
 
+	/**
+	 * @return An {@link org.apache.lucene.analysis.Analyzer} implementation.
+	 * @deprecated Support for direct references to normalizer implementations
+	 * by class will be removed in Hibernate Search 6.
+	 * Use {@link #normalizer(String)} instead.
+	 */
+	@Deprecated
 	public FieldMapping normalizer(Class<?> analyzerClass) {
 		final Map<String, Object> normalizer = new HashMap<String, Object>();
 		normalizer.put( "impl", analyzerClass );
