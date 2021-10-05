@@ -18,10 +18,13 @@ import java.lang.annotation.Target;
  * Define a <code>CharFilterFactory</code> and its parameters
  *
  * @author Gustavo Fernandes
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
+@Deprecated
 public @interface CharFilterDef {
 
 	/**
