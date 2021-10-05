@@ -13,10 +13,6 @@ package org.hibernate.search.elasticsearch.analyzer.definition;
  * the registry building is handled by Hibernate Search.
  *
  * @author Yoann Rodiere
- *
- * @hsearch.experimental The specific API of this DSL is a prototype.
- * Please let us know what you like and what you don't like, and bear in mind
- * that this will likely change in any future version.
  */
 public interface ElasticsearchAnalysisDefinitionRegistryBuilder {
 
