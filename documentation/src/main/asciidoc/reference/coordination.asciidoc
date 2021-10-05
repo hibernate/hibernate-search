@@ -289,9 +289,9 @@ Sharding can be controlled explicitly by setting the following configuration pro
 
 [source]
 ----
-hibernate.search.backend.coordination.shards.static = true
-hibernate.search.backend.coordination.shards.total_count = 4
-hibernate.search.backend.coordination.shards.assigned = 0
+hibernate.search.coordination.shards.static = true
+hibernate.search.coordination.shards.total_count = 4
+hibernate.search.coordination.shards.assigned = 0
 ----
 
 * `shards.static` defines sharding as static.
@@ -333,33 +333,33 @@ and no shard at all to application nodes #2 and #3:
 [source]
 ----
 # Node #0
-hibernate.search.backend.coordination.strategy = database-polling
-hibernate.search.backend.coordination.shards.static = true
-hibernate.search.backend.coordination.shards.total_count = 2
-hibernate.search.backend.coordination.shards.assigned = 0
+hibernate.search.coordination.strategy = database-polling
+hibernate.search.coordination.shards.static = true
+hibernate.search.coordination.shards.total_count = 2
+hibernate.search.coordination.shards.assigned = 0
 ----
 
 [source]
 ----
 # Node #1
-hibernate.search.backend.coordination.strategy = database-polling
-hibernate.search.backend.coordination.shards.static = true
-hibernate.search.backend.coordination.shards.total_count = 2
-hibernate.search.backend.coordination.shards.assigned = 1
+hibernate.search.coordination.strategy = database-polling
+hibernate.search.coordination.shards.static = true
+hibernate.search.coordination.shards.total_count = 2
+hibernate.search.coordination.shards.assigned = 1
 ----
 
 [source]
 ----
 # Node #2
-hibernate.search.backend.coordination.strategy = database-polling
-hibernate.search.backend.coordination.processors.indexing.enabled = false
+hibernate.search.coordination.strategy = database-polling
+hibernate.search.coordination.processors.indexing.enabled = false
 ----
 
 [source]
 ----
 # Node #3
-hibernate.search.backend.coordination.strategy = database-polling
-hibernate.search.backend.coordination.processors.indexing.enabled = false
+hibernate.search.coordination.strategy = database-polling
+hibernate.search.coordination.processors.indexing.enabled = false
 ----
 ====
 
@@ -386,9 +386,9 @@ These processors can be configured using the following configuration properties:
 
 [source]
 ----
-hibernate.search.backend.processors.indexing.enabled = true
-hibernate.search.backend.processors.indexing.polling_interval = 100
-hibernate.search.backend.processors.indexing.batch_size = 50
+hibernate.search.coordination.processors.indexing.enabled = true
+hibernate.search.coordination.processors.indexing.polling_interval = 100
+hibernate.search.coordination.processors.indexing.batch_size = 50
 hibernate.search.coordination.processors.indexing.transaction_timeout = 10
 ----
 
