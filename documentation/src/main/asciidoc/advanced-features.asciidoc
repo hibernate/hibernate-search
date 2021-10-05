@@ -252,6 +252,10 @@ have ideas, or just to let us know how you're using this API.
 It is technically possible to store the information of more than one entity into a single Lucene
 index. There are two ways to accomplish this:
 
+[WARNING]
+====
+Support for indexing multiple entity types in the same index is deprecated and is going to be removed in Hibernate Search 6.
+====
 
 * Configuring the underlying directory providers to point to the same physical index directory.
 In practice, you set the property `hibernate.search.[fully qualified entity name].indexName` to the

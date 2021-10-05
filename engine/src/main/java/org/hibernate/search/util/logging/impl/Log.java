@@ -35,6 +35,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.store.DirectoryProvider;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -1031,4 +1032,12 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " and cannot be used with any other technology (Elasticsearch in particular)."
 			+ " Analyzer reference: %s")
 	SearchException invalidConversionFromLuceneAnalyzer(LuceneAnalyzerReference reference, @Cause Exception cause);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = 355, value = "Index '%1$s' is assigned to multiple entity types: %2$s"
+			+ " Support for indexing multiple entity types in the same index is going to be removed in Hibernate Search 6."
+			+ " To assign a dedicated index to each type in a entity class hierarchy,"
+			+ " use @Indexed(index = \"someUniqueName\") on non-root classes." )
+	void multipleTypesInSingleIndex(String indexName, IndexedTypeSet indexedTypes);
+
 }
