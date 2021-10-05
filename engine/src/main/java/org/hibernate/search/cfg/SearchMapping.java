@@ -52,14 +52,26 @@ public class SearchMapping {
 		return entities.keySet();
 	}
 
+	/**
+	 * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
+	 */
+	@Deprecated
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return analyzerDef( name, "", tokenizerFactory );
 	}
 
+	/**
+	 * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
+	 */
+	@Deprecated
 	public AnalyzerDefMapping analyzerDef(String name, String tokenizerName, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping( name, tokenizerName, tokenizerFactory, this );
 	}
 
+	/**
+	 * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
+	 */
+	@Deprecated
 	public NormalizerDefMapping normalizerDef(String name) {
 		return new NormalizerDefMapping( name, this );
 	}

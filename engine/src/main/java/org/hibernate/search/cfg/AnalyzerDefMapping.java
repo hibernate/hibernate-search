@@ -15,7 +15,9 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See {@link org.hibernate.search.annotations.AnalyzerDef}
  */
+@Deprecated
 public class AnalyzerDefMapping {
 	private SearchMapping mapping;
 	private Map<String, Object> analyzerDef;

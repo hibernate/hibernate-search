@@ -30,7 +30,10 @@ import org.hibernate.search.annotations.AnalyzerDef;
  * </code></pre>
  *
  * @author Yoann Rodiere
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
+@Deprecated
 public abstract class ElasticsearchTokenizerFactory extends TokenizerFactory {
 
 	private ElasticsearchTokenizerFactory() {

@@ -498,7 +498,51 @@ public class Tweet {
 }
 --
 
+[[_custom_analyzers_using_a_definition_provider]]
+===== Custom analyzers using a definition provider
+
+As <<section-programmatic-analyzer-definition,with Lucene>>, you can define analyzers programmatically.
+
+In the case of Elasticsearch, this requires to set the
+`hibernate.search.elasticsearch.analysis_definition_provider` configuration property.
+
+The property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
+This class must either implement `org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider` directly
+or expose a `@Factory`-annotated method that returns such implementation. 
+
+[source,java]
+.Example of mapping that defines analyzers on Elasticsearch using the `Elasticsearch*Factory` types
+--
+public static class CustomAnalyzerProvider implements ElasticsearchAnalysisDefinitionProvider {
+    @Override
+    public void register(ElasticsearchAnalysisDefinitionRegistryBuilder builder) {
+        builder.analyzer( "tweet_analyzer" )
+                .withTokenizer( "whitespace" )
+                .withCharFilters( "custom_html_strip" )
+                .withCharFilters( "p_br_as_space" );
+        
+        builder.charFilter( "custom_html_strip" )
+                .type( "html_strip" )
+                .param( "escaped_tags", "br", "p" );
+
+        builder.charFilter( "p_br_as_space" )
+                .type( "pattern_replace" )
+                .param( "pattern", "<p/?>|<br/?>" )
+                .param( "replacement", " " )
+                .param( "tags", "CASE_INSENSITIVE" );
+    }
+}
+--
+
 ===== Custom analyzers using the `@AnalyzerDef` annotation
+
+[WARNING]
+====
+Support for defining analyzers or normalizers through annotations is deprecated,
+and will be removed in Hibernate Search 6.
+
+Use <<_custom_analyzers_using_a_definition_provider,a definition provider>> instead.
+====
 
 You can also define analyzers within your Hibernate Search mapping using the `@AnalyzerDef` annotation,
 like you would <<section-named-analyzers,do with an embedded Lucene instance>>.
@@ -510,9 +554,9 @@ Two different approaches allow you to define your analyzers with Elasticsearch.
 
 The first, recommended approach is to use the factories provided by the `hibernate-search-elasticsearch` module:
 
- * `org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory`
- * `org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory`
- * `org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory`
+* `org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory`
+* `org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory`
+* `org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory`
 
 Those classes can be passed to the `factory` attribute of
 the `@CharFilterDef`, `@TokenFilterDef` and `@TokenizerDef` annotations.
@@ -522,9 +566,9 @@ accepted by Elasticsearch for this type.
 
 The parameter values will be interpreted as JSON. The parser is not strict, though:
 
- * quotes around strings may be left out in some cases, as when a string only contains letters.
- * when quotes are required (e.g. your string may be interpreted as a number, and you don't want that),
-   you may use single quotes instead of double quotes (which are painful to write in Java).
+* quotes around strings may be left out in some cases, as when a string only contains letters.
+* when quotes are required (e.g. your string may be interpreted as a number, and you don't want that),
+you may use single quotes instead of double quotes (which are painful to write in Java).
 
 [NOTE]
 ====
@@ -591,16 +635,16 @@ never allow you to take full advantage of Elasticsearch analysis capabilities.
 
 Here are the known limitations of the automatic translation:
 
- * a few factories have unsupported parameters, because those have no equivalent in Elasticsearch.
-   An exception will be raised on startup if a parameter is not supported.
- * the `hyphenator` parameter for `HyphenatedWordsFilterFactory` must refer to
-   a file on the Elasticsearch servers, on the contrary to other factories
-   where the files are accessed by Hibernate Search directly.
-   This is due to an Elasticsearch limitation
-   (there is no way to forward the content of a local hyphenation pattern file).
- * some built-in Lucene factories are not (and cannot) be translated, because of incompatible
-   parameters between the Lucene factory and the Elasticsearch equivalent.
-   This is in particular the case for `HunspellStemFilterFactory`.
+* a few factories have unsupported parameters, because those have no equivalent in Elasticsearch.
+An exception will be raised on startup if a parameter is not supported.
+* the `hyphenator` parameter for `HyphenatedWordsFilterFactory` must refer to
+a file on the Elasticsearch servers, on the contrary to other factories
+where the files are accessed by Hibernate Search directly.
+This is due to an Elasticsearch limitation
+(there is no way to forward the content of a local hyphenation pattern file).
+* some built-in Lucene factories are not (and cannot) be translated, because of incompatible
+parameters between the Lucene factory and the Elasticsearch equivalent.
+This is in particular the case for `HunspellStemFilterFactory`.
 
 Therefore, Lucene factories should only be referenced within analyzer definitions
 when migrating an application that already used Hibernate Search,
@@ -648,41 +692,6 @@ public class Tweet {
 }
 --
 
-===== Custom analyzers using a definition provider
-
-As <<section-programmatic-analyzer-definition,with Lucene>>, you can define analyzers programmatically.
-
-In the case of Elasticsearch, this requires to set the
-`hibernate.search.elasticsearch.analysis_definition_provider` configuration property.
-
-The property can be set to the fully-qualified name of a class with a public, no-arg constructor in your application.
-This class must either implement `org.hibernate.search.elasticsearch.analyzer.definition.ElasticsearchAnalysisDefinitionProvider` directly
-or expose a `@Factory`-annotated method that returns such implementation. 
-
-[source,java]
-.Example of mapping that defines analyzers on Elasticsearch using the `Elasticsearch*Factory` types
---
-public static class CustomAnalyzerProvider implements ElasticsearchAnalysisDefinitionProvider {
-    @Override
-    public void register(ElasticsearchAnalysisDefinitionRegistryBuilder builder) {
-        builder.analyzer( "tweet_analyzer" )
-                .withTokenizer( "whitespace" )
-                .withCharFilters( "custom_html_strip" )
-                .withCharFilters( "p_br_as_space" );
-        
-        builder.charFilter( "custom_html_strip" )
-                .type( "html_strip" )
-                .param( "escaped_tags", "br", "p" );
-
-        builder.charFilter( "p_br_as_space" )
-                .type( "pattern_replace" )
-                .param( "pattern", "<p/?>|<br/?>" )
-                .param( "replacement", " " )
-                .param( "tags", "CASE_INSENSITIVE" );
-    }
-}
---
-
 ===== Normalizers
 
 Depending on the Elasticsearch version you're using,
@@ -704,12 +713,14 @@ same name as an analyzer definition.
 
 All the features mentioned above for analyzers are also available when using normalizers:
 
-* They can be defined using Lucene factories with `@NormalizerDef`,
-which will be translated to the equivalent types in Elasticsearch.
-* They can be defined using the special factories `ElasticsearchCharFilterFactory`
-and `ElasticsearchTokenFilterFactory` with `@NormalizerDef`.
 * They can be defined using an `ElasticsearchAnalysisDefinitionProvider`
 (use `builder.normalizer(name)`).
+* They can be defined using Lucene factories with `@NormalizerDef`,
+which will be translated to the equivalent types in Elasticsearch,
+though `@NormalizerDef` is deprecated (use the analysis definition provider instead).
+* They can be defined using the special factories `ElasticsearchCharFilterFactory`
+and `ElasticsearchTokenFilterFactory` with `@NormalizerDef`,
+though `@NormalizerDef` is deprecated (use the analysis definition provider instead).
 * The definitions can be referenced using
 `@Field(normalizer = @Normalizer(definition = "myDefinition"))`
 

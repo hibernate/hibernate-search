@@ -18,10 +18,13 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
  * Define a <code>TokenizerFactory</code> and its parameters.
  *
  * @author Emmanuel Bernard
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
+@Deprecated
 public @interface TokenizerDef {
 
 	/**

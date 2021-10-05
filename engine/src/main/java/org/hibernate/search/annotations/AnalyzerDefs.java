@@ -17,10 +17,13 @@ import java.lang.annotation.Documented;
  * This annotation allows multiple definition declarations per element
  *
  * @author Emmanuel Bernard
+ *
+ * @deprecated See {@link AnalyzerDef}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
+@Deprecated
 public @interface AnalyzerDefs {
 	AnalyzerDef[] value();
 }
