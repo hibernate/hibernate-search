@@ -255,6 +255,9 @@ index. There are two ways to accomplish this:
 [WARNING]
 ====
 Support for indexing multiple entity types in the same index is deprecated and is going to be removed in Hibernate Search 6.
+
+Support for the `hibernate.search.[fully qualified entity name].indexName` configuration property is deprecated
+and is going to be removed in Hibernate Search 6.
 ====
 
 * Configuring the underlying directory providers to point to the same physical index directory.

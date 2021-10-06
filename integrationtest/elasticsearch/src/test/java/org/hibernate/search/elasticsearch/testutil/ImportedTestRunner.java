@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
  * @author Gunnar Morling
  */
 @RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({ ".*ProjectionQueryTest" })
+@ClasspathSuite.ClassnameFilters({ ".*DeprecationTest" })
 // @ClasspathSuite.ClassnameFilters({ "org.hibernate.search.test.*" })
 public class ImportedTestRunner {
 }

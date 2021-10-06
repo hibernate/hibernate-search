@@ -192,6 +192,12 @@ public class IndexManagerGroupHolder implements AutoCloseable {
 
 		// init the IndexManager
 		try {
+			if ( workerBuildContext.isHibernateSearch6DeprecationWarningsEnabled() ) {
+				String override = indexProperties.getProperty( Environment.INDEX_NAME_PROP_NAME );
+				if ( override != null ) {
+					log.indexNameOverrideThroughConfigurationPropertiesForIndex( indexName );
+				}
+			}
 			manager.initialize( indexName, indexProperties, similarity, workerBuildContext );
 		}
 		catch (Exception e) {
