@@ -168,6 +168,17 @@ hibernate.search.[default|<indexName>].sharding_strategy = my.custom.RandomShard
 [[advanced-features-dynamic-sharding]]
 ==== Dynamic sharding
 
+[WARNING]
+====
+Support for dynamic sharding is deprecated,
+and will be removed in Hibernate Search 6.
+
+To implement a `ShardIdentifierProvider` in a future-proof way,
+make sure that all the shard identifiers are known on startup,
+and that no shard identifiers are added or removed at runtime.
+Only then will it be possible to migrate your implementation to Hibernate Search 6.
+====
+
 Dynamic sharding allows you to manage the shards yourself and even create new shards on the fly. To
 do so you need to implement the interface ShardIdentifierProvider and set the
 hibernate.search.[default|&lt;indexName&gt;].sharding_strategy property to the fully qualified name

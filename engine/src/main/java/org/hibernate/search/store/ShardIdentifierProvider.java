@@ -76,8 +76,15 @@ public interface ShardIdentifierProvider {
 	 * @param fullTextFilters the filters which are applied to the current query
 	 *
 	 * @return the set of shard identifiers this query should target
+	 *
+	 * @deprecated Support for
+	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * Future-proof implementations must not override this method.
 	 */
-	Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters);
+	@Deprecated
+	default Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+		return getAllShardIdentifiers();
+	}
 
 	/**
 	 * Returns the set of shard identifiers for a deletion.
@@ -86,8 +93,15 @@ public interface ShardIdentifierProvider {
 	 * @param id the id or null
 	 * @param idInString the transformed id or null
 	 * @return the target IndexManager for the deletion operation
+	 *
+	 * @deprecated Support for
+	 * <a href="https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#advanced-features-dynamic-sharding">dynamic sharding</a> will be removed in Hibernate Search 6.
+	 * Future-proof implementations must not override this method.
 	 */
-	Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString);
+	@Deprecated
+	default Set<String> getShardIdentifiersForDeletion(Class<?> entity, Serializable id, String idInString) {
+		return getAllShardIdentifiers();
+	}
 
 	/**
 	 * Returns the list of all currently known shard identifiers.
