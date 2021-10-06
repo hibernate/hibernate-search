@@ -37,7 +37,9 @@ public interface IndexedTypeDescriptor extends FieldContributor {
 
 	/**
 	 * @return {@code true} is this index is sharded, {@code false} otherwise
+	 * @deprecated Support for retrieving this information will be removed in Hibernate Search 6.
 	 */
+	@Deprecated
 	boolean isSharded();
 
 	/**
@@ -79,7 +81,11 @@ public interface IndexedTypeDescriptor extends FieldContributor {
 
 	/**
 	 * @return the set of indexed properties in form of {@code PropertyDescriptor}s
+	 * @deprecated Support for retrieving information about indexed properties will be removed in Hibernate Search 6.
+	 * Only information about index fields will be exposed.
+	 * To retrieve a list of index fields, use {@link #getIndexedFields()} instead.
 	 */
+	@Deprecated
 	Set<PropertyDescriptor> getIndexedProperties();
 
 	/**
@@ -91,7 +97,11 @@ public interface IndexedTypeDescriptor extends FieldContributor {
 	 *         the specified name does not exist
 	 *
 	 * @throws IllegalArgumentException in case {@code propertyName} is {@code null}
+	 * @deprecated Support for retrieving information about indexed properties will be removed in Hibernate Search 6.
+	 * Only information about index fields will be exposed.
+	 * To retrieve a particular index fields, use {@link #getIndexedField(String)} instead.
 	 */
+	@Deprecated
 	PropertyDescriptor getProperty(String propertyName);
 
 	/**
@@ -114,6 +124,9 @@ public interface IndexedTypeDescriptor extends FieldContributor {
 	 *         is returned in case the property does not exist or does not produce any indexed fields.
 	 *
 	 * @throws IllegalArgumentException in case {@code propertyName} is {@code null}
+	 * @deprecated Support for retrieving information about indexed properties will be removed in Hibernate Search 6.
+	 * Only information about index fields will be exposed.
 	 */
+	@Deprecated
 	Set<FieldDescriptor> getFieldsForProperty(String propertyName);
 }
