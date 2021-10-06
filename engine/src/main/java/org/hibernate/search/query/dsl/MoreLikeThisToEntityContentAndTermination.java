@@ -12,6 +12,8 @@ package org.hibernate.search.query.dsl;
  * algorithm tuning like ignore zeros etc.
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @deprecated See {@link QueryBuilder#moreLikeThis()}
  */
+@Deprecated
 public interface MoreLikeThisToEntityContentAndTermination extends Termination<MoreLikeThisToEntityContentAndTermination> {
 }

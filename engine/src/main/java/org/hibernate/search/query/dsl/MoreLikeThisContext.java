@@ -16,7 +16,9 @@ package org.hibernate.search.query.dsl;
  * objects which have similar properties matching.
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @deprecated See {@link QueryBuilder#moreLikeThis()}
  */
+@Deprecated
 public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisContext> {
 
 	/**
