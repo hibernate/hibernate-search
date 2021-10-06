@@ -1382,9 +1382,11 @@ public class MyEntity {
 public class MyCoordinates implements Coordinates {
 	private Double latitude;
 	private Double longitude;
+	@Override
 	public Double getLatitude() {
 		return latitude;
 	}
+	@Override
 	public Double getLongitude() {
 		return longitude;
 	}
@@ -1399,7 +1401,7 @@ public class MyEntity {
     @GeoPointBinding(projectable = Projectable.YES)
 	private MyCoordinates location;
 }
-public class MyCoordinates implements Coordinates {
+public class MyCoordinates {
 	private Double latitude;
 	private Double longitude;
 	@Latitude
@@ -1424,9 +1426,11 @@ public class MyEntity {
 public class MyCoordinates implements GeoPoint {
 	private final double latitude;
 	private final double longitude;
+	@Override
 	public double latitude() {
 		return latitude;
 	}
+	@Override
 	public double longitude() {
 		return longitude;
 	}
