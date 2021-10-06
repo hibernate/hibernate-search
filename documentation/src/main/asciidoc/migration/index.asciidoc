@@ -314,6 +314,17 @@ Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<in
 Hibernate Search 6 equivalent: `hibernate.search.backend.username`.
 `hibernate.search.default.exclusive_index_use`, `hibernate.search.<index-name>.exclusive_index_use`::
 No equivalent in Hibernate Search 6.
+`hibernate.search.default.directory_provider`, `hibernate.search.<index-name>.directory_provider`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.directory.type`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.directory.type`.
++
+Values for this property may have changed:
+
+* `filesystem` => `local-filesystem`
+* `local-heap` => `local-heap`
+* `ram` => `local-heap`
+* `filesystem-master`, `filesystem-slave`, `infinispan` => <<search-5-backends,no longer supported>>
 `hibernate.search.default.indexBase`, `hibernate.search.<index-name>.indexBase`::
 Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.directory.root`.
 +
@@ -393,7 +404,7 @@ See link:{hibernateSearchDocUrl}#backend-lucene-io-refresh[here for more informa
 +
 Custom reader strategies are no longer supported.
 `hibernate.search.default.retry_marker_lookup`, `hibernate.search.<index-name>.retry_marker_lookup`::
-No equivalent in Hibernate Search 6: <<search-5-backends,the `filesystem-slave` backend is no longer supported>>.
+No equivalent in Hibernate Search 6: <<search-5-backends,the `filesystem-slave` directory provider is no longer supported>>.
 `hibernate.search.default.sharding_strategy`, `hibernate.search.<index-name>.sharding_strategy`::
 No direct equivalent in Hibernate Search 6: sharding is configured differently.
 See <<sharding>>.
@@ -403,7 +414,7 @@ See <<sharding>>.
 `hibernate.search.default.similarity`, `hibernate.search.<index-name>.similarity`::
 No direct equivalent in Hibernate Search 6: the similarity is configured through the <<analysis-definition-provider,analysis configurer>>.
 `hibernate.search.default.worker.backend`, `hibernate.search.<index-name>.worker.backend`::
-No equivalent in Hibernate Search 6: <<search-5-backends,the JMS/JGroups/`filesystem-slave`/`filesystem-master`/`infinispan` backends are no longer supported>>.
+No equivalent in Hibernate Search 6: <<search-5-backends,the JMS/JGroups backends are no longer supported>>.
 `hibernate.search.default.worker.execution`, `hibernate.search.<index-name>.worker.execution`::
 No direct equivalent in Hibernate Search 6.
 +
@@ -412,7 +423,7 @@ similar to setting `hibernate.search.<index-name>.worker.execution` to the same 
 See link:{hibernateSearchDocUrl}#mapper-orm-indexing-automatic-synchronization[automatic indexing synchronization]
 for more information.
 `hibernate.search.default.worker.*`, `hibernate.search.<index-name>.worker.*`::
-No equivalent in Hibernate Search 6: <<search-5-backends,the JMS/JGroups/`filesystem-slave`/`filesystem-master`/`infinispan` backends are no longer supported>>.
+No equivalent in Hibernate Search 6: <<search-5-backends,the JMS/JGroups backends are no longer supported>>.
 `hibernate.search.elasticsearch.analysis_definition_provider`::
 Hibernate Search 6 equivalent: `hibernate.search.backend.analysis.configurer`.
 +
@@ -494,8 +505,8 @@ feel free to link:https://hibernate.org/community[contact us].
 [[search-5-backends]]
 === Backends
 
-Hibernate Search 6 does not provide support for the JGroups, JMS, Infinispan
-or `filesystem-master`/`filesystem-slave` backends at the moment.
+Hibernate Search 6 does not provide support for the JGroups or JMS backends at the moment,
+nor does it support the related `filesystem-master`/`filesystem-slave`/`infinispan` directory providers.
 
 If you need to scale your application to multiple nodes,
 consider switching to the link:{hibernateSearchDocUrl}#architecture-examples-elasticsearch[Elasticsearch backend].
