@@ -1057,4 +1057,9 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " Use @Indexed(index = ...) to override index names instead." )
 	void indexNameOverrideThroughConfigurationPropertiesForIndex(String indexName);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 360, value = "Enabling JMX."
+			+ " Support for statistics retrieved through JMX and indexing triggered through JMX is going to be removed in Hibernate Search 6." )
+	void jmxEnabled();
+
 }
