@@ -2263,7 +2263,7 @@ f.spatial().within()
 
 |qb.moreLikeThis()
 |-
-|No equivalent in Hibernate Search 6.
+|[[more-like-this]]No equivalent in Hibernate Search 6.
 
 If you need more-like-this predicates,
 feel free to drop a comment to explain your use case on link:{hibernateSearchJiraUrl}/HSEARCH-3272[HSEARCH-3272].
