@@ -164,7 +164,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 					ElasticsearchEnvironment.SERVER_PASSWORD,
 					null
 			);
-			if ( password != null ) {
+			if ( password != null && !password.isEmpty() ) {
 				hosts.warnPasswordsOverHttp();
 			}
 
