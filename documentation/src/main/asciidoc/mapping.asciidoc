@@ -1679,6 +1679,18 @@ classloader is used when the class is rehydrated
 [[mapping-tika-bridge]]
 ==== Tika bridge
 
+[WARNING]
+====
+Support for Tika bridges is deprecated,
+and will be removed in Hibernate Search 6.
+
+If you need this feature, vote for it to be re-implemented using the new bridge API
+in a later version of Hibernate Search:
+https://hibernate.atlassian.net/browse/HSEARCH-3350[HSEARCH-3350].
+We’ll also gladly help anyone interested in contributing a patch:
+feel free to https://hibernate.org/community[contact us].
+====
+
 Hibernate Search allows you to extract text from various document types using the built-in
 `TikaBridge` which utilizes link:http://tika.apache.org[Apache Tika] to extract text and metadata
 from the provided documents.
