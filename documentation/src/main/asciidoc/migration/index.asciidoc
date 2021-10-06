@@ -283,7 +283,7 @@ Hibernate Search 6 equivalent: `hibernate.search.backend.max_connections`.
 `hibernate.search.default.elasticsearch.password`::
 Hibernate Search 6 equivalent: `hibernate.search.backend.password`.
 `hibernate.search.default.elasticsearch.path_prefix`::
-No equivalent in Hibernate Search 6 link:{hibernateSearchJiraUrl}/HSEARCH-4051[yet].
+Hibernate Search 6 equivalent: `hibernate.search.backend.path_prefix`.
 `hibernate.search.default.elasticsearch.read_timeout`::
 Hibernate Search 6 equivalent: `hibernate.search.backend.read_timeout`.
 +
