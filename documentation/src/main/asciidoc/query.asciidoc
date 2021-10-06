@@ -534,6 +534,15 @@ This set of queries has its own chapter, check out <<spatial>>.
 [[search-query-querydsl-mlt]]
 ===== More Like This queries
 
+[WARNING]
+====
+Support for more-like-this queries will be removed in Hibernate Search 6.
+
+If you need more-like-this predicates in Hibernate Search 6,
+feel free to drop a comment to explain your use case on
+https://hibernate.atlassian.net/browse/HSEARCH-3272[HSEARCH-3272].
+====
+
 Have you ever looked at an article or document and thought: "I want to find more like this"? Have you ever
 appreciated an e-commerce website that gives you similar articles to the one you are exploring?
 

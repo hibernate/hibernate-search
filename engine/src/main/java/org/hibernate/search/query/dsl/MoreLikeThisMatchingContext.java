@@ -14,7 +14,9 @@ package org.hibernate.search.query.dsl;
  * Sub interfaces are expected to clarify whether additional fields can be set.
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @deprecated See {@link QueryBuilder#moreLikeThis()}
  */
+@Deprecated
 public interface MoreLikeThisMatchingContext {
 
 	/**

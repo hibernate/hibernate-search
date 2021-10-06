@@ -12,7 +12,9 @@ package org.hibernate.search.query.dsl;
  * Additional fields can be defined.
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @deprecated See {@link QueryBuilder#moreLikeThis()}
  */
+@Deprecated
 public interface MoreLikeThisOpenedMatchingContext extends MoreLikeThisMatchingContext, FieldCustomization<MoreLikeThisOpenedMatchingContext> {
 
 	/**
