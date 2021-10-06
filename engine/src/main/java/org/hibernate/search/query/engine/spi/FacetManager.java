@@ -50,6 +50,8 @@ public interface FacetManager {
 	 * @param groupName the name the group. If the name is unknown an empty selection group is returned. {@code null}
 	 * is not allowed.
 	 * @return the {@code FacetSelection} for this group name if it exists., otherwise a new selection is created.
+	 * @deprecated See {@link FacetSelection}
 	 */
+	@Deprecated
 	FacetSelection getFacetGroup(String groupName);
 }

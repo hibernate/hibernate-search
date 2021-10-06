@@ -177,7 +177,7 @@ of a QueryBuilder is a Lucene query. For this reason you can easily mix and matc
 via Lucene's query parser or Query objects you have assembled with the Lucene programmatic API and
 use them with the Hibernate Search DSL. Just in case the DSL is missing some features.
 
-
+[[_keyword_queries]]
 ===== Keyword queries
 
 Let's start with the most basic use case - searching for a specific word:
@@ -500,6 +500,7 @@ Query luceneQuery = mythQB
 ----
 ====
 
+[[_range_queries]]
 ===== Range queries
 
 After looking at all these query examples for searching for to a given word, it is time to introduce
@@ -707,6 +708,7 @@ Remember, more like this is a very subjective meaning and will vary depending on
 rules of your domain. With the various options offered, Hibernate Search arms you with the tools to
 adjust this weapon. Make sure to continuously test the results against your data set.
 
+[[_combining_queries]]
 ===== Combining queries
 
 You can combine queries to create more complex queries.
@@ -2101,6 +2103,19 @@ count value tells you how many Cds are released under the Universal label. Last 
 facet.
 
 ==== Restricting query results
+
+[WARNING]
+====
+Support for selecting facets ("drill-down") will be removed in Hibernate Search 6.
+
+In order to drill-down and have your query return only specific facets,
+wrap it in a <<_combining_queries,boolean query>> and
+add a filter clause (`filteredBy`)
+to constraint values of the facet field with either a <<_keyword_queries,keyword query>>
+or a <<_range_queries,range query>>.
+
+See also https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#searching-facets-selectfacets[this section of the migration guide].
+====
 
 A common use case for faceting is a "drill-down" functionality which allows you to narrow your
 original search by applying a given facet on it. To do this, you can apply any of the returned
