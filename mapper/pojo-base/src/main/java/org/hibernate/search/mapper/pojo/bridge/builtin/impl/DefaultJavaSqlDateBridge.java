@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.sql.Date;
 import java.time.Instant;
 
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-
 public final class DefaultJavaSqlDateBridge extends AbstractConvertingDelegatingDefaultBridge<Date, Instant> {
 
 	public static final DefaultJavaSqlDateBridge INSTANCE = new DefaultJavaSqlDateBridge();
