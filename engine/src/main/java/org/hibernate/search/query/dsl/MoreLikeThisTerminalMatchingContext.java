@@ -12,6 +12,8 @@ package org.hibernate.search.query.dsl;
  * No additional field can be defined.
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @deprecated See {@link QueryBuilder#moreLikeThis()}
  */
+@Deprecated
 public interface MoreLikeThisTerminalMatchingContext extends MoreLikeThisMatchingContext {
 }

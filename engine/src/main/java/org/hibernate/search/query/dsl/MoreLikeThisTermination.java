@@ -9,6 +9,8 @@ package org.hibernate.search.query.dsl;
 
 /**
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @deprecated See {@link QueryBuilder#moreLikeThis()}
  */
+@Deprecated
 public interface MoreLikeThisTermination extends Termination<MoreLikeThisTermination> {
 }
