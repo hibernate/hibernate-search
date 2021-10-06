@@ -1610,7 +1610,8 @@ to enable distance projections on a geo-point field.
 
 `@TikaBridge` has no equivalent in Hibernate Search 6 yet.
 
-If you need this feature, vote for it to be re-implemented using the new bridge API in 6.1:
+If you need this feature, vote for it to be re-implemented using the new bridge API
+in a later version of Hibernate Search:
 link:{hibernateSearchJiraUrl}/HSEARCH-3350[HSEARCH-3350].
 We'll also gladly help anyone interested in contributing a patch:
 feel free to link:https://hibernate.org/community[contact us].
