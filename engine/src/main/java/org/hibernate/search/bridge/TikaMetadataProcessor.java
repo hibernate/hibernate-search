@@ -11,7 +11,9 @@ import org.apache.tika.metadata.Metadata;
 
 /**
  * @author Hardy Ferentschik
+ * @deprecated See {@link org.hibernate.search.annotations.TikaBridge}
  */
+@Deprecated
 public interface TikaMetadataProcessor {
 	/**
 	 * This method is called by the {@link org.hibernate.search.bridge.builtin.TikaBridge} prior to processing the data

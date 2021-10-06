@@ -42,7 +42,9 @@ import static org.apache.tika.io.IOUtils.closeQuietly;
  * Bridge implementation which uses Apache Tika to extract data from provided input.
  *
  * @author Hardy Ferentschik
+ * @deprecated See {@link org.hibernate.search.annotations.TikaBridge}
  */
+@Deprecated
 public class TikaBridge implements MetadataProvidingFieldBridge, AppliedOnTypeAwareBridge {
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 

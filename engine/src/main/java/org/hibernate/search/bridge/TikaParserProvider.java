@@ -10,7 +10,9 @@ import org.apache.tika.parser.Parser;
 
 /**
  * @author Yoann Rodiere
+ * @deprecated See {@link org.hibernate.search.annotations.TikaBridge}
  */
+@Deprecated
 public interface TikaParserProvider {
 
 	/**
