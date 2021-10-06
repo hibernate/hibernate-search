@@ -821,7 +821,10 @@ Here is a quick reference of how to convert a `@Field` annotation to Hibernate S
 |[source, JAVA]
 ----
 @KeywordField
-// OR
+----
+or
+[source, JAVA]
+----
 @GenericField
 ----
 .2+|Other
@@ -884,9 +887,15 @@ See <<bridges>>.
 |[source, JAVA]
 ----
 @GenericField(searchable = Searchable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @FullTextField(searchable = Searchable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(searchable = Searchable.YES)
 ----
 |[source, JAVA]
@@ -896,9 +905,15 @@ See <<bridges>>.
 |[source, JAVA]
 ----
 @GenericField(searchable = Searchable.NO)
-// OR
+----
+or
+[source, JAVA]
+----
 @FullTextField(searchable = Searchable.NO)
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(searchable = Searchable.NO)
 ----
 |====
@@ -918,7 +933,10 @@ See <<bridges>>.
 |[source, JAVA]
 ----
 @GenericField(indexNullAs = "_null_")
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(indexNullAs = "_null_")
 ----
 |====
@@ -950,9 +968,15 @@ Each field that requires `indexNullAs` must have its value set explicitly.
 |[source, JAVA]
 ----
 @GenericField(name = "myField")
-// OR
+----
+or
+[source, JAVA]
+----
 @FullTextField(name = "myField")
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(name = "myField")
 ----
 |====
@@ -983,9 +1007,15 @@ The `Norms` enum has moved to `org.hibernate.search.engine.backend.types.Norms`.
 |[source, JAVA]
 ----
 @GenericField(projectable = Projectable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @FullTextField(projectable = Projectable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(projectable = Projectable.YES)
 ----
 |[source, JAVA]
@@ -995,9 +1025,15 @@ The `Norms` enum has moved to `org.hibernate.search.engine.backend.types.Norms`.
 |[source, JAVA]
 ----
 @GenericField(projectable = Projectable.NO)
-// OR
+----
+or
+[source, JAVA]
+----
 @FullTextField(projectable = Projectable.NO)
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(projectable = Projectable.NO)
 ----
 |[source, JAVA]
@@ -1283,7 +1319,10 @@ It no longer exists in Hibernate Search 6.
 |[source, JAVA]
 ----
 @GenericField(sortable = Sortable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @KeywordField(sortable = Sortable.YES)
 ----
 |[source, JAVA]
@@ -1487,7 +1526,10 @@ with one exception: the field name is mandatory when `@GeoPointBinding` is appli
 |[source, JAVA]
 ----
 @GeoPointBinding(name = "myField")
-// OR
+----
+or
+[source, JAVA]
+----
 @GenericField(name = "myField")
 ----
 |[source, JAVA]
@@ -1535,7 +1577,10 @@ For Elasticsearch, hash-based geo-point fields have never been available in the 
 |[source, JAVA]
 ----
 @GeoPointBinding(projectable = Projectable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @GenericField(projectable = Projectable.YES)
 ----
 |[source, JAVA]
@@ -1545,7 +1590,10 @@ For Elasticsearch, hash-based geo-point fields have never been available in the 
 |[source, JAVA]
 ----
 @GeoPointBinding(projectable = Projectable.YES)
-// OR
+----
+or
+[source, JAVA]
+----
 @GenericField(projectable = Projectable.YES)
 ----
 |====
