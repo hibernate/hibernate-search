@@ -1058,4 +1058,10 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " Avoid relying on non-exclusive index use." )
 	void nonExclusiveIndexUseForIndex(String indexName);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 359, value = "The index name of index '%1$s' is overridden through property 'indexName'."
+			+ " Support for index name override through configuration properties is going to be removed in Hibernate Search 6."
+			+ " Use @Indexed(index = ...) to override index names instead." )
+	void indexNameOverrideThroughConfigurationPropertiesForIndex(String indexName);
+
 }
