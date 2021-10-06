@@ -256,10 +256,14 @@ Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.dynam
 +
 Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.dynamic_mapping`.
 `hibernate.search.default.elasticsearch.host`::
-Hibernate Search 6 equivalent: `hibernate.search.backend.hosts`.
+Hibernate Search 6 equivalent: `hibernate.search.backend.uris`.
 +
-IMPORTANT: In Hibernate Search 6, the URL scheme (`http://` or `https://`) must *not* be included here.
-Instead, set the property `hibernate.search.backend.protocol` to either `http` (the default) or `https`.
+IMPORTANT: In Hibernate Search 6, the property `hibernate.search.backend.hosts` can also be used,
+but the URI scheme (`http://` or `https://`) must *not* be included there;
+either use `hibernate.search.backend.uris` and include the URI scheme directly in URIs,
+or use `hibernate.search.backend.hosts` without the URI scheme and specify the protocol
+through the separate property `hibernate.search.backend.protocol`.
+See link:{hibernateSearchDocUrl}#backend-elasticsearch-configuration-hosts[this section of the documentation] for more details.
 `hibernate.search.default.elasticsearch.index_management_wait_timeout`, `hibernate.search.<index-name>.elasticsearch.index_management_wait_timeout`::
 Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.schema_management.minimal_required_status_wait_timeout`.
 +
