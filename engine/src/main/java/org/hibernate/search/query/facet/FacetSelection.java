@@ -8,14 +8,25 @@ package org.hibernate.search.query.facet;
 
 import java.util.List;
 
+import org.hibernate.search.query.dsl.QueryBuilder;
+
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.Query;
 
 /**
  * Groups a set of {@link org.hibernate.search.query.facet.Facet} to be applied onto a query.
  * The facet criteria within a {@code FacetSelection} are combined in a disjunction (logical OR).
  *
  * @author Hardy Ferentschik
+ * @deprecated Support for facet selection ("drill-down") will be removed in Hibernate Search 6.
+ * In order to drill-down and have your query return only specific facets,
+ * wrap it in a {@link QueryBuilder#bool() boolean query} and
+ * add a {@link org.hibernate.search.query.dsl.BooleanJunction#filteredBy(Query) filter clause}
+ * to constraint values of the facet field with either a {@link QueryBuilder#keyword() keyword query}
+ * or a {@link QueryBuilder#range() range query}.
+ * See also <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/#searching-facets-selectfacets">this section of the migration guide</a>.
  */
+@Deprecated
 public interface FacetSelection {
 	/**
 	 * @param facets An array of facets which have to be applied as disjunction onto the current query. Facets are combined
