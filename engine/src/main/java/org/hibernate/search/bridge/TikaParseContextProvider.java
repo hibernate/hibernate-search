@@ -10,7 +10,9 @@ import org.apache.tika.parser.ParseContext;
 
 /**
  * @author Hardy Ferentschik
+ * @deprecated See {@link org.hibernate.search.annotations.TikaBridge}
  */
+@Deprecated
 public interface TikaParseContextProvider {
 
 	/**
