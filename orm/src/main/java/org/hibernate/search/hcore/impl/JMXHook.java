@@ -51,6 +51,9 @@ final class JMXHook {
 			throw new AssertionFailure( "Unexpected state" );
 		}
 		if ( indexControlMBeanEnabled ) {
+			if ( extendedIntegrator.isHibernateSearch6DeprecationWarningsEnabled() ) {
+				log.jmxEnabled();
+			}
 			enableIndexControlBean( indexControlMBeanName, extendedIntegrator, factory );
 		}
 		registeredIfEnabled = true;

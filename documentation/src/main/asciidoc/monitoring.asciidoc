@@ -9,6 +9,11 @@ and average Lucene query and object loading timings.
 
 === JMX
 
+[WARNING]
+====
+Support for statistics retrieved through JMX and indexing triggered through JMX is deprecated and will be removed in Hibernate Search 6.
+====
+
 You can also enable access to the statistics via JMX.
 Setting the property `hibernate.search.jmx_enabled` will automatically register the `StatisticsInfoMBean`.
 Depending on your the configuration the `IndexControlMBean` and `IndexingProgressMonitorMBean` will also be
