@@ -1052,4 +1052,10 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " Assign an analyzer to each index field separately using @Field(analyzer = @Analyzer(...)) instead." )
 	void analyzerAnnotationOnMember(XClass type, XMember member);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 358, value = "Property 'exclusive_index_use' is set to 'false' for index '%1$s'."
+			+ " Support for non-exclusive index use is going to be removed in Hibernate Search 6."
+			+ " Avoid relying on non-exclusive index use." )
+	void nonExclusiveIndexUseForIndex(String indexName);
+
 }
