@@ -158,7 +158,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * Defaults to {@link Defaults#COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE}.
 	 * <p>
 	 * When using JTA and this property is not set,
-	 * Hibernate Search will use whatever default transaction timeout configured in the JTA transaction manager.
+	 * Hibernate Search will use whatever default transaction timeout is configured in the JTA transaction manager.
 	 */
 	public static final String COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT =
 			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT;
