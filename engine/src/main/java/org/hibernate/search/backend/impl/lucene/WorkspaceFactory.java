@@ -36,6 +36,9 @@ final class WorkspaceFactory {
 		}
 		else {
 			log.debugf( "Starting workspace for index " + indexName + " using a shared index strategy" );
+			if ( context.isHibernateSearch6DeprecationWarningsEnabled() ) {
+				log.nonExclusiveIndexUseForIndex( indexName );
+			}
 			return new SharedIndexWorkspaceImpl( indexManager, context, cfg );
 		}
 	}

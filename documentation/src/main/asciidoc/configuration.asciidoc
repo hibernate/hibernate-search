@@ -1122,6 +1122,12 @@ please refer to the Lucene documentation.
 |Set to `true` when no other process will need to write to the same index. This will enable
 Hibernate Search to work in exclusive mode on the index and improve performance when writing changes
 to the index.
+
+[WARNING]
+====
+Support for non-exclusive index use (setting this property to `false`) is deprecated,
+and will be removed in Hibernate Search 6.
+====
 |`true` (improved performance, releases locks only at shutdown)
 
 |hibernate.search.[default\|<indexname>].max_queue_length
