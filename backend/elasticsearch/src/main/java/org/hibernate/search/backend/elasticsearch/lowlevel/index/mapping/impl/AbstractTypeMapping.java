@@ -44,6 +44,12 @@ public abstract class AbstractTypeMapping {
 		this.dynamic = dynamic;
 	}
 
+	public void setDynamicIfAbsent(DynamicType dynamic) {
+		if ( this.dynamic == null ) {
+			setDynamic( dynamic );
+		}
+	}
+
 	public Map<String, PropertyMapping> getProperties() {
 		return properties == null ? null : Collections.unmodifiableMap( properties );
 	}
