@@ -1,0 +1,23 @@
+{
+  "_source":{
+    "enabled":false
+  },
+  "properties":{
+    "_entity_type":{ // <1>
+      "type":"keyword",
+      "index":false
+    },
+    "title":{ // <2>
+      "type":"text",
+      "analyzer":"english"
+    },
+    "userField":{
+      "type":"keyword",
+      "norms":true
+    },
+    "userObject":{
+      "type":"object",
+      "dynamic":"true"
+    }
+  }
+}
