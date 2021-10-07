@@ -81,8 +81,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 					.asString()
 					.build();
 
-	private static final OptionalConfigurationProperty<String> SCHEMA_MANAGEMENT_MAPPINGS_FILE =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPINGS_FILE )
+	private static final OptionalConfigurationProperty<String> SCHEMA_MANAGEMENT_MAPPING_FILE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE )
 					.asString()
 					.build();
 
@@ -237,7 +237,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private ElasticsearchIndexRootBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			IndexSettings customIndexSettings, RootTypeMapping customIndexMappings,
+			IndexSettings customIndexSettings, RootTypeMapping customIndexMapping,
 			DynamicMapping dynamicMapping) {
 
 		ElasticsearchIndexRootBuilder builder = new ElasticsearchIndexRootBuilder(
@@ -246,7 +246,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				indexNames,
 				mappedTypeName,
 				analysisDefinitionRegistry,
-				customIndexSettings, customIndexMappings,
+				customIndexSettings, customIndexMapping,
 				dynamicMapping
 		);
 
@@ -318,7 +318,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private RootTypeMapping customIndexMappings(BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource, EventContext indexEventContext) {
 
-		Optional<String> schemaManagementMappingsFile = SCHEMA_MANAGEMENT_MAPPINGS_FILE.get( propertySource );
+		Optional<String> schemaManagementMappingsFile = SCHEMA_MANAGEMENT_MAPPING_FILE.get( propertySource );
 		if ( !schemaManagementMappingsFile.isPresent() ) {
 			return null;
 		}

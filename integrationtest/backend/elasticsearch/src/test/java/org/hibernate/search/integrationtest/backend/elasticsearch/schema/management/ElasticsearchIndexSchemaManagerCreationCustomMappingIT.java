@@ -27,12 +27,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * Tests related to index custom mappings when creating indexes,
+ * Tests related to index custom mapping when creating indexes,
  * for all index-creating schema management operations.
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-4253")
-public class ElasticsearchIndexSchemaManagerCreationCustomMappingsIT {
+public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
@@ -49,7 +49,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingsIT {
 
 	private final ElasticsearchIndexSchemaManagerOperation operation;
 
-	public ElasticsearchIndexSchemaManagerCreationCustomMappingsIT(ElasticsearchIndexSchemaManagerOperation operation) {
+	public ElasticsearchIndexSchemaManagerCreationCustomMappingIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
 	}
 
@@ -198,11 +198,11 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingsIT {
 				elasticsearchClient.index( index.name() ).type().getMapping() );
 	}
 
-	private void setupAndCreateIndex(String customMappingsFile) {
+	private void setupAndCreateIndex(String customMappingFile) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPINGS_FILE,
-						"custom-index-mappings/" + customMappingsFile
+				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
+						"custom-index-mapping/" + customMappingFile
 				)
 				.withIndex( index )
 				.setup();

@@ -24,11 +24,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 /**
- * Tests related to index custom mappings when updating indexes.
+ * Tests related to index custom mapping when updating indexes.
  */
 @Category(RequiresIndexOpenClose.class)
 @TestForIssue(jiraKey = "HSEARCH-4253")
-public class ElasticsearchIndexSchemaManagerUpdateCustomMappingsIT {
+public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -171,11 +171,11 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingsIT {
 				.hasMessageContainingAll( "conflicts", "_source" );
 	}
 
-	private void setupAndUpdateIndex(String customMappingsFile) {
+	private void setupAndUpdateIndex(String customMappingFile) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPINGS_FILE,
-						"custom-index-mappings/" + customMappingsFile
+				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
+						"custom-index-mapping/" + customMappingFile
 				)
 				.withIndex( index )
 				.setup();
