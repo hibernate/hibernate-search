@@ -39,6 +39,12 @@ public class RootTypeMapping extends AbstractTypeMapping {
 		this.routing = routing;
 	}
 
+	public void setRoutingIfAbsent(RoutingType routing) {
+		if ( this.routing == null ) {
+			setRouting( routing );
+		}
+	}
+
 	public List<NamedDynamicTemplate> getDynamicTemplates() {
 		return dynamicTemplates == null ? null : Collections.unmodifiableList( dynamicTemplates );
 	}
