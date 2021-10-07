@@ -42,8 +42,8 @@ public class ElasticsearchCustomIndexMappingIT {
 	public void smoke() throws Exception {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPINGS_FILE,
-						"custom/index-mappings.json"
+						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
+						"custom/index-mapping.json"
 				)
 				.setup( Book.class );
 

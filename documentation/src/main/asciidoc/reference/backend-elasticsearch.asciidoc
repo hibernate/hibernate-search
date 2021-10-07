@@ -1023,16 +1023,16 @@ An invalid custom mapping may not trigger any exception on bootstrap, but later 
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.schema_management.mappings_file = custom/index-mappings.json
+hibernate.search.backend.schema_management.mapping_file = custom/index-mapping.json
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.schema_management.mappings_file = custom/index-mappings.json
+hibernate.search.backend.indexes.<index name>.schema_management.mapping_file = custom/index-mapping.json
 ----
 
-.Possible content of `custom/index-mappings.json` file
+.Possible content of `custom/index-mapping.json` file
 ====
 [source, JSON, indent=0, subs="+callouts"]
 ----
-include::{resourcesdir}/custom/index-mappings.json[]
+include::{resourcesdir}/custom/index-mapping.json[]
 ----
 ====
 

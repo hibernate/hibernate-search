@@ -53,7 +53,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final IndexSettings customIndexSettings;
-	private final RootTypeMapping customIndexMappings;
+	private final RootTypeMapping customIndexMapping;
 	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
@@ -64,7 +64,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 			EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			IndexSettings customIndexSettings, RootTypeMapping customIndexMappings,
+			IndexSettings customIndexSettings, RootTypeMapping customIndexMapping,
 			DynamicMapping dynamicMapping) {
 		super( new ElasticsearchIndexCompositeNodeType.Builder( ObjectStructure.FLATTENED ) );
 		this.typeFactoryProvider = typeFactoryProvider;
@@ -73,7 +73,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.customIndexSettings = customIndexSettings;
-		this.customIndexMappings = customIndexMappings;
+		this.customIndexMapping = customIndexMapping;
 		this.defaultDynamicType = DynamicType.create( dynamicMapping );
 	}
 
@@ -169,8 +169,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	private RootTypeMapping rootTypeMapping() {
-		if ( customIndexMappings != null ) {
-			return customIndexMappings;
+		if ( customIndexMapping != null ) {
+			return customIndexMapping;
 		}
 
 		RootTypeMapping mapping = new RootTypeMapping();
