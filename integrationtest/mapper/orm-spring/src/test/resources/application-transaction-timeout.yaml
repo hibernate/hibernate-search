@@ -1,7 +1,10 @@
 spring.jpa:
   properties:
     hibernate:
-      session.events.auto: org.hibernate.search.integrationtest.spring.jta.listener.TimeoutSessionEventListener
+      session.events.auto: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutSessionEventListener
       search:
-        background_failure_handler: org.hibernate.search.integrationtest.spring.jta.listener.TimeoutFailureCollector
-        coordination.processors.indexing.transaction_timeout: 1
+        background_failure_handler: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutFailureCollector
+
+spring.jta.bitronix:
+  properties:
+    defaultTransactionTimeout: 1

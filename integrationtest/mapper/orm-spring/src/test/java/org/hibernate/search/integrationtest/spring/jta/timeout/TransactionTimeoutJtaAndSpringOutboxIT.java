@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.spring.jta;
+package org.hibernate.search.integrationtest.spring.jta.timeout;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -13,14 +13,15 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
+import org.hibernate.search.integrationtest.spring.jta.JtaAndSpringOutboxApplicationConfiguration;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
-import org.hibernate.search.integrationtest.spring.jta.listener.TimeoutFailureCollector;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import bitronix.tm.TransactionManagerServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -41,11 +42,16 @@ public class TransactionTimeoutJtaAndSpringOutboxIT {
 
 	@Before
 	public void checkJta() {
+		TimeoutFailureCollector.EXCEPTIONS.clear();
+
 		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
 
-		TimeoutFailureCollector.EXCEPTIONS.clear();
+		// we changed the default bitronix timeout to 1 second
+		assertThat( TransactionManagerServices.getConfiguration().getDefaultTransactionTimeout() ).isOne();
+
+		// the test is supposed to be timed out
 	}
 
 	@Test

@@ -1,0 +1,5 @@
+spring.jpa:
+  properties:
+    hibernate:
+      search:
+        coordination.processors.indexing.transaction_timeout: 60
