@@ -10,9 +10,13 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ab
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 
+import com.google.gson.JsonElement;
+
 abstract class AbstractTypeMappingValidator<T extends AbstractTypeMapping> implements Validator<T> {
 
 	protected abstract Validator<PropertyMapping> getPropertyMappingValidator();
+
+	private final Validator<JsonElement> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
 
 	@Override
 	public void validate(ValidationErrorCollector errorCollector, T expectedMapping, T actualMapping) {
@@ -28,6 +32,12 @@ abstract class AbstractTypeMappingValidator<T extends AbstractTypeMapping> imple
 				errorCollector, ValidationContextType.MAPPING_PROPERTY,
 				ElasticsearchValidationMessages.INSTANCE.propertyMissing(),
 				expectedMapping.getProperties(), actualMapping.getProperties()
+		);
+
+		extraAttributeValidator.validateAllIgnoreUnexpected(
+				errorCollector, ValidationContextType.CUSTOM_INDEX_MAPPING_ATTRIBUTE,
+				ElasticsearchValidationMessages.INSTANCE.customIndexMappingAttributeMissing(),
+				expectedMapping.getExtraAttributes(), actualMapping.getExtraAttributes()
 		);
 	}
 }

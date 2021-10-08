@@ -131,6 +131,8 @@ public final class ValidationErrorCollector {
 					return currentResult.withContext( ElasticsearchEventContexts.fromFieldTemplateAttribute( name ) );
 				case CUSTOM_INDEX_SETTINGS_ATTRIBUTE:
 					return currentResult.withContext( ElasticsearchEventContexts.fromCustomIndexSettingAttribute( name ) );
+				case CUSTOM_INDEX_MAPPING_ATTRIBUTE:
+					return currentResult.withContext( ElasticsearchEventContexts.fromCustomIndexMappingAttribute( name ) );
 				default:
 					throw new AssertionFailure( "Unexpected validation context element type: " + type );
 			}
