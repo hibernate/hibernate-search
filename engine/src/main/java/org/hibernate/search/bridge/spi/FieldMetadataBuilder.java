@@ -10,8 +10,6 @@ package org.hibernate.search.bridge.spi;
  * Allows to configure field-related meta-data.
  *
  * @author Gunnar Morling
- * @hsearch.experimental This contract is currently under active development and may be altered in future releases,
- * breaking existing users.
  */
 public interface FieldMetadataBuilder {
 

@@ -18,8 +18,6 @@ import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
  * <p>
  *
  * @author Gunnar Morling
- * @hsearch.experimental This contract is currently under active development and may be altered in future releases,
- * breaking existing implementations.
  */
 public interface MetadataProvidingFieldBridge extends FieldBridge {
 
