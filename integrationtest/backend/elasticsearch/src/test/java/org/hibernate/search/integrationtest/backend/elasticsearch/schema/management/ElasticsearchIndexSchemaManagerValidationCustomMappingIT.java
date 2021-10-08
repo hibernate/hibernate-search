@@ -57,7 +57,6 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'dynamic':'strict', " +
 				"   'properties':{ " +
 				"     '_entity_type':{ " +
 				"        'type':'keyword', " +
@@ -88,7 +87,6 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'dynamic':'strict', " +
 				"   'properties':{ " +
 				"     '_entity_type':{ " +
 				"        'type':'keyword', " +
@@ -125,7 +123,6 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'dynamic':'strict', " +
 				"   'properties':{ " +
 				"     '_entity_type':{ " +
 				"        'type':'keyword', " +
@@ -158,7 +155,6 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'dynamic':'strict', " +
 				"   'properties':{ " +
 				"     '_entity_type':{ " +
 				"        'type':'keyword', " +
@@ -200,7 +196,6 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
-				"   'dynamic':'strict', " +
 				"   'properties':{ " +
 				"     '_entity_type':{ " +
 				"        'type':'keyword', " +
