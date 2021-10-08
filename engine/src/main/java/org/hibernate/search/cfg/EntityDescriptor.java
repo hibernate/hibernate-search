@@ -91,10 +91,24 @@ public class EntityDescriptor {
 		//No-op: this feature is no longer available
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public void setBoost(Map<String, Object> boost) {
 		this.boost = boost;
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public Map<String, Object> getBoost() {
 		return boost;
 	}
@@ -159,10 +173,24 @@ public class EntityDescriptor {
 		return this.providedId;
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public void setDynamicBoost(Map<String, Object> dynamicEntityBoost) {
 		this.dynamicBoost = dynamicEntityBoost;
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public Map<String, Object> getDynamicBoost() {
 		return this.dynamicBoost;
 	}

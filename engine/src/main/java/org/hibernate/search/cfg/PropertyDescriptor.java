@@ -122,10 +122,24 @@ public class PropertyDescriptor {
 		this.containedIn = containedIn;
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public void setDynamicBoost(Map<String, Object> dynamicBoostAnn) {
 		this.dynamicBoost = dynamicBoostAnn;
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public Map<String,Object> getDynamicBoost() {
 		return this.dynamicBoost;
 	}
