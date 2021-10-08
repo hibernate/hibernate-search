@@ -79,6 +79,13 @@ public class ClassBridgeMapping {
 		return this;
 	}
 
+	/**
+	 * @deprecated Index-time boosting will not be possible anymore starting from Lucene 7.
+	 * You should use query-time boosting instead, for instance by calling
+	 * {@link org.hibernate.search.query.dsl.FieldCustomization#boostedTo(float) boostedTo(float)}
+	 * when building queries with the Hibernate Search query DSL.
+	 */
+	@Deprecated
 	public ClassBridgeMapping boost(float boost) {
 		final Map<String, Object> boostAnn = new HashMap<String, Object>();
 		boostAnn.put( "value", boost );
