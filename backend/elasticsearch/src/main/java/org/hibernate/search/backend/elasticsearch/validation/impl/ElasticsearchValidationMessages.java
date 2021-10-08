@@ -129,4 +129,9 @@ public interface ElasticsearchValidationMessages {
 	)
 	String customIndexSettingAttributeMissing();
 
+	@Message(
+			value = "Custom index mapping attribute missing"
+	)
+	String customIndexMappingAttributeMissing();
+
 }
