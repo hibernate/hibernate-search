@@ -58,7 +58,6 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 		setupAndCreateIndex( "no-overlapping.json" );
 		assertJsonEquals(
 				" { " +
-				"    'dynamic':'strict', " +
 				"    '_source':{ " +
 				"       'enabled':false " +
 				"    }, " +
@@ -72,14 +71,12 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				"          'doc_values':false " +
 				"       }, " +
 				"       'bothObject':{ " +
-				"          'dynamic':'strict', " +
 				"          'properties':{ " +
 				"             'bothNested':{ " +
 				"                'type':'keyword', " +
 				"                'doc_values':false " +
 				"             }, " +
 				"             'bothNestedObject':{ " +
-				"                'dynamic':'strict', " +
 				"                'properties':{ " +
 				"                   'bothNestedNested':{ " +
 				"                      'type':'keyword', " +
@@ -96,8 +93,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				"                'doc_values':false " +
 				"             }, " +
 				"             'searchNestedObject':{ " +
-				"                'type':'object', " +
-				"                'dynamic':'strict' " +
+				"                'type':'object' " +
 				"             } " +
 				"          } " +
 				"       }, " +
@@ -106,8 +102,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				"          'doc_values':false " +
 				"       }, " +
 				"       'searchObject':{ " +
-				"          'type':'object', " +
-				"          'dynamic':'strict' " +
+				"          'type':'object' " +
 				"       }, " +
 				"       'userField':{ " +
 				"          'type':'keyword', " +

@@ -169,13 +169,15 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	private RootTypeMapping rootTypeMapping() {
-		RootTypeMapping mapping = ( customIndexMapping != null ) ?
-				customIndexMapping : new RootTypeMapping();
-
-		if ( routing != null ) {
-			mapping.setRoutingIfAbsent( routing );
+		if ( customIndexMapping != null ) {
+			return customIndexMapping;
 		}
-		mapping.setDynamicIfAbsent( resolveSelfDynamicType( defaultDynamicType ) );
+
+		RootTypeMapping mapping = new RootTypeMapping();
+		if ( routing != null ) {
+			mapping.setRouting( routing );
+		}
+		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
 		return mapping;
 	}
 }

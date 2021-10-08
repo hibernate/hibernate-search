@@ -96,12 +96,9 @@ class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCom
 		PropertyMapping mapping = fieldNode.type().createMapping( dynamicType );
 
 		if ( parentMapping.getProperties() != null && parentMapping.getProperties().containsKey( relativeFieldName ) ) {
-			DynamicType generatedDynamic = mapping.getDynamic();
-
 			// If the object (node) property is already present on both sides,
 			// we will take the one from the user:
 			mapping = parentMapping.getProperties().get( relativeFieldName );
-			mapping.setDynamicIfAbsent( generatedDynamic );
 		}
 		else if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
 			parentMapping.addProperty( relativeFieldName, mapping );
