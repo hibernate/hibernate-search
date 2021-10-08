@@ -303,12 +303,6 @@ public class BigDecimalNumericFieldBridge implements MetadataProvidingFieldBridg
 ----
 ====
 
-[NOTE]
-====
-The `MetadataProvidingFieldBridge` contract is under active development and considered experimental at this time.
-It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
-====
-
 [[sortablefield-annotation]]
 ===== @SortableField
 
@@ -410,12 +404,6 @@ public class MyClassBridge implements MetadataProvidingFieldBridge {
 The meta-data configured through `configureFieldMetadata()` will be used for sort validation upon query execution. The
 name passed to the method is the default field name also passed to `set()`. It needs to be used consistently with
 `set()`, e.g. as a prefix for all custom fields added.
-
-[NOTE]
-====
-The `MetadataProvidingFieldBridge` contract is under active development and considered experimental at this time. It
-may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
-====
 
 [[flagging-uncovered-sorts]]
 ====== Flagging uncovered sorts
@@ -1730,7 +1718,7 @@ If you want to add multiple fields in your `TikaMetadataProcessor`, and also wan
 fields sortable, you should make your processor implement the `MetadataProvidingTikaMetadataProcessor`.
 This is similar to implementing `MetadataProvidingFieldBridge` on a regular field bridge: see <<sortablefield-annotation>>.
 
-Like `MetadataProvidingFieldBridge`, the `MetadataProvidingTikaMetadataProcessor` contract is under active development and considered experimental at this time. It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
+The `MetadataProvidingTikaMetadataProcessor` contract is under active development and considered experimental at this time. It may be altered in future revisions, e.g. by adding further methods, thus breaking existing implementations.
 ====
 
 The third interface is the `TikaParseContextProvider`.
