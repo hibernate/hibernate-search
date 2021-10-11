@@ -20,7 +20,9 @@ on:
       - '3.*'
 
 env:
-  MAVEN_ARGS: "-e -B"
+  # Maven Wagon options are supposed to work around a problem on GitHub Actions' hosting platform, Azure
+  # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-691957310
+  MAVEN_ARGS: "-e -B -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3"
 jobs:
   build:
     name: Build and test on Java 11
