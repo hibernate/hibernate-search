@@ -40,6 +40,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.mapper.javabean.schema.management.SearchSchemaManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
@@ -120,6 +121,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	@Override
 	public <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScope<T> scope) {
 		return search( (SearchScopeImpl<T>) scope );
+	}
+
+	@Override
+	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
+		return scope( types ).schemaManager();
 	}
 
 	@Override

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.log.impl;
 
+import java.util.List;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -59,5 +60,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 14, value = "Unable to access search session: %1$s")
 	SearchException hibernateSessionAccessError(String causeMessage);
+
+	@Message(id = ID_OFFSET + 15, value = "Invalid schema management strategy name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation,
+			List<String> validRepresentations);
 
 }

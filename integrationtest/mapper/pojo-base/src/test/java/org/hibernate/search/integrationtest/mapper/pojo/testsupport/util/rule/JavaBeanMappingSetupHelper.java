@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMappingBuilder;
+import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -73,13 +74,20 @@ public final class JavaBeanMappingSetupHelper
 		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
 
 		SetupContext() {
+			properties.put( JavaBeanMapperSpiSettings.SCHEMA_MANAGEMENT_STRATEGY,
+					SchemaManagementStrategyName.NONE );
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> properties.forEach( builder::property ) );
 		}
 
 		@Override
 		public SetupContext withProperty(String key, Object value) {
-			properties.put( key, value );
+			if ( value != null ) {
+				properties.put( key, value );
+			}
+			else {
+				properties.remove( key );
+			}
 			return thisAsC();
 		}
 

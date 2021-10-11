@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.javabean.mapping.metadata.impl.JavaBeanEntityTypeMetadataProvider;
+import org.hibernate.search.mapper.javabean.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -19,9 +20,12 @@ public final class JavaBeanMapperDelegate
 	private final JavaBeanEntityTypeMetadataProvider metadataProvider;
 	private final JavaBeanTypeContextContainer.Builder typeContextContainerBuilder =
 			new JavaBeanTypeContextContainer.Builder();
+	private final SchemaManagementListener schemaManagementListener;
 
-	public JavaBeanMapperDelegate(JavaBeanEntityTypeMetadataProvider metadataProvider) {
+	public JavaBeanMapperDelegate(JavaBeanEntityTypeMetadataProvider metadataProvider,
+			SchemaManagementListener schemaManagementListener) {
 		this.metadataProvider = metadataProvider;
+		this.schemaManagementListener = schemaManagementListener;
 	}
 
 	@Override
@@ -43,7 +47,7 @@ public final class JavaBeanMapperDelegate
 
 	@Override
 	public JavaBeanMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
-		return new JavaBeanMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build() );
+		return new JavaBeanMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder.build(), schemaManagementListener );
 	}
 
 }
