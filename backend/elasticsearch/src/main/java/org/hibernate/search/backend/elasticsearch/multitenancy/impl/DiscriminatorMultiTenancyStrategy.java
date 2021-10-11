@@ -82,17 +82,23 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	private static class DiscriminatorMultiTenancyIndexSchemaRootContributor implements IndexSchemaRootContributor {
 		@Override
 		public void contribute(RootTypeMapping rootTypeMapping) {
-			PropertyMapping idPropertyMapping = new PropertyMapping();
-			idPropertyMapping.setType( DataTypes.KEYWORD );
-			idPropertyMapping.setIndex( false );
-			idPropertyMapping.setDocValues( true );
-			rootTypeMapping.addProperty( ID_FIELD_NAME, idPropertyMapping );
+			// do not override if the property is defined in the user custom mapping
+			if ( rootTypeMapping.getProperties() == null || !rootTypeMapping.getProperties().containsKey( ID_FIELD_NAME ) ) {
+				PropertyMapping idPropertyMapping = new PropertyMapping();
+				idPropertyMapping.setType( DataTypes.KEYWORD );
+				idPropertyMapping.setIndex( false );
+				idPropertyMapping.setDocValues( true );
+				rootTypeMapping.addProperty( ID_FIELD_NAME, idPropertyMapping );
+			}
 
-			PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
-			tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
-			tenantIdPropertyMapping.setIndex( true );
-			tenantIdPropertyMapping.setDocValues( true );
-			rootTypeMapping.addProperty( TENANT_ID_FIELD_NAME, tenantIdPropertyMapping );
+			// do not override if the property is defined in the user custom mapping
+			if ( rootTypeMapping.getProperties() == null || !rootTypeMapping.getProperties().containsKey( TENANT_ID_FIELD_NAME ) ) {
+				PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
+				tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
+				tenantIdPropertyMapping.setIndex( true );
+				tenantIdPropertyMapping.setDocValues( true );
+				rootTypeMapping.addProperty( TENANT_ID_FIELD_NAME, tenantIdPropertyMapping );
+			}
 		}
 	}
 
