@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.mapper.javabean.schema.management.SearchSchemaManager;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -96,6 +97,13 @@ public interface SearchScope<E> {
 	 * @see SearchAggregationFactory
 	 */
 	SearchAggregationFactory aggregation();
+
+	/**
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 *
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	SearchSchemaManager schemaManager();
 
 	/**
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.

@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.mapper.javabean.schema.management.SearchSchemaManager;
 
 public interface SearchSession extends AutoCloseable {
 
@@ -100,6 +101,33 @@ public interface SearchSession extends AutoCloseable {
 	 * @see SearchQuerySelectStep
 	 */
 	<T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScope<T> scope);
+
+	/**
+	 * Create a {@link SearchSchemaManager} for all indexes.
+	 *
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	default SearchSchemaManager schemaManager() {
+		return schemaManager( Collections.singleton( Object.class ) );
+	}
+
+	/**
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to the given type, or to any of its sub-types.
+	 *
+	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the schema manager.
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	default SearchSchemaManager schemaManager(Class<?>... types) {
+		return schemaManager( Arrays.asList( types ) );
+	}
+
+	/**
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to the given types, or to any of their sub-types.
+	 *
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the schema manager.
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	SearchSchemaManager schemaManager(Collection<? extends Class<?>> types);
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.

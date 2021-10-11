@@ -9,17 +9,21 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 
 public class JavaBeanMappingPartialBuildState implements MappingPartialBuildState {
 
 	private final PojoMappingDelegate mappingDelegate;
 	private final JavaBeanTypeContextContainer typeContextContainer;
+	private final SchemaManagementListener schemaManagementListener;
 
 	JavaBeanMappingPartialBuildState(PojoMappingDelegate mappingDelegate,
-			JavaBeanTypeContextContainer typeContextContainer) {
+			JavaBeanTypeContextContainer typeContextContainer,
+			SchemaManagementListener schemaManagementListener) {
 		this.mappingDelegate = mappingDelegate;
 		this.typeContextContainer = typeContextContainer;
+		this.schemaManagementListener = schemaManagementListener;
 	}
 
 	@Override
@@ -28,7 +32,7 @@ public class JavaBeanMappingPartialBuildState implements MappingPartialBuildStat
 	}
 
 	public MappingImplementor<SearchMapping> finalizeMapping() {
-		return new JavaBeanMapping( mappingDelegate, typeContextContainer );
+		return new JavaBeanMapping( mappingDelegate, typeContextContainer, schemaManagementListener );
 	}
 
 }

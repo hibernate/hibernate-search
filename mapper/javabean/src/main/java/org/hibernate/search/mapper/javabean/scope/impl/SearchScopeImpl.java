@@ -21,9 +21,12 @@ import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexer;
+import org.hibernate.search.mapper.javabean.schema.management.SearchSchemaManager;
+import org.hibernate.search.mapper.javabean.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 
@@ -59,6 +62,11 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	@Override
+	public SearchSchemaManager schemaManager() {
+		return new SearchSchemaManagerImpl( schemaManagerDelegate() );
+	}
+
+	@Override
 	public Set<? extends SearchIndexedEntity<? extends E>> includedTypes() {
 		return delegate.includedIndexedTypes();
 	}
@@ -88,5 +96,9 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		JavaBeanLoadingContext context = mappingContext.loadingContextBuilder( sessionContext ).build();
 		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, sessionContext );
 		return new JavaBeanMassIndexer( massIndexerDelegate, context );
+	}
+
+	public PojoScopeSchemaManager schemaManagerDelegate() {
+		return delegate.schemaManager();
 	}
 }

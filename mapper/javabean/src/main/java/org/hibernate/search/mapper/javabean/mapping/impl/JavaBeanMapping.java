@@ -11,11 +11,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
@@ -25,7 +29,9 @@ import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;
+import org.hibernate.search.mapper.javabean.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
+import org.hibernate.search.mapper.javabean.scope.impl.JavaBeanScopeIndexedTypeContext;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -36,6 +42,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -48,15 +55,56 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 
 	private SearchIntegration integration;
 
-	JavaBeanMapping(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer) {
+	private boolean active;
+
+	private final SchemaManagementListener schemaManagementListener;
+
+	JavaBeanMapping(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer,
+			SchemaManagementListener schemaManagementListener) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
+		this.schemaManagementListener = schemaManagementListener;
+		this.active = true;
+	}
+
+	@Override
+	public CompletableFuture<?> start(MappingStartContext context) {
+		Optional<SearchScopeImpl<Object>> scopeOptional = createAllScope();
+		if ( !scopeOptional.isPresent() ) {
+			// No indexed type
+			return CompletableFuture.completedFuture( null );
+		}
+		SearchScopeImpl<Object> scope = scopeOptional.get();
+
+		// Schema management
+		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
+
+		return schemaManagementListener.onStart( context, schemaManager );
+	}
+
+	@Override
+	public CompletableFuture<?> preStop(MappingPreStopContext context) {
+		Optional<SearchScopeImpl<Object>> scope = createAllScope();
+		if ( !scope.isPresent() ) {
+			// No indexed type
+			return CompletableFuture.completedFuture( null );
+		}
+		PojoScopeSchemaManager schemaManager = scope.get().schemaManagerDelegate();
+		return schemaManagementListener.onStop( context, schemaManager );
 	}
 
 	@Override
 	public void close() {
-		if ( integration != null ) {
-			integration.close();
+		if ( !active ) {
+			return;
+		}
+		try {
+			if ( integration != null ) {
+				integration.close();
+			}
+		}
+		finally {
+			active = false;
 		}
 	}
 
@@ -165,6 +213,15 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 
 	public void setIntegration(SearchIntegration integration) {
 		this.integration = integration;
+	}
+
+	private Optional<SearchScopeImpl<Object>> createAllScope() {
+		return delegate()
+				.<EntityReference, JavaBeanScopeIndexedTypeContext<?>>createPojoAllScope(
+						this,
+						typeContextContainer::indexedForExactType
+				)
+				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
 	}
 
 	private JavaBeanSearchSession.Builder createSearchManagerBuilder() {
