@@ -11,7 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -33,11 +32,9 @@ public class PersonalContact extends Contact {
 	private String surname;
 
 	@Column(name = "P_DATEOFBIRTH")
-	@Type(type = "java.util.Date")
 	private Date dateOfBirth;
 
 	@Column(name = "P_NOTIFYBIRTHDAY")
-	@Type(type = "boolean")
 	private boolean notifyBirthDay;
 
 	@Column(name = "P_MYFACESURL")
@@ -48,7 +45,6 @@ public class PersonalContact extends Contact {
 	private int reminderCount;
 
 	@Column(name = "P_REMINDERRESET")
-	@Type(type = "boolean")
 	private boolean reset;
 
 	public PersonalContact() {
