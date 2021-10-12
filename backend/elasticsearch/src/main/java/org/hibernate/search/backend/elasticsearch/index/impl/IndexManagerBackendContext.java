@@ -177,6 +177,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	ElasticsearchIndexSchemaManager createSchemaManager(ElasticsearchIndexModel model,
 			ElasticsearchIndexLifecycleExecutionOptions lifecycleExecutionOptions) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
+				link.getGsonProvider(),
 				link.getIndexMetadataSyntax(),
 				model.names()
 		);

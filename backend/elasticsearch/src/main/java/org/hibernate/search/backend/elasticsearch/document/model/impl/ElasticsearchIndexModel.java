@@ -28,18 +28,20 @@ public class ElasticsearchIndexModel
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final IndexSettings customIndexSettings;
 	private final RootTypeMapping mapping;
+	private final RootTypeMapping customMapping;
 
 	public ElasticsearchIndexModel(IndexNames names, String mappedTypeName,
 			IndexIdentifier identifier,
 			ElasticsearchIndexRoot rootNode, Map<String, ElasticsearchIndexField> staticFields,
 			List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
-			RootTypeMapping mapping) {
+			RootTypeMapping mapping, RootTypeMapping customMapping) {
 		super( names.hibernateSearchIndex(), mappedTypeName, identifier, rootNode, staticFields, fieldTemplates );
 		this.names = names;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.customIndexSettings = customIndexSettings;
 		this.mapping = mapping;
+		this.customMapping = customMapping;
 	}
 
 	@Override
@@ -68,6 +70,7 @@ public class ElasticsearchIndexModel
 		builder.setAnalysisDefinitionRegistry( analysisDefinitionRegistry );
 		builder.setCustomIndexSettings( customIndexSettings );
 		builder.setMapping( mapping );
+		builder.setCustomMapping( customMapping );
 	}
 
 	@Override

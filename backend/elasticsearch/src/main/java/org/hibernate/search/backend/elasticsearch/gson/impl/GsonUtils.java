@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.gson.impl;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -46,6 +47,18 @@ public final class GsonUtils {
 			array.add( newValue );
 			object.add( propertyName, array );
 		}
+	}
+
+	/**
+	 * Efficiently performs a deep copy of a given object using Gson serialization/deserialization.
+	 * @param gson The {@link Gson} object.
+	 * @param objectType The type of the object to copy.
+	 * @param object The object to copy.
+	 * @param <T> The type of the object to copy.
+	 * @return A deep copy of {@code object}.
+	 */
+	public static <T> T deepCopy(Gson gson, Class<T> objectType, T object) {
+		return gson.fromJson( gson.toJsonTree( object ), objectType );
 	}
 
 }
