@@ -24,7 +24,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -54,21 +53,17 @@ public class Contact implements Serializable {
 	private String email;
 
 	@Column(name = "C_CREATEDON")
-	@Type(type = "java.util.Date")
 	private Date createdOn;
 
 	@Column(name = "C_LASTUPDATEDON")
-	@Type(type = "java.util.Date")
 	private Date lastUpdatedOn;
 
 	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contact")))
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
-	@Type(type = "java.util.Set")
 	private Set<Address> addresses;
 
 	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contact")))
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
-	@Type(type = "java.util.Set")
 	private Set<Phone> phoneNumbers;
 
 	@Column(name = "C_NOTES")

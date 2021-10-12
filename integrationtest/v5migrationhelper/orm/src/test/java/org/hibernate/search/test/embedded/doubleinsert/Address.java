@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -61,15 +60,12 @@ public class Address implements Serializable {
 	private String postcode;
 
 	@Column(name = "A_ACTIVE")
-	@Type(type = "boolean")
 	private boolean active;
 
 	@Column(name = "A_CREATEDON")
-	@Type(type = "java.util.Date")
 	private Date createdOn;
 
 	@Column(name = "A_LASTUPDATEDON")
-	@Type(type = "java.util.Date")
 	private Date lastUpdatedOn;
 
 	@ManyToOne

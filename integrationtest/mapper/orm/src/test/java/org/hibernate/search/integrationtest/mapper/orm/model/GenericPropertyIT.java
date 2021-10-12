@@ -15,7 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.annotations.Type;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -128,13 +127,19 @@ public class GenericPropertyIT {
 		private Integer id;
 
 		@Basic
-		@Type(type = "serializable") // Necessary for Hibernate ORM...
 		@GenericField
+		// Necessary for Hibernate ORM: even if we make T extend Serializable,
+		// ORM doesn't take it into account for some reason.
+		@SuppressWarnings("deprecation")
+		@org.hibernate.annotations.Type(type = "serializable")
 		private T content;
 
 		@Basic
-		@Type(type = "serializable") // Necessary for Hibernate ORM...
 		@GenericField
+		// Necessary for Hibernate ORM: even if we make T extend Serializable,
+		// ORM doesn't take it into account for some reason.
+		@SuppressWarnings("deprecation")
+		@org.hibernate.annotations.Type(type = "serializable")
 		private T[] arrayContent;
 
 		@OneToMany(mappedBy = "genericProperty")

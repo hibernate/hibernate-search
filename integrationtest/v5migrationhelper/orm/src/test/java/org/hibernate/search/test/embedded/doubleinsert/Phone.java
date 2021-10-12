@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -46,11 +45,9 @@ public class Phone implements Serializable {
 	private String type;
 
 	@Column(name = "P_CREATEDON")
-	@Type(type = "java.util.Date")
 	private Date createdOn;
 
 	@Column(name = "P_LASTUPDATEDON")
-	@Type(type = "java.util.Date")
 	private Date lastUpdatedOn;
 
 	@ManyToOne
