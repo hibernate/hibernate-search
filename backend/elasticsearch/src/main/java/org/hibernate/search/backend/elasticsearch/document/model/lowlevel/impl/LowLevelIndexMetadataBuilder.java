@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
@@ -21,13 +23,16 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.
 
 public class LowLevelIndexMetadataBuilder {
 
+	private final GsonProvider gsonProvider;
 	private final ElasticsearchIndexMetadataSyntax syntax;
 	private final IndexNames indexNames;
 	private ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private IndexSettings customIndexSettings;
 	private RootTypeMapping mapping;
+	private RootTypeMapping customMapping;
 
-	public LowLevelIndexMetadataBuilder(ElasticsearchIndexMetadataSyntax syntax, IndexNames indexNames) {
+	public LowLevelIndexMetadataBuilder(GsonProvider gsonProvider, ElasticsearchIndexMetadataSyntax syntax, IndexNames indexNames) {
+		this.gsonProvider = gsonProvider;
 		this.syntax = syntax;
 		this.indexNames = indexNames;
 	}
@@ -44,13 +49,17 @@ public class LowLevelIndexMetadataBuilder {
 		this.mapping = mapping;
 	}
 
+	public void setCustomMapping(RootTypeMapping customMapping) {
+		this.customMapping = customMapping;
+	}
+
 	public IndexMetadata build() {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setAliases( buildAliases() );
 
 		indexMetadata.setSettings( buildSettings() );
 
-		indexMetadata.setMapping( mapping );
+		indexMetadata.setMapping( buildMapping() );
 		return indexMetadata;
 	}
 
@@ -88,6 +97,20 @@ public class LowLevelIndexMetadataBuilder {
 		settings.merge( customIndexSettings );
 
 		return settings;
+	}
+
+	private RootTypeMapping buildMapping() {
+		if ( customMapping == null ) {
+			return mapping;
+		}
+		// Avoid side effects: we copy the mappings before modifying them.
+		RootTypeMapping customMappingCopy =
+				GsonUtils.deepCopy( gsonProvider.getGsonNoSerializeNulls(), RootTypeMapping.class, customMapping );
+		RootTypeMapping hibernateSearchMappingCopy =
+				GsonUtils.deepCopy( gsonProvider.getGsonNoSerializeNulls(), RootTypeMapping.class, mapping );
+		// The custom mapping takes precedence over the Hibernate Search one.
+		customMappingCopy.merge( hibernateSearchMappingCopy );
+		return customMappingCopy;
 	}
 
 	/*

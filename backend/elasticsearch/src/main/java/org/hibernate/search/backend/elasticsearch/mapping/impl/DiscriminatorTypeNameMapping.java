@@ -65,11 +65,6 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 			implements IndexSchemaRootContributor {
 		@Override
 		public void contribute(RootTypeMapping rootTypeMapping) {
-			if ( rootTypeMapping.getProperties() != null && rootTypeMapping.getProperties().containsKey( MAPPED_TYPE_FIELD_NAME ) ) {
-				// do not override if the property is defined in the user custom mapping
-				return;
-			}
-
 			PropertyMapping mappedTypePropertyMapping = new PropertyMapping();
 			mappedTypePropertyMapping.setType( DataTypes.KEYWORD );
 			mappedTypePropertyMapping.setIndex( false );

@@ -110,10 +110,16 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	public ElasticsearchIndexModel build() {
 		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
 
-		RootTypeMapping mapping = rootTypeMapping();
+		RootTypeMapping mapping = new RootTypeMapping();
+		if ( routing != null ) {
+			mapping.setRouting( routing );
+		}
+
 		for ( IndexSchemaRootContributor schemaRootContributor : schemaRootContributors ) {
 			schemaRootContributor.contribute( mapping );
 		}
+
+		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
 
 		Map<String, ElasticsearchIndexField> staticFields = new HashMap<>();
 		List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
@@ -151,7 +157,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates,
-				analysisDefinitionRegistry, customIndexSettings, mapping );
+				analysisDefinitionRegistry, customIndexSettings, mapping, customIndexMapping );
 	}
 
 	@Override
@@ -166,18 +172,5 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 
 	EventContext getIndexEventContext() {
 		return indexEventContext;
-	}
-
-	private RootTypeMapping rootTypeMapping() {
-		if ( customIndexMapping != null ) {
-			return customIndexMapping;
-		}
-
-		RootTypeMapping mapping = new RootTypeMapping();
-		if ( routing != null ) {
-			mapping.setRouting( routing );
-		}
-		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
-		return mapping;
 	}
 }

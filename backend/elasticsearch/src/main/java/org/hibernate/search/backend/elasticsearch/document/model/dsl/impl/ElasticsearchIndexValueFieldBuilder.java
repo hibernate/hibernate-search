@@ -84,11 +84,7 @@ class ElasticsearchIndexValueFieldBuilder<F>
 		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );
 
-		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) &&
-				// If the value (leaf) property is already present on both sides,
-				// we will take the one from the user:
-				( parentMapping.getProperties() == null ||
-						!parentMapping.getProperties().containsKey( relativeFieldName ) ) ) {
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
 			parentMapping.addProperty( relativeFieldName, type.mapping() );
 		}
 
