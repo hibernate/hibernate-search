@@ -71,12 +71,14 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				"          'doc_values':false " +
 				"       }, " +
 				"       'bothObject':{ " +
+				"          'dynamic':'strict', " +
 				"          'properties':{ " +
 				"             'bothNested':{ " +
 				"                'type':'keyword', " +
 				"                'doc_values':false " +
 				"             }, " +
 				"             'bothNestedObject':{ " +
+				"                'dynamic':'strict', " +
 				"                'properties':{ " +
 				"                   'bothNestedNested':{ " +
 				"                      'type':'keyword', " +
@@ -93,7 +95,8 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				"                'doc_values':false " +
 				"             }, " +
 				"             'searchNestedObject':{ " +
-				"                'type':'object' " +
+				"                'type':'object', " +
+				"                'dynamic':'strict' " +
 				"             } " +
 				"          } " +
 				"       }, " +
@@ -102,7 +105,8 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				"          'doc_values':false " +
 				"       }, " +
 				"       'searchObject':{ " +
-				"          'type':'object' " +
+				"          'type':'object', " +
+				"          'dynamic':'strict' " +
 				"       }, " +
 				"       'userField':{ " +
 				"          'type':'keyword', " +
