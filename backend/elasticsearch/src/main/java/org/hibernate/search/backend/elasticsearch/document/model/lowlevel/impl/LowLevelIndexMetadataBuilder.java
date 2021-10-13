@@ -93,10 +93,17 @@ public class LowLevelIndexMetadataBuilder {
 			getAnalysis( settings ).setCharFilters( analysisDefinitionRegistry.getCharFilterDefinitions() );
 		}
 
-		// if customSettings are present, merge them with the ones created by Search
-		settings.merge( customIndexSettings );
+		if ( customIndexSettings == null ) {
+			return settings;
+		}
 
-		return settings;
+		// If customIndexSettings are present, merge them with the ones created by Search.
+		// Avoid side effects: we copy the settings before modifying them.
+		IndexSettings customIndexSettingsCopy =
+				GsonUtils.deepCopy( gsonProvider.getGsonNoSerializeNulls(), IndexSettings.class, customIndexSettings );
+		// The custom settings take precedence over the Hibernate Search ones.
+		customIndexSettingsCopy.merge( settings );
+		return customIndexSettingsCopy;
 	}
 
 	private RootTypeMapping buildMapping() {
