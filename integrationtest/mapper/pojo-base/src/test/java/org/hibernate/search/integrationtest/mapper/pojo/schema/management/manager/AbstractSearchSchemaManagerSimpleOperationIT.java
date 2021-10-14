@@ -23,14 +23,13 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.junit.Before;
 
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@Rule
+	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public final JavaBeanMappingSetupHelper setupHelper
@@ -44,10 +43,6 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 
 		mapping = setupHelper.start()
-				.withConfiguration( b -> {
-					b.addEntityType( IndexedEntity1.class );
-					b.addEntityType( IndexedEntity2.class );
-				} )
 				.setup( IndexedEntity1.class, IndexedEntity2.class );
 
 		backendMock.verifyExpectationsMet();

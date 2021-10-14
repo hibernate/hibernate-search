@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
+import org.hibernate.search.mapper.javabean.cfg.JavaBeanMapperSettings;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -27,7 +27,7 @@ import org.junit.Test;
 public abstract class AbstractSchemaManagementStrategyIT {
 
 	@Rule
-	public BackendMock backendMock = new BackendMock();
+	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public final JavaBeanMappingSetupHelper setupHelper
@@ -37,8 +37,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 	public void noIndexedType() {
 		SchemaManagementStrategyName strategyName = getStrategyName();
 		CloseableSearchMapping mapper = setupHelper.start()
-				.withProperty(
-						JavaBeanMapperSpiSettings.SCHEMA_MANAGEMENT_STRATEGY,
+				.withProperty( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						strategyName == null ? null : strategyName.externalRepresentation()
 				)
 				.setup();
@@ -119,14 +118,9 @@ public abstract class AbstractSchemaManagementStrategyIT {
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 		SchemaManagementStrategyName strategyName = getStrategyName();
 		return (CloseableSearchMapping) setupHelper.start()
-				.withProperty(
-						JavaBeanMapperSpiSettings.SCHEMA_MANAGEMENT_STRATEGY,
+				.withProperty( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						strategyName == null ? null : strategyName.externalRepresentation()
 				)
-				.withConfiguration( b -> {
-					b.addEntityType( IndexedEntity1.class );
-					b.addEntityType( IndexedEntity2.class );
-				} )
 				.setup( IndexedEntity1.class, IndexedEntity2.class );
 	}
 
