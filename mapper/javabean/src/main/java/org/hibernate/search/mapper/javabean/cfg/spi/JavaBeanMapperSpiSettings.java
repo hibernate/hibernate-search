@@ -21,7 +21,6 @@ public final class JavaBeanMapperSpiSettings {
 		}
 
 		public static final String BEAN_PROVIDER = "bean_provider";
-		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 	}
 
 	/**
