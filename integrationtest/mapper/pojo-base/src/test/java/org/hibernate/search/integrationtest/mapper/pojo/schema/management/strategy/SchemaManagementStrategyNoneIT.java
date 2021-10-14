@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.schema.management.strat
 
 import java.lang.invoke.MethodHandles;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
+import org.hibernate.search.mapper.javabean.cfg.JavaBeanMapperSettings;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -42,14 +42,9 @@ public class SchemaManagementStrategyNoneIT {
 		backendMock.expectAnySchema( IndexedEntity1.NAME );
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 		return (CloseableSearchMapping) setupHelper.start()
-				.withProperty(
-						JavaBeanMapperSpiSettings.SCHEMA_MANAGEMENT_STRATEGY,
+				.withProperty( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						getStrategyName()
 				)
-				.withConfiguration( b -> {
-					b.addEntityType( IndexedEntity1.class );
-					b.addEntityType( IndexedEntity2.class );
-				} )
 				.setup( IndexedEntity1.class, IndexedEntity2.class );
 	}
 

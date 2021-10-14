@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.mapper.javabean.cfg.JavaBeanMapperSettings;
 import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -74,7 +75,7 @@ public final class JavaBeanMappingSetupHelper
 		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
 
 		SetupContext() {
-			properties.put( JavaBeanMapperSpiSettings.SCHEMA_MANAGEMENT_STRATEGY,
+			properties.put( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 					SchemaManagementStrategyName.NONE );
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> properties.forEach( builder::property ) );

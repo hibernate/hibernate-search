@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.javabean.cfg.spi;
 
-import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
-
 public final class JavaBeanMapperSpiSettings {
 
 	private JavaBeanMapperSpiSettings() {
@@ -16,18 +14,6 @@ public final class JavaBeanMapperSpiSettings {
 	public static final String PREFIX = "hibernate.search.";
 
 	public static final String BEAN_PROVIDER = PREFIX + Radicals.BEAN_PROVIDER;
-
-	/**
-	 * The schema management strategy, controlling how indexes and their schema
-	 * are created, updated, validated or dropped on startup and shutdown.
-	 * <p>
-	 * Expects a {@link SchemaManagementStrategyName} value, or a String representation of such value.
-	 * <p>
-	 * Defaults to {@link Defaults#SCHEMA_MANAGEMENT_STRATEGY}.
-	 *
-	 * @see SchemaManagementStrategyName
-	 */
-	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
 
 	public static class Radicals {
 
@@ -45,8 +31,6 @@ public final class JavaBeanMapperSpiSettings {
 
 		private Defaults() {
 		}
-
-		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 	}
 
 }

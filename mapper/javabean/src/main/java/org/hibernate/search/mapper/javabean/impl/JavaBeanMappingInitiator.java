@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.impl;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
-import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
+import org.hibernate.search.mapper.javabean.cfg.JavaBeanMapperSettings;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapperDelegate;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurer;
@@ -24,9 +24,9 @@ import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator
 public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaBeanMappingPartialBuildState> {
 
 	private static final ConfigurationProperty<SchemaManagementStrategyName> SCHEMA_MANAGEMENT_STRATEGY
-			= ConfigurationProperty.forKey( JavaBeanMapperSpiSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
+			= ConfigurationProperty.forKey( JavaBeanMapperSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
 					.as( SchemaManagementStrategyName.class, SchemaManagementStrategyName::of )
-					.withDefault( JavaBeanMapperSpiSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
+					.withDefault( JavaBeanMapperSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
 					.build();
 
 	private final JavaBeanEntityTypeMetadataProvider.Builder entityTypeMetadataProviderBuilder;
