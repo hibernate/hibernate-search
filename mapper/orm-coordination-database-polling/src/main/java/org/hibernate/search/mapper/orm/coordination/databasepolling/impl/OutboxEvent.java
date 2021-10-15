@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 
-import java.util.Arrays;
-import java.util.Objects;
 import javax.persistence.Transient;
 
 public final class OutboxEvent {
@@ -33,6 +31,18 @@ public final class OutboxEvent {
 		this.entityIdHash = entityIdHash;
 		this.payload = payload;
 		this.originalEntityId = originalEntityId;
+	}
+
+	@Override
+	public String toString() {
+		return "OutboxEvent{" +
+				"id=" + id +
+				", entityName='" + entityName + '\'' +
+				", entityId='" + entityId + '\'' +
+				", entityIdHash='" + entityIdHash + '\'' +
+				", retries=" + retries +
+				", originalEntityId=" + originalEntityId +
+				'}';
 	}
 
 	public Long getId() {
@@ -95,35 +105,4 @@ public final class OutboxEvent {
 		return new OutboxEventReference( getEntityName(), getEntityId() );
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != o.getClass() ) {
-			return false;
-		}
-		OutboxEvent event = (OutboxEvent) o;
-		return Objects.equals( entityName, event.entityName ) && Objects.equals(
-				entityId, event.entityId ) && Arrays.equals( payload, event.payload );
-	}
-
-	@Override
-	public int hashCode() {
-		int result = Objects.hash( entityName, entityId );
-		result = 31 * result + Arrays.hashCode( payload );
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		return "OutboxEvent{" +
-				"id=" + id +
-				", entityName='" + entityName + '\'' +
-				", entityId='" + entityId + '\'' +
-				", entityIdHash='" + entityIdHash + '\'' +
-				", retries=" + retries +
-				", originalEntityId=" + originalEntityId +
-				'}';
-	}
 }
