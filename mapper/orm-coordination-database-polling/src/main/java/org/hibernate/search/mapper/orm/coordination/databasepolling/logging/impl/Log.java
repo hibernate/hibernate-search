@@ -32,8 +32,8 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET = MessageConstants.MAPPER_ORM_DATABASE_POLLING_ID_RANGE_MIN;
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 1, value = "Outbox-generated entity mapping: %1$s")
-	void outboxGeneratedEntityMapping(String xmlMappingDefinition);
+	@Message(id = ID_OFFSET + 1, value = "Generated entity mapping for outbox events used in the database-polling coordination strategy: %1$s")
+	void outboxEventGeneratedEntityMapping(String xmlMappingDefinition);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 2, value = "Session factory closed while processing outbox events. Assuming Hibernate Search is shutting down.")
