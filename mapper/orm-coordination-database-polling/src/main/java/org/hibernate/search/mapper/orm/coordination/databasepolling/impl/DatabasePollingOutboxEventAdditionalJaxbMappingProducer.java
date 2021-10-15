@@ -37,7 +37,7 @@ public class DatabasePollingOutboxEventAdditionalJaxbMappingProducer
 	private static final String HSEARCH_TABLE_NAME_PREFIX = "HSEARCH_";
 
 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-	private static final String TABLE_NAME = HSEARCH_TABLE_NAME_PREFIX + "OUTBOX_TABLE";
+	private static final String TABLE_NAME = HSEARCH_TABLE_NAME_PREFIX + "OUTBOX_EVENT";
 
 	private static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping>\n" +

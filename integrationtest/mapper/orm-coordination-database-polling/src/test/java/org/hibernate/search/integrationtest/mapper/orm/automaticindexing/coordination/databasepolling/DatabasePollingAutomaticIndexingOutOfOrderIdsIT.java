@@ -41,7 +41,7 @@ import org.junit.Test;
 
 public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 
-	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
+	private static final String OUTBOX_EVENT_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ? WHERE ID = ?";
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
@@ -385,7 +385,7 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 				);
 			}
 
-			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_TABLE_UPDATE_ID ) ) {
+			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
 				ps.setInt( 1, newId );
 				ps.setInt( 2, oldId );
 
