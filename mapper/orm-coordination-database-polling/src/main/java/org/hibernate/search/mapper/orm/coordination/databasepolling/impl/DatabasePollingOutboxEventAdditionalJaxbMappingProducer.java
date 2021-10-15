@@ -63,7 +63,7 @@ public class DatabasePollingOutboxEventAdditionalJaxbMappingProducer
 			+ " and there's nothing we can do about it")
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
-		log.outboxGeneratedEntityMapping( ENTITY_DEFINITION );
+		log.outboxEventGeneratedEntityMapping( ENTITY_DEFINITION );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
 
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( ENTITY_DEFINITION.getBytes() );
