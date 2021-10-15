@@ -42,7 +42,7 @@ public class DatabasePollingOutboxEventAdditionalJaxbMappingProducer
 	private static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping>\n" +
 			"    <class name=\"" + OutboxEvent.class.getName() + "\" table=\"" + TABLE_NAME + "\">\n" +
-			"        <id name=\"id\" column=\"ID\" type=\"long\">\n" +
+			"        <id name=\"id\" type=\"long\">\n" +
 			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
 			"                <param name=\"sequence_name\">" + TABLE_NAME + "_GENERATOR</param>\n" +
 			"                <param name=\"table_name\">" + TABLE_NAME + "_GENERATOR</param>\n" +
