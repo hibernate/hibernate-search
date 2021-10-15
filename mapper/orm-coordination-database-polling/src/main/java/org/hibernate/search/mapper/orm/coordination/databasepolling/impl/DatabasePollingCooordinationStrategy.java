@@ -90,7 +90,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
-		context.mappingProducer( new DatabasePollingAdditionalJaxbMappingProducer() );
+		context.mappingProducer( new DatabasePollingOutboxEventAdditionalJaxbMappingProducer() );
 		context.sendIndexingEventsTo( ctx -> new DatabasePollingOutboxEventSendingPlan( ctx.session() ), true );
 	}
 
