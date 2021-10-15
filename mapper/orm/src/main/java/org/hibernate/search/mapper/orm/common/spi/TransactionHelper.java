@@ -53,12 +53,7 @@ public final class TransactionHelper {
 			procedure.accept( session );
 		}
 		catch (Exception e) {
-			try {
-				rollback( session );
-			}
-			catch (RuntimeException e2) {
-				e.addSuppressed( e2 );
-			}
+			rollbackSafely( session, e );
 			throw e;
 		}
 		commit( session );
@@ -97,7 +92,16 @@ public final class TransactionHelper {
 		}
 	}
 
-	public void rollback(SharedSessionContractImplementor session) {
+	public void rollbackSafely(SharedSessionContractImplementor session, Throwable t) {
+		try {
+			rollback( session );
+		}
+		catch (RuntimeException e) {
+			t.addSuppressed( e );
+		}
+	}
+
+	private void rollback(SharedSessionContractImplementor session) {
 		try {
 			if ( useJta ) {
 				transactionManager.rollback();
