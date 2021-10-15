@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIdentifierLoader {
@@ -65,8 +64,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 					.scroll( ScrollMode.FORWARD_ONLY );
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( h -> h.rollback( session ), transactionHelper );
+			transactionHelper.rollbackSafely( session, e );
 			throw e;
 		}
 	}

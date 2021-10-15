@@ -57,12 +57,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 			session.clear();
 		}
 		catch (Exception e) {
-			try {
-				transactionHelper.rollback( session );
-			}
-			catch (RuntimeException e2) {
-				e.addSuppressed( e2 );
-			}
+			transactionHelper.rollbackSafely( session, e );
 			throw e;
 		}
 		transactionHelper.commit( session );
