@@ -114,7 +114,10 @@ public class HibernateOrmClassRawTypeModel<T>
 				return findInSelfOrParents( t -> t.declaredPropertyGetters( propertyName ) );
 			}
 			else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
-				Member field = findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+				// The field name may be different from the property name,
+				// in particular with Grails when using Groovy traits (see HSEARCH-4348)
+				String memberName = memberFromHibernateOrmMetamodel.getName();
+				Member field = findInSelfOrParents( t -> t.declaredPropertyField( memberName ) );
 				return field == null ? null : Collections.singletonList( field );
 			}
 			else {
