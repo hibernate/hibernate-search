@@ -1,6 +1,38 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.7.Final (2021-10-18)
+-------------------------
+
+** Bug
+    * HSEARCH-4307 Hibernate Search version detection doesn't work on native images
+    * HSEARCH-4303 No automatic reindexing on insert/delete of contained entity without corresponding update in the containing entity
+
+** Improvement
+    * HSEARCH-4331 Default identifier bridges for some types supported in Search 5
+
+** Task
+    * HSEARCH-4343 Move away from repository.jboss.org for releases and (where possible) dependencies
+    * HSEARCH-4341 Fix GitHub action build taking 6+ hours to complete
+    * HSEARCH-4337 Document in the 6.0 migration guide the features restored in Hibernate Search 6.1
+    * HSEARCH-4328 Refactor JSR-352 ITs for safer startup/shutdown
+    * HSEARCH-4313 Missing anchors in the documentation
+    * HSEARCH-4310 Disable tests for dynamic BigDecimal fields on Elasticsearch 5.6
+    * HSEARCH-4301 Document the change of default Similarity in the migration guide
+    * HSEARCH-4300 Fix build timeout after 1 hour when testing against DB2
+    * HSEARCH-4296 Make sure assertion errors in background threads caused by unexpected works will fail a test
+    * HSEARCH-4285 Use containers to run databases in the 6.0 branch
+    * HSEARCH-4284 Use a different JDK for running Maven than for compiling tests in JDK CI jobs
+    * HSEARCH-4277 Upgrade to Awaitily 4.1.0
+    * HSEARCH-4276 Upgrade to the latest version of the Elasticsearch servers for tests
+    * HSEARCH-4274 Set up SSH config as part of the Jenkinsfile
+    * HSEARCH-4269 Fix assertion error on rollback being reported before the assertion error that triggered the rollback
+    * HSEARCH-4267 Fix variable interpolation in Jenkinsfile
+    * HSEARCH-4264 Disable extra database builds (postgres, oracle) by default for builds of topic branches in forks
+    * HSEARCH-4263 Switch to dockerhub to retrieve Elasticsearch container images
+    * HSEARCH-4227 Safer work expectations in backend mock
+    * HSEARCH-4172 Ignore relative ordering of works on different documents in BackendMock
+
 6.0.6.Final (20-07-2021)
 -------------------------
 
