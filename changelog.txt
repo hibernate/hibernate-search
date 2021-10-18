@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.10.Final (2021-10-18)
+-------------------------
+
+** Bug
+    * HSEARCH-4225 Memory leak (SessionImpl) when updating index without transaction
+
+** Task
+    * HSEARCH-4343 Move away from repository.jboss.org for releases and (where possible) dependencies
+    * HSEARCH-4336 Deprecate features that don't have a direct equivalent in Hibernate Search 6.0
+    * HSEARCH-4274 Set up SSH config as part of the Jenkinsfile
+    * HSEARCH-4267 Fix variable interpolation in Jenkinsfile
+    * HSEARCH-4264 Disable extra database builds (postgres, oracle) by default for builds of topic branches in forks
+    * HSEARCH-4260 Display Java version during builds
+    * HSEARCH-4259 Use the build's Maven settings also when retrieving the Karaf distribution in OSGi tests
+    * HSEARCH-4257 Upgrade to JUnit 4.13.2
+    * HSEARCH-4247 Upgrade to Byteman 4.0.16
+    * HSEARCH-4241 Upgrade to Hibernate ORM 5.4.32.Final
+    * HSEARCH-4226 Stop testing against JDK15
+    * HSEARCH-4221 Upgrade to Byteman 4.0.15
+    * HSEARCH-4219 Upgrade to Hibernate ORM 5.4.31.Final
+
 5.11.9.Final (05-05-2021)
 -------------------------
 
