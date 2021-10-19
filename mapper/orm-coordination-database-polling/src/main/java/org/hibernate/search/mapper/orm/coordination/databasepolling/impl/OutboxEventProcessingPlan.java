@@ -20,7 +20,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.AvroSerializationUtils;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.EventPayloadSerializationUtils;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -77,7 +77,7 @@ public class OutboxEventProcessingPlan {
 
 	private void addEventsToThePlan() {
 		for ( OutboxEvent event : events ) {
-			PojoIndexingQueueEventPayload payload = AvroSerializationUtils.deserialize( event.getPayload() );
+			PojoIndexingQueueEventPayload payload = EventPayloadSerializationUtils.deserialize( event.getPayload() );
 			processingPlan.append( event.getEntityName(), event.getEntityId(), payload );
 		}
 	}

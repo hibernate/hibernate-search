@@ -79,9 +79,9 @@ public interface Log extends BasicLogger {
 	void outboxEventProcessorUnableToLock(String name, @Cause OptimisticLockException lockException);
 
 	@Message(id = ID_OFFSET + 12, value = "Unable to serialize OutboxEvent payload with Avro")
-	SearchException unableToSerializeWithAvro(@Cause Throwable e);
+	SearchException unableToSerializeOutboxEventPayloadWithAvro(@Cause Throwable e);
 
 	@Message(id = ID_OFFSET + 13, value = "Unable to deserialize OutboxEvent payload with Avro")
-	SearchException unableToDeserializeWithAvro(@Cause Throwable e);
+	SearchException unableToDeserializeOutboxEventPayloadWithAvro(@Cause Throwable e);
 
 }
