@@ -23,11 +23,11 @@ import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 
-public final class AvroSerializationUtils {
+public final class EventPayloadSerializationUtils {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private AvroSerializationUtils() {
+	private EventPayloadSerializationUtils() {
 	}
 
 	public static byte[] serialize(PojoIndexingQueueEventPayload payload) {
@@ -38,11 +38,11 @@ public final class AvroSerializationUtils {
 		Encoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
 
 		try {
-			writer.write( DtoConverterUtils.convert( payload ), encoder );
+			writer.write( EventPayloadToDtoConverterUtils.convert( payload ), encoder );
 			encoder.flush();
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToSerializeWithAvro( e );
+			throw log.unableToSerializeOutboxEventPayloadWithAvro( e );
 		}
 
 		return out.toByteArray();
@@ -56,10 +56,10 @@ public final class AvroSerializationUtils {
 		BinaryDecoder decoder = DecoderFactory.get().binaryDecoder( in, null );
 
 		try {
-			return ModelConverterUtils.convert( reader.read( null, decoder ) );
+			return EventPayloadFromDtoConverterUtils.convert( reader.read( null, decoder ) );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToDeserializeWithAvro( e );
+			throw log.unableToDeserializeOutboxEventPayloadWithAvro( e );
 		}
 	}
 }

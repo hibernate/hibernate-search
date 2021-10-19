@@ -16,7 +16,7 @@ import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.AvroSerializationUtils;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.EventPayloadSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.data.impl.Murmur3HashFunction;
@@ -43,7 +43,7 @@ public class DatabasePollingOutboxEventSendingPlan implements AutomaticIndexingQ
 			PojoIndexingQueueEventPayload payload) {
 		events.add( new OutboxEvent( entityName, serializedId,
 				DatabasePollingOutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
-				AvroSerializationUtils.serialize( payload ),
+				EventPayloadSerializationUtils.serialize( payload ),
 				identifier
 		) );
 	}

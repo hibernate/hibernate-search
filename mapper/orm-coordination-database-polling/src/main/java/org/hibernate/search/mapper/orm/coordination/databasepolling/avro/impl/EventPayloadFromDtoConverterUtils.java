@@ -21,9 +21,9 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 
-public final class ModelConverterUtils {
+final class EventPayloadFromDtoConverterUtils {
 
-	private ModelConverterUtils() {
+	private EventPayloadFromDtoConverterUtils() {
 	}
 
 	static PojoIndexingQueueEventPayload convert(PojoIndexingQueueEventPayloadDto payload) {

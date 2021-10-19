@@ -20,7 +20,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling.FilteringOutboxEventFinder;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.AvroSerializationUtils;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.EventPayloadSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -502,7 +502,7 @@ public class DatabasePollingAutomaticIndexingEventSendingIT {
 			softly.assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
 			softly.assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
 
-			PojoIndexingQueueEventPayload payload = AvroSerializationUtils.deserialize( outboxEvent.getPayload() );
+			PojoIndexingQueueEventPayload payload = EventPayloadSerializationUtils.deserialize( outboxEvent.getPayload() );
 			DocumentRoutesDescriptor routesDescriptor = payload.routes;
 
 			softly.assertThat( routesDescriptor ).isNotNull();
