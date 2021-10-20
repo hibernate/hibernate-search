@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.common.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.function.Consumer;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -43,6 +44,25 @@ public final class TransactionHelper {
 		TransactionCoordinatorBuilder transactionCoordinatorBuilder =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, TransactionCoordinatorBuilder.class );
 		this.useJta = shouldUseJta( transactionManager, transactionCoordinatorBuilder );
+	}
+
+	public void inTransaction(SharedSessionContractImplementor session, Integer transactionTimeout,
+			Consumer<SharedSessionContractImplementor> procedure) {
+		begin( session, transactionTimeout );
+		try {
+			procedure.accept( session );
+		}
+		catch (Exception e) {
+			log.tracef( e, e.getMessage() );
+			try {
+				rollback( session );
+			}
+			catch (RuntimeException e2) {
+				e.addSuppressed( e2 );
+			}
+			throw e;
+		}
+		commit( session );
 	}
 
 	public void begin(SharedSessionContractImplementor session, Integer transactionTimeout) {

@@ -110,8 +110,7 @@ public class OutboxEventBackgroundProcessor {
 			}
 
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
-				transactionHelper.begin( session, transactionTimeout );
-				try {
+				transactionHelper.inTransaction( session, transactionTimeout, s -> {
 					List<OutboxEvent> events;
 					try {
 						events = finder.findOutboxEvents( session, batchSize );
@@ -127,8 +126,7 @@ public class OutboxEventBackgroundProcessor {
 					}
 					if ( events.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
-						transactionHelper.commit( session );
-						return CompletableFuture.completedFuture( null );
+						return;
 					}
 
 					// There are events to process
@@ -144,19 +142,7 @@ public class OutboxEventBackgroundProcessor {
 							mapping, session, events );
 					eventProcessing.processEvents();
 					updateOrDeleteEvents( failureHandler, session, eventProcessing );
-				}
-				catch (Exception e) {
-					log.tracef( e, e.getMessage() );
-					try {
-						transactionHelper.rollback( session );
-					}
-					catch (RuntimeException e2) {
-						e.addSuppressed( e2 );
-					}
-					throw e;
-				}
-
-				transactionHelper.commit( session );
+				} );
 
 				return CompletableFuture.completedFuture( null );
 			}
