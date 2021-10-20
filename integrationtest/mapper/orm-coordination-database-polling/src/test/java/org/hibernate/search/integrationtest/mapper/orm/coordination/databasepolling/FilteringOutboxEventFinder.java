@@ -22,11 +22,11 @@ import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.DefaultOutboxEventFinder;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEvent;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEventFinder;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEventFinderProvider;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEventPredicate;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DefaultOutboxEventFinder;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEvent;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinder;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinderProvider;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventPredicate;
 
 public class FilteringOutboxEventFinder {
 

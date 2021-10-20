@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
+package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.Ev
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.impl.Futures;
 
-public class OutboxEventProcessingPlan {
+final class OutboxEventProcessingPlan {
 
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
 	private final FailureHandler failureHandler;

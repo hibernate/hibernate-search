@@ -26,6 +26,14 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrat
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.impl.HibernateOrmMapperDatabasePollingImplSettings;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DatabasePollingOutboxEventAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DatabasePollingOutboxEventSendingPlan;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DefaultOutboxEventFinder;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.EntityIdHashRangeOutboxEventPredicate;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventBackgroundProcessor;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinder;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinderProvider;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventPredicate;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.data.impl.RangeHashTable;
