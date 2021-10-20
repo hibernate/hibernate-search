@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -37,21 +35,6 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 			query.setParameter( entry.getKey(), entry.getValue() );
 		}
 		query.setMaxResults( maxResults );
-		// HSEARCH-4289: some databases encounter deadlocks when multiple processors query or delete events
-		// in concurrent transactions.
-		// The deadlocks are mostly caused by lock escalation,
-		// e.g. MS SQL deciding it does not have enough resources to perform row-level locks
-		// and thus locking whole pages instead. This means that even though processors deal
-		// with strictly distinct subsets of the outbox events (thanks to sharding),
-		// they will actually end up locking more than their subset,
-		// and then conflicts *can* occur.
-		// Disabling locks is not an option: we cannot disable locking during deletes.
-		// Thus, our last option is to actually enforce locks ahead of time (LockModeType.PESSIMISTIC_WRITE),
-		// and to avoid conflicts by simply never working on events that are already locked (LockOptions.SKIP_LOCKED).
-		// That's possible because event processing is not sensitive to processing order,
-		// so we can afford to just skip events that are already locked,
-		// and process them later when they are no longer locked.
-		query.setLockOptions( new LockOptions( LockMode.PESSIMISTIC_WRITE ).setTimeOut( LockOptions.SKIP_LOCKED ) );
 		return query;
 	}
 
