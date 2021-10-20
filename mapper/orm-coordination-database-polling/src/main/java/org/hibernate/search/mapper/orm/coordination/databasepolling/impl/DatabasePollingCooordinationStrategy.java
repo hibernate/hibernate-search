@@ -7,11 +7,14 @@
 package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -26,17 +29,17 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrat
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.impl.HibernateOrmMapperDatabasePollingImplSettings;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.AgentRepositoryProvider;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.DatabasePollingAgentAdditionalJaxbMappingProducer;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.DefaultAgentRepository;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DatabasePollingOutboxEventAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DatabasePollingOutboxEventSendingPlan;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DefaultOutboxEventFinder;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.EntityIdHashRangeOutboxEventPredicate;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventBackgroundProcessor;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinder;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventBackgroundProcessorClusterLink;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinderProvider;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventPredicate;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
-import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
-import org.hibernate.search.util.common.data.impl.RangeHashTable;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -73,10 +76,27 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL )
 					.build();
 
+	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_PULSE_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_PULSE_INTERVAL )
+					.asIntegerStrictlyPositive()
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL )
+					.build();
+
+	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_PULSE_EXPIRATION =
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_PULSE_EXPIRATION )
+					.asIntegerStrictlyPositive()
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION )
+					.build();
+
 	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_BATCH_SIZE =
 			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE )
 					.asIntegerStrictlyPositive()
 					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE )
+					.build();
+
+	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER =
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingImplSettings.CoordinationRadicals.PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER )
+					.asBeanReference( AgentRepositoryProvider.class )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER =
@@ -92,18 +112,33 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 	public static final String PROCESSOR_NAME_PREFIX = "Outbox event processor";
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
+	private BeanHolder<? extends AgentRepositoryProvider> agentRepositoryProviderHolder;
 	private ScheduledExecutorService scheduledExecutor;
-	private List<Integer> assignedShardIndices;
-	private RangeHashTable<OutboxEventBackgroundProcessor> indexingProcessors;
+	private List<OutboxEventBackgroundProcessor> indexingProcessors;
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
 		context.mappingProducer( new DatabasePollingOutboxEventAdditionalJaxbMappingProducer() );
+		context.mappingProducer( new DatabasePollingAgentAdditionalJaxbMappingProducer() );
 		context.sendIndexingEventsTo( ctx -> new DatabasePollingOutboxEventSendingPlan( ctx.session() ), true );
 	}
 
 	@Override
 	public CompletableFuture<?> start(CoordinationStrategyStartContext context) {
+		Optional<BeanHolder<? extends AgentRepositoryProvider>> agentRepositoryProviderHolderOptional =
+				PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER.getAndMap(
+						context.configurationPropertySource(), context.beanResolver()::resolve );
+		if ( agentRepositoryProviderHolderOptional.isPresent() ) {
+			agentRepositoryProviderHolder = agentRepositoryProviderHolderOptional.get();
+			log.debugf(
+					"Outbox processing will use custom agent repository provider '%s'.",
+					agentRepositoryProviderHolder.get()
+			);
+		}
+		else {
+			agentRepositoryProviderHolder = BeanHolder.of( new DefaultAgentRepository.Provider() );
+		}
+
 		Optional<BeanHolder<? extends OutboxEventFinderProvider>> finderProviderHolderOptional =
 				PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
 						context.configurationPropertySource(), context.beanResolver()::resolve );
@@ -118,7 +153,9 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 			finderProviderHolder = BeanHolder.of( new DefaultOutboxEventFinder.Provider() );
 		}
 
-		if ( PROCESSORS_INDEXING_ENABLED.get( context.configurationPropertySource() ) ) {
+		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
+
+		if ( PROCESSORS_INDEXING_ENABLED.get( configurationSource ) ) {
 			initializeProcessors( context );
 		}
 		else {
@@ -134,28 +171,26 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 	private void initializeProcessors(CoordinationStrategyStartContext context) {
 		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
+		OutboxEventFinderProvider finderProvider = finderProviderHolder.get();
 
 		// IMPORTANT: we only configure sharding here, if processors are enabled.
 		// See the comment in the caller method.
 		boolean shardsStatic = SHARDS_STATIC.get( configurationSource );
-		int totalShardCount;
+		List<ShardAssignmentDescriptor> shardAssignmentOrNulls;
 		if ( shardsStatic ) {
-			totalShardCount = SHARDS_TOTAL_COUNT.getAndMapOrThrow(
+			int totalShardCount = SHARDS_TOTAL_COUNT.getAndMapOrThrow(
 					configurationSource,
 					this::checkTotalShardCount,
 					log::missingPropertyForStaticSharding
 			);
-			this.assignedShardIndices = SHARDS_ASSIGNED.getAndMapOrThrow(
+			shardAssignmentOrNulls = SHARDS_ASSIGNED.getAndMapOrThrow(
 					configurationSource,
-					shardIndices -> checkAssignedShardIndices(
-							configurationSource, totalShardCount, shardIndices ),
+					shardIndices -> toStaticShardAssignments( configurationSource, totalShardCount, shardIndices ),
 					log::missingPropertyForStaticSharding
 			);
 		}
 		else {
-			log.warnf( "Dynamic sharding is not implemented yet; defaulting to static sharding assuming a single node" );
-			totalShardCount = 1;
-			this.assignedShardIndices = Collections.singletonList( 0 );
+			shardAssignmentOrNulls = Collections.singletonList( null );
 		}
 
 		int pollingInterval = PROCESSORS_INDEXING_POLLING_INTERVAL.get( configurationSource );
@@ -163,24 +198,29 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 		Integer transactionTimeout = PROCESSORS_INDEXING_TRANSACTION_TIMEOUT.get( configurationSource )
 				.orElse( null );
 
+		Duration pollingIntervalAsDuration = Duration.ofMillis( pollingInterval );
+		Duration pulseInterval = PROCESSORS_INDEXING_PULSE_INTERVAL.getAndTransform( configurationSource,
+				v -> checkPulseInterval( Duration.ofMillis( v ), pollingIntervalAsDuration ) );
+		Duration pulseExpiration = PROCESSORS_INDEXING_PULSE_EXPIRATION.getAndTransform( configurationSource,
+				v -> checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
+
 		scheduledExecutor = context.threadPoolProvider()
-				.newScheduledExecutor( this.assignedShardIndices.size(), PROCESSOR_NAME_PREFIX );
-		// Note the hash function / table implementations MUST NOT CHANGE,
-		// otherwise existing indexes will no longer work correctly.
-		RangeCompatibleHashFunction hashFunction = DatabasePollingOutboxEventSendingPlan.HASH_FUNCTION;
-		indexingProcessors = new RangeHashTable<>( hashFunction, totalShardCount );
-		for ( int shardIndex : this.assignedShardIndices ) {
-			Optional<OutboxEventPredicate> predicate = totalShardCount == 1
-					? Optional.empty()
-					: Optional.of( new EntityIdHashRangeOutboxEventPredicate( indexingProcessors.rangeForBucket( shardIndex ) ) );
-			OutboxEventFinder finder = finderProviderHolder.get().create( predicate );
+				.newScheduledExecutor( shardAssignmentOrNulls.size(), PROCESSOR_NAME_PREFIX );
+		indexingProcessors = new ArrayList<>();
+		for ( ShardAssignmentDescriptor shardAssignmentOrNull : shardAssignmentOrNulls ) {
+			String agentName = PROCESSOR_NAME_PREFIX
+					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
+			OutboxEventBackgroundProcessorClusterLink clusterLink = new OutboxEventBackgroundProcessorClusterLink(
+					agentName, context.mapping().failureHandler(), Clock.systemUTC(),
+					finderProvider, pulseInterval, pulseExpiration, shardAssignmentOrNull );
+
 			OutboxEventBackgroundProcessor processor = new OutboxEventBackgroundProcessor(
-					PROCESSOR_NAME_PREFIX + " - " + shardIndex,
-					context.mapping(), scheduledExecutor, finder, pollingInterval, batchSize, transactionTimeout );
-			indexingProcessors.set( shardIndex, processor );
+					agentName, context.mapping(), scheduledExecutor, agentRepositoryProviderHolder.get(), clusterLink,
+					pollingInterval, batchSize, transactionTimeout );
+			indexingProcessors.add( processor );
 		}
-		for ( int processedShardIndex : this.assignedShardIndices ) {
-			indexingProcessors.get( processedShardIndex ).start();
+		for ( OutboxEventBackgroundProcessor indexingProcessor : indexingProcessors ) {
+			indexingProcessor.start();
 		}
 	}
 
@@ -191,16 +231,36 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 		return totalShardCount;
 	}
 
-	private List<Integer> checkAssignedShardIndices(ConfigurationPropertySource configurationPropertySource,
+	private List<ShardAssignmentDescriptor> toStaticShardAssignments(ConfigurationPropertySource configurationPropertySource,
 			int totalShardCount, List<Integer> shardIndices) {
-		for ( Integer shardIndex : shardIndices ) {
+		// Remove duplicates
+		Set<Integer> uniqueShardIndices = new HashSet<>( shardIndices );
+		for ( Integer shardIndex : uniqueShardIndices ) {
 			if ( !( 0 <= shardIndex && shardIndex < totalShardCount ) ) {
 				throw log.invalidShardIndex( totalShardCount,
 						SHARDS_TOTAL_COUNT.resolveOrRaw( configurationPropertySource ) );
 			}
 		}
-		// Remove duplicates
-		return new ArrayList<>( new HashSet<>( shardIndices ) );
+		List<ShardAssignmentDescriptor> shardAssignment = new ArrayList<>();
+		for ( Integer shardIndex : uniqueShardIndices ) {
+			shardAssignment.add( new ShardAssignmentDescriptor( totalShardCount, shardIndex ) );
+		}
+		return shardAssignment;
+	}
+
+	private Duration checkPulseInterval(Duration pulseInterval, Duration pollingInterval) {
+		if ( pulseInterval.compareTo( pollingInterval ) < 0 ) {
+			throw log.invalidPollingIntervalAndPulseInterval( pollingInterval.toMillis() );
+		}
+		return pulseInterval;
+	}
+
+	private Duration checkPulseExpiration(Duration pulseExpiration, Duration pulseInterval) {
+		Duration pulseIntervalTimes3 = pulseInterval.multipliedBy( 3 );
+		if ( pulseExpiration.compareTo( pulseIntervalTimes3 ) < 0 ) {
+			throw log.invalidPulseIntervalAndPulseExpiration( pulseIntervalTimes3.toMillis() );
+		}
+		return pulseExpiration;
 	}
 
 	@Override
@@ -209,10 +269,10 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		CompletableFuture<?>[] futures = new CompletableFuture[assignedShardIndices.size()];
+		CompletableFuture<?>[] futures = new CompletableFuture[indexingProcessors.size()];
 		int i = 0;
-		for ( int shardIndex : assignedShardIndices ) {
-			futures[i] = indexingProcessors.get( shardIndex ).completion();
+		for ( OutboxEventBackgroundProcessor indexingProcessor : indexingProcessors ) {
+			futures[i] = indexingProcessor.completion();
 			i++;
 		}
 		return CompletableFuture.allOf( futures );
@@ -224,10 +284,10 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		CompletableFuture<?>[] futures = new CompletableFuture[assignedShardIndices.size()];
+		CompletableFuture<?>[] futures = new CompletableFuture[indexingProcessors.size()];
 		int i = 0;
-		for ( int shardIndex : assignedShardIndices ) {
-			futures[i] = indexingProcessors.get( shardIndex ).preStop();
+		for ( OutboxEventBackgroundProcessor indexingProcessor : indexingProcessors ) {
+			futures[i] = indexingProcessor.preStop();
 			i++;
 		}
 		return CompletableFuture.allOf( futures );
@@ -239,6 +299,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 			closer.pushAll( OutboxEventBackgroundProcessor::stop, indexingProcessors );
 			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutor );
 			closer.push( BeanHolder::close, finderProviderHolder );
+			closer.push( BeanHolder::close, agentRepositoryProviderHolder );
 		}
 	}
 }

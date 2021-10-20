@@ -131,6 +131,81 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL;
 
 	/**
+	 * How long, in milliseconds, the background indexing processor can poll for events
+	 * before it must perform a "pulse".
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Every agent registers itself in a database table.
+	 * Regularly, while polling for events to process,
+	 * the background indexing processor performs a "pulse":
+	 * it pauses indexing and:
+	 * <ul>
+	 *     <li>Updates its entry in the table, to let other agents know it's still alive and prevent an expiration</li>
+	 *     <li>Removes any other agents that expired from the table</li>
+	 *     <li>Performs rebalancing (reassignment of shards) if the number of agents
+	 *     participating in background indexing changed since the last pulse</li>
+	 * </ul>
+	 * <p>
+	 * The pulse interval must be set to a value between the
+	 * {@link #COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL polling interval}
+	 * and one third (1/3) of the {@link #COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION expiration interval}:
+	 * <ul>
+	 *   <li>Low values (closer to the polling interval) mean a shorter delay before rebalancing
+	 *   when a node joins or leaves the cluster,
+	 *   and reduced risk of incorrectly considering an agent as expired,
+	 *   but more stress on the database because of more frequent checks of the list of agents.</li>
+	 *   <li>High values (closer to the expiration interval) mean a longer delay before rebalancing
+	 *   when a node joins or leaves the cluster,
+	 *   and increased risk of incorrectly considering an agent as expired,
+	 *   but less stress on the database because of less frequent checks of the list of agents.</li>
+	 * </ul>
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 2000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL}.
+	 */
+	public static final String COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL =
+			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL;
+
+	/**
+	 * How long, in milliseconds, a background indexing processor "pulse" remains valid
+	 * before considering the processor disconnected and forcibly removing it from the cluster.
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Every agent registers itself in a database table.
+	 * Regularly, while polling for events to process,
+	 * the background indexing processor performs a {@link #COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL "pulse"}:
+	 * it pauses indexing and (among other things) update its entry in the table,
+	 * to let other agents know it's still alive and prevent an expiration.
+	 * If an agent fails to update its entry for longer than the value of the expiration interval,
+	 * it will be considered disconnected: other agents will forcibly remove its entry from the table,
+	 * and will perform rebalancing (reassign shards) as necessary.
+	 * <p>
+	 * The expiration interval must be set to a value 3 times larger than the
+	 * {@link #COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL pulse interval}:
+	 * <ul>
+	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before rebalancing
+	 *   when a node abruptly leaves the cluster due to a crash or network failure,
+	 *   but increased risk of incorrectly considering an agent as expired.</li>
+	 *   <li>High values (much larger than the pulse interval) mean a longer delay before rebalancing
+	 *   when a node abruptly leaves the cluster due to a crash or network failure,
+	 *   but reduced risk of incorrectly considering an agent as expired.</li>
+	 * </ul>
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 30000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION}.
+	 */
+	public static final String COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION =
+			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION;
+
+	/**
 	 * In the background indexing processor, how many outbox events, at most, are processed in a single transaction.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
@@ -177,6 +252,8 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final String COORDINATION_SHARDS_ASSIGNED = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_ASSIGNED;
 		public static final String COORDINATION_PROCESSORS_INDEXING_ENABLED = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_ENABLED;
 		public static final String COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_POLLING_INTERVAL;
+		public static final String COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_PULSE_INTERVAL;
+		public static final String COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_PULSE_EXPIRATION;
 		public static final String COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE;
 		public static final String COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_TRANSACTION_TIMEOUT;
 	}
@@ -196,6 +273,8 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final String PROCESSORS_INDEXING_PREFIX = PROCESSORS_PREFIX + "indexing.";
 		public static final String PROCESSORS_INDEXING_ENABLED = PROCESSORS_INDEXING_PREFIX + "enabled";
 		public static final String PROCESSORS_INDEXING_POLLING_INTERVAL = PROCESSORS_INDEXING_PREFIX + "polling_interval";
+		public static final String PROCESSORS_INDEXING_PULSE_INTERVAL = PROCESSORS_INDEXING_PREFIX + "pulse_interval";
+		public static final String PROCESSORS_INDEXING_PULSE_EXPIRATION = PROCESSORS_INDEXING_PREFIX + "pulse_expiration";
 		public static final String PROCESSORS_INDEXING_BATCH_SIZE = PROCESSORS_INDEXING_PREFIX + "batch_size";
 		public static final String PROCESSORS_INDEXING_TRANSACTION_TIMEOUT = PROCESSORS_INDEXING_PREFIX + "transaction_timeout";
 	}
@@ -211,6 +290,8 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final boolean COORDINATION_SHARDS_STATIC = false;
 		public static final boolean COORDINATION_PROCESSORS_INDEXING_ENABLED = true;
 		public static final int COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL = 100;
+		public static final int COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL = 2000;
+		public static final int COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION = 30000;
 		public static final int COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE = 50;
 	}
 

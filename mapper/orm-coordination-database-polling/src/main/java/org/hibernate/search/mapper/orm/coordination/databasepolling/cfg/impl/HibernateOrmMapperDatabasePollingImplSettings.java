@@ -19,6 +19,7 @@ public final class HibernateOrmMapperDatabasePollingImplSettings {
 		private CoordinationRadicals() {
 		}
 
+		public static final String PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER = "processors.indexing.agent_repository.provider";
 		public static final String PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER = "processors.indexing.outbox_event_finder.provider";
 	}
 

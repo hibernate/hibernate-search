@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQu
 import org.hibernate.search.mapper.orm.coordination.databasepolling.avro.impl.EventPayloadSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
-import org.hibernate.search.util.common.data.impl.Murmur3HashFunction;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -29,7 +28,7 @@ public final class DatabasePollingOutboxEventSendingPlan implements AutomaticInd
 
 	// Note the hash function / table implementations MUST NOT CHANGE,
 	// otherwise existing indexes will no longer work correctly.
-	public static final RangeCompatibleHashFunction HASH_FUNCTION = Murmur3HashFunction.INSTANCE;
+	private static final RangeCompatibleHashFunction HASH_FUNCTION = ShardAssignment.HASH_FUNCTION;
 
 	private final Session session;
 	private final List<OutboxEvent> events = new ArrayList<>();
@@ -42,7 +41,7 @@ public final class DatabasePollingOutboxEventSendingPlan implements AutomaticInd
 	public void append(String entityName, Object identifier, String serializedId,
 			PojoIndexingQueueEventPayload payload) {
 		events.add( new OutboxEvent( entityName, serializedId,
-				DatabasePollingOutboxEventSendingPlan.HASH_FUNCTION.hash( serializedId ),
+				HASH_FUNCTION.hash( serializedId ),
 				EventPayloadSerializationUtils.serialize( payload ),
 				identifier
 		) );
