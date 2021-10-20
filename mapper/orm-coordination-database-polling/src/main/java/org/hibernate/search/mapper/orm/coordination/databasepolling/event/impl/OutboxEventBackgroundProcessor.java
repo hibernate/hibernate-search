@@ -8,19 +8,22 @@ package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.AgentRepository;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class OutboxEventBackgroundProcessor {
@@ -34,30 +37,35 @@ public final class OutboxEventBackgroundProcessor {
 
 	private final String name;
 	private final AutomaticIndexingMappingContext mapping;
-	private final OutboxEventFinder finder;
 	private final int pollingInterval;
 	private final int batchSize;
 	private final Integer transactionTimeout;
+
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
+	private final AgentRepositoryProvider agentRepositoryProvider;
+	private final OutboxEventBackgroundProcessorClusterLink clusterLink;
+	private final TransactionHelper transactionHelper;
 	private final FailureHandler failureHandler;
 	private final SingletonTask processingTask;
 
 	public OutboxEventBackgroundProcessor(String name,
 			AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
-			OutboxEventFinder finder,
-			int pollingInterval, int batchSize,
-			Integer transactionTimeout) {
+			AgentRepositoryProvider agentRepositoryProvider,
+			OutboxEventBackgroundProcessorClusterLink clusterLink,
+			int pollingInterval, int batchSize, Integer transactionTimeout) {
 		this.name = name;
 		this.mapping = mapping;
-		this.finder = finder;
 		this.pollingInterval = pollingInterval;
 		this.batchSize = batchSize;
 		this.transactionTimeout = transactionTimeout;
+		this.agentRepositoryProvider = agentRepositoryProvider;
+		this.clusterLink = clusterLink;
 
+		transactionHelper = new TransactionHelper( mapping.sessionFactory() );
 		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
 				name,
-				new DatabasePollingOutboxWorker( mapping.sessionFactory() ),
+				new DatabasePollingOutboxWorker(),
 				new DatabasePollingHibernateOrmOutboxScheduler( executor ),
 				failureHandler
 		);
@@ -80,16 +88,29 @@ public final class OutboxEventBackgroundProcessor {
 
 	public void stop() {
 		log.stoppingOutboxEventProcessor( name );
-		processingTask.stop();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( SingletonTask::stop, processingTask );
+			closer.push( OutboxEventBackgroundProcessor::leaveCluster, this );
+		}
+	}
+
+	private void leaveCluster() {
+		try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
+			transactionHelper.begin( session, transactionTimeout );
+			try {
+				AgentRepository agentRepository = agentRepositoryProvider.create( session );
+				clusterLink.leaveCluster( agentRepository );
+				transactionHelper.commit( session );
+			}
+			catch (RuntimeException e) {
+				transactionHelper.rollbackSafely( session, e );
+			}
+		}
 	}
 
 	private class DatabasePollingOutboxWorker implements SingletonTask.Worker {
 
-		private final TransactionHelper transactionHelper;
-
-		public DatabasePollingOutboxWorker(SessionFactoryImplementor sessionFactory) {
-			transactionHelper = new TransactionHelper( sessionFactory );
-		}
+		private AgentInstructions agentInstructions;
 
 		@Override
 		public CompletableFuture<?> work() {
@@ -101,10 +122,29 @@ public final class OutboxEventBackgroundProcessor {
 				return CompletableFuture.completedFuture( null );
 			}
 
+			// Optimization: don't even try to open a transaction/session if we know it's not necessary.
+			if ( agentInstructions != null && agentInstructions.isStillValid()
+					&& !agentInstructions.eventFinder.isPresent() ) {
+				// Processing is disabled for the time being.
+				// We will try again later (complete() will be called, re-scheduling the polling for later).
+				return CompletableFuture.completedFuture( null );
+			}
+
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
 				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
 				transactionHelper.inTransaction( session, transactionTimeout, s -> {
-					List<OutboxEvent> events = finder.findOutboxEvents( session, batchSize );
+					if ( agentInstructions == null || !agentInstructions.isStillValid() ) {
+						AgentRepository agentRepository = agentRepositoryProvider.create( session );
+						agentInstructions = clusterLink.pulse( agentRepository );
+					}
+					Optional<OutboxEventFinder> eventFinder = agentInstructions.eventFinder;
+					if ( !eventFinder.isPresent() ) {
+						// Processing is disabled for the time being.
+						// Don't do anything, we'll try again later
+						// (complete() will be called, re-scheduling the polling for later)
+						return;
+					}
+					List<OutboxEvent> events = eventFinder.get().findOutboxEvents( session, batchSize );
 					if ( events.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
 						return;

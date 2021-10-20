@@ -20,6 +20,7 @@ import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -98,10 +99,10 @@ public class DatabasePollingStrategyPropertyValueIT {
 	}
 
 	@Test
-	public void metamodel_userEntitiesAndOutboxEvent() {
+	public void metamodel_userEntitiesAndOutboxEventAndAgent() {
 		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
 				.extracting( e -> (Class) e.getJavaType() )
-				.containsExactlyInAnyOrder( IndexedEntity.class, OutboxEvent.class );
+				.containsExactlyInAnyOrder( IndexedEntity.class, OutboxEvent.class, Agent.class );
 	}
 
 	@Test

@@ -35,6 +35,18 @@
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
@@ -54,6 +66,7 @@
                         <configuration>
                             <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
                             <outputDirectory>${project.basedir}/target/generated-sources/avro/</outputDirectory>
+                            <customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
                         </configuration>
                     </execution>
                 </executions>

@@ -10,8 +10,12 @@ package org.hibernate.search.mapper.orm.coordination.databasepolling.logging.imp
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.WARN;
 
+import java.util.List;
 import javax.persistence.OptimisticLockException;
 
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.Agent;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.AgentReference;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
@@ -83,5 +87,58 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 13, value = "Unable to deserialize OutboxEvent payload with Avro")
 	SearchException unableToDeserializeOutboxEventPayloadWithAvro(@Cause Throwable e);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 14, value = "Generated entity mapping for agents used in the database-polling coordination strategy: %1$s")
+	void applicationNodeGeneratedEntityMapping(String xmlMappingDefinition);
+
+	@Message(id = ID_OFFSET + 15, value = "The pulse interval must be greater than or equal to the polling interval"
+			+ " i.e. in this case at least %s")
+	SearchException invalidPollingIntervalAndPulseInterval(long pollingInterval);
+
+	@Message(id = ID_OFFSET + 16, value = "The pulse expiration must be greater than or equal to 3 times the pulse interval"
+			+ " i.e. in this case at least %s")
+	SearchException invalidPulseIntervalAndPulseExpiration(long pulseInterfaceTimes3);
+
+	@Message(value = "Pulse operation for agent '%1$s'")
+	String outboxEventProcessorPulse(AgentReference agentReference);
+
+	@Message(id = ID_OFFSET + 17, value = "Agent '%1$s': failed to infer a target cluster from the list of registered agents."
+			+ " The agent will try again in the next pulse."
+			+ " Cause: %2$s"
+			+ " Registered agents: %3$s.")
+	SearchException outboxEventProcessorPulseFailed(AgentReference agentReference, String causeMessage,
+			List<Agent> allAgentsInIdOrder,
+			@Cause RuntimeException cause);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 18, value = "Agent '%1$s': the registration of some agents in the database-polling strategy"
+			+ " are considered expired and will be forcibly removed: %2$s."
+			+ " These agents did not update their registration in the database in time."
+			+ " This can be caused by invalid configuration (expiration lower than how long it takes to process a batch of events)"
+			+ " or by an application node being forcibly stopped (disconnection from the network, application crash).")
+	void removingTimedOutAgents(AgentReference agentReference, List<Agent> timedOutAgents);
+
+	@Message(id = ID_OFFSET + 19, value = "Agent '%1$s' is statically assigned to %2$s,"
+			+ " but this conflicts with agent '%3$s' which expects %4$s shards."
+			+ " This can be a temporary situation caused by some application instances being forcibly stopped and replacements being spun up,"
+			+ " in which case the problem will resolve itself after a few seconds once the registration of the old instances expires."
+			+ " However, if the situation persists, this indicates misconfiguration, with multiple application instances participating"
+			+ " in event processing and expecting a different amount of shards;"
+			+ " consider adjusting the configuration or switching to dynamic sharding.")
+	SearchException conflictingOutboxEventBackgroundProcessorAgentTotalShardCountForStaticSharding(
+			AgentReference reference, ShardAssignmentDescriptor staticShardAssignment,
+			AgentReference conflictingAgentReference, int conflictingAgentTotalShardCount);
+
+	@Message(id = ID_OFFSET + 20, value = "Agent '%1$s' is statically assigned to %2$s,"
+			+ " but this conflicts with agent '%3$s' which is also assigned to that shard."
+			+ " This can be a temporary situation caused by some application instances being forcibly stopped and replacements being spun up,"
+			+ " in which case the problem will resolve itself after a few seconds once the registration of the old instances expires."
+			+ " However, if the situation persists, this indicates misconfiguration, with multiple application instances participating"
+			+ " in event processing and being assigned to the same shard;"
+			+ " consider adjusting the configuration or switching to dynamic sharding.")
+	SearchException conflictingOutboxEventBackgroundProcessorAgentShardsForStaticSharding(
+			AgentReference reference, ShardAssignmentDescriptor staticShardAssignment,
+			AgentReference conflictingAgentReference);
 
 }
