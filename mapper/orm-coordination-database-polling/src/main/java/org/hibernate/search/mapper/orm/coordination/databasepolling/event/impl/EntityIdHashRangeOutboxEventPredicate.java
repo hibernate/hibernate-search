@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
+package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-class EntityIdHashRangeOutboxEventPredicate implements OutboxEventPredicate {
+public final class EntityIdHashRangeOutboxEventPredicate implements OutboxEventPredicate {
 	private static final String LOWER_BOUND_PARAM_NAME = "lowerHash";
 	private static final String UPPER_BOUND_PARAM_NAME = "upperHash";
 

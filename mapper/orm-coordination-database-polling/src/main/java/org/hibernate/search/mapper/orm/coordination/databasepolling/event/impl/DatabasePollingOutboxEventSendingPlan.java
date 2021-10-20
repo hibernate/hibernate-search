@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
+package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.data.impl.Murmur3HashFunction;
 import org.hibernate.search.util.common.data.impl.RangeCompatibleHashFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class DatabasePollingOutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
+public final class DatabasePollingOutboxEventSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
