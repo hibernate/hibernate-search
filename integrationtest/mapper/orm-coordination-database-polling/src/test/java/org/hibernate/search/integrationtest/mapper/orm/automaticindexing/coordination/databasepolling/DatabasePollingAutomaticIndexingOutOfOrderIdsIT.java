@@ -65,7 +65,7 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processCreateUpdateDelete() throws Exception {
+	public void processCreateUpdateDelete() {
 		// An entity is created, updated, then deleted in separate transactions,
 		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
 
@@ -77,17 +77,11 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 			session.persist( entity );
 		} );
 
-		// Make sure that the two events are outdistanced a bit
-		Thread.sleep( 50 );
-
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
 			entity.setIndexedField( "another value for the field" );
 			session.merge( entity );
 		} );
-
-		// Make sure that the two events are outdistanced a bit
-		Thread.sleep( 50 );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
@@ -176,7 +170,7 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 	}
 
 	@Test
-	public void processDeleteRecreate_outOfOrder() throws Exception {
+	public void processDeleteRecreate_outOfOrder() {
 		// An entity is deleted, then re-created in separate transactions,
 		// but the add event has ID 1, the and the delete event has ID 2.
 
@@ -197,9 +191,6 @@ public class DatabasePollingAutomaticIndexingOutOfOrderIdsIT {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
-
-		// Make sure that the two events are outdistanced a bit
-		Thread.sleep( 50 );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
