@@ -110,6 +110,7 @@ public class OutboxEventBackgroundProcessor {
 			}
 
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
+				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
 				transactionHelper.inTransaction( session, transactionTimeout, s -> {
 					List<OutboxEvent> events;
 					try {
@@ -138,9 +139,10 @@ public class OutboxEventBackgroundProcessor {
 					log.tracef( "Processing %d outbox events for '%s': '%s'", events.size(), name, events );
 
 					// Process the events
-					OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
-							mapping, session, events );
-					eventProcessing.processEvents();
+					eventProcessing.processEvents( events );
+				} );
+
+				transactionHelper.inTransaction( session, transactionTimeout, s -> {
 					updateOrDeleteEvents( failureHandler, session, eventProcessing );
 				} );
 
