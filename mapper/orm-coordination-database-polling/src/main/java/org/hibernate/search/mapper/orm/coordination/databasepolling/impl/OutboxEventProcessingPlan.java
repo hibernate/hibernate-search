@@ -29,18 +29,18 @@ public class OutboxEventProcessingPlan {
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
 	private final FailureHandler failureHandler;
 	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
-	private final List<OutboxEvent> events;
 	private final List<OutboxEvent> failedEvents = new ArrayList<>();
 
-	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session,
-			List<OutboxEvent> events) {
+	private List<OutboxEvent> events = new ArrayList<>();
+
+	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session) {
 		this.processingPlan = mapping.createIndexingQueueEventProcessingPlan( session );
 		this.failureHandler = mapping.failureHandler();
 		this.entityReferenceFactory = mapping.entityReferenceFactory();
-		this.events = events;
 	}
 
-	void processEvents() {
+	void processEvents(List<OutboxEvent> events) {
+		this.events = events;
 		try {
 			addEventsToThePlan();
 			reportBackendResult( Futures.unwrappedExceptionGet( processingPlan.executeAndReport() ) );

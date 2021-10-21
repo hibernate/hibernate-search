@@ -68,7 +68,6 @@ public class TransactionTimeoutJtaAndSpringOutboxIT {
 				.untilAsserted( () -> assertThat( TimeoutFailureCollector.EXCEPTIONS ).isNotEmpty() );
 
 		Throwable exception = TimeoutFailureCollector.EXCEPTIONS.iterator().next();
-		Throwable cause = exception.getCause().getCause().getCause();
-		assertThat( cause ).hasMessageContaining( "transaction timed out" );
+		assertThat( exception ).hasMessageContaining( "transaction timed out" );
 	}
 }
