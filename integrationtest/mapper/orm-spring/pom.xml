@@ -20,6 +20,7 @@
             See also the failsafe configuration.
          -->
         <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
+        <test.database.run.skip>false</test.database.run.skip>
     </properties>
 
     <dependencyManagement>
