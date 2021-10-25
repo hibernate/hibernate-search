@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -50,9 +49,7 @@ class InitialPropertyMappingStep
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		if ( children.hasContent() ) {
-			PojoAdditionalMetadataCollectorPropertyNode collectorPropertyNode =
-					collector.property( propertyModel.name() );
-			children.contributeAdditionalMetadata( collectorPropertyNode );
+			collector.property( propertyModel.name(), children::contributeAdditionalMetadata );
 		}
 	}
 

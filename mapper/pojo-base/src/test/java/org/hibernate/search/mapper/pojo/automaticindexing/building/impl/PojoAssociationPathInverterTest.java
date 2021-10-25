@@ -200,8 +200,10 @@ public class PojoAssociationPathInverterTest {
 		Map<ContainerExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
 		values.put( ContainerExtractorPath.noExtractors(), valueAdditionalMetadataMock );
 
-		when( typeAdditionalMetadata.getPropertiesAdditionalMetadata() )
-				.thenReturn( properties );
+		when( typeAdditionalMetadata.getNamesOfPropertiesWithAdditionalMetadata() )
+				.thenReturn( properties.keySet() );
+		when( typeAdditionalMetadata.getPropertyAdditionalMetadata( any() ) )
+				.thenAnswer( invocation -> properties.get( (String) invocation.getArgument( 0 ) ) );
 		when( propertyAdditionalMetadataMock.getValuesAdditionalMetadata() )
 				.thenReturn( values );
 		when( valueAdditionalMetadataMock.getInverseSidePath() )
