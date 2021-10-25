@@ -7,7 +7,10 @@
 package org.hibernate.search.mapper.orm.common.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +23,7 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
@@ -131,5 +135,18 @@ public final class HibernateOrmUtils {
 		Path<?> uniquePropertyInRoot = root.get( typeDescriptor.getSingularAttribute( uniquePropertyName ) );
 		criteriaQuery.where( uniquePropertyInRoot.in( idsParameter ) );
 		return session.createQuery( criteriaQuery );
+	}
+
+	public static List<Property> sortedNonSyntheticProperties(Iterator<Property> propertyIterator) {
+		List<Property> properties = new ArrayList<>();
+		while ( propertyIterator.hasNext() ) {
+			Property property = propertyIterator.next();
+			if ( property.isSynthetic() ) {
+				continue;
+			}
+			properties.add( property );
+		}
+		properties.sort( PropertyComparator.INSTANCE );
+		return properties;
 	}
 }
