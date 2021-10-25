@@ -24,16 +24,11 @@ class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		try {
-			if ( !typeIdentifier.equals( collector.typeIdentifier() ) ) {
-				// Entity metadata is not inherited; only contribute it to the exact type.
-				return;
-			}
-			collector.markAsEntity( entityName, new JavaBeanSimpleStringSetPojoPathFilterFactory() );
+		if ( !typeIdentifier.equals( collector.typeIdentifier() ) ) {
+			// Entity metadata is not inherited; only contribute it to the exact type.
+			return;
 		}
-		catch (RuntimeException e) {
-			collector.failureCollector().add( e );
-		}
+		collector.markAsEntity( entityName, new JavaBeanSimpleStringSetPojoPathFilterFactory() );
 	}
 
 	@Override
