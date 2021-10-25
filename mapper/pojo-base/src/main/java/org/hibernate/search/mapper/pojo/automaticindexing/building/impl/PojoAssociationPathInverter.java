@@ -184,12 +184,11 @@ final class PojoAssociationPathInverter {
 		PojoTypeAdditionalMetadata inverseSideTypeAdditionalMetadata =
 				typeAdditionalMetadataProvider.get( inverseSideTypeModel.rawType() );
 
-		for ( Map.Entry<String, PojoPropertyAdditionalMetadata> propertyEntry :
-				inverseSideTypeAdditionalMetadata.getPropertiesAdditionalMetadata().entrySet() ) {
-			String inverseSidePropertyName = propertyEntry.getKey();
+		for ( String inverseSidePropertyName : inverseSideTypeAdditionalMetadata.getNamesOfPropertiesWithAdditionalMetadata() ) {
 			BoundPojoModelPathPropertyNode<?, ?> inverseSidePathPropertyNode =
 					inverseSidePathTypeNode.property( inverseSidePropertyName );
-			PojoPropertyAdditionalMetadata inverseSidePropertyAdditionalMetadata = propertyEntry.getValue();
+			PojoPropertyAdditionalMetadata inverseSidePropertyAdditionalMetadata =
+					inverseSideTypeAdditionalMetadata.getPropertyAdditionalMetadata( inverseSidePropertyName );
 
 			for ( Map.Entry<ContainerExtractorPath, PojoValueAdditionalMetadata> valueEntry :
 					inverseSidePropertyAdditionalMetadata.getValuesAdditionalMetadata().entrySet() ) {
