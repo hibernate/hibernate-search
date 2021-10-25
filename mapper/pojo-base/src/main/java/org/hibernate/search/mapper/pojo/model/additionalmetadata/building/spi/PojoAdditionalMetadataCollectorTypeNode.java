@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
@@ -53,6 +55,6 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 */
 	PojoAdditionalMetadataCollectorIndexedTypeNode markAsIndexed(boolean enabled);
 
-	PojoAdditionalMetadataCollectorPropertyNode property(String propertyName);
+	void property(String propertyName, Consumer<PojoAdditionalMetadataCollectorPropertyNode> propertyMetadataContributor);
 
 }

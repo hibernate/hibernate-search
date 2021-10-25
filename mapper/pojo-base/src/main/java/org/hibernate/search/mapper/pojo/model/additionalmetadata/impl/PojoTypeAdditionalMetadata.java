@@ -6,20 +6,24 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class PojoTypeAdditionalMetadata {
 	private final Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata;
 	private final Optional<PojoIndexedTypeAdditionalMetadata> indexedTypeMetadata;
-	private final Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata;
+	private final Map<String, Supplier<PojoPropertyAdditionalMetadata>> propertiesAdditionalMetadataSuppliers;
+	private final Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata = new LinkedHashMap<>();
 
 	public PojoTypeAdditionalMetadata(Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata,
 			Optional<PojoIndexedTypeAdditionalMetadata> indexedTypeMetadata,
-			Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata) {
+			Map<String, Supplier<PojoPropertyAdditionalMetadata>> propertiesAdditionalMetadataSuppliers) {
 		this.entityTypeMetadata = entityTypeMetadata;
 		this.indexedTypeMetadata = indexedTypeMetadata;
-		this.propertiesAdditionalMetadata = propertiesAdditionalMetadata;
+		this.propertiesAdditionalMetadataSuppliers = propertiesAdditionalMetadataSuppliers;
 	}
 
 	/**
@@ -46,11 +50,17 @@ public class PojoTypeAdditionalMetadata {
 		return indexedTypeMetadata;
 	}
 
-	public PojoPropertyAdditionalMetadata getPropertyAdditionalMetadata(String name) {
-		return propertiesAdditionalMetadata.getOrDefault( name, PojoPropertyAdditionalMetadata.EMPTY );
+	public Set<String> getNamesOfPropertiesWithAdditionalMetadata() {
+		return propertiesAdditionalMetadataSuppliers.keySet();
 	}
 
-	public Map<String, PojoPropertyAdditionalMetadata> getPropertiesAdditionalMetadata() {
-		return propertiesAdditionalMetadata;
+	public PojoPropertyAdditionalMetadata getPropertyAdditionalMetadata(String name) {
+		return propertiesAdditionalMetadata.computeIfAbsent( name, theName -> {
+			Supplier<PojoPropertyAdditionalMetadata> supplier = propertiesAdditionalMetadataSuppliers.get( theName );
+			if ( supplier == null ) {
+				return PojoPropertyAdditionalMetadata.EMPTY;
+			}
+			return supplier.get();
+		} );
 	}
 }
