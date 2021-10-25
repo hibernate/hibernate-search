@@ -20,12 +20,7 @@ public final class ErrorCollectingPojoTypeMetadataContributor implements PojoTyp
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		if ( children != null ) {
 			for ( PojoTypeMetadataContributor child : children ) {
-				try {
-					child.contributeAdditionalMetadata( collector );
-				}
-				catch (RuntimeException e) {
-					collector.failureCollector().add( e );
-				}
+				child.contributeAdditionalMetadata( collector );
 			}
 		}
 	}

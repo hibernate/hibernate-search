@@ -18,21 +18,17 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public class PojoTypeAdditionalMetadataProvider {
 
 	private final BeanResolver beanResolver;
-	private final FailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider;
 	private final Map<PojoRawTypeModel<?>, PojoTypeAdditionalMetadata> cache = new HashMap<>();
 
 	public PojoTypeAdditionalMetadataProvider(BeanResolver beanResolver,
-			FailureCollector failureCollector,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> modelContributorProvider) {
 		this.beanResolver = beanResolver;
-		this.failureCollector = failureCollector;
 		this.modelContributorProvider = modelContributorProvider;
 	}
 
@@ -50,9 +46,7 @@ public class PojoTypeAdditionalMetadataProvider {
 	}
 
 	private PojoTypeAdditionalMetadata createTypeAdditionalMetadata(PojoRawTypeModel<?> typeModel) {
-		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder(
-				beanResolver, failureCollector, typeModel
-		);
+		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder( beanResolver, typeModel );
 		for ( PojoTypeMetadataContributor contributor : modelContributorProvider.get( typeModel ) ) {
 			contributor.contributeAdditionalMetadata( builder );
 		}

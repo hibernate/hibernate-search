@@ -25,12 +25,7 @@ final class HibernateOrmAssociationEmbeddedMetadataContributor implements PojoTy
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorValueNode collectorValueNode =
 				collector.property( propertyName ).value( extractorPath );
-		try {
-			collectorValueNode.associationEmbedded();
-		}
-		catch (RuntimeException e) {
-			collectorValueNode.failureCollector().add( e );
-		}
+		collectorValueNode.associationEmbedded();
 	}
 
 	@Override

@@ -19,12 +19,7 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		if ( hasContent() ) {
 			for ( PojoPropertyMetadataContributor child : children ) {
-				try {
-					child.contributeAdditionalMetadata( collector );
-				}
-				catch (RuntimeException e) {
-					collector.failureCollector().add( e );
-				}
+				child.contributeAdditionalMetadata( collector );
 			}
 		}
 	}
