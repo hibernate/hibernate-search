@@ -113,7 +113,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		ConfigurationPropertySource propertySource = buildContext.configurationPropertySource();
 
 		addConfigurationContributor(
-				new HibernateOrmMetatadaContributor( basicTypeMetadataProvider, introspector )
+				new HibernateOrmMappingConfigurationContributor( basicTypeMetadataProvider, introspector )
 		);
 
 		CoordinationConfigurationContextImpl coordinationStrategyConfiguration =
