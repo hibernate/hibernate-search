@@ -10,7 +10,7 @@ import java.util.Comparator;
 
 import org.hibernate.mapping.Property;
 
-public class PropertyComparator implements Comparator<Property> {
+final class PropertyComparator implements Comparator<Property> {
 	public static final Comparator<? super Property> INSTANCE = new PropertyComparator();
 
 	private PropertyComparator() {
