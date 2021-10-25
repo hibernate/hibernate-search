@@ -7,7 +7,10 @@
 package org.hibernate.search.mapper.orm.common.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -17,6 +20,7 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -172,5 +176,18 @@ public final class HibernateOrmUtils {
 			// Note the service may be null, even if the binding is defined
 			return Optional.ofNullable( serviceRegistry.getService( serviceClass ) );
 		}
+	}
+
+	public static List<Property> sortedNonSyntheticProperties(Iterator<Property> propertyIterator) {
+		List<Property> properties = new ArrayList<>();
+		while ( propertyIterator.hasNext() ) {
+			Property property = propertyIterator.next();
+			if ( property.isSynthetic() ) {
+				continue;
+			}
+			properties.add( property );
+		}
+		properties.sort( PropertyComparator.INSTANCE );
+		return properties;
 	}
 }
