@@ -39,11 +39,18 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public final class HibernateOrmMetatadaContributor implements PojoMappingConfigurationContributor {
+/**
+ * Translates metadata from the Hibernate ORM mapping into metadata for the Hibernate Search mapping,
+ * and contributes that metadata to the Hibernate Search mapping configuration.
+ * <p>
+ * This includes in particular metadata about the inverse side of associations,
+ * but is not limited to that (there's some metadata about BigDecimal scale, for example).
+ */
+public final class HibernateOrmMappingConfigurationContributor implements PojoMappingConfigurationContributor {
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
-	HibernateOrmMetatadaContributor(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
+	HibernateOrmMappingConfigurationContributor(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			HibernateOrmBootstrapIntrospector introspector) {
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.introspector = introspector;
@@ -52,7 +59,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	@Override
 	public void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
-		PropertyDelegatesCollector delegatesCollector = new PropertyDelegatesCollector();
+		MetadataContributorCollector delegatesCollector = new MetadataContributorCollector();
 
 		// Ensure all entities are declared as such and have their inverse associations declared
 		for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {
@@ -64,7 +71,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			else {
 				typeModel = introspector.typeModel( persistentClass.getEntityName() );
 			}
-			collectPropertyDelegates( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
+			collectMetadataContributors( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
 
 			Property identifierProperty = persistentClass.getIdentifierProperty();
 			Optional<String> identifierPropertyNameOptional =
@@ -96,7 +103,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Hibernate ORM gives us raw types, we must make do.
-	private void collectPropertyDelegates(PropertyDelegatesCollector collector,
+	private void collectMetadataContributors(MetadataContributorCollector collector,
 			PojoRawTypeModel<?> typeModel, Iterator propertyIterator) {
 		collector.markAsSeen( typeModel );
 
@@ -112,11 +119,11 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		properties.sort( PropertyComparator.INSTANCE );
 
 		for ( Property property : properties ) {
-			collectPropertyMetadataContributors( collector, typeModel, property );
+			collectMetadataContributors( collector, typeModel, property );
 		}
 	}
 
-	private void collectPropertyMetadataContributors(PropertyDelegatesCollector collector,
+	private void collectMetadataContributors(MetadataContributorCollector collector,
 			PojoRawTypeModel<?> typeModel, Property property) {
 		Value value = property.getValue();
 		if ( value instanceof org.hibernate.mapping.Collection ) {
@@ -184,7 +191,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			 * Thus we only use the first Component instance we find, and ignore the others.
 			 */
 			if ( !collector.hasSeen( componentTypeModel ) ) {
-				collectPropertyDelegates( collector, componentTypeModel, componentValue.getPropertyIterator() );
+				collectMetadataContributors( collector, componentTypeModel, componentValue.getPropertyIterator() );
 			}
 		}
 		else if ( value instanceof SimpleValue ) {
@@ -192,7 +199,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		}
 	}
 
-	private void collectScaleContributor(PropertyDelegatesCollector collector, PojoRawTypeModel<?> typeModel,
+	private void collectScaleContributor(MetadataContributorCollector collector, PojoRawTypeModel<?> typeModel,
 			Property property, Value value) {
 		Iterator<Selectable> ci = value.getColumnIterator();
 		while ( ci.hasNext() ) {
@@ -269,7 +276,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		}
 	}
 
-	private static class PropertyDelegatesCollector {
+	private static class MetadataContributorCollector {
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<PojoRawTypeModel<?>, List<PojoTypeMetadataContributor>> result = new LinkedHashMap<>();
 
