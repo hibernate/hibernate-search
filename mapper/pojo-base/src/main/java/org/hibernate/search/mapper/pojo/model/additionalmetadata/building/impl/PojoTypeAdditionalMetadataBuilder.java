@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.MarkerBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -23,12 +21,10 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
 
 	private final BeanResolver beanResolver;
-	private final FailureCollector failureCollector;
 	private final PojoRawTypeModel<?> rawTypeModel;
 
 	private PojoEntityTypeAdditionalMetadataBuilder entityTypeMetadataBuilder;
@@ -36,16 +32,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
-	PojoTypeAdditionalMetadataBuilder(BeanResolver beanResolver,
-			FailureCollector failureCollector, PojoRawTypeModel<?> rawTypeModel) {
+	PojoTypeAdditionalMetadataBuilder(BeanResolver beanResolver, PojoRawTypeModel<?> rawTypeModel) {
 		this.beanResolver = beanResolver;
-		this.failureCollector = failureCollector;
 		this.rawTypeModel = rawTypeModel;
-	}
-
-	@Override
-	public ContextualFailureCollector failureCollector() {
-		return failureCollector.withContext( PojoEventContexts.fromType( rawTypeModel ) );
 	}
 
 	@Override
@@ -58,7 +47,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 			PojoPathsDefinition pathsDefinition) {
 		if ( entityTypeMetadataBuilder == null ) {
 			entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder(
-					this, entityName, pathsDefinition );
+					entityName, pathsDefinition );
 		}
 		else {
 			entityTypeMetadataBuilder.checkSameEntity( entityName );
@@ -69,7 +58,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	@Override
 	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed(boolean enabled) {
 		if ( indexedTypeMetadataBuilder == null ) {
-			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder( this );
+			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder();
 		}
 		indexedTypeMetadataBuilder.enabled( enabled );
 		return indexedTypeMetadataBuilder;
@@ -79,7 +68,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	public PojoAdditionalMetadataCollectorPropertyNode property(String propertyName) {
 		return propertyBuilders.computeIfAbsent(
 				propertyName,
-				ignored -> new PojoPropertyAdditionalMetadataBuilder( this, propertyName )
+				ignored -> new PojoPropertyAdditionalMetadataBuilder( beanResolver )
 		);
 	}
 

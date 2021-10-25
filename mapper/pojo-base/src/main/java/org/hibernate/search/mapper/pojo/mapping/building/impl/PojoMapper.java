@@ -125,7 +125,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.providedIdentifierBridge = providedIdentifierBridge;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
-				buildContext.beanResolver(), failureCollector, contributorProvider
+				buildContext.beanResolver(), contributorProvider
 		);
 
 		this.extractorBinder = extractorBinder;

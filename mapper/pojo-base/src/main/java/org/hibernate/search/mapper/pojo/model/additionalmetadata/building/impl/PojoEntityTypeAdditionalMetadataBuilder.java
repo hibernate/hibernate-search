@@ -12,7 +12,6 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -20,23 +19,13 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
 	private final String entityName;
 	private final PojoPathsDefinition pathsDefinition;
 	private String entityIdPropertyName;
 
-	PojoEntityTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder,
-			String entityName,
-			PojoPathsDefinition pathsDefinition) {
-		this.rootBuilder = rootBuilder;
+	PojoEntityTypeAdditionalMetadataBuilder(String entityName, PojoPathsDefinition pathsDefinition) {
 		this.entityName = entityName;
 		this.pathsDefinition = pathsDefinition;
-	}
-
-	@Override
-	public ContextualFailureCollector failureCollector() {
-		// There's nothing to add to the context
-		return rootBuilder.failureCollector();
 	}
 
 	void checkSameEntity(String entityName) {

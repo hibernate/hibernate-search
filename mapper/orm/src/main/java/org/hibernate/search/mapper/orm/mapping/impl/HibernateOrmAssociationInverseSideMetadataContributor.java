@@ -29,12 +29,7 @@ final class HibernateOrmAssociationInverseSideMetadataContributor implements Poj
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorValueNode collectorValueNode =
 				collector.property( propertyName ).value( extractorPath );
-		try {
-			collectorValueNode.associationInverseSide( inverseSideValuePath );
-		}
-		catch (RuntimeException e) {
-			collectorValueNode.failureCollector().add( e );
-		}
+		collectorValueNode.associationInverseSide( inverseSideValuePath );
 	}
 
 	@Override
