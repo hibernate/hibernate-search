@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.coordination.databasepolling.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -15,25 +14,20 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.persistence.OptimisticLockException;
 
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
-import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OutboxEventBackgroundProcessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private static final int MAX_RETRIES = 3;
 
 	private enum Status {
 		STOPPED,
@@ -142,9 +136,11 @@ public class OutboxEventBackgroundProcessor {
 					eventProcessing.processEvents( events );
 				} );
 
-				transactionHelper.inTransaction( session, transactionTimeout, s -> {
-					updateOrDeleteEvents( failureHandler, session, eventProcessing );
-				} );
+				OutboxEventUpdater eventUpdater = new OutboxEventUpdater(
+						failureHandler, eventProcessing, session, name );
+				while ( eventUpdater.thereAreStillEventsToProcess() ) {
+					transactionHelper.inTransaction( session, transactionTimeout, s -> eventUpdater.process() );
+				}
 
 				return CompletableFuture.completedFuture( null );
 			}
@@ -180,42 +176,5 @@ public class OutboxEventBackgroundProcessor {
 		public Future<?> schedule(Runnable runnable) {
 			return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
 		}
-	}
-
-	private static void updateOrDeleteEvents(FailureHandler failureHandler, Session session,
-			OutboxEventProcessingPlan processingPlan) {
-		List<OutboxEvent> eventToDelete = new ArrayList<>();
-		for ( OutboxEvent event : processingPlan.getEvents() ) {
-			eventToDelete.add( event );
-		}
-
-		for ( OutboxEvent failedEvent : processingPlan.getFailedEvents() ) {
-			int attempts = failedEvent.getRetries() + 1;
-			if ( attempts >= MAX_RETRIES ) {
-				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-				SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
-				builder.throwable( exception );
-				builder.failingOperation( "Processing an outbox event." );
-				builder.entityReference( processingPlan.entityReference(
-						failedEvent.getEntityName(), failedEvent.getEntityId(), exception ) );
-				failureHandler.handle( builder.build() );
-			}
-			else {
-				// This is slow, but we don't expect failures often, so that's fine.
-				eventToDelete.remove( failedEvent );
-
-				failedEvent.setRetries( attempts );
-
-				log.automaticIndexingRetry( failedEvent.getId(),
-						failedEvent.getEntityName(), failedEvent.getEntityId(), attempts );
-			}
-		}
-
-		for ( OutboxEvent event : eventToDelete ) {
-			session.delete( event );
-		}
-
-		session.flush();
-		session.clear();
 	}
 }
