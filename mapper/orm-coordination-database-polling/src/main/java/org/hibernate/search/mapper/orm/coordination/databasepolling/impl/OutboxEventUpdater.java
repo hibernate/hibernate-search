@@ -31,9 +31,6 @@ public class OutboxEventUpdater {
 	private final Set<Long> eventsIds;
 	private final Set<Long> failedEventIds;
 
-	private List<OutboxEvent> lockedEvents;
-	private List<OutboxEvent> lockedFailedEvents;
-
 	public OutboxEventUpdater(FailureHandler failureHandler, OutboxEventProcessingPlan processingPlan,
 			SessionImplementor session, String processorName) {
 		this.failureHandler = failureHandler;
@@ -46,47 +43,43 @@ public class OutboxEventUpdater {
 				.collect( Collectors.toSet() );
 	}
 
-	public void process() {
-		lockedEvents = OutboxEventLoader.loadLocking( session, eventsIds, processorName );
-		lockedFailedEvents = new ArrayList<>( failedEventIds.size() );
-
-		for ( OutboxEvent event : lockedEvents ) {
-			Long id = event.getId();
-			eventsIds.remove( id );
-			if ( failedEventIds.contains( id ) ) {
-				lockedFailedEvents.add( event );
-			}
-		}
-
-		updateOrDeleteEvents();
-	}
-
 	public boolean thereAreStillEventsToProcess() {
 		return !eventsIds.isEmpty();
 	}
 
-	private void updateOrDeleteEvents() {
+	public void process() {
+		List<OutboxEvent> lockedEvents = OutboxEventLoader.loadLocking( session, eventsIds, processorName );
 		List<OutboxEvent> eventToDelete = new ArrayList<>( lockedEvents );
 
-		for ( OutboxEvent failedEvent : lockedFailedEvents ) {
-			int attempts = failedEvent.getRetries() + 1;
+		for ( OutboxEvent event : lockedEvents ) {
+			Long id = event.getId();
+			// Make sure we consider the event as processed in "thereAreStillEventsToProcess()"
+			eventsIds.remove( id );
+
+			if ( !failedEventIds.contains( id ) ) {
+				// The event was processed successfully; we will simply delete it.
+				continue;
+			}
+
+			// Failed events have to be processed differently:
+			// we try to update their retry count instead of deleting them,
+			// so that the process will try to process them again.
+			int attempts = event.getRetries() + 1;
 			if ( attempts >= MAX_RETRIES ) {
-				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-				SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
-				builder.throwable( exception );
-				builder.failingOperation( "Processing an outbox event." );
-				builder.entityReference( processingPlan.entityReference(
-						failedEvent.getEntityName(), failedEvent.getEntityId(), exception ) );
-				failureHandler.handle( builder.build() );
+				notifyMaxRetriesReached( event );
+				// We will delete this event, even if it was not processed correctly
+				// TODO HSEARCH-4283 Try to persist the event somewhere instead
 			}
 			else {
-				// This is slow, but we don't expect failures often, so that's fine.
-				eventToDelete.remove( failedEvent );
+				// We won't delete this event.
+				eventToDelete.remove( event );
 
-				failedEvent.setRetries( attempts );
+				// We will simply increment the retry count of this event,
+				// and the event processor will process it once more in the next batch.
+				event.setRetries( attempts );
 
-				log.automaticIndexingRetry( failedEvent.getId(),
-						failedEvent.getEntityName(), failedEvent.getEntityId(), attempts
+				log.automaticIndexingRetry( event.getId(),
+						event.getEntityName(), event.getEntityId(), attempts
 				);
 			}
 		}
@@ -94,5 +87,15 @@ public class OutboxEventUpdater {
 		for ( OutboxEvent event : eventToDelete ) {
 			session.delete( event );
 		}
+	}
+
+	private void notifyMaxRetriesReached(OutboxEvent failedEvent) {
+		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+		SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
+		builder.throwable( exception );
+		builder.failingOperation( "Processing an outbox event." );
+		builder.entityReference( processingPlan.entityReference(
+				failedEvent.getEntityName(), failedEvent.getEntityId(), exception ) );
+		failureHandler.handle( builder.build() );
 	}
 }
