@@ -53,7 +53,6 @@ public final class TransactionHelper {
 			procedure.accept( session );
 		}
 		catch (Exception e) {
-			log.tracef( e, e.getMessage() );
 			try {
 				rollback( session );
 			}
