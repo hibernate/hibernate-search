@@ -122,8 +122,19 @@ public class OutboxEventBackgroundProcessor {
 					eventProcessing.processEvents( events );
 				} );
 
+				// Updating events involves database locks on a table that
+				// can see heavily concurrent access (the outbox table),
+				// so we do that in a separate transaction, one that is as short as possible.
 				OutboxEventUpdater eventUpdater = new OutboxEventUpdater(
 						failureHandler, eventProcessing, session, name );
+				// We potentially perform this update in multiple transactions,
+				// each loading as many events as possible using SKIP_LOCKED,
+				// to only load events that are not already locked by another processor.
+				// This is to avoid problems related to lock escalation in MS SQL for example,
+				// where another processor could be locking on our own events because
+				// it locked a page instead of just a row.
+				// For more information, see
+				// org.hibernate.search.mapper.orm.coordination.databasepolling.impl.OutboxEventLoader.tryLoadLocking
 				while ( eventUpdater.thereAreStillEventsToProcess() ) {
 					transactionHelper.inTransaction( session, transactionTimeout, s -> eventUpdater.process() );
 				}
