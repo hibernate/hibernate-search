@@ -48,7 +48,7 @@ public class OutboxEventUpdater {
 
 	public void process() {
 		lockedEvents = OutboxEventLoader.loadLocking( session, eventsIds, processorName );
-		lockedFailedEvents = new ArrayList<>( lockedEvents.size() );
+		lockedFailedEvents = new ArrayList<>( failedEventIds.size() );
 
 		for ( OutboxEvent event : lockedEvents ) {
 			Long id = event.getId();
@@ -66,10 +66,7 @@ public class OutboxEventUpdater {
 	}
 
 	private void updateOrDeleteEvents() {
-		List<OutboxEvent> eventToDelete = new ArrayList<>();
-		for ( OutboxEvent event : lockedEvents ) {
-			eventToDelete.add( event );
-		}
+		List<OutboxEvent> eventToDelete = new ArrayList<>( lockedEvents );
 
 		for ( OutboxEvent failedEvent : lockedFailedEvents ) {
 			int attempts = failedEvent.getRetries() + 1;
@@ -97,8 +94,5 @@ public class OutboxEventUpdater {
 		for ( OutboxEvent event : eventToDelete ) {
 			session.delete( event );
 		}
-
-		session.flush();
-		session.clear();
 	}
 }
