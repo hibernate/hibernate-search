@@ -40,10 +40,10 @@ public class OutboxEventUpdater {
 		this.processingPlan = processingPlan;
 		this.session = session;
 		this.processorName = processorName;
-		this.eventsIds = processingPlan.getEvents().stream().map( event -> event.getId() ).collect(
-				Collectors.toSet() );
-		this.failedEventIds = processingPlan.getFailedEvents().stream().map( event -> event.getId() ).collect(
-				Collectors.toSet() );
+		this.eventsIds = processingPlan.getEvents().stream().map( OutboxEvent::getId )
+				.collect( Collectors.toSet() );
+		this.failedEventIds = processingPlan.getFailedEvents().stream().map( OutboxEvent::getId )
+				.collect( Collectors.toSet() );
 	}
 
 	public void process() {
