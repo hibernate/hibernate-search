@@ -22,7 +22,7 @@ public class BackendThreads {
 
 	private static final OptionalConfigurationProperty<Integer> THREAD_POOL_SIZE =
 			ConfigurationProperty.forKey( LuceneBackendSettings.THREAD_POOL_SIZE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.build();
 
 	private final String prefix;

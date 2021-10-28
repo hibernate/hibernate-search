@@ -68,7 +68,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	private static final ConfigurationProperty<Integer> LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
-					.asInteger()
+					.asIntegerPositiveOrZero()
 					.withDefault( ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 

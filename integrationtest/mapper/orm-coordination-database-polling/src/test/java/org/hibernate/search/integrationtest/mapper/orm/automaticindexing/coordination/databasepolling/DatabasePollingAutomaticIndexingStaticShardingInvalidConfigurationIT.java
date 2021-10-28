@@ -52,7 +52,7 @@ public class DatabasePollingAutomaticIndexingStaticShardingInvalidConfigurationI
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.total_count'",
-								"'0'", "The total shard count must be strictly positive" )
+								"'0'", "'value' must be strictly positive" )
 						.build() );
 	}
 
@@ -63,7 +63,7 @@ public class DatabasePollingAutomaticIndexingStaticShardingInvalidConfigurationI
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.total_count'",
-								"'-1'", "The total shard count must be strictly positive" )
+								"'-1'", "'value' must be strictly positive" )
 						.build() );
 	}
 
@@ -87,8 +87,7 @@ public class DatabasePollingAutomaticIndexingStaticShardingInvalidConfigurationI
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.assigned'",
 								"'-1'",
-								"Shard indices must be between 0 (inclusive) and 10 (exclusive,"
-										+ " set by 'hibernate.search.coordination.shards.total_count')" )
+								"'value' must be positive or zero" )
 						.build() );
 	}
 

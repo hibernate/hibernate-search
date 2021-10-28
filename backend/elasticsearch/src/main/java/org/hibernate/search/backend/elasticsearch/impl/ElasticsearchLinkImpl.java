@@ -52,7 +52,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 
 	private static final ConfigurationProperty<Integer> SCROLL_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.SCROLL_TIMEOUT )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchBackendSettings.Defaults.SCROLL_TIMEOUT )
 					.build();
 

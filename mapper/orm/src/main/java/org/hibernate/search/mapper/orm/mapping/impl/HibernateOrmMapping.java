@@ -86,7 +86,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private static final ConfigurationProperty<Integer> QUERY_LOADING_FETCH_SIZE =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.QUERY_LOADING_FETCH_SIZE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( HibernateOrmMapperSettings.Defaults.QUERY_LOADING_FETCH_SIZE )
 					.build();
 

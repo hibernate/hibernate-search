@@ -97,7 +97,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final OptionalConfigurationProperty<Integer> REQUEST_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.REQUEST_TIMEOUT )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.build();
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
@@ -114,13 +114,13 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_CONNECTIONS )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_CONNECTIONS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION_PER_ROUTE =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_CONNECTIONS_PER_ROUTE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
 					.build();
 
@@ -132,7 +132,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final ConfigurationProperty<Integer> DISCOVERY_REFRESH_INTERVAL =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.DISCOVERY_REFRESH_INTERVAL )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
