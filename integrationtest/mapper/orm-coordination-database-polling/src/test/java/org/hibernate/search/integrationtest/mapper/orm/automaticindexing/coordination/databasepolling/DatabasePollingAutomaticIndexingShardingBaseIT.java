@@ -7,10 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling.DatabasePollingTestUtils.awaitAllAgentsRunningInOneCluster;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
-import java.util.Arrays;
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -36,20 +35,28 @@ import org.junit.runners.Parameterized;
 import org.assertj.core.data.Percentage;
 
 /**
- * Base tests for static sharding with the database-polling coordination strategy:
+ * Base tests for sharding with the database-polling coordination strategy:
  * checks that all events are handled by one and only one node
  * (if they were not, we would see missing or duplicate indexing work executions).
  */
 @RunWith(Parameterized.class)
-@TestForIssue(jiraKey = "HSEARCH-4141")
-public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
+@TestForIssue(jiraKey = {"HSEARCH-4141", "HSEARCH-4140"})
+public class DatabasePollingAutomaticIndexingShardingBaseIT {
 
-	@Parameterized.Parameters(name = "totalShardCount = {0}")
-	public static List<Integer> params() {
-		return Arrays.asList( 2, 4, 10 );
+	@Parameterized.Parameters(name = "static = {0}, totalShardCount = {1}")
+	public static Object[][] params() {
+		return new Object[][] {
+				{ false, 2 },
+				{ true, 2 },
+				{ false, 10 },
+				{ true, 10 },
+		};
 	}
 
 	@Parameterized.Parameter
+	public boolean isStatic;
+
+	@Parameterized.Parameter(1)
 	public int totalShardCount;
 
 	@Rule
@@ -76,6 +83,8 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 		}
 
 		backendMock.verifyExpectationsMet();
+
+		awaitAllAgentsRunningInOneCluster( indexingCountHelper.sessionFactory( 0 ), totalShardCount );
 	}
 
 	private void setup(Action action, int assignedShardIndex) {
@@ -93,9 +102,17 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 		ormSetupHelper.start()
 				.withProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, action )
 				.with( indexingCountHelper::bind )
-				.withProperty( "hibernate.search.coordination.shards.static", "true" )
-				.withProperty( "hibernate.search.coordination.shards.total_count", totalShardCount )
-				.withProperty( "hibernate.search.coordination.shards.assigned", String.valueOf( assignedShardIndex ) )
+				.with( ctx -> {
+					if ( isStatic ) {
+						return ctx
+								.withProperty( "hibernate.search.coordination.shards.static", "true" )
+								.withProperty( "hibernate.search.coordination.shards.total_count", totalShardCount )
+								.withProperty( "hibernate.search.coordination.shards.assigned", String.valueOf( assignedShardIndex ) );
+					}
+					else {
+						return ctx;
+					}
+				} )
 				.setup( IndexedEntity.class, IndexedAndContainingEntity.class, ContainedEntity.class );
 	}
 
