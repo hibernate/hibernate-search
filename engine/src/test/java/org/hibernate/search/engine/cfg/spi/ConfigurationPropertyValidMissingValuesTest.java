@@ -41,13 +41,13 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 	public static Object[][] data() {
 		return new Object[][] {
 				params( KeyContext::asString, "string", "string" ),
-				params( KeyContext::asInteger, "42", 42 ),
-				params( KeyContext::asInteger, "0", 0 ),
-				params( KeyContext::asInteger, "-1", -1 ),
+				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "42", 42 ),
+				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "0", 0 ),
+				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "-1", -1 ),
 				params( KeyContext::asIntegerPositiveOrZero, "42", 42 ),
 				params( KeyContext::asIntegerPositiveOrZero, "0", 0 ),
 				params( KeyContext::asIntegerStrictlyPositive, "42", 42 ),
-				params( KeyContext::asLong, "3000000000042", 3000000000042L ),
+				params( KeyContext::asLongPositiveOrZeroOrNegative, "3000000000042", 3000000000042L ),
 				params( KeyContext::asBoolean, "true", true ),
 				params( KeyContext::asBoolean, "false", false ),
 				params(

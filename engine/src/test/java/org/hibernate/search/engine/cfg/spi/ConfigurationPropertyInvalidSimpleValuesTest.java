@@ -40,7 +40,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 	public static Object[][] data() {
 		return new Object[][] {
 				params(
-						KeyContext::asInteger, "foo", 42,
+						KeyContext::asIntegerPositiveOrZeroOrNegative, "foo", 42,
 						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
 						"For input string: \"foo\""
 				),
@@ -73,7 +73,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"'value' must be strictly positive"
 				),
 				params(
-						KeyContext::asLong, "bar", 42L,
+						KeyContext::asLongPositiveOrZeroOrNegative, "bar", 42L,
 						"Invalid Long value: expected either a Number or a String that can be parsed into a Long.",
 						"For input string: \"bar\""
 				),

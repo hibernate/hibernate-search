@@ -102,13 +102,13 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.READ_TIMEOUT )
-					.asInteger()
+					.asIntegerPositiveOrZeroOrNegative()
 					.withDefault( ElasticsearchBackendSettings.Defaults.READ_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> CONNECTION_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.CONNECTION_TIMEOUT )
-					.asInteger()
+					.asIntegerPositiveOrZeroOrNegative()
 					.withDefault( ElasticsearchBackendSettings.Defaults.CONNECTION_TIMEOUT )
 					.build();
 
