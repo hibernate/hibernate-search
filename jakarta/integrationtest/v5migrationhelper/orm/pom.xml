@@ -20,7 +20,7 @@
     <description>Hibernate Search integration tests for the migration helper for Hibernate ORM - Jakarta EE version</description>
 
     <properties>
-        <transform.original.pathFromRoot>integrationtests/v5migrationhelper/orm</transform.original.pathFromRoot>
+        <transform.original.pathFromRoot>integrationtest/v5migrationhelper/orm</transform.original.pathFromRoot>
 
         <!-- This is based on legacy code and there are plenty of problems that we don't care to fix -->
         <jqassistant.skip>true</jqassistant.skip>
