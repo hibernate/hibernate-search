@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling.DatabasePollingTestUtils.awaitAllAgentsRunningInOneCluster;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
@@ -56,25 +57,24 @@ public class DatabasePollingAutomaticIndexingConcurrencyIT {
 
 	@Before
 	public void setup() {
-		sessionFactories.add( setup( Action.CREATE_DROP, 0 ) );
+		sessionFactories.add( setup( Action.CREATE_DROP ) );
 		for ( int i = 1; i < TOTAL_SHARD_COUNT ; i++ ) {
 			// Avoid session factories stepping on each other's feet: use Action.NONE here.
-			sessionFactories.add( setup( Action.NONE, i ) );
+			sessionFactories.add( setup( Action.NONE ) );
 		}
 
 		backendMock.verifyExpectationsMet();
+
+		awaitAllAgentsRunningInOneCluster( sessionFactories.get( 0 ), TOTAL_SHARD_COUNT );
 	}
 
-	private SessionFactory setup(Action action, int assignedShardIndex) {
+	private SessionFactory setup(Action action) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
 				.withProperty( Environment.HBM2DDL_AUTO, action )
-				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
-				.withProperty( "hibernate.search.coordination.shards.static", "true" )
-				.withProperty( "hibernate.search.coordination.shards.total_count", TOTAL_SHARD_COUNT )
-				.withProperty( "hibernate.search.coordination.shards.assigned", String.valueOf( assignedShardIndex ) );
+				.withProperty( "hibernate.search.background_failure_handler", failureHandler );
 
 		return context.setup( IndexedEntity.class );
 	}
