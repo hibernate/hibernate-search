@@ -1923,6 +1923,16 @@
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+                        <!-- Catch configuration problems that could cause the plugin
+                             to not detect any tests.
+                             For example, in the past, we've had:
+                             - JUnit 5 Jupiter creeping up our classpath through transitive dependencies,
+                               causing the maven-failsafe-plugin to simply switch to JUnit 5 mode and
+                               ignore all JUnit 4 tests.
+                             - Misconfigured "source copy" artifacts (e.g. jakarta) that ended up not copying tests
+                               from the original module at all.
+                         -->
+                        <failIfNoTests>true</failIfNoTests>
                     </configuration>
                     <dependencies>
                         <!--
