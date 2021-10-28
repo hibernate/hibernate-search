@@ -20,6 +20,8 @@
     <description>Re-execution of Hibernate Search reference documentation tests with Jakarta EE</description>
 
     <properties>
+        <transform.original.pathFromRoot>documentation</transform.original.pathFromRoot>
+
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
     </properties>
@@ -97,6 +99,9 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>

@@ -17,7 +17,7 @@
     <description>Hibernate Search integration tests for (JDK 11+) Java modules - Jakarta EE version</description>
 
     <properties>
-        <transform.original.pathFromRoot>integrationtests/jdk/java-modules</transform.original.pathFromRoot>
+        <transform.original.pathFromRoot>integrationtest/jdk/java-modules</transform.original.pathFromRoot>
 
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
         <test.database.run.skip>false</test.database.run.skip>
@@ -66,6 +66,9 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
