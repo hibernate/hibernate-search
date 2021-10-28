@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.cfg.spi;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -17,6 +18,8 @@ public interface OptionalPropertyContext<T> {
 	OptionalPropertyContext<T> substitute(Object expected, Object replacement);
 
 	OptionalPropertyContext<List<T>> multivalued();
+
+	OptionalPropertyContext<T> validate(Consumer<T> validation);
 
 	DefaultedPropertyContext<T> withDefault(T defaultValue);
 

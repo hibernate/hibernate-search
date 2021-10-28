@@ -36,13 +36,41 @@ import org.mockito.quality.Strictness;
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
 public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 
-	@Parameterized.Parameters(name = "{2}")
+	@Parameterized.Parameters(name = "{1}")
 	public static Object[][] data() {
 		return new Object[][] {
 				params(
 						KeyContext::asInteger, "foo", 42,
 						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
 						"For input string: \"foo\""
+				),
+				params(
+						KeyContext::asIntegerPositiveOrZero, "foo", 42,
+						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
+						"For input string: \"foo\""
+				),
+				params(
+						KeyContext::asIntegerPositiveOrZero, "-1", 42,
+						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
+						"", // No particular prefix for validation failures
+						"'value' must be positive or zero"
+				),
+				params(
+						KeyContext::asIntegerStrictlyPositive, "foo", 42,
+						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
+						"For input string: \"foo\""
+				),
+				params(
+						KeyContext::asIntegerStrictlyPositive, "0", 42,
+						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
+						"", // No particular prefix for validation failures
+						"'value' must be strictly positive"
+				),
+				params(
+						KeyContext::asIntegerStrictlyPositive, "-1", 42,
+						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
+						"", // No particular prefix for validation failures
+						"'value' must be strictly positive"
 				),
 				params(
 						KeyContext::asLong, "bar", 42L,
@@ -68,9 +96,18 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 			String invalidStringValue, T validValue,
 			String expectedInvalidValueCommonMessagePrefix,
 			String expectedInvalidStringMessage) {
+		return params( testedMethod, invalidStringValue, validValue, expectedInvalidValueCommonMessagePrefix,
+				expectedInvalidValueCommonMessagePrefix, expectedInvalidStringMessage );
+	}
+
+	private static <T> Object[] params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String invalidStringValue, T validValue,
+			String expectedInvalidValueTypeMessagePrefix,
+			String expectedInvalidValueStringMessagePrefix,
+			String expectedInvalidStringMessage) {
 		return new Object[] {
 				testedMethod, invalidStringValue, validValue,
-				expectedInvalidValueCommonMessagePrefix,
+				expectedInvalidValueTypeMessagePrefix, expectedInvalidValueStringMessagePrefix,
 				expectedInvalidStringMessage
 		};
 	}
@@ -84,17 +121,20 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 	private final Function<KeyContext, OptionalPropertyContext<T>> testedMethod;
 	private final String invalidStringValue;
 	private final T validValue;
-	private final String expectedInvalidValueCommonMessagePrefix;
+	private final String expectedInvalidValueTypeMessagePrefix;
+	private final String expectedInvalidValueStringMessagePrefix;
 	private final String expectedInvalidStringMessage;
 
 	public ConfigurationPropertyInvalidSimpleValuesTest(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String invalidStringValue, T validValue,
-			String expectedInvalidValueCommonMessagePrefix,
+			String expectedInvalidValueTypeMessagePrefix,
+			String expectedInvalidValueStringMessagePrefix,
 			String expectedInvalidStringMessage) {
 		this.testedMethod = testedMethod;
 		this.invalidStringValue = invalidStringValue;
 		this.validValue = validValue;
-		this.expectedInvalidValueCommonMessagePrefix = expectedInvalidValueCommonMessagePrefix;
+		this.expectedInvalidValueTypeMessagePrefix = expectedInvalidValueTypeMessagePrefix;
+		this.expectedInvalidValueStringMessagePrefix = expectedInvalidValueStringMessagePrefix;
 		this.expectedInvalidStringMessage = expectedInvalidStringMessage;
 	}
 
@@ -116,7 +156,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + invalidStringValue + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
+				.hasMessageContaining( expectedInvalidValueStringMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
 		verifyNoOtherSourceInteractionsAndReset();
 
@@ -128,7 +168,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + invalidTypeValue + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix );
+				.hasMessageContaining( expectedInvalidValueTypeMessagePrefix );
 		verifyNoOtherSourceInteractionsAndReset();
 	}
 
@@ -149,7 +189,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + invalidStringValue + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
+				.hasMessageContaining( expectedInvalidValueStringMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
 		verifyNoOtherSourceInteractionsAndReset();
 
@@ -161,7 +201,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + invalidTypeValue + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix );
+				.hasMessageContaining( expectedInvalidValueTypeMessagePrefix );
 		verifyNoOtherSourceInteractionsAndReset();
 	}
 
@@ -184,7 +224,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + invalidStringValue + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
+				.hasMessageContaining( expectedInvalidValueStringMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
 		verifyNoOtherSourceInteractionsAndReset();
 
@@ -197,7 +237,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + commaSeparatedStringValue + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
+				.hasMessageContaining( expectedInvalidValueStringMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
 		verifyNoOtherSourceInteractionsAndReset();
 
@@ -210,7 +250,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						"Invalid value for configuration property '" + resolvedKey
 								+ "': '" + invalidTypeValueCollection + "'."
 				)
-				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix );
+				.hasMessageContaining( expectedInvalidValueTypeMessagePrefix );
 		verifyNoOtherSourceInteractionsAndReset();
 
 		// Invalid type value instead of collection

@@ -8,6 +8,7 @@ package org.hibernate.search.engine.cfg.impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -45,6 +46,14 @@ final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T>
 				return v;
 			}
 		} );
+	}
+
+	@Override
+	public OptionalPropertyContext<T> validate(Consumer<T> validation) {
+		return new OptionalPropertyContextImpl<>( key, converter.andThen( value -> {
+			validation.accept( value );
+			return value;
+		} ) );
 	}
 
 	@Override
