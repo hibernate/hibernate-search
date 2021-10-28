@@ -17,6 +17,10 @@ public interface KeyContext {
 
 	OptionalPropertyContext<Integer> asInteger();
 
+	OptionalPropertyContext<Integer> asIntegerPositiveOrZero();
+
+	OptionalPropertyContext<Integer> asIntegerStrictlyPositive();
+
 	OptionalPropertyContext<Long> asLong();
 
 	<T> OptionalPropertyContext<BeanReference<? extends T>> asBeanReference(Class<T> expectedBeanType);

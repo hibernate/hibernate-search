@@ -12,6 +12,7 @@ import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.cfg.spi.KeyContext;
 import org.hibernate.search.engine.cfg.spi.OptionalPropertyContext;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.util.common.impl.Contracts;
 
 public class KeyContextImpl implements KeyContext {
 
@@ -34,6 +35,18 @@ public class KeyContextImpl implements KeyContext {
 	@Override
 	public OptionalPropertyContext<Integer> asInteger() {
 		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertInteger );
+	}
+
+	@Override
+	public OptionalPropertyContext<Integer> asIntegerPositiveOrZero() {
+		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertInteger )
+				.validate( value -> Contracts.assertPositiveOrZero( value, "value" ) );
+	}
+
+	@Override
+	public OptionalPropertyContext<Integer> asIntegerStrictlyPositive() {
+		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertInteger )
+				.validate( value -> Contracts.assertStrictlyPositive( value, "value" ) );
 	}
 
 	@Override
