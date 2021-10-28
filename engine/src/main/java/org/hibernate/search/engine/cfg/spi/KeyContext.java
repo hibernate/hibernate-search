@@ -15,13 +15,31 @@ public interface KeyContext {
 
 	OptionalPropertyContext<Boolean> asBoolean();
 
-	OptionalPropertyContext<Integer> asInteger();
+	/**
+	 * @return The next context.
+	 * @deprecated Use {@link #asIntegerPositiveOrZeroOrNegative()} instead.
+	 */
+	@Deprecated
+	default OptionalPropertyContext<Integer> asInteger() {
+		return asIntegerPositiveOrZeroOrNegative();
+	}
+
+	OptionalPropertyContext<Integer> asIntegerPositiveOrZeroOrNegative();
 
 	OptionalPropertyContext<Integer> asIntegerPositiveOrZero();
 
 	OptionalPropertyContext<Integer> asIntegerStrictlyPositive();
 
-	OptionalPropertyContext<Long> asLong();
+	/**
+	 * @return The next context.
+	 * @deprecated Use {@link #asLongPositiveOrZeroOrNegative()} instead.
+	 */
+	@Deprecated
+	default OptionalPropertyContext<Long> asLong() {
+		return asLongPositiveOrZeroOrNegative();
+	}
+
+	OptionalPropertyContext<Long> asLongPositiveOrZeroOrNegative();
 
 	<T> OptionalPropertyContext<BeanReference<? extends T>> asBeanReference(Class<T> expectedBeanType);
 

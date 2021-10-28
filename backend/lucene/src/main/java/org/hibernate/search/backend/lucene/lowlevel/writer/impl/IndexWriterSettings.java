@@ -105,7 +105,7 @@ public final class IndexWriterSettings implements Serializable {
 				BiConsumer<IndexWriterConfig, T> writerSettingApplier,
 				BiConsumer<LogByteSizeMergePolicy, T> mergePolicySettingApplier) {
 			OptionalConfigurationProperty<Integer> property = ConfigurationProperty.forKey( propertyKey )
-					.asInteger().build();
+					.asIntegerPositiveOrZeroOrNegative().build();
 			return new Extractor<>( propertyKey, property, processor, writerSettingApplier, mergePolicySettingApplier );
 		}
 

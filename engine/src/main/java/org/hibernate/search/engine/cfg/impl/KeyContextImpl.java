@@ -33,7 +33,7 @@ public class KeyContextImpl implements KeyContext {
 	}
 
 	@Override
-	public OptionalPropertyContext<Integer> asInteger() {
+	public OptionalPropertyContext<Integer> asIntegerPositiveOrZeroOrNegative() {
 		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertInteger );
 	}
 
@@ -50,7 +50,7 @@ public class KeyContextImpl implements KeyContext {
 	}
 
 	@Override
-	public OptionalPropertyContext<Long> asLong() {
+	public OptionalPropertyContext<Long> asLongPositiveOrZeroOrNegative() {
 		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertLong );
 	}
 
