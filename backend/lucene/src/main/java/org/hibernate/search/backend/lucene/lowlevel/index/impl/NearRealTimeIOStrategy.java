@@ -23,13 +23,13 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 
 	private static final ConfigurationProperty<Integer> COMMIT_INTERVAL =
 			ConfigurationProperty.forKey( LuceneIndexSettings.IO_COMMIT_INTERVAL )
-					.asInteger()
+					.asIntegerPositiveOrZero()
 					.withDefault( LuceneIndexSettings.Defaults.IO_COMMIT_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<Integer> REFRESH_INTERVAL =
 			ConfigurationProperty.forKey( LuceneIndexSettings.IO_REFRESH_INTERVAL )
-					.asInteger()
+					.asIntegerPositiveOrZero()
 					.withDefault( LuceneIndexSettings.Defaults.IO_REFRESH_INTERVAL )
 					.build();
 

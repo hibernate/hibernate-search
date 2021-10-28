@@ -44,12 +44,12 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 	private static final OptionalConfigurationProperty<Integer> SHARDS_TOTAL_COUNT =
 			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.SHARDS_TOTAL_COUNT )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.build();
 
 	private static final OptionalConfigurationProperty<List<Integer>> SHARDS_ASSIGNED =
 			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.SHARDS_ASSIGNED )
-					.asInteger()
+					.asIntegerPositiveOrZero()
 					.multivalued()
 					.build();
 
@@ -61,13 +61,13 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_POLLING_INTERVAL =
 			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_POLLING_INTERVAL )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_BATCH_SIZE =
 			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE )
 					.build();
 
@@ -78,7 +78,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 	private static final OptionalConfigurationProperty<Integer> PROCESSORS_INDEXING_TRANSACTION_TIMEOUT =
 			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_TRANSACTION_TIMEOUT )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.build();
 
 	public static final String PROCESSOR_NAME_PREFIX = "Outbox event processor";

@@ -29,7 +29,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 
 	private static final OptionalConfigurationProperty<Integer> NUMBER_OF_SHARDS =
 			ConfigurationProperty.forKey( LuceneIndexSettings.ShardingRadicals.NUMBER_OF_SHARDS )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.build();
 
 	private HashTable<String> shardIds;

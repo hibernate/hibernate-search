@@ -37,19 +37,19 @@ public class ElasticsearchBatchingWorkOrchestrator
 
 	private static final ConfigurationProperty<Integer> QUEUE_COUNT =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_QUEUE_COUNT )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_QUEUE_COUNT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> QUEUE_SIZE =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_QUEUE_SIZE )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_BULK_SIZE =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_MAX_BULK_SIZE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_MAX_BULK_SIZE )
 					.build();
 

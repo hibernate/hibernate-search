@@ -26,13 +26,13 @@ public class LuceneSerialWorkOrchestratorImpl
 
 	private static final ConfigurationProperty<Integer> QUEUE_COUNT =
 			ConfigurationProperty.forKey( LuceneIndexSettings.INDEXING_QUEUE_COUNT )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( LuceneIndexSettings.Defaults.INDEXING_QUEUE_COUNT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> QUEUE_SIZE =
 			ConfigurationProperty.forKey( LuceneIndexSettings.INDEXING_QUEUE_SIZE )
-					.asInteger()
+					.asIntegerStrictlyPositive()
 					.withDefault( LuceneIndexSettings.Defaults.INDEXING_QUEUE_SIZE )
 					.build();
 
