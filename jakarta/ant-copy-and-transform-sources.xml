@@ -13,6 +13,7 @@
         <!-- https://ant.apache.org/manual/Tasks/replace.html -->
         <replace dir="${transform.output.root.path}">
             <replacefilter token="javax.persistence" value="jakarta.persistence"/>
+            <replacefilter token="java.persistence" value="jakarta.persistence"/>
             <replacefilter token="javax.transaction" value="jakarta.transaction"/>
             <replacefilter token="javax.enterprise" value="jakarta.enterprise"/>
             <replacefilter token="javax.annotation" value="jakarta.annotation"/>
