@@ -90,6 +90,11 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 			return EventContexts.fromIndexFieldAbsolutePath( getAbsolutePath() );
 		}
 
+		public Builder with(Consumer<Builder> consumer) {
+			consumer.accept( this );
+			return this;
+		}
+
 		public Builder field(String relativeFieldName, Class<?> valueClass) {
 			return field( relativeFieldName, valueClass, b -> {
 			} );

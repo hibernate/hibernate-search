@@ -58,7 +58,7 @@ public class DatabasePollingAutomaticIndexingConcurrencyIT {
 	public void setup() {
 		sessionFactories.add( setup( Action.CREATE_DROP, 0 ) );
 		for ( int i = 1; i < TOTAL_SHARD_COUNT ; i++ ) {
-			// Avoid session factories getting in each other's feet: use Action.NONE here.
+			// Avoid session factories stepping on each other's feet: use Action.NONE here.
 			sessionFactories.add( setup( Action.NONE, i ) );
 		}
 
