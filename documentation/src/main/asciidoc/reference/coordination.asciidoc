@@ -164,8 +164,6 @@ You will also need to add this dependency:
 </dependency>
 ----
 
-include::components/dynamic-sharding-not-implemented-warning.asciidoc[]
-
 include::components/coordination-comparison-note.asciidoc[]
 
 [[coordination-database-polling-indexing]]
@@ -247,8 +245,14 @@ but it will remain asynchronous.
 
 The database-polling coordination strategy needs to store data in additional tables in the application database,
 so that this data can be consumed by background threads.
+
 This includes in particular an outbox events table, where one row is pushed every time an entity is changed
 in a way that requires reindexing.
+
+This also includes an agent table, where Hibernate Search registers every background event processor
+in order to <<coordination-database-polling-sharding-dynamic,dynamically assign shards>> to each application instance,
+or simply to check that <<coordination-database-polling-sharding-static,statically assigned shards>>
+are consistent.
 
 These tables are accessed through entities that are automatically added to the Hibernate ORM configuration,
 and as such they should be automatically generated when relying on Hibernate ORM's
@@ -275,12 +279,39 @@ Hibernate Search partitions the entities in what it calls "shards":
 * Each application node involved in <<coordination-database-polling-processors,event processing>>
 is uniquely assigned one or more shards, and will only process events related to entities in these shards.
 
-How shards are assigned to application nodes can be customized, as explained in the following sections.
+In order to reliably assign shards,
+Hibernate Search <<coordination-database-polling-schema,adds an agent table to the database>>,
+and uses that table to register agents involved in indexing (most of the time, one application instance = one agent =
+the <<coordination-database-polling-processors,indexing processor>>).
+The registered agents form a cluster.
+
+To make sure that agents are always assigned one shard,
+and that one shard is never assigned to more than one agent,
+each agent will periodically perform a "pulse",
+updating and inspecting the agent table.
+
+During a "pulse", an agent will:
+
+* update its own entry in the agent table, to let other agents knows it's still active;
+* detect and report configuration mistakes
+if using <<coordination-database-polling-sharding-static,static sharding>>,
+e.g. two agents assigned to the same shard;
+* trigger rebalancing as necessary if using <<coordination-database-polling-sharding-dynamic,dynamic sharding>>;
+e.g. when it detects that new agents recently joined the cluster,
+or that agents left the cluster voluntarily,
+or that agents expired (did not update their entry for a long time).
+
+For more details about dynamic and static sharding, see the following sections.
 
 [[coordination-database-polling-sharding-dynamic]]
 ==== Dynamic sharding
 
-include::components/dynamic-sharding-not-implemented-warning.asciidoc[]
+By default, sharding is dynamic: Hibernate Search registers each application instance in the database,
+and uses that information to dynamically assign a single, unique shard to each application instance,
+updating assignments as instances start or stop.
+
+Dynamic sharding does not require any specific configuration,
+but you may want to configure <<coordination-database-polling-processors, the background event processor>>.
 
 [[coordination-database-polling-sharding-static]]
 ==== Static sharding
@@ -382,12 +413,14 @@ The database-polling coordination strategy involves background processors,
 in particular one that polls the outbox events table for events
 and then reindex the corresponding entities when new events are found.
 
-These processors can be configured using the following configuration properties:
+The background indexing processor can be configured using the following configuration properties:
 
 [source]
 ----
 hibernate.search.coordination.processors.indexing.enabled = true
 hibernate.search.coordination.processors.indexing.polling_interval = 100
+hibernate.search.coordination.processors.indexing.pulse_interval = 2000
+hibernate.search.coordination.processors.indexing.pulse_expiration = 30000
 hibernate.search.coordination.processors.indexing.batch_size = 50
 hibernate.search.coordination.processors.indexing.transaction_timeout = 10
 ----
@@ -403,6 +436,40 @@ The default for this property is `100`.
 +
 Lower values will reduce the time it takes for a change to be reflected in the index,
 but will increase the stress on the database when there are no new events.
+* `processors.indexing.pulse_interval` defines how long the background indexing processor can poll for events
+before it must perform a "pulse",
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `2000`.
++
+See <<coordination-database-polling-sharding-basics,the sharding basics>> for information about "pulses".
++
+The pulse interval must be set to a value between the polling interval (see above) and one third (1/3) of the expiration interval (see below).
++
+Low values (closer to the polling interval) mean a shorter delay before rebalancing
+when a node joins or leaves the cluster,
+and reduced risk of incorrectly considering an agent as expired,
+but more stress on the database because of more frequent checks of the list of agents.
++
+High values (closer to the expiration interval) mean a longer delay before rebalancing
+when a node joins or leaves the cluster,
+and increased risk of incorrectly considering an agent as expired,
+but less stress on the database because of less frequent checks of the list of agents.
+* `processors.indexing.pulse_expiration` defines how long a background indexing processor "pulse" remains valid
+before considering the processor disconnected and forcibly removing it from the cluster,
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `30000`.
++
+See <<coordination-database-polling-sharding-basics,the sharding basics>> for information about "pulses".
++
+The expiration interval must be set to a value 3 times larger than the pulse interval (see above).
++
+Low values (closer to the pulse interval) mean a shorter delay before rebalancing
+when a node abruptly leaves the cluster due to a crash or network failure,
+but increased risk of incorrectly considering an agent as expired.
++
+High values (much larger than the pulse interval) mean a longer delay before rebalancing
+when a node abruptly leaves the cluster due to a crash or network failure,
+but reduced risk of incorrectly considering an agent as expired.
 * `processors.indexing.batch_size` defines how many outbox events, at most, are processed in a single transaction
 as an <<configuration-property-types,integer value>>.
 The default for this property is `50`.
