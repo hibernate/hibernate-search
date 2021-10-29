@@ -24,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.tool.schema.Action;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -77,7 +76,7 @@ public class DatabasePollingAutomaticIndexingShardingBaseIT {
 		for ( int i = 0; i < totalShardCount; i++ ) {
 			setup(
 					// Avoid session factories stepping on each other's feet.
-					i == 0 ? Action.CREATE_DROP : Action.NONE,
+					i == 0 ? "create-drop" : "none",
 					i
 			);
 		}
@@ -87,7 +86,7 @@ public class DatabasePollingAutomaticIndexingShardingBaseIT {
 		awaitAllAgentsRunningInOneCluster( indexingCountHelper.sessionFactory( 0 ), totalShardCount );
 	}
 
-	private void setup(Action action, int assignedShardIndex) {
+	private void setup(String hbm2ddlAction, int assignedShardIndex) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 				.with( indexingCountHelper::expectSchema )
@@ -100,7 +99,7 @@ public class DatabasePollingAutomaticIndexingShardingBaseIT {
 		);
 
 		ormSetupHelper.start()
-				.withProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, action )
+				.withProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.with( indexingCountHelper::bind )
 				.with( ctx -> {
 					if ( isStatic ) {

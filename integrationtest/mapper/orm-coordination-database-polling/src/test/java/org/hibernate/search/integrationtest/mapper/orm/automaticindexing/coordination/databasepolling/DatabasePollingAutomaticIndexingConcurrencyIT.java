@@ -24,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.tool.schema.Action;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,10 +56,10 @@ public class DatabasePollingAutomaticIndexingConcurrencyIT {
 
 	@Before
 	public void setup() {
-		sessionFactories.add( setup( Action.CREATE_DROP ) );
+		sessionFactories.add( setup( "create-drop" ) );
 		for ( int i = 1; i < TOTAL_SHARD_COUNT ; i++ ) {
 			// Avoid session factories stepping on each other's feet: use Action.NONE here.
-			sessionFactories.add( setup( Action.NONE ) );
+			sessionFactories.add( setup( "none" ) );
 		}
 
 		backendMock.verifyExpectationsMet();
@@ -68,12 +67,12 @@ public class DatabasePollingAutomaticIndexingConcurrencyIT {
 		awaitAllAgentsRunningInOneCluster( sessionFactories.get( 0 ), TOTAL_SHARD_COUNT );
 	}
 
-	private SessionFactory setup(Action action) {
+	private SessionFactory setup(String hbm2ddlAction) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
-				.withProperty( Environment.HBM2DDL_AUTO, action )
+				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler );
 
 		return context.setup( IndexedEntity.class );

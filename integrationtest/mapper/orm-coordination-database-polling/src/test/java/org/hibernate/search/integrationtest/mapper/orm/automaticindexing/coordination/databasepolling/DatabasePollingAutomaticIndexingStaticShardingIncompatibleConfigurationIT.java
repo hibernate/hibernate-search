@@ -23,7 +23,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.tool.schema.Action;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,13 +43,13 @@ public class DatabasePollingAutomaticIndexingStaticShardingIncompatibleConfigura
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private void setup(Action action, TestFailureHandler failureHandler, int totalShardCount, List<Integer> assignedShardIndices) {
+	private void setup(String hbm2ddlAction, TestFailureHandler failureHandler, int totalShardCount, List<Integer> assignedShardIndices) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
-				.withProperty( Environment.HBM2DDL_AUTO, action )
+				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
 				.withProperty( "hibernate.search.coordination.shards.static", "true" )
 				.withProperty( "hibernate.search.coordination.shards.total_count", totalShardCount )
@@ -64,8 +63,8 @@ public class DatabasePollingAutomaticIndexingStaticShardingIncompatibleConfigura
 		TestFailureHandler sessionFactory1FailureHandler = new TestFailureHandler();
 		TestFailureHandler sessionFactory2FailureHandler = new TestFailureHandler();
 
-		setup( Action.CREATE_DROP, sessionFactory1FailureHandler, 1, Collections.singletonList( 0 ) );
-		setup( Action.NONE, sessionFactory2FailureHandler, 2, Collections.singletonList( 1 ) );
+		setup( "create-drop", sessionFactory1FailureHandler, 1, Collections.singletonList( 0 ) );
+		setup( "none", sessionFactory2FailureHandler, 2, Collections.singletonList( 1 ) );
 		backendMock.verifyExpectationsMet();
 
 		await().untilAsserted( () -> {
@@ -103,8 +102,8 @@ public class DatabasePollingAutomaticIndexingStaticShardingIncompatibleConfigura
 		TestFailureHandler sessionFactory1FailureHandler = new TestFailureHandler();
 		TestFailureHandler sessionFactory2FailureHandler = new TestFailureHandler();
 
-		setup( Action.CREATE_DROP, sessionFactory1FailureHandler, 2, Collections.singletonList( 0 ) );
-		setup( Action.NONE, sessionFactory2FailureHandler, 2, Collections.singletonList( 0 ) );
+		setup( "create-drop", sessionFactory1FailureHandler, 2, Collections.singletonList( 0 ) );
+		setup( "none", sessionFactory2FailureHandler, 2, Collections.singletonList( 0 ) );
 		backendMock.verifyExpectationsMet();
 
 		await().untilAsserted( () -> {
