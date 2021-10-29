@@ -9,24 +9,17 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordi
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -40,8 +33,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.assertj.core.api.AbstractIntegerAssert;
-import org.assertj.core.api.ListAssert;
 import org.assertj.core.data.Percentage;
 
 /**
@@ -52,8 +43,6 @@ import org.assertj.core.data.Percentage;
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-4141")
 public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Parameterized.Parameters(name = "totalShardCount = {0}")
 	public static List<Integer> params() {
@@ -73,40 +62,37 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 	@Rule
 	public StaticCounters counters = new StaticCounters();
 
-	private final List<StaticCounters.Key> sessionFactoryCounterKeys = new ArrayList<>();
-	private final List<SessionFactory> sessionFactories = new ArrayList<>();
+	private final PerSessionFactoryIndexingCountHelper indexingCountHelper =
+			new PerSessionFactoryIndexingCountHelper( counters );
 
 	@Before
 	public void setup() {
 		for ( int i = 0; i < totalShardCount; i++ ) {
-			sessionFactories.add( setup(
-					// Avoid session factories getting in each other's feet.
+			setup(
+					// Avoid session factories stepping on each other's feet.
 					i == 0 ? Action.CREATE_DROP : Action.NONE,
 					i
-			) );
+			);
 		}
 
 		backendMock.verifyExpectationsMet();
 	}
 
-	private SessionFactory setup(Action action, int assignedShardIndex) {
+	private void setup(Action action, int assignedShardIndex) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
-				.field( PerSessionFactoryIndexingTracingBridge.FAKE_FIELD_NAME, PerSessionFactoryIndexingTracingBridge.FAKE_FIELD_TYPE )
+				.with( indexingCountHelper::expectSchema )
 		);
 		backendMock.expectSchema( IndexedAndContainingEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
-				.field( PerSessionFactoryIndexingTracingBridge.FAKE_FIELD_NAME, PerSessionFactoryIndexingTracingBridge.FAKE_FIELD_TYPE )
+				.with( indexingCountHelper::expectSchema )
 				.objectField( "contained", b2 -> b2
 						.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) )
 		);
 
-		StaticCounters.Key counterKey = StaticCounters.createKey();
-		sessionFactoryCounterKeys.add( counterKey );
-
-		return ormSetupHelper.start()
+		ormSetupHelper.start()
 				.withProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, action )
-				.withProperty( PerSessionFactoryIndexingTracingBridge.SESSION_FACTORY_COUNTER_KEY_PROPERTY, counterKey )
+				.with( indexingCountHelper::bind )
 				.withProperty( "hibernate.search.coordination.shards.static", "true" )
 				.withProperty( "hibernate.search.coordination.shards.total_count", totalShardCount )
 				.withProperty( "hibernate.search.coordination.shards.assigned", String.valueOf( assignedShardIndex ) )
@@ -115,7 +101,7 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 
 	@Test
 	public void uniqueWorkAcrossSessionFactories_insertUpdateDelete_indexed() {
-		SessionFactory sessionFactory = sessionFactories.get( 0 );
+		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "initial" );
@@ -144,12 +130,12 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		assertIndexingCountAcrossAllSessionFactories().isEqualTo( 2 );
+		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( 2 );
 	}
 
 	@Test
 	public void uniqueWorkAcrossSessionFactories_insertUpdateDelete_contained() {
-		SessionFactory sessionFactory = sessionFactories.get( 0 );
+		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
@@ -188,12 +174,12 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		assertIndexingCountAcrossAllSessionFactories().isEqualTo( 3 );
+		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( 3 );
 	}
 
 	@Test
 	public void uniformWorkDistribution_insertUpdateDelete_indexed() {
-		SessionFactory sessionFactory = sessionFactories.get( 0 );
+		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
 		int entityCount = 1000;
 
@@ -209,9 +195,9 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
 		// The workload must be spread uniformly (with some tolerance)
-		assertIndexingCountForEachSessionFactory()
+		indexingCountHelper.assertIndexingCountForEachSessionFactory()
 				.allSatisfy( count -> assertThat( count )
 						.isCloseTo( entityCount / totalShardCount, Percentage.withPercentage( 25 ) ) );
 
@@ -234,33 +220,15 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 		}
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
 		// The workload must be spread uniformly (with some tolerance)
-		assertIndexingCountForEachSessionFactory()
+		indexingCountHelper.assertIndexingCountForEachSessionFactory()
 				.allSatisfy( count -> assertThat( count )
 						.isCloseTo( entityCount / totalShardCount, Percentage.withPercentage( 25 ) ) );
 	}
 
-	private AbstractIntegerAssert<?> assertIndexingCountAcrossAllSessionFactories() {
-		int sum = 0;
-		for ( StaticCounters.Key counterKey : sessionFactoryCounterKeys ) {
-			sum += counters.get( counterKey );
-		}
-		log.debugf( "Count of indexing operations across all session factories: %s", sum );
-		return assertThat( sum )
-				.as( "Count of indexing operations across all session factories" );
-	}
-
-	private ListAssert<Integer> assertIndexingCountForEachSessionFactory() {
-		List<Integer> counts = sessionFactoryCounterKeys.stream().map( counters::get ).collect( Collectors.toList() );
-		log.debugf( "Count of indexing operations for each session factory: %s", counts );
-		return assertThat( counts )
-				.as( "Count of indexing operations for each session factory" );
-	}
-
 	@Entity(name = IndexedEntity.NAME)
 	@Indexed
-	@TypeBinding(binder = @TypeBinderRef(type = PerSessionFactoryIndexingTracingBridge.Binder.class))
 	public static class IndexedEntity {
 
 		static final String NAME = "IndexedEntity";
@@ -293,7 +261,6 @@ public class DatabasePollingAutomaticIndexingStaticShardingBaseIT {
 
 	@Entity(name = IndexedAndContainingEntity.NAME)
 	@Indexed
-	@TypeBinding(binder = @TypeBinderRef(type = PerSessionFactoryIndexingTracingBridge.Binder.class))
 	public static class IndexedAndContainingEntity {
 
 		static final String NAME = "IndexedAndContainingEntity";
