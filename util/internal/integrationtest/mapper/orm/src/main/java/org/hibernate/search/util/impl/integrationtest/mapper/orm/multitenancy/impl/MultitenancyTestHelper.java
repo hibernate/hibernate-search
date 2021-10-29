@@ -45,7 +45,7 @@ public class MultitenancyTestHelper {
 	}
 
 	private void attachTo(SimpleSessionFactoryBuilder builder) {
-		builder.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, org.hibernate.tool.schema.Action.NONE );
+		builder.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "none" );
 		builder.setProperty( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
 		builder.setProperty( AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER,
 				new H2LazyMultiTenantConnectionProvider( tenantIds ) );

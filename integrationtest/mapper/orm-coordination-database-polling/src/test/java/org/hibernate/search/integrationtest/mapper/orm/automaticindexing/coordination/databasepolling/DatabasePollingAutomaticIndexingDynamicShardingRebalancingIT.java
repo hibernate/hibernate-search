@@ -29,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.tool.schema.Action;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,16 +62,16 @@ public class DatabasePollingAutomaticIndexingDynamicShardingRebalancingIT {
 			new ArrayList<>();
 
 	public void setup() {
-		setup( Action.CREATE_DROP );
-		setup( Action.NONE );
-		setup( Action.NONE );
+		setup( "create-drop" );
+		setup( "none" );
+		setup( "none" );
 
 		backendMock.verifyExpectationsMet();
 
 		awaitAllAgentsRunningInOneCluster( indexingCountHelper.sessionFactory( 0 ), 3 );
 	}
 
-	private void setup(Action action) {
+	private void setup(String hbm2ddlAction) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 				.with( indexingCountHelper::expectSchema )
@@ -82,7 +81,7 @@ public class DatabasePollingAutomaticIndexingDynamicShardingRebalancingIT {
 		disconnectionSimulatingAgentRepositoryProviders.add( disconnectionSimulatingAgentRepositoryProvider );
 
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
-				.withProperty( Environment.HBM2DDL_AUTO, action )
+				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.with( indexingCountHelper::bind )
 				.withProperty( "hibernate.search.coordination.processors.indexing.pulse_expiration", PULSE_EXPIRATION )
 				.withProperty( "hibernate.search.coordination.processors.indexing.pulse_interval", PULSE_INTERVAL )
@@ -198,7 +197,7 @@ public class DatabasePollingAutomaticIndexingDynamicShardingRebalancingIT {
 				.pollInterval( 1, TimeUnit.MILLISECONDS )
 				.untilAsserted( () -> indexingCountHelper.assertIndexingCountForEachSessionFactory()
 						.allSatisfy( c -> assertThat( c ).isNotZero() ) );
-		setup( Action.NONE );
+		setup( "none" );
 		totalShardCount += 1;
 
 		backendMock.verifyExpectationsMet();

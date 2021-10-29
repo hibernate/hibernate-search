@@ -24,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-import org.hibernate.tool.schema.Action;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,35 +56,35 @@ public class DatabasePollingAutomaticIndexingStaticShardingUnevenShardsIT {
 	@Before
 	public void setup() {
 		setup(
-				Action.CREATE_DROP,
+				"create-drop",
 				true, Collections.singletonList( 0 ) // 1 shard
 		);
 		setup(
-				Action.NONE, // Avoid session factories stepping on each other's feet.
+				"none", // Avoid session factories stepping on each other's feet.
 				// Make sure that nodes can disable processing,
 				// and if so that they don't need to configure sharding.
 				false, null // 0 shard
 		);
 		setup(
-				Action.NONE,
+				"none",
 				true, Arrays.asList( 1, 3 ) // 2 shards
 		);
 		setup(
-				Action.NONE,
+				"none",
 				true, Arrays.asList( 2, 4, 5, 6 ) // 4 shards
 		);
 
 		backendMock.verifyExpectationsMet();
 	}
 
-	private void setup(Action action, boolean processingEnabled, List<Integer> assignedShardIndices) {
+	private void setup(String hbm2ddlAction, boolean processingEnabled, List<Integer> assignedShardIndices) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.with( indexingCountHelper::expectSchema )
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
-				.withProperty( Environment.HBM2DDL_AUTO, action )
+				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.with( indexingCountHelper::bind );
 
 		if ( processingEnabled ) {
