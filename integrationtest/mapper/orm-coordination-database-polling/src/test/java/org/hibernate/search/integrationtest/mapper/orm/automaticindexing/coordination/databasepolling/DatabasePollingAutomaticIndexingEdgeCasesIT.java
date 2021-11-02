@@ -15,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling.FilteringOutboxEventFinder;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -31,7 +30,7 @@ import org.junit.Test;
 import org.junit.rules.MethodRule;
 
 /**
- * Extensive tests with edge cases for automatic indexing with {@link HibernateOrmMapperDatabasePollingSettings#DATABASE_POLLING}.
+ * Extensive tests with edge cases for automatic indexing with the database-polling strategy.
  */
 public class DatabasePollingAutomaticIndexingEdgeCasesIT {
 
