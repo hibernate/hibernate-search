@@ -263,13 +263,46 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/proper
 include::components/incubating-warning.asciidoc[]
 
 The context passed to the property binder's `bind` method
-exposes a `bridgedElement()` method that gives access to metadata about the property being bound,
-in particular its name and type.
+exposes a `bridgedElement()` method that gives access to metadata about the property being bound.
 
-The metadata can also be used to inspect the type of the property in details:
+The metadata can be used to inspect the property in details:
 
+* Getting the name of the property.
+* Checking the type of the property.
 * Getting accessors to properties.
 * Detecting properties with markers.
 Markers are applied by specific annotations carrying a `@MarkerBinding` meta-annotation.
 
 See the javadoc for more information.
+
+Below is an example of the simplest use of this metadata,
+getting the property name and using it as a field name.
+
+.Naming a field after the property being bound in a `PropertyBinder`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/bridgedelement/InvoiceLineItemsSummaryBinder.java[tags=include]
+----
+<1> Use the binding context to get the bridged element.
+<2> Use the name of the property as the name of a newly declared index field.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/bridgedelement/Invoice.java[tags=include;!getters-setters]
+----
+<1> Apply the bridge using the `@PropertyBinding` annotation.
+
+Here is an example of what an indexed document would look like, with the Elasticsearch backend:
+
+[source, JSON]
+----
+{
+  "lineItems": {
+    "total": 38.96,
+    "books": 30.97,
+    "shipping": 7.99
+  }
+}
+----
+====
