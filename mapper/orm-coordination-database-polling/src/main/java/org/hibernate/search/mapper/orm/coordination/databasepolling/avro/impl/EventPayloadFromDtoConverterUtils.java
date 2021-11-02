@@ -46,7 +46,7 @@ final class EventPayloadFromDtoConverterUtils {
 	}
 
 	private static Collection<DocumentRouteDescriptor> convertRoutes(List<DocumentRouteDescriptorDto> routes) {
-		return routes.stream().map( route -> convert( route ) )
+		return routes.stream().map( EventPayloadFromDtoConverterUtils::convert )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 	}
 
