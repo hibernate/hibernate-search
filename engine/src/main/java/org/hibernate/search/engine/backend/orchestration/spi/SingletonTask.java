@@ -136,7 +136,6 @@ public final class SingletonTask {
 		nextExecutionFuture = null;
 
 		cancelIfNotNull( completionFuture );
-		completionFuture = null;
 	}
 
 	private void cancelIfNotNull(Future<?> futureToCancel) {
