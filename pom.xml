@@ -431,7 +431,7 @@
                 is outdated and leads to compilation errors.
          -->
         <version.org.codehaus.plexus.plexus-compiler-eclipse>2.8.6</version.org.codehaus.plexus.plexus-compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.21.0</version.org.eclipse.jdt.ecj>
+        <version.org.eclipse.jdt.ecj>3.27.0</version.org.eclipse.jdt.ecj>
 
         <!--
             The absolute path to the root project directory.
