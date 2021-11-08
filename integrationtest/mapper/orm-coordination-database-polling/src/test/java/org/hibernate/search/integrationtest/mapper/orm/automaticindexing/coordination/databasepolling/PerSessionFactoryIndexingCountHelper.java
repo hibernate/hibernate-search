@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
@@ -26,6 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.assertj.core.api.AbstractIntegerAssert;
@@ -53,14 +55,26 @@ public class PerSessionFactoryIndexingCountHelper {
 	public OrmSetupHelper.SetupContext bind(OrmSetupHelper.SetupContext context) {
 		StaticCounters.Key counterKey = StaticCounters.createKey();
 		return context.withConfiguration(
-				builder -> builder.setProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-						new HibernateOrmSearchMappingConfigurer() {
-							@Override
-							public void configure(HibernateOrmMappingConfigurationContext context) {
-								context.programmaticMapping().type( Object.class )
-										.binder( new Binder( counterKey ) );
-							}
-						} ),
+				// For some reason the Eclipse compiler, ECJ, will throw a NullPointerException
+				// if we use a lambda here.
+				// This happens only in the -jakarta module, though, and only on CI,
+				// and even then only on the main build, not on PRs!
+				// I've been unable to reproduce the problem locally.
+				new Consumer<SimpleSessionFactoryBuilder>() {
+					@Override
+					public void accept(SimpleSessionFactoryBuilder builder) {
+						builder.setProperty(
+								HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+								new HibernateOrmSearchMappingConfigurer() {
+									@Override
+									public void configure(HibernateOrmMappingConfigurationContext context) {
+										context.programmaticMapping().type( Object.class )
+												.binder( new Binder( counterKey ) );
+									}
+								}
+						);
+					}
+				},
 				sessionFactory -> {
 					counterKeys.add( counterKey );
 					sessionFactories.add( sessionFactory );
