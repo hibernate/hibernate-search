@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
+import java.time.Instant;
 import javax.persistence.Transient;
 
 public final class OutboxEvent {
@@ -17,6 +18,7 @@ public final class OutboxEvent {
 	private int entityIdHash;
 	private byte[] payload;
 	private int retries = 0;
+	private Instant processAfter;
 
 	@Transient
 	private Object originalEntityId;
@@ -41,6 +43,7 @@ public final class OutboxEvent {
 				", entityId='" + entityId + '\'' +
 				", entityIdHash='" + entityIdHash + '\'' +
 				", retries=" + retries +
+				", processAfter=" + processAfter +
 				", originalEntityId=" + originalEntityId +
 				'}';
 	}
@@ -91,6 +94,14 @@ public final class OutboxEvent {
 
 	public void setRetries(int retries) {
 		this.retries = retries;
+	}
+
+	public Instant getProcessAfter() {
+		return processAfter;
+	}
+
+	public void setProcessAfter(Instant processAfter) {
+		this.processAfter = processAfter;
 	}
 
 	public Object getOriginalEntityId() {
