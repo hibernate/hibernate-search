@@ -39,7 +39,6 @@ import org.hibernate.stat.Statistics;
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
@@ -135,7 +134,7 @@ public class MassIndexingCachingIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4273: MassIndexer.cacheMode is not honored")
+	@TestForIssue(jiraKey = "HSEARCH-4273")
 	public void explicit_get() {
 		setupHolder.runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );

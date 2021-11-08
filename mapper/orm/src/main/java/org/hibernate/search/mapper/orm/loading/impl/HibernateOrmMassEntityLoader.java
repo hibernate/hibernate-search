@@ -11,6 +11,7 @@ import javax.persistence.LockModeType;
 
 import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
@@ -52,7 +53,8 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 					.setLockMode( LockModeType.NONE )
 					.setCacheable( false )
 					.setHibernateFlushMode( FlushMode.MANUAL )
-					.setFetchSize( identifiers.size() );
+					.setFetchSize( identifiers.size() )
+					.setHint( QueryHints.HINT_CACHEABLE, true );
 			sink.accept( query.getResultList() );
 			session.clear();
 		}
