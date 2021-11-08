@@ -6,16 +6,23 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+import java.util.Arrays;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.Table;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.CacheMode;
+import org.hibernate.Session;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.jpa.QueryHints;
+import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
@@ -59,6 +66,11 @@ public class MassIndexingCachingIT {
 
 		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, "false" )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
+				.withProperty( AvailableSettings.GENERATE_STATISTICS, "true" )
+				// it seems that without a query cache hit, we cannot have any second level cache hits,
+				// even if these caches I think they are supposed to be independent of each other:
+				.withProperty( AvailableSettings.USE_QUERY_CACHE, "true" )
+				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
 				.withAnnotatedTypes( IndexedEntity.class );
 	}
 
@@ -68,6 +80,13 @@ public class MassIndexingCachingIT {
 			session.persist( new IndexedEntity( 1, "text1" ) );
 			session.persist( new IndexedEntity( 2, "text2" ) );
 			session.persist( new IndexedEntity( 3, "text3" ) );
+		} );
+		setupHolder.runInTransaction( session -> {
+			// Load entities to populate 2nd lvl caches:
+			TypedQuery<IndexedEntity> query = cachedQuery( session, CacheMode.PUT );
+			List<IndexedEntity> entities = query.getResultList();
+
+			assertThat( entities ).hasSize( 3 );
 		} );
 
 		setupHolder.sessionFactory().getCache().evictEntityData( IndexedEntity.class, 1 );
@@ -153,14 +172,27 @@ public class MassIndexingCachingIT {
 		} );
 	}
 
-	public AbstractLongAssert<?> assertEntityLoadCount(SoftAssertions softly) {
+	private AbstractLongAssert<?> assertEntityLoadCount(SoftAssertions softly) {
 		return softly.assertThat( statistics.getEntityLoadCount() )
 				.as( "Entity load count" );
 	}
 
-	public AbstractLongAssert<?> assertSecondLevelCacheHitCount(SoftAssertions softly) {
+	private AbstractLongAssert<?> assertSecondLevelCacheHitCount(SoftAssertions softly) {
 		return softly.assertThat( statistics.getSecondLevelCacheHitCount() )
 				.as( "Second level cache hit count" );
+	}
+
+	private Query cachedQuery(Session session, CacheMode cacheMode) {
+		Query<IndexedEntity> query = session.createQuery(
+				"select e from IndexedEntity e where e.id in (:ids)",
+				IndexedEntity.class
+		);
+
+		query.setParameter( "ids", Arrays.asList( 1, 2, 3 ) )
+				.setCacheMode( cacheMode )
+				.setHint( QueryHints.HINT_CACHEABLE, true );
+
+		return query;
 	}
 
 	@Entity(name = IndexedEntity.NAME)
