@@ -86,7 +86,10 @@ place after indexing.
 |Specify the Hibernate `CacheMode` when loading entities.
 The default is `IGNORE`, and it will be the most efficient choice in most cases,
 but using another mode such as `GET` may be more efficient if many of the entities being indexed
-refer to a small set of other entities.
+are already present in the Hibernate ORM second-level cache before mass indexing.
+Enabling caches has an effect only if the entity id is also the document id, which is the default.
+`PUT` or `NORMAL` values may lead to bad performance, because all the entities are also loaded into
+Hibernate second level cache.
 
 |`idFetchSize` / `.idFetchSize(int)`
 |1000
