@@ -130,6 +130,7 @@ public class MassIndexingCachingIT {
 		assertSoftly( softly -> {
 			assertEntityLoadCount( softly ).isEqualTo( 3 );
 			assertSecondLevelCacheHitCount( softly ).isEqualTo( 0 );
+			assertSecondLevelCachePutCount( softly ).isEqualTo( 0 );
 		} );
 	}
 
@@ -168,6 +169,45 @@ public class MassIndexingCachingIT {
 		assertSoftly( softly -> {
 			assertEntityLoadCount( softly ).isEqualTo( 1 );
 			assertSecondLevelCacheHitCount( softly ).isEqualTo( 2 );
+			assertSecondLevelCachePutCount( softly ).isEqualTo( 0 );
+		} );
+	}
+
+	@Test
+	public void explicit_normal() {
+		setupHolder.runNoTransaction( session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer()
+					.cacheMode( CacheMode.NORMAL );
+
+			backendMock.expectWorks( IndexedEntity.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "1", b -> b.field( "text", "text1" ) )
+					.add( "2", b -> b.field( "text", "text2" ) )
+					.add( "3", b -> b.field( "text", "text3" ) );
+
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+			backendMock.expectIndexScaleWorks( IndexedEntity.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+
+		} );
+
+		backendMock.verifyExpectationsMet();
+
+		assertSoftly( softly -> {
+			assertEntityLoadCount( softly ).isEqualTo( 1 );
+			assertSecondLevelCacheHitCount( softly ).isEqualTo( 2 );
+			assertSecondLevelCachePutCount( softly ).isEqualTo( 1 );
 		} );
 	}
 
@@ -179,6 +219,11 @@ public class MassIndexingCachingIT {
 	private AbstractLongAssert<?> assertSecondLevelCacheHitCount(SoftAssertions softly) {
 		return softly.assertThat( statistics.getSecondLevelCacheHitCount() )
 				.as( "Second level cache hit count" );
+	}
+
+	private AbstractLongAssert<?> assertSecondLevelCachePutCount(SoftAssertions softly) {
+		return softly.assertThat( statistics.getSecondLevelCachePutCount() )
+				.as( "Second level cache put count" );
 	}
 
 	private Query cachedQuery(Session session, CacheMode cacheMode) {
