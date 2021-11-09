@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Set;
 
+import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.entity.EntityPersister;
@@ -49,6 +50,16 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 						+ " e where " + uniquePropertyName + " in (:" + parameterName + ")",
 				(Class<E>) entityPersister.getMappedClass()
 		);
+	}
+
+	@Override
+	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
+		return session.byMultipleIds( entityPersister.getEntityName() );
+	}
+
+	@Override
+	public boolean uniquePropertyIsTheEntityId() {
+		return uniquePropertyName.equals( entityPersister.getIdentifierPropertyName() );
 	}
 
 	private <T> Query<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,

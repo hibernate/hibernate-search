@@ -15,6 +15,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
@@ -74,5 +75,15 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 		Path<?> uniquePropertyInRoot = root.get( uniqueProperty );
 		criteriaQuery.where( uniquePropertyInRoot.in( idsParameter ) );
 		return session.createQuery( criteriaQuery );
+	}
+
+	@Override
+	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
+		return session.byMultipleIds( typeDescriptor.getJavaType() );
+	}
+
+	@Override
+	public boolean uniquePropertyIsTheEntityId() {
+		return uniqueProperty.isId();
 	}
 }
