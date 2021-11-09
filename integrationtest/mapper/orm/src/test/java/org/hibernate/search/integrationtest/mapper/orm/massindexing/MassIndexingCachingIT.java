@@ -21,7 +21,6 @@ import javax.persistence.TypedQuery;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -66,9 +65,6 @@ public class MassIndexingCachingIT {
 		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, "false" )
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
 				.withProperty( AvailableSettings.GENERATE_STATISTICS, "true" )
-				// it seems that without a query cache hit, we cannot have any second level cache hits,
-				// even if these caches I think they are supposed to be independent of each other:
-				.withProperty( AvailableSettings.USE_QUERY_CACHE, "true" )
 				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
 				.withAnnotatedTypes( IndexedEntity.class );
 	}
@@ -233,8 +229,7 @@ public class MassIndexingCachingIT {
 		);
 
 		query.setParameter( "ids", Arrays.asList( 1, 2, 3 ) )
-				.setCacheMode( cacheMode )
-				.setHint( QueryHints.HINT_CACHEABLE, true );
+				.setCacheMode( cacheMode );
 
 		return query;
 	}
