@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Set;
 
+import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -47,5 +48,9 @@ public interface TypeQueryFactory<E, I> {
 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
 
 	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
+
+	MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session);
+
+	boolean uniquePropertyIsTheEntityId();
 
 }

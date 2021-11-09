@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.io.Serializable;
 import java.util.List;
-import javax.persistence.LockModeType;
 
 import org.hibernate.FlushMode;
+import org.hibernate.LockOptions;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.jpa.QueryHints;
-import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
@@ -35,7 +34,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 		this.options = options;
 		this.sink = sink;
 		this.session = session;
-		this.transactionHelper = new TransactionHelper( session .getSessionFactory() );
+		this.transactionHelper = new TransactionHelper( session.getSessionFactory() );
 	}
 
 	@Override
@@ -47,15 +46,8 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 	public void load(List<I> identifiers) throws InterruptedException {
 		transactionHelper.begin( session, null );
 		try {
-			Query<E> query = typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
-					.setParameter( ID_PARAMETER_NAME, identifiers )
-					.setCacheMode( options.cacheMode() )
-					.setLockMode( LockModeType.NONE )
-					.setCacheable( false )
-					.setHibernateFlushMode( FlushMode.MANUAL )
-					.setFetchSize( identifiers.size() )
-					.setHint( QueryHints.HINT_CACHEABLE, true );
-			sink.accept( query.getResultList() );
+			sink.accept( typeQueryLoader.uniquePropertyIsTheEntityId() ?
+					multiLoad( identifiers ) : queryByIds( identifiers ) );
 			session.clear();
 		}
 		catch (Exception e) {
@@ -63,5 +55,24 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 			throw e;
 		}
 		transactionHelper.commit( session );
+	}
+
+	@SuppressWarnings("unchecked") // We can assume identifiers are serializable
+	private List<E> multiLoad(List<I> identifiers) {
+		return typeQueryLoader.createMultiIdentifierLoadAccess( session )
+				.with( options.cacheMode() )
+				.with( LockOptions.NONE )
+				.multiLoad( (List<Serializable>) identifiers );
+	}
+
+	private List<E> queryByIds(List<I> identifiers) {
+		return typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
+				.setParameter( ID_PARAMETER_NAME, identifiers )
+				.setCacheMode( options.cacheMode() )
+				.setLockOptions( LockOptions.NONE )
+				.setCacheable( false )
+				.setHibernateFlushMode( FlushMode.MANUAL )
+				.setFetchSize( identifiers.size() )
+				.list();
 	}
 }

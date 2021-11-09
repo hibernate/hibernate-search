@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Set;
 
+import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.entity.EntityPersister;
@@ -55,5 +56,13 @@ public class HibernateOrmQueryLoader<E, I> {
 
 	public Query<E> createLoadingQuery(SessionImplementor session, String idParameterName) {
 		return queryFactory.createQueryForLoadByUniqueProperty( session, idParameterName );
+	}
+
+	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
+		return queryFactory.createMultiIdentifierLoadAccess( session );
+	}
+
+	public boolean uniquePropertyIsTheEntityId() {
+		return queryFactory.uniquePropertyIsTheEntityId();
 	}
 }
