@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -75,11 +76,14 @@ public class OutboxEventUpdater {
 				eventToDelete.remove( event );
 
 				// We will simply increment the retry count of this event,
-				// and the event processor will process it once more in the next batch.
+				// and the event processor will process it once more in the next batch
 				event.setRetries( attempts );
+				// TODO HSEARCH-4194 Apply some configurable delay
+				Instant processAfter = Instant.now();
+				event.setProcessAfter( processAfter );
 
-				log.automaticIndexingRetry( event.getId(),
-						event.getEntityName(), event.getEntityId(), attempts
+				log.automaticIndexingRetry(
+						event.getId(), event.getEntityName(), event.getEntityId(), attempts, processAfter
 				);
 			}
 		}

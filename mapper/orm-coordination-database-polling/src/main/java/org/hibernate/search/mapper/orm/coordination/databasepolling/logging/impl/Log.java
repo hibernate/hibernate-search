@@ -10,6 +10,7 @@ package org.hibernate.search.mapper.orm.coordination.databasepolling.logging.imp
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.WARN;
 
+import java.time.Instant;
 import java.util.List;
 import javax.persistence.OptimisticLockException;
 
@@ -48,8 +49,8 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 4, value = "Automatic indexing failed for event #%1$s on entity of type '%2$s' with ID '%3$s'."
-			+ " Will try again soon. Attempts so far: %4$d.")
-	void automaticIndexingRetry(Long eventId, String entityName, String entityId, int attempts);
+			+ " Attempts so far: %4$d. The event will be reprocessed after the moment: %5$s.")
+	void automaticIndexingRetry(Long eventId, String entityName, String entityId, int attempts, Instant processAfter);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 5, value = "Starting outbox event processor '%1$s'")
