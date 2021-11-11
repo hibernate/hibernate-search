@@ -423,6 +423,7 @@ hibernate.search.coordination.processors.indexing.pulse_interval = 2000
 hibernate.search.coordination.processors.indexing.pulse_expiration = 30000
 hibernate.search.coordination.processors.indexing.batch_size = 50
 hibernate.search.coordination.processors.indexing.transaction_timeout = 10
+hibernate.search.coordination.processors.indexing.retry_delay = 15
 ----
 
 * `processors.indexing.enabled` defines whether the background processor responsible for indexing entities is enabled,
@@ -481,3 +482,7 @@ but will increase memory usage and in extreme cases may lead to `OutOfMemoryErro
 as an <<configuration-property-types,integer value>> in seconds.
 Only effective when a JTA transaction manager is configured.
 When using JTA and this property is not set, Hibernate Search will use whatever default transaction timeout is configured in the JTA transaction manager.
+* `processors.indexing.retry_delay` defines the time after which it is possible to process again an event that has gone into error.
+as a <<configuration-property-types,positive integer value>> in seconds.
+Use the value `0` to reprocess the failed events as soon as possible, with no delay.
+The default for this property is `30`.
