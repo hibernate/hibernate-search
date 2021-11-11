@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination.databasepolling;
 
-import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
@@ -16,7 +15,7 @@ import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
 
 /**
- * Tests suite for automatic indexing with {@link HibernateOrmMapperDatabasePollingSettings#DATABASE_POLLING}.
+ * Tests suite for automatic indexing with database-polling.
  */
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.IncludeJars(true)
