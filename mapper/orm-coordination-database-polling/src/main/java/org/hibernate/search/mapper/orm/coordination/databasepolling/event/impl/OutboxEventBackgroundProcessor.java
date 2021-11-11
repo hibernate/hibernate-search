@@ -40,6 +40,7 @@ public final class OutboxEventBackgroundProcessor {
 	private final int pollingInterval;
 	private final int batchSize;
 	private final Integer transactionTimeout;
+	private final int retryAfter;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
 	private final AgentRepositoryProvider agentRepositoryProvider;
@@ -52,12 +53,13 @@ public final class OutboxEventBackgroundProcessor {
 			AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
 			AgentRepositoryProvider agentRepositoryProvider,
 			OutboxEventBackgroundProcessorClusterLink clusterLink,
-			int pollingInterval, int batchSize, Integer transactionTimeout) {
+			int pollingInterval, int batchSize, Integer transactionTimeout, int retryAfter) {
 		this.name = name;
 		this.mapping = mapping;
 		this.pollingInterval = pollingInterval;
 		this.batchSize = batchSize;
 		this.transactionTimeout = transactionTimeout;
+		this.retryAfter = retryAfter;
 		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
@@ -166,7 +168,7 @@ public final class OutboxEventBackgroundProcessor {
 				// can see heavily concurrent access (the outbox table),
 				// so we do that in a separate transaction, one that is as short as possible.
 				OutboxEventUpdater eventUpdater = new OutboxEventUpdater(
-						failureHandler, eventProcessing, session, name );
+						failureHandler, eventProcessing, session, name, retryAfter );
 				// We potentially perform this update in multiple transactions,
 				// each loading as many events as possible using SKIP_LOCKED,
 				// to only load events that are not already locked by another processor.

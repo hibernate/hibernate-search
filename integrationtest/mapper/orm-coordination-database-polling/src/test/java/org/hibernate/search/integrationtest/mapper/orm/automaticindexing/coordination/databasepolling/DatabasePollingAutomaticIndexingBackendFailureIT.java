@@ -61,6 +61,7 @@ public class DatabasePollingAutomaticIndexingBackendFailureIT {
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
 				.withProperty( "hibernate.search.coordination.processors.indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.processors.indexing.retry_after", 0 )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
