@@ -21,7 +21,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.databasepolling.FilteringOutboxEventFinder;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.cfg.HibernateOrmMapperDatabasePollingSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -36,7 +35,7 @@ import org.junit.Test;
 import org.awaitility.core.ThrowingRunnable;
 
 /**
- * Extensive tests of backend failures for automatic indexing with {@link HibernateOrmMapperDatabasePollingSettings#DATABASE_POLLING}.
+ * Extensive tests of backend failures for automatic indexing with database-polling.
  */
 public class DatabasePollingAutomaticIndexingBackendFailureIT {
 
