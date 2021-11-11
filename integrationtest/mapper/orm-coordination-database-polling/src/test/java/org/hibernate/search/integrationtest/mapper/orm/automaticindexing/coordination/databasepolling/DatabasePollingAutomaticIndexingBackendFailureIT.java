@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -28,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -53,20 +53,9 @@ public class DatabasePollingAutomaticIndexingBackendFailureIT {
 	private SessionFactory sessionFactory;
 	private TestFailureHandler failureHandler;
 
-	@Before
-	public void setup() {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
-		failureHandler = new TestFailureHandler();
-		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
-				.withProperty( "hibernate.search.coordination.processors.indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
-				.withProperty( "hibernate.search.coordination.processors.indexing.retry_after", 0 )
-				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
-	}
-
 	@Test
 	public void backendFailure() {
+		setup( 0 );
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -117,7 +106,65 @@ public class DatabasePollingAutomaticIndexingBackendFailureIT {
 	}
 
 	@Test
+	public void backendFailure_retryAfter() {
+		setup( 3 );
+		AtomicLong timeOfTheException = new AtomicLong();
+		withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setIndexedField( "initialValue" );
+			session.persist( entity2 );
+
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setIndexedField( "initialValue" );
+			session.persist( entity3 );
+
+			CompletableFuture<?> failingFuture = new CompletableFuture<>();
+			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.createAndExecuteFollowingWorks()
+					.add( "1", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.add( "3", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createAndExecuteFollowingWorks( failingFuture )
+					.add( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					);
+
+			timeOfTheException.set( System.currentTimeMillis() );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.createAndExecuteFollowingWorks()
+				// retry (succeeds):
+				.createAndExecuteFollowingWorks()
+				.addOrUpdate( "2", b -> b
+						.field( "indexedField", "initialValue" )
+				);
+		backendMock.verifyExpectationsMet();
+
+		long timeOfTheProcess = System.currentTimeMillis();
+
+		// retry only once
+		assertThat( failureHandler.entityFailures.get( 2 ) ).hasSize( 1 );
+		// time is at least 3 sec
+		assertThat( timeOfTheProcess - timeOfTheException.get() ).isGreaterThan( 3000 );
+	}
+
+	@Test
 	public void backendFailure_twoFailuresOfTheSameIndexingWork() {
+		setup( 0 );
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -176,6 +223,7 @@ public class DatabasePollingAutomaticIndexingBackendFailureIT {
 
 	@Test
 	public void backendFailure_numberOfTrialsExhausted() {
+		setup( 0 );
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -237,6 +285,17 @@ public class DatabasePollingAutomaticIndexingBackendFailureIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Max '3' retries exhausted to process the event. Event will be lost." );
 		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
+	}
+
+	private void setup(int retryDelay) {
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
+		failureHandler = new TestFailureHandler();
+		sessionFactory = ormSetupHelper.start()
+				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
+				.withProperty( "hibernate.search.coordination.processors.indexing.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.processors.indexing.retry_delay", retryDelay )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 
 	private void checkId2EntityEventFailure(EntityIndexingFailureContext entityFailure) {
