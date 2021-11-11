@@ -29,15 +29,17 @@ public class OutboxEventUpdater {
 	private final OutboxEventProcessingPlan processingPlan;
 	private final SessionImplementor session;
 	private final String processorName;
+	private final int retryAfter;
 	private final Set<Long> eventsIds;
 	private final Set<Long> failedEventIds;
 
 	public OutboxEventUpdater(FailureHandler failureHandler, OutboxEventProcessingPlan processingPlan,
-			SessionImplementor session, String processorName) {
+			SessionImplementor session, String processorName, int retryAfter) {
 		this.failureHandler = failureHandler;
 		this.processingPlan = processingPlan;
 		this.session = session;
 		this.processorName = processorName;
+		this.retryAfter = retryAfter;
 		this.eventsIds = processingPlan.getEvents().stream().map( OutboxEvent::getId )
 				.collect( Collectors.toSet() );
 		this.failedEventIds = processingPlan.getFailedEvents().stream().map( OutboxEvent::getId )
@@ -78,8 +80,8 @@ public class OutboxEventUpdater {
 				// We will simply increment the retry count of this event,
 				// and the event processor will process it once more in the next batch
 				event.setRetries( attempts );
-				// TODO HSEARCH-4194 Apply some configurable delay
-				Instant processAfter = Instant.now();
+
+				Instant processAfter = ( retryAfter > 0 ) ? Instant.now().plusSeconds( retryAfter ) : Instant.now();
 				event.setProcessAfter( processAfter );
 
 				log.automaticIndexingRetry(

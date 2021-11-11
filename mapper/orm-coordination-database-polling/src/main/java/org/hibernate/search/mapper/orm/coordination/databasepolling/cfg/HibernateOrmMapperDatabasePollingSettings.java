@@ -230,13 +230,27 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 	 * Expects a positive Integer value in seconds, such as {@code 10},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE}.
-	 * <p>
 	 * When using JTA and this property is not set,
 	 * Hibernate Search will use whatever default transaction timeout is configured in the JTA transaction manager.
 	 */
 	public static final String COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT =
 			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT;
+
+	/**
+	 * In the background indexing processor,
+	 * the time after which it is possible to process again an event that has gone into error.
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Expects a positive integer value in seconds, such as {@code 10},
+	 * or a String that can be parsed into such Integer value.
+	 * Use the value {@code 0} to reprocess the failed events as soon as possible, with no delay.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY}.
+	 */
+	public static final String COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY =
+			PREFIX + Radicals.COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY;
 
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
@@ -256,6 +270,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final String COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_PULSE_EXPIRATION;
 		public static final String COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE;
 		public static final String COORDINATION_PROCESSORS_INDEXING_TRANSACTION_TIMEOUT = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_TRANSACTION_TIMEOUT;
+		public static final String COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY = COORDINATION_PREFIX + CoordinationRadicals.PROCESSORS_INDEXING_RETRY_DELAY;
 	}
 
 	/**
@@ -277,6 +292,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final String PROCESSORS_INDEXING_PULSE_EXPIRATION = PROCESSORS_INDEXING_PREFIX + "pulse_expiration";
 		public static final String PROCESSORS_INDEXING_BATCH_SIZE = PROCESSORS_INDEXING_PREFIX + "batch_size";
 		public static final String PROCESSORS_INDEXING_TRANSACTION_TIMEOUT = PROCESSORS_INDEXING_PREFIX + "transaction_timeout";
+		public static final String PROCESSORS_INDEXING_RETRY_DELAY = PROCESSORS_INDEXING_PREFIX + "retry_delay";
 	}
 
 	/**
@@ -293,6 +309,7 @@ public final class HibernateOrmMapperDatabasePollingSettings {
 		public static final int COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL = 2000;
 		public static final int COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION = 30000;
 		public static final int COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE = 50;
+		public static final int COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY = 30;
 	}
 
 }

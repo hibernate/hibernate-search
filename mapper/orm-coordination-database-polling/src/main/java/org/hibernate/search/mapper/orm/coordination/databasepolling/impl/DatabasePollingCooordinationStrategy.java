@@ -109,6 +109,12 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 					.asIntegerStrictlyPositive()
 					.build();
 
+	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_RETRY_DELAY =
+			ConfigurationProperty.forKey( HibernateOrmMapperDatabasePollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_RETRY_DELAY )
+					.asIntegerPositiveOrZero()
+					.withDefault( HibernateOrmMapperDatabasePollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY )
+					.build();
+
 	public static final String PROCESSOR_NAME_PREFIX = "Outbox event processor";
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
@@ -197,6 +203,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 		int batchSize = PROCESSORS_INDEXING_BATCH_SIZE.get( configurationSource );
 		Integer transactionTimeout = PROCESSORS_INDEXING_TRANSACTION_TIMEOUT.get( configurationSource )
 				.orElse( null );
+		int retryAfter = PROCESSORS_INDEXING_RETRY_DELAY.get( configurationSource );
 
 		Duration pollingIntervalAsDuration = Duration.ofMillis( pollingInterval );
 		Duration pulseInterval = PROCESSORS_INDEXING_PULSE_INTERVAL.getAndTransform( configurationSource,
@@ -216,7 +223,7 @@ public class DatabasePollingCooordinationStrategy implements CooordinationStrate
 
 			OutboxEventBackgroundProcessor processor = new OutboxEventBackgroundProcessor(
 					agentName, context.mapping(), scheduledExecutor, agentRepositoryProviderHolder.get(), clusterLink,
-					pollingInterval, batchSize, transactionTimeout );
+					pollingInterval, batchSize, transactionTimeout, retryAfter );
 			indexingProcessors.add( processor );
 		}
 		for ( OutboxEventBackgroundProcessor indexingProcessor : indexingProcessors ) {
