@@ -11,7 +11,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEvent;
+import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventAndPredicate;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEventPredicate;
@@ -132,42 +132,13 @@ public class FilteringOutboxEventFinder {
 			return predicate;
 		}
 
-		OutboxEventPredicate filterPredicate = new OutboxEventPredicate() {
-			@Override
-			public String queryPart(String eventAlias) {
-				return eventAlias + ".id in :ids";
-			}
-
-			@Override
-			public Map<String, Object> params() {
-				return Collections.singletonMap( "ids", allowedIds );
-			}
-		};
-
+		FilterById filterById = new FilterById();
 		if ( !predicate.isPresent() ) {
-			return Optional.of( filterPredicate );
+			return Optional.of( filterById );
 		}
 
 		// Need to combine the predicates...
-		return Optional.of( and( predicate.get(), filterPredicate ) );
-	}
-
-	private OutboxEventPredicate and(OutboxEventPredicate left, OutboxEventPredicate right) {
-		return new OutboxEventPredicate() {
-			@Override
-			public String queryPart(String eventAlias) {
-				return "(" + left.queryPart( eventAlias ) + ") and (" + right.queryPart( eventAlias ) + ")";
-			}
-
-			@Override
-			public Map<String, Object> params() {
-				Map<String, Object> merged = new HashMap<>();
-				// Assuming no conflicts...
-				merged.putAll( left.params() );
-				merged.putAll( right.params() );
-				return merged;
-			}
-		};
+		return Optional.of( OutboxEventAndPredicate.of( predicate.get(), filterById ) );
 	}
 
 	// Configures a query to avoid locking on events,
@@ -181,6 +152,18 @@ public class FilteringOutboxEventFinder {
 			List<OutboxEvent> outboxEntries = findOutboxEventsNotForProcessing( session, 1, Optional.empty() );
 			assertThat( outboxEntries ).isEmpty();
 		} ) );
+	}
+
+	private class FilterById implements OutboxEventPredicate {
+		@Override
+		public String queryPart(String eventAlias) {
+			return eventAlias + ".id in :ids";
+		}
+
+		@Override
+		public Map<String, Object> params() {
+			return Collections.singletonMap( "ids", allowedIds );
+		}
 	}
 
 	/**

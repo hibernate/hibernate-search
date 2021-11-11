@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,17 +24,23 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 	}
 
 	public static String createQueryString(Optional<OutboxEventPredicate> predicate) {
-		return "select e from OutboxEvent e"
-				+ predicate.map( p -> " where " + p.queryPart( "e" ) ).orElse( "" )
-				+ " order by e.id";
+		ProcessAfterFilter processAfterFilter = new ProcessAfterFilter();
+		OutboxEventPredicate combined = ( predicate.isPresent() ) ?
+				OutboxEventAndPredicate.of( predicate.get(), processAfterFilter ) :
+				processAfterFilter;
+
+		return "select e from OutboxEvent e where " + combined.queryPart( "e" ) + " order by e.id";
 	}
 
 	public static Query<OutboxEvent> createQuery(Session session, int maxResults,
 			String queryString, Map<String, Object> params) {
 		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
+
 		for ( Map.Entry<String, Object> entry : params.entrySet() ) {
 			query.setParameter( entry.getKey(), entry.getValue() );
 		}
+		query.setParameter( "now", Instant.now() );
+
 		query.setMaxResults( maxResults );
 		return query;
 	}
@@ -52,4 +59,15 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 				.list();
 	}
 
+	private static class ProcessAfterFilter implements OutboxEventPredicate {
+		@Override
+		public String queryPart(String eventAlias) {
+			return eventAlias + ".processAfter is null or " + eventAlias + ".processAfter < :now";
+		}
+
+		@Override
+		public Map<String, Object> params() {
+			return Collections.singletonMap( "now", Instant.now() );
+		}
+	}
 }
