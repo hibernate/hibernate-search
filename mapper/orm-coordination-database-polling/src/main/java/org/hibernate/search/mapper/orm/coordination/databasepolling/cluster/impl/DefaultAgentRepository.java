@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.databasepolling.cluster.impl.DatabasePollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME;
+
 import java.util.List;
 
 import org.hibernate.Session;
@@ -31,7 +33,7 @@ public class DefaultAgentRepository implements AgentRepository {
 
 	@Override
 	public List<Agent> findAllOrderById() {
-		return session.createQuery( "select a from Agent a order by id", Agent.class ).list();
+		return session.createQuery( "select a from " + ENTITY_NAME + " a order by id", Agent.class ).list();
 	}
 
 	@Override

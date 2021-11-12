@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.databasepol
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DatabasePollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.HashSet;
@@ -97,7 +98,7 @@ public class FilteringOutboxEventFinder {
 	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
+				"select e from " + ENTITY_NAME + " e order by e.id", OutboxEvent.class );
 		avoidLockingConflicts( query );
 		return query.list();
 	}
@@ -106,7 +107,7 @@ public class FilteringOutboxEventFinder {
 	public List<OutboxEvent> findOutboxEventsNoFilterOrderById(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
+				"select e from " + ENTITY_NAME + " e order by e.id", OutboxEvent.class );
 		avoidLockingConflicts( query );
 		return query.list();
 	}
@@ -114,7 +115,7 @@ public class FilteringOutboxEventFinder {
 	public List<Long> findOutboxEventIdsNoFilter(Session session) {
 		checkFiltering();
 		Query<Long> query = session.createQuery(
-				"select e.id from OutboxEvent e order by e.id", Long.class );
+				"select e.id from " + ENTITY_NAME + " e order by e.id", Long.class );
 		return query.list();
 	}
 
