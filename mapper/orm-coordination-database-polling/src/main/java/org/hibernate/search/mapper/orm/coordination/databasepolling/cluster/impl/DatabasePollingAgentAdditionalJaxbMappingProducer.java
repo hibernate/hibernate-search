@@ -34,14 +34,23 @@ public class DatabasePollingAgentAdditionalJaxbMappingProducer
 
 	// WARNING: Always use this prefix for all tables added by Hibernate Search:
 	// we guarantee that in the documentation.
-	public static final String HSEARCH_TABLE_NAME_PREFIX = "HSEARCH_";
+	public static final String HSEARCH_PREFIX = "HSEARCH_";
 
 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-	private static final String TABLE_NAME = HSEARCH_TABLE_NAME_PREFIX + "AGENT";
+	private static final String TABLE_NAME = HSEARCH_PREFIX + "AGENT";
+
+	private static final String CLASS_NAME = Agent.class.getName();
+
+	// Setting both the JPA entity name and the native entity name to the FQCN so that:
+	// 1. We don't pollute the namespace of JPA entity names with something like
+	// "Agent" that could potentially conflict with user-defined entities.
+	// 2. We can still use session methods (persist, ...) without passing the entity name,
+	// because our override actually matches the default for the native entity name.
+	public static final String ENTITY_NAME = CLASS_NAME;
 
 	private static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping>\n" +
-			"    <class name=\"" + Agent.class.getName() + "\" table=\"" + TABLE_NAME + "\">\n" +
+			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"" + TABLE_NAME + "\">\n" +
 			"        <id name=\"id\">\n" +
 			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
 			"                <param name=\"sequence_name\">" + TABLE_NAME + "_GENERATOR</param>\n" +

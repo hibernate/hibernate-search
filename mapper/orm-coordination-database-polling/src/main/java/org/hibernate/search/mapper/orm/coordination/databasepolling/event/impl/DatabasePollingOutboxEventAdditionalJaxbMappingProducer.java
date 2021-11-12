@@ -33,14 +33,23 @@ public final class DatabasePollingOutboxEventAdditionalJaxbMappingProducer
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String HSEARCH_TABLE_NAME_PREFIX = DatabasePollingAgentAdditionalJaxbMappingProducer.HSEARCH_TABLE_NAME_PREFIX;
+	private static final String HSEARCH_PREFIX = DatabasePollingAgentAdditionalJaxbMappingProducer.HSEARCH_PREFIX;
 
 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-	private static final String TABLE_NAME = HSEARCH_TABLE_NAME_PREFIX + "OUTBOX_EVENT";
+	private static final String TABLE_NAME = HSEARCH_PREFIX + "OUTBOX_EVENT";
+
+	private static final String CLASS_NAME = OutboxEvent.class.getName();
+
+	// Setting both the JPA entity name and the native entity name to the FQCN so that:
+	// 1. We don't pollute the namespace of JPA entity names with something like
+	// "OutboxEvent" that could potentially conflict with user-defined entities.
+	// 2. We can still use session methods (persist, ...) without passing the entity name,
+	// because our override actually matches the default for the native entity name.
+	public static final String ENTITY_NAME = CLASS_NAME;
 
 	private static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping>\n" +
-			"    <class name=\"" + OutboxEvent.class.getName() + "\" table=\"" + TABLE_NAME + "\">\n" +
+			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"" + TABLE_NAME + "\">\n" +
 			"        <id name=\"id\" type=\"long\">\n" +
 			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
 			"                <param name=\"sequence_name\">" + TABLE_NAME + "_GENERATOR</param>\n" +

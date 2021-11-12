@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.DatabasePollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +29,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 				OutboxEventAndPredicate.of( predicate.get(), processAfterFilter ) :
 				processAfterFilter;
 
-		return "select e from OutboxEvent e where " + combined.queryPart( "e" ) + " order by e.id";
+		return "select e from " + ENTITY_NAME + " e where " + combined.queryPart( "e" ) + " order by e.id";
 	}
 
 	public static Query<OutboxEvent> createQuery(Session session, int maxResults,
