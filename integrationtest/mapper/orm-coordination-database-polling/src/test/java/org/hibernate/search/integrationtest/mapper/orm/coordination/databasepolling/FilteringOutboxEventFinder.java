@@ -10,10 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -70,7 +68,7 @@ public class FilteringOutboxEventFinder {
 		Optional<OutboxEventPredicate> combinedPredicate = combineFilterWithPredicate( predicate );
 		String queryString = DefaultOutboxEventFinder.createQueryString( combinedPredicate );
 		Query<OutboxEvent> query = DefaultOutboxEventFinder.createQuery( session, maxResults, queryString,
-				combinedPredicate.map( OutboxEventPredicate::params ).orElse( Collections.emptyMap() ) );
+				combinedPredicate );
 		avoidLockingConflicts( query );
 		return query;
 	}
@@ -161,8 +159,8 @@ public class FilteringOutboxEventFinder {
 		}
 
 		@Override
-		public Map<String, Object> params() {
-			return Collections.singletonMap( "ids", allowedIds );
+		public void setParams(Query<OutboxEvent> query) {
+			query.setParameter( "ids", allowedIds );
 		}
 	}
 

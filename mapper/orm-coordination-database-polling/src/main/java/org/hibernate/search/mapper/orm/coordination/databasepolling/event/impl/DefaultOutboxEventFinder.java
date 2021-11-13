@@ -7,9 +7,7 @@
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Session;
@@ -33,41 +31,43 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 	}
 
 	public static Query<OutboxEvent> createQuery(Session session, int maxResults,
-			String queryString, Map<String, Object> params) {
+			String queryString, Optional<OutboxEventPredicate> predicate) {
+		ProcessAfterFilter processAfterFilter = new ProcessAfterFilter();
 		Query<OutboxEvent> query = session.createQuery( queryString, OutboxEvent.class );
 
-		for ( Map.Entry<String, Object> entry : params.entrySet() ) {
-			query.setParameter( entry.getKey(), entry.getValue() );
+		if ( predicate.isPresent() ) {
+			predicate.get().setParams( query );
 		}
-		query.setParameter( "now", Instant.now() );
+		processAfterFilter.setParams( query );
 
 		query.setMaxResults( maxResults );
 		return query;
 	}
 
 	private final String queryString;
-	private final Map<String, Object> params;
+	private final Optional<OutboxEventPredicate> predicate;
 
 	public DefaultOutboxEventFinder(Optional<OutboxEventPredicate> predicate) {
 		this.queryString = createQueryString( predicate );
-		this.params = predicate.map( OutboxEventPredicate::params ).orElse( Collections.emptyMap() );
+		this.predicate = predicate;
 	}
 
 	@Override
 	public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
-		return DefaultOutboxEventFinder.createQuery( session, maxResults, queryString, params )
+		return DefaultOutboxEventFinder.createQuery( session, maxResults, queryString, predicate )
 				.list();
 	}
 
 	private static class ProcessAfterFilter implements OutboxEventPredicate {
+
 		@Override
 		public String queryPart(String eventAlias) {
 			return eventAlias + ".processAfter is null or " + eventAlias + ".processAfter < :now";
 		}
 
 		@Override
-		public Map<String, Object> params() {
-			return Collections.singletonMap( "now", Instant.now() );
+		public void setParams(Query<OutboxEvent> query) {
+			query.setParameter( "now", Instant.now() );
 		}
 	}
 }

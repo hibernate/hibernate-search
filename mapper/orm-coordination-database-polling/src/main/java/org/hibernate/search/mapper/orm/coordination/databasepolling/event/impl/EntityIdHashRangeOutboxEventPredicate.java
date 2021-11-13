@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.query.Query;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
@@ -56,16 +55,14 @@ public final class EntityIdHashRangeOutboxEventPredicate implements OutboxEventP
 	}
 
 	@Override
-	public Map<String, Object> params() {
-		Map<String, Object> params = new HashMap<>();
+	public void setParams(Query<OutboxEvent> query) {
 		Optional<Integer> lowerBound = range.lowerBoundValue();
 		if ( lowerBound.isPresent() ) {
-			params.put( LOWER_BOUND_PARAM_NAME, lowerBound.get() );
+			query.setParameter( LOWER_BOUND_PARAM_NAME, lowerBound.get() );
 		}
 		Optional<Integer> upperBound = range.upperBoundValue();
 		if ( upperBound.isPresent() ) {
-			params.put( UPPER_BOUND_PARAM_NAME, upperBound.get() );
+			query.setParameter( UPPER_BOUND_PARAM_NAME, upperBound.get() );
 		}
-		return params;
 	}
 }
