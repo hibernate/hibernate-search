@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.hibernate.query.Query;
 
 public class OutboxEventAndPredicate implements OutboxEventPredicate {
 
@@ -29,11 +28,9 @@ public class OutboxEventAndPredicate implements OutboxEventPredicate {
 	}
 
 	@Override
-	public Map<String, Object> params() {
-		Map<String, Object> merged = new HashMap<>();
+	public void setParams(Query<OutboxEvent> query) {
 		// Assuming no conflicts...
-		merged.putAll( left.params() );
-		merged.putAll( right.params() );
-		return merged;
+		left.setParams( query );
+		right.setParams( query );
 	}
 }

@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl;
 
-import java.util.Map;
+import org.hibernate.query.Query;
 
 public interface OutboxEventPredicate {
+
 	String queryPart(String eventAlias);
 
-	Map<String, Object> params();
+	void setParams(Query<OutboxEvent> query);
+
 }
