@@ -80,7 +80,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 		} );
 
 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
+				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
 			backendMock.verifyExpectationsMet();
@@ -135,7 +135,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 		} );
 
 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
+				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
 			backendMock.verifyExpectationsMet();
@@ -189,7 +189,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 		} );
 
 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
+				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
 			backendMock.verifyExpectationsMet();
@@ -230,7 +230,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 		} );
 
 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
+				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, extendedBeanManager )
 				.setup( IndexedEntity.class ) ) {
 			// Hibernate Search should not have booted yet.
 			backendMock.verifyExpectationsMet();

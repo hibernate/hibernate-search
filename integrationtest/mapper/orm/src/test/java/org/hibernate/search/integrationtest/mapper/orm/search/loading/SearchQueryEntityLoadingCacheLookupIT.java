@@ -98,7 +98,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 
 		setupContext.withProperty( HibernateOrmMapperSettings.QUERY_LOADING_CACHE_LOOKUP_STRATEGY,
 						defaultCacheLookupStrategy )
-				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
+				.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
 				.withConfiguration( c -> mapping.configure( c, model ) );
 	}
 

@@ -137,7 +137,7 @@ public class CdiBeanResolutionIT {
 		int expectedInstances = ExpectedScope.SINGLETON.equals( expectedScope ) ? 1 : 2;
 
 		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, cdiContainer.getBeanManager() )
+				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, cdiContainer.getBeanManager() )
 				.setup( IndexedEntity.class ) ) {
 			backendMock.verifyExpectationsMet();
 
