@@ -139,7 +139,7 @@ public class CdiBeanResolutionIT {
 
 		try ( @SuppressWarnings("unused")
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, cdiContainer.getBeanManager() )
+				.withProperty( AvailableSettings.JAKARTA_CDI_BEAN_MANAGER, cdiContainer.getBeanManager() )
 				.setup( IndexedEntity.class ) ) {
 			backendMock.verifyExpectationsMet();
 

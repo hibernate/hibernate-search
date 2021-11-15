@@ -62,7 +62,7 @@ public class QueryDslIT {
 	@Before
 	public void setup() {
 		entityManagerFactory = setupHelper.start()
-				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
+				.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.setup( Book.class, Manager.class, Associate.class );
 		initData();
 	}
