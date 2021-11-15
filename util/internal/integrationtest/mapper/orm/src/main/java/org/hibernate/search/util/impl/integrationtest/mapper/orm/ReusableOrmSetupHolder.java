@@ -513,7 +513,11 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?> entityType, Session session, String prefix) {
-		StringBuilder builder = new StringBuilder( prefix ).append( "from " ).append( entityType.getName() ).append( " e" );
+		StringBuilder builder = ( prefix == null || prefix.trim().isEmpty() ) ?
+				new StringBuilder( "select e " ) :
+				new StringBuilder( prefix );
+
+		builder.append( "from " ).append( entityType.getName() ).append( " e" );
 		Class<?> typeArg = null;
 		if ( hasEntitySubclass( session.getSessionFactory(), entityType ) ) {
 			// We must target the type explicitly, without polymorphism,
