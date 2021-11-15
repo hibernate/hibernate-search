@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.MultiIdentifierLoadAccess;
@@ -24,7 +25,7 @@ public interface TypeQueryFactory<E, I> {
 			String uniquePropertyName) {
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		EntityDomainType<?> typeOrNull = metamodel.entity( entityPersister.getEntityName() );
-		if ( typeOrNull != null ) {
+		if ( typeOrNull != null && !( entityPersister.getMappedClass().equals( Map.class ) ) ) {
 			return CriteriaTypeQueryFactory.create( typeOrNull, uniquePropertyName );
 		}
 		else {
