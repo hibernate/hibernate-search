@@ -118,7 +118,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		backendMock.expectAnySchema( Hierarchy8_A_C_Cacheable.NAME );
 		backendMock.expectAnySchema( Hierarchy8_A_D_Cacheable.NAME );
 
-		setupContext.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
+		setupContext.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.withAnnotatedTypes(
 						Hierarchy1_A__Abstract.class,
 						Hierarchy1_A_B.class,
