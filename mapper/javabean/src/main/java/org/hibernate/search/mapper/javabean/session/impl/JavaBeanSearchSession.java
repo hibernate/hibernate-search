@@ -60,7 +60,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
-	private boolean active = true;
+	private boolean open = true;
 
 	private JavaBeanSearchSession(Builder builder) {
 		super( builder.mappingContext );
@@ -72,29 +72,32 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		this.loadingOptionsContributor = builder.loadingOptionsContributor;
 	}
 
-	private void chackActiveAndThrow() {
-		if ( !active ) {
+	private void checkOpenAndThrow() {
+		if ( !open ) {
 			throw log.hibernateSessionAccessError( "is closed" );
 		}
 	}
 
 	@Override
 	public void close() {
+		if ( !open ) {
+			return;
+		}
+		open = false;
 		if ( indexingPlan != null ) {
 			CompletableFuture<?> future = indexingPlan.execute();
 			Futures.unwrappedExceptionJoin( future );
 		}
-		active = false;
 	}
 
 	@Override
 	public boolean isOpen() {
-		return active;
+		return open;
 	}
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		chackActiveAndThrow();
+		checkOpenAndThrow();
 		return scope( types ).massIndexer( DetachedBackendSessionContext.of( this ) );
 	}
 
