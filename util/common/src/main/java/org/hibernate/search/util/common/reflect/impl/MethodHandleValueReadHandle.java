@@ -45,7 +45,7 @@ public final class MethodHandleValueReadHandle<T> implements ValueReadHandle<T> 
 			if ( e instanceof InterruptedException ) {
 				Thread.currentThread().interrupt();
 			}
-			throw log.errorInvokingMember( member, Throwables.safeToString( e, thiz ), e );
+			throw log.errorInvokingMember( member, Throwables.safeToString( e, thiz ), e, e.getMessage() );
 		}
 	}
 

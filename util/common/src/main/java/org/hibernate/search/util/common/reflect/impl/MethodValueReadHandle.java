@@ -36,7 +36,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 			return (T) method.invoke( thiz );
 		}
 		catch (RuntimeException | IllegalAccessException e) {
-			throw log.errorInvokingMember( method, Throwables.safeToString( e, thiz ), e );
+			throw log.errorInvokingMember( method, Throwables.safeToString( e, thiz ), e, e.getMessage() );
 		}
 		catch (InvocationTargetException e) {
 			Throwable thrown = e.getCause();
@@ -44,7 +44,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 				throw (Error) thrown;
 			}
 			else {
-				throw log.errorInvokingMember( method, Throwables.safeToString( thrown, thiz ), thrown );
+				throw log.errorInvokingMember( method, Throwables.safeToString( thrown, thiz ), thrown, thrown.getMessage() );
 			}
 		}
 	}
