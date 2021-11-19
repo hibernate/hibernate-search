@@ -71,6 +71,14 @@ public class ExceptionMatcherBuilder {
 		return new NestedExceptionCauseMatcherBuilder( CoreMatchers.sameInstance( throwable ) );
 	}
 
+	public ExceptionMatcherBuilder rootCause(Class<? extends Throwable> clazz) {
+		return new NestedExceptionRootCauseMatcherBuilder( CoreMatchers.instanceOf( clazz ) );
+	}
+
+	public ExceptionMatcherBuilder rootCause(Throwable throwable) {
+		return new NestedExceptionRootCauseMatcherBuilder( CoreMatchers.sameInstance( throwable ) );
+	}
+
 	public Matcher<? super Throwable> build() {
 		if ( !suppressedMatchers.isEmpty() ) {
 			@SuppressWarnings("unchecked")
@@ -121,6 +129,19 @@ public class ExceptionMatcherBuilder {
 		public Matcher<? super Throwable> build() {
 			Matcher<? super Throwable> myMatcher = super.build();
 			ExceptionMatcherBuilder.this.matching( hasCause( myMatcher ) );
+			return ExceptionMatcherBuilder.this.build();
+		}
+	}
+
+	private class NestedExceptionRootCauseMatcherBuilder extends ExceptionMatcherBuilder {
+		public NestedExceptionRootCauseMatcherBuilder(Matcher<? extends Throwable> matcher) {
+			super( matcher );
+		}
+
+		@Override
+		public Matcher<? super Throwable> build() {
+			Matcher<? super Throwable> myMatcher = super.build();
+			ExceptionMatcherBuilder.this.matching( hasRootCause( myMatcher ) );
 			return ExceptionMatcherBuilder.this.build();
 		}
 	}
@@ -261,5 +282,39 @@ public class ExceptionMatcherBuilder {
 
 	private static Matcher<Throwable> mainOrSuppressed(Matcher<?> mainOrSuppressedMatcher) {
 		return new ThrowableMainOrSuppressedMatcher( mainOrSuppressedMatcher );
+	}
+
+	public static class ThrowableRootCauseMatcher extends TypeSafeDiagnosingMatcher<Throwable> {
+
+		private final Matcher<?> rootCauseMatcher;
+
+		public ThrowableRootCauseMatcher(Matcher<?> suppressedMatcher) {
+			this.rootCauseMatcher = suppressedMatcher;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText( "root cause " );
+			description.appendDescriptionOf( rootCauseMatcher );
+		}
+
+		@Override
+		protected boolean matchesSafely(Throwable item, Description mismatchDescription) {
+			while ( item.getCause() != null ) {
+				item = item.getCause();
+			}
+
+			if ( rootCauseMatcher.matches( item ) ) {
+				return true;
+			}
+			else {
+				rootCauseMatcher.describeMismatch( item, mismatchDescription );
+				return false;
+			}
+		}
+	}
+
+	private static Matcher<Throwable> hasRootCause(Matcher<?> rootCauseMatcher) {
+		return new ThrowableRootCauseMatcher( rootCauseMatcher );
 	}
 }

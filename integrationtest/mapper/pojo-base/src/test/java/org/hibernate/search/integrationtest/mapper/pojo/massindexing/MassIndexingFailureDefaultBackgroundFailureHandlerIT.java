@@ -82,10 +82,9 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "Exception while building document for entity '" + entityReferenceAsString + "'" )
-						.causedBy( SearchException.class )
 						.withMessage( "Exception while invoking" )
-						.causedBy( SimulatedFailure.class )
 						.withMessage( exceptionMessage )
+						.rootCause( SimulatedFailure.class )
 						.build(),
 				failingOperationAsString,
 				"Entities that could not be indexed correctly:",

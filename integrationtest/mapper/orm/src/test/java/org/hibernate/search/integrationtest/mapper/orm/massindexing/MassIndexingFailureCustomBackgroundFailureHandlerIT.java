@@ -117,13 +117,11 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
 		assertThat( context.throwable() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Exception while building document for entity '%s'", entityReferenceAsString )
-				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Exception while invoking" )
-				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
-				.isInstanceOf( SimulatedFailure.class )
-				.hasMessageContaining( exceptionMessage );
+				.hasMessageContainingAll(
+						"Exception while building document for entity '" + entityReferenceAsString + "'",
+						"Exception while invoking",
+						exceptionMessage )
+				.hasRootCauseInstanceOf( SimulatedFailure.class );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
 		assertThat( context.entityReferences() )

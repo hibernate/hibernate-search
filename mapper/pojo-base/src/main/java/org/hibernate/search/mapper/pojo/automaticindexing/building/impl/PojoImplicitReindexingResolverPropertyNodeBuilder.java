@@ -130,7 +130,8 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 		}
 		else {
 			return Optional.of( new PojoImplicitReindexingResolverPropertyNode<>(
-					modelPath.getPropertyModel().handle(), createNested( immutableNestedNodes )
+					modelPath.getPropertyModel().handle(), createNested( immutableNestedNodes ),
+					modelPath.toUnboundPath()
 			) );
 		}
 	}

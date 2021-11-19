@@ -6,10 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
@@ -21,13 +28,18 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
  * @param <P> The property type
  */
 public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcessor<T> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ValueReadHandle<P> handle;
 	private final PojoIndexingProcessor<? super P> nested;
 
-	public PojoIndexingProcessorPropertyNode(ValueReadHandle<P> handle, PojoIndexingProcessor<? super P> nested) {
+	private final PojoModelPath modelPath;
+
+	public PojoIndexingProcessorPropertyNode(ValueReadHandle<P> handle, PojoIndexingProcessor<? super P> nested,
+			PojoModelPath modelPath) {
 		this.handle = handle;
 		this.nested = nested;
+		this.modelPath = modelPath;
 	}
 
 	@Override
@@ -46,7 +58,16 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 
 	@Override
 	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
-		P propertyValue = handle.get( source );
-		nested.process( target, propertyValue, sessionContext );
+		try {
+			P propertyValue = handle.get( source );
+			nested.process( target, propertyValue, sessionContext );
+		}
+		catch (SearchProcessingWithContextException e) {
+			// The context was already added to the exception, just re-throw:
+			throw e;
+		}
+		catch (RuntimeException e) {
+			throw log.searchProcessingFailure( e, e.getMessage(), PojoEventContexts.fromPath( modelPath ) );
+		}
 	}
 }

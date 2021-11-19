@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
+import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -640,5 +641,10 @@ public interface Log extends BasicLogger {
 			+ " First failure: %2$s")
 	SearchException massIndexingFirstFailure(long finalFailureCount, String firstFailureMessage,
 			@Cause Throwable firstFailure);
+
+	// Not using a message ID: this exception is just a simple wrapper
+	@Message(value = "%1$s")
+	SearchProcessingWithContextException searchProcessingFailure(@Cause Throwable cause, String causeMessage,
+			@Param EventContext context);
 
 }
