@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
 import java.util.concurrent.CompletionStage;
 
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
@@ -72,6 +73,13 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	public static class IndexerIndexingProcessorFailureIT extends AbstractPojoIndexingProcessorFailureIT {
+		@Override
+		protected void process(SearchSession session, Object entity) {
+			session.indexer().addOrUpdate( entity );
+		}
+	}
+
 	public static class IndexingPlanBaseIT extends AbstractPojoIndexingPlanOperationBaseIT {
 		@Override
 		protected PojoIndexingOperationScenario scenario() {
@@ -93,5 +101,20 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	public static class IndexingPlanIndexingProcessorFailureIT extends AbstractPojoIndexingProcessorFailureIT {
+		@Override
+		protected void process(SearchSession session, Object entity) {
+			session.indexingPlan().addOrUpdate( entity );
+			session.close();
+		}
+	}
+
+	public static class IndexingPlanReindexingResolutionFailureIT extends AbstractPojoReindexingResolutionFailureIT {
+		@Override
+		protected void process(SearchSession session, Object entity) {
+			session.indexingPlan().addOrUpdate( entity );
+			session.close();
+		}
+	}
 
 }

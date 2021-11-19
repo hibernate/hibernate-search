@@ -6,6 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -23,14 +30,19 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * @param <P> The property type.
  */
 public class PojoImplicitReindexingResolverPropertyNode<T, P> extends PojoImplicitReindexingResolverNode<T> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ValueReadHandle<P> handle;
 	private final PojoImplicitReindexingResolverNode<? super P> nested;
 
+	private final PojoModelPath modelPath;
+
 	public PojoImplicitReindexingResolverPropertyNode(ValueReadHandle<P> handle,
-			PojoImplicitReindexingResolverNode<? super P> nested) {
+			PojoImplicitReindexingResolverNode<? super P> nested,
+			PojoModelPath modelPath) {
 		this.handle = handle;
 		this.nested = nested;
+		this.modelPath = modelPath;
 	}
 
 	@Override
@@ -52,14 +64,23 @@ public class PojoImplicitReindexingResolverPropertyNode<T, P> extends PojoImplic
 			T dirty, PojoImplicitReindexingResolverRootContext context) {
 		P propertyValue;
 		try {
-			propertyValue = handle.get( dirty );
+			try {
+				propertyValue = handle.get( dirty );
+			}
+			catch (RuntimeException e) {
+				context.propagateOrIgnorePropertyAccessException( e );
+				return;
+			}
+			if ( propertyValue != null ) {
+				nested.resolveEntitiesToReindex( collector, propertyValue, context );
+			}
+		}
+		catch (SearchProcessingWithContextException e) {
+			// The context was already added to the exception, just re-throw:
+			throw e;
 		}
 		catch (RuntimeException e) {
-			context.propagateOrIgnorePropertyAccessException( e );
-			return;
-		}
-		if ( propertyValue != null ) {
-			nested.resolveEntitiesToReindex( collector, propertyValue, context );
+			throw log.searchProcessingFailure( e, e.getMessage(), PojoEventContexts.fromPath( modelPath ) );
 		}
 	}
 }

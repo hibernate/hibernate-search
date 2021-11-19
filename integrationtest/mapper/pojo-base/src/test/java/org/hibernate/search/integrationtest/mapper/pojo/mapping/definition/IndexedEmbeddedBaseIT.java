@@ -934,7 +934,7 @@ public class IndexedEmbeddedBaseIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Exception while building document for entity 'IndexedEntity#1'" )
-				.hasCauseInstanceOf( ClassCastException.class );
+				.hasRootCauseInstanceOf( ClassCastException.class );
 	}
 
 	@Test
