@@ -81,7 +81,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 		);
 
 		setupContext.withProperty(
-						"hibernate.search.coordination.processors.indexing.outbox_event_finder.provider",
+						"hibernate.search.coordination.agents.event_processor.outbox_event_finder.provider",
 						outboxEventFinder.provider()
 				)
 				.withProperty( HibernateOrmMapperSettings.COORDINATION_STRATEGY, strategyPropertyValue )

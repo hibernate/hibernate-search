@@ -65,7 +65,7 @@ public class ClusterLinkPulseExpectations {
 				'}';
 	}
 
-	void verify(AgentInstructions instructions) {
+	void verify(OutboxPollingEventProcessingInstructions instructions) {
 		assertSoftly( softly -> {
 			if ( expectedLinkShardAssignment != null ) {
 				softly.assertThat( link.lastShardAssignment )

@@ -94,7 +94,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		}
 		else {
 			// If processing is disabled, sharding is irrelevant: we don't need to configure it.
-			context = context.withProperty( "hibernate.search.coordination.processors.indexing.enabled", "false" );
+			context = context.withProperty( "hibernate.search.coordination.agents.event_processor.enabled", "false" );
 		}
 
 		context.setup( IndexedEntity.class );

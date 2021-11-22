@@ -64,55 +64,55 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 					.multivalued()
 					.build();
 
-	private static final ConfigurationProperty<Boolean> PROCESSORS_INDEXING_ENABLED =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_ENABLED )
+	private static final ConfigurationProperty<Boolean> AGENTS_EVENT_PROCESSOR_ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_ENABLED )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_ENABLED )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_ENABLED )
 					.build();
 
-	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_POLLING_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_POLLING_INTERVAL )
+	private static final ConfigurationProperty<Integer> AGENTS_EVENT_PROCESSOR_POLLING_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_POLLING_INTERVAL )
 					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_POLLING_INTERVAL )
 					.build();
 
-	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_PULSE_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_PULSE_INTERVAL )
+	private static final ConfigurationProperty<Integer> AGENTS_EVENT_PROCESSOR_PULSE_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_PULSE_INTERVAL )
 					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_PULSE_INTERVAL )
 					.build();
 
-	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_PULSE_EXPIRATION =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_PULSE_EXPIRATION )
+	private static final ConfigurationProperty<Integer> AGENTS_EVENT_PROCESSOR_PULSE_EXPIRATION =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_PULSE_EXPIRATION )
 					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_PULSE_EXPIRATION )
 					.build();
 
-	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_BATCH_SIZE =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_BATCH_SIZE )
+	private static final ConfigurationProperty<Integer> AGENTS_EVENT_PROCESSOR_BATCH_SIZE =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_BATCH_SIZE )
 					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_BATCH_SIZE )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_BATCH_SIZE )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER )
+	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> AGENTS_EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER )
 					.asBeanReference( AgentRepositoryProvider.class )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER )
+	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> AGENTS_EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER )
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
-	private static final OptionalConfigurationProperty<Integer> PROCESSORS_INDEXING_TRANSACTION_TIMEOUT =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_TRANSACTION_TIMEOUT )
+	private static final OptionalConfigurationProperty<Integer> AGENTS_EVENT_PROCESSOR_TRANSACTION_TIMEOUT =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_TRANSACTION_TIMEOUT )
 					.asIntegerStrictlyPositive()
 					.build();
 
-	private static final ConfigurationProperty<Integer> PROCESSORS_INDEXING_RETRY_DELAY =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.PROCESSORS_INDEXING_RETRY_DELAY )
+	private static final ConfigurationProperty<Integer> AGENTS_EVENT_PROCESSOR_RETRY_DELAY =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_RETRY_DELAY )
 					.asIntegerPositiveOrZero()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_RETRY_DELAY )
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_RETRY_DELAY )
 					.build();
 
 	public static final String PROCESSOR_NAME_PREFIX = "Outbox event processor";
@@ -120,7 +120,7 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
 	private BeanHolder<? extends AgentRepositoryProvider> agentRepositoryProviderHolder;
 	private ScheduledExecutorService scheduledExecutor;
-	private List<OutboxPollingEventProcessor> indexingProcessors;
+	private List<OutboxPollingEventProcessor> eventProcessors;
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
@@ -132,7 +132,7 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 	@Override
 	public CompletableFuture<?> start(CoordinationStrategyStartContext context) {
 		Optional<BeanHolder<? extends AgentRepositoryProvider>> agentRepositoryProviderHolderOptional =
-				PROCESSORS_INDEXING_AGENT_REPOSITORY_PROVIDER.getAndMap(
+				AGENTS_EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER.getAndMap(
 						context.configurationPropertySource(), context.beanResolver()::resolve );
 		if ( agentRepositoryProviderHolderOptional.isPresent() ) {
 			agentRepositoryProviderHolder = agentRepositoryProviderHolderOptional.get();
@@ -146,7 +146,7 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 		}
 
 		Optional<BeanHolder<? extends OutboxEventFinderProvider>> finderProviderHolderOptional =
-				PROCESSORS_INDEXING_OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
+				AGENTS_EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
 						context.configurationPropertySource(), context.beanResolver()::resolve );
 		if ( finderProviderHolderOptional.isPresent() ) {
 			finderProviderHolder = finderProviderHolderOptional.get();
@@ -161,21 +161,21 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 
 		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
 
-		if ( PROCESSORS_INDEXING_ENABLED.get( configurationSource ) ) {
-			initializeProcessors( context );
+		if ( AGENTS_EVENT_PROCESSOR_ENABLED.get( configurationSource ) ) {
+			initializeEventProcessors( context );
 		}
 		else {
 			// IMPORTANT: in this case we don't even configure sharding, and that's on purpose.
 			// Application developers may want a fixed number of processing nodes (static sharding)
 			// with a varying number of non-processing nodes,
 			// so we want to make those non-processing nodes easy to configure.
-			log.indexingProcessorDisabled();
+			log.eventProcessorDisabled();
 		}
 
 		return CompletableFuture.completedFuture( null );
 	}
 
-	private void initializeProcessors(CoordinationStrategyStartContext context) {
+	private void initializeEventProcessors(CoordinationStrategyStartContext context) {
 		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
 		OutboxEventFinderProvider finderProvider = finderProviderHolder.get();
 
@@ -199,21 +199,21 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 			shardAssignmentOrNulls = Collections.singletonList( null );
 		}
 
-		int pollingInterval = PROCESSORS_INDEXING_POLLING_INTERVAL.get( configurationSource );
-		int batchSize = PROCESSORS_INDEXING_BATCH_SIZE.get( configurationSource );
-		Integer transactionTimeout = PROCESSORS_INDEXING_TRANSACTION_TIMEOUT.get( configurationSource )
+		int pollingInterval = AGENTS_EVENT_PROCESSOR_POLLING_INTERVAL.get( configurationSource );
+		int batchSize = AGENTS_EVENT_PROCESSOR_BATCH_SIZE.get( configurationSource );
+		Integer transactionTimeout = AGENTS_EVENT_PROCESSOR_TRANSACTION_TIMEOUT.get( configurationSource )
 				.orElse( null );
-		int retryAfter = PROCESSORS_INDEXING_RETRY_DELAY.get( configurationSource );
+		int retryAfter = AGENTS_EVENT_PROCESSOR_RETRY_DELAY.get( configurationSource );
 
 		Duration pollingIntervalAsDuration = Duration.ofMillis( pollingInterval );
-		Duration pulseInterval = PROCESSORS_INDEXING_PULSE_INTERVAL.getAndTransform( configurationSource,
+		Duration pulseInterval = AGENTS_EVENT_PROCESSOR_PULSE_INTERVAL.getAndTransform( configurationSource,
 				v -> checkPulseInterval( Duration.ofMillis( v ), pollingIntervalAsDuration ) );
-		Duration pulseExpiration = PROCESSORS_INDEXING_PULSE_EXPIRATION.getAndTransform( configurationSource,
+		Duration pulseExpiration = AGENTS_EVENT_PROCESSOR_PULSE_EXPIRATION.getAndTransform( configurationSource,
 				v -> checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
 
 		scheduledExecutor = context.threadPoolProvider()
 				.newScheduledExecutor( shardAssignmentOrNulls.size(), PROCESSOR_NAME_PREFIX );
-		indexingProcessors = new ArrayList<>();
+		eventProcessors = new ArrayList<>();
 		for ( ShardAssignmentDescriptor shardAssignmentOrNull : shardAssignmentOrNulls ) {
 			String agentName = PROCESSOR_NAME_PREFIX
 					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
@@ -224,10 +224,10 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 			OutboxPollingEventProcessor processor = new OutboxPollingEventProcessor(
 					agentName, context.mapping(), scheduledExecutor, agentRepositoryProviderHolder.get(), clusterLink,
 					pollingInterval, batchSize, transactionTimeout, retryAfter );
-			indexingProcessors.add( processor );
+			eventProcessors.add( processor );
 		}
-		for ( OutboxPollingEventProcessor indexingProcessor : indexingProcessors ) {
-			indexingProcessor.start();
+		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
+			eventProcessor.start();
 		}
 	}
 
@@ -272,14 +272,14 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 
 	@Override
 	public CompletableFuture<?> completion() {
-		if ( indexingProcessors == null ) {
+		if ( eventProcessors == null ) {
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		CompletableFuture<?>[] futures = new CompletableFuture[indexingProcessors.size()];
+		CompletableFuture<?>[] futures = new CompletableFuture[eventProcessors.size()];
 		int i = 0;
-		for ( OutboxPollingEventProcessor indexingProcessor : indexingProcessors ) {
-			futures[i] = indexingProcessor.completion();
+		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
+			futures[i] = eventProcessor.completion();
 			i++;
 		}
 		return CompletableFuture.allOf( futures );
@@ -287,14 +287,14 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 
 	@Override
 	public CompletableFuture<?> preStop(CoordinationStrategyPreStopContext context) {
-		if ( indexingProcessors == null ) {
+		if ( eventProcessors == null ) {
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		CompletableFuture<?>[] futures = new CompletableFuture[indexingProcessors.size()];
+		CompletableFuture<?>[] futures = new CompletableFuture[eventProcessors.size()];
 		int i = 0;
-		for ( OutboxPollingEventProcessor indexingProcessor : indexingProcessors ) {
-			futures[i] = indexingProcessor.preStop();
+		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
+			futures[i] = eventProcessor.preStop();
 			i++;
 		}
 		return CompletableFuture.allOf( futures );
@@ -303,7 +303,7 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( OutboxPollingEventProcessor::stop, indexingProcessors );
+			closer.pushAll( OutboxPollingEventProcessor::stop, eventProcessors );
 			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutor );
 			closer.push( BeanHolder::close, finderProviderHolder );
 			closer.push( BeanHolder::close, agentRepositoryProviderHolder );
