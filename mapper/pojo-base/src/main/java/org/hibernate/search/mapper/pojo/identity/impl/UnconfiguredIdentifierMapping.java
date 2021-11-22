@@ -48,6 +48,11 @@ public final class UnconfiguredIdentifierMapping<E> implements IdentifierMapping
 	}
 
 	@Override
+	public Object getIdentifierOrNull(E entity) {
+		return null;
+	}
+
+	@Override
 	public String toDocumentIdentifier(Object identifier, BridgeMappingContext context) {
 		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}

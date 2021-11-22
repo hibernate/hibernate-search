@@ -27,6 +27,8 @@ public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping, A
 
 	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 
+	I getIdentifierOrNull(E entity);
+
 	String toDocumentIdentifier(I identifier, BridgeMappingContext context);
 
 }

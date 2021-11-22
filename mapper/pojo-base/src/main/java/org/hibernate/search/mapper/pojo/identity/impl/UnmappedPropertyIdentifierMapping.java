@@ -9,46 +9,38 @@ package org.hibernate.search.mapper.pojo.identity.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.impl.Closer;
 
 
-public final class PropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
+public final class UnmappedPropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoCaster<? super I> caster;
 	private final ValueReadHandle<I> property;
-	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
+	private final PojoRawTypeIdentifier<E> typeIdentifier;
 
-	public PropertyIdentifierMapping(PojoCaster<? super I> caster, ValueReadHandle<I> property,
-			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
+	public UnmappedPropertyIdentifierMapping(PojoRawTypeIdentifier<E> typeIdentifier, PojoCaster<? super I> caster,
+			ValueReadHandle<I> property) {
 		this.caster = caster;
 		this.property = property;
-		this.bridgeHolder = bridgeHolder;
+		this.typeIdentifier = typeIdentifier;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "handle=" + property
-				+ ", bridgeHolder=" + bridgeHolder
-				+ "]";
+		return getClass().getSimpleName() + "[entityType = " + typeIdentifier + "]";
 	}
 
 	@Override
 	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( IdentifierBridge::close, bridgeHolder, BeanHolder::get );
-			closer.push( BeanHolder::close, bridgeHolder );
-		}
+		// Nothing to close
 	}
 
 	@Override
@@ -69,13 +61,12 @@ public final class PropertyIdentifierMapping<I, E> implements IdentifierMappingI
 	}
 
 	@Override
-	public String toDocumentIdentifier(I identifier, BridgeMappingContext context) {
-		return bridgeHolder.get().toDocumentIdentifier( identifier, context.identifierBridgeToDocumentIdentifierContext() );
+	public String toDocumentIdentifier(Object identifier, BridgeMappingContext context) {
+		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}
 
 	@Override
-	public I fromDocumentIdentifier(String documentId, BridgeSessionContext context) {
-		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.identifierBridgeFromDocumentIdentifierContext() );
+	public I fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext) {
+		throw log.cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping( typeIdentifier );
 	}
-
 }

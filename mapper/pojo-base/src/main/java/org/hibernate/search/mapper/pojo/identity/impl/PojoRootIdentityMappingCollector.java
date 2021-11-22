@@ -102,10 +102,10 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 			return;
 		}
 
+		// Fall back to the entity ID if possible
+		Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
+				.createEntityIdPropertyPath( typeModel );
 		if ( IdentityMappingMode.REQUIRED.equals( mode ) ) {
-			// Fall back to the entity ID if possible
-			Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
-					.createEntityIdPropertyPath( typeModel );
 			if ( entityIdPropertyPath.isPresent() ) {
 				identifierBridge( entityIdPropertyPath.get(), null, Collections.emptyMap() );
 			}
@@ -114,7 +114,21 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 			}
 		}
 		else {
-			identifierMapping = new UnconfiguredIdentifierMapping<>( typeModel.typeIdentifier() );
+			if ( entityIdPropertyPath.isPresent() ) {
+				identifierMapping = unmappedIdentifier( entityIdPropertyPath.get() );
+			}
+			else {
+				identifierMapping = new UnconfiguredIdentifierMapping<>( typeModel.typeIdentifier() );
+			}
 		}
+	}
+
+	private <T> IdentifierMappingImplementor<T, E> unmappedIdentifier(BoundPojoModelPathPropertyNode<?, T> modelPath) {
+		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
+		return new UnmappedPropertyIdentifierMapping<>(
+				typeModel.typeIdentifier(),
+				propertyModel.typeModel().rawType().caster(),
+				propertyModel.handle()
+		);
 	}
 }
