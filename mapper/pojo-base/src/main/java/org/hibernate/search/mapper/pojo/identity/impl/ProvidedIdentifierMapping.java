@@ -57,6 +57,11 @@ public final class ProvidedIdentifierMapping implements IdentifierMappingImpleme
 	}
 
 	@Override
+	public Object getIdentifierOrNull(Object entity) {
+		return null;
+	}
+
+	@Override
 	public String toDocumentIdentifier(Object identifier, BridgeMappingContext context) {
 		return bridgeHolder.get().toDocumentIdentifier( identifier, context.identifierBridgeToDocumentIdentifierContext() );
 	}
