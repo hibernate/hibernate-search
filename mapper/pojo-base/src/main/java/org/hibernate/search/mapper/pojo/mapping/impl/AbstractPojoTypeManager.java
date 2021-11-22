@@ -127,6 +127,11 @@ public class AbstractPojoTypeManager<I, E>
 	}
 
 	@Override
+	public E toEntity(Object unproxiedEntity) {
+		return caster.cast( unproxiedEntity );
+	}
+
+	@Override
 	public final Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity) {
 		if ( entity == null ) {
 			return null;

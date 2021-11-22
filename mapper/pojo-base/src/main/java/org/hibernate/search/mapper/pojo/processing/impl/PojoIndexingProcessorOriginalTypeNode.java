@@ -22,11 +22,13 @@ public class PojoIndexingProcessorOriginalTypeNode<T> extends PojoIndexingProces
 
 	private final Iterable<IndexObjectFieldReference> parentIndexObjectReferences;
 	private final PojoIndexingProcessor<? super T> nested;
+	private final boolean isEntityType;
 
 	public PojoIndexingProcessorOriginalTypeNode(Iterable<IndexObjectFieldReference> parentIndexObjectReferences,
-			PojoIndexingProcessor<? super T> nested) {
+			PojoIndexingProcessor<? super T> nested, boolean isEntityType) {
 		this.parentIndexObjectReferences = parentIndexObjectReferences;
 		this.nested = nested;
+		this.isEntityType = isEntityType;
 	}
 
 	@Override
@@ -39,6 +41,7 @@ public class PojoIndexingProcessorOriginalTypeNode<T> extends PojoIndexingProces
 		builder.attribute( "operation", "process type" );
 		builder.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
 		builder.attribute( "nested", nested );
+		builder.attribute( "isEntityType", isEntityType );
 	}
 
 	@Override
@@ -48,6 +51,11 @@ public class PojoIndexingProcessorOriginalTypeNode<T> extends PojoIndexingProces
 			return;
 		}
 		source = (T) context.sessionContext().runtimeIntrospector().unproxy( source );
+		// "isEntityType" is just an optimization to avoid unnecessary calls to isDeleted(),
+		// which may be costly (reflection, ...)
+		if ( isEntityType && context.isDeleted( source ) ) {
+			return;
+		}
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );

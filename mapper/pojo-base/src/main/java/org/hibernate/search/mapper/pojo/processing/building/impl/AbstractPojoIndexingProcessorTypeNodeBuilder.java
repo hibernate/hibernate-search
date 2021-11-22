@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.identity.impl.PojoIdentityMappingCollect
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorCastedTypeNode;
@@ -103,6 +104,10 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 
 	@Override
 	abstract BoundPojoModelPathTypeNode<U> getModelPath();
+
+	protected PojoTypeAdditionalMetadata typeAdditionalMetadata() {
+		return mappingHelper.typeAdditionalMetadataProvider().get( getModelPath().getTypeModel().rawType() );
+	}
 
 	protected abstract PojoIndexingDependencyCollectorTypeNode<U> toType(
 			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, T> valueDependencyCollector);

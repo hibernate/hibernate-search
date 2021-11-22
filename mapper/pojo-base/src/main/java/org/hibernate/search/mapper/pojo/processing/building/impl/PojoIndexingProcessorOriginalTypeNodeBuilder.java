@@ -51,7 +51,8 @@ public class PojoIndexingProcessorOriginalTypeNodeBuilder<T> extends AbstractPoj
 	protected PojoIndexingProcessor<T> doBuild(Collection<IndexObjectFieldReference> parentIndexObjectReferences,
 			PojoIndexingProcessor<? super T> nested) {
 		return new PojoIndexingProcessorOriginalTypeNode<>(
-				parentIndexObjectReferences, nested
+				parentIndexObjectReferences, nested,
+				typeAdditionalMetadata().isEntity()
 		);
 	}
 }

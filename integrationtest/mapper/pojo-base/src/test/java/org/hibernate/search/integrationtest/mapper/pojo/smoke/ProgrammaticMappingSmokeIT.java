@@ -349,11 +349,7 @@ public class ProgrammaticMappingSmokeIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
-							.objectField( "embeddedIterable", b2 -> b2
-									.objectField( "myEmbedded", b3 -> b3
-											.field( "myTextField", entity1.getEmbedded().getText() )
-									)
-							)
+							// entity1 was deleted, so it will be omitted
 							.objectField( "embeddedIterable", b2 -> b2
 									.objectField( "myEmbedded", b3 -> b3
 											.field( "myTextField", entity2.getEmbedded().getText() )
@@ -381,13 +377,7 @@ public class ProgrammaticMappingSmokeIT {
 											)
 									)
 							)
-							.objectField( "embeddedArrayList", b2 -> b2
-									.objectField( "myEmbedded", b3 -> b3
-											.objectField( "customBridgeOnProperty", b4 -> b4
-													.field( "text", entity1.getEmbedded().getEmbedded().getText() )
-											)
-									)
-							)
+							// entity1 was deleted, so it will be omitted
 							.field( "embeddedMapKeys", "entity3", "entity2" )
 							.objectField( "embeddedMap", b2 -> b2
 									.objectField( "myEmbedded", b3 -> b3
