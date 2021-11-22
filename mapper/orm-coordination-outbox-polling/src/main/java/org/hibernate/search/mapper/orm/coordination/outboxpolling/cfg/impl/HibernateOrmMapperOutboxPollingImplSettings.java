@@ -19,8 +19,8 @@ public final class HibernateOrmMapperOutboxPollingImplSettings {
 		private CoordinationRadicals() {
 		}
 
-		public static final String AGENTS_EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER = "agents.event_processor.agent_repository.provider";
-		public static final String AGENTS_EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER = "agents.event_processor.outbox_event_finder.provider";
+		public static final String EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER = "event_processor.agent_repository.provider";
+		public static final String EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER = "event_processor.outbox_event_finder.provider";
 	}
 
 }

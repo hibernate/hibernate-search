@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withinPercentage;
 import static org.awaitility.Awaitility.await;
-import static org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.AGENTS_EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER;
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
@@ -85,11 +85,11 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
 				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.with( indexingCountHelper::bind )
-				.withProperty( "hibernate.search.coordination.processors.indexing.polling_interval", POLLING_INTERVAL )
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_expiration", PULSE_EXPIRATION )
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_interval", PULSE_INTERVAL )
-				.withProperty( "hibernate.search.coordination.agents.event_processor.batch_size", BATCH_SIZE )
-				.withProperty( "hibernate.search.coordination." + AGENTS_EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER,
+				.withProperty( "hibernate.search.coordination.event_processor.polling_interval", POLLING_INTERVAL )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", PULSE_EXPIRATION )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", PULSE_INTERVAL )
+				.withProperty( "hibernate.search.coordination.event_processor.batch_size", BATCH_SIZE )
+				.withProperty( "hibernate.search.coordination." + EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER,
 						disconnectionSimulatingAgentRepositoryProvider );
 
 		context.setup( IndexedEntity.class );

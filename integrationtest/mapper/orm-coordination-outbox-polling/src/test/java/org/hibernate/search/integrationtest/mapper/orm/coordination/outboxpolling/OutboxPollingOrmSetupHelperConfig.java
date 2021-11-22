@@ -26,7 +26,7 @@ public class OutboxPollingOrmSetupHelperConfig implements OrmSetupHelperConfig {
 		// but our many tests often wait for indexing to complete before carrying on,
 		// and waiting for 100ms a thousand times really adds up.
 		propertyConsumer.accept(
-				HibernateOrmMapperOutboxPollingSettings.COORDINATION_AGENTS_EVENT_PROCESSOR_POLLING_INTERVAL,
+				HibernateOrmMapperOutboxPollingSettings.COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL,
 				10 );
 	}
 }
