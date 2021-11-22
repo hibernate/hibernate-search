@@ -77,7 +77,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 				.field( "nonIndexedEmbeddedText", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
-		setupContext.withProperty( "hibernate.search.coordination.agents.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
+		setupContext.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class );
 

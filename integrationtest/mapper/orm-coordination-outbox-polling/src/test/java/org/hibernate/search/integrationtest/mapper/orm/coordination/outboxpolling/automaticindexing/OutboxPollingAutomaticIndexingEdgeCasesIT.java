@@ -55,7 +55,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		backendMock.expectSchema( IndexedAndContainedEntity.NAME, b -> b
 				.field( "text", String.class ) );
 		setupContext
-				.withProperty( "hibernate.search.coordination.agents.event_processor.outbox_event_finder.provider",
+				.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider",
 						outboxEventFinder.provider() )
 				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class );
 	}

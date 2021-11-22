@@ -39,10 +39,10 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	@Test
 	public void pulseInterval_negative() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_interval", "-1" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.agents.event_processor.pulse_interval'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
 								"'-1'", "'value' must be strictly positive" )
 						.build() );
 	}
@@ -50,10 +50,10 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	@Test
 	public void pulseInterval_zero() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_interval", "0" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "0" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.agents.event_processor.pulse_interval'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
 								"'0'", "'value' must be strictly positive" )
 						.build() );
 	}
@@ -61,11 +61,11 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	@Test
 	public void pulseInterval_lowerThanPollingInterval() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_interval", "40" )
-				.withProperty( "hibernate.search.coordination.agents.event_processor.polling_interval", "50" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "40" )
+				.withProperty( "hibernate.search.coordination.event_processor.polling_interval", "50" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.agents.event_processor.pulse_interval'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_interval'",
 								"'40'", "The pulse interval must be greater than or equal to the polling interval",
 								"i.e. in this case at least 50" )
 						.build() );
@@ -74,10 +74,10 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	@Test
 	public void pulseExpiration_negative() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_expiration", "-1" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.agents.event_processor.pulse_expiration'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
 								"'-1'", "'value' must be strictly positive" )
 						.build() );
 	}
@@ -85,10 +85,10 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	@Test
 	public void pulseExpiration_zero() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_expiration", "0" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "0" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.agents.event_processor.pulse_expiration'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
 								"'0'", "'value' must be strictly positive" )
 						.build() );
 	}
@@ -96,11 +96,11 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	@Test
 	public void pulseExpiration_lowerThan3TimesPollingInterval() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_expiration", "599" )
-				.withProperty( "hibernate.search.coordination.agents.event_processor.pulse_interval", "200" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "599" )
+				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "200" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.agents.event_processor.pulse_expiration'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.pulse_expiration'",
 								"'599'",
 								"The pulse expiration must be greater than or equal to 3 times the pulse interval",
 								"i.e. in this case at least 600" )
