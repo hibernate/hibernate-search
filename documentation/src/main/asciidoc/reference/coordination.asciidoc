@@ -383,14 +383,14 @@ hibernate.search.coordination.shards.assigned = 1
 ----
 # Node #2
 hibernate.search.coordination.strategy = outbox-polling
-hibernate.search.coordination.processors.indexing.enabled = false
+hibernate.search.coordination.agents.event_processor.enabled = false
 ----
 
 [source]
 ----
 # Node #3
 hibernate.search.coordination.strategy = outbox-polling
-hibernate.search.coordination.processors.indexing.enabled = false
+hibernate.search.coordination.agents.event_processor.enabled = false
 ----
 ====
 
@@ -406,38 +406,45 @@ then (once every node has processing disabled),
 restart nodes one by one with the new sharding settings and with processing re-enabled.
 ====
 
-[[coordination-outbox-polling-processors]]
-=== [[coordination-database-polling-processors]] Processors
+[[coordination-outbox-polling-agents]]
+=== [[coordination-database-polling-processors]] Agents
 
-The `outbox-polling` coordination strategy involves background processors,
-in particular one that polls the outbox table for events
-and then reindex the corresponding entities when new events are found.
+The `outbox-polling` coordination strategy involves agents executing in the background.
 
-The background indexing processor can be configured using the following configuration properties:
+The following subsections list those agents and detail their respective configuration options.
+
+[[coordination-outbox-polling-agents-event-processor]]
+==== Event processor
+
+The most important agent is the event processor,
+which polls the outbox table for events
+and then reindexes the corresponding entities when new events are found.
+
+The event processor can be configured using the following configuration properties:
 
 [source]
 ----
-hibernate.search.coordination.processors.indexing.enabled = true
-hibernate.search.coordination.processors.indexing.polling_interval = 100
-hibernate.search.coordination.processors.indexing.pulse_interval = 2000
-hibernate.search.coordination.processors.indexing.pulse_expiration = 30000
-hibernate.search.coordination.processors.indexing.batch_size = 50
-hibernate.search.coordination.processors.indexing.transaction_timeout = 10
-hibernate.search.coordination.processors.indexing.retry_delay = 15
+hibernate.search.coordination.agents.event_processor.enabled = true
+hibernate.search.coordination.agents.event_processor.polling_interval = 100
+hibernate.search.coordination.agents.event_processor.pulse_interval = 2000
+hibernate.search.coordination.agents.event_processor.pulse_expiration = 30000
+hibernate.search.coordination.agents.event_processor.batch_size = 50
+hibernate.search.coordination.agents.event_processor.transaction_timeout = 10
+hibernate.search.coordination.agents.event_processor.retry_delay = 15
 ----
 
-* `processors.indexing.enabled` defines whether the background processor responsible for indexing entities is enabled,
+* `agents.event_processor.enabled` defines whether the event processor is enabled,
 as a <<configuration-property-types,boolean value>>.
-The default for this property is `true`, but it can be set to `false` to disable background processing on some application nodes,
-for example to dedicate some nodes to HTTP request processing and other nodes to background processing.
-* `processors.indexing.polling_interval` defines how long to wait for another query to the outbox events table
+The default for this property is `true`, but it can be set to `false` to disable event processing on some application nodes,
+for example to dedicate some nodes to HTTP request processing and other nodes to event processing.
+* `agents.event_processor.polling_interval` defines how long to wait for another query to the outbox events table
 after a query didn't return any event,
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `100`.
 +
 Lower values will reduce the time it takes for a change to be reflected in the index,
 but will increase the stress on the database when there are no new events.
-* `processors.indexing.pulse_interval` defines how long the background indexing processor can poll for events
+* `agents.event_processor.pulse_interval` defines how long the event processor can poll for events
 before it must perform a "pulse",
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `2000`.
@@ -455,7 +462,7 @@ High values (closer to the expiration interval) mean a longer delay before rebal
 when a node joins or leaves the cluster,
 and increased risk of incorrectly considering an agent as expired,
 but less stress on the database because of less frequent checks of the list of agents.
-* `processors.indexing.pulse_expiration` defines how long a background indexing processor "pulse" remains valid
+* `agents.event_processor.pulse_expiration` defines how long an event processor "pulse" remains valid
 before considering the processor disconnected and forcibly removing it from the cluster,
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `30000`.
@@ -471,18 +478,18 @@ but increased risk of incorrectly considering an agent as expired.
 High values (much larger than the pulse interval) mean a longer delay before rebalancing
 when a node abruptly leaves the cluster due to a crash or network failure,
 but reduced risk of incorrectly considering an agent as expired.
-* `processors.indexing.batch_size` defines how many outbox events, at most, are processed in a single transaction
+* `agents.event_processor.batch_size` defines how many outbox events, at most, are processed in a single transaction
 as an <<configuration-property-types,integer value>>.
 The default for this property is `50`.
 +
 Higher values will reduce the number of transactions opened by the background process
 and may increase performance thanks to the first-level cache (persistence context),
 but will increase memory usage and in extreme cases may lead to `OutOfMemoryErrors`.
-* `processors.indexing.transaction_timeout` defines the timeout for transactions processing outbox events
+* `agents.event_processor.transaction_timeout` defines the timeout for transactions processing outbox events
 as an <<configuration-property-types,integer value>> in seconds.
 Only effective when a JTA transaction manager is configured.
 When using JTA and this property is not set, Hibernate Search will use whatever default transaction timeout is configured in the JTA transaction manager.
-* `processors.indexing.retry_delay` defines the time after which it is possible to process again an event that has gone into error.
+* `agents.event_processor.retry_delay` defines the time after which it is possible to process again an event that has gone into error.
 as a <<configuration-property-types,positive integer value>> in seconds.
 Use the value `0` to reprocess the failed events as soon as possible, with no delay.
 The default for this property is `30`.

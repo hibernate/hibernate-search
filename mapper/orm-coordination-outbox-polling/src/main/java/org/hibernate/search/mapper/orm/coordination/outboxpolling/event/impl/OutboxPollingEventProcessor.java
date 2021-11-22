@@ -114,7 +114,7 @@ public final class OutboxPollingEventProcessor {
 
 	private class Worker implements SingletonTask.Worker {
 
-		private volatile AgentInstructions agentInstructions;
+		private volatile OutboxPollingEventProcessingInstructions instructions;
 		private volatile boolean lastExecutionProcessedEvents;
 
 		@Override
@@ -130,8 +130,8 @@ public final class OutboxPollingEventProcessor {
 			}
 
 			// Optimization: don't even try to open a transaction/session if we know it's not necessary.
-			if ( agentInstructions != null && agentInstructions.isStillValid()
-					&& !agentInstructions.eventFinder.isPresent() ) {
+			if ( instructions != null && instructions.isStillValid()
+					&& !instructions.eventFinder.isPresent() ) {
 				// Processing is disabled for the time being.
 				// We will try again later (complete() will be called, re-scheduling the polling for later).
 				return CompletableFuture.completedFuture( null );
@@ -140,11 +140,11 @@ public final class OutboxPollingEventProcessor {
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
 				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
 				transactionHelper.inTransaction( session, transactionTimeout, s -> {
-					if ( agentInstructions == null || !agentInstructions.isStillValid() ) {
+					if ( instructions == null || !instructions.isStillValid() ) {
 						AgentRepository agentRepository = agentRepositoryProvider.create( session );
-						agentInstructions = clusterLink.pulse( agentRepository );
+						instructions = clusterLink.pulse( agentRepository );
 					}
-					Optional<OutboxEventFinder> eventFinder = agentInstructions.eventFinder;
+					Optional<OutboxEventFinder> eventFinder = instructions.eventFinder;
 					if ( !eventFinder.isPresent() ) {
 						// Processing is disabled for the time being.
 						// Don't do anything, we'll try again later
@@ -220,7 +220,7 @@ public final class OutboxPollingEventProcessor {
 
 		@Override
 		public Future<?> schedule(Runnable runnable) {
-			AgentInstructions instructions = worker.agentInstructions;
+			OutboxPollingEventProcessingInstructions instructions = worker.instructions;
 			if ( instructions == null ) {
 				// Before the first pulse (i.e. on startup),
 				// execute the worker only after the polling interval.

@@ -10,12 +10,12 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 
-final class AgentInstructions {
+final class OutboxPollingEventProcessingInstructions {
 	private final Clock clock;
 	final Instant expiration;
 	final Optional<OutboxEventFinder> eventFinder;
 
-	public AgentInstructions(Clock clock, Instant expiration, Optional<OutboxEventFinder> eventFinder) {
+	public OutboxPollingEventProcessingInstructions(Clock clock, Instant expiration, Optional<OutboxEventFinder> eventFinder) {
 		this.clock = clock;
 		this.expiration = expiration;
 		this.eventFinder = eventFinder;

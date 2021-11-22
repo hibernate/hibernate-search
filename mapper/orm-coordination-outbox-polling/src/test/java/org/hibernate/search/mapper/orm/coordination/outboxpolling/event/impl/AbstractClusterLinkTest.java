@@ -44,9 +44,9 @@ abstract class AbstractClusterLinkTest {
 	static final Duration POLLING_INTERVAL = Duration.ofMillis(
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL );
 	static final Duration PULSE_INTERVAL = Duration.ofMillis(
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL );
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_PULSE_INTERVAL );
 	static final Duration PULSE_EXPIRATION = Duration.ofMillis(
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_EXPIRATION );
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_AGENTS_EVENT_PROCESSOR_PULSE_EXPIRATION );
 
 	static final long SELF_ID = 42L;
 	static final AgentReference SELF_REF = AgentReference.of( SELF_ID, "Self Agent Name" );

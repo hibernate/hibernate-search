@@ -76,7 +76,7 @@ public final class OutboxPollingEventProcessorClusterLink {
 				agentName, staticShardAssignment );
 	}
 
-	public AgentInstructions pulse(AgentRepository agentRepository) {
+	public OutboxPollingEventProcessingInstructions pulse(AgentRepository agentRepository) {
 		Instant now = clock.instant();
 		Instant newExpiration = now.plus( pulseExpiration );
 
@@ -267,27 +267,27 @@ public final class OutboxPollingEventProcessorClusterLink {
 		return true;
 	}
 
-	private AgentInstructions instructCommitAndRetryPulseASAP(Instant now) {
+	private OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseASAP(Instant now) {
 		Instant expiration = now.plus( pollingInterval );
 		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
 				selfReference(), pollingInterval, expiration );
 		// "As soon as possible" still means we wait for a polling interval,
 		// to avoid polling the database continuously.
-		return new AgentInstructions( clock, expiration, Optional.empty() );
+		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.empty() );
 	}
 
-	private AgentInstructions instructCommitAndRetryPulseAfterInterval(Instant now) {
+	private OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseAfterInterval(Instant now) {
 		Instant expiration = now.plus( pulseInterval );
 		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
 				selfReference(), pulseInterval, expiration );
-		return new AgentInstructions( clock, expiration, Optional.empty() );
+		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.empty() );
 	}
 
-	private AgentInstructions instructProceedWithEventProcessing(Instant now) {
+	private OutboxPollingEventProcessingInstructions instructProceedWithEventProcessing(Instant now) {
 		Instant expiration = now.plus( pulseInterval );
 		log.tracef( "Agent '%s': instructions are to process events and to retry a pulse in %s, around %s",
 				selfReference(), pulseInterval, expiration );
-		return new AgentInstructions( clock, expiration, Optional.of( lastShardAssignment.eventFinder ) );
+		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.of( lastShardAssignment.eventFinder ) );
 	}
 
 }

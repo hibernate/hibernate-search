@@ -2,4 +2,4 @@ spring.jpa:
   properties:
     hibernate:
       search:
-        coordination.processors.indexing.transaction_timeout: 60
+        coordination.agents.event_processor.transaction_timeout: 60
