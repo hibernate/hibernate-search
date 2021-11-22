@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -41,8 +41,8 @@ public class PojoIndexingProcessorTypeBridgeNode<T> extends PojoIndexingProcesso
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
-		bridgeHolder.get().write( target, source, sessionContext.typeBridgeWriteContext() );
+	public final void process(DocumentElement target, T source, PojoIndexingProcessorRootContext context) {
+		bridgeHolder.get().write( target, source, context.sessionContext().typeBridgeWriteContext() );
 	}
 
 }

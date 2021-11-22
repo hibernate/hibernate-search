@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -66,12 +67,13 @@ public class PojoIndexingPlanEventProcessingStrategy implements PojoIndexingPlan
 
 	@Override
 	public <I, E> PojoIndexedTypeIndexingPlan<I, E> createDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext) {
+			PojoWorkSessionContext sessionContext,
+			PojoIndexingProcessorRootContext processorContext) {
 		// Will process indexing events locally, and send additional events upon reindexing resolution.
 		IndexIndexingPlan indexIndexingPlan =
 				typeContext.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext,
-				new PojoTypeIndexingPlanIndexOrEventQueueDelegate<>( typeContext, sessionContext,
+				new PojoTypeIndexingPlanIndexOrEventQueueDelegate<>( typeContext, sessionContext, processorContext,
 						indexIndexingPlan, sendingPlan ) );
 	}
 
