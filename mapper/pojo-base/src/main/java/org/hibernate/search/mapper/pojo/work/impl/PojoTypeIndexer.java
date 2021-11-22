@@ -40,6 +40,12 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		return sessionContext;
 	}
 
+	@Override
+	public boolean isDeleted(Object unproxiedObject) {
+		// No context holding any information about deleted entities here.
+		return false;
+	}
+
 	CompletableFuture<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );

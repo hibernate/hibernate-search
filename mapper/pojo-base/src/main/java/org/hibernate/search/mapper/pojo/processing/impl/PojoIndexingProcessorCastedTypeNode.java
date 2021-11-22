@@ -28,13 +28,16 @@ public class PojoIndexingProcessorCastedTypeNode<T, U> extends PojoIndexingProce
 	private final PojoCaster<? super U> caster;
 	private final Iterable<IndexObjectFieldReference> parentIndexObjectReferences;
 	private final PojoIndexingProcessor<? super U> nested;
+	private final boolean isEntityType;
 
 	public PojoIndexingProcessorCastedTypeNode(PojoCaster<? super U> caster,
 			Iterable<IndexObjectFieldReference> parentIndexObjectReferences,
-			PojoIndexingProcessor<? super U> nested) {
+			PojoIndexingProcessor<? super U> nested,
+			boolean isEntityType) {
 		this.caster = caster;
 		this.parentIndexObjectReferences = parentIndexObjectReferences;
 		this.nested = nested;
+		this.isEntityType = isEntityType;
 	}
 
 	@Override
@@ -48,16 +51,24 @@ public class PojoIndexingProcessorCastedTypeNode<T, U> extends PojoIndexingProce
 		builder.attribute( "caster", caster );
 		builder.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
 		builder.attribute( "nested", nested );
+		builder.attribute( "isEntityType", isEntityType );
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
 	public final void process(DocumentElement target, T source, PojoIndexingProcessorRootContext context) {
 		if ( source == null ) {
 			return;
 		}
+		source = (T) context.sessionContext().runtimeIntrospector().unproxy( source );
 		// The caster can only cast to the raw type, beyond that we have to use an unchecked cast.
 		@SuppressWarnings("unchecked")
-		U castedSource = (U) caster.cast( context.sessionContext().runtimeIntrospector().unproxy( source ) );
+		U castedSource = (U) caster.cast( source );
+		// "isEntityType" is just an optimization to avoid unnecessary calls to isDeleted(),
+		// which may be costly (reflection, ...)
+		if ( isEntityType && context.isDeleted( castedSource ) ) {
+			return;
+		}
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );

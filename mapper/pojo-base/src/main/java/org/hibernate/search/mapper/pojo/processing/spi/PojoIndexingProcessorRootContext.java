@@ -16,4 +16,11 @@ public interface PojoIndexingProcessorRootContext {
 
 	PojoIndexingProcessorSessionContext sessionContext();
 
+	/**
+	 * @param unproxiedObject An object that was already unproxied using {@link org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector#unproxy(Object)}.
+	 * @return {@code true} if this object is an entity and is considered deleted in the current context,
+	 * {@code false} otherwise.
+	 */
+	boolean isDeleted(Object unproxiedObject);
+
 }

@@ -30,6 +30,8 @@ public interface PojoWorkTypeContext<I, E> extends PojoLoadingTypeContext<E> {
 
 	PojoPathFilter dirtySelfOrContainingFilter();
 
+	E toEntity(Object unproxiedEntity);
+
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,

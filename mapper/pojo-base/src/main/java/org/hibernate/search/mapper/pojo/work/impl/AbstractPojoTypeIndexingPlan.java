@@ -131,6 +131,17 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 	protected abstract S createState(I identifier);
 
+	boolean isDeleted(Object unproxiedObject) {
+		E entity = typeContext().toEntity( unproxiedObject );
+		I identifier = typeContext().identifierMapping().getIdentifierOrNull( entity );
+		S state = statesPerId.get( identifier );
+		if ( state == null ) {
+			// No event whatsoever for that type, so definitely no delete event.
+			return false;
+		}
+		return state.currentStatus == EntityStatus.ABSENT;
+	}
+
 	abstract class AbstractEntityState
 			implements PojoImplicitReindexingResolverRootContext {
 		final I identifier;

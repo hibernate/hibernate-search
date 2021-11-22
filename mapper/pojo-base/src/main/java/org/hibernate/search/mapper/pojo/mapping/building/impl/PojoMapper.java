@@ -135,7 +135,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		);
 
 		mappingHelper = new PojoMappingHelper( buildContext.beanResolver(), failureCollector, contributorProvider,
-				introspector, indexModelBinder );
+				introspector, typeAdditionalMetadataProvider, indexModelBinder );
 	}
 
 	@Override

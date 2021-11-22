@@ -206,17 +206,37 @@ public class PojoIndexingPlanImpl
 		return sessionContext;
 	}
 
+	@Override
+	public boolean isDeleted(Object unproxiedObject) {
+		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().detectEntityType( unproxiedObject );
+		if ( typeIdentifier == null ) {
+			// Not a type that can be marked as deleted in this indexing plan.
+			return false;
+		}
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegateOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			// No event whatsoever for that type, so definitely no delete event.
+			return false;
+		}
+		return delegate.isDeleted( unproxiedObject );
+	}
+
 	private PojoRuntimeIntrospector getIntrospector() {
 		return introspector;
 	}
 
 	private AbstractPojoTypeIndexingPlan<?, ?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegateOrNull( typeIdentifier );
+		if ( delegate == null ) {
+			delegate = createDelegate( typeIdentifier );
+		}
+		return delegate;
+	}
+
+	private AbstractPojoTypeIndexingPlan<?, ?, ?> getDelegateOrNull(PojoRawTypeIdentifier<?> typeIdentifier) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = indexedTypeDelegates.get( typeIdentifier );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( typeIdentifier );
-			if ( delegate == null ) {
-				delegate = createDelegate( typeIdentifier );
-			}
 		}
 		return delegate;
 	}

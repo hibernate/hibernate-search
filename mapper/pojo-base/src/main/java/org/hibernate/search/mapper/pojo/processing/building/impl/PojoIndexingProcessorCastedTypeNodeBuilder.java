@@ -56,7 +56,8 @@ public class PojoIndexingProcessorCastedTypeNodeBuilder<T, U> extends AbstractPo
 			PojoIndexingProcessor<? super U> nested) {
 		return new PojoIndexingProcessorCastedTypeNode<>(
 				getModelPath().getTypeModel().rawType().caster(),
-				parentIndexObjectReferences, nested
+				parentIndexObjectReferences, nested,
+				typeAdditionalMetadata().isEntity()
 		);
 	}
 }
