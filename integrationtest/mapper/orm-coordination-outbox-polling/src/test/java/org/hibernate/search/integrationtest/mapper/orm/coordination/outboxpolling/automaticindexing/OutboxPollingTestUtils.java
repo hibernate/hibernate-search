@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 
 public class OutboxPollingTestUtils {
 
@@ -39,7 +39,7 @@ public class OutboxPollingTestUtils {
 						assertThat( agents )
 								.hasSize( expectedAgentCount )
 								.allSatisfy( agent -> {
-									assertThat( agent.getState() ).isEqualTo( EventProcessingState.RUNNING );
+									assertThat( agent.getState() ).isEqualTo( AgentState.RUNNING );
 									assertThat( agent.getTotalShardCount() ).isEqualTo( expectedAgentCount );
 								} )
 								.extracting( Agent::getAssignedShardIndex )

@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
 public class ClusterLinkPulseExpectations {
@@ -37,7 +37,7 @@ public class ClusterLinkPulseExpectations {
 
 	private final Long expectedSelfAgentId;
 	private final Instant expectedSelfAgentExpiration;
-	private final EventProcessingState expectedSelfAgentCurrentState;
+	private final AgentState expectedSelfAgentCurrentState;
 	private final ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
 
 	private ClusterLinkPulseExpectations(Builder builder) {
@@ -106,7 +106,7 @@ public class ClusterLinkPulseExpectations {
 	}
 
 	public interface AgentMainStateStep {
-		AgentOptionsStep agent(long expectedId, EventProcessingState expectedCurrentState);
+		AgentOptionsStep agent(long expectedId, AgentState expectedCurrentState);
 	}
 
 	public interface AgentOptionsStep {
@@ -129,7 +129,7 @@ public class ClusterLinkPulseExpectations {
 
 		private Long expectedSelfAgentId;
 		private Instant expectedSelfAgentExpiration;
-		private EventProcessingState expectedSelfAgentCurrentState;
+		private AgentState expectedSelfAgentCurrentState;
 		private ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
 
 		private Builder(AgentRepositoryMockingHelper repoMockingHelper,
@@ -158,7 +158,7 @@ public class ClusterLinkPulseExpectations {
 		}
 
 		@Override
-		public AgentOptionsStep agent(long expectedId, EventProcessingState expectedCurrentState) {
+		public AgentOptionsStep agent(long expectedId, AgentState expectedCurrentState) {
 			this.expectedSelfAgentId = expectedId;
 			this.expectedSelfAgentCurrentState = expectedCurrentState;
 			this.expectedSelfAgentExpiration = NOW.plus( PULSE_EXPIRATION );

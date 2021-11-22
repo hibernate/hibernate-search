@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
 import org.mockito.ArgumentCaptor;
@@ -38,7 +38,7 @@ class AgentRepositoryMockingHelper {
 	private final List<Agent> otherAgents = new ArrayList<>();
 	private Supplier<Agent> selfSupplier = null;
 	private boolean selfPreExisting;
-	private EventProcessingState selfInitialState;
+	private AgentState selfInitialState;
 	private Instant selfInitialExpiration;
 	private ShardAssignmentDescriptor selfInitialShardAssignment;
 
@@ -95,7 +95,7 @@ class AgentRepositoryMockingHelper {
 				.collect( Collectors.toList() );
 	}
 
-	public EventProcessingState selfInitialState() {
+	public AgentState selfInitialState() {
 		return selfInitialState;
 	}
 
@@ -108,11 +108,11 @@ class AgentRepositoryMockingHelper {
 	}
 
 	class AllAgentsDefinition {
-		AllAgentsDefinition other(Long id, AgentType type, Instant expiration, EventProcessingState state) {
+		AllAgentsDefinition other(Long id, AgentType type, Instant expiration, AgentState state) {
 			return other( id, type, expiration, state, null );
 		}
 
-		AllAgentsDefinition other(Long id, AgentType type, Instant expiration, EventProcessingState state,
+		AllAgentsDefinition other(Long id, AgentType type, Instant expiration, AgentState state,
 				ShardAssignmentDescriptor shardAssignment) {
 			Agent agent = new Agent( type, "other agent", expiration, state, shardAssignment );
 			agent.setId( id );

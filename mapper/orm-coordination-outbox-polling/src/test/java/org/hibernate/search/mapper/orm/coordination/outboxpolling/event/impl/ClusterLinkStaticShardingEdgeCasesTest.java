@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.util.common.SearchException;
 
@@ -51,16 +51,16 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 		defineSelfNotCreatedYet( link );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( 4, 1 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( 4, 2 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( 4, 3 ) );
 
 		expect( null, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( new ShardAssignmentDescriptor( 4, 0 ) )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
@@ -73,7 +73,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 
 		expect( null, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( newId, EventProcessingState.REBALANCING )
+				.agent( newId, AgentState.WAITING )
 				.shardAssignment( new ShardAssignmentDescriptor( 4, 3 ) )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
@@ -91,14 +91,14 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 		defineSelfNotCreatedYet( link );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.SUSPENDED,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.SUSPENDED,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.SUSPENDED,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.SUSPENDED,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( PULSE_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.SUSPENDED )
+				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
@@ -131,14 +131,14 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 		defineSelfNotCreatedYet( link );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( 3, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( 4, 2 ) );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( PULSE_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.SUSPENDED )
+				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
@@ -163,26 +163,26 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfRebalancing_includedAgentsReady_extraAgentsSuspended() {
+	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( selfStaticShardAssignment );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.REBALANCING, selfStaticShardAssignment );
+		defineSelfCreatedAndStillPresent( link, AgentState.WAITING, selfStaticShardAssignment );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 2 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
 				.processThenPulse( selfStaticShardAssignment )
-				.agent( SELF_ID, EventProcessingState.RUNNING )
+				.agent( SELF_ID, AgentState.RUNNING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
@@ -195,152 +195,152 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( selfStaticShardAssignment );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.SUSPENDED, null );
+		defineSelfCreatedAndStillPresent( link, AgentState.SUSPENDED, null );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 2 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfRebalancing_includedAgentSuspended_extraAgentsSuspended() {
+	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentSuspended_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( selfStaticShardAssignment );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.REBALANCING, selfStaticShardAssignment );
+		defineSelfCreatedAndStillPresent( link, AgentState.WAITING, selfStaticShardAssignment );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.SUSPENDED,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.SUSPENDED,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 2 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfRebalancing_includedAgentInWrongCluster_extraAgentsSuspended() {
+	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentInWrongCluster_extraAgentsSuspended() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( selfStaticShardAssignment );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.REBALANCING, selfStaticShardAssignment );
+		defineSelfCreatedAndStillPresent( link, AgentState.WAITING, selfStaticShardAssignment );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 1 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfRebalancing_includedAgentsReady_extraAgentsRunning() {
+	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsRunning() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( selfStaticShardAssignment );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.REBALANCING, selfStaticShardAssignment );
+		defineSelfCreatedAndStillPresent( link, AgentState.WAITING, selfStaticShardAssignment );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 2 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.RUNNING,
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.RUNNING,
 						new ShardAssignmentDescriptor( 1, 0 ) );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void mixedSharding_otherDynamicSuperfluous_selfRebalancing_includedAgentsReady_extraAgentsRebalancing() {
+	public void mixedSharding_otherDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsWaiting() {
 		int totalShardCount = 4;
 		ShardAssignmentDescriptor selfStaticShardAssignment =
 				new ShardAssignmentDescriptor( totalShardCount, 1 );
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( selfStaticShardAssignment );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.REBALANCING, selfStaticShardAssignment );
+		defineSelfCreatedAndStillPresent( link, AgentState.WAITING, selfStaticShardAssignment );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_3_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 2 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( 1, 0 ) );
 
 		expect( selfStaticShardAssignment, link )
 				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void mixedSharding_selfDynamicSuperfluous_selfRebalancing_includedAgentsReady_extraAgentsSuspended() {
+	public void mixedSharding_selfDynamicSuperfluous_selfWaiting_includedAgentsReady_extraAgentsSuspended() {
 		int totalShardCount = 4;
 
 		OutboxPollingEventProcessorClusterLink link = setupLink( null );
-		defineSelfCreatedAndStillPresent( link, EventProcessingState.REBALANCING,
+		defineSelfCreatedAndStillPresent( link, AgentState.WAITING,
 				new ShardAssignmentDescriptor( totalShardCount, 2 ) );
 
 		repositoryMockHelper.defineOtherAgents()
-				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_1_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 0 ) )
-				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_2_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 3 ) )
-				.other( OTHER_0_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.REBALANCING,
+				.other( OTHER_0_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, AgentState.WAITING,
 						new ShardAssignmentDescriptor( totalShardCount, 2 ) )
-				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, EventProcessingState.SUSPENDED,
+				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_STATIC_SHARDING, LATER, AgentState.SUSPENDED,
 						new ShardAssignmentDescriptor( totalShardCount, 1 ) );
 
 		expect( null, link )
 				.pulseAgain( NOW.plus( PULSE_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.SUSPENDED )
+				.agent( SELF_ID, AgentState.SUSPENDED )
 				.build()
 				.verify( link.pulse( repositoryMock ) );
 	}

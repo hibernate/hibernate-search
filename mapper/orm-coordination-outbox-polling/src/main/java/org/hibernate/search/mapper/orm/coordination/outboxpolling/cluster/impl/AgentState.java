@@ -10,12 +10,12 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-public enum EventProcessingState {
+public enum AgentState {
 
 	RUNNING,
-	REBALANCING,
+	WAITING,
 	SUSPENDED;
 
-	public static final Set<EventProcessingState> REBALANCING_OR_RUNNING =
-			Collections.unmodifiableSet( EnumSet.of( REBALANCING, RUNNING ) );
+	public static final Set<AgentState> WAITING_OR_RUNNING =
+			Collections.unmodifiableSet( EnumSet.of( WAITING, RUNNING ) );
 }

@@ -52,7 +52,7 @@ public final class AgentPersister {
 	}
 
 	public Agent createSelf(AgentRepository agentRepository, List<Agent> allAgentsInIdOrder, Instant expiration) {
-		Agent self = new Agent( type, name, expiration, EventProcessingState.SUSPENDED, staticShardAssignment );
+		Agent self = new Agent( type, name, expiration, AgentState.SUSPENDED, staticShardAssignment );
 		agentRepository.create( self );
 		selfReference = self.getReference();
 		ListIterator<Agent> it = allAgentsInIdOrder.listIterator();
@@ -83,9 +83,9 @@ public final class AgentPersister {
 	}
 
 	public void setSuspended(Agent self) {
-		if ( self.getState() != EventProcessingState.SUSPENDED ) {
+		if ( self.getState() != AgentState.SUSPENDED ) {
 			log.infof( "Agent '%s': suspending", selfReference );
-			self.setState( EventProcessingState.SUSPENDED );
+			self.setState( AgentState.SUSPENDED );
 		}
 		if ( staticShardAssignment == null ) {
 			self.setTotalShardCount( null );
@@ -93,12 +93,12 @@ public final class AgentPersister {
 		}
 	}
 
-	public void setRebalancing(Agent self, ClusterDescriptor clusterDescriptor,
+	public void setWaiting(Agent self, ClusterDescriptor clusterDescriptor,
 			ShardAssignmentDescriptor shardAssignment) {
-		if ( self.getState() != EventProcessingState.REBALANCING ) {
-			log.infof( "Agent '%s': rebalancing. Shard assignment: %s. Cluster: %s",
+		if ( self.getState() != AgentState.WAITING ) {
+			log.infof( "Agent '%s': waiting for cluster changes. Shard assignment: %s. Cluster: %s",
 					selfReference, shardAssignment, clusterDescriptor );
-			self.setState( EventProcessingState.REBALANCING );
+			self.setState( AgentState.WAITING );
 		}
 		if ( staticShardAssignment == null ) {
 			self.setTotalShardCount( shardAssignment.totalShardCount );
@@ -107,10 +107,10 @@ public final class AgentPersister {
 	}
 
 	public void setRunning(Agent self, ClusterDescriptor clusterDescriptor) {
-		if ( self.getState() != EventProcessingState.RUNNING ) {
+		if ( self.getState() != AgentState.RUNNING ) {
 			log.infof( "Agent '%s': running. Shard assignment: %s. Cluster: %s",
 					selfReference, self.getShardAssignment(), clusterDescriptor );
-			self.setState( EventProcessingState.RUNNING );
+			self.setState( AgentState.RUNNING );
 		}
 	}
 

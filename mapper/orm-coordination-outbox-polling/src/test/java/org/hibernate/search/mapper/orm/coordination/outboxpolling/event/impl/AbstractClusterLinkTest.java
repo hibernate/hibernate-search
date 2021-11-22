@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
 import org.junit.After;
@@ -94,7 +94,7 @@ abstract class AbstractClusterLinkTest {
 	}
 
 	protected void defineSelfCreatedAndStillPresent(OutboxPollingEventProcessorClusterLink link,
-			EventProcessingState state, ShardAssignmentDescriptor shardAssignment) {
+			AgentState state, ShardAssignmentDescriptor shardAssignment) {
 		link.agentPersister.setSelfReferenceForTests( SELF_REF );
 		AgentType type;
 		if ( link.shardAssignmentIsStatic ) {

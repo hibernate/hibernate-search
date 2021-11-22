@@ -14,7 +14,7 @@ public class Agent {
 	private AgentType type;
 	private String name;
 	private Instant expiration;
-	private EventProcessingState state;
+	private AgentState state;
 	private Integer totalShardCount;
 	private Integer assignedShardIndex;
 	private byte[] payload;
@@ -22,7 +22,7 @@ public class Agent {
 	protected Agent() {
 	}
 
-	public Agent(AgentType type, String name, Instant expiration, EventProcessingState state,
+	public Agent(AgentType type, String name, Instant expiration, AgentState state,
 			ShardAssignmentDescriptor shardAssignment) {
 		this.type = type;
 		this.name = name;
@@ -78,11 +78,11 @@ public class Agent {
 		this.expiration = expiration;
 	}
 
-	public EventProcessingState getState() {
+	public AgentState getState() {
 		return state;
 	}
 
-	public void setState(EventProcessingState state) {
+	public void setState(AgentState state) {
 		this.state = state;
 	}
 
