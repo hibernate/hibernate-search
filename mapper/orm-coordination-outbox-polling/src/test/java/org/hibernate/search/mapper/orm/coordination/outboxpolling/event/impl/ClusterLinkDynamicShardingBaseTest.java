@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
 import org.junit.Test;
@@ -60,35 +60,35 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Test
-		public void clusterWith4Nodes_allRebalancing_clusterExcludingSelf() {
+		public void clusterWith4Nodes_allWaiting_clusterExcludingSelf() {
 			repositoryMockHelper.defineOtherAgents()
-					.other( other1Id(), other1Type(), LATER, EventProcessingState.REBALANCING,
+					.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 							new ShardAssignmentDescriptor( 3, 0 ) )
-					.other( other2Id(), other2Type(), LATER, EventProcessingState.REBALANCING,
+					.other( other2Id(), other2Type(), LATER, AgentState.WAITING,
 							new ShardAssignmentDescriptor( 3, 1 ) )
-					.other( other3Id(), other3Type(), LATER, EventProcessingState.REBALANCING,
+					.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 							new ShardAssignmentDescriptor( 3, 2 ) );
 
-			expectRebalancing( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+			expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
 		}
 
 		@Test
 		public void clusterWith4Nodes_allRunning_clusterExcludingSelf() {
 			repositoryMockHelper.defineOtherAgents()
-					.other( other1Id(), other1Type(), LATER, EventProcessingState.RUNNING,
+					.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 							new ShardAssignmentDescriptor( 3, 0 ) )
-					.other( other2Id(), other2Type(), LATER, EventProcessingState.RUNNING,
+					.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
 							new ShardAssignmentDescriptor( 3, 1 ) )
-					.other( other3Id(), other3Type(), LATER, EventProcessingState.RUNNING,
+					.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
 							new ShardAssignmentDescriptor( 3, 2 ) );
 
-			expectRebalancing( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+			expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
 		}
 	}
 
 	// It's very important that an agent that wasn't registered
 	// must not start running immediately on the first pulse,
-	// but should go through the rebalancing state first.
+	// but should go through the waiting state first.
 	// See comments in OutboxEventBackgroundProcessorClusterLink.
 	public static class NotRegisteredTest extends AbstractBaseTest {
 		@Override
@@ -98,54 +98,54 @@ public class ClusterLinkDynamicShardingBaseTest {
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
 	public static class SuspendedTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.SUSPENDED, null );
+			defineSelfCreatedAndStillPresent( AgentState.SUSPENDED, null );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
-	public static class RebalancingIn1NodeClusterTest extends AbstractBaseTest {
+	public static class WaitingIn1NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.REBALANCING, selfShardAssignmentIn1NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.WAITING, selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			// We were already rebalancing and had the correct cluster => we can run now!
+			// We were already waiting and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
 	public static class RunningIn1NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.RUNNING, selfShardAssignmentIn1NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
@@ -155,58 +155,58 @@ public class ClusterLinkDynamicShardingBaseTest {
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
-	public static class RebalancingIn3NodeClusterTest extends AbstractBaseTest {
+	public static class WaitingIn3NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.REBALANCING, selfShardAssignmentIn3NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.WAITING, selfShardAssignmentIn3NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
 	public static class RunningIn3NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.RUNNING, selfShardAssignmentIn3NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn3NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
-	public static class RebalancingIn4NodeClusterTest extends AbstractBaseTest {
+	public static class WaitingIn4NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.REBALANCING, selfShardAssignmentIn4NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.WAITING, selfShardAssignmentIn4NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			// We were already rebalancing and had the correct cluster => we can run now!
+			// We were already waiting and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -214,12 +214,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 	public static class RunningIn4NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.RUNNING, selfShardAssignmentIn4NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn4NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
@@ -229,37 +229,37 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 	}
 
-	public static class RebalancingIn5NodeClusterTest extends AbstractBaseTest {
+	public static class WaitingIn5NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.REBALANCING, shardAssignmentIn5NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.WAITING, shardAssignmentIn5NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 
 	public static class RunningIn5NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
-			defineSelfCreatedAndStillPresent( EventProcessingState.RUNNING, shardAssignmentIn5NodeCluster() );
+			defineSelfCreatedAndStillPresent( AgentState.RUNNING, shardAssignmentIn5NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectRebalancing( selfShardAssignmentIn1NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
 		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
-			return expectRebalancing( selfShardAssignmentIn4NodeCluster() );
+			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
 

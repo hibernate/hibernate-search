@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ClusterDescriptor;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -143,7 +143,7 @@ public final class OutboxPollingEventProcessorClusterLink {
 		Optional<ShardAssignmentDescriptor> shardAssignmentOptional =
 				ShardAssignmentDescriptor.fromClusterMemberList( clusterTarget.descriptor.memberIdsInShardOrder, selfReference().id );
 		if ( !shardAssignmentOptional.isPresent() ) {
-			log.logf( self.getState() != EventProcessingState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
+			log.logf( self.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
 					"Agent '%s': this agent is superfluous and will not perform event processing,"
 							+ " because other agents are enough to handle all the shards."
 							+ " Target cluster: %s.",
@@ -155,7 +155,7 @@ public final class OutboxPollingEventProcessorClusterLink {
 		ShardAssignmentDescriptor targetShardAssignment = shardAssignmentOptional.get();
 
 		if ( clusterTarget.descriptor.memberIdsInShardOrder.contains( null ) ) {
-			log.logf( self.getState() != EventProcessingState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
+			log.logf( self.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
 					"Agent '%s': some cluster members are missing; this agent will wait until they are present."
 							+ " Target cluster: %s.",
 					selfReference(), clusterTarget.descriptor );
@@ -171,20 +171,20 @@ public final class OutboxPollingEventProcessorClusterLink {
 							+ " Cluster: %s.",
 					selfReference(), persistedShardAssignment, targetShardAssignment,
 					clusterTarget.descriptor );
-			agentPersister.setRebalancing( self, clusterTarget.descriptor, targetShardAssignment );
+			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
 			return instructCommitAndRetryPulseASAP( now );
 		}
 
 		// Check whether excluded (superfluous) agents complied with the cluster target and suspended themselves.
 		if ( !excludedAgentsAreOutOfCluster( clusterTarget.excluded ) ) {
-			agentPersister.setRebalancing( self, clusterTarget.descriptor, targetShardAssignment );
+			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
 			return instructCommitAndRetryPulseASAP( now );
 		}
 
 		// Check whether cluster members complied with the cluster target.
 		// Note this also checks the Agent instance representing self,
 		// which ensures that we won't just spawn the agent directly in the RUNNING state,
-		// but will always persist it once in the SUSPENDED state first,
+		// but will always persist it once in the WAITING state first,
 		// making others aware of our existence before we start running.
 		// Failing that, two agents spawning concurrently could potentially
 		// start their own, separate cluster (split brain).
@@ -192,7 +192,7 @@ public final class OutboxPollingEventProcessorClusterLink {
 		// we make sure that on the second transaction,
 		// one of those agent would see the other and take it into account when rebalancing.
 		if ( !clusterMembersAreInCluster( clusterTarget.membersInShardOrder, clusterTarget.descriptor ) ) {
-			agentPersister.setRebalancing( self, clusterTarget.descriptor, targetShardAssignment );
+			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
 			return instructCommitAndRetryPulseASAP( now );
 		}
 
@@ -221,7 +221,7 @@ public final class OutboxPollingEventProcessorClusterLink {
 	}
 
 	private boolean excludedAgentsAreOutOfCluster(List<Agent> excludedAgents) {
-		EventProcessingState expectedState = EventProcessingState.SUSPENDED;
+		AgentState expectedState = AgentState.SUSPENDED;
 		for ( Agent agent : excludedAgents ) {
 			if ( !expectedState.equals( agent.getState() ) ) {
 				log.tracef( "Agent '%s': waiting for agent '%s', which has not reached state '%s' yet",
@@ -239,9 +239,9 @@ public final class OutboxPollingEventProcessorClusterLink {
 			ClusterDescriptor clusterDescriptor) {
 		int expectedTotalShardCount = clusterMembersInShardOrder.size();
 		int expectedAssignedShardIndex = 0;
-		Set<EventProcessingState> expectedStates = EventProcessingState.REBALANCING_OR_RUNNING;
+		Set<AgentState> expectedStates = AgentState.WAITING_OR_RUNNING;
 		for ( Agent agent : clusterMembersInShardOrder ) {
-			EventProcessingState state = agent.getState();
+			AgentState state = agent.getState();
 			if ( !expectedStates.contains( agent.getState() ) ) {
 				log.tracef( "Agent '%s': waiting for agent '%s', whose state %s is not in the expected %s yet",
 						selfReference(), agent.getReference(), state, expectedStates );

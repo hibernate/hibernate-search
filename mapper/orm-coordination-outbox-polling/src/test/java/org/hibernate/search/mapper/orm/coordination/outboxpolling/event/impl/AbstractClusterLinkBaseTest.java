@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.EventProcessingState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
 import org.junit.Before;
@@ -52,7 +52,7 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 		defineSelfNotCreatedYet( link );
 	}
 
-	protected void defineSelfCreatedAndStillPresent(EventProcessingState state,
+	protected void defineSelfCreatedAndStillPresent(AgentState state,
 			ShardAssignmentDescriptor shardAssignment) {
 		defineSelfCreatedAndStillPresent( link, state, shardAssignment );
 	}
@@ -63,7 +63,7 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 
 	protected final ClusterLinkPulseExpectations expectSuspendedAndPulseASAP() {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.SUSPENDED )
+				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment() )
 				.build();
 	}
@@ -74,7 +74,7 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 						// If self created before this pulse:
 						? repositoryMockHelper.selfInitialState()
 						// If self created by this pulse:
-						: EventProcessingState.SUSPENDED )
+						: AgentState.SUSPENDED )
 				.expiration( repositoryMockHelper.selfInitialExpiration() != null
 						// If self created before this pulse:
 						? repositoryMockHelper.selfInitialExpiration()
@@ -85,16 +85,16 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 				.build();
 	}
 
-	protected final ClusterLinkPulseExpectations expectRebalancing(ShardAssignmentDescriptor shardAssignment) {
+	protected final ClusterLinkPulseExpectations expectWaiting(ShardAssignmentDescriptor shardAssignment) {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
-				.agent( SELF_ID, EventProcessingState.REBALANCING )
+				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( shardAssignment )
 				.build();
 	}
 
 	protected final ClusterLinkPulseExpectations expectRunning(ShardAssignmentDescriptor shardAssignment) {
 		return expect().processThenPulse( shardAssignment )
-				.agent( SELF_ID, EventProcessingState.RUNNING )
+				.agent( SELF_ID, AgentState.RUNNING )
 				.shardAssignment( shardAssignment )
 				.build();
 	}
@@ -174,11 +174,11 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 	@Test
 	public void clusterWith4Nodes_someExpired() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.RUNNING,
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
-				.other( other2Id(), other2Type(), EARLIER, EventProcessingState.RUNNING,
+				.other( other2Id(), other2Type(), EARLIER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 2 ) )
-				.other( other3Id(), other3Type(), EARLIER, EventProcessingState.RUNNING,
+				.other( other3Id(), other3Type(), EARLIER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
@@ -190,78 +190,78 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 	}
 
 	@Test
-	public void clusterWith4Nodes_someSuspended_someRebalancing() {
+	public void clusterWith4Nodes_someSuspended_someWaiting() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.SUSPENDED,
+				.other( other2Id(), other2Type(), LATER, AgentState.SUSPENDED,
 						isOther2Static() ? otherShardAssignmentIn4NodeCluster( 2 ) : null )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		expectRebalancing( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
 	public void clusterWith4Nodes_someSuspended_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.RUNNING,
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.SUSPENDED,
+				.other( other2Id(), other2Type(), LATER, AgentState.SUSPENDED,
 						isOther2Static() ? otherShardAssignmentIn4NodeCluster( 2 ) : null )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.RUNNING,
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		expectRebalancing( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void clusterWith4Nodes_someRebalancing_someRunning() {
+	public void clusterWith4Nodes_someWaiting_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.RUNNING,
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 2 ) )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
 		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void clusterWith4Nodes_someSuspended_someRebalancing_someRunning() {
+	public void clusterWith4Nodes_someSuspended_someWaiting_someRunning() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.SUSPENDED,
+				.other( other1Id(), other1Type(), LATER, AgentState.SUSPENDED,
 						isOther1Static() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.RUNNING,
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 2 ) )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		expectRebalancing( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
 	public void clusterWith4Nodes_allSuspended() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.SUSPENDED,
+				.other( other1Id(), other1Type(), LATER, AgentState.SUSPENDED,
 						isOther1Static() ? otherShardAssignmentIn4NodeCluster( 1 ) : null )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.SUSPENDED,
+				.other( other2Id(), other2Type(), LATER, AgentState.SUSPENDED,
 						isOther2Static() ? otherShardAssignmentIn4NodeCluster( 2 ) : null )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.SUSPENDED,
+				.other( other3Id(), other3Type(), LATER, AgentState.SUSPENDED,
 						isOther3Static() ? otherShardAssignmentIn4NodeCluster( 3 ) : null );
 
-		expectRebalancing( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
 	}
 
 	@Test
-	public void clusterWith4Nodes_allRebalancing() {
+	public void clusterWith4Nodes_allWaiting() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other1Id(), other1Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other2Id(), other2Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 2 ) )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.REBALANCING,
+				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
 		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
@@ -270,11 +270,11 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 	@Test
 	public void clusterWith4Nodes_allRunning() {
 		repositoryMockHelper.defineOtherAgents()
-				.other( other1Id(), other1Type(), LATER, EventProcessingState.RUNNING,
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 1 ) )
-				.other( other2Id(), other2Type(), LATER, EventProcessingState.RUNNING,
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 2 ) )
-				.other( other3Id(), other3Type(), LATER, EventProcessingState.RUNNING,
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
 		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
