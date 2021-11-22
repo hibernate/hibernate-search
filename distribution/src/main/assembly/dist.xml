@@ -277,15 +277,15 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>org.hibernate.search:hibernate-search-mapper-orm-coordination-database-polling</include>
+                <include>org.hibernate.search:hibernate-search-mapper-orm-coordination-outbox-polling</include>
             </includes>
             <binaries>
-                <outputDirectory>dist/mapper/orm-coordination-database-polling</outputDirectory>
+                <outputDirectory>dist/mapper/orm-coordination-outbox-polling</outputDirectory>
                 <unpack>false</unpack>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/orm-coordination-database-polling/lib/required</outputDirectory>
+                        <outputDirectory>dist/mapper/orm-coordination-outbox-polling/lib/required</outputDirectory>
                         <scope>runtime</scope>
                         <useTransitiveDependencies>true</useTransitiveDependencies>
                         <useTransitiveFiltering>true</useTransitiveFiltering>

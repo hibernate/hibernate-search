@@ -42,7 +42,7 @@ This chain of events ends with the index containing a version of A where C is up
 The following solutions can help circumvent this limitation:
 
 1. Use a safer <<coordination,coordination strategy>>,
-e.g. the <<coordination-database-polling,database-polling coordination strategy>>.
+e.g. the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>.
 See in particular <<architecture-examples>>.
 2. OR avoid parallel updates to entities that are indexed-embedded in the same indexed entity.
 This is only possible in very specific setups.
@@ -83,7 +83,7 @@ ensuring that indexes are still in sync with the database.
 The following solutions can help circumvent this limitation:
 
 1. Use a safer <<coordination,coordination strategy>>,
-e.g. the <<coordination-database-polling,database-polling coordination strategy>>.
+e.g. the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>.
 See in particular <<architecture-examples>>.
 2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
@@ -93,7 +93,7 @@ to get the index back in sync with the database.
 
 This limitation is caused directly by the lack of persistence of entity change events,
 so it can only be addressed completely by persisting those events,
-e.g. by switching to the <<coordination-database-polling,database-polling coordination strategy>>.
+e.g. by switching to the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>.
 
 Some incomplete countermeasures may be considered in future versions,
 such as automatic in-thread retries,
@@ -182,7 +182,7 @@ or <<mapper-orm-indexing-manual,manually>>.
 Hibernate Search may handle asymmetric association updates in the future,
 by keeping tracks of entities added to / removed from an association.
 However, this will only solve the problem completely if indexing happens asynchronously in a background thread,
-such as with the <<coordination-database-polling,database-polling coordination strategy>>.
+such as with the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>.
 This is tracked as https://hibernate.atlassian.net/browse/HSEARCH-3567[HSEARCH-3567].
 
 Alternatively, sourcing entity change events directly from the database, using for example Debezium,

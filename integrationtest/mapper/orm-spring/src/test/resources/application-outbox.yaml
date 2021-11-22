@@ -1,4 +1,4 @@
 spring.jpa:
   properties:
     hibernate.search:
-      coordination.strategy: database-polling
+      coordination.strategy: outbox-polling

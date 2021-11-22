@@ -73,7 +73,7 @@ See <<search-dsl>> for details.
 |Architecture
 |<<architecture-examples-single-node-lucene,Single-node with Lucene>>
 |<<architecture-examples-no-coordination-elasticsearch,No coordination with Elasticsearch>>
-|<<architecture-examples-database-polling-elasticsearch,Database polling with Elasticsearch>>
+|<<architecture-examples-outbox-polling-elasticsearch,Outbox polling with Elasticsearch>>
 
 |Application topology
 |Single-node
@@ -85,12 +85,12 @@ See <<search-dsl>> for details.
 
 |Guarantee of index updates
 2+|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
-|<<coordination-database-polling-indexing-guarantee,On commit (transactional)>>
+|<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
 
 |Visibility of index updates
 |<<coordination-none-indexing-visibility,Configurable: immediate or eventual>>
 |<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
-|<<coordination-database-polling-indexing-visibility,Eventual>>
+|<<coordination-outbox-polling-indexing-visibility,Eventual>>
 
 |Native features
 |Mostly for experts
@@ -98,15 +98,15 @@ See <<search-dsl>> for details.
 
 |Overhead for application threads
 2+|<<coordination-none-indexing-on-flush,Low to medium>>
-|<<coordination-database-polling-indexing-background,Very low>>
+|<<coordination-outbox-polling-indexing-background,Very low>>
 
 |Overhead for the database
 2+|<<coordination-none-indexing-lazy-loading,Low>>
-|<<coordination-database-polling-indexing-full-loading,Low to medium>>
+|<<coordination-outbox-polling-indexing-full-loading,Low to medium>>
 
 |Impact on database schema
 2+|None
-|<<coordination-database-polling-schema,Extra tables>>
+|<<coordination-outbox-polling-schema,Extra tables>>
 
 .2+|Limitations
 3+|Automatic indexing ignores: <<limitations-changes-in-session,JPQL/SQL queries>>, <<limitations-changes-asymmetric-association-updates,asymmetric association updates>>
@@ -239,41 +239,41 @@ To implement this architecture, use the following Maven dependencies:
 </dependency>
 ----
 
-[[architecture-examples-database-polling-elasticsearch]]
-=== [[_elasticsearch]] Multi-node application with database polling and Elasticsearch backend
+[[architecture-examples-outbox-polling-elasticsearch]]
+=== [[_elasticsearch]] Multi-node application with outbox polling and Elasticsearch backend
 
-[[architecture-examples-database-polling-elasticsearch-description]]
-==== Description
+[[architecture-examples-outbox-polling-elasticsearch-description]]
+==== [[architecture-examples-database-polling-elasticsearch-description]] Description
 
-With Hibernate Search's <<coordination-database-polling,`database-polling` coordination strategy>>,
+With Hibernate Search's <<coordination-outbox-polling,`outbox-polling` coordination strategy>>,
 entity change events are not processed immediately in the ORM session where they arise,
-but are pushed to a database table.
+but are pushed to an outbox table in the database.
 
-A background process polls that table for new events,
+A background process polls that outbox table for new events,
 and processes them asynchronously,
 updating the indexes as necessary.
-Since that queue <<coordination-database-polling-sharding,can be sharded>>,
+Since that queue <<coordination-outbox-polling-sharding,can be sharded>>,
 multiple application nodes can share the workload of indexing.
 
 This requires the <<backend-elasticsearch,Elasticsearch backend>>
 so that indexes are not tied to a single application node
 and can be updated or queried from multiple application nodes.
 
-image::architecture-database-polling-elasticsearch.png[Clustered architecture with database polling and Elasticsearch backend,align="center"]
+image::architecture-outbox-polling-elasticsearch.png[Clustered architecture with outbox polling and Elasticsearch backend,align="center"]
 
-[[architecture-examples-database-polling-elasticsearch-pros-and-cons]]
-==== Pros and cons
+[[architecture-examples-outbox-polling-elasticsearch-pros-and-cons]]
+==== [[architecture-examples-database-polling-elasticsearch-pros-and-cons]] Pros and cons
 
 Pros:
 
 * Safest:
 ** the possibility of out-of-sync indexes caused by <<limitations-backend-indexing-error,indexing errors in the backend>>
 that affects other architectures is eliminated here,
-because entity change events <<coordination-database-polling-indexing-guarantee,are persisted in the same transaction as the entity changes>>
+because entity change events <<coordination-outbox-polling-indexing-guarantee,are persisted in the same transaction as the entity changes>>
 allowing retries for as long as necessary.
 ** the possibility of out-of-sync indexes caused by <<limitations-parallel-embedded-update,concurrent updates>>
 that affects other architectures is eliminated here,
-because <<coordination-database-polling-indexing-full-loading,each entity instance is reloaded from the database within a new transaction>>
+because <<coordination-outbox-polling-indexing-full-loading,each entity instance is reloaded from the database within a new transaction>>
 before being reindexed.
 * Easy to extend: you can easily access most Elasticsearch features,
 even those that are not exposed by Hibernate Search, by providing your own JSON.
@@ -281,7 +281,7 @@ See for example <<search-dsl-predicate-extensions-elasticsearch-from-json,JSON-d
 or <<search-dsl-aggregation-extensions-elasticsearch-from-json,JSON-defined aggregations>>,
 or <<search-dsl-query-elasticsearch-json,leveraging advanced features with JSON manipulation>>.
 * Minimal overhead for application threads:
-application threads <<coordination-database-polling-indexing-background,only need to append events to the queue>>,
+application threads <<coordination-outbox-polling-indexing-background,only need to append events to the queue>>,
 they don't perform reindexing themselves.
 * Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
 See link:{elasticsearchDocUrl}/scalability.html["Scalability and resilience" in the Elasticsearch documentation].
@@ -292,16 +292,16 @@ Cons:
 * Need to manage an additional service: the Elasticsearch cluster.
 * Delayed visibility (~1 second or more, depending on load and hardware) of index updates.
 First because Elasticsearch is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] by nature,
-but also because <<coordination-database-polling-indexing-visibility,the event queue introduces additional delays>>.
-* Impact on the database schema: <<coordination-database-polling-schema,additional tables must be created in the database>>
+but also because <<coordination-outbox-polling-indexing-visibility,the event queue introduces additional delays>>.
+* Impact on the database schema: <<coordination-outbox-polling-schema,additional tables must be created in the database>>
 to hold the data necessary for coordination.
 * Overhead for the database: the background process that reads entity changes and performs reindexing
-<<coordination-database-polling-indexing-full-loading,needs to read changed entities from the database>>.
+<<coordination-outbox-polling-indexing-full-loading,needs to read changed entities from the database>>.
 
-[[architecture-examples-database-polling-elasticsearch-getting-started]]
-==== Getting started
+[[architecture-examples-outbox-polling-elasticsearch-getting-started]]
+==== [[architecture-examples-database-polling-elasticsearch-getting-started]] Getting started
 
-The database polling coordination strategy requires an extra dependency.
+The `outbox-polling` coordination strategy requires an extra dependency.
 To implement this architecture, use the following Maven dependencies:
 
 [source, XML, subs="+attributes"]
@@ -313,7 +313,7 @@ To implement this architecture, use the following Maven dependencies:
 </dependency>
 <dependency>
    <groupId>org.hibernate.search</groupId>
-   <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+   <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
@@ -323,4 +323,4 @@ To implement this architecture, use the following Maven dependencies:
 </dependency>
 ----
 
-Also, configure coordination as explained in <<coordination-database-polling>>.
+Also, configure coordination as explained in <<coordination-outbox-polling>>.

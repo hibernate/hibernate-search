@@ -21,7 +21,7 @@ public final class CoordinationStrategyExpectations {
 	}
 
 	public static CoordinationStrategyExpectations outboxPolling() {
-		return async( "database-polling", ".*Outbox event processor.*" );
+		return async( "outbox-polling", ".*Outbox event processor.*" );
 	}
 
 	private static CoordinationStrategyExpectations async(String strategyName, String threadNamePattern) {

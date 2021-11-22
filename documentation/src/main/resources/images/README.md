@@ -13,7 +13,7 @@ these files were generated from a single source file with multiple layers,
 https://docs.google.com/drawings/d/1jrS3gjbCglHhuPSolFX15cr0RzKsZdf2YCQRU8AeSAE/edit?usp=sharing
 * `architecture-simple-elasticsearch.png`, `architecture-simple-elasticsearch.svg`:
 https://docs.google.com/drawings/d/1pzuJrEqsqMxi67MRamJ1NBm-7qszGbAs0Lfr1ddsTdI/edit?usp=sharing
-* `architecture-database-polling-elasticsearch.png`, `architecture-database-polling-elasticsearch.svg`:
+* `architecture-outbox-polling-elasticsearch.png`, `architecture-outbox-polling-elasticsearch.svg`:
 https://docs.google.com/drawings/d/1QvIt0d0xjCFflPxguIQJZGnWH5TbKGHhVjIEqycOA9k/edit?usp=sharing
 
 ## Software to open source files

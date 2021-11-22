@@ -50,7 +50,7 @@ this pattern will work as expected:
 
 * <<coordination-none,with coordination disabled>> (the default),
 documents will be built on flushes, and sent to the index upon transaction commit.
-* <<coordination-database-polling,with database-polling coordination>>,
+* <<coordination-outbox-polling,with outbox-polling coordination>>,
 entity change events will be persisted on flushes, and committed along with the rest of the changes upon transaction commit.
 
 However, each `flush` call will potentially add data to an internal buffer,

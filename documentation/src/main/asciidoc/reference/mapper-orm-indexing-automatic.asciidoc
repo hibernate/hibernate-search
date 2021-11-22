@@ -21,7 +21,7 @@ Follow the links for more details.
 |===
 |Coordination strategy
 |<<coordination-none,No coordination>> (default)
-|<<coordination-database-polling,Database-polling>>
+|<<coordination-outbox-polling,Outbox polling>>
 
 |Detects changes occurring in ORM sessions (`session.persist(...)`, `session.delete(...)`, setters, ...)
 2+|<<mapper-orm-indexing-automatic-concepts-changes-in-session,Yes>>
@@ -37,19 +37,19 @@ Follow the links for more details.
 
 |Guarantee of indexes updates
 |<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
-|<<coordination-database-polling-indexing-guarantee,On commit (transactional)>>
+|<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
 
 |Visibility of index updates
 |<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
-|<<coordination-database-polling-indexing-visibility,Eventual>>
+|<<coordination-outbox-polling-indexing-visibility,Eventual>>
 
 |Overhead for application threads
 |<<coordination-none-indexing-on-flush,Low to medium>>
-|<<coordination-database-polling-indexing-background,Very low>>
+|<<coordination-outbox-polling-indexing-background,Very low>>
 
 |Overhead for the database
 |<<coordination-none-indexing-lazy-loading,Low>>
-|<<coordination-database-polling-indexing-full-loading,Low to medium>>
+|<<coordination-outbox-polling-indexing-full-loading,Low to medium>>
 |===
 
 [[mapper-orm-indexing-automatic-configuration]]
@@ -101,7 +101,7 @@ include::components/writing-reading-intro-note.asciidoc[]
 ====
 Indexing synchronization is only relevant when <<coordination-none,coordination is disabled>>.
 
-With coordination strategies such as <<coordination-database-polling,`database-polling`>>,
+With coordination strategies such as <<coordination-outbox-polling,`outbox-polling`>>,
 indexing happens in background threads and is always asynchronous.
 ====
 
