@@ -569,8 +569,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	 * Until HSEARCH-3567 is fixed (and maybe even after),
 	 * this can only work if
 	 * the contained side of the association is already loaded before the contained entity is deleted,
-	 * and the contained side of the association is not explicitly updated,
-	 * and the containing side of the association is lazy and is not yet loaded
+	 * and the contained side of the association is not explicitly updated
 	 * before the contained entity is deleted.
 	 */
 	@Test
@@ -604,6 +603,65 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 		setupHolder.runInTransaction( session -> {
 			TContained containedEntity = session.get( primitives.getContainedClass(), 2 );
+
+			// Do NOT update the association on either side; that's on purpose.
+			// But DO force loading on contained side:
+			// if the association is lazy and unloaded, it won't be loadable after the deletion
+			// and the deletion even will simply be ignored.
+			primitives.containingAsIndexedEmbedded().get( containedEntity );
+
+			session.delete( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> { } );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that deleting a contained entity
+	 * is enough to trigger reindexing of the indexed entity,
+	 * even if we don't update the containing side of the association.
+	 * <p>
+	 * Until HSEARCH-3567 is fixed (and maybe even after),
+	 * this can only work if
+	 * the contained side of the association is already loaded before the contained entity is deleted,
+	 * and the contained side of the association is not explicitly updated
+	 * before the contained entity is deleted.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4365")
+	public final void directImplicitAssociationUpdateThroughDeleteWithAlreadyLoadedAssociation_indexedEmbedded() {
+		assumeTrue( "This test only makes sense if the association is owned by the contained side;" +
+						" if the association is owned by the containing side," +
+						" deleting a contained entity requires updating the association to avoid violating foreign key constraints.",
+				primitives.isAssociationOwnedByContainedSide() );
+
+		setupHolder.runInTransaction( session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			session.persist( entity1 );
+			session.persist( containedEntity );
+
+			primitives.containedIndexedEmbedded().set( entity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "containedIndexedEmbedded", b2 -> b2
+									.field( "indexedField", "initialValue" )
+							) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+			// Make sure we initialize the association from indexed to contained;
+			// the magic is in the fact that Hibernate doesn't index the contained entity
+			// even though it's referenced by the Java representation of the association.
+			TContained containedEntity = primitives.containedIndexedEmbedded().get( entity1 );
 
 			// Do NOT update the association on either side; that's on purpose.
 			// But DO force loading on contained side:
@@ -1161,6 +1219,64 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 		setupHolder.runInTransaction( session -> {
 			TContained containedEntity = session.get( primitives.getContainedClass(), 2 );
+
+			// Do NOT update the association on either side; that's on purpose.
+			// But DO force loading on contained side:
+			// if the association is lazy and unloaded, it won't be loadable after the deletion
+			// and the deletion even will simply be ignored.
+			primitives.containingAsIndexedEmbedded().get( containedEntity );
+
+			session.delete( containedEntity );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.addOrUpdate( "1", b -> b
+							.objectField( "child", b2 -> { } ) );
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Same as {@link #directImplicitAssociationUpdateThroughDeleteWithAlreadyLoadedAssociation_indexedEmbedded()},
+	 * but with an additional association: indexedEntity -> containingEntity -> containedEntity.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4365")
+	public final void indirectImplicitAssociationUpdateThroughDeleteWithAlreadyLoadedAssociation_indexedEmbedded() {
+		assumeTrue( "This test only makes sense if the association is owned by the contained side;" +
+						" if the association is owned by the containing side," +
+						" deleting a contained entity requires updating the association to avoid violating foreign key constraints.",
+				primitives.isAssociationOwnedByContainedSide() );
+
+		setupHolder.runInTransaction( session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.child().set( entity1, containingEntity1 );
+			primitives.parent().set( containingEntity1, entity1 );
+			TContained containedEntity = primitives.newContained( 2 );
+			primitives.indexedField().set( containedEntity, "initialValue" );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+			session.persist( containedEntity );
+
+			primitives.containedIndexedEmbedded().set( containingEntity1, containedEntity );
+			primitives.containingAsIndexedEmbedded().set( containedEntity, containingEntity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									) ) );
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			TContaining containing = session.get( primitives.getContainingClass(), 2 );
+			// Make sure we initialize the association from containing to contained;
+			// the magic is in the fact that Hibernate doesn't index the contained entity
+			// even though it's referenced by the Java representation of the association.
+			TContained containedEntity = primitives.containedIndexedEmbedded().get( containing );
 
 			// Do NOT update the association on either side; that's on purpose.
 			// But DO force loading on contained side:
