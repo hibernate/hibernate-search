@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -43,10 +43,10 @@ public class PojoIndexingProcessorMultiNode<T> extends PojoIndexingProcessor<T> 
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
+	public final void process(DocumentElement target, T source, PojoIndexingProcessorRootContext context) {
 		for ( PojoIndexingProcessor<? super T> element : elements ) {
 			// Recursion here
-			element.process( target, source, sessionContext );
+			element.process( target, source, context );
 		}
 	}
 

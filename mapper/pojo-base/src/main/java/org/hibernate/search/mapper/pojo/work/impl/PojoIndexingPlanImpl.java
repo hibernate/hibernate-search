@@ -23,13 +23,17 @@ import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanProvider, PojoReindexingCollector {
+public class PojoIndexingPlanImpl
+		implements PojoIndexingPlan, PojoLoadingPlanProvider, PojoReindexingCollector,
+				PojoIndexingProcessorRootContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -188,6 +192,11 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 
+	@Override
+	public PojoIndexingProcessorSessionContext sessionContext() {
+		return sessionContext;
+	}
+
 	private PojoRuntimeIntrospector getIntrospector() {
 		return introspector;
 	}
@@ -257,7 +266,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 	}
 
 	private <I, E> PojoIndexedTypeIndexingPlan<I, E> createDelegate(PojoWorkIndexedTypeContext<I, E> typeContext) {
-		return strategy.createDelegate( typeContext, sessionContext );
+		return strategy.createDelegate( typeContext, sessionContext, this );
 	}
 
 	private PojoContainedTypeIndexingPlan<?, ?> createDelegate(PojoWorkContainedTypeContext<?, ?> typeContext) {

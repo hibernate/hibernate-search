@@ -15,11 +15,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-public class PojoTypeIndexer<I, E> {
+public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 
 	private final PojoWorkSessionContext sessionContext;
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
@@ -31,6 +33,11 @@ public class PojoTypeIndexer<I, E> {
 		this.sessionContext = sessionContext;
 		this.typeContext = typeContext;
 		this.delegate = delegate;
+	}
+
+	@Override
+	public PojoIndexingProcessorSessionContext sessionContext() {
+		return sessionContext;
 	}
 
 	CompletableFuture<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
@@ -51,7 +58,7 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				currentRoute.routingKey(), identifier );
 		return delegate.add( referenceProvider,
-				typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ),
+				typeContext.toDocumentContributor( sessionContext, this, identifier, entitySupplier ),
 				commitStrategy, refreshStrategy );
 	}
 
@@ -81,7 +88,7 @@ public class PojoTypeIndexer<I, E> {
 		// and we don't care about relative order of works on different indexes/shards.
 		return deletePreviousFuture.thenCombine(
 				delegate.addOrUpdate( referenceProvider,
-						typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ),
+						typeContext.toDocumentContributor( sessionContext, this, identifier, entitySupplier ),
 						commitStrategy, refreshStrategy ),
 				(deletePreviousResult, updateResult) -> updateResult );
 	}

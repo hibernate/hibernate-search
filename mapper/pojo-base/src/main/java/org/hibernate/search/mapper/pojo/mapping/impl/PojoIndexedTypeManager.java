@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
@@ -85,9 +86,11 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	}
 
 	@Override
-	public PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext, I identifier,
-			Supplier<E> entitySupplier) {
-		return new PojoDocumentContributor<>( entityName, processor, sessionContext, identifier, entitySupplier );
+	public PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext,
+			PojoIndexingProcessorRootContext processorContext,
+			I identifier, Supplier<E> entitySupplier) {
+		return new PojoDocumentContributor<>( entityName, processor, sessionContext, processorContext,
+				identifier, entitySupplier );
 	}
 
 	@Override

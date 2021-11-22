@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -27,15 +28,18 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 	private final PojoIndexingProcessor<E> processor;
 
 	private final PojoWorkSessionContext sessionContext;
+	private final PojoIndexingProcessorRootContext processorContext;
 
 	private final Object identifier;
 	private final Supplier<E> entitySupplier;
 
 	public PojoDocumentContributor(String entityName, PojoIndexingProcessor<E> processor,
-			PojoWorkSessionContext sessionContext, Object identifier, Supplier<E> entitySupplier) {
+			PojoWorkSessionContext sessionContext, PojoIndexingProcessorRootContext processorContext,
+			Object identifier, Supplier<E> entitySupplier) {
 		this.entityName = entityName;
 		this.processor = processor;
 		this.sessionContext = sessionContext;
+		this.processorContext = processorContext;
 		this.identifier = identifier;
 		this.entitySupplier = entitySupplier;
 	}
@@ -43,7 +47,7 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 	@Override
 	public void contribute(DocumentElement state) {
 		try {
-			processor.process( state, entitySupplier.get(), sessionContext );
+			processor.process( state, entitySupplier.get(), processorContext );
 		}
 		catch (RuntimeException e) {
 			EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();

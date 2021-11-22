@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
@@ -43,16 +43,16 @@ public class PojoIndexingProcessorOriginalTypeNode<T> extends PojoIndexingProces
 
 	@Override
 	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
-	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
+	public final void process(DocumentElement target, T source, PojoIndexingProcessorRootContext context) {
 		if ( source == null ) {
 			return;
 		}
-		source = (T) sessionContext.runtimeIntrospector().unproxy( source );
+		source = (T) context.sessionContext().runtimeIntrospector().unproxy( source );
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );
 		}
-		nested.process( parentObject, source, sessionContext );
+		nested.process( parentObject, source, context );
 	}
 
 }

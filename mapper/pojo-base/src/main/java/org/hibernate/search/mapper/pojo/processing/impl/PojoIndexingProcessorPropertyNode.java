@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -57,10 +57,10 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
+	public final void process(DocumentElement target, T source, PojoIndexingProcessorRootContext context) {
 		try {
 			P propertyValue = handle.get( source );
-			nested.process( target, propertyValue, sessionContext );
+			nested.process( target, propertyValue, context );
 		}
 		catch (SearchProcessingWithContextException e) {
 			// The context was already added to the exception, just re-throw:

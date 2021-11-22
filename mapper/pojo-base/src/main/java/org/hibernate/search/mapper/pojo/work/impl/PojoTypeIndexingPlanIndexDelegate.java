@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -30,12 +31,15 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
 	private final PojoWorkSessionContext sessionContext;
+	private final PojoIndexingProcessorRootContext processorContext;
 	private final IndexIndexingPlan indexPlan;
 
 	PojoTypeIndexingPlanIndexDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext, IndexIndexingPlan indexPlan) {
+			PojoWorkSessionContext sessionContext, PojoIndexingProcessorRootContext processorContext,
+			IndexIndexingPlan indexPlan) {
 		this.typeContext = typeContext;
 		this.sessionContext = sessionContext;
+		this.processorContext = processorContext;
 		this.indexPlan = indexPlan;
 	}
 
@@ -55,7 +59,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				route.routingKey(), identifier );
 		indexPlan.add( referenceProvider,
-				typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
+				typeContext.toDocumentContributor( sessionContext, processorContext, identifier, entitySupplier ) );
 	}
 
 	@Override
@@ -73,7 +77,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				routes.currentRoute().routingKey(), identifier );
 		indexPlan.addOrUpdate( referenceProvider,
-				typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
+				typeContext.toDocumentContributor( sessionContext, processorContext, identifier, entitySupplier ) );
 	}
 
 	@Override

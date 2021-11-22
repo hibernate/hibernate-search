@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
@@ -51,18 +51,18 @@ public class PojoIndexingProcessorCastedTypeNode<T, U> extends PojoIndexingProce
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
+	public final void process(DocumentElement target, T source, PojoIndexingProcessorRootContext context) {
 		if ( source == null ) {
 			return;
 		}
 		// The caster can only cast to the raw type, beyond that we have to use an unchecked cast.
 		@SuppressWarnings("unchecked")
-		U castedSource = (U) caster.cast( sessionContext.runtimeIntrospector().unproxy( source ) );
+		U castedSource = (U) caster.cast( context.sessionContext().runtimeIntrospector().unproxy( source ) );
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );
 		}
-		nested.process( parentObject, castedSource, sessionContext );
+		nested.process( parentObject, castedSource, context );
 	}
 
 }

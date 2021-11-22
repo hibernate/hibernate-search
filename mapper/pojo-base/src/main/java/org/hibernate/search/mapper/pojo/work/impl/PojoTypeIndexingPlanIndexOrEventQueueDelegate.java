@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
@@ -35,10 +36,11 @@ final class PojoTypeIndexingPlanIndexOrEventQueueDelegate<I, E> implements PojoT
 	private final PojoTypeIndexingPlanEventQueueDelegate<I, E> eventQueueDelegate;
 
 	PojoTypeIndexingPlanIndexOrEventQueueDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext,
+			PojoWorkSessionContext sessionContext, PojoIndexingProcessorRootContext processorRootContext,
 			IndexIndexingPlan indexPlan, PojoIndexingQueueEventSendingPlan sendingPlan) {
 		this.typeContext = typeContext;
-		this.indexDelegate = new PojoTypeIndexingPlanIndexDelegate<>( typeContext, sessionContext, indexPlan );
+		this.indexDelegate = new PojoTypeIndexingPlanIndexDelegate<>( typeContext, sessionContext, processorRootContext,
+				indexPlan );
 		this.eventQueueDelegate = new PojoTypeIndexingPlanEventQueueDelegate<>( typeContext, sessionContext, sendingPlan );
 	}
 
