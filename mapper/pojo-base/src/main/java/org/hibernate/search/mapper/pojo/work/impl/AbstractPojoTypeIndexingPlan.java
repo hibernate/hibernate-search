@@ -93,22 +93,17 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		delegate.discard();
 	}
 
-	void discardNotProcessed() {
+	void clearStates() {
 		this.statesPerId.clear();
 	}
 
 	void process(PojoLoadingPlanProvider loadingPlanProvider) {
-		try {
-			if ( delegate == null ) {
-				// Can happen with contained types depending on the strategy.
-				return;
-			}
-			for ( S state : statesPerId.values() ) {
-				state.sendCommandsToDelegate( loadingPlanProvider );
-			}
+		if ( delegate == null ) {
+			// Can happen with contained types depending on the strategy.
+			return;
 		}
-		finally {
-			statesPerId.clear();
+		for ( S state : statesPerId.values() ) {
+			state.sendCommandsToDelegate( loadingPlanProvider );
 		}
 	}
 

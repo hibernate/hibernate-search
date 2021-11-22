@@ -142,6 +142,7 @@ public class PojoIndexingPlanImpl
 			isProcessing = false;
 			mayRequireLoading = false;
 			loadingPlan = null;
+			clearStates();
 		}
 	}
 
@@ -169,8 +170,15 @@ public class PojoIndexingPlanImpl
 
 	@Override
 	public void discardNotProcessed() {
+		clearStates();
+	}
+
+	private void clearStates() {
 		for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
-			delegate.discardNotProcessed();
+			delegate.clearStates();
+		}
+		for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
+			delegate.clearStates();
 		}
 	}
 
