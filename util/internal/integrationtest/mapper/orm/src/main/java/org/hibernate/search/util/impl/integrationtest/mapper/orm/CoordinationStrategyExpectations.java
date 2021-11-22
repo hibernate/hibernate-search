@@ -16,12 +16,17 @@ public final class CoordinationStrategyExpectations {
 	}
 
 	public static CoordinationStrategyExpectations outboxPolling() {
-		return async( "outbox-polling", ".*Outbox event processor.*" );
+		return new CoordinationStrategyExpectations( "outbox-polling", false,
+				BackendIndexingWorkExpectations.async( ".*Outbox event processor.*",
+						StubDocumentWork.Type.ADD_OR_UPDATE ) );
 	}
 
-	private static CoordinationStrategyExpectations async(String strategyName, String threadNamePattern) {
-		return new CoordinationStrategyExpectations( strategyName, false,
-				BackendIndexingWorkExpectations.async( threadNamePattern, StubDocumentWork.Type.ADD_OR_UPDATE ) );
+	public static CoordinationStrategyExpectations outboxPollingAndMassIndexing() {
+		return new CoordinationStrategyExpectations( "outbox-polling", false,
+				BackendIndexingWorkExpectations.async( ".*Outbox event processor.*|Hibernate Search - Mass indexing.*",
+						// We expect the test to take into account that event processors always
+						// issue "add-or-update" works, never "add" work; but the mass indexer does.
+						StubDocumentWork.Type.ADD ) );
 	}
 
 	final String strategyName;
