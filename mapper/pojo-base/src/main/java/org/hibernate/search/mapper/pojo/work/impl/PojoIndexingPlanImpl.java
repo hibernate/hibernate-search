@@ -165,6 +165,7 @@ public class PojoIndexingPlanImpl
 		}
 		finally {
 			indexedTypeDelegates.clear();
+			containedTypeDelegates.clear();
 		}
 	}
 
