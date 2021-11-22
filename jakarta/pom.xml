@@ -24,7 +24,7 @@
         <module>parents/public</module>
         <module>parents/internal</module>
         <module>mapper/orm</module>
-        <module>mapper/orm-coordination-database-polling</module>
+        <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>
         <module>mapper/orm-batch-jsr352/jberet</module>
         <module>v5migrationhelper/orm</module>

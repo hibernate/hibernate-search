@@ -29,7 +29,7 @@ import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.coordination.databasepolling.event.impl.OutboxEvent;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -80,7 +80,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	public void indexingStrategyOutbox() throws Throwable {
 		synchronizationAsync = true;
 		sessionFactory = setupHelper.start()
-				.withProperty( "hibernate.search.coordination.strategy", "database-polling" )
+				.withProperty( "hibernate.search.coordination.strategy", "outbox-polling" )
 				.setup( Book.class, Author.class, BookEdition.class );
 
 		reproducer();

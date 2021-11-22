@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-orm-coordination-database-polling</artifactId>
+            <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling</artifactId>
         </dependency>
 
         <dependency>
