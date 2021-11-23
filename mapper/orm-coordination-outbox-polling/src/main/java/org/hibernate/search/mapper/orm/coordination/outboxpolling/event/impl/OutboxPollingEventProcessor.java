@@ -47,6 +47,7 @@ public final class OutboxPollingEventProcessor {
 	private final OutboxPollingEventProcessorClusterLink clusterLink;
 	private final TransactionHelper transactionHelper;
 	private final FailureHandler failureHandler;
+	private final Worker worker;
 	private final SingletonTask processingTask;
 
 	public OutboxPollingEventProcessor(String name,
@@ -65,9 +66,10 @@ public final class OutboxPollingEventProcessor {
 
 		transactionHelper = new TransactionHelper( mapping.sessionFactory() );
 		failureHandler = mapping.failureHandler();
+		this.worker = new Worker();
 		processingTask = new SingletonTask(
 				name,
-				new Worker(),
+				worker,
 				new Scheduler( executor ),
 				failureHandler
 		);
@@ -113,9 +115,12 @@ public final class OutboxPollingEventProcessor {
 	private class Worker implements SingletonTask.Worker {
 
 		private AgentInstructions agentInstructions;
+		private volatile boolean lastExecutionProcessedEvents;
 
 		@Override
 		public CompletableFuture<?> work() {
+			lastExecutionProcessedEvents = false;
+
 			if ( mapping.sessionFactory().isClosed() ) {
 				// Work around HHH-14541, which is not currently fixed in ORM 5.4.
 				// Even if a fix gets backported, the bug will still be present in older 5.4 versions,
@@ -153,9 +158,11 @@ public final class OutboxPollingEventProcessor {
 					}
 
 					// There are events to process
+					lastExecutionProcessedEvents = true;
 					// Make sure we will process the next batch ASAP
-					// Since the worker is already working,
-					// calling ensureScheduled() will lead to immediate re-execution right after we're done
+					// Since we set lastExecutionProcessedEvents to true,
+					// calling ensureScheduled() will lead to immediate re-execution right after we're done.
+					// See the Scheduler class below.
 					ensureScheduled();
 
 					log.tracef( "Processing %d outbox events for '%s': '%s'", events.size(), name, events );
@@ -213,7 +220,15 @@ public final class OutboxPollingEventProcessor {
 
 		@Override
 		public Future<?> schedule(Runnable runnable) {
-			return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
+			if ( worker.lastExecutionProcessedEvents ) {
+				// As long as there are more events to process, re-execute the worker continuously.
+				return delegate.submit( runnable );
+			}
+			else {
+				// When no events can be found, or cluster instructions tell us to wait,
+				// re-execute the worker after the polling interval.
+				return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
+			}
 		}
 	}
 }
