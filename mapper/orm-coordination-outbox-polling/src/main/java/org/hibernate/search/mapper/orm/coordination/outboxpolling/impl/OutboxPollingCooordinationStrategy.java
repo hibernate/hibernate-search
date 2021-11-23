@@ -219,7 +219,7 @@ public class OutboxPollingCooordinationStrategy implements CooordinationStrategy
 					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
 			OutboxPollingEventProcessorClusterLink clusterLink = new OutboxPollingEventProcessorClusterLink(
 					agentName, context.mapping().failureHandler(), Clock.systemUTC(),
-					finderProvider, pulseInterval, pulseExpiration, shardAssignmentOrNull );
+					finderProvider, pollingIntervalAsDuration, pulseInterval, pulseExpiration, shardAssignmentOrNull );
 
 			OutboxPollingEventProcessor processor = new OutboxPollingEventProcessor(
 					agentName, context.mapping(), scheduledExecutor, agentRepositoryProviderHolder.get(), clusterLink,

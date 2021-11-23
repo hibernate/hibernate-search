@@ -22,6 +22,10 @@ final class AgentInstructions {
 	}
 
 	boolean isStillValid() {
-		return clock.instant().isBefore( expiration );
+		return timeInMillisecondsToExpiration() > 0;
+	}
+
+	long timeInMillisecondsToExpiration() {
+		return Math.max( 0L, expiration.toEpochMilli() - clock.millis() );
 	}
 }

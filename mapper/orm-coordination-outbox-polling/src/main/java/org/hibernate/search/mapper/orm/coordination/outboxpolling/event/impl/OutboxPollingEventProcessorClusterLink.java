@@ -40,6 +40,7 @@ public final class OutboxPollingEventProcessorClusterLink {
 	private final FailureHandler failureHandler;
 	private final Clock clock;
 	private final OutboxEventFinderProvider finderProvider;
+	private final Duration pollingInterval;
 	private final Duration pulseInterval;
 	private final Duration pulseExpiration;
 
@@ -50,12 +51,13 @@ public final class OutboxPollingEventProcessorClusterLink {
 
 	public OutboxPollingEventProcessorClusterLink(String agentName,
 			FailureHandler failureHandler, Clock clock, OutboxEventFinderProvider finderProvider,
-			Duration pulseInterval, Duration pulseExpiration,
+			Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
 			ShardAssignmentDescriptor staticShardAssignment) {
 		this.agentName = agentName;
 		this.failureHandler = failureHandler;
 		this.clock = clock;
 		this.finderProvider = finderProvider;
+		this.pollingInterval = pollingInterval;
 		this.pulseInterval = pulseInterval;
 		this.pulseExpiration = pulseExpiration;
 
@@ -323,22 +325,26 @@ public final class OutboxPollingEventProcessorClusterLink {
 	}
 
 	private AgentInstructions instructCommitAndRetryPulseASAP(Instant now) {
-		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse as soon as possible",
-				selfReference );
-		return new AgentInstructions( clock, now, Optional.empty() );
+		Instant expiration = now.plus( pollingInterval );
+		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
+				selfReference, pollingInterval, expiration );
+		// "As soon as possible" still means we wait for a polling interval,
+		// to avoid polling the database continuously.
+		return new AgentInstructions( clock, expiration, Optional.empty() );
 	}
 
 	private AgentInstructions instructCommitAndRetryPulseAfterInterval(Instant now) {
-		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s",
-				selfReference, pulseInterval );
-		return new AgentInstructions( clock, now.plus( pulseInterval ), Optional.empty() );
+		Instant expiration = now.plus( pulseInterval );
+		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
+				selfReference, pulseInterval, expiration );
+		return new AgentInstructions( clock, expiration, Optional.empty() );
 	}
 
 	private AgentInstructions instructProceedWithEventProcessing(Instant now) {
-		log.tracef( "Agent '%s': instructions are to process events and to retry a pulse in %s",
-				selfReference, pulseInterval );
-		return new AgentInstructions( clock, now.plus( pulseInterval ),
-				Optional.of( lastShardAssignment.eventFinder ) );
+		Instant expiration = now.plus( pulseInterval );
+		log.tracef( "Agent '%s': instructions are to process events and to retry a pulse in %s, around %s",
+				selfReference, pulseInterval, expiration );
+		return new AgentInstructions( clock, expiration, Optional.of( lastShardAssignment.eventFinder ) );
 	}
 
 }
