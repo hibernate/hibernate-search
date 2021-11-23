@@ -31,6 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFa
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.ListAssert;
 
 public class PerSessionFactoryIndexingCountHelper {
@@ -96,17 +97,26 @@ public class PerSessionFactoryIndexingCountHelper {
 				.as( "Count of indexing operations across all session factories" );
 	}
 
+	public int indexingCountForSessionFactory(int i) {
+		log.debugf( "Count of indexing operations for session factory %d: %s", i, i );
+		return counters.get( counterKeys.get( i ) );
+	}
+
+	public List<Integer> indexingCountForEachSessionFactory() {
+		List<Integer> counts = counterKeys.stream().map( counters::get ).collect( Collectors.toList() );
+		log.debugf( "Count of indexing operations for each session factory: %s", counts );
+		return counts;
+	}
+
 	public AbstractIntegerAssert<?> assertIndexingCountForSessionFactory(int i) {
-		int count = counters.get( counterKeys.get( i ) );
-		log.debugf( "Count of indexing operations for session factory %d: %s", i, count );
-		return assertThat( count )
-				.as( "Count of indexing operations for session factory %d", i );
+		List<Integer> countForEach = indexingCountForEachSessionFactory();
+		return assertThat( countForEach )
+				.element( i, InstanceOfAssertFactories.INTEGER )
+				.as( "Count of indexing operations for session factory %d (count for each factory: " + countForEach + ")", i );
 	}
 
 	public ListAssert<Integer> assertIndexingCountForEachSessionFactory() {
-		List<Integer> counts = counterKeys.stream().map( counters::get ).collect( Collectors.toList() );
-		log.debugf( "Count of indexing operations for each session factory: %s", counts );
-		return assertThat( counts )
+		return assertThat( indexingCountForEachSessionFactory() )
 				.as( "Count of indexing operations for each session factory" );
 	}
 
