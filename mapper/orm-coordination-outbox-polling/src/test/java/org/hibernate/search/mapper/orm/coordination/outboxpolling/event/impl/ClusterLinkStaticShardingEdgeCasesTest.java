@@ -34,7 +34,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 	final OutboxPollingEventProcessorClusterLink setupLink(ShardAssignmentDescriptor staticShardAssignment) {
 		return new OutboxPollingEventProcessorClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock, eventFinderProviderStub,
-				PULSE_INTERVAL, PULSE_EXPIRATION,
+				POLLING_INTERVAL, PULSE_INTERVAL, PULSE_EXPIRATION,
 				staticShardAssignment
 		);
 	}
@@ -59,7 +59,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 						new ShardAssignmentDescriptor( 4, 3 ) );
 
 		expect( null, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( new ShardAssignmentDescriptor( 4, 0 ) )
 				.build()
@@ -72,7 +72,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 		repositoryMockHelper.defineSelfCreatedByPulse( newId );
 
 		expect( null, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( newId, EventProcessingState.REBALANCING )
 				.shardAssignment( new ShardAssignmentDescriptor( 4, 3 ) )
 				.build()
@@ -207,7 +207,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
@@ -233,7 +233,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
@@ -259,7 +259,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 				.other( OTHER_4_ID, AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING, LATER, EventProcessingState.SUSPENDED );
 
 		expect( selfStaticShardAssignment, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
@@ -286,7 +286,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 						new ShardAssignmentDescriptor( 1, 0 ) );
 
 		expect( selfStaticShardAssignment, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
@@ -313,7 +313,7 @@ public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkT
 						new ShardAssignmentDescriptor( 1, 0 ) );
 
 		expect( selfStaticShardAssignment, link )
-				.pulseAgain( NOW )
+				.pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()

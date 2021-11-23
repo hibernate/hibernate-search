@@ -114,7 +114,7 @@ public final class OutboxPollingEventProcessor {
 
 	private class Worker implements SingletonTask.Worker {
 
-		private AgentInstructions agentInstructions;
+		private volatile AgentInstructions agentInstructions;
 		private volatile boolean lastExecutionProcessedEvents;
 
 		@Override
@@ -220,14 +220,35 @@ public final class OutboxPollingEventProcessor {
 
 		@Override
 		public Future<?> schedule(Runnable runnable) {
-			if ( worker.lastExecutionProcessedEvents ) {
-				// As long as there are more events to process, re-execute the worker continuously.
-				return delegate.submit( runnable );
+			AgentInstructions instructions = worker.agentInstructions;
+			if ( instructions == null ) {
+				// Before the first pulse (i.e. on startup),
+				// execute the worker only after the polling interval.
+				// This is to mitigate the impact of infinite loops when there is an unhandled
+				// failure while getting instructions (e.g. if the database is not up and running)
+				// TODO Ideally we should record unhandled failures in a variable and force a wait after they happen.
+				return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
+			}
+			else if ( instructions.eventFinder.isPresent() ) {
+				if ( worker.lastExecutionProcessedEvents ) {
+					// When running and there might be  more events to process,
+					// re-execute the worker immediately.
+					return delegate.submit( runnable );
+				}
+				else {
+					// When running and there are no more events to process,
+					// re-execute the worker after the polling interval.
+					return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
+				}
 			}
 			else {
-				// When no events can be found, or cluster instructions tell us to wait,
-				// re-execute the worker after the polling interval.
-				return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
+				// On rebalancing or when suspended,
+				// re-execute the worker only after the current instructions expire.
+				// Instructions are expected to provide a reasonably high waiting time
+				// between when they are issued and when they expire,
+				// i.e. at least the polling interval,
+				// to avoid polling the database continuously.
+				return delegate.schedule( runnable, instructions.timeInMillisecondsToExpiration(), TimeUnit.MILLISECONDS );
 			}
 		}
 	}

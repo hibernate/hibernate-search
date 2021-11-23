@@ -22,7 +22,7 @@ public class ClusterLinkLeaveClusterTest extends AbstractClusterLinkTest {
 	final OutboxPollingEventProcessorClusterLink setupLink() {
 		return new OutboxPollingEventProcessorClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock, eventFinderProviderStub,
-				PULSE_INTERVAL, PULSE_EXPIRATION,
+				POLLING_INTERVAL, PULSE_INTERVAL, PULSE_EXPIRATION,
 				null
 		);
 	}

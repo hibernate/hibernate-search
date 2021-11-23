@@ -39,7 +39,7 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 	public final void initLink() {
 		link = new OutboxPollingEventProcessorClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock, eventFinderProviderStub,
-				PULSE_INTERVAL, PULSE_EXPIRATION,
+				POLLING_INTERVAL, PULSE_INTERVAL, PULSE_EXPIRATION,
 				selfStaticShardAssignment()
 		);
 
@@ -62,14 +62,14 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 	}
 
 	protected final ClusterLinkPulseExpectations expectSuspendedAndPulseASAP() {
-		return expect().pulseAgain( NOW )
+		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment() )
 				.build();
 	}
 
 	protected final ClusterLinkPulseExpectations expectRebalancing(ShardAssignmentDescriptor shardAssignment) {
-		return expect().pulseAgain( NOW )
+		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
 				.shardAssignment( shardAssignment )
 				.build();

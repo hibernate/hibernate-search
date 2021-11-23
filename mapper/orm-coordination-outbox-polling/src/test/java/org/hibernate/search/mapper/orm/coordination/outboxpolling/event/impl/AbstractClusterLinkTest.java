@@ -41,6 +41,8 @@ abstract class AbstractClusterLinkTest {
 	static final Instant EARLIER = NOW.minus( 1, ChronoUnit.NANOS );
 	static final Instant LATER = NOW.plus( 1, ChronoUnit.NANOS );
 
+	static final Duration POLLING_INTERVAL = Duration.ofMillis(
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL );
 	static final Duration PULSE_INTERVAL = Duration.ofMillis(
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_PROCESSORS_INDEXING_PULSE_INTERVAL );
 	static final Duration PULSE_EXPIRATION = Duration.ofMillis(
