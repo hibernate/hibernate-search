@@ -40,10 +40,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 1, value = "Generated entity mapping for outbox events used in the outbox-polling coordination strategy: %1$s")
 	void outboxEventGeneratedEntityMapping(String xmlMappingDefinition);
 
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 2, value = "Session factory closed while processing outbox events. Assuming Hibernate Search is shutting down.")
-	void sessionFactoryIsClosedOnOutboxProcessing();
-
 	@Message(id = ID_OFFSET + 3, value = "Max '%1$s' retries exhausted to process the event. Event will be lost.")
 	SearchException maxRetryExhausted(int retries);
 

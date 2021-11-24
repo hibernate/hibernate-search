@@ -121,14 +121,6 @@ public final class OutboxPollingEventProcessor {
 		public CompletableFuture<?> work() {
 			lastExecutionProcessedEvents = false;
 
-			if ( mapping.sessionFactory().isClosed() ) {
-				// Work around HHH-14541, which is not currently fixed in ORM 5.4.
-				// Even if a fix gets backported, the bug will still be present in older 5.4 versions,
-				// so we'd better keep this workaround.
-				log.sessionFactoryIsClosedOnOutboxProcessing();
-				return CompletableFuture.completedFuture( null );
-			}
-
 			// Optimization: don't even try to open a transaction/session if we know it's not necessary.
 			if ( instructions != null && instructions.isStillValid()
 					&& !instructions.eventFinder.isPresent() ) {
