@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 
@@ -140,29 +141,34 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		if ( mergeSegmentsOnFinish ) {
 			Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
 		}
+		flushAndRefresh();
+	}
+
+	private void flushAndRefresh() throws InterruptedException {
 		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
 		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
 	}
 
 	@Override
 	protected void cleanUpOnInterruption() throws InterruptedException {
-		cancelPendingTasks();
-		// Indexing performed before the exception must still be committed,
-		// in order to leave the index in a consistent state
-		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
-		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
+		try ( Closer<InterruptedException> closer = new Closer<>() ) {
+			closer.pushAll( this::cancelPendingTask, indexingFutures );
+			// Indexing performed before the exception must still be committed,
+			// in order to leave the index in a consistent state
+			closer.push( PojoMassIndexingBatchCoordinator::flushAndRefresh, this );
+		}
 	}
 
 	@Override
 	protected void cleanUpOnFailure() {
-		cancelPendingTasks();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( this::cancelPendingTask, indexingFutures );
+		}
 	}
 
-	private void cancelPendingTasks() {
-		for ( Future<?> task : indexingFutures ) {
-			if ( !task.isDone() ) {
-				task.cancel( true );
-			}
+	private void cancelPendingTask(Future<?> task) {
+		if ( !task.isDone() ) {
+			task.cancel( true );
 		}
 	}
 
