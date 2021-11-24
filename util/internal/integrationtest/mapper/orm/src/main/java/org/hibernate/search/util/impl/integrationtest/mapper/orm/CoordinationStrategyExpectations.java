@@ -8,16 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendIndexingWorkExpectations;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.coordination.localheap.LocalHeapQueueCooordinationStrategy;
 
 public final class CoordinationStrategyExpectations {
 
 	public static CoordinationStrategyExpectations defaults() {
 		return new CoordinationStrategyExpectations( null, true, BackendIndexingWorkExpectations.sync() );
-	}
-
-	public static CoordinationStrategyExpectations localHeapQueue() {
-		return async( LocalHeapQueueCooordinationStrategy.class.getName(), ".*Local heap queue.*" );
 	}
 
 	public static CoordinationStrategyExpectations outboxPolling() {
