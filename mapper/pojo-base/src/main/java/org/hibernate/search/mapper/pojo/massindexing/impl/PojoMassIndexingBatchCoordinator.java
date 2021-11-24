@@ -30,19 +30,20 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMapping
  */
 public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHandledRunnable {
 
+	private final PojoMassIndexingMappingContext mappingContext;
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
-	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final PojoMassIndexingMappingContext mappingContext;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
 	private final boolean mergeSegmentsOnFinish;
 	private final boolean dropAndCreateSchemaOnStart;
 	private final boolean purgeAtStart;
 	private final boolean mergeSegmentsAfterPurge;
+
+	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 
 	public PojoMassIndexingBatchCoordinator(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
@@ -82,41 +83,22 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		}
 	}
 
-	@Override
-	protected void cleanUpOnInterruption() throws InterruptedException {
-		cancelPendingTasks();
-		// Indexing performed before the exception must still be committed,
-		// in order to leave the index in a consistent state
-		afterBatchOnInterruption();
-	}
+	/**
+	 * Optional operations to do before the multiple-threads start indexing
+	 */
+	private void beforeBatch() throws InterruptedException {
+		if ( dropAndCreateSchemaOnStart ) {
+			RootFailureCollector failureCollector = new RootFailureCollector(
+					PojoEventContextMessages.INSTANCE.schemaManagement()
+			);
+			Futures.unwrappedExceptionGet( scopeSchemaManager.dropAndCreate( failureCollector ) );
+			failureCollector.checkNoFailure();
+		}
 
-	@Override
-	protected void cleanUpOnFailure() {
-		cancelPendingTasks();
-	}
-
-	@Override
-	protected void notifySuccess() {
-		getNotifier().reportIndexingCompleted();
-	}
-
-	@Override
-	protected void notifyInterrupted(InterruptedException exception) {
-		getNotifier().reportInterrupted( exception );
-		getNotifier().reportIndexingCompleted();
-	}
-
-	@Override
-	protected void notifyFailure(RuntimeException exception) {
-		super.notifyFailure( exception );
-		// TODO HSEARCH-3729 Call a different method when indexing failed?
-		getNotifier().reportIndexingCompleted();
-	}
-
-	private void cancelPendingTasks() {
-		for ( Future<?> task : indexingFutures ) {
-			if ( !task.isDone() ) {
-				task.cancel( true );
+		if ( purgeAtStart ) {
+			Futures.unwrappedExceptionGet( scopeWorkspace.purge( Collections.emptySet() ) );
+			if ( mergeSegmentsAfterPurge ) {
+				Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
 			}
 		}
 	}
@@ -162,32 +144,44 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
 	}
 
-	/**
-	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
-	 */
-	private void afterBatchOnInterruption() throws InterruptedException {
+	@Override
+	protected void cleanUpOnInterruption() throws InterruptedException {
+		cancelPendingTasks();
+		// Indexing performed before the exception must still be committed,
+		// in order to leave the index in a consistent state
 		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
 		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
 	}
 
-	/**
-	 * Optional operations to do before the multiple-threads start indexing
-	 */
-	private void beforeBatch() throws InterruptedException {
-		if ( dropAndCreateSchemaOnStart ) {
-			RootFailureCollector failureCollector = new RootFailureCollector(
-					PojoEventContextMessages.INSTANCE.schemaManagement()
-			);
-			Futures.unwrappedExceptionGet( scopeSchemaManager.dropAndCreate( failureCollector ) );
-			failureCollector.checkNoFailure();
-		}
+	@Override
+	protected void cleanUpOnFailure() {
+		cancelPendingTasks();
+	}
 
-		if ( purgeAtStart ) {
-			Futures.unwrappedExceptionGet( scopeWorkspace.purge( Collections.emptySet() ) );
-			if ( mergeSegmentsAfterPurge ) {
-				Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
+	private void cancelPendingTasks() {
+		for ( Future<?> task : indexingFutures ) {
+			if ( !task.isDone() ) {
+				task.cancel( true );
 			}
 		}
+	}
+
+	@Override
+	protected void notifySuccess() {
+		getNotifier().reportIndexingCompleted();
+	}
+
+	@Override
+	protected void notifyInterrupted(InterruptedException exception) {
+		getNotifier().reportInterrupted( exception );
+		getNotifier().reportIndexingCompleted();
+	}
+
+	@Override
+	protected void notifyFailure(RuntimeException exception) {
+		super.notifyFailure( exception );
+		// TODO HSEARCH-3729 Call a different method when indexing failed?
+		getNotifier().reportIndexingCompleted();
 	}
 
 }
