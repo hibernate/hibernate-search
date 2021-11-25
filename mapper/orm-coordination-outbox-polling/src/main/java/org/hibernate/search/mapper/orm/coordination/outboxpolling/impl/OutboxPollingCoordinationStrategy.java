@@ -7,8 +7,6 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.time.Clock;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,7 +35,6 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventSendingPlan;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessorClusterLink;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
@@ -70,30 +67,6 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_ENABLED )
 					.build();
 
-	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_POLLING_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_POLLING_INTERVAL )
-					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL )
-					.build();
-
-	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_PULSE_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_INTERVAL )
-					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL )
-					.build();
-
-	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_PULSE_EXPIRATION =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_EXPIRATION )
-					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION )
-					.build();
-
-	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_BATCH_SIZE =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_BATCH_SIZE )
-					.asIntegerStrictlyPositive()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE )
-					.build();
-
 	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER =
 			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER )
 					.asBeanReference( AgentRepositoryProvider.class )
@@ -103,19 +76,6 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER )
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
-
-	private static final OptionalConfigurationProperty<Integer> EVENT_PROCESSOR_TRANSACTION_TIMEOUT =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT )
-					.asIntegerStrictlyPositive()
-					.build();
-
-	private static final ConfigurationProperty<Integer> EVENT_PROCESSOR_RETRY_DELAY =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY )
-					.asIntegerPositiveOrZero()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY )
-					.build();
-
-	public static final String PROCESSOR_NAME_PREFIX = "Outbox event processor";
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
 	private BeanHolder<? extends AgentRepositoryProvider> agentRepositoryProviderHolder;
@@ -177,7 +137,6 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 
 	private void initializeEventProcessors(CoordinationStrategyStartContext context) {
 		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
-		OutboxEventFinderProvider finderProvider = finderProviderHolder.get();
 
 		// IMPORTANT: we only configure sharding here, if processors are enabled.
 		// See the comment in the caller method.
@@ -199,32 +158,14 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 			shardAssignmentOrNulls = Collections.singletonList( null );
 		}
 
-		int pollingInterval = EVENT_PROCESSOR_POLLING_INTERVAL.get( configurationSource );
-		int batchSize = EVENT_PROCESSOR_BATCH_SIZE.get( configurationSource );
-		Integer transactionTimeout = EVENT_PROCESSOR_TRANSACTION_TIMEOUT.get( configurationSource )
-				.orElse( null );
-		int retryAfter = EVENT_PROCESSOR_RETRY_DELAY.get( configurationSource );
-
-		Duration pollingIntervalAsDuration = Duration.ofMillis( pollingInterval );
-		Duration pulseInterval = EVENT_PROCESSOR_PULSE_INTERVAL.getAndTransform( configurationSource,
-				v -> checkPulseInterval( Duration.ofMillis( v ), pollingIntervalAsDuration ) );
-		Duration pulseExpiration = EVENT_PROCESSOR_PULSE_EXPIRATION.getAndTransform( configurationSource,
-				v -> checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
+		OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(), configurationSource );
 
 		scheduledExecutor = context.threadPoolProvider()
-				.newScheduledExecutor( shardAssignmentOrNulls.size(), PROCESSOR_NAME_PREFIX );
+				.newScheduledExecutor( shardAssignmentOrNulls.size(), OutboxPollingEventProcessor.NAME_PREFIX );
 		eventProcessors = new ArrayList<>();
 		for ( ShardAssignmentDescriptor shardAssignmentOrNull : shardAssignmentOrNulls ) {
-			String agentName = PROCESSOR_NAME_PREFIX
-					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
-			OutboxPollingEventProcessorClusterLink clusterLink = new OutboxPollingEventProcessorClusterLink(
-					agentName, context.mapping().failureHandler(), Clock.systemUTC(),
-					finderProvider, pollingIntervalAsDuration, pulseInterval, pulseExpiration, shardAssignmentOrNull );
-
-			OutboxPollingEventProcessor processor = new OutboxPollingEventProcessor(
-					agentName, context.mapping(), scheduledExecutor, agentRepositoryProviderHolder.get(), clusterLink,
-					pollingInterval, batchSize, transactionTimeout, retryAfter );
-			eventProcessors.add( processor );
+			eventProcessors.add( factory.create( scheduledExecutor, finderProviderHolder.get(),
+					agentRepositoryProviderHolder.get(), shardAssignmentOrNull ) );
 		}
 		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
 			eventProcessor.start();
@@ -253,21 +194,6 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 			shardAssignment.add( new ShardAssignmentDescriptor( totalShardCount, shardIndex ) );
 		}
 		return shardAssignment;
-	}
-
-	private Duration checkPulseInterval(Duration pulseInterval, Duration pollingInterval) {
-		if ( pulseInterval.compareTo( pollingInterval ) < 0 ) {
-			throw log.invalidPollingIntervalAndPulseInterval( pollingInterval.toMillis() );
-		}
-		return pulseInterval;
-	}
-
-	private Duration checkPulseExpiration(Duration pulseExpiration, Duration pulseInterval) {
-		Duration pulseIntervalTimes3 = pulseInterval.multipliedBy( 3 );
-		if ( pulseExpiration.compareTo( pulseIntervalTimes3 ) < 0 ) {
-			throw log.invalidPulseIntervalAndPulseExpiration( pulseIntervalTimes3.toMillis() );
-		}
-		return pulseExpiration;
 	}
 
 	@Override

@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Clock;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -17,11 +19,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepositoryProvider;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -30,6 +37,110 @@ public final class OutboxPollingEventProcessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static final String NAME_PREFIX = "Outbox event processor";
+
+	private static final ConfigurationProperty<Integer> POLLING_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_POLLING_INTERVAL )
+					.asIntegerStrictlyPositive()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL )
+					.build();
+
+	private static final ConfigurationProperty<Integer> PULSE_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_INTERVAL )
+					.asIntegerStrictlyPositive()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL )
+					.build();
+
+	private static final ConfigurationProperty<Integer> PULSE_EXPIRATION =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_PULSE_EXPIRATION )
+					.asIntegerStrictlyPositive()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION )
+					.build();
+
+	private static final ConfigurationProperty<Integer> BATCH_SIZE =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_BATCH_SIZE )
+					.asIntegerStrictlyPositive()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_BATCH_SIZE )
+					.build();
+
+	private static final OptionalConfigurationProperty<Integer> TRANSACTION_TIMEOUT =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT )
+					.asIntegerStrictlyPositive()
+					.build();
+
+	private static final ConfigurationProperty<Integer> RETRY_DELAY =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY )
+					.asIntegerPositiveOrZero()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY )
+					.build();
+
+	public static Factory factory(AutomaticIndexingMappingContext mapping,
+			ConfigurationPropertySource configurationSource) {
+		Duration pollingInterval = POLLING_INTERVAL.getAndTransform( configurationSource, Duration::ofMillis );
+		Duration pulseInterval = PULSE_INTERVAL.getAndTransform( configurationSource,
+				v -> checkPulseInterval( Duration.ofMillis( v ), pollingInterval ) );
+		Duration pulseExpiration = PULSE_EXPIRATION.getAndTransform( configurationSource,
+				v -> checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
+
+		int batchSize = BATCH_SIZE.get( configurationSource );
+		int retryDelay = RETRY_DELAY.get( configurationSource );
+		Integer transactionTimeout = TRANSACTION_TIMEOUT.get( configurationSource )
+				.orElse( null );
+
+		return new Factory( mapping, pollingInterval, pulseInterval, pulseExpiration, batchSize, retryDelay,
+				transactionTimeout );
+	}
+
+	private static Duration checkPulseInterval(Duration pulseInterval, Duration pollingInterval) {
+		if ( pulseInterval.compareTo( pollingInterval ) < 0 ) {
+			throw log.invalidPollingIntervalAndPulseInterval( pollingInterval.toMillis() );
+		}
+		return pulseInterval;
+	}
+
+	private static Duration checkPulseExpiration(Duration pulseExpiration, Duration pulseInterval) {
+		Duration pulseIntervalTimes3 = pulseInterval.multipliedBy( 3 );
+		if ( pulseExpiration.compareTo( pulseIntervalTimes3 ) < 0 ) {
+			throw log.invalidPulseIntervalAndPulseExpiration( pulseIntervalTimes3.toMillis() );
+		}
+		return pulseExpiration;
+	}
+
+	public static class Factory {
+		private final AutomaticIndexingMappingContext mapping;
+		private final Duration pollingInterval;
+		private final Duration pulseInterval;
+		private final Duration pulseExpiration;
+		private final int batchSize;
+		private final int retryDelay;
+		private final Integer transactionTimeout;
+
+		private Factory(AutomaticIndexingMappingContext mapping,
+				Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
+				int batchSize, int retryDelay, Integer transactionTimeout) {
+			this.mapping = mapping;
+			this.pollingInterval = pollingInterval;
+			this.pulseInterval = pulseInterval;
+			this.pulseExpiration = pulseExpiration;
+			this.batchSize = batchSize;
+			this.retryDelay = retryDelay;
+			this.transactionTimeout = transactionTimeout;
+		}
+
+		public OutboxPollingEventProcessor create(ScheduledExecutorService scheduledExecutor,
+				OutboxEventFinderProvider finderProvider, AgentRepositoryProvider agentRepositoryProvider,
+				ShardAssignmentDescriptor shardAssignmentOrNull) {
+			String agentName = NAME_PREFIX
+					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
+			OutboxPollingEventProcessorClusterLink clusterLink = new OutboxPollingEventProcessorClusterLink(
+					agentName, mapping.failureHandler(), Clock.systemUTC(),
+					finderProvider, pollingInterval, pulseInterval, pulseExpiration, shardAssignmentOrNull );
+
+			return new OutboxPollingEventProcessor( agentName, this, scheduledExecutor,
+					agentRepositoryProvider, clusterLink );
+		}
+	}
+
 	private enum Status {
 		STOPPED,
 		STARTED
@@ -37,10 +148,10 @@ public final class OutboxPollingEventProcessor {
 
 	private final String name;
 	private final AutomaticIndexingMappingContext mapping;
-	private final int pollingInterval;
+	private final long pollingInterval;
 	private final int batchSize;
 	private final Integer transactionTimeout;
-	private final int retryAfter;
+	private final int retryDelay;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
 	private final AgentRepositoryProvider agentRepositoryProvider;
@@ -50,17 +161,16 @@ public final class OutboxPollingEventProcessor {
 	private final Worker worker;
 	private final SingletonTask processingTask;
 
-	public OutboxPollingEventProcessor(String name,
-			AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
+	public OutboxPollingEventProcessor(String name, Factory factory,
+			ScheduledExecutorService executor,
 			AgentRepositoryProvider agentRepositoryProvider,
-			OutboxPollingEventProcessorClusterLink clusterLink,
-			int pollingInterval, int batchSize, Integer transactionTimeout, int retryAfter) {
+			OutboxPollingEventProcessorClusterLink clusterLink) {
 		this.name = name;
-		this.mapping = mapping;
-		this.pollingInterval = pollingInterval;
-		this.batchSize = batchSize;
-		this.transactionTimeout = transactionTimeout;
-		this.retryAfter = retryAfter;
+		this.mapping = factory.mapping;
+		this.pollingInterval = factory.pollingInterval.toMillis();
+		this.batchSize = factory.batchSize;
+		this.transactionTimeout = factory.transactionTimeout;
+		this.retryDelay = factory.retryDelay;
 		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
@@ -167,7 +277,7 @@ public final class OutboxPollingEventProcessor {
 				// can see heavily concurrent access (the outbox table),
 				// so we do that in a separate transaction, one that is as short as possible.
 				OutboxEventUpdater eventUpdater = new OutboxEventUpdater(
-						failureHandler, eventProcessing, session, name, retryAfter );
+						failureHandler, eventProcessing, session, name, retryDelay );
 				// We potentially perform this update in multiple transactions,
 				// each loading as many events as possible using SKIP_LOCKED,
 				// to only load events that are not already locked by another processor.
