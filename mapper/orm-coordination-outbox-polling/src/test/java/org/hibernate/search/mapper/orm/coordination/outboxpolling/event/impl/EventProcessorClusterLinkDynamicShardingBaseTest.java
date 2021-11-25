@@ -89,7 +89,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	// It's very important that an agent that wasn't registered
 	// must not start running immediately on the first pulse,
 	// but should go through the waiting state first.
-	// See comments in OutboxEventBackgroundProcessorClusterLink.
+	// See comments in OutboxPollingEventProcessorClusterLink.
 	public static class NotRegisteredTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
