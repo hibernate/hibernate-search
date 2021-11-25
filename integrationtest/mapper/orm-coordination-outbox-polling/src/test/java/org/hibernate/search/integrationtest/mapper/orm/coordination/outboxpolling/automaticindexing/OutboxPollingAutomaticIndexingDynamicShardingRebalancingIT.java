@@ -45,7 +45,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 	private static final int BATCH_SIZE = 5;
 	// Don't use a low expiration: we can't set it too low,
 	// or agents will be likely to expire while processing a single batch.
-	private static final int PULSE_EXPIRATION = 1000;
+	private static final int PULSE_EXPIRATION = 5000;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
