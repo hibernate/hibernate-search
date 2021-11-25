@@ -19,7 +19,7 @@ public class OutboxPollingBeanConfigurer implements BeanConfigurer {
 		context.define(
 				CooordinationStrategy.class,
 				HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
-				BeanReference.ofInstance( new OutboxPollingCooordinationStrategy() )
+				BeanReference.ofInstance( new OutboxPollingCoordinationStrategy() )
 		);
 	}
 }
