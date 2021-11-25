@@ -142,9 +142,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * the event processor performs a "pulse":
 	 * it pauses indexing and:
 	 * <ul>
-	 *     <li>Updates its entry in the table, to let other agents know it's still alive and prevent an expiration</li>
-	 *     <li>Removes any other agents that expired from the table</li>
-	 *     <li>Performs rebalancing (reassignment of shards) if the number of agents
+	 *     <li>It updates its own entry in the table, to let other agents know it's still alive and prevent an expiration</li>
+	 *     <li>It removes any other agents that expired from the table</li>
+	 *     <li>It suspends itself if it notices a mass indexer is running</li>
+	 *     <li>It performs rebalancing (reassignment of shards) if the number of agents
 	 *     participating in background indexing changed since the last pulse</li>
 	 * </ul>
 	 * <p>
@@ -154,11 +155,11 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <ul>
 	 *   <li>Low values (closer to the polling interval) mean a shorter delay before rebalancing
 	 *   when a node joins or leaves the cluster,
-	 *   and reduced risk of incorrectly considering an agent as expired,
+	 *   and reduced risk of incorrectly considering an event processor disconnected,
 	 *   but more stress on the database because of more frequent checks of the list of agents.</li>
 	 *   <li>High values (closer to the expiration interval) mean a longer delay before rebalancing
 	 *   when a node joins or leaves the cluster,
-	 *   and increased risk of incorrectly considering an agent as expired,
+	 *   and increased risk of incorrectly considering an event processor disconnected,
 	 *   but less stress on the database because of less frequent checks of the list of agents.</li>
 	 * </ul>
 	 * <p>
@@ -179,8 +180,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <p>
 	 * Every agent registers itself in a database table.
 	 * Regularly, while polling for events to process,
-	 * the event processor performs a {@link #COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL "pulse"}:
-	 * it pauses indexing and (among other things) update its entry in the table,
+	 * mass indexer agent performs a {@link #COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL "pulse"}:
+	 * it pauses what it was doing and (among other things) updates its entry in the table,
 	 * to let other agents know it's still alive and prevent an expiration.
 	 * If an agent fails to update its entry for longer than the value of the expiration interval,
 	 * it will be considered disconnected: other agents will forcibly remove its entry from the table,
@@ -191,10 +192,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <ul>
 	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before rebalancing
 	 *   when a node abruptly leaves the cluster due to a crash or network failure,
-	 *   but increased risk of incorrectly considering an agent as expired.</li>
+	 *   but increased risk of incorrectly considering an event processor disconnected.</li>
 	 *   <li>High values (much larger than the pulse interval) mean a longer delay before rebalancing
 	 *   when a node abruptly leaves the cluster due to a crash or network failure,
-	 *   but reduced risk of incorrectly considering an agent as expired.</li>
+	 *   but reduced risk of incorrectly considering an event processor disconnected.</li>
 	 * </ul>
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 30000},
