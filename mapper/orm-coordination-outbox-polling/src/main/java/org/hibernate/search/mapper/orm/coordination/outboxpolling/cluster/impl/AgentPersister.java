@@ -100,7 +100,7 @@ public final class AgentPersister {
 					selfReference, shardAssignment, clusterDescriptor );
 			self.setState( AgentState.WAITING );
 		}
-		if ( staticShardAssignment == null ) {
+		if ( staticShardAssignment == null && shardAssignment != null ) {
 			self.setTotalShardCount( shardAssignment.totalShardCount );
 			self.setAssignedShardIndex( shardAssignment.assignedShardIndex );
 		}

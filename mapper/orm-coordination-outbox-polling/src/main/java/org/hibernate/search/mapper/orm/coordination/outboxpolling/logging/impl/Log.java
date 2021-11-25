@@ -138,4 +138,12 @@ public interface Log extends BasicLogger {
 			AgentReference reference, ShardAssignmentDescriptor staticShardAssignment,
 			AgentReference conflictingAgentReference);
 
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 21, value = "Starting outbox mass indexer agent '%1$s'")
+	void startingOutboxMassIndexerAgent(String name);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 22, value = "Stopping outbox mass indexer agent '%1$s'")
+	void stoppingOutboxMassIndexerAgent(String name);
+
 }

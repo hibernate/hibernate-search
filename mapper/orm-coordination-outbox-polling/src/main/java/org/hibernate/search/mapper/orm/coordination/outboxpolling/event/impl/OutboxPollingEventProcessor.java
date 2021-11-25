@@ -78,9 +78,9 @@ public final class OutboxPollingEventProcessor {
 			ConfigurationPropertySource configurationSource) {
 		Duration pollingInterval = POLLING_INTERVAL.getAndTransform( configurationSource, Duration::ofMillis );
 		Duration pulseInterval = PULSE_INTERVAL.getAndTransform( configurationSource,
-				v -> checkPulseInterval( Duration.ofMillis( v ), pollingInterval ) );
+				v -> OutboxConfigUtils.checkPulseInterval( Duration.ofMillis( v ), pollingInterval ) );
 		Duration pulseExpiration = PULSE_EXPIRATION.getAndTransform( configurationSource,
-				v -> checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
+				v -> OutboxConfigUtils.checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
 
 		int batchSize = BATCH_SIZE.get( configurationSource );
 		int retryDelay = RETRY_DELAY.get( configurationSource );
@@ -89,21 +89,6 @@ public final class OutboxPollingEventProcessor {
 
 		return new Factory( mapping, clock, pollingInterval, pulseInterval, pulseExpiration, batchSize, retryDelay,
 				transactionTimeout );
-	}
-
-	private static Duration checkPulseInterval(Duration pulseInterval, Duration pollingInterval) {
-		if ( pulseInterval.compareTo( pollingInterval ) < 0 ) {
-			throw log.invalidPollingIntervalAndPulseInterval( pollingInterval.toMillis() );
-		}
-		return pulseInterval;
-	}
-
-	private static Duration checkPulseExpiration(Duration pulseExpiration, Duration pulseInterval) {
-		Duration pulseIntervalTimes3 = pulseInterval.multipliedBy( 3 );
-		if ( pulseExpiration.compareTo( pulseIntervalTimes3 ) < 0 ) {
-			throw log.invalidPulseIntervalAndPulseExpiration( pulseIntervalTimes3.toMillis() );
-		}
-		return pulseExpiration;
 	}
 
 	public static class Factory {

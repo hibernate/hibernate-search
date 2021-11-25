@@ -12,6 +12,8 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfi
 import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 
 public class NoCoordinationStrategy implements CooordinationStrategy {
 
@@ -26,6 +28,12 @@ public class NoCoordinationStrategy implements CooordinationStrategy {
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
 		context.reindexInSession();
+	}
+
+	@Override
+	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
+		// No coordination: we don't prevent automatic indexing from continuing while mass indexing.
+		return PojoMassIndexerAgent.noOp();
 	}
 
 	@Override
@@ -44,4 +52,5 @@ public class NoCoordinationStrategy implements CooordinationStrategy {
 	public void stop() {
 		// Nothing to do
 	}
+
 }

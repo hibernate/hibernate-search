@@ -40,6 +40,8 @@ import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionMa
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -199,6 +201,12 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	@Override
 	public FailureHandler failureHandler() {
 		return delegate().failureHandler();
+	}
+
+	@Override
+	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
+		// No coordination: we don't prevent automatic indexing from continuing while mass indexing.
+		return PojoMassIndexerAgent.noOp();
 	}
 
 	@Override
