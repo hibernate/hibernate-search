@@ -19,24 +19,24 @@ import org.junit.runner.RunWith;
  * with dynamic sharding.
  */
 @RunWith(Enclosed.class)
-public class ClusterLinkDynamicShardingBaseTest {
+public class EventProcessorClusterLinkDynamicShardingBaseTest {
 
-	abstract static class AbstractBaseTest extends AbstractClusterLinkBaseTest {
+	abstract static class AbstractBaseTest extends AbstractEventProcessorClusterLinkBaseTest {
 		// Define IDs in ascending order, because IDs matter when using dynamic sharding.
 
 		@Override
 		protected long other1Id() {
-			return AbstractClusterLinkTest.SELF_ID - 1;
+			return AbstractEventProcessorClusterLinkTest.SELF_ID - 1;
 		}
 
 		@Override
 		protected long other2Id() {
-			return AbstractClusterLinkTest.SELF_ID + 1;
+			return AbstractEventProcessorClusterLinkTest.SELF_ID + 1;
 		}
 
 		@Override
 		protected long other3Id() {
-			return AbstractClusterLinkTest.SELF_ID + 2;
+			return AbstractEventProcessorClusterLinkTest.SELF_ID + 2;
 		}
 
 		@Override
@@ -97,12 +97,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -114,12 +114,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -131,13 +131,13 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			// We were already waiting and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -149,12 +149,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectRunning( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -166,12 +166,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -183,12 +183,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -200,12 +200,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			// We were already waiting and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn4NodeCluster() );
 		}
@@ -218,12 +218,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			// We were already running and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn4NodeCluster() );
 		}
@@ -236,12 +236,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -253,12 +253,12 @@ public class ClusterLinkDynamicShardingBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}

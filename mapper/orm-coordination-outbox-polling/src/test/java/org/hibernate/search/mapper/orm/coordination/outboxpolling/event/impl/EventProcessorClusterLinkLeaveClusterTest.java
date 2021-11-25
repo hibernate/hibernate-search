@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * Tests for {@link OutboxPollingEventProcessorClusterLink#leaveCluster(AgentRepository)}.
  */
-public class ClusterLinkLeaveClusterTest extends AbstractClusterLinkTest {
+public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProcessorClusterLinkTest {
 	final OutboxPollingEventProcessorClusterLink setupLink() {
 		return new OutboxPollingEventProcessorClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock, eventFinderProviderStub,

@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractClusterLinkTest.NOW;
-import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractClusterLinkTest.PULSE_EXPIRATION;
-import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractClusterLinkTest.PULSE_INTERVAL;
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractEventProcessorClusterLinkTest.NOW;
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractEventProcessorClusterLinkTest.PULSE_EXPIRATION;
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractEventProcessorClusterLinkTest.PULSE_INTERVAL;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
-public class ClusterLinkPulseExpectations {
+public class EventProcessorClusterLinkPulseExpectations {
 
 	public static InstructionsStep expect(AgentRepositoryMockingHelper repoMockingHelper,
 			OutboxEventFinder eventFinderMock,
@@ -40,7 +40,7 @@ public class ClusterLinkPulseExpectations {
 	private final AgentState expectedSelfAgentCurrentState;
 	private final ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
 
-	private ClusterLinkPulseExpectations(Builder builder) {
+	private EventProcessorClusterLinkPulseExpectations(Builder builder) {
 		this.repoMockingHelper = builder.repoMockingHelper;
 		this.link = builder.link;
 		this.expectedLinkShardAssignment = builder.expectedLinkShardAssignment;
@@ -114,7 +114,7 @@ public class ClusterLinkPulseExpectations {
 
 		AgentOptionsStep shardAssignment(ShardAssignmentDescriptor shardAssignment);
 
-		ClusterLinkPulseExpectations build();
+		EventProcessorClusterLinkPulseExpectations build();
 	}
 
 	private static class Builder implements InstructionsStep, AgentMainStateStep, AgentOptionsStep {
@@ -178,8 +178,8 @@ public class ClusterLinkPulseExpectations {
 		}
 
 		@Override
-		public ClusterLinkPulseExpectations build() {
-			return new ClusterLinkPulseExpectations( this );
+		public EventProcessorClusterLinkPulseExpectations build() {
+			return new EventProcessorClusterLinkPulseExpectations( this );
 		}
 	}
 

@@ -19,26 +19,26 @@ import org.junit.runner.RunWith;
  * self being static.
  */
 @RunWith(Enclosed.class)
-public class ClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
+public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 
-	abstract static class AbstractBaseTest extends AbstractClusterLinkBaseTest {
+	abstract static class AbstractBaseTest extends AbstractEventProcessorClusterLinkBaseTest {
 
 		// Define IDs of statically agents in the opposite order of the shard order,
 		// to demonstrate that the ID order doesn't matter when using static sharding:
 
 		@Override
 		protected long other1Id() {
-			return AbstractClusterLinkTest.SELF_ID + 1;
+			return AbstractEventProcessorClusterLinkTest.SELF_ID + 1;
 		}
 
 		@Override
 		protected long other2Id() {
-			return AbstractClusterLinkTest.SELF_ID - 1;
+			return AbstractEventProcessorClusterLinkTest.SELF_ID - 1;
 		}
 
 		@Override
 		protected long other3Id() {
-			return AbstractClusterLinkTest.SELF_ID - 2;
+			return AbstractEventProcessorClusterLinkTest.SELF_ID - 2;
 		}
 
 		@Override
@@ -74,12 +74,12 @@ public class ClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -91,12 +91,12 @@ public class ClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			return expectWaiting( selfShardAssignmentIn4NodeCluster() );
 		}
 	}
@@ -109,12 +109,12 @@ public class ClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			// We were already waiting and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn4NodeCluster() );
 		}
@@ -127,12 +127,12 @@ public class ClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onNoOtherAgents() {
+		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
 			return expectWaiting( selfShardAssignmentIn1NodeCluster() );
 		}
 
 		@Override
-		protected ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
+		protected EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady() {
 			// We were already running and had the correct cluster => we can run now!
 			return expectRunning( selfShardAssignmentIn4NodeCluster() );
 		}
