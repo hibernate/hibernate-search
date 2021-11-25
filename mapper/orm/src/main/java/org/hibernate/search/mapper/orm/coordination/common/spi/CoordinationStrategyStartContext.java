@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.coordination.common.spi;
 
+import java.time.Clock;
+
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
@@ -41,6 +43,11 @@ public interface CoordinationStrategyStartContext {
 	 * @return A provided of thread pools, to use when spawning background processes.
 	 */
 	ThreadPoolProvider threadPoolProvider();
+
+	/**
+	 * @return A {@link Clock} to be used for coordination between nodes.
+	 */
+	Clock clock();
 
 	/**
 	 * @return The mapping, providing all information and operations necessary

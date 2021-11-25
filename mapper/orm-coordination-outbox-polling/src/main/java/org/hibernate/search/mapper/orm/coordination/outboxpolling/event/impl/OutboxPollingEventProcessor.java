@@ -74,7 +74,7 @@ public final class OutboxPollingEventProcessor {
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY )
 					.build();
 
-	public static Factory factory(AutomaticIndexingMappingContext mapping,
+	public static Factory factory(AutomaticIndexingMappingContext mapping, Clock clock,
 			ConfigurationPropertySource configurationSource) {
 		Duration pollingInterval = POLLING_INTERVAL.getAndTransform( configurationSource, Duration::ofMillis );
 		Duration pulseInterval = PULSE_INTERVAL.getAndTransform( configurationSource,
@@ -87,7 +87,7 @@ public final class OutboxPollingEventProcessor {
 		Integer transactionTimeout = TRANSACTION_TIMEOUT.get( configurationSource )
 				.orElse( null );
 
-		return new Factory( mapping, pollingInterval, pulseInterval, pulseExpiration, batchSize, retryDelay,
+		return new Factory( mapping, clock, pollingInterval, pulseInterval, pulseExpiration, batchSize, retryDelay,
 				transactionTimeout );
 	}
 
@@ -108,6 +108,7 @@ public final class OutboxPollingEventProcessor {
 
 	public static class Factory {
 		private final AutomaticIndexingMappingContext mapping;
+		private final Clock clock;
 		private final Duration pollingInterval;
 		private final Duration pulseInterval;
 		private final Duration pulseExpiration;
@@ -115,10 +116,11 @@ public final class OutboxPollingEventProcessor {
 		private final int retryDelay;
 		private final Integer transactionTimeout;
 
-		private Factory(AutomaticIndexingMappingContext mapping,
+		private Factory(AutomaticIndexingMappingContext mapping, Clock clock,
 				Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
 				int batchSize, int retryDelay, Integer transactionTimeout) {
 			this.mapping = mapping;
+			this.clock = clock;
 			this.pollingInterval = pollingInterval;
 			this.pulseInterval = pulseInterval;
 			this.pulseExpiration = pulseExpiration;
@@ -133,7 +135,7 @@ public final class OutboxPollingEventProcessor {
 			String agentName = NAME_PREFIX
 					+ ( shardAssignmentOrNull == null ? "" : " - " + shardAssignmentOrNull.assignedShardIndex );
 			OutboxPollingEventProcessorClusterLink clusterLink = new OutboxPollingEventProcessorClusterLink(
-					agentName, mapping.failureHandler(), Clock.systemUTC(),
+					agentName, mapping.failureHandler(), clock,
 					finderProvider, pollingInterval, pulseInterval, pulseExpiration, shardAssignmentOrNull );
 
 			return new OutboxPollingEventProcessor( agentName, this, scheduledExecutor,
