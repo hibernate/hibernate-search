@@ -290,16 +290,28 @@ and that one shard is never assigned to more than one agent,
 each agent will periodically perform a "pulse",
 updating and inspecting the agent table.
 
-During a "pulse", an agent will:
+What happens during a pulse depends on the <<coordination-outbox-polling-agents,type of agent>>.
+During a "pulse":
 
-* update its own entry in the agent table, to let other agents knows it's still active;
-* detect and report configuration mistakes
-if using <<coordination-outbox-polling-sharding-static,static sharding>>,
-e.g. two agents assigned to the same shard;
-* trigger rebalancing as necessary if using <<coordination-outbox-polling-sharding-dynamic,dynamic sharding>>;
-e.g. when it detects that new agents recently joined the cluster,
-or that agents left the cluster voluntarily,
-or that agents expired (did not update their entry for a long time).
+* An event processor will:
+** update its own entry in the agent table, to let other agents knows it's still active;
+** forcibly remove entries from other agents if it detects that these agents expired
+   (did not update their entry for a long time);
+** detect and report configuration mistakes
+   if using <<coordination-outbox-polling-sharding-static,static sharding>>,
+   e.g. two agents assigned to the same shard;
+** decide to suspend itself if a <<coordination-outbox-polling-agents-mass-indexer,mass indexer>> is running;
+** trigger rebalancing as necessary if using <<coordination-outbox-polling-sharding-dynamic,dynamic sharding>>;
+   e.g. when it detects that new agents recently joined the cluster,
+   or that agents left the cluster (voluntarily or forcibly).
+* A mass indexer will:
+** update its own entry in the agent table, to let other agents knows it's still active;
+** forcibly remove entries from other agents if it detects that these agents expired
+   (did not update their entry for a long time);
+** switch to active waiting mode (frequent polling) if it notices some
+   <<coordination-outbox-polling-agents-event-processor,event processors>> are still running;
+** switch to pulse-only mode (infrequent polling) and give the green light for mass indexing to start
+  if it notices no <<coordination-outbox-polling-agents-event-processor,event processors>> are running anymore.
 
 For more details about dynamic and static sharding, see the following sections.
 
@@ -455,12 +467,12 @@ The pulse interval must be set to a value between the polling interval (see abov
 +
 Low values (closer to the polling interval) mean a shorter delay before rebalancing
 when a node joins or leaves the cluster,
-and reduced risk of incorrectly considering an agent as expired,
+and reduced risk of incorrectly considering an agent disconnected,
 but more stress on the database because of more frequent checks of the list of agents.
 +
 High values (closer to the expiration interval) mean a longer delay before rebalancing
 when a node joins or leaves the cluster,
-and increased risk of incorrectly considering an agent as expired,
+and increased risk of incorrectly considering an agent disconnected,
 but less stress on the database because of less frequent checks of the list of agents.
 * `event_processor.pulse_expiration` defines how long an event processor "pulse" remains valid
 before considering the processor disconnected and forcibly removing it from the cluster,
@@ -473,11 +485,11 @@ The expiration interval must be set to a value 3 times larger than the pulse int
 +
 Low values (closer to the pulse interval) mean a shorter delay before rebalancing
 when a node abruptly leaves the cluster due to a crash or network failure,
-but increased risk of incorrectly considering an agent as expired.
+but increased risk of incorrectly considering an event processor disconnected.
 +
 High values (much larger than the pulse interval) mean a longer delay before rebalancing
 when a node abruptly leaves the cluster due to a crash or network failure,
-but reduced risk of incorrectly considering an agent as expired.
+but reduced risk of incorrectly considering an event processor disconnected.
 * `event_processor.batch_size` defines how many outbox events, at most, are processed in a single transaction
 as an <<configuration-property-types,integer value>>.
 The default for this property is `50`.
@@ -493,3 +505,72 @@ When using JTA and this property is not set, Hibernate Search will use whatever 
 as a <<configuration-property-types,positive integer value>> in seconds.
 Use the value `0` to reprocess the failed events as soon as possible, with no delay.
 The default for this property is `30`.
+
+[[coordination-outbox-polling-agents-mass-indexer]]
+==== Mass indexer
+
+During <<mapper-orm-indexing-massindexer,mass indexing>>,
+an application instance will exceptionally bypass <<coordination-database-polling-sharding,sharding>>
+and index entities from any shard.
+
+Bypassing sharding can be dangerous,
+because indexing the same entity simultaneously from an event processor and the mass indexer
+could potentially result in an out-of-sync index in some rare situations.
+This is why, to be perfectly safe, event processing gets suspended while mass indexing is in progress.
+Events are still produced and persisted, but their processing gets delayed until mass indexing finishes.
+
+The suspension of event processing is achieved by registering a mass indexer agent in the agent table,
+which event processors will eventually detect and react to by suspending themselves.
+When mass indexing finishes, the mass indexer agent is removed from the agent table,
+event processors detect that and resume event processing.
+
+The mass indexer agent can be configured using the following configuration properties:
+
+[source]
+----
+hibernate.search.coordination.mass_indexer.polling_interval = 100
+hibernate.search.coordination.mass_indexer.pulse_interval = 2000
+hibernate.search.coordination.mass_indexer.pulse_expiration = 30000
+----
+
+* `mass_indexer.polling_interval` defines how long to wait for another query to the agent table
+when actively waiting for event processors to suspend themselves,
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `100`.
++
+Low values will reduce the time it takes for the mass indexer agent to detect that event processors finally suspended themselves,
+but will increase the stress on the database while the mass indexer agent is actively waiting.
++
+High values will increase the time it takes for the mass indexer agent to detect that event processors finally suspended themselves,
+but will reduce the stress on the database while the mass indexer agent is actively waiting.
+* `mass_indexer.pulse_interval` defines how long the mass indexer can wait before it must perform a "pulse",
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `2000`.
++
+See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
++
+The pulse interval must be set to a value between the polling interval (see above) and one third (1/3) of the expiration interval (see below).
++
+Low values (closer to the polling interval) mean reduced risk of incorrectly considering a mass indexer agent disconnected,
+but more stress on the database because of more frequent updates of the mass indexer agent's entry in the agent table.
++
+High values (closer to the expiration interval) mean increased risk of incorrectly considering a mass indexer agent disconnected,
+but less stress on the database because of less frequent updates of the mass indexer agent's entry in the agent table.
+* `mass_indexer.pulse_expiration` defines how long an event processor "pulse" remains valid
+before considering the processor disconnected and forcibly removing it from the cluster,
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `30000`.
++
+See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
++
+The expiration interval must be set to a value 3 times larger than the pulse interval (see above).
++
+Low values (closer to the pulse interval) mean a shorter delay before resuming
+event processing when a node currently performing mass indexing
+abruptly leaves the cluster due to a crash or network failure,
+but increased risk of incorrectly considering a mass indexer disconnected.
++
+High values (much larger than the pulse interval) mean a longer delay before resuming
+event processing when a node currently performing mass indexing
+abruptly leaves the cluster due to a crash or network failure,
+but reduced risk of incorrectly considering a mass indexer disconnected.

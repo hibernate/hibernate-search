@@ -321,7 +321,14 @@ the different options applied to the `MassIndexer` affect
 the number of used worker threads and connections:
 
 ----
-threads = typesToIndexInParallel * (threadsToLoadObjects + 1);
+if ( using the default 'none' coordination strategy ) {
+    threadsToCoordinate = 0;
+}
+else {
+    threadsToCoordinate = 1;
+}
+threadsToLoadIdentifiers = 1;
+threads = threadsToCoordinate + typesToIndexInParallel * (threadsToLoadObjects + threadsToLoadIdentifiers);
 required JDBC connections = threads;
 ----
 
