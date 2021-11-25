@@ -253,6 +253,97 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_RETRY_DELAY;
 
 	/**
+	 * In the mass indexer, how long to wait for another query to the agent table
+	 * when actively waiting for event processors to suspend themselves, in milliseconds.
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Hibernate Search will wait that long before polling again when it finds other agents haven't suspended yet:
+	 * <ul>
+	 *   <li>Low values will reduce the time it takes for the mass indexer agent to detect that event processors finally suspended themselves,
+	 *   but will increase the stress on the database while the mass indexer agent is actively waiting.</li>
+	 *   <li>High values will increase the time it takes for the mass indexer agent to detect that event processors finally suspended themselves,
+	 *   but will reduce the stress on the database while the mass indexer agent is actively waiting.</li>
+	 * </ul>
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_MASS_INDEXER_POLLING_INTERVAL}.
+	 */
+	public static final String COORDINATION_MASS_INDEXER_POLLING_INTERVAL =
+			PREFIX + Radicals.COORDINATION_MASS_INDEXER_POLLING_INTERVAL;
+
+	/**
+	 * How long, in milliseconds, the mass indexer can wait before it must perform a "pulse".
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Every agent registers itself in a database table.
+	 * Regularly, the mass indexer performs a "pulse":
+	 * <ul>
+	 *     <li>It updates its owm entry in the table, to let other agents know it's still alive and prevent an expiration</li>
+	 *     <li>It removes any other agents that expired from the table</li>
+	 * </ul>
+	 * <p>
+	 * The pulse interval must be set to a value between the
+	 * {@link #COORDINATION_MASS_INDEXER_POLLING_INTERVAL polling interval}
+	 * and one third (1/3) of the {@link #COORDINATION_MASS_INDEXER_PULSE_EXPIRATION expiration interval}:
+	 * <ul>
+	 *   <li>Low values (closer to the polling interval) mean reduced risk of incorrectly considering a mass indexer agent disconnected,
+	 *   but more stress on the database because of more frequent updates of the mass indexer agent's entry in the agent table.</li>
+	 *   <li>High values (closer to the expiration interval) mean increased risk of incorrectly considering an agent disconnected,
+	 *   but less stress on the database because of less frequent updates of the mass indexer agent's entry in the agent table.</li>
+	 * </ul>
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 2000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_MASS_INDEXER_PULSE_INTERVAL}.
+	 */
+	public static final String COORDINATION_MASS_INDEXER_PULSE_INTERVAL =
+			PREFIX + Radicals.COORDINATION_MASS_INDEXER_PULSE_INTERVAL;
+
+	/**
+	 * How long, in milliseconds, a mass indexer agent "pulse" remains valid
+	 * before considering the agent disconnected and forcibly removing it from the cluster.
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Every agent registers itself in a database table.
+	 * Regularly, while polling for events to process,
+	 * each agent performs a {@link #COORDINATION_MASS_INDEXER_PULSE_INTERVAL "pulse"}:
+	 * it pauses what it was doing and (among other things) updates its entry in the table,
+	 * to let other agents know it's still alive and prevent an expiration.
+	 * If an agent fails to update its entry for longer than the value of the expiration interval,
+	 * it will be considered disconnected: other agents will forcibly remove its entry from the table,
+	 * and will resume their work as if the expired agent didn't exist.
+	 * <p>
+	 * The expiration interval must be set to a value 3 times larger than the
+	 * {@link #COORDINATION_MASS_INDEXER_PULSE_INTERVAL pulse interval}:
+	 * <ul>
+	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before resuming
+	 *   event processing when a node currently performing mass indexing
+	 *   abruptly leaves the cluster due to a crash or network failure,
+	 *   but increased risk of incorrectly considering a mass indexer disconnected.</li>
+	 *   <li>High values (much larger than the pulse interval) mean a longer delay before resuming
+	 * 	 event processing when a node currently performing mass indexing
+	 *   abruptly leaves the cluster due to a crash or network failure,
+	 *   but reduced risk of incorrectly considering a mass indexer disconnected.</li>
+	 * </ul>
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 30000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#COORDINATION_MASS_INDEXER_PULSE_EXPIRATION}.
+	 */
+	public static final String COORDINATION_MASS_INDEXER_PULSE_EXPIRATION =
+			PREFIX + Radicals.COORDINATION_MASS_INDEXER_PULSE_EXPIRATION;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -271,6 +362,9 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_EVENT_PROCESSOR_BATCH_SIZE = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_BATCH_SIZE;
 		public static final String COORDINATION_EVENT_PROCESSOR_TRANSACTION_TIMEOUT = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_TRANSACTION_TIMEOUT;
 		public static final String COORDINATION_EVENT_PROCESSOR_RETRY_DELAY = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_RETRY_DELAY;
+		public static final String COORDINATION_MASS_INDEXER_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_POLLING_INTERVAL;
+		public static final String COORDINATION_MASS_INDEXER_PULSE_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_PULSE_INTERVAL;
+		public static final String COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_PULSE_EXPIRATION;
 	}
 
 	/**
@@ -292,6 +386,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String EVENT_PROCESSOR_BATCH_SIZE = EVENT_PROCESSOR_PREFIX + "batch_size";
 		public static final String EVENT_PROCESSOR_TRANSACTION_TIMEOUT = EVENT_PROCESSOR_PREFIX + "transaction_timeout";
 		public static final String EVENT_PROCESSOR_RETRY_DELAY = EVENT_PROCESSOR_PREFIX + "retry_delay";
+		public static final String MASS_INDEXER_PREFIX = "mass_indexer.";
+		public static final String MASS_INDEXER_POLLING_INTERVAL = MASS_INDEXER_PREFIX + "polling_interval";
+		public static final String MASS_INDEXER_PULSE_INTERVAL = MASS_INDEXER_PREFIX + "pulse_interval";
+		public static final String MASS_INDEXER_PULSE_EXPIRATION = MASS_INDEXER_PREFIX + "pulse_expiration";
 	}
 
 	/**
@@ -309,6 +407,9 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final int COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION = 30000;
 		public static final int COORDINATION_EVENT_PROCESSOR_BATCH_SIZE = 50;
 		public static final int COORDINATION_EVENT_PROCESSOR_RETRY_DELAY = 30;
+		public static final int COORDINATION_MASS_INDEXER_POLLING_INTERVAL = 100;
+		public static final int COORDINATION_MASS_INDEXER_PULSE_INTERVAL = 2000;
+		public static final int COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = 30000;
 	}
 
 }

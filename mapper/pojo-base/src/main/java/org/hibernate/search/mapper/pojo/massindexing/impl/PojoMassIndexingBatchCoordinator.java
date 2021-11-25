@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.PojoEventContextMessages;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -45,6 +46,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final boolean mergeSegmentsAfterPurge;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
+	private PojoMassIndexerAgent agent;
 
 	public PojoMassIndexingBatchCoordinator(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
@@ -85,9 +87,14 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	}
 
 	/**
-	 * Optional operations to do before the multiple-threads start indexing
+	 * Operations to do before the multiple-threads start indexing
 	 */
 	private void beforeBatch() throws InterruptedException {
+		// Create an agent to suspend concurrent indexing
+		agent = mappingContext.createMassIndexerAgent( new PojoMassIndexerAgentCreateContextImpl( mappingContext ) );
+		// Start the agent and wait until concurrent indexing actually gets suspended
+		Futures.unwrappedExceptionGet( agent.start() );
+
 		if ( dropAndCreateSchemaOnStart ) {
 			RootFailureCollector failureCollector = new RootFailureCollector(
 					PojoEventContextMessages.INSTANCE.schemaManagement()
@@ -142,6 +149,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
 		}
 		flushAndRefresh();
+		Futures.unwrappedExceptionGet( agent.preStop() );
+		agent.stop();
+		agent = null;
 	}
 
 	private void flushAndRefresh() throws InterruptedException {
@@ -156,6 +166,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 			// Indexing performed before the exception must still be committed,
 			// in order to leave the index in a consistent state
 			closer.push( PojoMassIndexingBatchCoordinator::flushAndRefresh, this );
+			closer.push( PojoMassIndexerAgent::stop, agent );
+			agent = null;
 		}
 	}
 
@@ -163,6 +175,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	protected void cleanUpOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( this::cancelPendingTask, indexingFutures );
+			closer.push( PojoMassIndexerAgent::stop, agent );
+			agent = null;
 		}
 	}
 

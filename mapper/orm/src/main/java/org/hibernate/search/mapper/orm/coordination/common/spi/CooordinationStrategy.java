@@ -8,6 +8,9 @@ package org.hibernate.search.mapper.orm.coordination.common.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
+
 /**
  * The strategy for coordinating between threads of a single-node application,
  * or between nodes of a distributed application.
@@ -37,6 +40,15 @@ public interface CooordinationStrategy {
 	 * @return A future that completes when the strategy is completely started.
 	 */
 	CompletableFuture<?> start(CoordinationStrategyStartContext context);
+
+	/**
+	 * Creates a {@link PojoMassIndexerAgent},
+	 * able to exert control over other agents that could perform indexing concurrently (e.g. automatic indexing).
+	 *
+	 * @param context A context with information about the mass indexing that is about to start.
+	 * @return An agent.
+	 */
+	PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context);
 
 	/**
 	 * @return A future that completes when all works submitted to background executors so far are completely executed.

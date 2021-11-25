@@ -13,13 +13,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentPersister;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ClusterDescriptor;
@@ -32,18 +30,13 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.jboss.logging.Logger;
 
-public final class OutboxPollingEventProcessorClusterLink {
+public final class OutboxPollingEventProcessorClusterLink
+		extends AbstractAgentClusterLink<OutboxPollingEventProcessingInstructions> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final FailureHandler failureHandler;
-	private final Clock clock;
 	private final OutboxEventFinderProvider finderProvider;
-	private final Duration pollingInterval;
-	private final Duration pulseInterval;
-	private final Duration pulseExpiration;
 
 	// Accessible for test purposes
-	final AgentPersister agentPersister;
 	final boolean shardAssignmentIsStatic;
 	ShardAssignment lastShardAssignment;
 
@@ -51,18 +44,16 @@ public final class OutboxPollingEventProcessorClusterLink {
 			FailureHandler failureHandler, Clock clock, OutboxEventFinderProvider finderProvider,
 			Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
 			ShardAssignmentDescriptor staticShardAssignment) {
-		this.agentPersister =
+		super(
 				new AgentPersister(
 						staticShardAssignment == null ? AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING
 								: AgentType.EVENT_PROCESSING_STATIC_SHARDING,
 						agentName, staticShardAssignment
-				);
-		this.failureHandler = failureHandler;
-		this.clock = clock;
+				),
+				failureHandler, clock,
+				pollingInterval, pulseInterval, pulseExpiration
+		);
 		this.finderProvider = finderProvider;
-		this.pollingInterval = pollingInterval;
-		this.pulseInterval = pulseInterval;
-		this.pulseExpiration = pulseExpiration;
 
 		if ( staticShardAssignment == null ) {
 			this.shardAssignmentIsStatic = false;
@@ -72,60 +63,26 @@ public final class OutboxPollingEventProcessorClusterLink {
 			this.shardAssignmentIsStatic = true;
 			this.lastShardAssignment = ShardAssignment.of( staticShardAssignment, finderProvider );
 		}
-		log.tracef( "Agent '%s': staticShardAssignment = %s",
+		log.tracef( "Agent '%s': created, staticShardAssignment = %s",
 				agentName, staticShardAssignment );
 	}
 
-	public OutboxPollingEventProcessingInstructions pulse(AgentRepository agentRepository) {
-		Instant now = clock.instant();
-		Instant newExpiration = now.plus( pulseExpiration );
-
-		// In order to avoid transaction deadlocks with some RDBMS (yes, I mean SQL Server),
-		// we make sure that *all* reads (listing all agents) happen before the write (creating/updating self).
-		// I'm not entirely sure, but I think it goes like this:
-		// if we read, then write, then read again, then the second read can trigger a deadlock,
-		// with each transaction holding a write lock on some rows
-		// while waiting for a read lock on the whole table.
-		List<Agent> allAgentsInIdOrder = agentRepository.findAllOrderById();
-
-		Agent preExistingSelf = agentPersister.extractSelf( allAgentsInIdOrder );
-		Agent self;
-		if ( preExistingSelf != null ) {
-			self = preExistingSelf;
+	@Override
+	protected OutboxPollingEventProcessingInstructions doPulse(AgentRepository agentRepository, Instant now,
+			List<Agent> allAgentsInIdOrder, Agent self) {
+		for ( Agent agent : allAgentsInIdOrder ) {
+			if ( AgentType.MASS_INDEXING.equals( agent.getType() ) ) {
+				log.logf( self.getState() != AgentState.SUSPENDED ? Logger.Level.INFO : Logger.Level.TRACE,
+						"Agent '%s': another agent '%s' is currently mass indexing",
+						selfReference(), now, agent );
+				agentPersister.setSuspended( self );
+				return instructCommitAndRetryPulseAfterInterval( now );
+			}
 		}
-		else {
-			self = agentPersister.createSelf( agentRepository, allAgentsInIdOrder, newExpiration );
-		}
-
-		log.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
-				selfReference(), now, self, allAgentsInIdOrder );
-
-		// In order to avoid transaction deadlocks with some RDBMS (and this time I mean Oracle),
-		// we make sure that if we need to delete expired agents,
-		// we do it without updating the agent representing self in the same transaction
-		// (creation is fine).
-		// I'm not entirely sure, but I think it goes like this:
-		// if one (already created) agent starts, updates itself,
-		// then before its transaction is finished another agent does the same,
-		// then the first agent tries to delete the second agent because it expired,
-		// then the second agent tries to delete the first agent because it expired,
-		// all in the same transaction,  well... here you have a deadlock.
-		List<Agent> timedOutAgents = allAgentsInIdOrder.stream()
-				.filter( a -> !a.equals( self ) && a.getExpiration().isBefore( now ) )
-				.collect( Collectors.toList() );
-		if ( !timedOutAgents.isEmpty() ) {
-			log.removingTimedOutAgents( selfReference(), timedOutAgents );
-			agentRepository.delete( timedOutAgents );
-			log.infof( "Agent '%s': reassessing the new situation in the next pulse",
-					selfReference(), now );
-			return instructCommitAndRetryPulseASAP( now );
-		}
-
-		// Delay expiration in each pulse
-		self.setExpiration( newExpiration );
 
 		// The target must be completely independent of the current in-memory state of this agent,
-		// so that every agent will conclude
+		// so that every agent will generate the same target
+		// when reading the same information from the database.
 		ClusterTarget clusterTarget;
 		try {
 			clusterTarget = ClusterTarget.create( allAgentsInIdOrder );
@@ -188,9 +145,9 @@ public final class OutboxPollingEventProcessorClusterLink {
 		// making others aware of our existence before we start running.
 		// Failing that, two agents spawning concurrently could potentially
 		// start their own, separate cluster (split brain).
-		// By requiring at least two transaction to switch from "just spawned" to RUNNING,
+		// By requiring at least two transactions to switch from "just spawned" to RUNNING,
 		// we make sure that on the second transaction,
-		// one of those agent would see the other and take it into account when rebalancing.
+		// one of those agents would see the other and take it into account when rebalancing.
 		if ( !clusterMembersAreInCluster( clusterTarget.membersInShardOrder, clusterTarget.descriptor ) ) {
 			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
 			return instructCommitAndRetryPulseASAP( now );
@@ -210,14 +167,6 @@ public final class OutboxPollingEventProcessorClusterLink {
 		}
 		agentPersister.setRunning( self, clusterTarget.descriptor );
 		return instructProceedWithEventProcessing( now );
-	}
-
-	public void leaveCluster(AgentRepository agentRepository) {
-		agentPersister.leaveCluster( agentRepository );
-	}
-
-	private AgentReference selfReference() {
-		return agentPersister.selfReference();
 	}
 
 	private boolean excludedAgentsAreOutOfCluster(List<Agent> excludedAgents) {
@@ -267,7 +216,8 @@ public final class OutboxPollingEventProcessorClusterLink {
 		return true;
 	}
 
-	private OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseASAP(Instant now) {
+	@Override
+	protected OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseASAP(Instant now) {
 		Instant expiration = now.plus( pollingInterval );
 		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
 				selfReference(), pollingInterval, expiration );

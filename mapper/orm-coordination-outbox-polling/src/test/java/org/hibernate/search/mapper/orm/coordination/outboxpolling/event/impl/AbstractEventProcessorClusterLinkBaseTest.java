@@ -33,6 +33,8 @@ import org.junit.Test;
  */
 abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventProcessorClusterLinkTest {
 
+	private static final long MASS_INDEXING_ID = 4353L;
+
 	OutboxPollingEventProcessorClusterLink link;
 
 	@Before
@@ -63,6 +65,13 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 
 	protected final EventProcessorClusterLinkPulseExpectations expectSuspendedAndPulseASAP() {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
+				.agent( SELF_ID, AgentState.SUSPENDED )
+				.shardAssignment( selfStaticShardAssignment() )
+				.build();
+	}
+
+	protected final EventProcessorClusterLinkPulseExpectations expectSuspendedAndPulseLater() {
+		return expect().pulseAgain( NOW.plus( PULSE_INTERVAL ) )
 				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment() )
 				.build();
@@ -182,7 +191,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
-		// see the comment in OutboxPollingEventProcessorClusterLink#pulse.
+		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
 		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
 
@@ -278,6 +287,109 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
 		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
+	}
+
+	@Test
+	public void clusterWith4Nodes_someExpired_massIndexingAgent_running() {
+		repositoryMockHelper.defineOtherAgents()
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 1 ) )
+				.other( other2Id(), other2Type(), EARLIER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 2 ) )
+				.other( other3Id(), other3Type(), EARLIER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 3 ) )
+				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, LATER, AgentState.RUNNING );
+
+		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
+		// see the comment in AbstractAgentClusterLink#pulse.
+		// We will assess the situation in the next pulse.
+		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
+
+		// Cleaning up expired agents takes precedence over suspending because a mass indexing agent exists.
+		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( other2Id(), other3Id() ) );
+	}
+
+	@Test
+	public void clusterWith4Nodes_someSuspended_someRunning_massIndexingAgent_running() {
+		repositoryMockHelper.defineOtherAgents()
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 1 ) )
+				.other( other2Id(), other2Type(), LATER, AgentState.SUSPENDED,
+						isOther2Static() ? otherShardAssignmentIn4NodeCluster( 2 ) : null )
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 3 ) )
+				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, LATER, AgentState.RUNNING );
+
+		// The presence of a mass indexing agent is more important than rebalancing:
+		// we expect the agent to suspend itself.
+		expectSuspendedAndPulseLater().verify( link.pulse( repositoryMock ) );
+	}
+
+	@Test
+	public void clusterWith4Nodes_allRunning_massIndexingAgent_running() {
+		repositoryMockHelper.defineOtherAgents()
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 1 ) )
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 2 ) )
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 3 ) )
+				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, LATER, AgentState.RUNNING );
+
+		expectSuspendedAndPulseLater().verify( link.pulse( repositoryMock ) );
+	}
+
+	@Test
+	public void clusterWith4Nodes_allRunning_massIndexingAgent_suspended() {
+		repositoryMockHelper.defineOtherAgents()
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 1 ) )
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 2 ) )
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 3 ) )
+				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, LATER, AgentState.SUSPENDED );
+
+		// Suspended mass indexing agents should not exist,
+		// but just for the sake of fully defining the behavior,
+		// we'll say they prevent automatic indexing too.
+		expectSuspendedAndPulseLater().verify( link.pulse( repositoryMock ) );
+	}
+
+	@Test
+	public void clusterWith4Nodes_allRunning_massIndexingAgent_waiting() {
+		repositoryMockHelper.defineOtherAgents()
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 1 ) )
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 2 ) )
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 3 ) )
+				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, LATER, AgentState.WAITING );
+
+		// Rebalancing mass indexing agents should not exist,
+		// but just for the sake of fully defining the behavior,
+		// we'll say they prevent automatic indexing too.
+		expectSuspendedAndPulseLater().verify( link.pulse( repositoryMock ) );
+	}
+
+	@Test
+	public void clusterWith4Nodes_allRunning_massIndexingAgent_expired() {
+		repositoryMockHelper.defineOtherAgents()
+				.other( other1Id(), other1Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 1 ) )
+				.other( other2Id(), other2Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 2 ) )
+				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
+						otherShardAssignmentIn4NodeCluster( 3 ) )
+				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, EARLIER, AgentState.RUNNING );
+
+		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
+		// see the comment in AbstractAgentClusterLink#pulse.
+		// We will assess the situation in the next pulse.
+		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
+
+		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( MASS_INDEXING_ID ) );
 	}
 
 }

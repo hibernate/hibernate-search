@@ -29,4 +29,14 @@ public interface PojoMassIndexingMappingContext {
 	 * @return A {@link FailureHandler}.
 	 */
 	FailureHandler failureHandler();
+
+	/**
+	 * Creates a {@link PojoMassIndexerAgent},
+	 * able to exert control over other agents that could perform indexing concurrently (e.g. automatic indexing).
+	 *
+	 * @param context A context with information about the mass indexing that is about to start.
+	 * @return An agent.
+	 */
+	PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context);
+
 }

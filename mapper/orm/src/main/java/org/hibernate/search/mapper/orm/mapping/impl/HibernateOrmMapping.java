@@ -62,6 +62,8 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeConte
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
@@ -319,6 +321,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	// For tests
 	public CompletableFuture<?> backgroundIndexingCompletion() {
 		return coordinationStrategyHolder.get().completion();
+	}
+
+	@Override
+	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
+		return coordinationStrategyHolder.get().createMassIndexerAgent( context );
 	}
 
 	@Override

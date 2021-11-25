@@ -31,12 +31,15 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.DefaultAgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingMassIndexerAgent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventSendingPlan;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.DefaultOutboxEventFinder;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -79,8 +82,9 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
 	private BeanHolder<? extends AgentRepositoryProvider> agentRepositoryProviderHolder;
-	private ScheduledExecutorService scheduledExecutor;
+	private ScheduledExecutorService eventProcessorExecutor;
 	private List<OutboxPollingEventProcessor> eventProcessors;
+	private OutboxPollingMassIndexerAgent.Factory massIndexerAgentFactory;
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
@@ -132,6 +136,9 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 			log.eventProcessorDisabled();
 		}
 
+		this.massIndexerAgentFactory = OutboxPollingMassIndexerAgent.factory( context.mapping(), context.clock(),
+				configurationSource );
+
 		return CompletableFuture.completedFuture( null );
 	}
 
@@ -161,11 +168,11 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 		OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
 				context.clock(), configurationSource );
 
-		scheduledExecutor = context.threadPoolProvider()
+		eventProcessorExecutor = context.threadPoolProvider()
 				.newScheduledExecutor( shardAssignmentOrNulls.size(), OutboxPollingEventProcessor.NAME_PREFIX );
 		eventProcessors = new ArrayList<>();
 		for ( ShardAssignmentDescriptor shardAssignmentOrNull : shardAssignmentOrNulls ) {
-			eventProcessors.add( factory.create( scheduledExecutor, finderProviderHolder.get(),
+			eventProcessors.add( factory.create( eventProcessorExecutor, finderProviderHolder.get(),
 					agentRepositoryProviderHolder.get(), shardAssignmentOrNull ) );
 		}
 		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
@@ -195,6 +202,11 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 			shardAssignment.add( new ShardAssignmentDescriptor( totalShardCount, shardIndex ) );
 		}
 		return shardAssignment;
+	}
+
+	@Override
+	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
+		return massIndexerAgentFactory.create( context, agentRepositoryProviderHolder.get() );
 	}
 
 	@Override
@@ -231,7 +243,7 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( OutboxPollingEventProcessor::stop, eventProcessors );
-			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutor );
+			closer.push( ScheduledExecutorService::shutdownNow, eventProcessorExecutor );
 			closer.push( BeanHolder::close, finderProviderHolder );
 			closer.push( BeanHolder::close, agentRepositoryProviderHolder );
 		}
