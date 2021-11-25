@@ -153,7 +153,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		SessionFactory sessionFactory;
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
 		return sessionFactory;
@@ -162,7 +162,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 	private SessionFactory setupWithCleanup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 		return sessionFactory;

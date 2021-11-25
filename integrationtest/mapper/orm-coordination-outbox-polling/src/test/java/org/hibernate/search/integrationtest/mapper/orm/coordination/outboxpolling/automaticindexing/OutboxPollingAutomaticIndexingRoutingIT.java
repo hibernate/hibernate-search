@@ -40,7 +40,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 	public void setup() {
 		backendMock.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = setupHelper.start()
-				.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.setup( RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}

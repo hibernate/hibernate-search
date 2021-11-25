@@ -67,13 +67,13 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_ENABLED )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER )
+	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> AGENT_REPOSITORY_PROVIDER =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.AGENT_REPOSITORY_PROVIDER )
 					.asBeanReference( AgentRepositoryProvider.class )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER )
+	private static final OptionalConfigurationProperty<BeanReference<? extends OutboxEventFinderProvider>> OUTBOX_EVENT_FINDER_PROVIDER =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.OUTBOX_EVENT_FINDER_PROVIDER )
 					.asBeanReference( OutboxEventFinderProvider.class )
 					.build();
 
@@ -92,7 +92,7 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 	@Override
 	public CompletableFuture<?> start(CoordinationStrategyStartContext context) {
 		Optional<BeanHolder<? extends AgentRepositoryProvider>> agentRepositoryProviderHolderOptional =
-				EVENT_PROCESSOR_AGENT_REPOSITORY_PROVIDER.getAndMap(
+				AGENT_REPOSITORY_PROVIDER.getAndMap(
 						context.configurationPropertySource(), context.beanResolver()::resolve );
 		if ( agentRepositoryProviderHolderOptional.isPresent() ) {
 			agentRepositoryProviderHolder = agentRepositoryProviderHolderOptional.get();
@@ -106,7 +106,7 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 		}
 
 		Optional<BeanHolder<? extends OutboxEventFinderProvider>> finderProviderHolderOptional =
-				EVENT_PROCESSOR_OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
+				OUTBOX_EVENT_FINDER_PROVIDER.getAndMap(
 						context.configurationPropertySource(), context.beanResolver()::resolve );
 		if ( finderProviderHolderOptional.isPresent() ) {
 			finderProviderHolder = finderProviderHolderOptional.get();

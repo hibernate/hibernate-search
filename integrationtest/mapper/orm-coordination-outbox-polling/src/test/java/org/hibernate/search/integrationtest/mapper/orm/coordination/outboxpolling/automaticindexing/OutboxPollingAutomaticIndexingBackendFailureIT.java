@@ -292,7 +292,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 		failureHandler = new TestFailureHandler();
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
-				.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.withProperty( "hibernate.search.coordination.event_processor.retry_delay", retryDelay )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
