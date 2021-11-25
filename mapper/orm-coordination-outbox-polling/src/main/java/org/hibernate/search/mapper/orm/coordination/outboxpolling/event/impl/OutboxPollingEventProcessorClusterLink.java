@@ -83,21 +83,42 @@ public final class OutboxPollingEventProcessorClusterLink {
 		// with each transaction holding a write lock on some rows
 		// while waiting for a read lock on the whole table.
 		List<Agent> allAgentsInIdOrder = agentRepository.findAllOrderById();
-		Agent self = createOrUpdateSelf( agentRepository, allAgentsInIdOrder, now );
+
+		Agent preExistingSelf = extractSelf( allAgentsInIdOrder );
+		Agent self;
+		if ( preExistingSelf != null ) {
+			self = preExistingSelf;
+		}
+		else {
+			self = createSelf( agentRepository, allAgentsInIdOrder, now );
+		}
+
 		log.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
 				selfReference, now, self, allAgentsInIdOrder );
 
+		// In order to avoid transaction deadlocks with some RDBMS (and this time I mean Oracle),
+		// we make sure that if we need to delete expired agents,
+		// we do it without updating the agent representing self in the same transaction
+		// (creation is fine).
+		// I'm not entirely sure, but I think it goes like this:
+		// if one (already created) agent starts, updates itself,
+		// then before its transaction is finished another agent does the same,
+		// then the first agent tries to delete the second agent because it expired,
+		// then the second agent tries to delete the first agent because it expired,
+		// all in the same transaction,  well... here you have a deadlock.
 		List<Agent> timedOutAgents = allAgentsInIdOrder.stream()
-				.filter( a -> a.getExpiration().isBefore( now ) )
+				.filter( a -> !a.equals( self ) && a.getExpiration().isBefore( now ) )
 				.collect( Collectors.toList() );
 		if ( !timedOutAgents.isEmpty() ) {
 			log.removingTimedOutAgents( selfReference, timedOutAgents );
 			agentRepository.delete( timedOutAgents );
-			log.infof( "Agent '%s': suspending the agent to assess the new situation in the next pulse",
+			log.infof( "Agent '%s': reassessing the new situation in the next pulse",
 					selfReference, now );
-			setSuspended( self );
 			return instructCommitAndRetryPulseASAP( now );
 		}
+
+		// Delay expiration in each pulse
+		self.setExpiration( now.plus( pulseExpiration ) );
 
 		// The target must be completely independent of the current in-memory state of this agent,
 		// so that every agent will conclude
@@ -176,6 +197,17 @@ public final class OutboxPollingEventProcessorClusterLink {
 		return instructProceedWithEventProcessing( now );
 	}
 
+	private Agent extractSelf(List<Agent> allAgentsInIdOrder) {
+		if ( selfReference != null ) {
+			for ( Agent agent : allAgentsInIdOrder ) {
+				if ( agent.getId().equals( selfReference.id ) ) {
+					return agent;
+				}
+			}
+		}
+		return null;
+	}
+
 	public void leaveCluster(AgentRepository store) {
 		if ( selfReference == null ) {
 			// We never even joined the cluster
@@ -188,47 +220,33 @@ public final class OutboxPollingEventProcessorClusterLink {
 		}
 	}
 
-	private Agent createOrUpdateSelf(AgentRepository agentRepository, List<Agent> allAgentsInIdOrder, Instant now) {
+	private Agent createSelf(AgentRepository agentRepository, List<Agent> allAgentsInIdOrder, Instant now) {
 		Instant nextExpiration = now.plus( pulseExpiration );
-		Agent self = null;
-		if ( selfReference != null ) {
-			for ( Agent agent : allAgentsInIdOrder ) {
-				if ( agent.getId().equals( selfReference.id ) ) {
-					self = agent;
-					break;
-				}
-			}
-		}
-		if ( self == null ) {
-			AgentType type;
-			ShardAssignmentDescriptor shardAssignment;
-			if ( shardAssignmentIsStatic ) {
-				type = AgentType.EVENT_PROCESSING_STATIC_SHARDING;
-				shardAssignment = lastShardAssignment.descriptor;
-			}
-			else {
-				type = AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING;
-				shardAssignment = null;
-			}
-			self = new Agent( type, agentName, nextExpiration, EventProcessingState.SUSPENDED, shardAssignment );
-			agentRepository.create( self );
-			selfReference = self.getReference();
-			ListIterator<Agent> it = allAgentsInIdOrder.listIterator();
-			// Find the position where self should be inserted
-			while ( it.hasNext() ) {
-				if ( it.next().getId() >= self.getId() ) {
-					if ( it.hasPrevious() ) {
-						it.previous();
-					}
-					break;
-				}
-			}
-			// Insert self
-			it.add( self );
+		AgentType type;
+		ShardAssignmentDescriptor shardAssignment;
+		if ( shardAssignmentIsStatic ) {
+			type = AgentType.EVENT_PROCESSING_STATIC_SHARDING;
+			shardAssignment = lastShardAssignment.descriptor;
 		}
 		else {
-			self.setExpiration( nextExpiration );
+			type = AgentType.EVENT_PROCESSING_DYNAMIC_SHARDING;
+			shardAssignment = null;
 		}
+		Agent self = new Agent( type, agentName, nextExpiration, EventProcessingState.SUSPENDED, shardAssignment );
+		agentRepository.create( self );
+		selfReference = self.getReference();
+		ListIterator<Agent> it = allAgentsInIdOrder.listIterator();
+		// Find the position where self should be inserted
+		while ( it.hasNext() ) {
+			if ( it.next().getId() >= self.getId() ) {
+				if ( it.hasPrevious() ) {
+					it.previous();
+				}
+				break;
+			}
+		}
+		// Insert self
+		it.add( self );
 		return self;
 	}
 

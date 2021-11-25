@@ -68,6 +68,23 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 				.build();
 	}
 
+	protected final ClusterLinkPulseExpectations expectInitialStateAndPulseASAP() {
+		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
+				.agent( SELF_ID, repositoryMockHelper.selfInitialState() != null
+						// If self created before this pulse:
+						? repositoryMockHelper.selfInitialState()
+						// If self created by this pulse:
+						: EventProcessingState.SUSPENDED )
+				.expiration( repositoryMockHelper.selfInitialExpiration() != null
+						// If self created before this pulse:
+						? repositoryMockHelper.selfInitialExpiration()
+						// If self created by this pulse:
+						: NOW.plus( PULSE_EXPIRATION ) )
+				.shardAssignment( selfStaticShardAssignment() != null ? selfStaticShardAssignment()
+						: repositoryMockHelper.selfInitialShardAssignment() )
+				.build();
+	}
+
 	protected final ClusterLinkPulseExpectations expectRebalancing(ShardAssignmentDescriptor shardAssignment) {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, EventProcessingState.REBALANCING )
@@ -164,8 +181,10 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 				.other( other3Id(), other3Type(), EARLIER, EventProcessingState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		// Suspend the agent: we will assess the situation in the next pulse
-		expectSuspendedAndPulseASAP().verify( link.pulse( repositoryMock ) );
+		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
+		// see the comment in OutboxPollingEventProcessorClusterLink#pulse.
+		// We will assess the situation in the next pulse.
+		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
 
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( other2Id(), other3Id() ) );
 	}

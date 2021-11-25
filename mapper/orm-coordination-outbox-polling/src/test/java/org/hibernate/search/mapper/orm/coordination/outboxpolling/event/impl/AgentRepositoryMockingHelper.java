@@ -38,6 +38,9 @@ class AgentRepositoryMockingHelper {
 	private final List<Agent> otherAgents = new ArrayList<>();
 	private Supplier<Agent> selfSupplier = null;
 	private boolean selfPreExisting;
+	private EventProcessingState selfInitialState;
+	private Instant selfInitialExpiration;
+	private ShardAssignmentDescriptor selfInitialShardAssignment;
 
 	public AgentRepositoryMockingHelper(AgentRepository repositoryMock) {
 		this.repositoryMock = repositoryMock;
@@ -47,6 +50,9 @@ class AgentRepositoryMockingHelper {
 		ArgumentCaptor<Agent> selfCaptor = ArgumentCaptor.forClass( Agent.class );
 		selfSupplier = selfCaptor::getValue;
 		selfPreExisting = false;
+		selfInitialState = null;
+		selfInitialExpiration = null;
+		selfInitialShardAssignment = null;
 		doAnswer( invocation -> {
 			Agent agent = invocation.getArgument( 0 );
 			agent.setId( selfId );
@@ -58,6 +64,9 @@ class AgentRepositoryMockingHelper {
 	void defineSelfPreExisting(Agent self) {
 		selfSupplier = () -> self;
 		selfPreExisting = true;
+		selfInitialState = self.getState();
+		selfInitialExpiration = self.getExpiration();
+		selfInitialShardAssignment = self.getShardAssignment();
 	}
 
 	AllAgentsDefinition defineOtherAgents() {
@@ -84,6 +93,18 @@ class AgentRepositoryMockingHelper {
 		return allAgentsInIdOrder().stream()
 				.filter( agent -> idSet.contains( agent.getId() ) )
 				.collect( Collectors.toList() );
+	}
+
+	public EventProcessingState selfInitialState() {
+		return selfInitialState;
+	}
+
+	public Instant selfInitialExpiration() {
+		return selfInitialExpiration;
+	}
+
+	public ShardAssignmentDescriptor selfInitialShardAssignment() {
+		return selfInitialShardAssignment;
 	}
 
 	class AllAgentsDefinition {
