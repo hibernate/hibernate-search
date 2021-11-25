@@ -92,15 +92,16 @@ public class CallQueue<C extends Call<? super C>> {
 			return behavior.execute();
 		}
 
+		List<AssertionError> duplicateCallsMatchingErrors = new ArrayList<>();
 		// Maybe this is just a duplicate call?
 		// If duplicate calls are allowed, try to match against last matching calls.
 		if ( allowDuplicates ) {
-			behavior = tryMatchInOrder( lastMatchingCallInOrder, actualCall, callVerifyFunction, matchingErrors );
+			behavior = tryMatchInOrder( lastMatchingCallInOrder, actualCall, callVerifyFunction, duplicateCallsMatchingErrors );
 			if ( behavior != null ) {
 				return behavior.execute();
 			}
 
-			behavior = tryMatchOutOfOrder( lastMatchingCallsOutOfOrder, actualCall, callVerifyFunction, matchingErrors );
+			behavior = tryMatchOutOfOrder( lastMatchingCallsOutOfOrder, actualCall, callVerifyFunction, duplicateCallsMatchingErrors );
 			if ( behavior != null ) {
 				return behavior.execute();
 			}
@@ -113,15 +114,28 @@ public class CallQueue<C extends Call<? super C>> {
 			return noExpectationBehavior.apply( actualCall );
 		}
 
-		if ( !matchingErrors.isEmpty() ) {
+		if ( !matchingErrors.isEmpty() || !duplicateCallsMatchingErrors.isEmpty() ) {
 			// We found similar calls, but they didn't match
 			StringBuilder failureMessage = new StringBuilder(
-					"Unexpected call, see below for details.\n\tLast matching call was "
-							+ lastMatchingCall + "\n\tFailed matching attempts for this call: "
+					"Unexpected call, see below for details.\nLast matching call was "
+							+ lastMatchingCall
 			);
-			for ( AssertionError matchingError : matchingErrors ) {
-				failureMessage.append( "\n" ).append( matchingError.getMessage() );
+			if ( !matchingErrors.isEmpty() ) {
+				failureMessage.append( "\n----------------------------------------" );
+				failureMessage.append( "\nFailed matching attempts against expected future calls:\n" );
+				for ( AssertionError matchingError : matchingErrors ) {
+					failureMessage.append( "\n" ).append( matchingError.getMessage() );
+				}
 			}
+			if ( !duplicateCallsMatchingErrors.isEmpty() ) {
+				failureMessage.append( "\n----------------------------------------" );
+				failureMessage.append( "\nFailed matching attempts against previous calls"
+						+ " (in case this call was just a duplicate):\n" );
+				for ( AssertionError matchingError : duplicateCallsMatchingErrors ) {
+					failureMessage.append( "\n" ).append( matchingError.getMessage() );
+				}
+			}
+			failureMessage.append( "\n----------------------------------------" );
 			throw createFailure( failureMessage.toString() );
 		}
 		else {
