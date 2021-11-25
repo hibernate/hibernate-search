@@ -24,7 +24,8 @@ import org.mockito.ArgumentCaptor;
 /**
  * Tests edge cases of static sharding.
  */
-public class ClusterLinkStaticShardingEdgeCasesTest extends AbstractClusterLinkTest {
+public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
+		extends AbstractEventProcessorClusterLinkTest {
 	private static final long OTHER_0_ID = SELF_ID - 1;
 	private static final long OTHER_1_ID = SELF_ID + 1;
 	private static final long OTHER_2_ID = SELF_ID + 2;

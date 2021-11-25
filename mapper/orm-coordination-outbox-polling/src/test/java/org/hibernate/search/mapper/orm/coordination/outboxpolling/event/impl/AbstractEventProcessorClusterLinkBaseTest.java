@@ -31,7 +31,7 @@ import org.junit.Test;
  * By testing all these combinations, we manage to test many (all?) possible situations
  * that {@link OutboxPollingEventProcessorClusterLink#pulse(AgentRepository)} can encounter.
  */
-abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
+abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventProcessorClusterLinkTest {
 
 	OutboxPollingEventProcessorClusterLink link;
 
@@ -57,18 +57,18 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 		defineSelfCreatedAndStillPresent( link, state, shardAssignment );
 	}
 
-	protected final ClusterLinkPulseExpectations.InstructionsStep expect() {
+	protected final EventProcessorClusterLinkPulseExpectations.InstructionsStep expect() {
 		return expect( selfStaticShardAssignment(), link );
 	}
 
-	protected final ClusterLinkPulseExpectations expectSuspendedAndPulseASAP() {
+	protected final EventProcessorClusterLinkPulseExpectations expectSuspendedAndPulseASAP() {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment() )
 				.build();
 	}
 
-	protected final ClusterLinkPulseExpectations expectInitialStateAndPulseASAP() {
+	protected final EventProcessorClusterLinkPulseExpectations expectInitialStateAndPulseASAP() {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, repositoryMockHelper.selfInitialState() != null
 						// If self created before this pulse:
@@ -85,14 +85,14 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 				.build();
 	}
 
-	protected final ClusterLinkPulseExpectations expectWaiting(ShardAssignmentDescriptor shardAssignment) {
+	protected final EventProcessorClusterLinkPulseExpectations expectWaiting(ShardAssignmentDescriptor shardAssignment) {
 		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( shardAssignment )
 				.build();
 	}
 
-	protected final ClusterLinkPulseExpectations expectRunning(ShardAssignmentDescriptor shardAssignment) {
+	protected final EventProcessorClusterLinkPulseExpectations expectRunning(ShardAssignmentDescriptor shardAssignment) {
 		return expect().processThenPulse( shardAssignment )
 				.agent( SELF_ID, AgentState.RUNNING )
 				.shardAssignment( shardAssignment )
@@ -154,9 +154,9 @@ abstract class AbstractClusterLinkBaseTest extends AbstractClusterLinkTest {
 		return new ShardAssignmentDescriptor( 5, 1 );
 	}
 
-	protected abstract ClusterLinkPulseExpectations onNoOtherAgents();
+	protected abstract EventProcessorClusterLinkPulseExpectations onNoOtherAgents();
 
-	protected abstract ClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady();
+	protected abstract EventProcessorClusterLinkPulseExpectations onClusterWith4NodesAllOther3NodesReady();
 
 	@Before
 	public void initPulseMocks() {

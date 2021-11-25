@@ -35,7 +35,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-abstract class AbstractClusterLinkTest {
+abstract class AbstractEventProcessorClusterLinkTest {
 
 	static final Instant NOW = Instant.parse( "2021-10-21T14:30:00.000Z" );
 	static final Instant EARLIER = NOW.minus( 1, ChronoUnit.NANOS );
@@ -111,9 +111,9 @@ abstract class AbstractClusterLinkTest {
 		repositoryMockHelper.defineSelfPreExisting( self );
 	}
 
-	protected final ClusterLinkPulseExpectations.InstructionsStep expect(ShardAssignmentDescriptor selfStaticShardAssignment,
+	protected final EventProcessorClusterLinkPulseExpectations.InstructionsStep expect(ShardAssignmentDescriptor selfStaticShardAssignment,
 			OutboxPollingEventProcessorClusterLink link) {
-		return ClusterLinkPulseExpectations.expect( repositoryMockHelper, eventFinderMock, selfStaticShardAssignment, link );
+		return EventProcessorClusterLinkPulseExpectations.expect( repositoryMockHelper, eventFinderMock, selfStaticShardAssignment, link );
 	}
 
 }
