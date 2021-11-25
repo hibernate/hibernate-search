@@ -183,7 +183,7 @@ Indexing happens in a background thread::
 When a Hibernate ORM session is flushed,
 Hibernate Search will persist entity change events within the same Hibernate ORM session and the same transaction.
 +
-A <<coordination-outbox-polling-processors,background processor>> polls the database for new entity change events,
+A <<coordination-outbox-polling-agents-event-processor,event processor>> polls the database for new entity change events,
 and asynchronously performs reindexing of the appropriate entities when it finds new events
 (i.e. after the transaction is committed).
 +
@@ -237,7 +237,7 @@ This means these changes are safely stored to disk,
 but this does not mean a search query ran immediately when the thread resumes will take the changes into account:
 <<coordination-outbox-polling-indexing-background,indexing will happen at a later time, asynchronously, in a background processor>>.
 +
-You can <<coordination-outbox-polling-processors,configure this background processor>> to run more often,
+You can <<coordination-outbox-polling-agents-event-processor,configure this event processor>> to run more often,
 but it will remain asynchronous.
 
 [[coordination-outbox-polling-schema]]
@@ -276,13 +276,13 @@ In order to avoid unnecessarily indexing the same entity multiple times on diffe
 Hibernate Search partitions the entities in what it calls "shards":
 
 * Each entity belongs to exactly one shard.
-* Each application node involved in <<coordination-outbox-polling-processors,event processing>>
+* Each application node involved in <<coordination-outbox-polling-agents-event-processor,event processing>>
 is uniquely assigned one or more shards, and will only process events related to entities in these shards.
 
 In order to reliably assign shards,
 Hibernate Search <<coordination-outbox-polling-schema,adds an agent table to the database>>,
 and uses that table to register agents involved in indexing (most of the time, one application instance = one agent =
-the <<coordination-outbox-polling-processors,indexing processor>>).
+the <<coordination-outbox-polling-agents-event-processor,event processor>>).
 The registered agents form a cluster.
 
 To make sure that agents are always assigned one shard,
@@ -311,7 +311,7 @@ and uses that information to dynamically assign a single, unique shard to each a
 updating assignments as instances start or stop.
 
 Dynamic sharding does not require any specific configuration,
-but you may want to configure <<coordination-outbox-polling-processors, the background event processor>>.
+but you may want to configure <<coordination-outbox-polling-agents-event-processor,the event processor>>.
 
 [[coordination-outbox-polling-sharding-static]]
 ==== [[coordination-database-polling-sharding-static]] Static sharding
@@ -352,7 +352,7 @@ or event out-of-sync indexes.
 [TIP]
 ====
 Sharding settings are irrelevant, and thus ignored,
-when <<coordination-outbox-polling-processors,processing is disabled>>.
+when <<coordination-outbox-polling-agents-event-processor,event processing is disabled>>.
 ====
 
 .Example of static sharding settings
@@ -401,7 +401,7 @@ but must be consistent across all application nodes involved in processing at al
 
 If you cannot stop your whole application cluster,
 the only way to safely change sharding settings is to restart nodes one by one
-to disable <<coordination-outbox-polling-processors,processing>>,
+to disable <<coordination-outbox-polling-agents-event-processor,event processing>>,
 then (once every node has processing disabled),
 restart nodes one by one with the new sharding settings and with processing re-enabled.
 ====
