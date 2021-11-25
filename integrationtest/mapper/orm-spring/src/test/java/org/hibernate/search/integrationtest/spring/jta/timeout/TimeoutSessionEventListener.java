@@ -7,14 +7,14 @@
 package org.hibernate.search.integrationtest.spring.jta.timeout;
 
 import org.hibernate.BaseSessionEventListener;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.impl.OutboxPollingCooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.impl.OutboxPollingCoordinationStrategy;
 
 public class TimeoutSessionEventListener extends BaseSessionEventListener {
 
 	@Override
 	public void jdbcPrepareStatementEnd() {
 		String name = Thread.currentThread().getName();
-		if ( !name.contains( OutboxPollingCooordinationStrategy.PROCESSOR_NAME_PREFIX ) ) {
+		if ( !name.contains( OutboxPollingCoordinationStrategy.PROCESSOR_NAME_PREFIX ) ) {
 			return;
 		}
 

@@ -43,7 +43,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.L
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class OutboxPollingCooordinationStrategy implements CooordinationStrategy {
+public class OutboxPollingCoordinationStrategy implements CooordinationStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
