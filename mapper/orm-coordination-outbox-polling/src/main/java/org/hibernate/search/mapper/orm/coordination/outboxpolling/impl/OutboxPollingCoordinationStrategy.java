@@ -158,7 +158,8 @@ public class OutboxPollingCoordinationStrategy implements CooordinationStrategy 
 			shardAssignmentOrNulls = Collections.singletonList( null );
 		}
 
-		OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(), configurationSource );
+		OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
+				context.clock(), configurationSource );
 
 		scheduledExecutor = context.threadPoolProvider()
 				.newScheduledExecutor( shardAssignmentOrNulls.size(), OutboxPollingEventProcessor.NAME_PREFIX );

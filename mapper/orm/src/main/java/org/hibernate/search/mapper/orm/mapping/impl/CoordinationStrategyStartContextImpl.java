@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.time.Clock;
+
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
@@ -46,6 +48,11 @@ public class CoordinationStrategyStartContextImpl implements CoordinationStrateg
 	@Override
 	public ThreadPoolProvider threadPoolProvider() {
 		return delegate.threadPoolProvider();
+	}
+
+	@Override
+	public Clock clock() {
+		return Clock.systemUTC();
 	}
 
 	@Override
