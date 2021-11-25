@@ -36,6 +36,7 @@ public class ClusterLinkPulseExpectations {
 	private final Optional<OutboxEventFinder> expectedInstructionsEventFinder;
 
 	private final Long expectedSelfAgentId;
+	private final Instant expectedSelfAgentExpiration;
 	private final EventProcessingState expectedSelfAgentCurrentState;
 	private final ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
 
@@ -46,6 +47,7 @@ public class ClusterLinkPulseExpectations {
 		this.expectedInstructionsExpiration = builder.expectedInstructionsExpiration;
 		this.expectedInstructionsEventFinder = builder.expectedInstructionsEventFinder;
 		this.expectedSelfAgentId = builder.expectedSelfAgentId;
+		this.expectedSelfAgentExpiration = builder.expectedSelfAgentExpiration;
 		this.expectedSelfAgentCurrentState = builder.expectedSelfAgentCurrentState;
 		this.expectedSelfAgentShardAssignment = builder.expectedSelfAgentShardAssignment;
 	}
@@ -57,6 +59,7 @@ public class ClusterLinkPulseExpectations {
 				", expectedInstructionsExpiration=" + expectedInstructionsExpiration +
 				", expectedInstructionsEventFinder=" + expectedInstructionsEventFinder +
 				", expectedSelfAgentId=" + expectedSelfAgentId +
+				", expectedSelfAgentExpiration=" + expectedSelfAgentExpiration +
 				", expectedSelfAgentCurrentState=" + expectedSelfAgentCurrentState +
 				", expectedSelfAgentShardAssignment=" + expectedSelfAgentShardAssignment +
 				'}';
@@ -86,7 +89,7 @@ public class ClusterLinkPulseExpectations {
 					.isEqualTo( expectedSelfAgentId );
 			softly.assertThat( selfAgent.getExpiration() )
 					.as( "selfAgent.expiration" )
-					.isEqualTo( NOW.plus( PULSE_EXPIRATION ) );
+					.isEqualTo( expectedSelfAgentExpiration );
 			softly.assertThat( selfAgent.getState() )
 					.as( "selfAgent.state" )
 					.isEqualTo( expectedSelfAgentCurrentState );
@@ -107,6 +110,8 @@ public class ClusterLinkPulseExpectations {
 	}
 
 	public interface AgentOptionsStep {
+		AgentOptionsStep expiration(Instant instant);
+
 		AgentOptionsStep shardAssignment(ShardAssignmentDescriptor shardAssignment);
 
 		ClusterLinkPulseExpectations build();
@@ -123,6 +128,7 @@ public class ClusterLinkPulseExpectations {
 		private Optional<OutboxEventFinder> expectedInstructionsEventFinder;
 
 		private Long expectedSelfAgentId;
+		private Instant expectedSelfAgentExpiration;
 		private EventProcessingState expectedSelfAgentCurrentState;
 		private ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
 
@@ -155,6 +161,13 @@ public class ClusterLinkPulseExpectations {
 		public AgentOptionsStep agent(long expectedId, EventProcessingState expectedCurrentState) {
 			this.expectedSelfAgentId = expectedId;
 			this.expectedSelfAgentCurrentState = expectedCurrentState;
+			this.expectedSelfAgentExpiration = NOW.plus( PULSE_EXPIRATION );
+			return this;
+		}
+
+		@Override
+		public AgentOptionsStep expiration(Instant instant) {
+			this.expectedSelfAgentExpiration = instant;
 			return this;
 		}
 
