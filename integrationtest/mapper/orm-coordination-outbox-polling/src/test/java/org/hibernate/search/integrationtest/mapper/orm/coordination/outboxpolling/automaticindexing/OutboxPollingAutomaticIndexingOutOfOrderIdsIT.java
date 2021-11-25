@@ -58,7 +58,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.expectAnySchema( IndexedEntity.INDEX )
 				.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.event_processor.outbox_event_finder.provider", outboxEventFinder.provider() )
+				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				.setup( IndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
