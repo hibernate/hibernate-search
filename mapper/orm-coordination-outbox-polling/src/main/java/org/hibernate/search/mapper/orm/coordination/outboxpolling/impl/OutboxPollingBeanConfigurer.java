@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 
 public class OutboxPollingBeanConfigurer implements BeanConfigurer {
@@ -17,7 +17,7 @@ public class OutboxPollingBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				CooordinationStrategy.class,
+				CoordinationStrategy.class,
 				HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
 				BeanReference.ofInstance( new OutboxPollingCoordinationStrategy() )
 		);

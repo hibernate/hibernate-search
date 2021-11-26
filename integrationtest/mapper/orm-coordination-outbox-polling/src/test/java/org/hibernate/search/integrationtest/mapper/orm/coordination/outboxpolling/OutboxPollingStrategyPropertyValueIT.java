@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
@@ -52,7 +52,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 				HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
 				"builtin:" + HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
 				BeanReference.of(
-						CooordinationStrategy.class,
+						CoordinationStrategy.class,
 						HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
 						BeanRetrieval.BUILTIN
 				)

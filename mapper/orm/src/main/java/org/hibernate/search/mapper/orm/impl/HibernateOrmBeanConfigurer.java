@@ -12,13 +12,13 @@ import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 
 public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define(
-				CooordinationStrategy.class,
+				CoordinationStrategy.class,
 				NoCoordinationStrategy.NAME,
 				BeanReference.ofInstance( new NoCoordinationStrategy() )
 		);

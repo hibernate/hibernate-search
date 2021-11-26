@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
@@ -21,11 +21,11 @@ public final class HibernateOrmMapperDelegate
 		implements PojoMapperDelegate<HibernateOrmMappingPartialBuildState> {
 
 	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
-	private final BeanHolder<? extends CooordinationStrategy> coordinationStrategyHolder;
+	private final BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
 	private final ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
 
 	HibernateOrmMapperDelegate(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			BeanHolder<? extends CooordinationStrategy> coordinationStrategyHolder,
+			BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder,
 			ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy) {
 		typeContextContainerBuilder = new HibernateOrmTypeContextContainer.Builder( basicTypeMetadataProvider );
 		this.coordinationStrategyHolder = coordinationStrategyHolder;
@@ -36,7 +36,7 @@ public final class HibernateOrmMapperDelegate
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
-			closer.push( CooordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
+			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 		}
 	}
