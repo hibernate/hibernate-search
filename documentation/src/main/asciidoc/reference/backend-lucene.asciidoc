@@ -526,9 +526,8 @@ according to the tenant ID defined in the current session:
 * documents will be indexed with the appropriate values, allowing later filtering;
 * queries will filter results appropriately.
 
-The multi-tenancy is automatically enabled on the backend if it is enabled in the mapper,
-e.g.: if a multi-tenancy strategy is defined on Hibernate ORM,
-see link:{hibernateDocUrl}#multitenacy[Multitenancy].
+The multi-tenancy is automatically enabled in the backend if it is enabled in the mapper,
+e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected in Hibernate ORM].
 
 However, it is possible to enable multi-tenancy manually.
 
