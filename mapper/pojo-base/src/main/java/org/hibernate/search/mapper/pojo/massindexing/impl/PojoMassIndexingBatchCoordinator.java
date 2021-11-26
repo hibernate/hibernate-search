@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -36,6 +37,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
+	private final DetachedBackendSessionContext detachedSession;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final int typesToIndexInParallel;
@@ -51,7 +53,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	public PojoMassIndexingBatchCoordinator(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
-			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,
+			PojoScopeSchemaManager scopeSchemaManager,
+			DetachedBackendSessionContext detachedSession,
+			PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
 		super( notifier );
@@ -59,6 +63,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		this.typeGroupsToIndex = typeGroupsToIndex;
 
 		this.scopeSchemaManager = scopeSchemaManager;
+		this.detachedSession = detachedSession;
 		this.scopeWorkspace = scopeWorkspace;
 		this.typesToIndexInParallel = typesToIndexInParallel;
 		this.documentBuilderThreads = documentBuilderThreads;
@@ -91,7 +96,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	 */
 	private void beforeBatch() throws InterruptedException {
 		// Create an agent to suspend concurrent indexing
-		agent = mappingContext.createMassIndexerAgent( new PojoMassIndexerAgentCreateContextImpl( mappingContext ) );
+		agent = mappingContext.createMassIndexerAgent(
+				new PojoMassIndexerAgentCreateContextImpl( mappingContext, detachedSession.tenantIdentifier() )
+		);
 		// Start the agent and wait until concurrent indexing actually gets suspended
 		Futures.unwrappedExceptionGet( agent.start() );
 

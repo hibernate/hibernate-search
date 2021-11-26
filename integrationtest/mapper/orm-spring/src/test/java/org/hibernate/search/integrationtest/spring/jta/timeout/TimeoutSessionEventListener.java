@@ -14,7 +14,7 @@ public class TimeoutSessionEventListener extends BaseSessionEventListener {
 	@Override
 	public void jdbcPrepareStatementEnd() {
 		String name = Thread.currentThread().getName();
-		if ( !name.contains( OutboxPollingEventProcessor.NAME_PREFIX ) ) {
+		if ( !name.contains( OutboxPollingEventProcessor.namePrefix( null ) ) ) {
 			return;
 		}
 

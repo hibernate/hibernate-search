@@ -165,6 +165,10 @@ public final class OrmSetupHelper
 
 		public SetupContext tenants(String... tenants) {
 			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
+			if ( coordinationStrategyExpectations.requiresTenantIds ) {
+				withProperty( HibernateOrmMapperSettings.MULTI_TENANCY_TENANT_IDS,
+						String.join( ",", tenants ) );
+			}
 			return thisAsC();
 		}
 
