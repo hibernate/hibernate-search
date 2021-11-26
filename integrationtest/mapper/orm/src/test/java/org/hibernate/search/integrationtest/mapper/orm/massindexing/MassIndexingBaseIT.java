@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
+import java.util.Collections;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,6 +18,7 @@ import javax.persistence.Table;
 import org.hibernate.Session;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -34,11 +37,22 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
+@RunWith(Parameterized.class)
 public class MassIndexingBaseIT {
+
+	@Parameterized.Parameters(name = "{0}")
+	public static TenancyMode[] params() {
+		return TenancyMode.values();
+	}
+
+	private static final String TENANT_1_ID = "tenant1";
+	private static final String TENANT_2_ID = "tenant2";
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -46,6 +60,8 @@ public class MassIndexingBaseIT {
 	public static final String AUTHOR_2 = "James Joyce";
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
+	public static final String TITLE_4 = "The Fellowship Of The Ring";
+	public static final String AUTHOR_4 = "J. R. R. Tolkien";
 
 	@ClassRule
 	public static BackendMock backendMock = new BackendMock();
@@ -56,33 +72,62 @@ public class MassIndexingBaseIT {
 	@Rule
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
+	@Parameterized.Parameter
+	public TenancyMode tenancyMode;
+
+	@ReusableOrmSetupHolder.SetupParams
+	public List<?> setupParams() {
+		return Collections.singletonList( tenancyMode );
+	}
+
 	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, false )
 				.withAnnotatedTypes( Book.class );
+
+		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
+			setupContext.tenants( TENANT_1_ID, TENANT_2_ID );
+			dataClearConfig.tenants( TENANT_1_ID, TENANT_2_ID );
+		}
 	}
 
 	@Before
 	public void initData() {
-		setupHolder.runInTransaction( session -> {
+		setupHolder.with( targetTenantId() ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
 			session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );
 		} );
+
+		if ( TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ) {
+			// Also add data to the other tenant,
+			// in order to trigger failures if the mass indexer does not correctly limit itself
+			// to just the target tenant.
+			setupHolder.with( TENANT_2_ID ).runInTransaction( session -> {
+				session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
+				session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
+				session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );
+				session.persist( new Book( 4, TITLE_4, AUTHOR_4 ) );
+			} );
+		}
+	}
+
+	private String targetTenantId() {
+		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ? TENANT_1_ID : null;
 	}
 
 	@Test
 	public void defaultMassIndexerStartAndWait() throws Exception {
-		setupHolder.runNoTransaction( session -> {
+		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -99,7 +144,7 @@ public class MassIndexingBaseIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -119,14 +164,14 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void dropAndCreateSchemaOnStart() {
-		setupHolder.runNoTransaction( session -> {
+		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -146,7 +191,7 @@ public class MassIndexingBaseIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -166,14 +211,14 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void mergeSegmentsOnFinish() {
-		setupHolder.runNoTransaction( session -> {
+		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
 			backendMock.expectWorks(
-					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -191,7 +236,7 @@ public class MassIndexingBaseIT {
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
-			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -213,12 +258,12 @@ public class MassIndexingBaseIT {
 	@Test
 	public void fromMappingWithoutSession() throws Exception {
 		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
-		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer();
+		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( targetTenantId() );
 
 		// add operations on indexes can follow any random order,
 		// since they are executed by different threads
 		backendMock.expectWorks(
-				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				Book.INDEX, targetTenantId(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
 				.add( "1", b -> b
 						.field( "title", TITLE_1 )
@@ -235,7 +280,7 @@ public class MassIndexingBaseIT {
 
 		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-		backendMock.expectIndexScaleWorks( Book.INDEX )
+		backendMock.expectIndexScaleWorks( Book.INDEX, targetTenantId() )
 				.purge()
 				.mergeSegments()
 				.flush()
@@ -253,7 +298,9 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
-		Session session = setupHolder.sessionFactory().openSession();
+		Session session = setupHolder.sessionFactory().withOptions()
+				.tenantIdentifier( targetTenantId() )
+				.openSession();
 		SearchSession searchSession = Search.session( session );
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -269,7 +316,9 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
-		Session session = setupHolder.sessionFactory().openSession();
+		Session session = setupHolder.sessionFactory().withOptions()
+				.tenantIdentifier( targetTenantId() )
+				.openSession();
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = Search.session( session );
 		session.close();
