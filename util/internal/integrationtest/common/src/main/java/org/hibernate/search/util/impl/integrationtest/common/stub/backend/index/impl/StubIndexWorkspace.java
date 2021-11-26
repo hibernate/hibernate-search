@@ -29,7 +29,13 @@ class StubIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.MERGE_SEGMENTS ).build();
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.MERGE_SEGMENTS )
+				// In a real-world backend the operation would cross tenants,
+				// because that doesn't matter,
+				// but here passing along the tenant identifier
+				// makes testing easier.
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
 	}
 
@@ -44,13 +50,25 @@ class StubIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> flush() {
-		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.FLUSH ).build();
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.FLUSH )
+				// In a real-world backend the operation would cross tenants,
+				// because that doesn't matter,
+				// but here passing along the tenant identifier
+				// makes testing easier.
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.REFRESH ).build();
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.REFRESH )
+				// In a real-world backend the operation would cross tenants,
+				// because that doesn't matter,
+				// but here passing along the tenant identifier
+				// makes testing easier.
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.build();
 		return behavior.executeIndexScaleWork( indexName, work );
 	}
 }
