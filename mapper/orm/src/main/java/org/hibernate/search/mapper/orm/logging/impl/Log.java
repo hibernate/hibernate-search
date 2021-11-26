@@ -13,6 +13,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
@@ -233,4 +234,15 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 53, value = "Configuration property '%1$s' is deprecated; use '%2$s' instead.")
 	void automaticIndexingStrategyIsDeprecated(String resolveOrRaw, String resolveOrRaw1);
 
+	@Message(id = ID_OFFSET + 54, value = "Cannot determine the set of all possible tenant identifiers."
+			+ " You must provide this information by setting configuration property '%1$s'"
+			+ " to a comma-separated string containing all possible tenant identifiers.")
+	SearchException missingTenantIdConfiguration(String tenantIdsConfigurationPropertyKey);
+
+	@Message(id = ID_OFFSET + 55, value = "Cannot target tenant '%1$s' because this tenant identifier"
+			+ " was not listed in the configuration provided on startup."
+			+ " To target this tenant, you must provide the tenant identifier through configuration property '%3$s',"
+			+ " which should be set to a comma-separated string containing all possible tenant identifiers."
+			+ " Currently configured tenant identifiers: %2$s." )
+	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
 }

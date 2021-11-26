@@ -101,8 +101,8 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		this.containedEntityIdentityMappingMode = required ? IdentityMappingMode.REQUIRED : IdentityMappingMode.OPTIONAL;
 	}
 
-	public void multiTenancyEnabled(boolean multiTenancyEnabled) {
-		this.tenancyMode = multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY;
+	public void tenancyMode(TenancyMode tenancyMode) {
+		this.tenancyMode = tenancyMode;
 	}
 
 	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {

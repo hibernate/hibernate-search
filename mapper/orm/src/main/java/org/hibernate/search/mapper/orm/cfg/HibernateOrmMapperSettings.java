@@ -159,6 +159,17 @@ public final class HibernateOrmMapperSettings {
 	public static final String COORDINATION_STRATEGY = PREFIX + Radicals.COORDINATION_STRATEGY;
 
 	/**
+	 * An exhaustive list of all tenant identifiers that can be used by the application when multi-tenancy is enabled.
+	 * <p>
+	 * Expects either a String representing multiple tenant IDs separated by commas,
+	 * or a {@code Collection<String>} containing tenant IDs.
+	 * <p>
+	 * No default; this property may have to be set explicitly depending on the
+	 * {@link #COORDINATION_STRATEGY coordination strategy}.
+	 */
+	public static final String MULTI_TENANCY_TENANT_IDS = PREFIX + Radicals.MULTI_TENANCY_TENANT_IDS;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -185,6 +196,9 @@ public final class HibernateOrmMapperSettings {
 		public static final String COORDINATION = "coordination";
 		public static final String COORDINATION_PREFIX = COORDINATION + ".";
 		public static final String COORDINATION_STRATEGY = COORDINATION_PREFIX + CoordinationRadicals.STRATEGY;
+		public static final String MULTI_TENANCY = "multi_tenancy";
+		public static final String MULTI_TENANCY_PREFIX = MULTI_TENANCY + ".";
+		public static final String MULTI_TENANCY_TENANT_IDS = MULTI_TENANCY_PREFIX + MultiTenancyRadicals.TENANT_IDS;
 	}
 
 	/**
@@ -214,6 +228,17 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String STRATEGY = "strategy";
+	}
+
+	/**
+	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#MULTI_TENANCY_PREFIX}.
+	 */
+	public static final class MultiTenancyRadicals {
+
+		private MultiTenancyRadicals() {
+		}
+
+		public static final String TENANT_IDS = "tenant_ids";
 	}
 
 	/**

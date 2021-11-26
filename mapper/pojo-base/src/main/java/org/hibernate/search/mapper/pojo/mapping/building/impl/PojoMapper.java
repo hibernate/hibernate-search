@@ -305,7 +305,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			mappingDelegate = new PojoMappingDelegateImpl(
-					threadPoolProvider, failureHandler,
+					threadPoolProvider, failureHandler, tenancyMode,
 					indexedTypeManagerContainerBuilder.build(),
 					containedTypeManagerContainerBuilder.build()
 			);

@@ -22,6 +22,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
@@ -149,7 +150,7 @@ public final class SearchMappingBuilder {
 	}
 
 	public SearchMappingBuilder multiTenancyEnabled(boolean multiTenancyEnabled) {
-		mappingInitiator.multiTenancyEnabled( multiTenancyEnabled );
+		mappingInitiator.tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
 		return this;
 	}
 
