@@ -217,14 +217,16 @@ public class CallQueue<C extends Call<? super C>> {
 		throw new IllegalStateException( "This should not happen" );
 	}
 
-	public synchronized void verifyExpectationsMet() {
+	public synchronized void verifyNoUnexpectedCall() {
 		if ( lastVerifyFailure != null ) {
 			Fail.fail(
 					"A verify error occurred during the test: " + lastVerifyFailure.getMessage(),
 					lastVerifyFailure
 			);
 		}
+	}
 
+	public synchronized void verifyExpectationsMet() {
 		List<C> remaining = new ArrayList<>();
 		remaining.addAll( callsExpectedInOrder );
 		remaining.addAll( callsExpectedOutOfOrder );
