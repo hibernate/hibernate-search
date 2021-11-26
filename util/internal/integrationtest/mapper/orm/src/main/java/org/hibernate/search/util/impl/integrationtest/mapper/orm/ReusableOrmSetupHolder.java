@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -143,6 +141,8 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	public interface DataClearConfig {
+
+		DataClearConfig tenants(String ... tenantIds);
 
 		DataClearConfig preClear(Consumer<Session> preClear);
 
@@ -402,11 +402,23 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	private void clearDatabase(SessionFactory sessionFactory, HibernateOrmMapping mapping) {
+		if ( config.tenantsIds.isEmpty() ) {
+			clearDatabase( sessionFactory, mapping, null );
+		}
+		else {
+			for ( String tenantsId : config.tenantsIds ) {
+				clearDatabase( sessionFactory, mapping, tenantsId );
+			}
+		}
+	}
+
+
+	private void clearDatabase(SessionFactory sessionFactory, HibernateOrmMapping mapping, String tenantId) {
 		for ( Consumer<Session> preClear : config.preClear ) {
 			if ( mapping != null ) {
 				mapping.listenerEnabled( false );
 			}
-			withinTransaction( sessionFactory, preClear );
+			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( preClear );
 			if ( mapping != null ) {
 				mapping.listenerEnabled( true );
 			}
@@ -425,7 +437,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 				continue;
 			}
 			if ( clearedEntityNames.add( entityType.getName() ) ) {
-				clearEntityInstances( sessionFactory, mapping, entityType );
+				clearEntityInstances( sessionFactory, mapping, tenantId, entityType );
 			}
 		}
 
@@ -438,13 +450,13 @@ public class ReusableOrmSetupHolder implements TestRule {
 				.collect( Collectors.toList() );
 		for ( EntityType<?> entityType : sortedEntityTypes ) {
 			if ( clearedEntityNames.add( entityType.getName() ) ) {
-				clearEntityInstances( sessionFactory, mapping, entityType );
+				clearEntityInstances( sessionFactory, mapping, tenantId, entityType );
 			}
 		}
 	}
 
 	private static void clearEntityInstances(SessionFactory sessionFactory, HibernateOrmMapping mapping,
-			EntityType<?> entityType) {
+			String tenantId, EntityType<?> entityType) {
 		if ( Modifier.isAbstract( entityType.getJavaType().getModifiers() ) ) {
 			// There are no instances of this specific class,
 			// only instances of subclasses, and those are handled separately.
@@ -460,7 +472,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 				mapping.listenerEnabled( false );
 			}
 			try {
-				withinTransaction( sessionFactory, s -> {
+				OrmUtils.with( sessionFactory, tenantId ).runInTransaction( s -> {
 					Query<?> query = selectAllOfSpecificType( entityType, s );
 					try {
 						query.list().forEach( s::remove );
@@ -478,7 +490,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 			}
 		}
 		else {
-			withinTransaction( sessionFactory, s -> {
+			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( s -> {
 				Query<?> query = deleteAllOfSpecificType( entityType, s );
 				try {
 					query.executeUpdate();
@@ -580,9 +592,17 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	private static class DataClearConfigImpl implements DataClearConfig {
+		private final List<String> tenantsIds = new ArrayList<>();
+
 		private final List<Class<?>> entityClearOrder = new ArrayList<>();
 
 		private final List<Consumer<Session>> preClear = new ArrayList<>();
+
+		@Override
+		public DataClearConfig tenants(String ... tenantIds) {
+			Collections.addAll( this.tenantsIds, tenantIds );
+			return this;
+		}
 
 		@Override
 		public DataClearConfig preClear(Consumer<Session> preClear) {
@@ -617,6 +637,6 @@ public class ReusableOrmSetupHolder implements TestRule {
 
 	private enum IndexDataClearStrategy {
 		NONE,
-		DROP_AND_CREATE_SCHEMA;
+		DROP_AND_CREATE_SCHEMA
 	}
 }
