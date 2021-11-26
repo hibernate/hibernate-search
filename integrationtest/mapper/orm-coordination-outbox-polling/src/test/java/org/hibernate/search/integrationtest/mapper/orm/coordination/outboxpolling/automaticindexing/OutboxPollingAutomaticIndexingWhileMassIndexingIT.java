@@ -56,11 +56,16 @@ public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 		// Wait for the initial indexing to be over.
 		backendMock.verifyExpectationsMet();
 
+		// Before loading entities, we expect mass indexing to perform a few operations
+		backendMock.expectIndexScaleWorks( IndexedEntity.NAME )
+				.purge()
+				.mergeSegments();
+
 		// Upon loading the entity for mass indexing:
 		IndexedEntity.getTextConcurrentOperation.set( () -> {
 			// 1. We make sure this operation doesn't get executed multiple times.
 			IndexedEntity.getTextConcurrentOperation.set( () -> { } );
-			// 2. We simulate a concurrent transaction that updates the entity.
+			// 2. We simulate a concurrent transaction that updates the entity being mass-indexed.
 			with( sessionFactory ).runInTransaction( session -> {
 				IndexedEntity entity = session.get( IndexedEntity.class, 1 );
 				entity.setText( "updated" );
@@ -73,22 +78,24 @@ public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 			catch (InterruptedException e) {
 				throw new RuntimeException( e );
 			}
+			// 4. We expect nothing to be indexed at this point,
+			// because the event processor should be suspended.
+			backendMock.verifyExpectationsMet();
+
+			// Later, we expect the mass indexer to reindex the entity it is currently loading, with the initial value...
+			backendMock.expectWorks( IndexedEntity.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( String.valueOf( 1 ), b -> b.field( "text", "initial" ) );
+
+			// Then we expect the mass indexer to perform finishing operations...
+			backendMock.expectIndexScaleWorks( IndexedEntity.NAME )
+					.flush()
+					.refresh();
+
+			// ... and ONLY AFTER THAT,
+			// we expect the event processor to reindex the same entity with the updated value.
+			backendMock.expectWorks( IndexedEntity.NAME )
+					.addOrUpdate( String.valueOf( 1 ), b -> b.field( "text", "updated" ) );
 		} );
-
-		// We expect the mass indexer to reindex the entity with the initial value...
-		backendMock.expectWorks( IndexedEntity.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-				.add( String.valueOf( 1 ), b -> b.field( "text", "initial" ) );
-		// ... and ONLY LATER, when mass indexing finishes,
-		// we expect the event processor to reindex the entity with the updated value.
-		backendMock.expectWorks( IndexedEntity.NAME )
-				.addOrUpdate( String.valueOf( 1 ), b -> b.field( "text", "updated" ) );
-
-		// Some other works expected from the mass indexer
-		backendMock.expectIndexScaleWorks( IndexedEntity.NAME )
-				.purge()
-				.mergeSegments()
-				.flush()
-				.refresh();
 
 		Search.mapping( sessionFactory )
 				.scope( Object.class ).massIndexer()
