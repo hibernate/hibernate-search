@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanEventProcessingStrategy;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanEventSendingStrategy;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
@@ -39,15 +40,18 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
+	private final TenancyMode tenancyMode;
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 
 	public PojoMappingDelegateImpl(ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler,
+			TenancyMode tenancyMode,
 			PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers) {
 		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
+		this.tenancyMode = tenancyMode;
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 	}
@@ -68,6 +72,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public FailureHandler failureHandler() {
 		return failureHandler;
+	}
+
+	@Override
+	public TenancyMode tenancyMode() {
+		return tenancyMode;
 	}
 
 	@Override

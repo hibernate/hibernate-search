@@ -125,6 +125,9 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
 
+		// TODO HSEARCH-4316 Use context.tenancyConfiguration() to determine the tenant IDs and create
+		//  one set of event processors per tenant
+
 		if ( EVENT_PROCESSOR_ENABLED.get( configurationSource ) ) {
 			initializeEventProcessors( context );
 		}

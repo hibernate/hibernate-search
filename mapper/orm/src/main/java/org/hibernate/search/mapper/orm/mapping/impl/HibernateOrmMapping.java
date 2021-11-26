@@ -60,6 +60,7 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -162,11 +163,17 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 		SearchScopeImpl<Object> scope = scopeOptional.get();
 
+		TenancyConfiguration tenancyConfiguration =
+				TenancyConfiguration.create( delegate().tenancyMode(), context.configurationPropertySource() );
+		// TODO HSEARCH-4321 use the tenancy configuration to have a default list of tenant IDs
+		//  to target when creating the mass indexer from the mapping (not from a session)
+
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
 		return schemaManagementListener.onStart( context, schemaManager )
-				.thenCompose( ignored -> coordinationStrategyHolder.get()
-						.start( new CoordinationStrategyStartContextImpl( this, context ) ) );
+				.thenCompose( ignored -> coordinationStrategyHolder.get().start(
+						new CoordinationStrategyStartContextImpl( this, context, tenancyConfiguration )
+				) );
 	}
 
 	@Override

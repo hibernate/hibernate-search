@@ -16,18 +16,21 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 
 public class CoordinationStrategyStartContextImpl implements CoordinationStrategyStartContext {
 	private final AutomaticIndexingMappingContext mapping;
 	private final MappingStartContext delegate;
 	private final ConfigurationPropertySource configurationPropertySource;
+	private final TenancyConfiguration tenancyConfiguration;
 
 	public CoordinationStrategyStartContextImpl(AutomaticIndexingMappingContext mapping,
-			MappingStartContext delegate) {
+			MappingStartContext delegate, TenancyConfiguration tenancyConfiguration) {
 		this.mapping = mapping;
 		this.delegate = delegate;
 		this.configurationPropertySource = delegate.configurationPropertySource()
 				.withMask( HibernateOrmMapperSettings.Radicals.COORDINATION );
+		this.tenancyConfiguration = tenancyConfiguration;
 	}
 
 	@Override
@@ -58,5 +61,10 @@ public class CoordinationStrategyStartContextImpl implements CoordinationStrateg
 	@Override
 	public AutomaticIndexingMappingContext mapping() {
 		return mapping;
+	}
+
+	@Override
+	public TenancyConfiguration tenancyConfiguration() {
+		return tenancyConfiguration;
 	}
 }

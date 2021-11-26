@@ -13,6 +13,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 
 public interface CoordinationStrategyStartContext {
 
@@ -54,5 +55,7 @@ public interface CoordinationStrategyStartContext {
 	 * for background processing of automatic indexing events.
 	 */
 	AutomaticIndexingMappingContext mapping();
+
+	TenancyConfiguration tenancyConfiguration();
 
 }

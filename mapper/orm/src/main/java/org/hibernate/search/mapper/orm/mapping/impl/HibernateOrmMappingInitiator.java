@@ -19,6 +19,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.orm.bootstrap.impl.HibernateSearchPreIntegrationService;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
@@ -91,9 +92,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		MultiTenancyStrategy multiTenancyStrategy =
 				MultiTenancyStrategy.determineMultiTenancyStrategy( ormConfigurationService.getSettings() );
 
-		multiTenancyEnabled(
-				!MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
-		);
+		tenancyMode( MultiTenancyStrategy.NONE.equals( multiTenancyStrategy ) ? TenancyMode.SINGLE_TENANCY
+				: TenancyMode.MULTI_TENANCY );
 
 		this.preIntegrationService = preIntegrationService;
 	}
