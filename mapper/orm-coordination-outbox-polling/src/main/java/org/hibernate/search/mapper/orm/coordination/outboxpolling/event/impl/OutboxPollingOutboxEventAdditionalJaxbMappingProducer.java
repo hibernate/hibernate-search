@@ -71,7 +71,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"                <column length=\"2147483647\" />\n" +
 			"        </property>\n" +
 			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
-			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" nullable=\"false\" />\n" +
+			"        <property name=\"processAfter\" type=\"instant\" index=\"processAfter\" nullable=\"false\" />\n" +
 			"        <property name=\"status\" index=\"status\" nullable=\"false\">\n" +
 			"            <type name=\"org.hibernate.type.EnumType\">\n" +
 			"                <param name=\"enumClass\">" + OutboxEvent.Status.class.getName() + "</param>\n" +
