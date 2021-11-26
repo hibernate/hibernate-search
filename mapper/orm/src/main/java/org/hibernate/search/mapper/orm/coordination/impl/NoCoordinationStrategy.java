@@ -9,13 +9,13 @@ package org.hibernate.search.mapper.orm.coordination.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 
-public class NoCoordinationStrategy implements CooordinationStrategy {
+public class NoCoordinationStrategy implements CoordinationStrategy {
 
 	public static final String NAME = "none";
 

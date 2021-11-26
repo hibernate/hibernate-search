@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCre
  *
  * @see org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#COORDINATION_STRATEGY
  */
-public interface CooordinationStrategy {
+public interface CoordinationStrategy {
 
 	/**
 	 * Configures coordination.

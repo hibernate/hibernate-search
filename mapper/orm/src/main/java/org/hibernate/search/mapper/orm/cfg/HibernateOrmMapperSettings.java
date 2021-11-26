@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.cfg;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.impl.NoCoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
@@ -242,8 +242,8 @@ public final class HibernateOrmMapperSettings {
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
-		public static final BeanReference<CooordinationStrategy> COORDINATION_STRATEGY =
-				BeanReference.of( CooordinationStrategy.class, NoCoordinationStrategy.NAME );
+		public static final BeanReference<CoordinationStrategy> COORDINATION_STRATEGY =
+				BeanReference.of( CoordinationStrategy.class, NoCoordinationStrategy.NAME );
 	}
 
 }

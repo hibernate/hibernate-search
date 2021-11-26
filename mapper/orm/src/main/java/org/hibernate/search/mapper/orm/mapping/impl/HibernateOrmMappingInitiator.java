@@ -22,7 +22,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.mapper.orm.bootstrap.impl.HibernateSearchPreIntegrationService;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
@@ -70,7 +70,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 
-	private BeanHolder<? extends CooordinationStrategy> coordinationStrategyHolder;
+	private BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
 	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
 
 	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
@@ -101,7 +101,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ConfiguredAutomaticIndexingStrategy::stop, configuredAutomaticIndexingStrategy );
-			closer.push( CooordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
+			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 		}
 	}

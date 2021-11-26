@@ -16,7 +16,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.coordination.common.spi.CooordinationStrategy;
+import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
@@ -25,15 +25,15 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class CoordinationConfigurationContextImpl implements CoordinationConfigurationContext, AutoCloseable {
 
-	private static final ConfigurationProperty<BeanReference<? extends CooordinationStrategy>> COORDINATION_STRATEGY =
+	private static final ConfigurationProperty<BeanReference<? extends CoordinationStrategy>> COORDINATION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.COORDINATION_STRATEGY )
-					.asBeanReference( CooordinationStrategy.class )
+					.asBeanReference( CoordinationStrategy.class )
 					.withDefault( HibernateOrmMapperSettings.Defaults.COORDINATION_STRATEGY )
 					.build();
 
 	public static CoordinationConfigurationContextImpl configure(ConfigurationPropertySource propertySource,
 			BeanResolver beanResolver) {
-		BeanHolder<? extends CooordinationStrategy> strategyHolder =
+		BeanHolder<? extends CoordinationStrategy> strategyHolder =
 				COORDINATION_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
 		CoordinationConfigurationContextImpl context = new CoordinationConfigurationContextImpl( strategyHolder );
 		try {
@@ -46,14 +46,14 @@ public final class CoordinationConfigurationContextImpl implements CoordinationC
 		}
 	}
 
-	private final BeanHolder<? extends CooordinationStrategy> strategyHolder;
+	private final BeanHolder<? extends CoordinationStrategy> strategyHolder;
 
 	@SuppressWarnings("deprecation")
 	private final List<org.hibernate.boot.spi.AdditionalJaxbMappingProducer> mappingProducers = new ArrayList<>();
 	private Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
 	private boolean enlistsInTransaction = false;
 
-	public CoordinationConfigurationContextImpl(BeanHolder<? extends CooordinationStrategy> strategyHolder) {
+	public CoordinationConfigurationContextImpl(BeanHolder<? extends CoordinationStrategy> strategyHolder) {
 		this.strategyHolder = strategyHolder;
 	}
 
@@ -82,7 +82,7 @@ public final class CoordinationConfigurationContextImpl implements CoordinationC
 		mappingProducers.add( producer );
 	}
 
-	public BeanHolder<? extends CooordinationStrategy> strategyHolder() {
+	public BeanHolder<? extends CoordinationStrategy> strategyHolder() {
 		return strategyHolder;
 	}
 
