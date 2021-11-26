@@ -34,7 +34,13 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final String NAME_PREFIX = "Mass indexer agent";
+	private static String name(String tenantId) {
+		StringBuilder prefix = new StringBuilder( "Mass indexer agent" );
+		if ( tenantId != null ) {
+			prefix.append( " - Tenant <" ).append( tenantId ).append( ">" );
+		}
+		return prefix.toString();
+	}
 
 	private static final ConfigurationProperty<Integer> POLLING_INTERVAL =
 			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.MASS_INDEXER_POLLING_INTERVAL )
@@ -54,7 +60,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_MASS_INDEXER_PULSE_EXPIRATION )
 					.build();
 
-	public static Factory factory(AutomaticIndexingMappingContext mapping, Clock clock,
+	public static Factory factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
 			ConfigurationPropertySource configurationSource) {
 		Duration pollingInterval = POLLING_INTERVAL.getAndTransform( configurationSource, Duration::ofMillis );
 		Duration pulseInterval = PULSE_INTERVAL.getAndTransform( configurationSource,
@@ -62,20 +68,22 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		Duration pulseExpiration = PULSE_EXPIRATION.getAndTransform( configurationSource,
 				v -> OutboxConfigUtils.checkPulseExpiration( Duration.ofMillis( v ), pulseInterval ) );
 
-		return new Factory( mapping, clock, pollingInterval, pulseInterval, pulseExpiration );
+		return new Factory( mapping, clock, tenantId, pollingInterval, pulseInterval, pulseExpiration );
 	}
 
 	public static class Factory {
 		private final AutomaticIndexingMappingContext mapping;
 		private final Clock clock;
+		private final String tenantId;
 		private final Duration pollingInterval;
 		private final Duration pulseInterval;
 		private final Duration pulseExpiration;
 
-		private Factory(AutomaticIndexingMappingContext mapping, Clock clock,
+		private Factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
 				Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration) {
 			this.mapping = mapping;
 			this.clock = clock;
+			this.tenantId = tenantId;
 			this.pollingInterval = pollingInterval;
 			this.pulseInterval = pulseInterval;
 			this.pulseExpiration = pulseExpiration;
@@ -83,7 +91,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 
 		public OutboxPollingMassIndexerAgent create(PojoMassIndexerAgentCreateContext context,
 				AgentRepositoryProvider agentRepositoryProvider) {
-			String agentName = NAME_PREFIX;
+			String agentName = name( tenantId );
 			OutboxPollingMassIndexerAgentClusterLink clusterLink = new OutboxPollingMassIndexerAgentClusterLink(
 					agentName, mapping.failureHandler(), clock,
 					pollingInterval, pulseInterval, pulseExpiration );
@@ -104,6 +112,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	private final String name;
 	private final ScheduledExecutorService executor;
 	private final AutomaticIndexingMappingContext mapping;
+	private final String tenantId;
 	private final long pollingInterval;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
@@ -121,6 +130,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		this.executor = executor;
 		this.mapping = factory.mapping;
 		this.pollingInterval = factory.pollingInterval.toMillis();
+		this.tenantId = factory.tenantId;
 		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
@@ -159,7 +169,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	}
 
 	private void leaveCluster() {
-		try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
+		try ( SessionImplementor session = openSession() ) {
 			transactionHelper.begin( session, null );
 			try {
 				AgentRepository agentRepository = agentRepositoryProvider.create( session );
@@ -170,6 +180,10 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 				transactionHelper.rollbackSafely( session, e );
 			}
 		}
+	}
+
+	private SessionImplementor openSession() {
+		return (SessionImplementor) mapping.sessionFactory().withOptions().tenantIdentifier( tenantId ).openSession();
 	}
 
 	private class Worker implements SingletonTask.Worker {
@@ -185,7 +199,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 				return CompletableFuture.completedFuture( null );
 			}
 
-			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
+			try ( SessionImplementor session = openSession() ) {
 				transactionHelper.inTransaction( session, null, s -> {
 					if ( instructions == null || !instructions.isStillValid() ) {
 						AgentRepository agentRepository = agentRepositoryProvider.create( session );

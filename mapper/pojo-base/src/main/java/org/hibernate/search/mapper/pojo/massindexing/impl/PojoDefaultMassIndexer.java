@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
@@ -34,6 +36,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
+	private final DetachedBackendSessionContext detachedSession;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	// default settings defined here:
@@ -52,12 +55,14 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
+			DetachedBackendSessionContext detachedSession,
 			PojoScopeWorkspace scopeWorkspace) {
 		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.targetedIndexedTypes = targetedIndexedTypes;
 		this.scopeSchemaManager = scopeSchemaManager;
+		this.detachedSession = detachedSession;
 		this.scopeWorkspace = scopeWorkspace;
 	}
 
@@ -154,7 +159,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		return new PojoMassIndexingBatchCoordinator(
 				mappingContext,
 				notifier,
-				typeGroupsToIndex, scopeSchemaManager, scopeWorkspace,
+				typeGroupsToIndex, scopeSchemaManager, detachedSession, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				mergeSegmentsOnFinish, dropAndCreateSchemaOnStart,
 				purgeAtStart, mergeSegmentsAfterPurge

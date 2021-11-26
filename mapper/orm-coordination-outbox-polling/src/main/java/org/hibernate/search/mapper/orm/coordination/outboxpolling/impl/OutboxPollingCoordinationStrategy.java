@@ -10,7 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -28,16 +30,17 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrat
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepositoryProvider;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.DefaultAgentRepository;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.DefaultOutboxEventFinder;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingMassIndexerAgent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventSendingPlan;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.DefaultOutboxEventFinder;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingEventProcessor;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEventFinderProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -82,9 +85,9 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 	private BeanHolder<? extends OutboxEventFinderProvider> finderProviderHolder;
 	private BeanHolder<? extends AgentRepositoryProvider> agentRepositoryProviderHolder;
-	private ScheduledExecutorService eventProcessorExecutor;
-	private List<OutboxPollingEventProcessor> eventProcessors;
-	private OutboxPollingMassIndexerAgent.Factory massIndexerAgentFactory;
+
+	private TenancyConfiguration tenancyConfiguration;
+	private final Map<String, TenantDelegate> tenantDelegates = new LinkedHashMap<>();
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
@@ -123,132 +126,171 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			finderProviderHolder = BeanHolder.of( new DefaultOutboxEventFinder.Provider() );
 		}
 
-		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
+		tenancyConfiguration = context.tenancyConfiguration();
+		Set<String> tenantIds = tenancyConfiguration.tenantIdsOrFail();
 
-		// TODO HSEARCH-4316 Use context.tenancyConfiguration() to determine the tenant IDs and create
-		//  one set of event processors per tenant
-
-		if ( EVENT_PROCESSOR_ENABLED.get( configurationSource ) ) {
-			initializeEventProcessors( context );
+		if ( tenantIds.isEmpty() ) {
+			// Single-tenant
+			TenantDelegate tenantDelegate = new TenantDelegate( null );
+			tenantDelegates.put( null, tenantDelegate );
+			tenantDelegate.start( context );
 		}
 		else {
-			// IMPORTANT: in this case we don't even configure sharding, and that's on purpose.
-			// Application developers may want a fixed number of processing nodes (static sharding)
-			// with a varying number of non-processing nodes,
-			// so we want to make those non-processing nodes easy to configure.
-			log.eventProcessorDisabled();
+			// Multi-tenant
+			for ( String tenantId : tenantIds ) {
+				TenantDelegate tenantDelegate = new TenantDelegate( tenantId );
+				tenantDelegates.put( tenantId, tenantDelegate );
+				tenantDelegate.start( context );
+			}
 		}
-
-		this.massIndexerAgentFactory = OutboxPollingMassIndexerAgent.factory( context.mapping(), context.clock(),
-				configurationSource );
 
 		return CompletableFuture.completedFuture( null );
 	}
-
-	private void initializeEventProcessors(CoordinationStrategyStartContext context) {
-		ConfigurationPropertySource configurationSource = context.configurationPropertySource();
-
-		// IMPORTANT: we only configure sharding here, if processors are enabled.
-		// See the comment in the caller method.
-		boolean shardsStatic = SHARDS_STATIC.get( configurationSource );
-		List<ShardAssignmentDescriptor> shardAssignmentOrNulls;
-		if ( shardsStatic ) {
-			int totalShardCount = SHARDS_TOTAL_COUNT.getAndMapOrThrow(
-					configurationSource,
-					this::checkTotalShardCount,
-					log::missingPropertyForStaticSharding
-			);
-			shardAssignmentOrNulls = SHARDS_ASSIGNED.getAndMapOrThrow(
-					configurationSource,
-					shardIndices -> toStaticShardAssignments( configurationSource, totalShardCount, shardIndices ),
-					log::missingPropertyForStaticSharding
-			);
-		}
-		else {
-			shardAssignmentOrNulls = Collections.singletonList( null );
-		}
-
-		OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
-				context.clock(), configurationSource );
-
-		eventProcessorExecutor = context.threadPoolProvider()
-				.newScheduledExecutor( shardAssignmentOrNulls.size(), OutboxPollingEventProcessor.NAME_PREFIX );
-		eventProcessors = new ArrayList<>();
-		for ( ShardAssignmentDescriptor shardAssignmentOrNull : shardAssignmentOrNulls ) {
-			eventProcessors.add( factory.create( eventProcessorExecutor, finderProviderHolder.get(),
-					agentRepositoryProviderHolder.get(), shardAssignmentOrNull ) );
-		}
-		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
-			eventProcessor.start();
-		}
-	}
-
-	private Integer checkTotalShardCount(Integer totalShardCount) {
-		if ( totalShardCount <= 0 ) {
-			throw log.invalidTotalShardCount();
-		}
-		return totalShardCount;
-	}
-
-	private List<ShardAssignmentDescriptor> toStaticShardAssignments(ConfigurationPropertySource configurationPropertySource,
-			int totalShardCount, List<Integer> shardIndices) {
-		// Remove duplicates
-		Set<Integer> uniqueShardIndices = new HashSet<>( shardIndices );
-		for ( Integer shardIndex : uniqueShardIndices ) {
-			if ( !( 0 <= shardIndex && shardIndex < totalShardCount ) ) {
-				throw log.invalidShardIndex( totalShardCount,
-						SHARDS_TOTAL_COUNT.resolveOrRaw( configurationPropertySource ) );
-			}
-		}
-		List<ShardAssignmentDescriptor> shardAssignment = new ArrayList<>();
-		for ( Integer shardIndex : uniqueShardIndices ) {
-			shardAssignment.add( new ShardAssignmentDescriptor( totalShardCount, shardIndex ) );
-		}
-		return shardAssignment;
-	}
-
 	@Override
 	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
-		return massIndexerAgentFactory.create( context, agentRepositoryProviderHolder.get() );
+		return tenantDelegate( context.tenantIdentifier() ).massIndexerAgentFactory
+				.create( context, agentRepositoryProviderHolder.get() );
+	}
+
+	private TenantDelegate tenantDelegate(String tenantId) {
+		TenantDelegate tenantDelegate = tenantDelegates.get( tenantId );
+		if ( tenantDelegate == null ) {
+			throw tenancyConfiguration.invalidTenantId( tenantId );
+		}
+		return tenantDelegate;
 	}
 
 	@Override
 	public CompletableFuture<?> completion() {
-		if ( eventProcessors == null ) {
-			// Nothing to do
-			return CompletableFuture.completedFuture( null );
+		List<CompletableFuture<?>> futures = new ArrayList<>();
+		for ( TenantDelegate tenantDelegate : tenantDelegates.values() ) {
+			if ( tenantDelegate.eventProcessors == null ) {
+				continue;
+			}
+			for ( OutboxPollingEventProcessor eventProcessor : tenantDelegate.eventProcessors ) {
+				futures.add( eventProcessor.completion() );
+			}
 		}
-		CompletableFuture<?>[] futures = new CompletableFuture[eventProcessors.size()];
-		int i = 0;
-		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
-			futures[i] = eventProcessor.completion();
-			i++;
-		}
-		return CompletableFuture.allOf( futures );
+		return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
 	}
 
 	@Override
 	public CompletableFuture<?> preStop(CoordinationStrategyPreStopContext context) {
-		if ( eventProcessors == null ) {
-			// Nothing to do
-			return CompletableFuture.completedFuture( null );
+		List<CompletableFuture<?>> futures = new ArrayList<>();
+		for ( TenantDelegate tenantDelegate : tenantDelegates.values() ) {
+			if ( tenantDelegate.eventProcessors == null ) {
+				continue;
+			}
+			for ( OutboxPollingEventProcessor eventProcessor : tenantDelegate.eventProcessors ) {
+				futures.add( eventProcessor.preStop() );
+			}
 		}
-		CompletableFuture<?>[] futures = new CompletableFuture[eventProcessors.size()];
-		int i = 0;
-		for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
-			futures[i] = eventProcessor.preStop();
-			i++;
-		}
-		return CompletableFuture.allOf( futures );
+		return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
 	}
 
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( OutboxPollingEventProcessor::stop, eventProcessors );
-			closer.push( ScheduledExecutorService::shutdownNow, eventProcessorExecutor );
+			for ( TenantDelegate tenantDelegate : tenantDelegates.values() ) {
+				closer.pushAll( OutboxPollingEventProcessor::stop, tenantDelegate.eventProcessors );
+				closer.push( ScheduledExecutorService::shutdownNow, tenantDelegate.eventProcessorExecutor );
+			}
 			closer.push( BeanHolder::close, finderProviderHolder );
 			closer.push( BeanHolder::close, agentRepositoryProviderHolder );
 		}
+	}
+
+	private class TenantDelegate {
+		private final String tenantId;
+
+		private ScheduledExecutorService eventProcessorExecutor;
+		private List<OutboxPollingEventProcessor> eventProcessors;
+		private OutboxPollingMassIndexerAgent.Factory massIndexerAgentFactory;
+
+		private TenantDelegate(String tenantId) {
+			this.tenantId = tenantId;
+		}
+
+		void start(CoordinationStrategyStartContext context) {
+			ConfigurationPropertySource configurationSource = context.configurationPropertySource();
+
+			if ( EVENT_PROCESSOR_ENABLED.get( configurationSource ) ) {
+				initializeEventProcessors( context );
+			}
+			else {
+				// IMPORTANT: in this case we don't even configure sharding, and that's on purpose.
+				// Application developers may want a fixed number of processing nodes (static sharding)
+				// with a varying number of non-processing nodes,
+				// so we want to make those non-processing nodes easy to configure.
+				log.eventProcessorDisabled();
+			}
+
+			this.massIndexerAgentFactory = OutboxPollingMassIndexerAgent.factory( context.mapping(), context.clock(),
+					tenantId, configurationSource );
+		}
+
+		private void initializeEventProcessors(CoordinationStrategyStartContext context) {
+			ConfigurationPropertySource configurationSource = context.configurationPropertySource();
+
+			// IMPORTANT: we only configure sharding here, if processors are enabled.
+			// See the comment in the caller method.
+			boolean shardsStatic = SHARDS_STATIC.get( configurationSource );
+			List<ShardAssignmentDescriptor> shardAssignmentOrNulls;
+			if ( shardsStatic ) {
+				int totalShardCount = SHARDS_TOTAL_COUNT.getAndMapOrThrow(
+						configurationSource,
+						this::checkTotalShardCount,
+						log::missingPropertyForStaticSharding
+				);
+				shardAssignmentOrNulls = SHARDS_ASSIGNED.getAndMapOrThrow(
+						configurationSource,
+						shardIndices -> toStaticShardAssignments( configurationSource, totalShardCount, shardIndices ),
+						log::missingPropertyForStaticSharding
+				);
+			}
+			else {
+				shardAssignmentOrNulls = Collections.singletonList( null );
+			}
+
+			OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
+					context.clock(), tenantId, configurationSource );
+
+			eventProcessorExecutor = context.threadPoolProvider()
+					.newScheduledExecutor( shardAssignmentOrNulls.size(),
+							OutboxPollingEventProcessor.namePrefix( tenantId ) );
+			eventProcessors = new ArrayList<>();
+			for ( ShardAssignmentDescriptor shardAssignmentOrNull : shardAssignmentOrNulls ) {
+				eventProcessors.add( factory.create( eventProcessorExecutor, finderProviderHolder.get(),
+						agentRepositoryProviderHolder.get(), shardAssignmentOrNull ) );
+			}
+			for ( OutboxPollingEventProcessor eventProcessor : eventProcessors ) {
+				eventProcessor.start();
+			}
+		}
+
+		private Integer checkTotalShardCount(Integer totalShardCount) {
+			if ( totalShardCount <= 0 ) {
+				throw log.invalidTotalShardCount();
+			}
+			return totalShardCount;
+		}
+
+		private List<ShardAssignmentDescriptor> toStaticShardAssignments(ConfigurationPropertySource configurationPropertySource,
+				int totalShardCount, List<Integer> shardIndices) {
+			// Remove duplicates
+			Set<Integer> uniqueShardIndices = new HashSet<>( shardIndices );
+			for ( Integer shardIndex : uniqueShardIndices ) {
+				if ( !( 0 <= shardIndex && shardIndex < totalShardCount ) ) {
+					throw log.invalidShardIndex( totalShardCount,
+							SHARDS_TOTAL_COUNT.resolveOrRaw( configurationPropertySource ) );
+				}
+			}
+			List<ShardAssignmentDescriptor> shardAssignment = new ArrayList<>();
+			for ( Integer shardIndex : uniqueShardIndices ) {
+				shardAssignment.add( new ShardAssignmentDescriptor( totalShardCount, shardIndex ) );
+			}
+			return shardAssignment;
+		}
+
 	}
 }

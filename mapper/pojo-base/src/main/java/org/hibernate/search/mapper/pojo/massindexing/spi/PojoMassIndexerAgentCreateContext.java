@@ -21,4 +21,6 @@ public interface PojoMassIndexerAgentCreateContext {
 	 */
 	ScheduledExecutorService newScheduledExecutor(int threads, String threadNamePrefix);
 
+	String tenantIdentifier();
+
 }

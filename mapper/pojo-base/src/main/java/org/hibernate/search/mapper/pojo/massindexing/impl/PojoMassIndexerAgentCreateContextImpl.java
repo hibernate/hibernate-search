@@ -13,9 +13,11 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMapping
 
 class PojoMassIndexerAgentCreateContextImpl implements PojoMassIndexerAgentCreateContext {
 	private final PojoMassIndexingMappingContext mappingContext;
+	private final String tenantIdentifier;
 
-	PojoMassIndexerAgentCreateContextImpl(PojoMassIndexingMappingContext mappingContext) {
+	PojoMassIndexerAgentCreateContextImpl(PojoMassIndexingMappingContext mappingContext, String tenantIdentifier) {
 		this.mappingContext = mappingContext;
+		this.tenantIdentifier = tenantIdentifier;
 	}
 
 	@Override
@@ -23,5 +25,10 @@ class PojoMassIndexerAgentCreateContextImpl implements PojoMassIndexerAgentCreat
 		return mappingContext.threadPoolProvider()
 				.newScheduledExecutor( threads,
 						PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + threadNamePrefix );
+	}
+
+	@Override
+	public String tenantIdentifier() {
+		return tenantIdentifier;
 	}
 }
