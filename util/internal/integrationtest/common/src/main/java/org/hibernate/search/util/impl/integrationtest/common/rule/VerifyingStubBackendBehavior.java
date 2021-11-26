@@ -205,6 +205,20 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		// we also report the additional ones as suppressed exceptions.
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
+
+			// First, we check that there weren't any unexpected calls:
+			// those are the most useful to debug problems.
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall, schemaDefinitionCalls.values() );
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall, indexScaleWorkCalls.values() );
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall, schemaManagementWorkCall.values() );
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall, documentWorkCreateCalls.values() );
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall, documentWorkDiscardCalls.values() );
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall, documentWorkExecuteCalls.values() );
+			closer.pushAll( CallQueue::verifyNoUnexpectedCall,
+					searchCalls, countCalls,
+					scrollCalls, closeScrollCalls, nextScrollCalls );
+
+			// Then, we check that whatever we *were* expecting actually happened.
 			closer.pushAll( CallQueue::verifyExpectationsMet, schemaDefinitionCalls.values() );
 			closer.pushAll( CallQueue::verifyExpectationsMet, indexScaleWorkCalls.values() );
 			closer.pushAll( CallQueue::verifyExpectationsMet, schemaManagementWorkCall.values() );
@@ -221,7 +235,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 			);
 			closer.pushAll( CallQueue::verifyExpectationsMet,
 					searchCalls, countCalls,
-					scrollCalls, closeScrollCalls, nextScrollCalls, closeScrollCalls );
+					scrollCalls, closeScrollCalls, nextScrollCalls );
 		}
 
 		if ( indexingWorkExpectations.allowDuplicateIndexing() ) {
