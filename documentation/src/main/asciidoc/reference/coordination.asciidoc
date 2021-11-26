@@ -155,6 +155,15 @@ The `outbox-polling` strategy can be enabled with the following settings:
 hibernate.search.coordination.strategy = outbox-polling
 ----
 
+[CAUTION]
+====
+If link:{hibernateDocUrl}#configurations-multi-tenancy[multi-tenancy] is enabled,
+you will need extra configuration.
+
+See <<coordination-outbox-polling-multi-tenancy>>.
+====
+
+
 You will also need to add this dependency:
 
 [source, XML, subs="+attributes"]
@@ -576,3 +585,49 @@ High values (much larger than the pulse interval) mean a longer delay before res
 event processing when a node currently performing mass indexing
 abruptly leaves the cluster due to a crash or network failure,
 but reduced risk of incorrectly considering a mass indexer disconnected.
+
+[[coordination-outbox-polling-multi-tenancy]]
+=== Multi-tenancy
+
+If you use link:{hibernateDocUrl}#configurations-multi-tenancy[Hibernate ORM's multi-tenancy support],
+you will need to <<configuration-multi-tenancy,configure the list of all possible tenant identifiers>>.
+
+Failing to mention a tenant identifier in this configuration might result in
+events piling up in the outbox table without ever being <<coordination-outbox-polling-agents-event-processor,processed>>,
+or in exceptions being thrown upon <<coordination-outbox-polling-agents-mass-indexer,mass indexing>>
+due to incomplete configuration.
+
+Apart from that, multi-tenancy support should be fairly transparent:
+Hibernate Search will simply duplicate event processors for each tenant identifiers.
+
+You can use different configuration for different tenants by using a different root for configuration properties:
+
+* `hibernate.search.coordination` is the default root, whose properties will be used as a default for all tenants.
+* `hibernate.search.coordination.tenants.<tenant ID>` is the tenant-specific root.
+
+See below for an example.
+
+.Configuration of coordination in a multi-tenant application with a node dedicated to a single tenant
+====
+Node 1:
+
+[source]
+----
+hibernate.search.multi_tenancy.tenant_ids=tenant1,tenant2,tenant3,tenant4
+hibernate.search.coordination.strategy = outbox-polling
+hibernate.search.coordination.tenants.tenant1.event_processor.enabled = false <1>
+----
+<1> This node will process events for all tenants *except* `tenant1`.
+
+Node 2:
+
+[source]
+----
+hibernate.search.multi_tenancy.tenant_ids=tenant1,tenant2,tenant3,tenant4
+hibernate.search.coordination.strategy = outbox-polling
+hibernate.search.coordination.event_processor.enabled = false <1>
+hibernate.search.coordination.tenants.tenant1.event_processor.enabled = true <2>
+----
+<1> This node will not process events for any tenant...
+<2> ... *except* `tenant1`.
+====

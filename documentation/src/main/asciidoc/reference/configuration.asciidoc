@@ -398,3 +398,28 @@ When a failure handler's `handle` method throws an error or exception,
 Hibernate Search will catch it and log it at the ERROR level.
 It will not be propagated.
 ====
+
+[[configuration-multi-tenancy]]
+== Multi-tenancy
+
+If your application uses Hibernate ORM's link:{hibernateDocUrl}#multitenacy[multi-tenancy support],
+Hibernate Search should detect that and configure your backends transparently.
+For details, see:
+
+* <<backend-lucene-multi-tenancy,here for Lucene>>
+* <<backend-elasticsearch-multi-tenancy,here for Elasticsearch>>
+
+In some cases, in particular when <<coordination-outbox-polling-multi-tenancy,using the `outbox-polling` coordination strategy>>,
+you will need to list explicitly all tenant identifiers that your application might use.
+This information is used by Hibernate Search when spawning background processes
+that should apply an operation to every tenant.
+
+The list of identifiers is defined through the following configuration property:
+
+[source]
+----
+hibernate.search.multi_tenancy.tenant_ids = mytenant1,mytenant2,mytenant3
+----
+
+This property may be set to a String containing multiple tenant identifiers separated by commas,
+or a `Collection<String>` containing tenant identifiers.
