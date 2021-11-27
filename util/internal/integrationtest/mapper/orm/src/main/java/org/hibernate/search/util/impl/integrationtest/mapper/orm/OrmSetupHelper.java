@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
@@ -24,20 +26,33 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
 public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
+
+	static {
+		// we don't need a ServiceLoader using a general-purpose aggregated class loader,
+		// since we expect the service impl in the direct dependent test module.
+		ServiceLoader<OrmSetupHelperConfig> serviceLoader = ServiceLoader.load( OrmSetupHelperConfig.class );
+		Iterator<OrmSetupHelperConfig> iterator = serviceLoader.iterator();
+		if ( iterator.hasNext() ) {
+			OrmSetupHelperConfig next = iterator.next();
+			defaultCoordinationStrategyExpectations = next.coordinationStrategyExpectations();
+		}
+		else {
+			defaultCoordinationStrategyExpectations = CoordinationStrategyExpectations.defaults();
+		}
+	}
 
 	public static void defaultAutomaticIndexingStrategy(
 			CoordinationStrategyExpectations coordinationStrategyExpectations) {
 		OrmSetupHelper.defaultCoordinationStrategyExpectations = coordinationStrategyExpectations;
 	}
 
-	private static CoordinationStrategyExpectations defaultCoordinationStrategyExpectations =
-			CoordinationStrategyExpectations.defaults();
+	private static CoordinationStrategyExpectations defaultCoordinationStrategyExpectations;
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
 		return new OrmSetupHelper(
@@ -146,7 +161,7 @@ public final class OrmSetupHelper
 			return thisAsC();
 		}
 
-		public SetupContext tenants(String ... tenants) {
+		public SetupContext tenants(String... tenants) {
 			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			return thisAsC();
 		}
@@ -154,16 +169,19 @@ public final class OrmSetupHelper
 		public SetupContext skipTestForDialect(Class<? extends Dialect> dialect, String reason) {
 			withConfiguration( b -> b.onMetadata( metadataImplementor -> {
 				Dialect currentDialect = metadataImplementor.getDatabase().getDialect();
-				assumeFalse( "Skipping test for dialect " + dialect.getName() + "; reason: " + reason, dialect.isAssignableFrom( currentDialect.getClass() ) );
+				assumeFalse(
+						"Skipping test for dialect " + dialect.getName() + "; reason: " + reason,
+						dialect.isAssignableFrom( currentDialect.getClass() )
+				);
 			} ) );
 			return thisAsC();
 		}
 
-		public SetupContext withAnnotatedTypes(Class<?> ... annotatedTypes) {
+		public SetupContext withAnnotatedTypes(Class<?>... annotatedTypes) {
 			return withConfiguration( builder -> builder.addAnnotatedClasses( Arrays.asList( annotatedTypes ) ) );
 		}
 
-		public SessionFactory setup(Class<?> ... annotatedTypes) {
+		public SessionFactory setup(Class<?>... annotatedTypes) {
 			return withAnnotatedTypes( annotatedTypes ).setup();
 		}
 
