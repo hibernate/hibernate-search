@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing;
 
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.RunWith;
 
@@ -39,16 +34,8 @@ import org.junit.runner.RunWith;
 })
 public class OutboxPollingAutomaticIndexingBaseIT {
 
-	@BeforeClass
-	public static void beforeAll() {
-		// Force the automatic indexing strategy
-		OrmSetupHelper.defaultAutomaticIndexingStrategy( CoordinationStrategyExpectations.outboxPolling() );
-	}
-
-	@AfterClass
-	public static void afterAll() {
-		OrmSetupHelper.defaultAutomaticIndexingStrategy( CoordinationStrategyExpectations.defaults() );
-	}
+	// @BeforeClass nor @BeforeSuite do not work to set static instance on OrmSetupHelper#defaultCoordinationStrategyExpectations
+	// for this reason we introduced OrmSetupHelperConfig module service to solve HSEARCH-4373
 
 	// For checkstyle.
 	public void thisIsNotAUtilityClass() {
