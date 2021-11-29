@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
@@ -82,7 +84,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 
 		backendMock.verifyExpectationsMet();
 
-		OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster( indexingCountHelper.sessionFactory( 0 ), totalShardCount );
+		awaitAllAgentsRunningInOneCluster( with( indexingCountHelper.sessionFactory( 0 ) ), totalShardCount );
 	}
 
 	private void setup(String hbm2ddlAction, int assignedShardIndex) {
@@ -145,7 +147,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( 2 );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( 2 );
 	}
 
 	@Test
@@ -189,7 +191,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( 3 );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( 3 );
 	}
 
 	@Test
@@ -210,9 +212,9 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// The workload must be spread uniformly (with some tolerance)
-		indexingCountHelper.assertIndexingCountForEachSessionFactory()
+		indexingCountHelper.indexingCounts().assertForEachSessionFactory()
 				.allSatisfy( count -> assertThat( count )
 						.isCloseTo( entityCount / totalShardCount, Percentage.withPercentage( 25 ) ) );
 
@@ -235,9 +237,9 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		}
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// The workload must be spread uniformly (with some tolerance)
-		indexingCountHelper.assertIndexingCountForEachSessionFactory()
+		indexingCountHelper.indexingCounts().assertForEachSessionFactory()
 				.allSatisfy( count -> assertThat( count )
 						.isCloseTo( entityCount / totalShardCount, Percentage.withPercentage( 25 ) ) );
 	}

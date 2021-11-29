@@ -9,7 +9,9 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withinPercentage;
 import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.AGENT_REPOSITORY_PROVIDER;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
@@ -70,7 +72,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 
 		backendMock.verifyExpectationsMet();
 
-		OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster( indexingCountHelper.sessionFactory( 0 ), 3 );
+		awaitAllAgentsRunningInOneCluster( with( indexingCountHelper.sessionFactory( 0 ) ), 3 );
 	}
 
 	private void setup(String hbm2ddlAction) {
@@ -117,12 +119,12 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// Stop the last factory as soon as it's processed at least one entity
 		await()
 				.pollInterval( 1, TimeUnit.MILLISECONDS )
-				.untilAsserted( () -> indexingCountHelper.assertIndexingCountForSessionFactory( 2 ).isNotZero() );
+				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForSessionFactory( 2 ).isNotZero() );
 		indexingCountHelper.sessionFactory( 2 ).close();
 
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// We expect factory 2 to not have processed many events before it left the cluster,
 		// but we can't predict exactly how many it will have processed:
 		// how many events are processed during a pulse interval is a matter of performance.
@@ -130,15 +132,15 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// This assertion could fail on a very well-performing machine where all events
 		// are processed before the pulse; if that happens, either lower the pulse interval
 		// or raise the number of entities.
-		indexingCountHelper.assertIndexingCountForSessionFactory( 2 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
 				.isLessThan( entityCount / initialShardCount / 2 );
 		// The workload must be spread evenly over the other factories in accordance with
 		// the number of shards (with some tolerance)
 		int remainingShardCount = initialShardCount - 1;
-		int entityCountNotProcessedByFactory2 = entityCount - indexingCountHelper.indexingCountForSessionFactory( 2 );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 0 )
+		int entityCountNotProcessedByFactory2 = entityCount - indexingCountHelper.indexingCounts().forSessionFactory( 2 );
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 0 )
 				.isCloseTo( entityCountNotProcessedByFactory2 / remainingShardCount, withinPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 1 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 1 )
 				.isCloseTo( entityCountNotProcessedByFactory2 / remainingShardCount, withinPercentage( 25 ) );
 
 		counters.clear();
@@ -167,15 +169,15 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// so that its registration ultimately expires
 		await()
 				.pollInterval( 1, TimeUnit.MILLISECONDS )
-				.untilAsserted( () -> indexingCountHelper.assertIndexingCountForSessionFactory( 2 ).isNotZero() );
+				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForSessionFactory( 2 ).isNotZero() );
 		disconnectionSimulatingAgentRepositoryProviders.get( 2 ).setPreventPulse( false );
 
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// We expect factory 2 to not have processed many events before it was disconnected,
 		// but we can't predict exactly how many it will have processed; see the similar comment in agentLeft().
-		indexingCountHelper.assertIndexingCountForSessionFactory( 2 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
 				.isLessThan( entityCount / initialShardCount / 2 );
 		// The workload will most likely not be spread evenly over the other factories,
 		// because they will have processed most of their own events by the time
@@ -209,26 +211,26 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// Start a new factory as soon as all others have processed at least one entity
 		await()
 				.pollInterval( 1, TimeUnit.MILLISECONDS )
-				.untilAsserted( () -> indexingCountHelper.assertIndexingCountForEachSessionFactory()
+				.untilAsserted( () -> indexingCountHelper.indexingCounts().assertForEachSessionFactory()
 						.allSatisfy( c -> assertThat( c ).isNotZero() ) );
 		setup( "none" );
 		int newShardCount = initialShardCount + 1;
 
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// We expect the factory 3 to have "missed" a few events processed by another factory before factory 3 joined,
 		// but we can't predict exactly how many it will have missed; see the similar comment in agentLeft().
-		indexingCountHelper.assertIndexingCountForSessionFactory( 3 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 3 )
 				.isGreaterThan( entityCount / newShardCount / 2 );
 		// The workload must be spread evenly over the other factories in accordance with
 		// the number of shards (with some tolerance)
-		int entityCountNotProcessedByFactory3 = entityCount - indexingCountHelper.indexingCountForSessionFactory( 3 );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 0 )
+		int entityCountNotProcessedByFactory3 = entityCount - indexingCountHelper.indexingCounts().forSessionFactory( 3 );
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 0 )
 				.isCloseTo( entityCountNotProcessedByFactory3 / initialShardCount, withinPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 1 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 1 )
 				.isCloseTo( entityCountNotProcessedByFactory3 / initialShardCount, withinPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 2 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
 				.isCloseTo( entityCountNotProcessedByFactory3 / initialShardCount, withinPercentage( 25 ) );
 	}
 
