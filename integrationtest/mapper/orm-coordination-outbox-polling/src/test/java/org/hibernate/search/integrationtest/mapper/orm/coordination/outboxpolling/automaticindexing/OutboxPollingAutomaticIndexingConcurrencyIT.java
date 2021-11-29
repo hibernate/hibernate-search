@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 
 		backendMock.verifyExpectationsMet();
 
-		OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster( sessionFactories.get( 0 ), TOTAL_SHARD_COUNT );
+		awaitAllAgentsRunningInOneCluster( with( sessionFactories.get( 0 ) ), TOTAL_SHARD_COUNT );
 	}
 
 	private SessionFactory setup(String hbm2ddlAction) {

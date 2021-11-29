@@ -118,18 +118,18 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		} );
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// The workload must be spread in accordance with the number of shards (with some tolerance)
-		indexingCountHelper.assertIndexingCountForSessionFactory( 0 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 0 )
 				// 1 shard
 				.isCloseTo( 1 * entityCount / TOTAL_SHARD_COUNT, Percentage.withPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 1 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 1 )
 				// 0 shard
 				.isEqualTo( 0 );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 2 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
 				// 2 shards
 				.isCloseTo( 2 * entityCount / TOTAL_SHARD_COUNT, Percentage.withPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 3 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 3 )
 				// 4 shards
 				.isCloseTo( 4 * entityCount / TOTAL_SHARD_COUNT, Percentage.withPercentage( 25 ) );
 
@@ -152,18 +152,18 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		}
 		backendMock.verifyExpectationsMet();
 		// All works must be executed exactly once
-		indexingCountHelper.assertIndexingCountAcrossAllSessionFactories().isEqualTo( entityCount );
+		indexingCountHelper.indexingCounts().assertAcrossAllSessionFactories().isEqualTo( entityCount );
 		// The workload must be spread in accordance with the number of shards (with some tolerance)
-		indexingCountHelper.assertIndexingCountForSessionFactory( 0 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 0 )
 				// 1 shard
 				.isCloseTo( 1 * entityCount / TOTAL_SHARD_COUNT, Percentage.withPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 1 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 1 )
 				// 0 shard
 				.isEqualTo( 0 );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 2 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
 				// 2 shards
 				.isCloseTo( 2 * entityCount / TOTAL_SHARD_COUNT, Percentage.withPercentage( 25 ) );
-		indexingCountHelper.assertIndexingCountForSessionFactory( 3 )
+		indexingCountHelper.indexingCounts().assertForSessionFactory( 3 )
 				// 4 shards
 				.isCloseTo( 4 * entityCount / TOTAL_SHARD_COUNT, Percentage.withPercentage( 25 ) );
 	}

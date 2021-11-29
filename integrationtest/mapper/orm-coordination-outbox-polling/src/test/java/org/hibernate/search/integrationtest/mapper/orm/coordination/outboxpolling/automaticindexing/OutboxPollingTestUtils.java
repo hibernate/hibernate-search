@@ -9,15 +9,16 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.pollinterval.IterativePollInterval.iterative;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.PersistenceRunner;
 
 public class OutboxPollingTestUtils {
 
@@ -27,13 +28,13 @@ public class OutboxPollingTestUtils {
 	// Wait for all agents to be registered and member of the same cluster.
 	// Useful in tests checking indexing count for each agent,
 	// because for those tests, starting with a partially-formed cluster could skew the numbers.
-	public static void awaitAllAgentsRunningInOneCluster(SessionFactory sessionFactory, int expectedAgentCount) {
+	public static void awaitAllAgentsRunningInOneCluster(PersistenceRunner<Session, Transaction> runner, int expectedAgentCount) {
 		await( "Waiting for the formation of a cluster of " + expectedAgentCount + " agents" )
 				.pollDelay( Duration.ZERO )
 				.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
 				.atMost( Duration.ofSeconds( 5 ) )
 				.untilAsserted( () -> {
-					with( sessionFactory ).runInTransaction( session -> {
+					runner.runInTransaction( session -> {
 						List<Agent> agents = session.createQuery( "select a from Agent a order by a.id", Agent.class )
 								.list();
 						assertThat( agents )
