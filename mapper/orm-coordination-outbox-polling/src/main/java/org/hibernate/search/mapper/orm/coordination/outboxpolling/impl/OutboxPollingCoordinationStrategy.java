@@ -133,14 +133,19 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			// Single-tenant
 			TenantDelegate tenantDelegate = new TenantDelegate( null );
 			tenantDelegates.put( null, tenantDelegate );
-			tenantDelegate.start( context );
+			tenantDelegate.start( context, context.configurationPropertySource() );
 		}
 		else {
 			// Multi-tenant
 			for ( String tenantId : tenantIds ) {
 				TenantDelegate tenantDelegate = new TenantDelegate( tenantId );
 				tenantDelegates.put( tenantId, tenantDelegate );
-				tenantDelegate.start( context );
+				ConfigurationPropertySource configurationSource = context.configurationPropertySource();
+				configurationSource = configurationSource
+						.withMask( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.TENANTS )
+						.withMask( tenantId )
+						.withFallback( configurationSource );
+				tenantDelegate.start( context, configurationSource );
 			}
 		}
 
@@ -211,27 +216,24 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			this.tenantId = tenantId;
 		}
 
-		void start(CoordinationStrategyStartContext context) {
-			ConfigurationPropertySource configurationSource = context.configurationPropertySource();
-
+		void start(CoordinationStrategyStartContext context, ConfigurationPropertySource configurationSource) {
 			if ( EVENT_PROCESSOR_ENABLED.get( configurationSource ) ) {
-				initializeEventProcessors( context );
+				initializeEventProcessors( context, configurationSource );
 			}
 			else {
 				// IMPORTANT: in this case we don't even configure sharding, and that's on purpose.
 				// Application developers may want a fixed number of processing nodes (static sharding)
 				// with a varying number of non-processing nodes,
 				// so we want to make those non-processing nodes easy to configure.
-				log.eventProcessorDisabled();
+				log.eventProcessorDisabled( tenantId );
 			}
 
 			this.massIndexerAgentFactory = OutboxPollingMassIndexerAgent.factory( context.mapping(), context.clock(),
 					tenantId, configurationSource );
 		}
 
-		private void initializeEventProcessors(CoordinationStrategyStartContext context) {
-			ConfigurationPropertySource configurationSource = context.configurationPropertySource();
-
+		private void initializeEventProcessors(CoordinationStrategyStartContext context,
+				ConfigurationPropertySource configurationSource) {
 			// IMPORTANT: we only configure sharding here, if processors are enabled.
 			// See the comment in the caller method.
 			boolean shardsStatic = SHARDS_STATIC.get( configurationSource );
