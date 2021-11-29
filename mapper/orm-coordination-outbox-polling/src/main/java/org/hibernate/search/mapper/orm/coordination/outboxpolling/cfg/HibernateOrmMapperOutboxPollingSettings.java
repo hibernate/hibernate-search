@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 
+import static java.lang.String.join;
+
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.common.annotation.Incubating;
+import org.hibernate.search.util.common.impl.Contracts;
 
 @Incubating
 public final class HibernateOrmMapperOutboxPollingSettings {
@@ -34,6 +37,12 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * and possible architectures.
 	 */
 	public static final String COORDINATION_STRATEGY_NAME = "outbox-polling";
+
+	/**
+	 * The root property for coordination properties specific to a tenant,
+	 * e.g. "hibernate.search.coordination.tenants.tenant1.something = somevalue".
+	 */
+	public static final String COORDINATION_TENANTS = PREFIX + Radicals.COORDINATION_TENANTS;
 
 	/**
 	 * Whether shards are static, i.e. configured explicitly for each node, with a fixed number of shards/nodes.
@@ -355,6 +364,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		}
 
 		public static final String COORDINATION_PREFIX = HibernateOrmMapperSettings.Radicals.COORDINATION_PREFIX;
+		public static final String COORDINATION_TENANTS = COORDINATION_PREFIX + CoordinationRadicals.TENANTS;
 		public static final String COORDINATION_SHARDS_STATIC = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_STATIC;
 		public static final String COORDINATION_SHARDS_TOTAL_COUNT = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_TOTAL_COUNT;
 		public static final String COORDINATION_SHARDS_ASSIGNED = COORDINATION_PREFIX + CoordinationRadicals.SHARDS_ASSIGNED;
@@ -378,6 +388,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		private CoordinationRadicals() {
 		}
 
+		public static final String TENANTS = "tenants";
 		public static final String SHARDS_STATIC = "shards.static";
 		public static final String SHARDS_TOTAL_COUNT = "shards.total_count";
 		public static final String SHARDS_ASSIGNED = "shards.assigned";
@@ -413,6 +424,22 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final int COORDINATION_MASS_INDEXER_POLLING_INTERVAL = 100;
 		public static final int COORDINATION_MASS_INDEXER_PULSE_INTERVAL = 2000;
 		public static final int COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = 30000;
+	}
+
+	/**
+	 * Builds a configuration property key for coordination for the given tenant, with the given radical.
+	 * <p>
+	 * See {@link CoordinationRadicals} for available radicals.
+	 * <p>
+	 * Example result: "{@code hibernate.search.coordination.tenant.myTenant.event_processor.enabled}"
+	 *
+	 * @param tenantId The identifier of the tenant whose coordination to configure.
+	 * @param radical The radical of the configuration property (see constants in {@link CoordinationRadicals})
+	 * @return the concatenated prefix + tenant ID + radical
+	 */
+	public static String coordinationKey(String tenantId, String radical) {
+		Contracts.assertNotNull( tenantId, "tenantId" );
+		return join( ".", COORDINATION_TENANTS, tenantId, radical );
 	}
 
 }

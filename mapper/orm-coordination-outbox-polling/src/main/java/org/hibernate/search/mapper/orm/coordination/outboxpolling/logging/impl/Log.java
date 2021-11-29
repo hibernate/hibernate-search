@@ -70,10 +70,10 @@ public interface Log extends BasicLogger {
 	SearchException missingPropertyForStaticSharding();
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 10, value = "The outbox event processor is disabled. "
+	@Message(id = ID_OFFSET + 10, value = "The outbox event processor is disabled for tenant '%s'. "
 			+ " Events will accumulate in the outbox table and indexes will not be updated,"
 			+ " unless another application node connects to the same database with their event processor enabled.")
-	void eventProcessorDisabled();
+	void eventProcessorDisabled(String tenantId);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 11, value = "'%1$s' failed to obtain a lock on events to process; will try again later.")
