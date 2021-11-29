@@ -33,6 +33,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.im
 public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
+	private static final CoordinationStrategyExpectations DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
+	private static final Map<String, Object> DEFAULT_PROPERTIES;
+
 	static {
 		// we don't need a ServiceLoader using a general-purpose aggregated class loader,
 		// since we expect the service impl in the direct dependent test module.
@@ -40,19 +43,16 @@ public final class OrmSetupHelper
 		Iterator<OrmSetupHelperConfig> iterator = serviceLoader.iterator();
 		if ( iterator.hasNext() ) {
 			OrmSetupHelperConfig next = iterator.next();
-			defaultCoordinationStrategyExpectations = next.coordinationStrategyExpectations();
+			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS = next.coordinationStrategyExpectations();
+			Map<String, Object> defaults = new LinkedHashMap<>();
+			next.overrideHibernateSearchDefaults( defaults::put );
+			DEFAULT_PROPERTIES = Collections.unmodifiableMap( defaults );
 		}
 		else {
-			defaultCoordinationStrategyExpectations = CoordinationStrategyExpectations.defaults();
+			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS = CoordinationStrategyExpectations.defaults();
+			DEFAULT_PROPERTIES = Collections.emptyMap();
 		}
 	}
-
-	public static void defaultAutomaticIndexingStrategy(
-			CoordinationStrategyExpectations coordinationStrategyExpectations) {
-		OrmSetupHelper.defaultCoordinationStrategyExpectations = coordinationStrategyExpectations;
-	}
-
-	private static CoordinationStrategyExpectations defaultCoordinationStrategyExpectations;
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
 		return new OrmSetupHelper(
@@ -98,7 +98,7 @@ public final class OrmSetupHelper
 	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 	private CoordinationStrategyExpectations coordinationStrategyExpectations =
-			defaultCoordinationStrategyExpectations;
+			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
@@ -142,6 +142,8 @@ public final class OrmSetupHelper
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
 		SetupContext(SchemaManagementStrategyName schemaManagementStrategyName) {
+			// Set the default properties according to OrmSetupHelperConfig
+			withProperties( DEFAULT_PROPERTIES );
 			// Override the schema management strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, schemaManagementStrategyName );
 			// Set the automatic indexing strategy according to the expectations

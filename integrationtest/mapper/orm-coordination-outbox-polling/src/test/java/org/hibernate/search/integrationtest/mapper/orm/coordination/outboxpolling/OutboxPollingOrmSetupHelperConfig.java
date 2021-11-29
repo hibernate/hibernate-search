@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling;
 
+import java.util.function.BiConsumer;
+
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelperConfig;
 
@@ -14,5 +17,16 @@ public class OutboxPollingOrmSetupHelperConfig implements OrmSetupHelperConfig {
 	@Override
 	public CoordinationStrategyExpectations coordinationStrategyExpectations() {
 		return CoordinationStrategyExpectations.outboxPolling();
+	}
+
+	@Override
+	public void overrideHibernateSearchDefaults(BiConsumer<String, Object> propertyConsumer) {
+		// Use a shorter polling interval.
+		// The default 100ms is just fine in normal applications that expect asynchronous indexing,
+		// but our many tests often wait for indexing to complete before carrying on,
+		// and waiting for 100ms a thousand times really adds up.
+		propertyConsumer.accept(
+				HibernateOrmMapperOutboxPollingSettings.COORDINATION_PROCESSORS_INDEXING_POLLING_INTERVAL,
+				10 );
 	}
 }
