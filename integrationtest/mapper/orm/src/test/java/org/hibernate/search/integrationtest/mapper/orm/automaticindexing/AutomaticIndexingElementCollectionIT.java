@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OrderColumn;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -412,17 +413,20 @@ public class AutomaticIndexingElementCollectionIT {
 		@ElementCollection
 		@CollectionTable(name = "indexedColl")
 		@Column(name = "indexed")
+		@OrderColumn(name = "idx")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
 		@ElementCollection
 		@CollectionTable(name = "nonIndexedColl")
 		@Column(name = "nonIndexed")
+		@OrderColumn(name = "idx")
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@ElementCollection
 		@CollectionTable(name = "shallowReindexOnUpdateColl")
 		@Column(name = "shallowReindexOnUpdate")
+		@OrderColumn(name = "idx")
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private List<String> shallowReindexOnUpdateElementCollectionField = new ArrayList<>();
@@ -430,6 +434,7 @@ public class AutomaticIndexingElementCollectionIT {
 		@ElementCollection
 		@CollectionTable(name = "noReindexOnUpdateColl")
 		@Column(name = "noReindexOnUpdate")
+		@OrderColumn(name = "idx")
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<String> noReindexOnUpdateElementCollectionField = new ArrayList<>();
