@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.pollinterval.IterativePollInterval.iterative;
 
 import java.time.Duration;
 import java.util.List;
@@ -31,7 +30,7 @@ public class OutboxPollingTestUtils {
 	public static void awaitAllAgentsRunningInOneCluster(PersistenceRunner<Session, Transaction> runner, int expectedAgentCount) {
 		await( "Waiting for the formation of a cluster of " + expectedAgentCount + " agents" )
 				.pollDelay( Duration.ZERO )
-				.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
+				.pollInterval( Duration.ofMillis( 5 ) )
 				.atMost( Duration.ofSeconds( 5 ) )
 				.untilAsserted( () -> {
 					runner.runInTransaction( session -> {
