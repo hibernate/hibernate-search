@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.pollinterval.IterativePollInterval.iterative;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -60,7 +59,10 @@ public final class BackendIndexingWorkExpectations {
 		else {
 			await( "Waiting for indexing assertions" )
 					.pollDelay( Duration.ZERO )
-					.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
+					// Most of the time the assertions
+					// are only about in-memory state (i.e. the CallQueues in BackendMock),
+					// so it's fine to poll aggressively every 5ms.
+					.pollInterval( Duration.ofMillis( 5 ) )
 					.atMost( Duration.ofSeconds( 15 ) )
 					.untilAsserted( assertions );
 		}
@@ -73,7 +75,9 @@ public final class BackendIndexingWorkExpectations {
 		else {
 			await( "Waiting for background process completion" )
 					.pollDelay( Duration.ZERO )
-					.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
+					// We're only waiting for in-memory state to change,
+					// so it's fine to poll aggressively every 5ms.
+					.pollInterval( Duration.ofMillis( 5 ) )
 					.atMost( Duration.ofSeconds( 15 ) )
 					.until( completion::isDone );
 		}
