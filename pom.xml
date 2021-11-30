@@ -311,7 +311,7 @@
         <!-- >>> JSR 352: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.0.10.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
-        <version.org.google.guava>30.0-jre</version.org.google.guava>
+        <version.org.google.guava>31.0.1-jre</version.org.google.guava>
 
         <!-- >>> Spring integration tests -->
         <version.org.springframework.boot>2.4.0</version.org.springframework.boot>
