@@ -608,7 +608,7 @@ For a field that is lowercased, but not tokenized (using a normalizer):
 As a result of Elasticsearch normalizing regular expressions,
 normalizers can interfere with regexp meta-characters and completely change the meaning of a regexp.
 
-For example, for a field whose normalizer replaces the characters `*` and `?` with `_`,
+For example, for a field whose normalizer replaces the characters `*` and `?` with `+_+`,
 the regexp `Robots?` will be normalized to `Robots_` and will probably never match anything.
 
 This behavior is considered a bug and
