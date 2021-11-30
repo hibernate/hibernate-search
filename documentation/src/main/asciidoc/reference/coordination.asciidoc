@@ -194,7 +194,7 @@ Indexing happens in a background thread::
 When a Hibernate ORM session is flushed,
 Hibernate Search will persist entity change events within the same Hibernate ORM session and the same transaction.
 +
-A <<coordination-outbox-polling-agents-event-processor,event processor>> polls the database for new entity change events,
+A <<coordination-outbox-polling-event-processor,event processor>> polls the database for new entity change events,
 and asynchronously performs reindexing of the appropriate entities when it finds new events
 (i.e. after the transaction is committed).
 +
@@ -248,7 +248,7 @@ This means these changes are safely stored to disk,
 but this does not mean a search query ran immediately when the thread resumes will take the changes into account:
 <<coordination-outbox-polling-indexing-background,indexing will happen at a later time, asynchronously, in a background processor>>.
 +
-You can <<coordination-outbox-polling-agents-event-processor,configure this event processor>> to run more often,
+You can <<coordination-outbox-polling-event-processor,configure this event processor>> to run more often,
 but it will remain asynchronous.
 
 [[coordination-outbox-polling-schema]]
@@ -284,13 +284,13 @@ In order to avoid unnecessarily indexing the same entity multiple times on diffe
 Hibernate Search partitions the entities in what it calls "shards":
 
 * Each entity belongs to exactly one shard.
-* Each application node involved in <<coordination-outbox-polling-agents-event-processor,event processing>>
+* Each application node involved in <<coordination-outbox-polling-event-processor,event processing>>
 is uniquely assigned one or more shards, and will only process events related to entities in these shards.
 
 In order to reliably assign shards,
 Hibernate Search <<coordination-outbox-polling-schema,adds an agent table to the database>>,
 and uses that table to register agents involved in indexing (most of the time, one application instance = one agent =
-the <<coordination-outbox-polling-agents-event-processor,event processor>>).
+the <<coordination-outbox-polling-event-processor,event processor>>).
 The registered agents form a cluster.
 
 To make sure that agents are always assigned one shard,
@@ -298,46 +298,40 @@ and that one shard is never assigned to more than one agent,
 each agent will periodically perform a "pulse",
 updating and inspecting the agent table.
 
-What happens during a pulse depends on the <<coordination-outbox-polling-agents,type of agent>>.
+What happens during a pulse depends on the type of agent.
 During a "pulse":
 
-* An event processor will:
+* An <<coordination-outbox-polling-event-processor,event processor>> will:
 ** update its own entry in the agent table, to let other agents knows it's still active;
 ** forcibly remove entries from other agents if it detects that these agents expired
    (did not update their entry for a long time);
 ** detect and report configuration mistakes
    if using <<coordination-outbox-polling-sharding-static,static sharding>>,
    e.g. two agents assigned to the same shard;
-** decide to suspend itself if a <<coordination-outbox-polling-agents-mass-indexer,mass indexer>> is running;
-** trigger rebalancing as necessary if using <<coordination-outbox-polling-agents-event-processor-sharding,dynamic sharding>>;
+** decide to suspend itself if a <<coordination-outbox-polling-mass-indexer,mass indexer>> is running;
+** trigger rebalancing as necessary if using <<coordination-outbox-polling-event-processor-sharding,dynamic sharding>>;
    e.g. when it detects that new agents recently joined the cluster,
    or that agents left the cluster (voluntarily or forcibly).
-* A mass indexer will:
+* A <<coordination-outbox-polling-mass-indexer,mass indexer>> will:
 ** update its own entry in the agent table, to let other agents knows it's still active;
 ** forcibly remove entries from other agents if it detects that these agents expired
    (did not update their entry for a long time);
 ** switch to active waiting mode (frequent polling) if it notices some
-   <<coordination-outbox-polling-agents-event-processor,event processors>> are still running;
+   <<coordination-outbox-polling-event-processor,event processors>> are still running;
 ** switch to pulse-only mode (infrequent polling) and give the green light for mass indexing to start
-  if it notices no <<coordination-outbox-polling-agents-event-processor,event processors>> are running anymore.
+  if it notices no <<coordination-outbox-polling-event-processor,event processors>> are running anymore.
 
 For more details about dynamic and static sharding, see the following sections.
 
-[[coordination-outbox-polling-agents]]
-=== [[coordination-database-polling-processors]] Agents
+[[coordination-outbox-polling-event-processor]]
+=== [[coordination-database-polling-processors]] Event processor
 
-The `outbox-polling` coordination strategy involves agents executing in the background.
+[[coordination-outbox-polling-event-processor-basics]]
+==== Basics
 
-The following subsections list those agents and detail their respective configuration options.
-
-[[coordination-outbox-polling-agents-event-processor]]
-==== Event processor
-
-[[coordination-outbox-polling-agents-event-processor-basics]]
-===== Basics
-
-The most important agent is the event processor,
-which polls the outbox table for events
+Among agents of the `outbox-polling` coordination strategy executing in the background,
+the most important one is the event processor:
+it polls the outbox table for events
 and then reindexes the corresponding entities when new events are found.
 
 The event processor can be configured using the following configuration properties:
@@ -414,17 +408,17 @@ as a <<configuration-property-types,positive integer value>> in seconds.
 Use the value `0` to reprocess the failed events as soon as possible, with no delay.
 The default for this property is `30`.
 Dynamic sharding does not require any specific configuration,
-but you may want to configure other properties of <<coordination-outbox-polling-agents-event-processor,the event processor>>.
+but you may want to configure other properties of <<coordination-outbox-polling-event-processor,the event processor>>.
 
-[[coordination-outbox-polling-agents-event-processor-sharding]]
-===== [[coordination-database-polling-sharding-dynamic]] [[coordination-database-polling-sharding-static]] Sharding
+[[coordination-outbox-polling-event-processor-sharding]]
+==== [[coordination-database-polling-sharding-dynamic]] [[coordination-database-polling-sharding-static]] Sharding
 
 By default, <<coordination-outbox-polling-sharding,sharding>> is dynamic:
 Hibernate Search registers each application instance in the database,
 and uses that information to dynamically assign a single, unique shard to each application instance,
 updating assignments as instances start or stop.
 Dynamic sharding does not accept any configuration beyond the
-<<coordination-outbox-polling-agents-event-processor-basics,basics>>.
+<<coordination-outbox-polling-event-processor-basics,basics>>.
 
 If you want to configure sharding explicitly, you can use static sharding
 by setting the following configuration properties:
@@ -497,11 +491,11 @@ hibernate.search.coordination.event_processor.enabled = false
 ----
 ====
 
-[[coordination-outbox-polling-agents-mass-indexer]]
-==== Mass indexer
+[[coordination-outbox-polling-mass-indexer]]
+=== Mass indexer
 
-[[coordination-outbox-polling-agents-mass-indexer-basics]]
-===== Basics
+[[coordination-outbox-polling-mass-indexer-basics]]
+==== Basics
 
 During <<mapper-orm-indexing-massindexer,mass indexing>>,
 an application instance will exceptionally bypass <<coordination-database-polling-sharding,sharding>>
@@ -576,8 +570,8 @@ If you use link:{hibernateDocUrl}#configurations-multi-tenancy[Hibernate ORM's m
 you will need to <<configuration-multi-tenancy,configure the list of all possible tenant identifiers>>.
 
 Failing to mention a tenant identifier in this configuration might result in
-events piling up in the outbox table without ever being <<coordination-outbox-polling-agents-event-processor,processed>>,
-or in exceptions being thrown upon <<coordination-outbox-polling-agents-mass-indexer,mass indexing>>
+events piling up in the outbox table without ever being <<coordination-outbox-polling-event-processor,processed>>,
+or in exceptions being thrown upon <<coordination-outbox-polling-mass-indexer,mass indexing>>
 due to incomplete configuration.
 
 Apart from that, multi-tenancy support should be fairly transparent:
