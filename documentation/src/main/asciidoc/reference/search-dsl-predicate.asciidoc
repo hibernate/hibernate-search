@@ -591,25 +591,28 @@ For a field that is lowercased and tokenized on spaces:
 * the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
 * the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 
-With the Elasticsearch backend, **regexps are normalized**, but **only for normalized fields**::
+With the Elasticsearch backend, regexps are not analyzed nor normalized on text (tokenized) fields, but **are normalized on keyword (non-tokenized) fields**::
+For a field that is lowercased and tokenized on spaces (using an analyzer):
+* the regexp `Robots?` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
+* the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
++
+However, **behavior differs from Lucene for normalized fields**!
 For a field that is lowercased, but not tokenized (using a normalizer):
 * the regexp `Robots?` will be normalized to `robots?` and will match `I love robots`: the indexed token `robots` matches.
 * the regexp `[Rr]obots?` will be normalized to `[rr]obots?` and will match `I love Robots`: the indexed token `robots` matches.
 * the regexp `love .* robots?` will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 +
-However, **that's not true for an analyzed field**!
-For a field that is lowercased and tokenized on spaces (using an analyzer):
-* the regexp `Robots?` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
-* the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
-* the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
-
 [WARNING]
 ====
-With the Elasticsearch backend, normalizers can interfere with regexp meta-characters
-and completely change the meaning of a regexp.
+As a result of Elasticsearch normalizing regular expressions,
+normalizers can interfere with regexp meta-characters and completely change the meaning of a regexp.
 
 For example, for a field whose normalizer replaces the characters `*` and `?` with `_`,
 the regexp `Robots?` will be normalized to `Robots_` and will probably never match anything.
+
+This behavior is considered a bug and
+https://github.com/elastic/elasticsearch/issues/80189[was reported to the Elasticsearch project].
 ====
 
 [[search-dsl-predicate-regexp-multiple-fields]]
