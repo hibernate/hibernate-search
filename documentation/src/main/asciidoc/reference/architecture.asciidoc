@@ -242,6 +242,8 @@ To implement this architecture, use the following Maven dependencies:
 [[architecture-examples-outbox-polling-elasticsearch]]
 === [[_elasticsearch]] Multi-node application with outbox polling and Elasticsearch backend
 
+include::components/incubating-warning.asciidoc[]
+
 [[architecture-examples-outbox-polling-elasticsearch-description]]
 ==== [[architecture-examples-database-polling-elasticsearch-description]] Description
 

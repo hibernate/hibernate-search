@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public final class HibernateOrmMapperOutboxPollingSettings {
 
 	private HibernateOrmMapperOutboxPollingSettings() {
