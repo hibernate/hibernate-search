@@ -261,7 +261,7 @@ This includes in particular an outbox table, to which one row (representing a ch
 in a way that requires reindexing.
 
 This also includes an agent table, where Hibernate Search registers every background event processor
-in order to <<coordination-outbox-polling-sharding-dynamic,dynamically assign shards>> to each application instance,
+in order to <<coordination-outbox-polling-sharding,dynamically assign shards>> to each application instance,
 or simply to check that <<coordination-outbox-polling-sharding-static,statically assigned shards>>
 are consistent.
 
@@ -278,10 +278,7 @@ in particular the Hibernate ORM properties `javax.persistence.schema-generation.
 and `javax.persistence.schema-generation.scripts.drop-target`.
 
 [[coordination-outbox-polling-sharding]]
-=== [[coordination-database-polling-sharding]] Sharding
-
-[[coordination-outbox-polling-sharding-basics]]
-==== [[coordination-database-polling-sharding-basics]] Basics
+=== [[coordination-database-polling-sharding]] [[coordination-outbox-polling-sharding-basics]] Sharding and pulse
 
 In order to avoid unnecessarily indexing the same entity multiple times on different application nodes,
 Hibernate Search partitions the entities in what it calls "shards":
@@ -312,7 +309,7 @@ During a "pulse":
    if using <<coordination-outbox-polling-sharding-static,static sharding>>,
    e.g. two agents assigned to the same shard;
 ** decide to suspend itself if a <<coordination-outbox-polling-agents-mass-indexer,mass indexer>> is running;
-** trigger rebalancing as necessary if using <<coordination-outbox-polling-sharding-dynamic,dynamic sharding>>;
+** trigger rebalancing as necessary if using <<coordination-outbox-polling-agents-event-processor-sharding,dynamic sharding>>;
    e.g. when it detects that new agents recently joined the cluster,
    or that agents left the cluster (voluntarily or forcibly).
 * A mass indexer will:
@@ -326,20 +323,111 @@ During a "pulse":
 
 For more details about dynamic and static sharding, see the following sections.
 
-[[coordination-outbox-polling-sharding-dynamic]]
-==== [[coordination-database-polling-sharding-dynamic]] Dynamic sharding
+[[coordination-outbox-polling-agents]]
+=== [[coordination-database-polling-processors]] Agents
 
-By default, sharding is dynamic: Hibernate Search registers each application instance in the database,
+The `outbox-polling` coordination strategy involves agents executing in the background.
+
+The following subsections list those agents and detail their respective configuration options.
+
+[[coordination-outbox-polling-agents-event-processor]]
+==== Event processor
+
+[[coordination-outbox-polling-agents-event-processor-basics]]
+===== Basics
+
+The most important agent is the event processor,
+which polls the outbox table for events
+and then reindexes the corresponding entities when new events are found.
+
+The event processor can be configured using the following configuration properties:
+
+[source]
+----
+hibernate.search.coordination.event_processor.enabled = true
+hibernate.search.coordination.event_processor.polling_interval = 100
+hibernate.search.coordination.event_processor.pulse_interval = 2000
+hibernate.search.coordination.event_processor.pulse_expiration = 30000
+hibernate.search.coordination.event_processor.batch_size = 50
+hibernate.search.coordination.event_processor.transaction_timeout = 10
+hibernate.search.coordination.event_processor.retry_delay = 15
+----
+
+* `event_processor.enabled` defines whether the event processor is enabled,
+as a <<configuration-property-types,boolean value>>.
+The default for this property is `true`, but it can be set to `false` to disable event processing on some application nodes,
+for example to dedicate some nodes to HTTP request processing and other nodes to event processing.
+* `event_processor.polling_interval` defines how long to wait for another query to the outbox events table
+after a query didn't return any event,
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `100`.
++
+Lower values will reduce the time it takes for a change to be reflected in the index,
+but will increase the stress on the database when there are no new events.
+* `event_processor.pulse_interval` defines how long the event processor can poll for events
+before it must perform a "pulse",
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `2000`.
++
+See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
++
+The pulse interval must be set to a value between the polling interval (see above) and one third (1/3) of the expiration interval (see below).
++
+Low values (closer to the polling interval) mean a shorter delay before rebalancing
+when a node joins or leaves the cluster,
+and reduced risk of incorrectly considering an agent disconnected,
+but more stress on the database because of more frequent checks of the list of agents.
++
+High values (closer to the expiration interval) mean a longer delay before rebalancing
+when a node joins or leaves the cluster,
+and increased risk of incorrectly considering an agent disconnected,
+but less stress on the database because of less frequent checks of the list of agents.
+* `event_processor.pulse_expiration` defines how long an event processor "pulse" remains valid
+before considering the processor disconnected and forcibly removing it from the cluster,
+as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `30000`.
++
+See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
++
+The expiration interval must be set to a value 3 times larger than the pulse interval (see above).
++
+Low values (closer to the pulse interval) mean a shorter delay before rebalancing
+when a node abruptly leaves the cluster due to a crash or network failure,
+but increased risk of incorrectly considering an event processor disconnected.
++
+High values (much larger than the pulse interval) mean a longer delay before rebalancing
+when a node abruptly leaves the cluster due to a crash or network failure,
+but reduced risk of incorrectly considering an event processor disconnected.
+* `event_processor.batch_size` defines how many outbox events, at most, are processed in a single transaction
+as an <<configuration-property-types,integer value>>.
+The default for this property is `50`.
++
+Higher values will reduce the number of transactions opened by the background process
+and may increase performance thanks to the first-level cache (persistence context),
+but will increase memory usage and in extreme cases may lead to `OutOfMemoryErrors`.
+* `event_processor.transaction_timeout` defines the timeout for transactions processing outbox events
+as an <<configuration-property-types,integer value>> in seconds.
+Only effective when a JTA transaction manager is configured.
+When using JTA and this property is not set, Hibernate Search will use whatever default transaction timeout is configured in the JTA transaction manager.
+* `event_processor.retry_delay` defines the time after which it is possible to process again an event that has gone into error.
+as a <<configuration-property-types,positive integer value>> in seconds.
+Use the value `0` to reprocess the failed events as soon as possible, with no delay.
+The default for this property is `30`.
+Dynamic sharding does not require any specific configuration,
+but you may want to configure other properties of <<coordination-outbox-polling-agents-event-processor,the event processor>>.
+
+[[coordination-outbox-polling-agents-event-processor-sharding]]
+===== [[coordination-database-polling-sharding-dynamic]] [[coordination-database-polling-sharding-static]] Sharding
+
+By default, <<coordination-outbox-polling-sharding,sharding>> is dynamic:
+Hibernate Search registers each application instance in the database,
 and uses that information to dynamically assign a single, unique shard to each application instance,
 updating assignments as instances start or stop.
+Dynamic sharding does not accept any configuration beyond the
+<<coordination-outbox-polling-agents-event-processor-basics,basics>>.
 
-Dynamic sharding does not require any specific configuration,
-but you may want to configure <<coordination-outbox-polling-agents-event-processor,the event processor>>.
-
-[[coordination-outbox-polling-sharding-static]]
-==== [[coordination-database-polling-sharding-static]] Static sharding
-
-Sharding can be controlled explicitly by setting the following configuration properties:
+If you want to configure sharding explicitly, you can use static sharding
+by setting the following configuration properties:
 
 [source]
 ----
@@ -429,96 +517,11 @@ then (once every node has processing disabled),
 restart nodes one by one with the new sharding settings and with processing re-enabled.
 ====
 
-[[coordination-outbox-polling-agents]]
-=== [[coordination-database-polling-processors]] Agents
-
-The `outbox-polling` coordination strategy involves agents executing in the background.
-
-The following subsections list those agents and detail their respective configuration options.
-
-[[coordination-outbox-polling-agents-event-processor]]
-==== Event processor
-
-The most important agent is the event processor,
-which polls the outbox table for events
-and then reindexes the corresponding entities when new events are found.
-
-The event processor can be configured using the following configuration properties:
-
-[source]
-----
-hibernate.search.coordination.event_processor.enabled = true
-hibernate.search.coordination.event_processor.polling_interval = 100
-hibernate.search.coordination.event_processor.pulse_interval = 2000
-hibernate.search.coordination.event_processor.pulse_expiration = 30000
-hibernate.search.coordination.event_processor.batch_size = 50
-hibernate.search.coordination.event_processor.transaction_timeout = 10
-hibernate.search.coordination.event_processor.retry_delay = 15
-----
-
-* `event_processor.enabled` defines whether the event processor is enabled,
-as a <<configuration-property-types,boolean value>>.
-The default for this property is `true`, but it can be set to `false` to disable event processing on some application nodes,
-for example to dedicate some nodes to HTTP request processing and other nodes to event processing.
-* `event_processor.polling_interval` defines how long to wait for another query to the outbox events table
-after a query didn't return any event,
-as an <<configuration-property-types,integer value>> in milliseconds.
-The default for this property is `100`.
-+
-Lower values will reduce the time it takes for a change to be reflected in the index,
-but will increase the stress on the database when there are no new events.
-* `event_processor.pulse_interval` defines how long the event processor can poll for events
-before it must perform a "pulse",
-as an <<configuration-property-types,integer value>> in milliseconds.
-The default for this property is `2000`.
-+
-See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
-+
-The pulse interval must be set to a value between the polling interval (see above) and one third (1/3) of the expiration interval (see below).
-+
-Low values (closer to the polling interval) mean a shorter delay before rebalancing
-when a node joins or leaves the cluster,
-and reduced risk of incorrectly considering an agent disconnected,
-but more stress on the database because of more frequent checks of the list of agents.
-+
-High values (closer to the expiration interval) mean a longer delay before rebalancing
-when a node joins or leaves the cluster,
-and increased risk of incorrectly considering an agent disconnected,
-but less stress on the database because of less frequent checks of the list of agents.
-* `event_processor.pulse_expiration` defines how long an event processor "pulse" remains valid
-before considering the processor disconnected and forcibly removing it from the cluster,
-as an <<configuration-property-types,integer value>> in milliseconds.
-The default for this property is `30000`.
-+
-See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
-+
-The expiration interval must be set to a value 3 times larger than the pulse interval (see above).
-+
-Low values (closer to the pulse interval) mean a shorter delay before rebalancing
-when a node abruptly leaves the cluster due to a crash or network failure,
-but increased risk of incorrectly considering an event processor disconnected.
-+
-High values (much larger than the pulse interval) mean a longer delay before rebalancing
-when a node abruptly leaves the cluster due to a crash or network failure,
-but reduced risk of incorrectly considering an event processor disconnected.
-* `event_processor.batch_size` defines how many outbox events, at most, are processed in a single transaction
-as an <<configuration-property-types,integer value>>.
-The default for this property is `50`.
-+
-Higher values will reduce the number of transactions opened by the background process
-and may increase performance thanks to the first-level cache (persistence context),
-but will increase memory usage and in extreme cases may lead to `OutOfMemoryErrors`.
-* `event_processor.transaction_timeout` defines the timeout for transactions processing outbox events
-as an <<configuration-property-types,integer value>> in seconds.
-Only effective when a JTA transaction manager is configured.
-When using JTA and this property is not set, Hibernate Search will use whatever default transaction timeout is configured in the JTA transaction manager.
-* `event_processor.retry_delay` defines the time after which it is possible to process again an event that has gone into error.
-as a <<configuration-property-types,positive integer value>> in seconds.
-Use the value `0` to reprocess the failed events as soon as possible, with no delay.
-The default for this property is `30`.
-
 [[coordination-outbox-polling-agents-mass-indexer]]
 ==== Mass indexer
+
+[[coordination-outbox-polling-agents-mass-indexer-basics]]
+===== Basics
 
 During <<mapper-orm-indexing-massindexer,mass indexing>>,
 an application instance will exceptionally bypass <<coordination-database-polling-sharding,sharding>>
