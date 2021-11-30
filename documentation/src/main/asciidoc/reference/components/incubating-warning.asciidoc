@@ -3,7 +3,7 @@
 Features detailed in this section are _incubating_: they are still under active development.
 
 The usual https://hibernate.org/community/compatibility-policy/[compatibility policy] does not apply:
-the contract of incubating elements (e.g. types, methods etc.)
+the contract of incubating elements (e.g. types, methods, configuration properties, etc.)
 may be altered in a backward-incompatible way -- or even removed -- in subsequent releases.
 
 You are encouraged to use incubating features so the development team can get feedback and improve them,

@@ -132,6 +132,8 @@ See <<mapper-orm-indexing-automatic-synchronization>> for details.
 [[coordination-outbox-polling]]
 == [[coordination-database-polling]] `outbox-polling`: additional event tables and polling in background processors
 
+include::components/incubating-warning.asciidoc[]
+
 [[coordination-outbox-polling-basics]]
 === [[coordination-database-polling-basics]] Basics
 
