@@ -39,15 +39,8 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-test-common</artifactId>
+            <artifactId>hibernate-search-util-internal-test-orm-jakarta</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

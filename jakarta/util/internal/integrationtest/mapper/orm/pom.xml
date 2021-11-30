@@ -23,28 +23,23 @@
         <transform.original.pathFromRoot>util/internal/integrationtest/mapper/orm</transform.original.pathFromRoot>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${version.org.mockito}</version>
-                <exclusions>
-                    <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
-                    <exclusion>
-                        <groupId>net.bytebuddy</groupId>
-                        <artifactId>byte-buddy</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-test-orm-jakarta</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <!-- We're importing this through hibernate-search-util-internal-test-orm above,
+                     and that module adds specific exclusions to the dependency -->
+                <exclusion>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-util-internal-test-common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>

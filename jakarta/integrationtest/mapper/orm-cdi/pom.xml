@@ -16,23 +16,6 @@
         <transform.original.pathFromRoot>integrationtest/mapper/orm-cdi</transform.original.pathFromRoot>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${version.org.mockito}</version>
-                <exclusions>
-                    <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
-                    <exclusion>
-                        <groupId>net.bytebuddy</groupId>
-                        <artifactId>byte-buddy</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
