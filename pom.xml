@@ -260,7 +260,7 @@
         <version.org.assertj.assertj-core>3.9.1</version.org.assertj.assertj-core>
         <version.org.skyscreamer.jsonassert>1.2.3</version.org.skyscreamer.jsonassert>
         <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
-        <version.org.jboss.byteman>4.0.16</version.org.jboss.byteman>
+        <version.org.jboss.byteman>4.0.18</version.org.jboss.byteman>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.h2database>1.4.178</version.com.h2database>
 
