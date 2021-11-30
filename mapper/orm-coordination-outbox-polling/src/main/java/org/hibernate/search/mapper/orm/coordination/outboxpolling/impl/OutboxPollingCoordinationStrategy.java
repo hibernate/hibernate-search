@@ -56,12 +56,6 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_ENABLED )
 					.build();
 
-	private static final ConfigurationProperty<Boolean> EVENT_PROCESSOR_SHARDS_STATIC =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_STATIC )
-					.asBoolean()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC )
-					.build();
-
 	private static final OptionalConfigurationProperty<Integer> EVENT_PROCESSOR_SHARDS_TOTAL_COUNT =
 			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_TOTAL_COUNT )
 					.asIntegerStrictlyPositive()
@@ -233,18 +227,21 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
 					context.clock(), tenantId, configurationSource );
 
-			boolean shardsStatic = EVENT_PROCESSOR_SHARDS_STATIC.get( configurationSource );
+			boolean shardsStatic = EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.get( configurationSource ).isPresent()
+					|| EVENT_PROCESSOR_SHARDS_ASSIGNED.get( configurationSource ).isPresent();
 			List<ShardAssignmentDescriptor> shardAssignmentOrNulls;
 			if ( shardsStatic ) {
 				int totalShardCount = EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.getAndMapOrThrow(
 						configurationSource,
 						this::checkTotalShardCount,
-						log::missingPropertyForStaticSharding
+						() -> log.missingPropertyForStaticSharding(
+								EVENT_PROCESSOR_SHARDS_ASSIGNED.resolveOrRaw( configurationSource ) )
 				);
 				shardAssignmentOrNulls = EVENT_PROCESSOR_SHARDS_ASSIGNED.getAndMapOrThrow(
 						configurationSource,
 						shardIndices -> toStaticShardAssignments( configurationSource, totalShardCount, shardIndices ),
-						log::missingPropertyForStaticSharding
+						() -> log.missingPropertyForStaticSharding(
+								EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.resolveOrRaw( configurationSource ) )
 				);
 			}
 			else {

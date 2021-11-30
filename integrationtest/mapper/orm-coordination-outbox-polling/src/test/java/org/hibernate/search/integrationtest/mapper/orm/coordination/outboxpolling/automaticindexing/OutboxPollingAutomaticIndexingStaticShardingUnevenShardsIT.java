@@ -88,8 +88,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 				.with( indexingCountHelper::bind );
 
 		if ( processingEnabled ) {
-			context = context.withProperty( "hibernate.search.coordination.event_processor.shards.static", "true" )
-					.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", TOTAL_SHARD_COUNT )
+			context = context.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", TOTAL_SHARD_COUNT )
 					.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", assignedShardIndices );
 		}
 		else {

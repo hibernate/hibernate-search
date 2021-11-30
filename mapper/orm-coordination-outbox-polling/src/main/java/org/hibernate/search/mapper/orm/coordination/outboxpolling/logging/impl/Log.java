@@ -65,9 +65,9 @@ public interface Log extends BasicLogger {
 	SearchException invalidShardIndex(int totalShardCount, String totalShardCountPropertyKey);
 
 	@Message(id = ID_OFFSET + 9,
-			value = "When using static sharding, this property must be set."
+			value = "This property must be set when '%s' is set."
 	)
-	SearchException missingPropertyForStaticSharding();
+	SearchException missingPropertyForStaticSharding(String otherPropertyKey);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 10, value = "The outbox event processor is disabled for tenant '%s'. "
