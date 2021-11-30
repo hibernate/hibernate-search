@@ -17,23 +17,6 @@
         <test.database.run.skip>false</test.database.run.skip>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${version.org.mockito}</version>
-                <exclusions>
-                    <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
-                    <exclusion>
-                        <groupId>net.bytebuddy</groupId>
-                        <artifactId>byte-buddy</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>

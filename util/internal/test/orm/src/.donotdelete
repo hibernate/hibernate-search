@@ -1,0 +1,2 @@
+This file is only here so that the src/ directory gets checked in by git,
+so that Sonar won't complain about missing directories.

@@ -23,6 +23,7 @@
     <modules>
         <module>parents/public</module>
         <module>parents/internal</module>
+        <module>util/internal/test/orm</module>
         <module>mapper/orm</module>
         <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>

@@ -155,6 +155,7 @@
         <module>build/surefire-extension</module>
         <module>parents/internal</module>
         <module>util/internal/test/common</module>
+        <module>util/internal/test/orm</module>
         <module>parents/public</module>
         <module>util/common</module>
         <module>engine</module>
@@ -638,6 +639,16 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-test-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-test-orm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-test-orm-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

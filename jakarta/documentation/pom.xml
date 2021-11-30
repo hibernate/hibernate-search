@@ -26,23 +26,6 @@
         <test.database.run.skip>false</test.database.run.skip>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${version.org.mockito}</version>
-                <exclusions>
-                    <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
-                    <exclusion>
-                        <groupId>net.bytebuddy</groupId>
-                        <artifactId>byte-buddy</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -61,17 +44,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm-jakarta</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
         <!--
