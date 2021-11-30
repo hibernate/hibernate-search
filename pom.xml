@@ -361,7 +361,7 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
-        <version.com.buschmais.jqassistant.plugin>1.8.0</version.com.buschmais.jqassistant.plugin>
+        <version.com.buschmais.jqassistant.plugin>1.11.1</version.com.buschmais.jqassistant.plugin>
         <version.docker.maven.plugin>0.34.1</version.docker.maven.plugin>
         <version.moditect.plugin>1.0.0.RC2</version.moditect.plugin>
         <version.sonar.plugin>3.7.0.1746</version.sonar.plugin>
