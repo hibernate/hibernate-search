@@ -71,10 +71,6 @@ public class TransactionOutboxIT {
 	@Service
 	@Transactional
 	public static class HelperService {
-
-		@Autowired
-		private HelperService self;
-
 		@Autowired
 		private EntityManager entityManager;
 
