@@ -154,7 +154,7 @@
         <module>build/config</module>
         <module>build/surefire-extension</module>
         <module>parents/internal</module>
-        <module>util/internal/test</module>
+        <module>util/internal/test/common</module>
         <module>parents/public</module>
         <module>util/common</module>
         <module>engine</module>
@@ -637,7 +637,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test</artifactId>
+                <artifactId>hibernate-search-util-internal-test-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
