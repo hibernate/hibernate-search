@@ -53,14 +53,14 @@ public final class ParseUtils {
 	public static final DateTimeFormatter ISO_YEAR = new DateTimeFormatterBuilder()
 			.parseLenient() // Accept "-1" instead of requiring -0001
 			.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
-			.toFormatter();
+			.toFormatter( Locale.ROOT );
 
 	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
 	public static final DateTimeFormatter ISO_YEAR_MONTH = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 4, 10, SignStyle.EXCEEDS_PAD )
 			.appendLiteral( '-' )
 			.appendValue( MONTH_OF_YEAR, 2 )
-			.toFormatter();
+			.toFormatter( Locale.ROOT );
 
 	// The DateTimeFormatter class does not expose a public constant for the ISO format, so we need to do it ourselves.
 	public static final DateTimeFormatter ISO_MONTH_DAY = new DateTimeFormatterBuilder()
@@ -68,7 +68,7 @@ public final class ParseUtils {
 			.appendValue( MONTH_OF_YEAR, 2 )
 			.appendLiteral( '-' )
 			.appendValue( DAY_OF_MONTH, 2 )
-			.toFormatter();
+			.toFormatter( Locale.ROOT );
 
 	private static final String GEO_POINT_SEPARATOR = ",\\s*";
 
@@ -258,7 +258,7 @@ public final class ParseUtils {
 		DateTimeFormatter formatter = ISO_YEAR_MONTH;
 
 		try {
-			return YearMonth.parse( value );
+			return YearMonth.parse( value, formatter );
 		}
 		catch (DateTimeParseException e) {
 			throw log.unableToParseTemporal( YearMonth.class, value, formatter, e );
@@ -270,7 +270,7 @@ public final class ParseUtils {
 		DateTimeFormatter formatter = ISO_MONTH_DAY;
 
 		try {
-			return MonthDay.parse( value );
+			return MonthDay.parse( value, formatter );
 		}
 		catch (DateTimeParseException e) {
 			throw log.unableToParseTemporal( MonthDay.class, value, formatter, e );
