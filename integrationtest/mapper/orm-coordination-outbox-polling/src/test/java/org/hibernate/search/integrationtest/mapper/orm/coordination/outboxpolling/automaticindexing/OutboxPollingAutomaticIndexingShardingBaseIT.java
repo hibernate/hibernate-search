@@ -105,9 +105,9 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 				.with( ctx -> {
 					if ( isStatic ) {
 						return ctx
-								.withProperty( "hibernate.search.coordination.shards.static", "true" )
-								.withProperty( "hibernate.search.coordination.shards.total_count", totalShardCount )
-								.withProperty( "hibernate.search.coordination.shards.assigned", String.valueOf( assignedShardIndex ) );
+								.withProperty( "hibernate.search.coordination.event_processor.shards.static", "true" )
+								.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", totalShardCount )
+								.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", String.valueOf( assignedShardIndex ) );
 					}
 					else {
 						return ctx;

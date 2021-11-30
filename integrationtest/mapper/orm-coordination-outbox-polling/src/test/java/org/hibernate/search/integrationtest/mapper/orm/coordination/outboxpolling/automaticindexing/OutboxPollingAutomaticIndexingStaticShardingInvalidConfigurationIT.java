@@ -40,7 +40,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 		assertThatThrownBy( () -> setup( context -> context ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.total_count'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.total_count'",
 								"''", "When using static sharding, this property must be set" )
 						.build() );
 	}
@@ -48,10 +48,10 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	@Test
 	public void totalCount_zero() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.shards.total_count", "0" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "0" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.total_count'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.total_count'",
 								"'0'", "'value' must be strictly positive" )
 						.build() );
 	}
@@ -59,10 +59,10 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	@Test
 	public void totalCount_negative() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.shards.total_count", "-1" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.total_count'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.total_count'",
 								"'-1'", "'value' must be strictly positive" )
 						.build() );
 	}
@@ -70,10 +70,10 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	@Test
 	public void assigned_missing() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.shards.total_count", "10" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.assigned'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.assigned'",
 								"''", "When using static sharding, this property must be set" )
 						.build() );
 	}
@@ -81,11 +81,11 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	@Test
 	public void assigned_negative() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.shards.total_count", "10" )
-				.withProperty( "hibernate.search.coordination.shards.assigned", "-1" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.assigned'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.assigned'",
 								"'-1'",
 								"'value' must be positive or zero" )
 						.build() );
@@ -94,28 +94,28 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	@Test
 	public void assigned_equalToTotalCount() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.shards.total_count", "10" )
-				.withProperty( "hibernate.search.coordination.shards.assigned", "10" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "10" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.assigned'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.assigned'",
 								"'10'",
 								"Shard indices must be between 0 (inclusive) and 10 (exclusive,"
-										+ " set by 'hibernate.search.coordination.shards.total_count')" )
+										+ " set by 'hibernate.search.coordination.event_processor.shards.total_count')" )
 						.build() );
 	}
 
 	@Test
 	public void assigned_greaterThanTotalCount() {
 		assertThatThrownBy( () -> setup( context -> context
-				.withProperty( "hibernate.search.coordination.shards.total_count", "10" )
-				.withProperty( "hibernate.search.coordination.shards.assigned", "11" ) ) )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "11" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.failure( "Invalid value for configuration property 'hibernate.search.coordination.shards.assigned'",
+						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.assigned'",
 								"'11'",
 								"Shard indices must be between 0 (inclusive) and 10 (exclusive,"
-										+ " set by 'hibernate.search.coordination.shards.total_count')" )
+										+ " set by 'hibernate.search.coordination.event_processor.shards.total_count')" )
 						.build() );
 	}
 
@@ -123,7 +123,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 		ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.shards.static", "true" )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.static", "true" )
 				.with( config )
 				.setup( IndexedEntity.class );
 	}
