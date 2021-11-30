@@ -42,6 +42,14 @@
                 <groupId>org.jberet</groupId>
                 <artifactId>jberet-core</artifactId>
                 <version>${version.org.jberet.jakarta}</version>
+                <exclusions>
+                    <!-- This dependency is marked as "provided" but will never be there at runtime.
+                         This confuses maven-enforcer-plugin, so we'll exclude it. -->
+                    <exclusion>
+                        <groupId>org.jboss.logging</groupId>
+                        <artifactId>jboss-logging-processor</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
