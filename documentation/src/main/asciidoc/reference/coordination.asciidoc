@@ -343,9 +343,9 @@ Sharding can be controlled explicitly by setting the following configuration pro
 
 [source]
 ----
-hibernate.search.coordination.shards.static = true
-hibernate.search.coordination.shards.total_count = 4
-hibernate.search.coordination.shards.assigned = 0
+hibernate.search.coordination.event_processor.shards.static = true
+hibernate.search.coordination.event_processor.shards.total_count = 4
+hibernate.search.coordination.event_processor.shards.assigned = 0
 ----
 
 * `shards.static` defines sharding as static.
@@ -388,18 +388,18 @@ and no shard at all to application nodes #2 and #3:
 ----
 # Node #0
 hibernate.search.coordination.strategy = outbox-polling
-hibernate.search.coordination.shards.static = true
-hibernate.search.coordination.shards.total_count = 2
-hibernate.search.coordination.shards.assigned = 0
+hibernate.search.coordination.event_processor.shards.static = true
+hibernate.search.coordination.event_processor.shards.total_count = 2
+hibernate.search.coordination.event_processor.shards.assigned = 0
 ----
 
 [source]
 ----
 # Node #1
 hibernate.search.coordination.strategy = outbox-polling
-hibernate.search.coordination.shards.static = true
-hibernate.search.coordination.shards.total_count = 2
-hibernate.search.coordination.shards.assigned = 1
+hibernate.search.coordination.event_processor.shards.static = true
+hibernate.search.coordination.event_processor.shards.total_count = 2
+hibernate.search.coordination.event_processor.shards.assigned = 1
 ----
 
 [source]

@@ -50,27 +50,27 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Boolean> SHARDS_STATIC =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.SHARDS_STATIC )
-					.asBoolean()
-					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_SHARDS_STATIC )
-					.build();
-
-	private static final OptionalConfigurationProperty<Integer> SHARDS_TOTAL_COUNT =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.SHARDS_TOTAL_COUNT )
-					.asIntegerStrictlyPositive()
-					.build();
-
-	private static final OptionalConfigurationProperty<List<Integer>> SHARDS_ASSIGNED =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.SHARDS_ASSIGNED )
-					.asIntegerPositiveOrZero()
-					.multivalued()
-					.build();
-
 	private static final ConfigurationProperty<Boolean> EVENT_PROCESSOR_ENABLED =
 			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_ENABLED )
 					.asBoolean()
 					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_ENABLED )
+					.build();
+
+	private static final ConfigurationProperty<Boolean> EVENT_PROCESSOR_SHARDS_STATIC =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_STATIC )
+					.asBoolean()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC )
+					.build();
+
+	private static final OptionalConfigurationProperty<Integer> EVENT_PROCESSOR_SHARDS_TOTAL_COUNT =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_TOTAL_COUNT )
+					.asIntegerStrictlyPositive()
+					.build();
+
+	private static final OptionalConfigurationProperty<List<Integer>> EVENT_PROCESSOR_SHARDS_ASSIGNED =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.EVENT_PROCESSOR_SHARDS_ASSIGNED )
+					.asIntegerPositiveOrZero()
+					.multivalued()
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends AgentRepositoryProvider>> AGENT_REPOSITORY_PROVIDER =
@@ -221,10 +221,6 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 				initializeEventProcessors( context, configurationSource );
 			}
 			else {
-				// IMPORTANT: in this case we don't even configure sharding, and that's on purpose.
-				// Application developers may want a fixed number of processing nodes (static sharding)
-				// with a varying number of non-processing nodes,
-				// so we want to make those non-processing nodes easy to configure.
 				log.eventProcessorDisabled( tenantId );
 			}
 
@@ -234,17 +230,18 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 		private void initializeEventProcessors(CoordinationStrategyStartContext context,
 				ConfigurationPropertySource configurationSource) {
-			// IMPORTANT: we only configure sharding here, if processors are enabled.
-			// See the comment in the caller method.
-			boolean shardsStatic = SHARDS_STATIC.get( configurationSource );
+			OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
+					context.clock(), tenantId, configurationSource );
+
+			boolean shardsStatic = EVENT_PROCESSOR_SHARDS_STATIC.get( configurationSource );
 			List<ShardAssignmentDescriptor> shardAssignmentOrNulls;
 			if ( shardsStatic ) {
-				int totalShardCount = SHARDS_TOTAL_COUNT.getAndMapOrThrow(
+				int totalShardCount = EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.getAndMapOrThrow(
 						configurationSource,
 						this::checkTotalShardCount,
 						log::missingPropertyForStaticSharding
 				);
-				shardAssignmentOrNulls = SHARDS_ASSIGNED.getAndMapOrThrow(
+				shardAssignmentOrNulls = EVENT_PROCESSOR_SHARDS_ASSIGNED.getAndMapOrThrow(
 						configurationSource,
 						shardIndices -> toStaticShardAssignments( configurationSource, totalShardCount, shardIndices ),
 						log::missingPropertyForStaticSharding
@@ -253,9 +250,6 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			else {
 				shardAssignmentOrNulls = Collections.singletonList( null );
 			}
-
-			OutboxPollingEventProcessor.Factory factory = OutboxPollingEventProcessor.factory( context.mapping(),
-					context.clock(), tenantId, configurationSource );
 
 			eventProcessorExecutor = context.threadPoolProvider()
 					.newScheduledExecutor( shardAssignmentOrNulls.size(),
@@ -284,7 +278,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			for ( Integer shardIndex : uniqueShardIndices ) {
 				if ( !( 0 <= shardIndex && shardIndex < totalShardCount ) ) {
 					throw log.invalidShardIndex( totalShardCount,
-							SHARDS_TOTAL_COUNT.resolveOrRaw( configurationPropertySource ) );
+							EVENT_PROCESSOR_SHARDS_TOTAL_COUNT.resolveOrRaw( configurationPropertySource ) );
 				}
 			}
 			List<ShardAssignmentDescriptor> shardAssignment = new ArrayList<>();

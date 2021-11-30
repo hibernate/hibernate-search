@@ -51,9 +51,9 @@ public class OutboxPollingAutomaticIndexingStaticShardingIncompatibleConfigurati
 		OrmSetupHelper.SetupContext context = ormSetupHelper.start()
 				.withProperty( Environment.HBM2DDL_AUTO, hbm2ddlAction )
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
-				.withProperty( "hibernate.search.coordination.shards.static", "true" )
-				.withProperty( "hibernate.search.coordination.shards.total_count", totalShardCount )
-				.withProperty( "hibernate.search.coordination.shards.assigned", assignedShardIndices );
+				.withProperty( "hibernate.search.coordination.event_processor.shards.static", "true" )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", totalShardCount )
+				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", assignedShardIndices );
 
 		context.setup( IndexedEntity.class );
 	}
