@@ -244,7 +244,7 @@
              That's why we have two separate properties for jackson versions,
              even though they may have the same value from time to time.
          -->
-        <version.com.fasterxml.jackson.databind>${version.com.fasterxml.jackson}</version.com.fasterxml.jackson.databind>
+        <version.com.fasterxml.jackson.databind>2.13.0</version.com.fasterxml.jackson.databind>
         <!-- Reactive-streams: used by the AWS SDK -->
         <version.org.reactivestreams.reactive-streams>1.0.3</version.org.reactivestreams.reactive-streams>
         <!-- slf4j: used by the AWS SDK -->
