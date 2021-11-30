@@ -37,11 +37,12 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 
 	@Test
 	public void totalCount_missing() {
-		assertThatThrownBy( () -> setup( context -> context ) )
+		assertThatThrownBy( () -> setup( context -> context
+				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "0" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.total_count'",
-								"''", "When using static sharding, this property must be set" )
+								"''", "This property must be set when 'hibernate.search.coordination.event_processor.shards.assigned' is set" )
 						.build() );
 	}
 
@@ -74,7 +75,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.failure( "Invalid value for configuration property 'hibernate.search.coordination.event_processor.shards.assigned'",
-								"''", "When using static sharding, this property must be set" )
+								"''", "This property must be set when 'hibernate.search.coordination.event_processor.shards.total_count' is set" )
 						.build() );
 	}
 
@@ -123,7 +124,6 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 		ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.event_processor.shards.static", "true" )
 				.with( config )
 				.setup( IndexedEntity.class );
 	}

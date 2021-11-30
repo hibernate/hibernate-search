@@ -63,8 +63,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_ENABLED;
 
 	/**
-	 * Whether shards configured for event processing are static,
-	 * i.e. configured explicitly for each node, with a fixed number of shards/nodes.
+	 * The total number of shards across all application nodes for event processing.
 	 * <p>
 	 * <strong>WARNING:</strong> This property must have the same value for all application nodes,
 	 * and must never change unless all application nodes are stopped, then restarted.
@@ -74,24 +73,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
-	 * <p>
-	 * Defaults to {@link Defaults#COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC}.
-	 */
-	public static final String COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC = PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC;
-
-	/**
-	 * The total number of shards across all application nodes for event processing.
-	 * <p>
-	 * <strong>WARNING:</strong> This property must have the same value for all application nodes,
-	 * and must never change unless all application nodes are stopped, then restarted.
-	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
-	 * resulting in errors and/or out-of-sync indexes.
-	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
-	 * {@value #COORDINATION_STRATEGY_NAME}
-	 * and {@link #COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC} is {@code true}.
+	 * When this property is set, {@value #COORDINATION_EVENT_PROCESSOR_SHARDS_ASSIGNED} must also be set.
 	 * <p>
 	 * Expects an Integer value of at least {@code 2},
 	 * or a String that can be parsed into such Integer value.
@@ -108,8 +90,9 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY} is
-	 * {@value #COORDINATION_STRATEGY_NAME}
-	 * and {@link #COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC} is {@code true}.
+	 * {@value #COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * When this property is set, {@value #COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT} must also be set.
 	 * <p>
 	 * Expects a shard index, i.e. an Integer value between {@code 0} (inclusive) and the
 	 * {@link #COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT total shard count} (exclusive),
@@ -367,7 +350,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_PREFIX = HibernateOrmMapperSettings.Radicals.COORDINATION_PREFIX;
 		public static final String COORDINATION_TENANTS = COORDINATION_PREFIX + CoordinationRadicals.TENANTS;
 		public static final String COORDINATION_EVENT_PROCESSOR_ENABLED = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_ENABLED;
-		public static final String COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_SHARDS_STATIC;
 		public static final String COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_SHARDS_TOTAL_COUNT;
 		public static final String COORDINATION_EVENT_PROCESSOR_SHARDS_ASSIGNED = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_SHARDS_ASSIGNED;
 		public static final String COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.EVENT_PROCESSOR_POLLING_INTERVAL;
@@ -392,7 +374,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String TENANTS = "tenants";
 		public static final String EVENT_PROCESSOR_PREFIX = "event_processor.";
 		public static final String EVENT_PROCESSOR_ENABLED = EVENT_PROCESSOR_PREFIX + "enabled";
-		public static final String EVENT_PROCESSOR_SHARDS_STATIC = EVENT_PROCESSOR_PREFIX + "shards.static";
 		public static final String EVENT_PROCESSOR_SHARDS_TOTAL_COUNT = EVENT_PROCESSOR_PREFIX + "shards.total_count";
 		public static final String EVENT_PROCESSOR_SHARDS_ASSIGNED = EVENT_PROCESSOR_PREFIX + "shards.assigned";
 		public static final String EVENT_PROCESSOR_POLLING_INTERVAL = EVENT_PROCESSOR_PREFIX + "polling_interval";
@@ -416,7 +397,6 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		}
 
 		public static final boolean COORDINATION_EVENT_PROCESSOR_ENABLED = true;
-		public static final boolean COORDINATION_EVENT_PROCESSOR_SHARDS_STATIC = false;
 		public static final int COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL = 100;
 		public static final int COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL = 2000;
 		public static final int COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION = 30000;
