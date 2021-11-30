@@ -451,19 +451,11 @@ A given application node must be assigned at least one shard
 but may be assigned multiple shards by setting `shards.assigned` to a comma-separated list,
 e.g. `0,3`.
 
-[CAUTION]
+[NOTE]
 ====
-Each shard must be assigned to one and only one application node,
-but this is **not** checked automatically by Hibernate Search.
+Each shard must be assigned to one and only one application node.
 
-Failure to do so may result in poor performance,
-or event out-of-sync indexes.
-====
-
-[TIP]
-====
-Sharding settings are irrelevant, and thus ignored,
-when <<coordination-outbox-polling-agents-event-processor,event processing is disabled>>.
+Event processing simply won't start until every shard has exactly one node.
 ====
 
 .Example of static sharding settings
@@ -503,18 +495,6 @@ hibernate.search.coordination.event_processor.enabled = false
 hibernate.search.coordination.strategy = outbox-polling
 hibernate.search.coordination.event_processor.enabled = false
 ----
-====
-
-[TIP]
-====
-Sharding settings, even static, may change over the lifetime of an application,
-but must be consistent across all application nodes involved in processing at all times.
-
-If you cannot stop your whole application cluster,
-the only way to safely change sharding settings is to restart nodes one by one
-to disable <<coordination-outbox-polling-agents-event-processor,event processing>>,
-then (once every node has processing disabled),
-restart nodes one by one with the new sharding settings and with processing re-enabled.
 ====
 
 [[coordination-outbox-polling-agents-mass-indexer]]
