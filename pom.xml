@@ -359,7 +359,7 @@
         <version.surefire.plugin>3.0.0-M5</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>7.3.1</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
-        <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
+        <version.jacoco.plugin>0.8.7</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.com.buschmais.jqassistant.plugin>1.11.1</version.com.buschmais.jqassistant.plugin>
         <version.docker.maven.plugin>0.34.1</version.docker.maven.plugin>
