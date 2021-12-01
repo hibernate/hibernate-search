@@ -234,7 +234,7 @@
         <version.org.elasticsearch.latest-5.6>5.6.16</version.org.elasticsearch.latest-5.6>
         <!-- The latest micro of other Elasticsearch distributions -->
         <version.org.opensearch.latest-1.0>1.0.0</version.org.opensearch.latest-1.0>
-        <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
+        <version.com.google.code.gson>2.8.9</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.14.18</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
         <version.com.fasterxml.jackson>2.12.3</version.com.fasterxml.jackson>
