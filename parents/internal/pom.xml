@@ -34,6 +34,13 @@
          -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
+        <!-- Disable the dependency convergence rule in internal artifacts because it's a lost cause:
+             a lot of our test dependencies have *themselves* diverging dependencies.
+             For example, many Jakarta API artifacts depend on two versions of another API
+             (an RC1 directly and a final version indirectly),
+             Wiremock depends on multiple versions of the servlet API, ... -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+
         <!--
             In all internal modules, especially but not only test modules,
             consider all sources as tests during Sonar analysis.

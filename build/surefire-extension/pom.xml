@@ -24,6 +24,8 @@
         <jqassistant.skip>true</jqassistant.skip>
 
         <forbiddenapis.skip>true</forbiddenapis.skip>
+        <!-- Disable the dependency convergence rule because of Maven Surefire Plugin -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
     </properties>
 
     <dependencies>
