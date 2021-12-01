@@ -72,7 +72,7 @@ public class ElasticsearchCustomIndexMappingIT {
 				.getResourceAsStream( "custom/index-mapping-merged.json" ) ) {
 
 			Reader reader = new InputStreamReader( in, "UTF-8" );
-			return new JsonParser().parse( reader ).toString();
+			return JsonParser.parseReader( reader ).toString();
 		}
 	}
 }

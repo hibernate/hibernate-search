@@ -722,7 +722,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	 * In tests, single quotes are way easier to include in JSON strings, because we don't have to escape them.
 	 */
 	private JsonElement toJsonElement(String jsonAsString) {
-		return new JsonParser().parse( jsonAsString );
+		return JsonParser.parseString( jsonAsString );
 	}
 
 }

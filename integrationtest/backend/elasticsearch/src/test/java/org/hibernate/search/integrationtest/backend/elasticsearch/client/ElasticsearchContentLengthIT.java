@@ -68,7 +68,7 @@ import com.google.gson.stream.JsonWriter;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.client.ElasticsearchContentLengthIT")
 public class ElasticsearchContentLengthIT {
 
-	private static final JsonObject BODY_PART = new JsonParser().parse( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
+	private static final JsonObject BODY_PART = JsonParser.parseString( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
 
 	private static final int BODY_PART_BYTE_SIZE;
 	static {
