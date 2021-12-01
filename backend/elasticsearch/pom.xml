@@ -69,7 +69,7 @@
                             <module>
                                 <moduleInfo>
                                     <opens>
-                                        org.hibernate.search.backend.elasticsearch.lowlevel.index.* to gson
+                                        org.hibernate.search.backend.elasticsearch.lowlevel.index.* to com.google.gson
                                     </opens>
                                 </moduleInfo>
                             </module>
