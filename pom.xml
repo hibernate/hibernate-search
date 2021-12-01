@@ -297,7 +297,7 @@
         <version.org.apache.commons.lang3>3.10</version.org.apache.commons.lang3>
         <version.org.apache.commons.math3>3.2</version.org.apache.commons.math3>
         <version.org.apache.avro>1.10.2</version.org.apache.avro>
-        <version.org.jboss.weld>3.1.5.SP1</version.org.jboss.weld>
+        <version.org.jboss.weld>4.0.2.Final</version.org.jboss.weld>
         <version.org.jboss.weld.jakarta>4.0.2.Final</version.org.jboss.weld.jakarta>
 
         <!-- >>> Performance tests -->
