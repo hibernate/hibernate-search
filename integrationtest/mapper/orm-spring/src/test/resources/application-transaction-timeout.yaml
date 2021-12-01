@@ -5,6 +5,6 @@ spring.jpa:
       search:
         background_failure_handler: org.hibernate.search.integrationtest.spring.jta.timeout.TimeoutFailureCollector
 
-spring.jta.bitronix:
+spring.jta.atomikos:
   properties:
-    defaultTransactionTimeout: 1
+    defaultJtaTimeout: 1000

@@ -22,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import bitronix.tm.TransactionManagerServices;
+import com.atomikos.icatch.jta.TransactionManagerImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -51,10 +51,11 @@ public class RaisedTimeoutJtaAndSpringOutboxIT {
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
 
-		// we changed the default bitronix timeout to 1 second
-		assertThat( TransactionManagerServices.getConfiguration().getDefaultTransactionTimeout() ).isOne();
+		// We changed the default Atomikos timeout to 1s (1000ms)
+		assertThat( TransactionManagerImp.getDefaultTimeout() ).isOne();
 
-		// however, the test is not supposed to be timed out, because we raised it to 60 seconds
+		// However, the test is not supposed to time out,
+		// because we raised the timeout to 60 seconds in Hibernate Search properties
 	}
 
 	@Test

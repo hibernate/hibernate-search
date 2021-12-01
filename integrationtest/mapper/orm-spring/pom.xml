@@ -13,6 +13,9 @@
     <description>Hibernate Search integration tests for the Hibernate ORM integration with Spring</description>
 
     <properties>
+        <!-- Disable the dependency convergence rule because of Atomikos -->
+        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+
         <!--
             Remove Hibernate system properties from parent settings:
             They are supposed to be handled by the spring.datasource subsystem
@@ -58,7 +61,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jta-bitronix</artifactId>
+            <artifactId>spring-boot-starter-jta-atomikos</artifactId>
             <scope>test</scope>
         </dependency>
 
