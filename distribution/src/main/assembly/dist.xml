@@ -24,401 +24,126 @@
         -->
     </formats>
 
-    <moduleSets>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
-            <includes>
-                <!--
-                     We cannot just merge the -engine moduleSet with the utils moduleSets,
-                     because that would result in the utils JARs being included twice:
-                     once in dist/engine/, and once in dist/engine/lib/required.
-                     Excluding it from the dependency set is not an option either,
-                     since it would exclude transitive dependencies too.
-                 -->
-                <include>org.hibernate.search:hibernate-search-util-common</include>
-            </includes>
-            <binaries>
-                <outputDirectory>dist/engine</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/engine/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>dist/engine</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-engine</include>
+                <include>org.hibernate.search:hibernate-search-util-common</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/engine</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/engine/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not include the utils JAR, nor its dependencies that are already included above -->
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/mapper/orm</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <!--
-                     We cannot just merge the -mapper-orm moduleSet with the -mapper-pojo-base moduleSet,
-                     for the same reason as above with the -engine and utils moduleSets.
-                 -->
                 <include>org.hibernate.search:hibernate-search-mapper-pojo-base</include>
-            </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/orm</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/orm/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the engine -->
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
-            <includes>
                 <include>org.hibernate.search:hibernate-search-mapper-orm</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/orm</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/orm/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the engine -->
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <!-- Do not include the mapper-pojo-base JAR, nor its dependencies that are already included above -->
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/mapper/standalone</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <!--
-                     We cannot just merge the -mapper-orm moduleSet with the -mapper-pojo-base moduleSet,
-                     for the same reason as above with the -engine and utils moduleSets.
-                 -->
                 <include>org.hibernate.search:hibernate-search-mapper-pojo-base</include>
-            </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/pojo-standalone</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/pojo-standalone/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the engine -->
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
-            <includes>
                 <include>org.hibernate.search:hibernate-search-mapper-pojo-standalone</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/pojo-standalone</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/pojo-standalone/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the engine -->
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <!-- Do not include the mapper-pojo-base JAR, nor its dependencies that are already included above -->
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/backend/lucene</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-backend-lucene</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/backend/lucene</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/backend/lucene/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the engine -->
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/backend/elasticsearch</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-backend-elasticsearch</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/backend/elasticsearch</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/backend/elasticsearch/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the engine -->
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/backend/elasticsearch/aws</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-backend-elasticsearch-aws</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/backend/elasticsearch/aws</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/backend/elasticsearch/aws/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by the elasticsearch backend -->
-                            <exclude>org.hibernate.search:hibernate-search-backend-elasticsearch</exclude>
-                            <exclude>org.elasticsearch.client:elasticsearch-rest-client</exclude>
-                            <exclude>org.elasticsearch.client:elasticsearch-rest-client-sniffer</exclude>
-                            <exclude>com.google.code.gson:gson</exclude>
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/v5migrationhelper/</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <!--
-                     We cannot just merge the -mapper-orm moduleSet with the -mapper-pojo-base moduleSet,
-                     for the same reason as above with the -engine and utils moduleSets.
-                 -->
                 <include>org.hibernate.search:hibernate-search-v5migrationhelper-engine</include>
-            </includes>
-            <binaries>
-                <outputDirectory>dist/v5migrationhelper/</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/v5migrationhelper/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by other modules -->
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-backend-lucene</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
-            <includes>
                 <include>org.hibernate.search:hibernate-search-v5migrationhelper-orm</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/v5migrationhelper/</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/v5migrationhelper/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by other modules -->
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-orm</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-v5migrationhelper-engine</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/mapper/orm/coordination-outbox-polling</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-mapper-orm-coordination-outbox-polling</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/orm-coordination-outbox-polling</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/orm-coordination-outbox-polling/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by other modules -->
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-orm</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/mapper/orm/batch-jsr352/core</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-core</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/orm-batch-jsr352/core</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/orm-batch-jsr352/core/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by other modules -->
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-orm</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/mapper/orm/batch-jsr352/jberet</outputDirectory>
+            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-jberet</include>
             </includes>
-            <binaries>
-                <outputDirectory>dist/mapper/orm-batch-jsr352/jberet</outputDirectory>
-                <unpack>false</unpack>
-                <dependencySets>
-                    <dependencySet>
-                        <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/mapper/orm-batch-jsr352/jberet/lib/required</outputDirectory>
-                        <scope>runtime</scope>
-                        <useTransitiveDependencies>true</useTransitiveDependencies>
-                        <useTransitiveFiltering>true</useTransitiveFiltering>
-                        <excludes>
-                            <!-- Do not repeat dependencies that are already included by other modules -->
-                            <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
-                            <exclude>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-core</exclude>
-                        </excludes>
-                        <useStrictFiltering>true</useStrictFiltering>
-                    </dependencySet>
-                </dependencySets>
-            </binaries>
-        </moduleSet>
-    </moduleSets>
-
-    <dependencySets>
+        </dependencySet>
         <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>dist/lib/provided</outputDirectory>
+            <outputDirectory>dist/provided</outputDirectory>
             <scope>provided</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.jboss.spec.javax.annotation:*</include>
                 <include>javax.persistence:javax.persistence-api</include>
@@ -427,7 +152,6 @@
                 <include>javax.inject:javax.inject</include>
                 <include>javax.enterprise:cdi-api</include>
             </includes>
-            <useStrictFiltering>true</useStrictFiltering>
         </dependencySet>
     </dependencySets>
 
