@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.assertj.core.api.ThrowableAssert;
 
 
 public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
@@ -132,7 +131,7 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			failWithCauseAndMessage( e, "future <%s> should have failed, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
-			return new ThrowableAssert( e.getCause() )
+			return assertThat( e.getCause() )
 					.as( "failure reported by future <%s>", actual );
 		}
 		throw new IllegalStateException( "We should never reach this line" );
