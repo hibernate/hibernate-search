@@ -1612,7 +1612,6 @@
                             </goals>
                             <phase>generate-sources</phase>
                             <configuration>
-                                <releaseVersion>${maven.compiler.release}</releaseVersion>
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
