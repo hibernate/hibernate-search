@@ -94,8 +94,6 @@ import org.mockito.quality.Strictness;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
 public class ElasticsearchClientFactoryImplIT {
 
-	private static final JsonParser JSON_PARSER = new JsonParser();
-
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
@@ -1036,7 +1034,7 @@ public class ElasticsearchClientFactoryImplIT {
 			}
 		}
 		if ( payload != null ) {
-			builder = builder.body( JSON_PARSER.parse( payload ).getAsJsonObject() );
+			builder = builder.body( JsonParser.parseString( payload ).getAsJsonObject() );
 		}
 		return builder.build();
 	}

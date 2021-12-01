@@ -47,9 +47,9 @@ public class GsonHttpEntityTest {
 		List<Object[]> params = new ArrayList<>();
 		Gson gson = GsonProvider.create( GsonBuilder::new, true ).getGson();
 
-		JsonObject bodyPart1 = new JsonParser().parse( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
-		JsonObject bodyPart2 = new JsonParser().parse( "{ \"foobar\": 235 }" ).getAsJsonObject();
-		JsonObject bodyPart3 = new JsonParser().parse( "{ \"obj1\": " + bodyPart1.toString()
+		JsonObject bodyPart1 = JsonParser.parseString( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
+		JsonObject bodyPart2 = JsonParser.parseString( "{ \"foobar\": 235 }" ).getAsJsonObject();
+		JsonObject bodyPart3 = JsonParser.parseString( "{ \"obj1\": " + bodyPart1.toString()
 				+ ", \"obj2\": " + bodyPart2.toString() + "}" ).getAsJsonObject();
 
 		for ( @SuppressWarnings("unchecked") List<JsonObject> jsonObjects: new List[] {
