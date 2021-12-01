@@ -1116,20 +1116,6 @@
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock</artifactId>
                 <version>${version.com.github.tomakehurst.wiremock}</version>
-                <exclusions>
-                    <!--
-                        These dependencies point to multiple different versions, and are not really necessary in our case:
-                        either they are not used, or they are provided by other dependencies such as the Elasticsearch Rest client.
-                     -->
-                    <exclusion>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <!-- Dependency management is necessary for Wiremock in particular (it has internal dependency divergence) -->
