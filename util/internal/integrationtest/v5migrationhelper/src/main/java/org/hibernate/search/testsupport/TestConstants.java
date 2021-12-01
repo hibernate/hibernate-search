@@ -6,19 +6,8 @@
  */
 package org.hibernate.search.testsupport;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.hibernate.search.test.util.logging.Log;
-
-import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Logger;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -33,11 +22,7 @@ public final class TestConstants {
 
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer();
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( EnglishAnalyzer.ENGLISH_STOP_WORDS_SET );
-	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
-
-	private static final BasicLogger log = Logger.getMessageLogger( Log.class, MethodHandles.lookup().lookupClass().getName() );
-	private static final CallerProvider callerProvider = new CallerProvider();
 
 	private TestConstants() {
 		//not allowed
@@ -47,50 +32,4 @@ public final class TestConstants {
 		return Version.LATEST;
 	}
 
-	/**
-	 * Returns a temporary directory for storing test data such as indexes etc. Specific tests should store their data
-	 * in sub-directories. The returned directory will be deleted on graceful shut-down. The returned directory will be
-	 * named like {@code $TEMP/hsearch-tests-<random>}.
-	 */
-	public static Path getTempTestDataDir() {
-		try {
-			Path tempTestDataDir = Files.createTempDirectory( "hsearch-tests-" );
-			tempTestDataDir.toFile().deleteOnExit();
-
-			return tempTestDataDir;
-		}
-		catch (IOException e) {
-			throw new RuntimeException( "Could not create temporary directory for tests", e );
-		}
-	}
-
-	/**
-	 * Doing the same as {@link #getIndexDirectory(Path, Class)}, using the immediate caller class as requester.
-	 */
-	public static Path getIndexDirectory(Path parent) {
-		return getIndexDirectory( parent, callerProvider.getCallerClass() );
-	}
-
-	/**
-	 * Return the root directory to store test indexes in. Tests should never use or delete this directly but rather
-	 * nest sub directories in it to avoid interferences across tests.
-	 *
-	 * @param requester The test class requesting the index directory, its name will be part of the returned directory
-	 * @return Return the root directory to store test indexes
-	 */
-	public static Path getIndexDirectory(Path parent, Class<?> requester) {
-		Path indexDirPath = parent.resolve( "indextemp-" + requester.getSimpleName() );
-		indexDirPath.toFile().deleteOnExit();
-
-		String indexDir = indexDirPath.toAbsolutePath().toString();
-		log.debugf( "Using %s as index directory.", indexDir );
-		return indexDirPath;
-	}
-
-	private static class CallerProvider extends SecurityManager {
-
-		public Class<?> getCallerClass() {
-			return getClassContext()[2];
-		}
-	}
 }
