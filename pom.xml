@@ -173,8 +173,8 @@
         <module>util/internal/integrationtest</module>
         <module>parents/integrationtest</module>
         <module>integrationtest</module>
-        <module>jakarta</module>
         <module>documentation</module>
+        <module>jakarta</module>
     </modules>
 
     <properties>
