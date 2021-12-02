@@ -2342,6 +2342,12 @@
                                 <release></release>
                                 <source>${maven.compiler.release}</source>
                                 <target>${maven.compiler.release}</target>
+                                <compilerArgs combine.self="override">
+                                    <!-- Ignore warnings in generated code -->
+                                    <compilerArg>-nowarn:[${project.build.directory}/generated-sources/apt]</compilerArg>
+                                    <!-- Ignore all warnings for now TODO HSEARCH-4387 finer configuration -->
+                                    <compilerArg>-warn:none</compilerArg>
+                                </compilerArgs>
                             </configuration>
                             <dependencies>
                                 <dependency>
