@@ -1315,32 +1315,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                    <failOnWarning>true</failOnWarning>
-                    <release>${maven.compiler.release}</release>
-                    <testRelease>${maven.compiler.testRelease}</testRelease>
-                    <encoding>UTF-8</encoding>
-                    <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
-                    <proc>none</proc>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <configuration>
-                            <fork>true</fork>
-                            <executable>${java-version.main.compiler}</executable>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <configuration>
-                            <fork>true</fork>
-                            <executable>${java-version.test.compiler}</executable>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.github.marschall</groupId>
@@ -1598,6 +1572,32 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${version.compiler.plugin}</version>
+                    <configuration>
+                        <showWarnings>true</showWarnings>
+                        <showDeprecation>true</showDeprecation>
+                        <failOnWarning>true</failOnWarning>
+                        <release>${maven.compiler.release}</release>
+                        <testRelease>${maven.compiler.testRelease}</testRelease>
+                        <encoding>UTF-8</encoding>
+                        <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
+                        <proc>none</proc>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <configuration>
+                                <fork>true</fork>
+                                <executable>${java-version.main.compiler}</executable>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>default-testCompile</id>
+                            <configuration>
+                                <fork>true</fork>
+                                <executable>${java-version.test.compiler}</executable>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.bsc.maven</groupId>
