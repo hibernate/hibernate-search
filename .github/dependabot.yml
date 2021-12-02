@@ -11,3 +11,7 @@ updates:
       interval: "daily"
     assignees: ["yrodiere"]
     open-pull-requests-limit: 5
+    ignore:
+      # AWS SDK releases way too often (every week?); ignore all patch updates
+      - dependency-name: "software.amazon.awssdk:*"
+        update-types: ["version-update:semver-patch"]
