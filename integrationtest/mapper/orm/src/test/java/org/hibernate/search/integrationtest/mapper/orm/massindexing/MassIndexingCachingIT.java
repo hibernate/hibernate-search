@@ -6,22 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import java.util.Arrays;
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.Table;
-import javax.persistence.TypedQuery;
 
 import org.hibernate.CacheMode;
-import org.hibernate.Session;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
@@ -71,17 +65,11 @@ public class MassIndexingCachingIT {
 
 	@Before
 	public void initData() {
+		// This will also add entities to the 2nd level cache
 		setupHolder.runInTransaction( session -> {
 			session.persist( new IndexedEntity( 1, "text1" ) );
 			session.persist( new IndexedEntity( 2, "text2" ) );
 			session.persist( new IndexedEntity( 3, "text3" ) );
-		} );
-		setupHolder.runInTransaction( session -> {
-			// Load entities to populate 2nd lvl caches:
-			TypedQuery<IndexedEntity> query = cachedQuery( session, CacheMode.PUT );
-			List<IndexedEntity> entities = query.getResultList();
-
-			assertThat( entities ).hasSize( 3 );
 		} );
 
 		setupHolder.sessionFactory().getCache().evictEntityData( IndexedEntity.class, 1 );
@@ -220,18 +208,6 @@ public class MassIndexingCachingIT {
 	private AbstractLongAssert<?> assertSecondLevelCachePutCount(SoftAssertions softly) {
 		return softly.assertThat( statistics.getSecondLevelCachePutCount() )
 				.as( "Second level cache put count" );
-	}
-
-	private Query<IndexedEntity> cachedQuery(Session session, CacheMode cacheMode) {
-		Query<IndexedEntity> query = session.createQuery(
-				"select e from IndexedEntity e where e.id in (:ids)",
-				IndexedEntity.class
-		);
-
-		query.setParameter( "ids", Arrays.asList( 1, 2, 3 ) )
-				.setCacheMode( cacheMode );
-
-		return query;
 	}
 
 	@Entity(name = IndexedEntity.NAME)
