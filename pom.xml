@@ -1581,6 +1581,9 @@
                         <encoding>UTF-8</encoding>
                         <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                         <proc>none</proc>
+                        <compilerArgs>
+                            <compilerArg>-Xlint:unchecked</compilerArg>
+                        </compilerArgs>
                     </configuration>
                     <executions>
                         <execution>
@@ -2348,13 +2351,29 @@
                                 <release></release>
                                 <source>${maven.compiler.release}</source>
                                 <target>${maven.compiler.release}</target>
-                                <compilerArgs combine.self="override">
+                                <compilerArgs>
                                     <!-- Ignore warnings in generated code -->
                                     <compilerArg>-nowarn:[${project.build.directory}/generated-sources/apt]</compilerArg>
-                                    <!-- Ignore all warnings for now TODO HSEARCH-4387 finer configuration -->
-                                    <compilerArg>-warn:none</compilerArg>
+                                    <!-- For a list of warning categories that can be passed to -warn,
+                                         see https://git.eclipse.org/c/jdt/eclipse.jdt.core.git/tree/org.eclipse.jdt.core/batch/org/eclipse/jdt/internal/compiler/batch/messages.properties#n376
+                                     -->
+                                    <!-- Ignore warnings that we don't care about -->
+                                    <compilerArg>-warn:-serial,intfAnnotation</compilerArg>
+                                    <!-- Ignore warnings that give false positives with ecj (or are addressed by other tools) -->
+                                    <compilerArg>-warn:-unusedImport,warningToken,unusedPrivate,enumSwitch</compilerArg>
                                 </compilerArgs>
                             </configuration>
+                            <executions>
+                                <execution>
+                                    <id>default-testCompile</id>
+                                    <configuration>
+                                        <compilerArgs combine.children="append">
+                                            <!-- Ignore warnings that are too annoying for tests -->
+                                            <compilerArg>-warn:-unused,resource</compilerArg>
+                                        </compilerArgs>
+                                    </configuration>
+                                </execution>
+                            </executions>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.codehaus.plexus</groupId>
