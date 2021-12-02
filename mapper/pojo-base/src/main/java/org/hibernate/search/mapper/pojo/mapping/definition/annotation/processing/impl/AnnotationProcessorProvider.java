@@ -30,6 +30,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
+@SuppressWarnings("rawtypes") // Using reflection for checks
 public class AnnotationProcessorProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

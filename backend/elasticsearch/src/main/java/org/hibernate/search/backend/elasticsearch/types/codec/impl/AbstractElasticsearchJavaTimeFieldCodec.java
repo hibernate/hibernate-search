@@ -68,7 +68,7 @@ public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends Temporal
 			return false;
 		}
 
-		AbstractElasticsearchJavaTimeFieldCodec other = (AbstractElasticsearchJavaTimeFieldCodec) obj;
+		AbstractElasticsearchJavaTimeFieldCodec<?> other = (AbstractElasticsearchJavaTimeFieldCodec<?>) obj;
 		return formatter.equals( other.formatter );
 	}
 

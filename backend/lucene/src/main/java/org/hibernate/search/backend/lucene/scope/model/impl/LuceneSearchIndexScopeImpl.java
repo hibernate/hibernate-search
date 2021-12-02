@@ -226,7 +226,7 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected LuceneSearchIndexNodeContext createMultiIndexSearchValueFieldContext(String absolutePath,
 			List<LuceneSearchIndexNodeContext> fieldForEachIndex) {
 		return new LuceneMultiIndexSearchIndexValueFieldContext<>( this, absolutePath,
@@ -234,7 +234,7 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected LuceneSearchIndexNodeContext createMultiIndexSearchObjectFieldContext(String absolutePath,
 			List<LuceneSearchIndexNodeContext> fieldForEachIndex) {
 		return new LuceneMultiIndexSearchIndexCompositeNodeContext( this, absolutePath,

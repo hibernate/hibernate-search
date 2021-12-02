@@ -1036,7 +1036,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( implementor.isClosed() ).isTrue();
 
 				// Mutating methods should no longer work after the results are closed
-				Consumer exceptionExpectations = e -> assertThat( e )
+				Consumer<Throwable> exceptionExpectations = e -> assertThat( e )
 						.asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
 						.hasMessageContaining( "Cannot use this ScrollableResults instance: it is closed" );

@@ -12,10 +12,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPr
 class StubIndexNamedPredicateBuilder
 	implements IndexSchemaNamedPredicateOptionsStep {
 
-	private final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
-
+	@SuppressWarnings("unused")
 	StubIndexNamedPredicateBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
-		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 	}
 
 }

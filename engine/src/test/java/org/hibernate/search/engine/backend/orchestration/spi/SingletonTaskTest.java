@@ -50,7 +50,7 @@ public class SingletonTaskTest {
 
 	private static final class TestWorker implements SingletonTask.Worker {
 
-		private final CompletableFuture<Void> future = new CompletableFuture();
+		private final CompletableFuture<Void> future = new CompletableFuture<>();
 		private volatile boolean started = false;
 
 		@Override

@@ -51,6 +51,7 @@ class MultitenancyTestHelperSchemaManagementTool
 		}
 
 		@Override
+		@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
 		public SchemaManagementTool initiateService(Map configurationValues, ServiceRegistryImplementor registry) {
 			return new MultitenancyTestHelperSchemaManagementTool( tenantIds );
 		}
@@ -87,6 +88,7 @@ class MultitenancyTestHelperSchemaManagementTool
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
 	public SchemaCreator getSchemaCreator(Map options) {
 		return new SchemaCreator() {
 			final SchemaCreatorImpl delegate = (SchemaCreatorImpl) toolDelegate.getSchemaCreator( options );
@@ -99,6 +101,7 @@ class MultitenancyTestHelperSchemaManagementTool
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
 	public SchemaDropper getSchemaDropper(Map options) {
 		return new SchemaDropper() {
 			final SchemaDropperImpl delegate = (SchemaDropperImpl) toolDelegate.getSchemaDropper( options );
@@ -122,11 +125,13 @@ class MultitenancyTestHelperSchemaManagementTool
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
 	public SchemaMigrator getSchemaMigrator(Map options) {
 		throw notSupported();
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
 	public SchemaValidator getSchemaValidator(Map options) {
 		throw notSupported();
 	}

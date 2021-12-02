@@ -92,13 +92,14 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		}
 
 		@Override
+		@SuppressWarnings("unchecked") // Workaround for assertThat(Optional) not taking wildcard type into account like assertThat(Collection) does
 		public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
 			StaticCounters.get().increment( CREATE_DIRECTORY_COUNTER_KEY );
 			assertThat( context ).isNotNull();
 			assertThat( context.indexName() ).isEqualTo( index.name() );
 			Optional<?> actualConfigurationPropertyValue = context.configurationPropertySource()
 					.get( CONFIGURATION_PROPERTY_KEY_RADICAL );
-			assertThat( (Optional) actualConfigurationPropertyValue )
+			assertThat( (Optional<Object>) actualConfigurationPropertyValue )
 					.contains( CONFIGURATION_PROPERTY_EXPECTED_VALUE );
 			return new DirectoryHolder() {
 				Directory directory;

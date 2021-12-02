@@ -12,10 +12,8 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
 public class LuceneSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory {
 
-	private final LuceneSearchIndexScope<?> scope;
-
+	@SuppressWarnings("unused")
 	public LuceneSearchAggregationBuilderFactory(LuceneSearchIndexScope<?> scope) {
-		this.scope = scope;
 	}
 
 }

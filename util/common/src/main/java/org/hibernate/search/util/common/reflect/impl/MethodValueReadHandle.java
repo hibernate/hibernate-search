@@ -31,6 +31,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public T get(Object thiz) {
 		try {
 			return (T) method.invoke( thiz );
@@ -59,7 +60,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		MethodValueReadHandle<?> other = (MethodValueReadHandle) obj;
+		MethodValueReadHandle<?> other = (MethodValueReadHandle<?>) obj;
 		return method.equals( other.method );
 	}
 

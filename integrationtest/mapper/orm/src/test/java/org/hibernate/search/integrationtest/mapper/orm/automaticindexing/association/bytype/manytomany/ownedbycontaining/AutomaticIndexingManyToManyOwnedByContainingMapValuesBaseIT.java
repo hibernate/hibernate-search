@@ -198,7 +198,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapValuesBaseIT
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Map<String, ContainedEntity>> containedIndexedEmbeddedWithCast() {
 			return new MultiValuedPropertyAccessor<>(
 					MAP_VALUES_PRIMITIVES,
@@ -206,7 +206,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapValuesBaseIT
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedWithCast() {
 			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
 					root -> (List) root.getContainingAsIndexedEmbeddedWithCast() );

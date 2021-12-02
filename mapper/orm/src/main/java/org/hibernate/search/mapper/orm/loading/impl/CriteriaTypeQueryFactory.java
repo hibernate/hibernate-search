@@ -67,6 +67,7 @@ class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 		ParameterExpression<Collection> idsParameter = criteriaBuilder.parameter( Collection.class, parameterName );

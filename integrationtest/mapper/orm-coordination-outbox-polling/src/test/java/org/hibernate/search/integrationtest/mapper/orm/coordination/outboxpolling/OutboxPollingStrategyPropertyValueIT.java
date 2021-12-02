@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.metamodel.Type;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -101,7 +102,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 	@Test
 	public void metamodel_userEntitiesAndOutboxEventAndAgent() {
 		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
-				.extracting( e -> (Class) e.getJavaType() )
+				.<Class<?>>extracting( Type::getJavaType )
 				.containsExactlyInAnyOrder( IndexedEntity.class, OutboxEvent.class, Agent.class );
 	}
 

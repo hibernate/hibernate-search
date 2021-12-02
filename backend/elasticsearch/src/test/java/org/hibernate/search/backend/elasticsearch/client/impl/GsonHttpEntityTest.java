@@ -52,14 +52,14 @@ public class GsonHttpEntityTest {
 		JsonObject bodyPart3 = JsonParser.parseString( "{ \"obj1\": " + bodyPart1.toString()
 				+ ", \"obj2\": " + bodyPart2.toString() + "}" ).getAsJsonObject();
 
-		for ( @SuppressWarnings("unchecked") List<JsonObject> jsonObjects: new List[] {
+		for ( List<JsonObject> jsonObjects: Arrays.<List<JsonObject>>asList(
 				Collections.emptyList(),
 				Collections.singletonList( bodyPart1 ),
 				Collections.singletonList( bodyPart2 ),
 				Collections.singletonList( bodyPart3 ),
 				Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ),
 				Arrays.asList( bodyPart3, bodyPart2, bodyPart1 )
-		} ) {
+		) ) {
 			params.add( new Object[] { jsonObjects.toString(), jsonObjects } );
 		}
 		params.add( new Object[] {

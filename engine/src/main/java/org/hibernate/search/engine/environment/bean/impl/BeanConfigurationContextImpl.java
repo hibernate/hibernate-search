@@ -39,6 +39,6 @@ final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 	@SuppressWarnings("unchecked")
 	private <T> BeanReferenceRegistryForType<T> configuredBeans(Class<T> exposedType) {
 		return (BeanReferenceRegistryForType<T>) configuredBeans.computeIfAbsent( exposedType,
-				ignored -> new BeanReferenceRegistryForType( exposedType ) );
+				ignored -> new BeanReferenceRegistryForType<>( exposedType ) );
 	}
 }

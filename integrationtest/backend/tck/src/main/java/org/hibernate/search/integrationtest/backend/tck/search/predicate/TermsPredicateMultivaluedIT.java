@@ -64,7 +64,7 @@ public class TermsPredicateMultivaluedIT<F> {
 		setupHelper.start().withIndexes( index ).setup();
 		BulkIndexer indexer = index.bulkIndexer();
 		indexer.add( DOC_ID, doc -> {
-			for ( TypeValues typeValues : typeValuesSet ) {
+			for ( TypeValues<?> typeValues : typeValuesSet ) {
 				typeValues.contribute( doc );
 			}
 		} );

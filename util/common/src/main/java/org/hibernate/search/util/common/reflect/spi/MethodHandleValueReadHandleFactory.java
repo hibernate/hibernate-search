@@ -25,11 +25,11 @@ final class MethodHandleValueReadHandleFactory implements ValueReadHandleFactory
 
 	@Override
 	public ValueReadHandle<?> createForField(Field field) throws IllegalAccessException {
-		return new MethodHandleValueReadHandle( field, lookup.unreflectGetter( field ) );
+		return new MethodHandleValueReadHandle<>( field, lookup.unreflectGetter( field ) );
 	}
 
 	@Override
 	public ValueReadHandle<?> createForMethod(Method method) throws IllegalAccessException {
-		return new MethodHandleValueReadHandle( method, lookup.unreflect( method ) );
+		return new MethodHandleValueReadHandle<>( method, lookup.unreflect( method ) );
 	}
 }

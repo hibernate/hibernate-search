@@ -930,11 +930,11 @@ public class TypeBridgeBaseIT {
 	@Test
 	public void typeBridge_noGenericType() {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
-		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntityWithRawTypeBridge.class );
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {
-			IndexedEntity entity = new IndexedEntity();
+			IndexedEntityWithRawTypeBridge entity = new IndexedEntityWithRawTypeBridge();
 			entity.id = 739;
 
 			session.indexingPlan().add( entity );
@@ -945,6 +945,7 @@ public class TypeBridgeBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class RawTypeBridge implements TypeBridge {
 
 		private final IndexFieldReference<String> fieldReference;
@@ -955,12 +956,13 @@ public class TypeBridgeBaseIT {
 
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+			IndexedEntityWithRawTypeBridge castedBridgedElement = (IndexedEntityWithRawTypeBridge) bridgedElement;
 			target.addValue( fieldReference, castedBridgedElement.id.toString() );
 		}
 
 		public static class Binder implements TypeBinder {
 			@Override
+			@SuppressWarnings("unchecked")
 			public void bind(TypeBindingContext context) {
 				context.dependencies().useRootOnly();
 
@@ -973,7 +975,7 @@ public class TypeBridgeBaseIT {
 
 	@Indexed(index = INDEX_NAME)
 	@TypeBinding(binder = @TypeBinderRef(type = RawTypeBridge.Binder.class))
-	private static class IndexedEntity {
+	private static class IndexedEntityWithRawTypeBridge {
 		@DocumentId
 		Integer id;
 	}

@@ -67,6 +67,7 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
+		@SuppressWarnings("unchecked") // Necessary for ecj (Eclipse compiler)
 		LuceneSearchProjection<?, P> casted = (LuceneSearchProjection<?, P>) projection;
 		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),

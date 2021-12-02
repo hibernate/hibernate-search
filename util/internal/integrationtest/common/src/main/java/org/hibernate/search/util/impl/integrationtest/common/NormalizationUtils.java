@@ -50,16 +50,16 @@ public final class NormalizationUtils {
 			return (T) normalize( (BigDecimal) object );
 		}
 		else if ( object instanceof Range ) {
-			return (T) normalize( (Range) object );
+			return (T) normalize( (Range<?>) object );
 		}
 		else if ( object instanceof Map.Entry ) {
-			return (T) normalize( (Map.Entry) object );
+			return (T) normalize( (Map.Entry<?, ?>) object );
 		}
 		else if ( object instanceof List ) {
-			return (T) normalize( (List) object );
+			return (T) normalize( (List<?>) object );
 		}
 		else if ( object instanceof Map ) {
-			return (T) normalize( (Map) object );
+			return (T) normalize( (Map<?, ?>) object );
 		}
 		else if ( object.getClass().isArray() ) {
 			// Primitive arrays not supported, since we don't need them yet.

@@ -46,6 +46,7 @@ public class IdentifierSearchProjectionBaseIT {
 
 	private final String[] ids = new String[7];
 	private final String[] names = new String[7];
+	@SuppressWarnings("unchecked")
 	private final List<String>[] duplicates = new List[7];
 
 	private final String[] compatibleIndexIds = new String[3];

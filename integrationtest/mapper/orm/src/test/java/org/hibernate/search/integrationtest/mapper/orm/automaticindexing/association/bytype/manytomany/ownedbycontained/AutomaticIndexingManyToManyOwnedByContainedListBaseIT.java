@@ -187,14 +187,14 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, List<ContainedEntity>> containedIndexedEmbeddedWithCast() {
 			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
 					root -> (List) root.getContainedIndexedEmbeddedWithCast() );
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedWithCast() {
 			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
 					root -> (List) root.getContainingAsIndexedEmbeddedWithCast() );

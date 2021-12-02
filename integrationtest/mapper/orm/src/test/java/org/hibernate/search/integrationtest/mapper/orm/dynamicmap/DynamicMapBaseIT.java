@@ -49,6 +49,7 @@ import org.junit.Test;
  * <p>
  * This test is rather simplistic because "dynamic-map" entity mapping is not fully supported in Hibernate Search yet.
  */
+@SuppressWarnings("rawtypes")
 public class DynamicMapBaseIT {
 
 	private static final String INDEX1_NAME = "Index1Name";

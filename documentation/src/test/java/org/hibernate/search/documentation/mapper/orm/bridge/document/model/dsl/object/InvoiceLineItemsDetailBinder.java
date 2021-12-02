@@ -51,6 +51,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 	}
 	//end::bind[]
 
+	@SuppressWarnings("rawtypes")
 	private static class Bridge implements PropertyBridge<List> {
 
 		private final IndexObjectFieldReference lineItemsField;
@@ -66,8 +67,8 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
+			@SuppressWarnings("unchecked")
 			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
 
 			for ( InvoiceLineItem lineItem : lineItems ) {

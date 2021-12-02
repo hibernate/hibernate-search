@@ -201,6 +201,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		}
 	}
 
+	@SuppressWarnings("unchecked") // Can't do much better without adding generics to EntityTypeDescriptor
 	private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, StatelessSession ss,
 			EntityTypeDescriptor entityTypeDescriptor,
 			Integer maxResults, int fetchSize, int rowsPerPartition,

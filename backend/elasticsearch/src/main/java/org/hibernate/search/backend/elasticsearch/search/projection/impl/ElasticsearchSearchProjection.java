@@ -65,6 +65,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
 		}
+		@SuppressWarnings("unchecked") // Necessary for ecj (Eclipse compiler)
 		ElasticsearchSearchProjection<?, P> casted = (ElasticsearchSearchProjection<?, P>) projection;
 		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),

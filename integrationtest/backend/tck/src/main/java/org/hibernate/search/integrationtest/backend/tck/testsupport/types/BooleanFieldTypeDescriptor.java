@@ -72,7 +72,7 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 
 	@Override
 	protected List<Boolean> createNonMatchingValues() {
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	@Override

@@ -36,6 +36,7 @@ public @interface IdentifierBridgeRef {
 	 * Reference an identifier bridge by its type.
 	 * @return The type of the  identifier bridge.
 	 */
+	@SuppressWarnings("rawtypes") // For backwards compatibility reasons, we allow raw types
 	Class<? extends IdentifierBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**

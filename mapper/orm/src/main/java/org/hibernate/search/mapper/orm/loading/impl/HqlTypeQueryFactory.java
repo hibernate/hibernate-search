@@ -53,6 +53,7 @@ class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Can't do better here: the underlying method has no generics
 	public MultiIdentifierLoadAccess<E> createMultiIdentifierLoadAccess(SessionImplementor session) {
 		return session.byMultipleIds( entityPersister.getEntityName() );
 	}

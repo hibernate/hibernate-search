@@ -92,9 +92,9 @@ public class BatchIndexingJobIT {
 	public void initData() {
 		emf = setupHolder.entityManagerFactory();
 		jobOperator = JobTestUtil.getAndCheckRuntime();
-		List<Company> companies = new ArrayList();
-		List<Person> people = new ArrayList();
-		List<WhoAmI> whos = new ArrayList();
+		List<Company> companies = new ArrayList<>();
+		List<Person> people = new ArrayList<>();
+		List<WhoAmI> whos = new ArrayList<>();
 		for ( int i = 0; i < INSTANCE_PER_ENTITY_TYPE; i += 3 ) {
 			int index1 = i;
 			int index2 = i + 1;

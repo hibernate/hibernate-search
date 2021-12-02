@@ -192,7 +192,7 @@ public class AutomaticIndexingManyToOneBaseIT
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public MultiValuedPropertyAccessor<ContainedEntity, ContainingEntity, List<ContainingEntity>> containingAsIndexedEmbeddedWithCast() {
 			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
 					root -> (List) root.getContainingAsIndexedEmbeddedWithCast() );

@@ -92,7 +92,7 @@ public class HibernateOrmMassIndexer implements MassIndexer {
 	}
 
 	@Override
-	public CompletionStage start() {
+	public CompletionStage<?> start() {
 		return delegate.start();
 	}
 

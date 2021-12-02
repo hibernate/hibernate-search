@@ -154,7 +154,6 @@ public class SloppyMath {
 
 	// Earth's mean radius, in meters and kilometers; see http://earth-info.nga.mil/GandG/publications/tr8350.2/wgs84fin.pdf
 	private static final double TO_METERS = 6_371_008.7714D; // equatorial radius
-	private static final double TO_KILOMETERS = 6_371.0087714D; // equatorial radius
 
 	// cos/asin
 	private static final double ONE_DIV_F2 = 1 / 2.0;
@@ -218,7 +217,7 @@ public class SloppyMath {
 	private static final double ASIN_QS4 = Double.longBitsToDouble(
 			0x3fb3b8c5b12e9282L ); //  7.70381505559019352791e-02
 
-	/** Initializes look-up tables. */
+	/* Initializes look-up tables. */
 	static {
 		// sin and cos
 		final int SIN_COS_PI_INDEX = ( SIN_COS_TABS_SIZE - 1 ) / 2;

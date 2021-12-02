@@ -72,6 +72,7 @@ public final class StandardFieldMapper<F, M> {
 		return map( parent, name, true, additionalConfigurations );
 	}
 
+	@SafeVarargs
 	private M map(IndexSchemaElement parent, String name, boolean multiValued,
 			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
 		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldContext = parent

@@ -34,7 +34,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneStandardFieldSort(AbstractBuilder builder) {
+	private LuceneStandardFieldSort(AbstractBuilder<?, ?, ?> builder) {
 		super( builder );
 	}
 
@@ -139,6 +139,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		protected LuceneFieldComparatorSource toFieldComparatorSource() {
 			return new LuceneNumericFieldComparatorSource<>( nestedDocumentPath, codec.getDomain(),
 					(E) getEffectiveMissingValue(), getMultiValueMode(), getNestedFilter() );

@@ -213,7 +213,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		}
 	}
 
-	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult ... results) {
+	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult<?> ... results) {
 		Sort sort = query.luceneSort();
 		TopFieldDocs[] allTopDocs = new TopFieldDocs[results.length];
 		for ( int i = 0; i < results.length; i++ ) {

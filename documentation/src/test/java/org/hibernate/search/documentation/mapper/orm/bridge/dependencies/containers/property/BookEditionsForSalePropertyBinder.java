@@ -34,6 +34,7 @@ public class BookEditionsForSalePropertyBinder implements PropertyBinder {
 		context.bridge( Map.class, new Bridge( editionsForSaleField ) );
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static class Bridge implements PropertyBridge<Map> {
 
 		private final IndexFieldReference<String> editionsForSaleField;
@@ -43,8 +44,8 @@ public class BookEditionsForSalePropertyBinder implements PropertyBinder {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public void write(DocumentElement target, Map bridgedElement, PropertyBridgeWriteContext context) {
+			@SuppressWarnings("unchecked")
 			Map<BookEdition, ?> priceByEdition = (Map<BookEdition, ?>) bridgedElement;
 
 			for ( BookEdition edition : priceByEdition.keySet() ) { // <3>

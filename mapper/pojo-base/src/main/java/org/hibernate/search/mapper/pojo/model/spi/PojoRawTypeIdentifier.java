@@ -52,7 +52,7 @@ public final class PojoRawTypeIdentifier<T> {
 		if ( ! ( obj instanceof PojoRawTypeIdentifier ) ) {
 			return false;
 		}
-		PojoRawTypeIdentifier other = (PojoRawTypeIdentifier) obj;
+		PojoRawTypeIdentifier<?> other = (PojoRawTypeIdentifier<?>) obj;
 		return javaClass.equals( other.javaClass )
 				&& Objects.equals( name, other.name );
 	}

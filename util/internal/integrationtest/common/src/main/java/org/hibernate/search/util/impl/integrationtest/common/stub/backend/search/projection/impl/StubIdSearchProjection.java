@@ -43,7 +43,7 @@ public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
 		private final StubSearchProjection<I> projection;
 
 		public Builder(ProjectionConverter<String, ? extends I> converter) {
-			projection = new StubIdSearchProjection( converter );
+			projection = new StubIdSearchProjection<>( converter );
 		}
 
 		@Override

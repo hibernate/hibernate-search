@@ -100,19 +100,19 @@ public final class IndexWriterSettings implements Serializable {
 
 	private static final class Extractor<T, R> {
 
-		static <T> Extractor fromInteger(String propertyKey,
-				Function<Integer, T> processor,
-				BiConsumer<IndexWriterConfig, T> writerSettingApplier,
-				BiConsumer<LogByteSizeMergePolicy, T> mergePolicySettingApplier) {
+		static <R> Extractor<Integer, R> fromInteger(String propertyKey,
+				Function<Integer, R> processor,
+				BiConsumer<IndexWriterConfig, R> writerSettingApplier,
+				BiConsumer<LogByteSizeMergePolicy, R> mergePolicySettingApplier) {
 			OptionalConfigurationProperty<Integer> property = ConfigurationProperty.forKey( propertyKey )
 					.asIntegerPositiveOrZeroOrNegative().build();
 			return new Extractor<>( propertyKey, property, processor, writerSettingApplier, mergePolicySettingApplier );
 		}
 
-		static <T> Extractor fromBoolean(String propertyKey,
-				Function<Boolean, T> processor,
-				BiConsumer<IndexWriterConfig, T> writerSettingApplier,
-				BiConsumer<LogByteSizeMergePolicy, T> mergePolicySettingApplier) {
+		static <R> Extractor<Boolean, R> fromBoolean(String propertyKey,
+				Function<Boolean, R> processor,
+				BiConsumer<IndexWriterConfig, R> writerSettingApplier,
+				BiConsumer<LogByteSizeMergePolicy, R> mergePolicySettingApplier) {
 			OptionalConfigurationProperty<Boolean> property = ConfigurationProperty.forKey( propertyKey )
 					.asBoolean().build();
 			return new Extractor<>( propertyKey, property, processor, writerSettingApplier, mergePolicySettingApplier );

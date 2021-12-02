@@ -137,7 +137,7 @@ public class StubSearchIndexScope
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected StubSearchIndexNodeContext createMultiIndexSearchValueFieldContext(String absolutePath,
 			List<StubSearchIndexNodeContext> fieldForEachIndex) {
 		return new StubMultiIndexSearchIndexValueFieldContext<>( this, absolutePath,
@@ -145,7 +145,7 @@ public class StubSearchIndexScope
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected StubSearchIndexNodeContext createMultiIndexSearchObjectFieldContext(String absolutePath,
 			List<StubSearchIndexNodeContext> fieldForEachIndex) {
 		return new StubMultiIndexSearchIndexCompositeNodeContext( this, absolutePath,

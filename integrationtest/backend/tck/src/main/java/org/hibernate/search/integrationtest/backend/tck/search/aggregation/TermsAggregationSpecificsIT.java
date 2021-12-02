@@ -642,7 +642,6 @@ public class TermsAggregationSpecificsIT<F> {
 
 		private void init() {
 			BulkIndexer indexer = index.bulkIndexer();
-			int documentCount = 0;
 			for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
 				F value = entry.getKey();
 				for ( String documentId : entry.getValue() ) {
@@ -650,11 +649,9 @@ public class TermsAggregationSpecificsIT<F> {
 						document.addValue( index.binding().fieldModels.get( fieldType ).reference, value );
 						document.addValue( index.binding().fieldWithConverterModels.get( fieldType ).reference, value );
 					} );
-					++documentCount;
 				}
 			}
 			indexer.add( name + "_document_empty", name, document -> { } );
-			++documentCount;
 			indexer.join();
 		}
 

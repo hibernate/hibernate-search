@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.mapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 
-public interface DefaultBinderDefinitionStep<S extends DefaultBinderDefinitionStep> {
+public interface DefaultBinderDefinitionStep<S extends DefaultBinderDefinitionStep<?>> {
 
 	/**
 	 * Use the given binder by default for properties with a matching type marked as document identifier

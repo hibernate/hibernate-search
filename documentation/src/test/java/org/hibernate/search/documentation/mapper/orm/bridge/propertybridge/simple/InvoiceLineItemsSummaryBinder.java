@@ -47,6 +47,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 	//tag::bridge[]
 	// ... class InvoiceLineItemsSummaryBinder (continued)
 
+	@SuppressWarnings("rawtypes")
 	private static class Bridge implements PropertyBridge<List> { // <1>
 
 		private final IndexObjectFieldReference summaryField;
@@ -65,8 +66,8 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) { // <3>
+			@SuppressWarnings("unchecked")
 			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
 
 			BigDecimal total = BigDecimal.ZERO;

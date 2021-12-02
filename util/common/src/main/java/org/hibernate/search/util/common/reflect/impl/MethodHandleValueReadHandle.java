@@ -59,7 +59,7 @@ public final class MethodHandleValueReadHandle<T> implements ValueReadHandle<T> 
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		MethodHandleValueReadHandle<?> other = (MethodHandleValueReadHandle) obj;
+		MethodHandleValueReadHandle<?> other = (MethodHandleValueReadHandle<?>) obj;
 		return member.equals( other.member );
 	}
 

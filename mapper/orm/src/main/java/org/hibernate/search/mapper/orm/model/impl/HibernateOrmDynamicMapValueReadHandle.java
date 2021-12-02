@@ -31,7 +31,7 @@ final class HibernateOrmDynamicMapValueReadHandle<T> implements ValueReadHandle<
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		HibernateOrmDynamicMapValueReadHandle<?> other = (HibernateOrmDynamicMapValueReadHandle) obj;
+		HibernateOrmDynamicMapValueReadHandle<?> other = (HibernateOrmDynamicMapValueReadHandle<?>) obj;
 		return name.equals( other.name ) && type.equals( other.type );
 	}
 

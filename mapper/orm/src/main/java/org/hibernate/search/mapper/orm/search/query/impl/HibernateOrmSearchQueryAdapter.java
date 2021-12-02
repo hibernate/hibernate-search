@@ -52,6 +52,7 @@ import org.hibernate.type.Type;
 
 @SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
 		+ " in order to implement a org.hibernate.query.Query")
+@SuppressWarnings("unchecked") // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
 public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
@@ -197,7 +198,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
 		loadingOptions.entityGraphHint( new EntityGraphHint<>( graph, semantic ), true );
 		return this;
@@ -440,7 +441,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	private static RootGraph<?> hintValueToEntityGraph(Object value) {
-		return (RootGraph) value;
+		return (RootGraph<?>) value;
 	}
 
 }

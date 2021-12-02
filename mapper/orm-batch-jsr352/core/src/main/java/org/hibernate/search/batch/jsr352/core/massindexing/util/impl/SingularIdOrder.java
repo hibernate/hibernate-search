@@ -28,16 +28,19 @@ public class SingularIdOrder implements IdOrder {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Can't do better without addings generics for the ID type everywhere
 	public Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj) {
 		return builder.greaterThan( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Can't do better without addings generics for the ID type everywhere
 	public Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj) {
 		return builder.greaterThanOrEqualTo( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Can't do better without addings generics for the ID type everywhere
 	public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
 		return builder.lessThan( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
 	}

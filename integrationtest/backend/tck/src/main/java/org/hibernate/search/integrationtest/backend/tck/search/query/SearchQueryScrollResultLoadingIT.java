@@ -68,8 +68,11 @@ public class SearchQueryScrollResultLoadingIT {
 
 	@Test
 	public void resultLoadingOnScrolling() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
+		@SuppressWarnings("unchecked")
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
+				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -83,8 +86,11 @@ public class SearchQueryScrollResultLoadingIT {
 
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
+		@SuppressWarnings("unchecked")
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
+				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -99,8 +105,11 @@ public class SearchQueryScrollResultLoadingIT {
 
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
+		@SuppressWarnings("unchecked")
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
+				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )

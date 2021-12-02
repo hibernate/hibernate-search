@@ -222,7 +222,7 @@ public class MassIndexingCachingIT {
 				.as( "Second level cache put count" );
 	}
 
-	private Query cachedQuery(Session session, CacheMode cacheMode) {
+	private Query<IndexedEntity> cachedQuery(Session session, CacheMode cacheMode) {
 		Query<IndexedEntity> query = session.createQuery(
 				"select e from IndexedEntity e where e.id in (:ids)",
 				IndexedEntity.class

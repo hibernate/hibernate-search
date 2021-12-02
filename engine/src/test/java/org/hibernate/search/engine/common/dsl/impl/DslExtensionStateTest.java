@@ -256,6 +256,7 @@ public class DslExtensionStateTest {
 		verifyNoOtherInteractionsAndReset();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void verifyNoOtherInteractionsAndReset() {
 		verifyNoMoreInteractions( contextFunction );
 		reset( contextFunction );

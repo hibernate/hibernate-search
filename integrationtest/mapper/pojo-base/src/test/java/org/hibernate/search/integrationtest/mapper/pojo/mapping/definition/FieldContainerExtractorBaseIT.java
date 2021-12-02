@@ -87,6 +87,7 @@ public class FieldContainerExtractorBaseIT {
 	private static class MyContainer<T> {
 		private final List<T> elements;
 
+		@SafeVarargs
 		private MyContainer(T ... elements) {
 			this.elements = Arrays.asList( elements );
 		}

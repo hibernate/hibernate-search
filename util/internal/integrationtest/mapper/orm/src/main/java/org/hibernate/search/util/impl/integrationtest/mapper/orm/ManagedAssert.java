@@ -23,31 +23,31 @@ public class ManagedAssert<T> extends AbstractObjectAssert<ManagedAssert<T>, T> 
 		super( t, ManagedAssert.class );
 	}
 
-	public ManagedAssert isInitialized(boolean expectInitialized) {
+	public ManagedAssert<T> isInitialized(boolean expectInitialized) {
 		isNotNull();
 		managedInitialization().isEqualTo( expectInitialized );
 		return this;
 	}
 
-	public ManagedAssert isInitialized() {
+	public ManagedAssert<T> isInitialized() {
 		return isInitialized( true );
 	}
 
-	public ManagedAssert isNotInitialized() {
+	public ManagedAssert<T> isNotInitialized() {
 		return isInitialized( false );
 	}
 
-	public ManagedAssert hasPropertyInitialized(String propertyName, boolean expectInitialized) {
+	public ManagedAssert<T> hasPropertyInitialized(String propertyName, boolean expectInitialized) {
 		isNotNull();
 		propertyInitialization( propertyName ).isEqualTo( expectInitialized );
 		return this;
 	}
 
-	public ManagedAssert hasPropertyInitialized(String propertyName) {
+	public ManagedAssert<T> hasPropertyInitialized(String propertyName) {
 		return hasPropertyInitialized( propertyName, true );
 	}
 
-	public ManagedAssert hasPropertyNotInitialized(String propertyName) {
+	public ManagedAssert<T> hasPropertyNotInitialized(String propertyName) {
 		return hasPropertyInitialized( propertyName, false );
 	}
 

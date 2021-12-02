@@ -30,6 +30,7 @@ public final class FieldValueReadHandle<T> implements ValueReadHandle<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public T get(Object thiz) {
 		try {
 			return (T) field.get( thiz );
@@ -49,7 +50,7 @@ public final class FieldValueReadHandle<T> implements ValueReadHandle<T> {
 		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
 			return false;
 		}
-		FieldValueReadHandle<?> other = (FieldValueReadHandle) obj;
+		FieldValueReadHandle<?> other = (FieldValueReadHandle<?>) obj;
 		return field.equals( other.field );
 	}
 

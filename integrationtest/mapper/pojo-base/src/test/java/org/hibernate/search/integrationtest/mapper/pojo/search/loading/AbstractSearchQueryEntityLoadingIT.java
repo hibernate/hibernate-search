@@ -69,7 +69,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			List<Object> expectedLoadedEntities = entityCollector.collected;
 
 			assertSoftly( softAssertions -> {
-				softAssertions.assertThat( loadedEntities )
+				softAssertions.<Object>assertThat( loadedEntities )
 						.as(
 								"Loaded entities when targeting types " + targetClasses
 										+ " and when the backend returns document references " + hitDocumentReferences
@@ -78,7 +78,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 								element -> assertThat( element )
 										.isInstanceOfAny( targetClasses.toArray( new Class<?>[0] ) )
 						)
-						.containsExactlyElementsOf( (List) expectedLoadedEntities );
+						.containsExactlyElementsOf( expectedLoadedEntities );
 
 				assertionsContributor.accept( softAssertions );
 			} );

@@ -22,6 +22,7 @@ import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
  * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentValueConverter)  projection converters}.
  */
 public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
+	@SuppressWarnings("rawtypes")
 	public static <T> ToDocumentValueConverter<ValueWrapper, T> toDocumentValueConverter() {
 		return new ToDocumentValueConverter<ValueWrapper, T>() {
 			@Override
@@ -37,6 +38,7 @@ public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
 		};
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static <T> FromDocumentValueConverter<T, ValueWrapper> fromDocumentValueConverter() {
 		return new FromDocumentValueConverter<T, ValueWrapper>() {
 			@Override

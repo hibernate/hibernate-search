@@ -39,6 +39,7 @@ public class LuceneEntityReferenceProjection<R> extends AbstractLuceneProjection
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
 			SearchProjectionTransformContext context) {
 		return (R) loadingResult.convertReference( extractedData );

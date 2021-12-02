@@ -28,6 +28,7 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Void>[] futures;
 
+	@SuppressWarnings("unchecked")
 	ElasticsearchIndexIndexingPlanExecution(ElasticsearchSerialWorkOrchestrator orchestrator,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			List<SingleDocumentIndexingWork> works) {

@@ -93,6 +93,7 @@ public class HibernateOrmExtensionTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void toDocumentValueConverter() {
 		ToDocumentValueConvertContext context = new ToDocumentValueConvertContextImpl( mappingContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
@@ -107,6 +108,7 @@ public class HibernateOrmExtensionTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void fromDocumentValueConverter() {
 		FromDocumentValueConvertContext context = new FromDocumentValueConvertContextImpl( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );

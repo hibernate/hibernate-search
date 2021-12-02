@@ -178,6 +178,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	}
 
 	// These DSL converters should not be used, since no conversion takes place.
+	@SuppressWarnings("rawtypes")
 	private static <T> ToDocumentValueConverter<ValueWrapper, T> unusedDslConverter() {
 		return new ToDocumentValueConverter<ValueWrapper, T>() {
 			@Override

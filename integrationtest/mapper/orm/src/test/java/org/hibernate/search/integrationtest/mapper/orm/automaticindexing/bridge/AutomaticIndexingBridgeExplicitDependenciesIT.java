@@ -133,6 +133,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge<List> {
 
 		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
@@ -151,7 +152,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
 			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
 

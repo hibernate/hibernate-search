@@ -62,7 +62,7 @@ public final class DefaultEnumBridge<T extends Enum<T>> extends AbstractStringBa
 		}
 
 		@Override
-		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
+		@SuppressWarnings({ "unchecked", "rawtypes" }) // The bridge resolver performs the checks using reflection
 		public void bind(IdentifierBindingContext<?> context) {
 			doBind( context, (Class) context.bridgedElement().rawType() );
 		}
@@ -72,7 +72,7 @@ public final class DefaultEnumBridge<T extends Enum<T>> extends AbstractStringBa
 		}
 
 		@Override
-		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
+		@SuppressWarnings({ "unchecked", "rawtypes" }) // The bridge resolver performs the checks using reflection
 		public void bind(ValueBindingContext<?> context) {
 			doBind( context, (Class) context.bridgedElement().rawType() );
 		}

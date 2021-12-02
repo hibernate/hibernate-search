@@ -15,7 +15,7 @@ import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 public class NormalizedListHit {
 
-	public static List[] of(Consumer<Builder> contributor) {
+	public static List<?>[] of(Consumer<Builder> contributor) {
 		Builder builder = new Builder();
 		contributor.accept( builder );
 		return builder.build();

@@ -32,6 +32,7 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
 			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		return createQueryWithConditionalExpression( session,

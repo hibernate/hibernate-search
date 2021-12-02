@@ -59,7 +59,7 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 	@Override
 	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
 		// Just check the type and simulate building native constructs.
-		( (StubSearchAggregation) aggregation ).simulateBuild();
+		( (StubSearchAggregation<?>) aggregation ).simulateBuild();
 	}
 
 	@Override

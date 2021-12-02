@@ -404,7 +404,7 @@ public class FieldSearchSortBaseIT<F> {
 		assumeTrue( "This test is only relevant when the field is located on an object field",
 				parentObjectBinding.absolutePath != null );
 
-		DataSet dataSet = dataSetForAsc;
+		DataSet<F> dataSet = dataSetForAsc;
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll().except( f.id().matchingAny( Arrays.asList(
 								dataSet.emptyDoc1Id, dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id

@@ -40,6 +40,7 @@ public @interface ValueBridgeRef {
 	 * Reference a value bridge by its type.
 	 * @return The type of the value bridge.
 	 */
+	@SuppressWarnings("rawtypes") // For backwards compatibility reasons, we allow raw types
 	Class<? extends ValueBridge> type() default UndefinedBridgeImplementationType.class;
 
 	/**
@@ -50,7 +51,7 @@ public @interface ValueBridgeRef {
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedBridgeImplementationType implements ValueBridge {
+	abstract class UndefinedBridgeImplementationType implements ValueBridge<Void, Void> {
 		private UndefinedBridgeImplementationType() {
 		}
 	}

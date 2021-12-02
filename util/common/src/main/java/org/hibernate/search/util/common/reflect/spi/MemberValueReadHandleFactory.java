@@ -15,11 +15,11 @@ import org.hibernate.search.util.common.reflect.impl.MethodValueReadHandle;
 final class MemberValueReadHandleFactory implements ValueReadHandleFactory {
 	@Override
 	public ValueReadHandle<?> createForField(Field field) {
-		return new FieldValueReadHandle( field );
+		return new FieldValueReadHandle<>( field );
 	}
 
 	@Override
 	public ValueReadHandle<?> createForMethod(Method method) {
-		return new MethodValueReadHandle( method );
+		return new MethodValueReadHandle<>( method );
 	}
 }

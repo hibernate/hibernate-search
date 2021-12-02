@@ -630,6 +630,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void projection_nativeField_withProjectionConverters_enabled() {
 		StubMappingScope scope = mainIndex.createScope();
 

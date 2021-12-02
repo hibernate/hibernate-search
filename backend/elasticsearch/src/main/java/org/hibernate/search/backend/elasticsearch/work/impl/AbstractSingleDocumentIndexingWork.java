@@ -103,6 +103,7 @@ public abstract class AbstractSingleDocumentIndexingWork
 			this.documentIdentifier = documentIdentifier;
 		}
 
+		@SuppressWarnings("unchecked")
 		public B refresh(DocumentRefreshStrategy refreshStrategy) {
 			this.refreshStrategy = refreshStrategy;
 			return (B) this;

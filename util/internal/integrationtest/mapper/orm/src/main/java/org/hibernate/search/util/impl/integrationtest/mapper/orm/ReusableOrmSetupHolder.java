@@ -178,7 +178,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 	private boolean inClassStatement;
 	private boolean inMethodStatement;
 	private DataClearConfigImpl config;
-	private SessionFactory sessionFactory;
+	private SessionFactoryImplementor sessionFactory;
 	private Collection<?> testParamsForSessionFactory;
 
 	private ReusableOrmSetupHolder(OrmSetupHelper setupHelper, List<BackendMock> allBackendMocks,
@@ -212,7 +212,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 		return sessionFactory();
 	}
 
-	public SessionFactory sessionFactory() {
+	public SessionFactoryImplementor sessionFactory() {
 		if ( !inMethodStatement ) {
 			throw new Error( "The session factory cannot be used outside of methods annotated with @Test, @Before, @After."
 					+ " In particular, you cannot use it in a method annotated with " + Setup.class.getName() + ";"
@@ -324,7 +324,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 		config = new DataClearConfigImpl();
 		TestCustomSetup customSetup = new TestCustomSetup( testInstance );
 		customSetup.callSetupMethods( setupContext, config );
-		sessionFactory = setupContext.setup();
+		sessionFactory = setupContext.setup().unwrap( SessionFactoryImplementor.class );
 		testParamsForSessionFactory = testParams;
 
 		// If any backend expectations where set during setup, verify them immediately.
@@ -342,6 +342,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	private Collection<?> testParams(Object testInstance) {
+		@SuppressWarnings("rawtypes")
 		List<TestPluggableMethod<Collection>> setupParamsMethods = TestPluggableMethod.createAll( SetupParams.class,
 				testInstance.getClass(), Collection.class, Collections.emptyList() );
 		if ( setupParamsMethods.size() > 1 ) {
@@ -367,7 +368,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 		return annotation == null ? null : annotation.value();
 	}
 
-	private void clearAllData(SessionFactory sessionFactory) {
+	private void clearAllData(SessionFactoryImplementor sessionFactory) {
 		HibernateOrmMapping mapping;
 		try {
 			mapping = ( (HibernateOrmMapping) Search.mapping( sessionFactory ) );
@@ -401,7 +402,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 		}
 	}
 
-	private void clearDatabase(SessionFactory sessionFactory, HibernateOrmMapping mapping) {
+	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping) {
 		if ( config.tenantsIds.isEmpty() ) {
 			clearDatabase( sessionFactory, mapping, null );
 		}
@@ -413,7 +414,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 
-	private void clearDatabase(SessionFactory sessionFactory, HibernateOrmMapping mapping, String tenantId) {
+	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, String tenantId) {
 		for ( Consumer<Session> preClear : config.preClear ) {
 			if ( mapping != null ) {
 				mapping.listenerEnabled( false );
@@ -455,7 +456,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 		}
 	}
 
-	private static void clearEntityInstances(SessionFactory sessionFactory, HibernateOrmMapping mapping,
+	private static void clearEntityInstances(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
 			String tenantId, EntityType<?> entityType) {
 		if ( Modifier.isAbstract( entityType.getJavaType().getModifiers() ) ) {
 			// There are no instances of this specific class,
@@ -539,7 +540,7 @@ public class ReusableOrmSetupHolder implements TestRule {
 		return false;
 	}
 
-	private static boolean hasPotentiallyJoinTable(SessionFactory sessionFactory,
+	private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor sessionFactory,
 			ManagedType<?> managedType) {
 		for ( Attribute<?, ?> attribute : managedType.getAttributes() ) {
 			switch ( attribute.getPersistentAttributeType() ) {

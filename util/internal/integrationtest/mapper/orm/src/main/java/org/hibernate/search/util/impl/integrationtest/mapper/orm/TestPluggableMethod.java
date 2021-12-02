@@ -143,7 +143,7 @@ class TestPluggableMethod<T> {
 			if ( o == null || getClass() != o.getClass() ) {
 				return false;
 			}
-			ArgumentKey that = (ArgumentKey) o;
+			ArgumentKey<?> that = (ArgumentKey<?>) o;
 			return Objects.equals( type, that.type ) && Objects.equals( name, that.name );
 		}
 

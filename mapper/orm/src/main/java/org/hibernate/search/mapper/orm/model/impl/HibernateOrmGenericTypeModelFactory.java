@@ -32,7 +32,7 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 	}
 
 	// This cast is safe if the caller made sure that this name really points to a dynamic-map type
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static HibernateOrmGenericTypeModelFactory<Map> dynamicMap(String name) {
 		return introspector -> SyntheticPojoGenericTypeModel.opaqueType(
 				(PojoRawTypeModel<Map>) introspector.typeModel( name )
@@ -46,7 +46,7 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 		);
 	}
 
-	static <C extends Collection> HibernateOrmGenericTypeModelFactory<C> collection(
+	static <C extends Collection<?>> HibernateOrmGenericTypeModelFactory<C> collection(
 			Class<C> collectionType, HibernateOrmGenericTypeModelFactory<?> elementType) {
 		return introspector -> SyntheticPojoGenericTypeModel.genericType(
 				introspector.typeModel( collectionType ),
@@ -54,7 +54,7 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 		);
 	}
 
-	static <M extends Map> HibernateOrmGenericTypeModelFactory<M> map(
+	static <M extends Map<?, ?>> HibernateOrmGenericTypeModelFactory<M> map(
 			Class<M> mapType,
 			HibernateOrmGenericTypeModelFactory<?> keyType,
 			HibernateOrmGenericTypeModelFactory<?> valueType) {

@@ -40,6 +40,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import org.assertj.core.api.Assertions;
+
 /**
  * Tests for field descriptor features.
  * <p>
@@ -172,8 +174,10 @@ public class IndexFieldDescriptorIT {
 		// Static children
 		Collection<? extends IndexFieldDescriptor> children = fieldDescriptor.staticChildren();
 		Map<String, ? extends IndexFieldDescriptor> childrenByName = fieldDescriptor.staticChildrenByName();
-		assertThat( (Collection<IndexFieldDescriptor>) children ).contains( childFieldDescriptor );
-		assertThat( (Map<String, IndexFieldDescriptor>) childrenByName )
+		Assertions.<IndexFieldDescriptor>assertThat( children ).contains( childFieldDescriptor );
+		@SuppressWarnings("unchecked") // Workaround for assertThat(Map) not taking wildcard type into account like assertThat(Collection) does
+		Map<String, IndexFieldDescriptor> castChildrenByName = (Map<String, IndexFieldDescriptor>) childrenByName;
+		assertThat( castChildrenByName )
 				.contains( entry( getRelativeFieldName(), childFieldDescriptor ) );
 
 		switch ( fieldStructure.location ) {

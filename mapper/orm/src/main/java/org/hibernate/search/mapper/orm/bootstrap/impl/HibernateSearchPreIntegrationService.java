@@ -77,6 +77,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		}
 
 		@Override
+		@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
 		public HibernateSearchPreIntegrationService initiateService(Map configurationValues,
 				ServiceRegistryImplementor registry) {
 			// Hibernate ORM may call this method twice if we return a null service.

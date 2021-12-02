@@ -21,9 +21,9 @@ public class EnumLabelService {
 		if ( Genre.class.equals( enumType ) ) {
 			switch ( value ) {
 				case "science-fiction":
-					return (T) Genre.SCIFI;
+					return enumType.cast( Genre.SCIFI );
 				case "crime-fiction":
-					return (T) Genre.CRIME;
+					return enumType.cast( Genre.CRIME );
 			}
 		}
 

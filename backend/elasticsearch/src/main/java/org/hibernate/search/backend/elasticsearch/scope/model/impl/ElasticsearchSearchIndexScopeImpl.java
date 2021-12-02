@@ -249,7 +249,7 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected ElasticsearchSearchIndexNodeContext createMultiIndexSearchValueFieldContext(String absolutePath,
 			List<ElasticsearchSearchIndexNodeContext> fieldForEachIndex) {
 		return new ElasticsearchMultiIndexSearchIndexValueFieldContext<>( this, absolutePath,
@@ -257,7 +257,7 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected ElasticsearchSearchIndexNodeContext createMultiIndexSearchObjectFieldContext(String absolutePath,
 			List<ElasticsearchSearchIndexNodeContext> fieldForEachIndex) {
 		return new ElasticsearchMultiIndexSearchIndexCompositeNodeContext( this, absolutePath,

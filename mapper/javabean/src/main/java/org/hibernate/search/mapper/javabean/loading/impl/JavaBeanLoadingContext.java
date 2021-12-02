@@ -100,7 +100,8 @@ public final class JavaBeanLoadingContext
 			PojoLoadingTypeContext<T> type) {
 		PojoRawTypeIdentifier<T> typeId = type.typeIdentifier();
 		return typeContextProvider.forExactType( typeId ).selectionLoadingStrategy()
-				.map( JavaBeanSelectionLoadingStrategy::new );
+				// Eclipse will complain about a raw type if we use a method reference here... for some reason.
+				.map( s -> new JavaBeanSelectionLoadingStrategy<>( s ) );
 	}
 
 	@Override

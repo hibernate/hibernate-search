@@ -23,6 +23,7 @@ public final class SingleValuedProjectionAccumulator<F, V> implements Projection
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	@SuppressWarnings("rawtypes")
 	private static final ProjectionAccumulator.Provider PROVIDER = new ProjectionAccumulator.Provider() {
 		private final SingleValuedProjectionAccumulator instance = new SingleValuedProjectionAccumulator();
 		@Override

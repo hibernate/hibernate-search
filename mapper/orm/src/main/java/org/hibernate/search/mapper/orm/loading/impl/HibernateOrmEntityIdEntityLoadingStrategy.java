@@ -97,6 +97,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		return result;
 	}
 
+	@SuppressWarnings("unchecked") // Can't do better here: EntityPersister has no generics
 	private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {

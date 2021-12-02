@@ -134,6 +134,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 	}
 
 	private void verifyDynamicMapping(String mapping, DynamicMapping dynamicMapping) {
+		@SuppressWarnings("unchecked") // Workaround for assertThat(Map) not taking wildcard type into account like assertThat(Collection) does
 		Map<String, Object> map = gson.fromJson( mapping, Map.class );
 		assertThat( map ).extractingByKey( "dynamic" )
 				.isEqualTo( dynamicMapping.externalRepresentation() );

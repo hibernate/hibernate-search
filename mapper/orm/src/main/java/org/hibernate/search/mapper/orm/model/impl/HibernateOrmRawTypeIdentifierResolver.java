@@ -19,6 +19,7 @@ public class HibernateOrmRawTypeIdentifierResolver {
 		return PojoRawTypeIdentifier.of( javaClass );
 	}
 
+	@SuppressWarnings("rawtypes")
 	static PojoRawTypeIdentifier<Map> createDynamicMapTypeIdentifier(String name) {
 		return PojoRawTypeIdentifier.of( Map.class, name );
 	}
@@ -94,6 +95,7 @@ public class HibernateOrmRawTypeIdentifierResolver {
 			byHibernateOrmEntityName.put( hibernateOrmEntityName, typeIdentifier );
 		}
 
+		@SuppressWarnings("rawtypes")
 		void addDynamicMapEntityType(String jpaEntityName, String hibernateOrmEntityName) {
 			PojoRawTypeIdentifier<Map> typeIdentifier = createDynamicMapTypeIdentifier( hibernateOrmEntityName );
 			byJpaEntityName.put( jpaEntityName, typeIdentifier );

@@ -90,6 +90,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void containerExtraction() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
@@ -126,6 +127,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void nested_containerExtraction() {
 		RootEntity root = new RootEntity();
 		root.id = 1;

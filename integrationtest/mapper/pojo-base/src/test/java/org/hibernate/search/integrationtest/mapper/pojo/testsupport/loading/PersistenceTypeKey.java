@@ -25,7 +25,7 @@ public class PersistenceTypeKey<E, I> {
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		PersistenceTypeKey<E, I> typesKey = (PersistenceTypeKey<E, I>) o;
+		PersistenceTypeKey<?, ?> typesKey = (PersistenceTypeKey<?, ?>) o;
 		return idType.equals( typesKey.idType ) && entityType.equals( typesKey.entityType );
 	}
 

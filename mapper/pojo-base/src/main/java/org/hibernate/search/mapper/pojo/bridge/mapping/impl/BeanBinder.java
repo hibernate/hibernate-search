@@ -44,7 +44,7 @@ public final class BeanBinder
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void bind(IdentifierBindingContext<?> context) {
 		BeanHolder<? extends IdentifierBridge> bridgeHolder = doBuild( context.beanResolver(), IdentifierBridge.class );
 		try {
@@ -59,7 +59,7 @@ public final class BeanBinder
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void bind(ValueBindingContext<?> context) {
 		BeanHolder<? extends ValueBridge> bridgeHolder = doBuild( context.beanResolver(), ValueBridge.class );
 		try {
@@ -73,6 +73,7 @@ public final class BeanBinder
 		}
 	}
 
+	@SuppressWarnings("unchecked") // Using reflection
 	private <B extends IdentifierBridge<I>, I> void doBind(BeanHolder<B> bridgeHolder, IdentifierBindingContext<?> context) {
 		IdentifierBridge<I> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
@@ -87,6 +88,7 @@ public final class BeanBinder
 		}
 	}
 
+	@SuppressWarnings("unchecked") // Using reflection
 	private <B extends ValueBridge<V, F>, V, F> void doBind(BeanHolder<B> bridgeHolder, ValueBindingContext<?> context) {
 		ValueBridge<V, F> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );

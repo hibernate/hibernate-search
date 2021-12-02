@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  */
 public final class ListProjectionAccumulator<F, V> implements ProjectionAccumulator<F, V, List<F>, List<V>> {
 
+	@SuppressWarnings("rawtypes")
 	private static final Provider PROVIDER = new Provider() {
 		private final ListProjectionAccumulator instance = new ListProjectionAccumulator();
 		@Override
@@ -58,7 +59,7 @@ public final class ListProjectionAccumulator<F, V> implements ProjectionAccumula
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<V> finish(List<F> accumulated, ProjectionConverter<? super F, ? extends V> converter,
 			FromDocumentValueConvertContext context) {
 		// Hack to avoid instantiating another list: we convert a List<F> into a List<V> just by replacing its elements.

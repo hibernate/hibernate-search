@@ -84,7 +84,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	}
 
 	public IndexClient indexNoAlias(String hibernateSearchIndexName) {
-		return index( IndexNames.encodeName( hibernateSearchIndexName ), null, (URLEncodedString) null );
+		return index( IndexNames.encodeName( hibernateSearchIndexName ), null, null );
 	}
 
 	public IndexClient index(URLEncodedString primaryIndexName, URLEncodedString writeAlias, URLEncodedString readAlias) {
@@ -318,21 +318,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		tryDeleteESIndex( indexName );
 	}
 
-	private void closeIndex(URLEncodedString indexName) {
-		try {
-			performRequest( ElasticsearchRequest.post()
-					.pathComponent( indexName )
-					.pathComponent( Paths._CLOSE )
-					.build() );
-		}
-		catch (RuntimeException e) {
-			throw new AssertionFailure(
-					String.format( Locale.ROOT, "Error while trying to close index '%s' in the test client", indexName ),
-					e
-			);
-		}
-	}
-
 	private void createTemplate(String templateName, String templateString, int priority, JsonObject settings) {
 		ElasticsearchRequest request =
 				dialect.createTemplatePutRequest( templateName, templateString, priority, settings );
@@ -532,32 +517,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			aliases = new JsonObject();
 		}
 		return aliases.toString();
-	}
-
-	private void index(URLEncodedString indexName, URLEncodedString id, String jsonDocument) {
-		JsonObject documentJsonObject = toJsonElement( jsonDocument ).getAsJsonObject();
-		performRequest( ElasticsearchRequest.put()
-				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
-				.body( documentJsonObject )
-				.param( "refresh", true )
-				.build() );
-	}
-
-	private JsonObject getDocumentSource(URLEncodedString indexName, URLEncodedString id) {
-		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
-				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
-				.build() );
-		JsonObject result = response.body();
-		return result.get( "_source" ).getAsJsonObject();
-	}
-
-	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString id, String fieldName) {
-		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
-				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
-				.param( "stored_fields", fieldName )
-				.build() );
-		JsonObject result = response.body();
-		return result.get( "fields" ).getAsJsonObject().get( fieldName );
 	}
 
 	@Override

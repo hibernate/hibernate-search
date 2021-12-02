@@ -32,6 +32,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Long>[] futures;
 
+	@SuppressWarnings("unchecked")
 	LuceneIndexIndexingPlanExecution(LuceneSerialWorkOrchestrator orchestrator,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy,

@@ -50,6 +50,7 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 	//end::bind[]
 
 	//tag::write[]
+	@SuppressWarnings("rawtypes")
 	private static class Bridge implements PropertyBridge<Map> {
 
 		private final IndexObjectFieldReference userMetadataFieldReference;
@@ -60,6 +61,7 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 
 		@Override
 		public void write(DocumentElement target, Map bridgedElement, PropertyBridgeWriteContext context) {
+			@SuppressWarnings("unchecked")
 			Map<String, Object> userMetadata = (Map<String, Object>) bridgedElement;
 
 			DocumentElement indexedUserMetadata = target.addObject( userMetadataFieldReference ); // <1>

@@ -46,12 +46,14 @@ public class BorrowalService {
 		return accountRepo.save( account );
 	}
 
-	public <D extends Document<C>, C extends DocumentCopy<D>> Borrowal borrow(Person user, Library library, Document document, BorrowalType type) {
+	public <D extends Document<C>, C extends DocumentCopy<D>> Borrowal borrow(Person user, Library library,
+			Document<?> document, BorrowalType type) {
 		return borrow( user, library, document, 0, type );
 	}
 
-	public <D extends Document<C>, C extends DocumentCopy<D>> Borrowal borrow(Person user, Library library, Document document, int copyIndex, BorrowalType type) {
-		DocumentCopy copy = getCopy( document, library, copyIndex );
+	public <D extends Document<C>, C extends DocumentCopy<D>> Borrowal borrow(Person user, Library library,
+			Document<?> document, int copyIndex, BorrowalType type) {
+		DocumentCopy<?> copy = getCopy( document, library, copyIndex );
 		Borrowal borrowal = new Borrowal( user.getAccount(), copy, type );
 		user.getAccount().getBorrowals().add( borrowal );
 		copy.getBorrowals().add( borrowal );
@@ -74,7 +76,7 @@ public class BorrowalService {
 		return personRepo.searchPerson( terms, offset, limit );
 	}
 
-	private DocumentCopy getCopy(Document<DocumentCopy<?>> document, Library library, int copyIndex) {
+	private DocumentCopy<?> getCopy(Document<?> document, Library library, int copyIndex) {
 		return document.getCopies().stream()
 				.filter( c -> c.getLibrary().equals( library ) )
 				.skip( copyIndex )

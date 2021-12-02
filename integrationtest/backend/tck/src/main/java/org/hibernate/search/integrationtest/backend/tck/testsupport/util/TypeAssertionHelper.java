@@ -31,6 +31,7 @@ public abstract class TypeAssertionHelper<F, T> {
 		};
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static <F> TypeAssertionHelper<F, ValueWrapper> wrapper(FieldTypeDescriptor<F> typeDescriptor) {
 		return new TypeAssertionHelper<F, ValueWrapper>() {
 			@Override

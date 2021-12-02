@@ -38,7 +38,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -249,7 +248,7 @@ public class SearchSetupHelper implements TestRule {
 			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
 						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ), unusedPropertyChecker );
-				StubMapping mapping = finalizer.finalizeMapping(
+				finalizer.finalizeMapping(
 						mappingKey,
 						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
 				);

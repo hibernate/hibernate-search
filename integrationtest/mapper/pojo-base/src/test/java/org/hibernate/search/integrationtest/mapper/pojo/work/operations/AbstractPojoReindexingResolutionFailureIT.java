@@ -89,6 +89,7 @@ abstract class AbstractPojoReindexingResolutionFailureIT {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void containerExtraction() {
 		NonRootEntity level1 = new NonRootEntity();
 		level1.containingInContainer = Mockito.mock( List.class );
@@ -124,6 +125,7 @@ abstract class AbstractPojoReindexingResolutionFailureIT {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void nested_containerExtraction() {
 		NonRootEntity level1 = new NonRootEntity();
 		level1.containingInContainer = Mockito.mock( List.class );

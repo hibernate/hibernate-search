@@ -78,7 +78,7 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 	}
 
 	@Override
-	protected boolean isSimilarTo(ScrollWorkCall other) {
+	protected boolean isSimilarTo(ScrollWorkCall<?> other) {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 }

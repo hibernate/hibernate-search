@@ -42,6 +42,7 @@ public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticse
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
 			SearchProjectionTransformContext context) {
 		return (R) loadingResult.convertReference( extractedData );

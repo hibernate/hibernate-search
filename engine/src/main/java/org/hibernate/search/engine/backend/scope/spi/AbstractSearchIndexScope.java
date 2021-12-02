@@ -157,7 +157,7 @@ public abstract class AbstractSearchIndexScope<
 		return fieldInternal( parent.absolutePath( name ) );
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
+	@SuppressWarnings("unchecked")
 	private N createMultiIndexFieldContext(String absoluteFieldPath) {
 		List<N> fieldForEachIndex = new ArrayList<>();
 		M modelOfFirstField = null;

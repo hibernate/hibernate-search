@@ -33,7 +33,6 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.BeforeClass;
@@ -321,7 +320,6 @@ public class MatchPredicateFuzzyIT {
 
 	@Test
 	public void skipAnalysis() {
-		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()

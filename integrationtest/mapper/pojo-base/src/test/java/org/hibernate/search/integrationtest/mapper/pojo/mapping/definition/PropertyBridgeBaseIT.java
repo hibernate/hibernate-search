@@ -1098,6 +1098,7 @@ public class PropertyBridgeBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class RawTypeBridge implements PropertyBridge {
 
 		private final IndexFieldReference<String> fieldReference;
@@ -1113,6 +1114,7 @@ public class PropertyBridgeBaseIT {
 
 		public static class Binder implements PropertyBinder {
 			@Override
+			@SuppressWarnings("unchecked")
 			public void bind(PropertyBindingContext context) {
 				context.dependencies().useRootOnly();
 

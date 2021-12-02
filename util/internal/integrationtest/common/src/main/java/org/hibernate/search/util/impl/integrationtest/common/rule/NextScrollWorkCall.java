@@ -79,7 +79,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	}
 
 	@Override
-	protected boolean isSimilarTo(NextScrollWorkCall other) {
+	protected boolean isSimilarTo(NextScrollWorkCall<?> other) {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 }

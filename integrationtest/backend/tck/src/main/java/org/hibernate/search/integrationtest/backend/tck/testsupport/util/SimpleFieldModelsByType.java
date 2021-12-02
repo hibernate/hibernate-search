@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 public class SimpleFieldModelsByType {
 	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix) {
-		return mapAll( typeDescriptors.stream(), parent, prefix, new Consumer[0] );
+		return mapAll( typeDescriptors.stream(), parent, prefix );
 	}
 
 	@SafeVarargs
