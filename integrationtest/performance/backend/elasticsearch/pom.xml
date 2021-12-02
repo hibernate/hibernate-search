@@ -73,7 +73,7 @@
                         <goals>
                             <goal>process</goal>
                         </goals>
-                        <phase>generate-sources</phase>
+                        <phase>process-sources</phase>
                         <configuration>
                             <processors>
                                 <processor>org.openjdk.jmh.generators.BenchmarkProcessor</processor>
