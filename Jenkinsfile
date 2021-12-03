@@ -901,12 +901,12 @@ void withMavenWorkspace(Map args, Closure body) {
 	helper.withMavenWorkspace(args, {
 		// The script is in the code repository, so we need the scm checkout
 		// to be performed by helper.withMavenWorkspace before we can call the script.
-		sh 'ci/docker-prune.sh'
+		sh 'ci/docker-cleanup.sh'
 		try {
 			body()
 		}
 		finally {
-			sh 'ci/docker-prune.sh'
+			sh 'ci/docker-cleanup.sh'
 		}
 	})
 }
