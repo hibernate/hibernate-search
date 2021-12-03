@@ -1,6 +1,85 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.0.Beta1 (2021-12-03)
+-------------------------
+
+** Bug
+    * HSEARCH-4370 Event processing triggers deadlock with Oracle database
+    * HSEARCH-4369 The outbox event processors apply the polling interval even when there are still events to process
+    * HSEARCH-4365 remove of entity with IndexedEmbedded collections cause LazyInitializationException during indexing
+    * HSEARCH-4363 NPE on SingletonTask
+    * HSEARCH-4352 MappingException: property [xxx] not found on entity [yyy]
+    * HSEARCH-4348 Mapping does not work when the properties are defined inside Groovy Traits
+    * HSEARCH-4307 Hibernate Search version detection doesn't work on native images
+    * HSEARCH-4273 MassIndexer.cacheMode is not honored
+    * HSEARCH-4266 Conditional indexing with condition including an OR may lead to unnecessary entity loading
+
+** Improvement
+    * HSEARCH-4384 Upgrade to Elasticsearch client 7.15.2
+    * HSEARCH-4383 Upgrade to GSON 2.8.9
+    * HSEARCH-4382 Upgrade to AWS SDK 2.17.94 
+    * HSEARCH-4381 Upgrade to Avro 1.11
+    * HSEARCH-4379 Upgrade to Hibernate ORM 5.6.1.Final
+    * HSEARCH-4372 Simplify sharding configuration and move it to hibernate.search.coordination.event_processor.* properties
+    * HSEARCH-4368 Rename the database-polling coordination strategy to outbox-polling
+    * HSEARCH-4367 Upgrade to Lucene 8.11
+    * HSEARCH-4366 Add context to exceptions thrown during processing of POJOs (for indexing or reindexing resolution)
+    * HSEARCH-4360 Use conflict-free entity names for entities added by the database-polling coordination strategy
+    * HSEARCH-4354 Avoid retrieving additional metadata for properties that are not used by Hibernate Search
+    * HSEARCH-4345 Upgrade to Hibernate ORM 5.6.0.Final
+    * HSEARCH-4339 Upgrade to Elasticsearch client 7.15
+    * HSEARCH-4332 Upgrade to Hibernate ORM 5.6.0.CR1
+    * HSEARCH-4331 Default identifier bridges for some types supported in Search 5
+    * HSEARCH-4329 Upgrade to Lucene 8.10
+    * HSEARCH-4316 Multi-tenancy for asynchronous indexing
+    * HSEARCH-4311 Upgrade to Lucene 8.9
+    * HSEARCH-4306 Avoid ORM warnings on locking outbox events
+    * HSEARCH-4297 Run background processor indexing and event deletes in separate transactions
+    * HSEARCH-4295 Refine the column types for synthetic tables added by the database-polling strategy
+    * HSEARCH-4282 Configurable transaction timeout for the outbox event processor in JTA environments
+    * HSEARCH-4209 Reasonable, future-proof serialization strategy for outbox events
+    * HSEARCH-4182 Improve detection of whether an OutboxEvent entity mapping is required
+    * HSEARCH-4033 Support mass-indexing entities with @IdClass if they have an explicit @DocumentId
+    * HSEARCH-3875 Validate configuration property values more precisely
+
+** New Feature
+    * HSEARCH-4358 Prevent concurrent execution of outbox event processing and mass indexing
+    * HSEARCH-4342 Add SchemaManager in the Javabean mapper
+    * HSEARCH-4253 JSON-format Elasticsearch mapping templates on the application side
+    * HSEARCH-4240 Compatibility with Jakarta EE 9.1 (Jakarta Persistence 3)
+    * HSEARCH-4234 Disable _source
+    * HSEARCH-4194 Guarantee a minimum delay on processing retries of outbox events
+    * HSEARCH-4140 Dynamic sharding of the event queue for asynchronous automatic indexing
+    * HSEARCH-3274 Expose fully defined (non-automatic) Java modules for consumption by users
+
+** Task
+    * HSEARCH-4388 Stop all containers before starting builds
+    * HSEARCH-4387 Address compilation warnings, in particular unchecked type conversions
+    * HSEARCH-4385 Test that annotations on interfaces are correctly detected even when no implementation is known by HSearch
+    * HSEARCH-4378 Upgrade build dependencies to the latest version
+    * HSEARCH-4377 Enable GitHub's Dependabot
+    * HSEARCH-4376 Document Elasticsearch normalizing regexps as a bug
+    * HSEARCH-4375 Mark the outbox-polling coordination strategy as incubating in the documentation
+    * HSEARCH-4374 Make outbox-polling ITs shorter, in particular automatic indexing ITs
+    * HSEARCH-4373 Verify that all the test instances run from OutboxPollingAutomaticIndexingBaseIT always use the outbox polling as automatic indexing strategy.
+    * HSEARCH-4364 Upgrade to the latest version of Eclipse ECJ
+    * HSEARCH-4357 Fix some integration tests not being executed in jakarta artifacts
+    * HSEARCH-4351 Avoid unnecessary Thread.sleep in database polling coordination tests
+    * HSEARCH-4347 Rename OutboxEvent table and clean up related code
+    * HSEARCH-4343 Move away from repository.jboss.org for releases and (where possible) dependencies
+    * HSEARCH-4341 Fix GitHub action build taking 6+ hours to complete
+    * HSEARCH-4335 Clean up dead code and deprecated usage in ORM mapper
+    * HSEARCH-4334 Refactor default bridge implementations
+    * HSEARCH-4328 Refactor JSR-352 ITs for safer startup/shutdown
+    * HSEARCH-4326 Avoid null values for DirtinessDescriptor.dirtyPath()
+    * HSEARCH-4325 Try a different phase to generate Avro DTOs
+    * HSEARCH-4315 Fix example captions in documentation
+    * HSEARCH-4313 Missing anchors in the documentation
+    * HSEARCH-4308 Make tests more resilient to duplicate indexing works
+    * HSEARCH-4304 Upgrade CDI support to Jakarta CDI3
+    * HSEARCH-4290 Add an example to the documentation using ".bridgedElement().name()" in a property binder
+
 6.1.0.Alpha1 (2021-09-09)
 -------------------------
 
