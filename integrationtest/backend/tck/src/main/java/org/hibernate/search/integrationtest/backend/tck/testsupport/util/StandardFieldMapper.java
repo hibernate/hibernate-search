@@ -72,8 +72,9 @@ public final class StandardFieldMapper<F, M> {
 		return map( parent, name, true, additionalConfigurations );
 	}
 
+	// Note: this needs to be final even if it's private; otherwise javac will raise an error when using Java 8.
 	@SafeVarargs
-	private M map(IndexSchemaElement parent, String name, boolean multiValued,
+	private final M map(IndexSchemaElement parent, String name, boolean multiValued,
 			Consumer<? super StandardIndexFieldTypeOptionsStep<?, F>>... additionalConfigurations) {
 		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldContext = parent
 				.field(
