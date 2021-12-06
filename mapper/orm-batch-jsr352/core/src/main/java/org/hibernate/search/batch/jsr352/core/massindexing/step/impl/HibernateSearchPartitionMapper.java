@@ -213,7 +213,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		Object upperID = null;
 
 		CriteriaBuilder builder = emf.getCriteriaBuilder();
-		CriteriaQuery<?> criteria = builder.createQuery( javaClass );
+		CriteriaQuery<?> criteria = builder.createQuery();
 		Root<?> root = criteria.from( javaClass );
 
 		entityTypeDescriptor.getIdOrder().addAscOrder( builder, criteria, root );
