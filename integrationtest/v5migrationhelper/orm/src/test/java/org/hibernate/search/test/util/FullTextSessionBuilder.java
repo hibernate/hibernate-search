@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
@@ -47,10 +46,6 @@ public class FullTextSessionBuilder implements TestRule {
 	private final Set<Class<?>> annotatedClasses = new HashSet<>();
 	private SessionFactoryImplementor sessionFactory;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<>();
-
-	public FullTextSessionBuilder() {
-		cfg.put( AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true" ); //As in ORM testsuite
-	}
 
 	/**
 	 * Override before building any parameter, or add new ones.
