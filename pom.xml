@@ -525,7 +525,7 @@
         <test.elasticsearch.connection.uris.defined></test.elasticsearch.connection.uris.defined>
 
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
-        <test.elasticsearch.run.elastic.image.name>elasticsearch</test.elasticsearch.run.elastic.image.name>
+        <test.elasticsearch.run.elastic.image.name>elastic/elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
         <test.elasticsearch.run.opensearch.skip>true</test.elasticsearch.run.opensearch.skip>
         <test.elasticsearch.run.opensearch.image.name>opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
