@@ -23,10 +23,20 @@ public interface ElasticsearchFieldCodec<F> {
 		return encode( value );
 	}
 
+	/**
+	 * Encodes a value for inclusion in an aggregation request.
+	 *
+	 * @param value The value to encode.
+	 * @return The encoded value.
+	 */
+	default JsonElement encodeForAggregation(F value) {
+		return encode( value );
+	}
+
 	F decode(JsonElement element);
 
 	/**
-	 * Decode the key returned by an aggregation.
+	 * Decodes the key returned by a term aggregation.
 	 * @param key The "key" property  returned by the aggregation.
 	 * May be a number, a string, ... depending on the field type.
 	 * @param keyAsString The "key_as_string" property returned by the term aggregation.
