@@ -69,8 +69,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
 
-	private final List<String> createdTemplatesNames = new ArrayList<>();
-
 	public ElasticsearchTestDialect getDialect() {
 		return dialect;
 	}
@@ -241,32 +239,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 	}
 
-	public TemplateClient template(String templateName) {
-		return new TemplateClient( templateName );
-	}
-
-	public class TemplateClient {
-
-		private final String templateName;
-
-		public TemplateClient(String templateName) {
-			this.templateName = templateName;
-		}
-
-		public TemplateClient create(String templateString, String settings) {
-			return create( templateString, 99999, settings );
-		}
-
-		public TemplateClient create(String templateString, int priority, String settings) {
-			return create( templateString, priority, toJsonElement( settings ).getAsJsonObject() );
-		}
-
-		public TemplateClient create(String templateString, int priority, JsonObject settings) {
-			TestElasticsearchClient.this.createTemplate( templateName, templateString, priority, settings );
-			return this;
-		}
-	}
-
 	private void deleteAndCreateIndex(URLEncodedString primaryIndexName,
 			URLEncodedString writeAlias, URLEncodedString readAlias) {
 		deleteAndCreateIndex( primaryIndexName, writeAlias, readAlias, null );
@@ -316,13 +288,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private void deleteIndex(URLEncodedString indexName) {
 		// We're okay with deletion failing if it's just because the index doesn't exist yet
 		tryDeleteESIndex( indexName );
-	}
-
-	private void createTemplate(String templateName, String templateString, int priority, JsonObject settings) {
-		ElasticsearchRequest request =
-				dialect.createTemplatePutRequest( templateName, templateString, priority, settings );
-		registerTemplateForCleanup( templateName );
-		performRequest( request );
 	}
 
 	private void ensureIndexDoesNotExist(URLEncodedString indexName) {
@@ -377,10 +342,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	private void registerIndexForCleanup(URLEncodedString indexName) {
 		createdIndicesNames.add( indexName );
-	}
-
-	private void registerTemplateForCleanup(String templateName) {
-		createdTemplatesNames.add( templateName );
 	}
 
 	private boolean exists(final URLEncodedString indexName) {
@@ -576,8 +537,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private void close(Closer<IOException> closer) {
 		closer.pushAll( this::tryDeleteESIndex, createdIndicesNames );
 		createdIndicesNames.clear();
-		closer.pushAll( this::tryDeleteESTemplate, createdTemplatesNames );
-		createdTemplatesNames.clear();
 		closer.push( this::tryCloseClient, client );
 		client = null;
 		closer.push( ThreadPoolProviderImpl::close, threadPoolProvider );
@@ -596,18 +555,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		catch (RuntimeException e) {
 			throw new AssertionFailure(
 					String.format( Locale.ROOT, "Error while trying to delete index '%s' as part of test cleanup", indexName ),
-					e
-			);
-		}
-	}
-
-	private void tryDeleteESTemplate(String templateName) {
-		try {
-			performRequestIgnore404( dialect.createTemplateDeleteRequest( templateName ) );
-		}
-		catch (RuntimeException e) {
-			throw new AssertionFailure(
-					String.format( Locale.ROOT, "Error while trying to delete template '%s' as part of test cleanup", templateName ),
 					e
 			);
 		}

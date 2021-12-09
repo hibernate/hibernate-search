@@ -17,10 +17,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 
 public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperationIT {
 
-	private static final int VERY_LONG_INTERVAL_MS = 1_000_000;
-
 	public IndexWorkspaceRefreshIT() {
-		super( new SearchSetupHelper( helper -> helper.createPeriodicRefreshBackendSetupStrategy( VERY_LONG_INTERVAL_MS ) ) );
+		super( new SearchSetupHelper( helper -> helper.createRarePeriodicRefreshBackendSetupStrategy() ) );
 	}
 
 	@Override

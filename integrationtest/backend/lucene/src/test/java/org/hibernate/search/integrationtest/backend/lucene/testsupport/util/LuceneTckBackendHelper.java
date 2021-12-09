@@ -66,8 +66,8 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public TckBackendSetupStrategy<?> createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
+	public TckBackendSetupStrategy<?> createRarePeriodicRefreshBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
-				.setProperty( "io.refresh_interval", String.valueOf( refreshIntervalMs ) );
+				.setProperty( "io.refresh_interval", String.valueOf( 1_000_000 ) );
 	}
 }
