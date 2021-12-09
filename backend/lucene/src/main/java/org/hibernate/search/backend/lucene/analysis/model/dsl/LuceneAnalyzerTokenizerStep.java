@@ -16,9 +16,19 @@ public interface LuceneAnalyzerTokenizerStep {
 	/**
 	 * Set the tokenizer to use.
 	 *
-	 * @param factory The factory that will create the tokenizer.
+	 * @param factoryName The name of the factory that will create the tokenizer.
+	 * The list of available names can be looked up with
+	 * {@link org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext#availableTokenizers()}.
 	 * @return The next step.
 	 */
-	LuceneAnalyzerOptionalComponentsStep tokenizer(Class<? extends TokenizerFactory> factory);
+	LuceneAnalyzerOptionalComponentsStep tokenizer(String factoryName);
+
+	/**
+	 * Set the tokenizer to use.
+	 *
+	 * @param factoryType The type of the factory that will create the tokenizer.
+	 * @return The next step.
+	 */
+	LuceneAnalyzerOptionalComponentsStep tokenizer(Class<? extends TokenizerFactory> factoryType);
 
 }

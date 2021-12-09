@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.analysis;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 
@@ -40,5 +42,23 @@ public interface LuceneAnalysisConfigurationContext {
 	 * @param similarity The {@link Similarity} to use when indexing and when searching.
 	 */
 	void similarity(Similarity similarity);
+
+	/**
+	 * @return A list of all possible values that can be passed to
+	 * {@link org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTokenizerStep#tokenizer(String)}.
+	 */
+	Set<String> availableTokenizers();
+
+	/**
+	 * @return A list of all possible values that can be passed to
+	 * {@link org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOptionalComponentsStep#charFilter(String)}.
+	 */
+	Set<String> availableCharFilters();
+
+	/**
+	 * @return A list of all possible values that can be passed to
+	 * {@link org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisOptionalComponentsStep#tokenFilter(String)}.
+	 */
+	Set<String> availableTokenFilters();
 
 }

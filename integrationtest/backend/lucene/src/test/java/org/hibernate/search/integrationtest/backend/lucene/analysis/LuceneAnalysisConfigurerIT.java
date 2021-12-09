@@ -6,23 +6,33 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.analysis;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.function.Consumer;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
+import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneAnalysisUtils;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
+import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
 
 public class LuceneAnalysisConfigurerIT {
 
@@ -30,6 +40,92 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4404")
+	public void availableComponents() {
+		assertThat( CollectingConfigurer.TOKENIZERS ).isEmpty();
+		assertThat( CollectingConfigurer.CHAR_FILTERS ).isEmpty();
+		assertThat( CollectingConfigurer.TOKEN_FILTERS ).isEmpty();
+
+		setup( CollectingConfigurer.class.getName() );
+
+		assertThat( CollectingConfigurer.TOKENIZERS ).contains( "whitespace", "standard", "pattern" );
+		assertThat( CollectingConfigurer.CHAR_FILTERS ).contains( "htmlStrip", "patternReplace" );
+		assertThat( CollectingConfigurer.TOKEN_FILTERS ).contains( "lowercase", "asciiFolding" );
+	}
+
+	public static class CollectingConfigurer implements LuceneAnalysisConfigurer {
+		private static final Set<String> TOKENIZERS = new HashSet<>();
+		private static final Set<String> CHAR_FILTERS = new HashSet<>();
+		private static final Set<String> TOKEN_FILTERS = new HashSet<>();
+
+		@Override
+		public void configure(LuceneAnalysisConfigurationContext context) {
+			TOKENIZERS.addAll( context.availableTokenizers() );
+			CHAR_FILTERS.addAll( context.availableCharFilters() );
+			TOKEN_FILTERS.addAll( context.availableTokenFilters() );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4404")
+	public void byName() throws IOException {
+		LuceneBackend backend = setup( ByNameConfigurer.class.getName() );
+
+		Optional<? extends Analyzer> analyzer = backend.analyzer( "analyzer" );
+		assertThat( analyzer ).isPresent();
+		assertThat( LuceneAnalysisUtils.analyze( analyzer.get(), "foo", "ThIS-<strong>is</strong>-a string" ) )
+				.containsExactly( "this", "is", "a string" );
+
+		Optional<? extends Analyzer> normalizer = backend.normalizer( "normalizer" );
+		assertThat( normalizer ).isPresent();
+		assertThat( LuceneAnalysisUtils.analyze( normalizer.get(), "foo", "ThIS-<strong>is</strong>-a string" ) )
+				.containsExactly( "this-is-a string" );
+	}
+
+	public static class ByNameConfigurer implements LuceneAnalysisConfigurer {
+		@Override
+		public void configure(LuceneAnalysisConfigurationContext context) {
+			context.analyzer( "analyzer" ).custom()
+					.tokenizer( "pattern" )
+					.param( "pattern", "-" )
+					.charFilter( "htmlStrip" )
+					.tokenFilter( "lowercase" );
+			context.normalizer( "normalizer" ).custom()
+					.charFilter( "htmlStrip" )
+					.tokenFilter( "lowercase" );
+		}
+	}
+
+	@Test
+	public void byClass() throws IOException {
+		LuceneBackend backend = setup( ByClassConfigurer.class.getName() );
+
+		Optional<? extends Analyzer> analyzer = backend.analyzer( "analyzer" );
+		assertThat( analyzer ).isPresent();
+		assertThat( LuceneAnalysisUtils.analyze( analyzer.get(), "foo", "ThIS-<strong>is</strong>-a string" ) )
+				.containsExactly( "this", "is", "a string" );
+
+		Optional<? extends Analyzer> normalizer = backend.normalizer( "normalizer" );
+		assertThat( normalizer ).isPresent();
+		assertThat( LuceneAnalysisUtils.analyze( normalizer.get(), "foo", "ThIS-<strong>is</strong>-a string" ) )
+				.containsExactly( "this-is-a string" );
+	}
+
+	public static class ByClassConfigurer implements LuceneAnalysisConfigurer {
+		@Override
+		public void configure(LuceneAnalysisConfigurationContext context) {
+			context.analyzer( "analyzer" ).custom()
+					.tokenizer( PatternTokenizerFactory.class )
+					.param( "pattern", "-" )
+					.charFilter( HTMLStripCharFilterFactory.class )
+					.tokenFilter( LowerCaseFilterFactory.class );
+			context.normalizer( "normalizer" ).custom()
+					.charFilter( HTMLStripCharFilterFactory.class )
+					.tokenFilter( LowerCaseFilterFactory.class );
+		}
+	}
 
 	@Test
 	public void error_invalidReference() {
@@ -108,16 +204,13 @@ public class LuceneAnalysisConfigurerIT {
 		}
 	}
 
-	private void setup(String analysisConfigurer) {
-		setup( analysisConfigurer, c -> { } );
-	}
-
-	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> binder) {
-		StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( binder );
-		setupHelper.start()
+	private LuceneBackend setup(String analysisConfigurer) {
+		return setupHelper.start()
 				.expectCustomBeans()
 				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
-				.withIndex( index )
-				.setup();
+				.withIndex( StubMappedIndex.withoutFields() )
+				.setup()
+				.backend()
+				.unwrap( LuceneBackend.class );
 	}
 }
