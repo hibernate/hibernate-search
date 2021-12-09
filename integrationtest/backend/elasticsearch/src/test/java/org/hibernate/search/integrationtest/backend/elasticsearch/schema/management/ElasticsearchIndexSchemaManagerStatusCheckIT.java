@@ -66,7 +66,9 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
-		setupAndInspectIndexExpectingFailure( "HSEARCH400050" );
+		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "HSEARCH400050" );
 	}
 
 	@Test
@@ -75,20 +77,13 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
-		// Make sure automatically created indexes will never be green
-		elasticSearchClient.template( "yellow_index_because_not_enough_nodes_for_so_many_replicas" )
-				.create(
-						"*",
-						/*
-						 * The exact number of replicas we ask for doesn't matter much,
-						 * since we're testing with only 1 node (the cluster can't replicate shards)
-						 */
-						"{'number_of_replicas': 5}"
-				);
-
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
-		setupAndInspectIndexExpectingFailure( "HSEARCH400024", "100ms" );
+		// Make sure automatically created indexes will never be green by requiring 5 replicas
+		// (more than the amount of ES nodes)
+		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "HSEARCH400024", "100ms" );
 	}
 
 	@Test
@@ -97,33 +92,21 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 						+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ) );
 
-		// Make sure automatically created indexes will never be green
-		elasticSearchClient.template( "yellow_index_because_not_enough_nodes_for_so_many_replicas" )
-				.create(
-						"*",
-						/*
-						 * The exact number of replicas we ask for doesn't matter much,
-						 * since we're testing with only 1 node (the cluster can't replicate shards)
-						 */
-						"{'number_of_replicas': 5}"
-				);
-
+		// Make sure automatically created indexes will never be green by requiring 5 replicas
+		// (more than the amount of ES nodes)
 		elasticSearchClient.index( index.name() )
-				.deleteAndCreate()
+				.deleteAndCreate( "number_of_replicas", "5" )
 				.type().putMapping(
 						simpleMappingForInitialization( "" )
 				);
 
-		setupAndInspectIndexExpectingFailure( "HSEARCH400024", "100ms" );
-	}
-
-	private void setupAndInspectIndexExpectingFailure(String ... messageContent) {
-		assertThatThrownBy( this::setupAndInspectIndex )
+		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( messageContent );
+				.hasMessageContainingAll( "HSEARCH400024", "100ms" );
 	}
 
-	private void setupAndInspectIndex() {
+
+	private void setupAndInspectIndex(String settingsPath) {
 		setupHelper.start()
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, validation of those is tested in another test class
@@ -132,6 +115,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 							// No-op
 						}
 				)
+				.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE, settingsPath )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS,

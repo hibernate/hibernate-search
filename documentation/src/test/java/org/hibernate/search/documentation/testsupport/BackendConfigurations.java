@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.testsupport;
 
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
@@ -64,13 +65,9 @@ public final class BackendConfigurations {
 					@Override
 					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
-						// Make sure automatically created indexes will have an appropriate number of shards
-						testElasticsearchClient.template( "sharded_index" )
-								.create(
-										"*",
-										"{'number_of_shards': " + shardCount + "}"
-								);
-						return super.setup( setupContext, backendNameOrNull, configurationProvider );
+						return super.setup( setupContext, backendNameOrNull, configurationProvider )
+								.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
+										"index-settings-for-tests/" + shardCount + "-shards.json" );
 					}
 				};
 			default:

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -74,20 +75,14 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 			@Override
 			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {
 				// Make sure automatically created indexes will have an appropriate number of shards
-				backendConfiguration.testElasticsearchClient().template( "sharded_index" )
-						.create(
-								"*",
-								"{'number_of_shards': " + shardCount + "}"
-						);
-
-				// Nothing to change in the Hibernate Search configuration
-				return setupHelper;
+				return setupHelper.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
+						"index-settings-for-tests/" + shardCount + "-shards.json" );
 			}
 		};
 	}
 
 	@Override
-	public TckBackendSetupStrategy<?> createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
+	public TckBackendSetupStrategy<?> createRarePeriodicRefreshBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy() {
 			{
 				useConfigurationTestRule();
@@ -95,15 +90,9 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 
 			@Override
 			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {
-				// Make sure automatically created indexes will have an appropriate number of shards
-				backendConfiguration.testElasticsearchClient().template( "explicit_refresh_interval" )
-						.create(
-								"*",
-								"{'refresh_interval': '" + refreshIntervalMs + "ms' }"
-						);
-
-				// Nothing to change in the Hibernate Search configuration
-				return setupHelper;
+				// Make sure automatically created indexes will perform auto refresh very rarely
+				return setupHelper.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
+						"index-settings-for-tests/rare-periodic-refresh.json" );
 			}
 		};
 	}

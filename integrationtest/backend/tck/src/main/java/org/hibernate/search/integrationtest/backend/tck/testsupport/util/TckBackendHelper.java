@@ -33,6 +33,6 @@ public interface TckBackendHelper {
 
 	TckBackendSetupStrategy<?> createHashBasedShardingBackendSetupStrategy(int shardCount);
 
-	TckBackendSetupStrategy<?> createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs);
+	TckBackendSetupStrategy<?> createRarePeriodicRefreshBackendSetupStrategy();
 
 }
