@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -33,6 +34,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private static final int PREFETCH_HITS_SIZE = 100;
 	private static final int PREFETCH_TOTAL_HIT_COUNT_THRESHOLD = 10_000;
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final LuceneSearchQueryRequestContext requestContext;
@@ -82,6 +84,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private LuceneExtractableSearchResult<H> doSearch(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
 			int offset, Integer limit, int totalHitCountThreshold) throws IOException {
+		if ( limit != null && (long) offset + limit > Integer.MAX_VALUE ) {
+			throw log.offsetLimitExceedsMaxValue( offset, limit );
+		}
+
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );

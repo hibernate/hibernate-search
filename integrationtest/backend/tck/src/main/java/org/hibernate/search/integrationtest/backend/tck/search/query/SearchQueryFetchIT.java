@@ -120,6 +120,13 @@ public class SearchQueryFetchIT {
 				.hasNoHits();
 	}
 
+	@Test
+	public void fetch_offset_limit_exceedsMaxValue() {
+		assertThatThrownBy( () -> matchAllQuerySortByField().fetch( 1, Integer.MAX_VALUE ) )
+				// error message will depend on the specific backend
+				.isInstanceOf( SearchException.class );
+	}
+
 	/**
 	 * Same as the test above, but with the default, score sort.
 	 * This is important in the Lucene implementation in particular,
