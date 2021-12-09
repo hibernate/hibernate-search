@@ -18,17 +18,37 @@ public interface LuceneAnalysisOptionalComponentsStep {
 	/**
 	 * Add a char filter that the analyzer will use.
 	 *
-	 * @param factory The factory that will create the char filter.
+	 * @param factoryName The name of the factory that will create the char filter.
+	 * The list of available names can be looked up with
+	 * {@link org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext#availableCharFilters()}.
 	 * @return The next step.
 	 */
-	LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory);
+	LuceneAnalysisComponentParametersStep charFilter(String factoryName);
+
+	/**
+	 * Add a char filter that the analyzer will use.
+	 *
+	 * @param factoryType The type of the factory that will create the char filter.
+	 * @return The next step.
+	 */
+	LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factoryType);
 
 	/**
 	 * Add a token filter that the analyzer will use.
 	 *
-	 * @param factory The factory that will create the token filter.
+	 * @param factoryName The name of the factory that will create the token filter.
+	 * The list of available names can be looked up with
+	 * {@link org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext#availableTokenFilters()}.
 	 * @return The next step.
 	 */
-	LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory);
+	LuceneAnalysisComponentParametersStep tokenFilter(String factoryName);
+
+	/**
+	 * Add a token filter that the analyzer will use.
+	 *
+	 * @param factoryType The type of the factory that will create the token filter.
+	 * @return The next step.
+	 */
+	LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factoryType);
 
 }

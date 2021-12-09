@@ -11,13 +11,12 @@ import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneAnalysisUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -29,8 +28,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 public class LuceneIndexManagerIT {
 
@@ -53,16 +50,16 @@ public class LuceneIndexManagerIT {
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void indexingAnalyzer() throws IOException {
 		Analyzer analyzer = indexApi.indexingAnalyzer();
-		assertThat( analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
 		// Overridden with a search analyzer, which should be ignored here
-		assertThat( analyze( analyzer, "ngram", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "ngram", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
 		// Normalizer
-		assertThat( analyze( analyzer, "normalized", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "normalized", "Foo Bar" ) )
 				.containsExactly( "foo bar" );
 		// Default for unknown fields: keyword analyzer
-		assertThat( analyze( analyzer, "unknown", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "unknown", "Foo Bar" ) )
 				.containsExactly( "Foo Bar" );
 	}
 
@@ -70,16 +67,16 @@ public class LuceneIndexManagerIT {
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void searchAnalyzer() throws IOException {
 		Analyzer analyzer = indexApi.searchAnalyzer();
-		assertThat( analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
 		// Overridden with a search analyzer
-		assertThat( analyze( analyzer, "ngram", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "ngram", "Foo Bar" ) )
 				.containsExactly( "Foo B", "Foo Ba", "oo Ba", "oo Bar", "o Bar" );
 		// Normalizer
-		assertThat( analyze( analyzer, "normalized", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "normalized", "Foo Bar" ) )
 				.containsExactly( "foo bar" );
 		// Default for unknown fields: keyword analyzer
-		assertThat( analyze( analyzer, "unknown", "Foo Bar" ) )
+		assertThat( LuceneAnalysisUtils.analyze( analyzer, "unknown", "Foo Bar" ) )
 				.containsExactly( "Foo Bar" );
 	}
 
@@ -127,20 +124,6 @@ public class LuceneIndexManagerIT {
 		long finalSize = finalSizeFuture.join();
 		assertThat( finalSize ).isGreaterThan( 0L );
 		assertThat( finalSize ).isGreaterThan( initialSize );
-	}
-
-	private List<String> analyze(Analyzer analyzer, String absoluteFieldPath, String inputString) throws IOException {
-		final List<String> tokenList = new ArrayList<>();
-		try ( TokenStream stream = analyzer.tokenStream( absoluteFieldPath, inputString ) ) {
-			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
-			stream.reset();
-			while ( stream.incrementToken() ) {
-				String s = new String( term.buffer(), 0, term.length() );
-				tokenList.add( s );
-			}
-			stream.end();
-		}
-		return tokenList;
 	}
 
 	private static class IndexBinding {

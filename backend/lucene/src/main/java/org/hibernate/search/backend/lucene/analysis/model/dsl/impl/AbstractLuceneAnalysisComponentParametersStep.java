@@ -42,13 +42,23 @@ abstract class AbstractLuceneAnalysisComponentParametersStep<T>
 	}
 
 	@Override
-	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory) {
-		return parentStep.charFilter( factory );
+	public LuceneAnalysisComponentParametersStep charFilter(String factoryName) {
+		return parentStep.charFilter( factoryName );
 	}
 
 	@Override
-	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		return parentStep.tokenFilter( factory );
+	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factoryType) {
+		return parentStep.charFilter( factoryType );
+	}
+
+	@Override
+	public LuceneAnalysisComponentParametersStep tokenFilter(String factoryName) {
+		return parentStep.tokenFilter( factoryName );
+	}
+
+	@Override
+	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factoryType) {
+		return parentStep.tokenFilter( factoryType );
 	}
 
 }

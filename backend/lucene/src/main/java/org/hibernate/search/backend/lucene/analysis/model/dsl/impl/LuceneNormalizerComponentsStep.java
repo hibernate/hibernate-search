@@ -39,15 +39,25 @@ class LuceneNormalizerComponentsStep
 	}
 
 	@Override
-	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factory) {
-		LuceneCharFilterParametersStep filter = new LuceneCharFilterParametersStep( this, factory );
+	public LuceneAnalysisComponentParametersStep charFilter(String factoryName) {
+		return charFilter( CharFilterFactory.lookupClass( factoryName ) );
+	}
+
+	@Override
+	public LuceneAnalysisComponentParametersStep charFilter(Class<? extends CharFilterFactory> factoryType) {
+		LuceneCharFilterParametersStep filter = new LuceneCharFilterParametersStep( this, factoryType );
 		charFilters.add( filter );
 		return filter;
 	}
 
 	@Override
-	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		LuceneTokenFilterParametersStep filter = new LuceneTokenFilterParametersStep( this, factory );
+	public LuceneAnalysisComponentParametersStep tokenFilter(String factoryName) {
+		return tokenFilter( TokenFilterFactory.lookupClass( factoryName ) );
+	}
+
+	@Override
+	public LuceneAnalysisComponentParametersStep tokenFilter(Class<? extends TokenFilterFactory> factoryType) {
+		LuceneTokenFilterParametersStep filter = new LuceneTokenFilterParametersStep( this, factoryType );
 		tokenFilters.add( filter );
 		return filter;
 	}

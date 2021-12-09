@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
@@ -20,6 +21,9 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.search.similarities.Similarity;
 
 
@@ -79,6 +83,21 @@ public class LuceneAnalysisConfigurationContextImpl
 	@Override
 	public void similarity(Similarity similarity) {
 		this.similarity = similarity;
+	}
+
+	@Override
+	public Set<String> availableTokenizers() {
+		return TokenizerFactory.availableTokenizers();
+	}
+
+	@Override
+	public Set<String> availableCharFilters() {
+		return CharFilterFactory.availableCharFilters();
+	}
+
+	@Override
+	public Set<String> availableTokenFilters() {
+		return TokenFilterFactory.availableTokenFilters();
 	}
 
 	@Override
