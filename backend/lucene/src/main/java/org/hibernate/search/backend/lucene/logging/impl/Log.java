@@ -588,4 +588,8 @@ public interface Log extends BasicLogger {
 			value = "Param with name '%1$s' has not been defined for the named predicate '%2$s'.")
 	SearchException paramNotDefined(String name, String predicateName, @Param EventContext context);
 
+	@Message(id = ID_OFFSET + 151,
+			value = "Offset + limit should be lower than Integer.MAX_VALUE, offset: '%1$s', limit: '%2$s'.")
+	IOException offsetLimitExceedsMaxValue(int offset, Integer limit);
+
 }
