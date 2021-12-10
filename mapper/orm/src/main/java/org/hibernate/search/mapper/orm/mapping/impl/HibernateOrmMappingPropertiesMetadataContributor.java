@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.hibernate.boot.Metadata;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.Size;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.OneToMany;
@@ -96,13 +99,17 @@ public final class HibernateOrmMappingPropertiesMetadataContributor implements P
 
 	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
 		Iterator<Selectable> columnIterator = value.getColumnIterator();
+		Dialect dialect = basicTypeMetadataProvider.getDialect();
+		Metadata metadata = basicTypeMetadataProvider.getMetadata();
+
 		while ( columnIterator.hasNext() ) {
 			Selectable mappedColumn = columnIterator.next();
 			if ( !(mappedColumn instanceof Column) ) {
 				continue;
 			}
 			Column column = (Column) mappedColumn;
-			Integer scale = column.getScale();
+			Size size = column.getColumnSize( dialect, metadata );
+			Integer scale = size.getScale();
 			if ( scale == null ) {
 				continue;
 			}
