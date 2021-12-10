@@ -15,3 +15,6 @@ updates:
       # AWS SDK releases way too often (every week?); ignore all patch updates
       - dependency-name: "software.amazon.awssdk:*"
         update-types: ["version-update:semver-patch"]
+      # JRuby releases way too often (every two weeks?) and is only used during the build; ignore all patch updates
+      - dependency-name: "org.jruby:jruby-complete"
+        update-types: ["version-update:semver-patch"]
