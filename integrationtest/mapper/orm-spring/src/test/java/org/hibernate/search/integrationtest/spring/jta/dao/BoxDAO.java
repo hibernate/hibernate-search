@@ -15,33 +15,26 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional(timeout = 10) // Raise the timeout, because the default is very low in some tests
 public class BoxDAO {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Transactional
 	public void persist(Box box) {
 		entityManager.persist( box );
 	}
 
-	@Transactional
 	public Box merge(Box box) {
 		Box result = entityManager.merge( box );
 		return result;
 	}
 
-	@Transactional
 	public void changeColor(long boxId, String newColor) {
 		Box box = entityManager.find( Box.class, boxId );
 		box.setColor( newColor );
 	}
 
-	@Transactional
 	public void remove(Box box) {
 		entityManager.remove( box );
-	}
-
-	public EntityManager getEntityManager() {
-		return entityManager;
 	}
 }

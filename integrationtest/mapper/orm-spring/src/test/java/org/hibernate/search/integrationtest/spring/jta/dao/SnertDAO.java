@@ -15,22 +15,20 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional(timeout = 10) // Raise the timeout, because the default is very low in some tests
 public class SnertDAO {
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Transactional
 	public void persist(Snert snert) {
 		entityManager.persist( snert );
 	}
 
-	@Transactional
 	public void merge(Snert snert) {
 		entityManager.merge( snert );
 	}
 
-	@Transactional
 	public void remove(Snert snert) {
 		entityManager.remove( snert );
 	}
