@@ -128,12 +128,12 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// We expect factory 2 to not have processed many events before it left the cluster,
 		// but we can't predict exactly how many it will have processed:
 		// how many events are processed during a pulse interval is a matter of performance.
-		// Here we'll just expect it processed less than half of the normally assigned events.
+		// Here we'll just expect it didn't process all normally assigned events.
 		// This assertion could fail on a very well-performing machine where all events
 		// are processed before the pulse; if that happens, either lower the pulse interval
 		// or raise the number of entities.
 		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
-				.isLessThan( entityCount / initialShardCount / 2 );
+				.isLessThan( entityCount / initialShardCount );
 		// The workload must be spread evenly over the other factories in accordance with
 		// the number of shards (with some tolerance)
 		int remainingShardCount = initialShardCount - 1;
@@ -178,7 +178,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// We expect factory 2 to not have processed many events before it was disconnected,
 		// but we can't predict exactly how many it will have processed; see the similar comment in agentLeft().
 		indexingCountHelper.indexingCounts().assertForSessionFactory( 2 )
-				.isLessThan( entityCount / initialShardCount / 2 );
+				.isLessThan( entityCount / initialShardCount );
 		// The workload will most likely not be spread evenly over the other factories,
 		// because they will have processed most of their own events by the time
 		// factory 2 gets evicted and rebalancing happens,
@@ -222,7 +222,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		// We expect the factory 3 to have "missed" a few events processed by another factory before factory 3 joined,
 		// but we can't predict exactly how many it will have missed; see the similar comment in agentLeft().
 		indexingCountHelper.indexingCounts().assertForSessionFactory( 3 )
-				.isGreaterThan( entityCount / newShardCount / 2 );
+				.isPositive();
 		// The workload must be spread evenly over the other factories in accordance with
 		// the number of shards (with some tolerance)
 		int entityCountNotProcessedByFactory3 = entityCount - indexingCountHelper.indexingCounts().forSessionFactory( 3 );
