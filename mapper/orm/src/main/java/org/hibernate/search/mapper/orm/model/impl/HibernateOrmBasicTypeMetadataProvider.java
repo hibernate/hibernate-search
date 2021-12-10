@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import org.hibernate.MappingException;
 import org.hibernate.boot.Metadata;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -34,7 +35,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 				new TreeSet<>( Comparator.comparing( PersistentClass::getEntityName ) );
 		persistentClasses.addAll( metadata.getEntityBindings() );
 
-		Builder builder = new Builder();
+		Builder builder = new Builder( metadata );
 
 		for ( PersistentClass persistentClass : persistentClasses ) {
 			collectPersistentClass( builder, persistentClass );
@@ -221,6 +222,8 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		}
 	}
 
+	private final Metadata metadata;
+
 	private final Map<String, PersistentClass> persistentClasses;
 	private final Map<Class<?>, HibernateOrmBasicClassTypeMetadata> classTypeMetadata;
 	private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata;
@@ -229,11 +232,20 @@ public class HibernateOrmBasicTypeMetadataProvider {
 	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
 
 	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
+		this.metadata = builder.metadata;
 		this.persistentClasses = builder.persistentClasses;
 		this.classTypeMetadata = builder.classTypeMetadata;
 		this.dynamicMapTypeMetadata = builder.dynamicMapTypeMetadata;
 		this.jpaEntityNameToHibernateOrmEntityName = builder.jpaEntityNameToHibernateOrmEntityName;
 		this.typeIdentifierResolver = builder.typeIdentifierResolverBuilder.build();
+	}
+
+	public Metadata getMetadata() {
+		return metadata;
+	}
+
+	public Dialect getDialect() {
+		return metadata.getDatabase().getDialect();
 	}
 
 	public Collection<PersistentClass> getPersistentClasses() {
@@ -267,6 +279,8 @@ public class HibernateOrmBasicTypeMetadataProvider {
 	}
 
 	private static class Builder {
+		private final Metadata metadata;
+
 		private final Map<String, PersistentClass> persistentClasses = new LinkedHashMap<>();
 		private final Map<Class<?>, HibernateOrmBasicClassTypeMetadata> classTypeMetadata = new LinkedHashMap<>();
 		private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata = new LinkedHashMap<>();
@@ -274,6 +288,10 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		private final Map<String, String> jpaEntityNameToHibernateOrmEntityName = new LinkedHashMap<>();
 		private final HibernateOrmRawTypeIdentifierResolver.Builder typeIdentifierResolverBuilder =
 				new HibernateOrmRawTypeIdentifierResolver.Builder();
+
+		public Builder(Metadata metadata) {
+			this.metadata = metadata;
+		}
 
 		HibernateOrmBasicTypeMetadataProvider build() {
 			return new HibernateOrmBasicTypeMetadataProvider( this );
