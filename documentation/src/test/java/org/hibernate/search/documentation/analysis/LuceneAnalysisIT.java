@@ -43,7 +43,7 @@ public class LuceneAnalysisIT {
 						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
 								.type( IndexedEntity.class )
 										.property( "text" )
-												.fullTextField( "standard" ).analyzer( "standard" )
+												.fullTextField( "standard" ).analyzer( "my-standard" )
 				)
 				.setup( IndexedEntity.class );
 
@@ -64,6 +64,40 @@ public class LuceneAnalysisIT {
 							)
 							.fetchHits( 20 )
 			)
+					.hasSize( 1 );
+		} );
+	}
+
+	@Test
+	public void luceneClasses() {
+		EntityManagerFactory entityManagerFactory = setupHelper.start()
+				.withBackendProperty(
+						LuceneBackendSettings.ANALYSIS_CONFIGURER,
+						new LuceneClassesAnalysisConfigurer()
+				)
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
+								.type( IndexedEntity.class )
+								.property( "text" )
+								.fullTextField( "standard" ).analyzer( "english" )
+				)
+				.setup( IndexedEntity.class );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setText( "the Wording" );
+			entityManager.persist( entity );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			assertThat( searchSession.search( IndexedEntity.class )
+					.where( f -> f.match()
+							.field( "standard" )
+							.matching( "wording" ) )
+					.fetchHits( 20 ) )
 					.hasSize( 1 );
 		} );
 	}

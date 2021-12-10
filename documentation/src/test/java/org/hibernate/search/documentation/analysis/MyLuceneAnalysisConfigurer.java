@@ -10,34 +10,28 @@ package org.hibernate.search.documentation.analysis;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
-import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-
 public class MyLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom() // <1>
-				.tokenizer( StandardTokenizerFactory.class ) // <2>
-				.charFilter( HTMLStripCharFilterFactory.class ) // <3>
-				.tokenFilter( LowerCaseFilterFactory.class ) // <4>
-				.tokenFilter( SnowballPorterFilterFactory.class ) // <4>
+				.tokenizer( "standard" ) // <2>
+				.charFilter( "htmlStrip" ) // <3>
+				.tokenFilter( "lowercase" ) // <4>
+				.tokenFilter( "snowballPorter" ) // <4>
 						.param( "language", "English" ) // <5>
-				.tokenFilter( ASCIIFoldingFilterFactory.class );
+				.tokenFilter( "asciiFolding" );
 
 		context.normalizer( "lowercase" ).custom() // <6>
-				.tokenFilter( LowerCaseFilterFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class );
+				.tokenFilter( "lowercase" )
+				.tokenFilter( "asciiFolding" );
 
 		context.analyzer( "french" ).custom() // <7>
-				.tokenizer( StandardTokenizerFactory.class )
-				.charFilter( HTMLStripCharFilterFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class )
-				.tokenFilter( SnowballPorterFilterFactory.class )
+				.tokenizer( "standard" )
+				.charFilter( "htmlStrip" )
+				.tokenFilter( "lowercase" )
+				.tokenFilter( "snowballPorter" )
 						.param( "language", "French" )
-				.tokenFilter( ASCIIFoldingFilterFactory.class );
+				.tokenFilter( "asciiFolding" );
 	}
 }
 // end::include[]

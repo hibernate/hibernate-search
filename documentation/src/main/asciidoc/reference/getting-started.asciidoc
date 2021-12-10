@@ -585,10 +585,14 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene-analysis]
 ----
 <1> Define a custom analyzer named "english", to analyze English text such as book titles.
-<2> Set the tokenizer to a standard tokenizer. You need to pass factory classes to refer to components.
+<2> Set the tokenizer to a standard tokenizer.
+You need to pass Lucene-specific names to refer to tokenizers;
+see <<backend-lucene-analysis-analyzers>> for information about available tokenizers, their name and their parameters.
 <3> Set the token filters. Token filters are applied in the order they are given.
+Here too, Lucene-specific names are expected;
+see <<backend-lucene-analysis-analyzers>> for information about available token filters, their name and their parameters.
 <4> Set the value of a parameter for the last added char filter/tokenizer/token filter.
-<5> Define another custom analyzer, named "name", to analyze author names.
+<5> Define another custom analyzer, called "name", to analyze author names.
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
 <6> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
@@ -607,9 +611,13 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 ----
 <1> Define a custom analyzer named "english", to analyze English text such as book titles.
 <2> Set the tokenizer to a standard tokenizer.
+You need to pass Elasticsearch-specific names to refer to tokenizers;
+see <<backend-elasticsearch-analysis-analyzers>> for information about available tokenizers, their name and their parameters.
 <3> Set the token filters. Token filters are applied in the order they are given.
+Here too, Elasticsearch-specific names are expected;
+see <<backend-elasticsearch-analysis-analyzers>> for information about available token filters, their name and their parameters.
 <4> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
-must be defined separately and assigned a name.
+must be defined separately and assigned a new name.
 <5> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
 <6> Define another custom analyzer, named "name", to analyze author names.
 On contrary to the first one, do not use enable stemming,
