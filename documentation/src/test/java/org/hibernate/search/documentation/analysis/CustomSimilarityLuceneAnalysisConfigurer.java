@@ -9,9 +9,6 @@ package org.hibernate.search.documentation.analysis;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 
 // tag::include[]
@@ -21,9 +18,9 @@ public class CustomSimilarityLuceneAnalysisConfigurer implements LuceneAnalysisC
 		context.similarity( new ClassicSimilarity() ); // <1>
 
 		context.analyzer( "english" ).custom() // <2>
-				.tokenizer( StandardTokenizerFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class );
+				.tokenizer( "standard" )
+				.tokenFilter( "lowercase" )
+				.tokenFilter( "asciiFolding" );
 	}
 }
 // end::include[]

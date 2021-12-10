@@ -15,7 +15,7 @@ public class AdvancedLuceneAnalysisConfigurer implements LuceneAnalysisConfigure
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		// tag::instance[]
-		context.analyzer( "standard" ).instance( new StandardAnalyzer() );
+		context.analyzer( "my-standard" ).instance( new StandardAnalyzer() );
 		// end::instance[]
 	}
 }

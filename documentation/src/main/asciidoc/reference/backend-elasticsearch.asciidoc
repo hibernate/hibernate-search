@@ -1043,9 +1043,7 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedElastic
 <2> Set the value of a parameter for the analyzer being defined.
 ====
 
-[TIP]
-====
-To know which character filters, tokenizers and token filters are available,
+To know which analyzers, character filters, tokenizers and token filters are available,
 refer to the documentation:
 
 * If you want to use a built-in analyzer and not create your own:
@@ -1054,7 +1052,6 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-charfilters.html[character filters],
 {elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
-====
 
 [[backend-elasticsearch-configuration-index-settings]]
 == [[_custom_index_settings]] Custom index settings

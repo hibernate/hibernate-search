@@ -640,6 +640,9 @@ The Lucene backend does not provide any built-in normalizer.
 [[backend-lucene-analysis-analyzers]]
 === Custom analyzers and normalizers
 
+[[backend-lucene-analysis-analyzers-component-by-factory-name]]
+==== Referencing components by name
+
 The context passed to the configurer exposes a DSL to define analyzers and normalizers:
 
 .Implementing and using an analysis configurer to define analyzers and normalizers with the Lucene backend
@@ -649,7 +652,7 @@ The context passed to the configurer exposes a DSL to define analyzers and norma
 include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysisConfigurer.java[tags=include]
 ----
 <1> Define a custom analyzer named "english", because it will be used to analyze English text such as book titles.
-<2> Set the tokenizer to a standard tokenizer: components are referenced by their factory class.
+<2> Set the tokenizer to a standard tokenizer: components are referenced by their name.
 <3> Set the char filters. Char filters are applied in the order they are given, before the tokenizer.
 <4> Set the token filters. Token filters are applied in the order they are given, after the tokenizer.
 <5> Set the value of a parameter for the last added char filter/tokenizer/token filter.
@@ -663,14 +666,50 @@ include::{resourcesdir}/analysis/lucene-simple.properties[]
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
 
-[TIP]
-====
-To know which analyzers, character filters, tokenizers and token filters are available,
-either browse the Lucene Javadoc or read the corresponding section on the
+To know which character filters, tokenizers and token filters are available,
+you can call `context.availableTokenizers()`, `context.availableTokenizers()`
+and `context.availableTokenFilters()` on the context passed to your analysis configurer;
+this will return a set of all valid names.
+
+To know more about the behavior of these character filters, tokenizers and token filters,
+either browse the link:{luceneJavadocUrl}[Lucene Javadoc] or read the corresponding section on the
 link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).
+
+[TIP]
 ====
+In the Lucene Javadoc, the description of each factory class includes the mention "SPI Name" followed by a string constant.
+This is the name that should be passed to use that factory when defining analyzers.
+====
+
+[[backend-lucene-analysis-analyzers-component-by-factory-class]]
+==== Referencing components by factory class
+
+Instead of names, you may also pass Lucene factory classes to refer to a particular tokenizer,
+char filter or token filter implementation.
+Those classes extend `org.apache.lucene.analysis.util.TokenizerFactory`,
+`org.apache.lucene.analysis.util.TokenFilterFactory`
+or `org.apache.lucene.analysis.util.CharFilterFactory`.
+
+This avoids string constants in your code, at the cost of having a direct compile-time dependency to Lucene.
+
+.Analysis configurer implementation using Lucene factory classes
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/LuceneClassesAnalysisConfigurer.java[tags=include]
+----
+====
+
+To know which character filters, tokenizers and token filters are available,
+either browse the link:{luceneJavadocUrl}[Lucene Javadoc] or read the corresponding section on the
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
+(you don't need Solr to use these analyzers,
+it's just that there is no documentation page for Lucene proper).
+
+[[backend-lucene-analysis-analyzers-instance]]
+==== Assigning names to analyzer instances
 
 It is also possible to assign a name to an analyzer instance:
 
