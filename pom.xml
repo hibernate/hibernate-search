@@ -260,7 +260,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.log4j>2.15.0</version.log4j>
+        <version.log4j>2.16.0</version.log4j>
         <version.junit>4.13.2</version.junit>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
