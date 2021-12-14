@@ -232,7 +232,8 @@ The following profiles are available:
   * `elasticsearch-7.11` for 7.11 ([not open-source](https://opensource.org/node/1099))
   * `elasticsearch-7.12` for 7.12+ ([not open-source](https://opensource.org/node/1099))
 * [OpenSearch](https://www.opensearch.org/)
-  * `opensearch-1.0` for 1.0+
+  * `opensearch-1.0` for 1.0
+  * `opensearch-1.2` for 1.2+
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
