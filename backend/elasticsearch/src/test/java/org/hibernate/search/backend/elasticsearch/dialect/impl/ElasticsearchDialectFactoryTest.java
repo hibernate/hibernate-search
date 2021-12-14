@@ -582,7 +582,7 @@ public class ElasticsearchDialectFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-4212")
 	public void openSearch_1() {
 		testSuccess(
-				ElasticsearchDistributionName.OPENSEARCH, "1", "1.0.0-rc1",
+				ElasticsearchDistributionName.OPENSEARCH, "1", "1.2.1",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}
@@ -619,6 +619,33 @@ public class ElasticsearchDialectFactoryTest {
 	public void openSearch_1_0_1() {
 		testSuccess(
 				ElasticsearchDistributionName.OPENSEARCH, "1.0.1", "1.0.1",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4412")
+	public void openSearch_1_2() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.2", "1.2.1",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4412")
+	public void openSearch_1_2_0() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.2.0", "1.2.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4412")
+	public void openSearch_1_2_1() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.2.1", "1.2.1",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}
