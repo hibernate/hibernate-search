@@ -229,13 +229,6 @@
         <!-- Elasticsearch 7.10 test environment (default) -->
         <profile>
             <id>elasticsearch-7.10</id>
-            <activation>
-                <!-- This must be re-defined here: the activation defined in the parent pom is not enough -->
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.version</name>
-                </property>
-            </activation>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
                     <!-- Nothing here -->
@@ -256,6 +249,13 @@
         <!-- Elasticsearch 7.12+ test environment -->
         <profile>
             <id>elasticsearch-7.12</id>
+            <activation>
+                <!-- This must be re-defined here: the activation defined in the parent pom is not enough -->
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.connection.version</name>
+                </property>
+            </activation>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
                     <!-- Nothing here -->
