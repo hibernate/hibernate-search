@@ -547,12 +547,6 @@
         <!-- Elasticsearch 7.10 test environment (default) -->
         <profile>
             <id>elasticsearch-7.10</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.version</name>
-                </property>
-            </activation>
             <properties>
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
@@ -575,6 +569,12 @@
         <!-- Elasticsearch 7.12+ test environment -->
         <profile>
             <id>elasticsearch-7.12</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.connection.version</name>
+                </property>
+            </activation>
             <properties>
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>

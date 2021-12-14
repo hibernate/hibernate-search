@@ -205,11 +205,10 @@
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently from the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 7.16+ -->
         <version.org.elasticsearch.client>7.16.1</version.org.elasticsearch.client>
-        <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links and as the default when testing.
-             We're trying to stick to a fully-OSS version as the default, so don't upgrade to 7.11 here. -->
+        <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
-             to make sure the corresponding profile (e.g. elasticsearch-7.10) becomes the default. -->
-        <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest-7.10}</version.org.elasticsearch.compatible.main>
+             to make sure the corresponding profile (e.g. elasticsearch-7.12) becomes the default. -->
+        <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest-7.16}</version.org.elasticsearch.compatible.main>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.compatible.main.majorVersion}.${parsed-version.org.elasticsearch.compatible.main.minorVersion}</documentation.org.elasticsearch.url>
         <!-- The versions of Elasticsearch/OpenSearch advertised as compatible with Hibernate Search -->
         <!-- Make sure that 7.10 stays explicitly mentioned here, because that's the last open-source version -->

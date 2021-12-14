@@ -254,15 +254,15 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.8,7.10)', mavenProfile: 'elasticsearch-7.8',
 							condition: TestCondition.AFTER_MERGE),
 					new EsLocalBuildEnvironment(versionRange: '[7.10,7.11)', mavenProfile: 'elasticsearch-7.10',
-							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
+							condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.11 to make the build quicker.
 					// The only difference with 7.12+ is that wildcard predicates on analyzed fields get their pattern normalized,
 					// and that was deemed a bug: https://github.com/elastic/elasticsearch/pull/53127
 					new EsLocalBuildEnvironment(versionRange: '[7.11,7.12)', mavenProfile: 'elasticsearch-7.11',
 							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[7.12,7.x)', mavenProfile: 'elasticsearch-7.12',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
 
 					// --------------------------------------------
 					// OpenSearch
