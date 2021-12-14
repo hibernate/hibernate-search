@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     assignees: ["yrodiere"]
     open-pull-requests-limit: 5
     ignore:
