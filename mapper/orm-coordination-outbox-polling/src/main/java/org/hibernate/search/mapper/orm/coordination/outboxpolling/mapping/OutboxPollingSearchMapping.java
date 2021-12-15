@@ -11,10 +11,10 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Incubating
 public interface OutboxPollingSearchMapping {
 
-	int countAbortedEvents();
+	long countAbortedEvents();
 
-	void reprocessAbortedEvents();
+	int reprocessAbortedEvents();
 
-	void clearAllAbortedEvents();
+	int clearAllAbortedEvents();
 
 }

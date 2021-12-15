@@ -58,7 +58,7 @@ public class OutboxPollingSearchMappingIT {
 
 		assertThat( searchMapping.countAbortedEvents() ).isEqualTo( 3 );
 
-		searchMapping.clearAllAbortedEvents();
+		assertThat( searchMapping.clearAllAbortedEvents() ).isEqualTo( 3 );
 
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
 	}
@@ -82,7 +82,7 @@ public class OutboxPollingSearchMappingIT {
 				.addOrUpdate( "3", b -> b
 						.field( "indexedField", "initialValue" )
 				);
-		searchMapping.reprocessAbortedEvents();
+		assertThat( searchMapping.reprocessAbortedEvents() ).isEqualTo( 3 );
 		backendMock.verifyExpectationsMet();
 
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
