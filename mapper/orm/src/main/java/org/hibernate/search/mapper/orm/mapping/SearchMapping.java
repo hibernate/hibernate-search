@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * The Hibernate Search mapping between the Hibernate ORM model and the backend(s).
@@ -118,5 +119,18 @@ public interface SearchMapping {
 	 * @return The backend having {@code backendName} as name.
 	 */
 	Backend backend(String backendName);
+
+	/**
+	 * Extend the current search mapping with the given extension,
+	 * resulting in an extended search mapping offering mapper-specific utilities.
+	 *
+	 * @param extension The extension to apply.
+	 * @param <T> The type of search mapping provided by the extension.
+	 * @return The extended search mapping.
+	 * @throws SearchException If the extension cannot be applied (wrong underlying technology, ...).
+	 */
+	default <T> T extension(SearchMappingExtension<T> extension) {
+		return extension.extendOrFail( this );
+	}
 
 }
