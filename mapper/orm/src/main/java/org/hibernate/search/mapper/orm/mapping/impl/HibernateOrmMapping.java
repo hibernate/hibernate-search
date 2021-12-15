@@ -47,6 +47,7 @@ import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextPro
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
+import org.hibernate.search.mapper.orm.mapping.spi.CoordinationStrategyContext;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -77,7 +78,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		implements SearchMapping, HibernateOrmMappingContext, EntityReferenceFactory<EntityReference>,
 				HibernateOrmListenerContextProvider, BatchMappingContext,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
-				AutomaticIndexingMappingContext {
+				AutomaticIndexingMappingContext, CoordinationStrategyContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -395,6 +396,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 		return new HibernateOrmSearchSession.Builder( this, typeContextContainer,
 				configuredAutomaticIndexingStrategy, sessionImplementor );
+	}
+
+	@Override
+	public CoordinationStrategy coordinationStrategy() {
+		return coordinationStrategyHolder.get();
 	}
 
 	private SearchIntegration searchIntegration() {
