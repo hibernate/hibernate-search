@@ -146,7 +146,6 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 		backendMock.verifyExpectationsMet();
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.createAndExecuteFollowingWorks()
 				// retry (succeeds):
 				.createAndExecuteFollowingWorks()
 				.addOrUpdate( "2", b -> b
