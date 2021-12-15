@@ -11,6 +11,10 @@ import javax.persistence.Transient;
 
 public final class OutboxEvent {
 
+	public enum Status {
+		PENDING, ABORTED
+	}
+
 	private Long id;
 
 	private String entityName;
@@ -19,6 +23,7 @@ public final class OutboxEvent {
 	private byte[] payload;
 	private int retries = 0;
 	private Instant processAfter;
+	private Status status = Status.PENDING;
 
 	@Transient
 	private Object originalEntityId;
@@ -44,6 +49,7 @@ public final class OutboxEvent {
 				", entityIdHash='" + entityIdHash + '\'' +
 				", retries=" + retries +
 				", processAfter=" + processAfter +
+				", status=" + status +
 				", originalEntityId=" + originalEntityId +
 				'}';
 	}
@@ -102,6 +108,14 @@ public final class OutboxEvent {
 
 	public void setProcessAfter(Instant processAfter) {
 		this.processAfter = processAfter;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	public Object getOriginalEntityId() {
