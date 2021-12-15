@@ -146,4 +146,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 22, value = "Stopping outbox mass indexer agent '%1$s'")
 	void stoppingOutboxMassIndexerAgent(String name);
 
+	@Message(id = ID_OFFSET + 23,
+			value = "Invalid target for Outbox Polling extension: '%1$s'."
+					+ " This extension can only be applied to components created by a Outbox Polling mapper.")
+	SearchException outboxPollingExtensionOnUnknownType(Object context);
+
 }

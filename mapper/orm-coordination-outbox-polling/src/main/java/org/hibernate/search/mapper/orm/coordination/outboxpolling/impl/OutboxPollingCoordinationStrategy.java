@@ -40,6 +40,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventSendingPlan;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.impl.OutboxPollingSearchMappingImpl;
 import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgentCreateContext;
@@ -82,6 +83,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 
 	private TenancyConfiguration tenancyConfiguration;
 	private final Map<String, TenantDelegate> tenantDelegates = new LinkedHashMap<>();
+	private OutboxPollingSearchMappingImpl outboxPollingSearchMapping;
 
 	@Override
 	public void configure(CoordinationConfigurationContext context) {
@@ -143,6 +145,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			}
 		}
 
+		outboxPollingSearchMapping = new OutboxPollingSearchMappingImpl( context, tenantIds );
 		return CompletableFuture.completedFuture( null );
 	}
 	@Override
@@ -197,6 +200,10 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			closer.push( BeanHolder::close, finderProviderHolder );
 			closer.push( BeanHolder::close, agentRepositoryProviderHolder );
 		}
+	}
+
+	public OutboxPollingSearchMappingImpl outboxPollingSearchMapping() {
+		return outboxPollingSearchMapping;
 	}
 
 	private class TenantDelegate {
