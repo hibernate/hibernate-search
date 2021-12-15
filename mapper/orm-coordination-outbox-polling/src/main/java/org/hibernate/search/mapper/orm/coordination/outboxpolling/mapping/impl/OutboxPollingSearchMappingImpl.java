@@ -7,13 +7,23 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.impl;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.OutboxPollingSearchMapping;
 
 public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMapping {
+
+	public static final String COUNT_EVENTS_WITH_STATUS = "select count(e) from OutboxEvent e where e.status = :status";
+	public static final String UPDATE_EVENTS_WITH_STATUS = "update OutboxEvent e set e.status = :newStatus where e.status = :status";
+	public static final String DELETE_EVENTS_WITH_STATUS = "delete OutboxEvent e where e.status = :status";
 
 	private final TransactionHelper transactionHelper;
 	private final SessionFactoryImplementor sessionFactory;
@@ -26,18 +36,51 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	}
 
 	@Override
-	public int countAbortedEvents() {
-		// TODO HSEARCH-4283 Implement it
-		return 0;
+	public long countAbortedEvents() {
+		// TODO HSEARCH-4283 Handle multi-tenancy
+		assert tenantIds.isEmpty();
+
+		AtomicLong result = new AtomicLong();
+		try ( Session session = sessionFactory.openSession() ) {
+			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
+				query.setParameter( "status", OutboxEvent.Status.ABORTED );
+				result.set( query.getSingleResult() );
+			} );
+		}
+		return result.get();
 	}
 
 	@Override
-	public void reprocessAbortedEvents() {
-		// TODO HSEARCH-4283 Implement it
+	public int reprocessAbortedEvents() {
+		// TODO HSEARCH-4283 Handle multi-tenancy
+		assert tenantIds.isEmpty();
+
+		AtomicInteger result = new AtomicInteger();
+		try ( Session session = sessionFactory.openSession() ) {
+			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
+				query.setParameter( "status", OutboxEvent.Status.ABORTED );
+				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
+				result.set( query.executeUpdate() );
+			} );
+		}
+		return result.get();
 	}
 
 	@Override
-	public void clearAllAbortedEvents() {
-		// TODO HSEARCH-4283 Implement it
+	public int clearAllAbortedEvents() {
+		// TODO HSEARCH-4283 Handle multi-tenancy
+		assert tenantIds.isEmpty();
+
+		AtomicInteger result = new AtomicInteger();
+		try ( Session session = sessionFactory.openSession() ) {
+			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
+				query.setParameter( "status", OutboxEvent.Status.ABORTED );
+				result.set( query.executeUpdate() );
+			} );
+		}
+		return result.get();
 	}
 }
