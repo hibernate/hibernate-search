@@ -64,19 +64,18 @@ public class OutboxEventUpdater {
 				continue;
 			}
 
+			// We won't delete this event.
+			eventToDelete.remove( event );
+
 			// Failed events have to be processed differently:
 			// we try to update their retry count instead of deleting them,
 			// so that the process will try to process them again.
 			int attempts = event.getRetries() + 1;
 			if ( attempts >= MAX_RETRIES ) {
 				notifyMaxRetriesReached( event );
-				// We will delete this event, even if it was not processed correctly
-				// TODO HSEARCH-4283 Try to persist the event somewhere instead
+				event.setStatus( OutboxEvent.Status.ABORTED );
 			}
 			else {
-				// We won't delete this event.
-				eventToDelete.remove( event );
-
 				// We will simply increment the retry count of this event,
 				// and the event processor will process it once more in the next batch
 				event.setRetries( attempts );
