@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,13 +18,17 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.OutboxPollingSearchMapping;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMapping {
 
-	public static final String COUNT_EVENTS_WITH_STATUS = "select count(e) from OutboxEvent e where e.status = :status";
-	public static final String UPDATE_EVENTS_WITH_STATUS = "update OutboxEvent e set e.status = :newStatus where e.status = :status";
-	public static final String DELETE_EVENTS_WITH_STATUS = "delete OutboxEvent e where e.status = :status";
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final String COUNT_EVENTS_WITH_STATUS = "select count(e) from OutboxEvent e where e.status = :status";
+	private static final String UPDATE_EVENTS_WITH_STATUS = "update OutboxEvent e set e.status = :newStatus where e.status = :status";
+	private static final String DELETE_EVENTS_WITH_STATUS = "delete OutboxEvent e where e.status = :status";
 
 	private final TransactionHelper transactionHelper;
 	private final SessionFactoryImplementor sessionFactory;
@@ -37,8 +42,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 	@Override
 	public long countAbortedEvents() {
-		// TODO HSEARCH-4283 Handle multi-tenancy
-		assert tenantIds.isEmpty();
+		checkNoTenant();
 
 		AtomicLong result = new AtomicLong();
 		try ( Session session = sessionFactory.openSession() ) {
@@ -52,9 +56,23 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	}
 
 	@Override
+	public long countAbortedEvents(String tenantId) {
+		checkTenant( tenantId );
+
+		AtomicLong result = new AtomicLong();
+		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
+				query.setParameter( "status", OutboxEvent.Status.ABORTED );
+				result.set( query.getSingleResult() );
+			} );
+		}
+		return result.get();
+	}
+
+	@Override
 	public int reprocessAbortedEvents() {
-		// TODO HSEARCH-4283 Handle multi-tenancy
-		assert tenantIds.isEmpty();
+		checkNoTenant();
 
 		AtomicInteger result = new AtomicInteger();
 		try ( Session session = sessionFactory.openSession() ) {
@@ -69,9 +87,24 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	}
 
 	@Override
+	public int reprocessAbortedEvents(String tenantId) {
+		checkTenant( tenantId );
+
+		AtomicInteger result = new AtomicInteger();
+		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
+				query.setParameter( "status", OutboxEvent.Status.ABORTED );
+				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
+				result.set( query.executeUpdate() );
+			} );
+		}
+		return result.get();
+	}
+
+	@Override
 	public int clearAllAbortedEvents() {
-		// TODO HSEARCH-4283 Handle multi-tenancy
-		assert tenantIds.isEmpty();
+		checkNoTenant();
 
 		AtomicInteger result = new AtomicInteger();
 		try ( Session session = sessionFactory.openSession() ) {
@@ -82,5 +115,35 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 			} );
 		}
 		return result.get();
+	}
+
+	@Override
+	public int clearAllAbortedEvents(String tenantId) {
+		checkTenant( tenantId );
+
+		AtomicInteger result = new AtomicInteger();
+		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
+			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
+				query.setParameter( "status", OutboxEvent.Status.ABORTED );
+				result.set( query.executeUpdate() );
+			} );
+		}
+		return result.get();
+	}
+
+	private void checkNoTenant() {
+		if ( !tenantIds.isEmpty() ) {
+			throw log.noTenantIdSpecified( tenantIds );
+		}
+	}
+
+	private void checkTenant(String tenantId) {
+		if ( tenantIds.isEmpty() ) {
+			throw log.multiTenancyNotEnabled( tenantId );
+		}
+		if ( !tenantIds.contains( tenantId ) ) {
+			throw log.wrongTenantId( tenantId, tenantIds );
+		}
 	}
 }
