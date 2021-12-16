@@ -78,7 +78,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Expects an Integer value of at least {@code 2},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * No default: must be provided when static sharding is enabled.
+	 * No default: must be provided explicitly if you want static sharding.
 	 */
 	public static final String COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT = PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT;
 
@@ -89,7 +89,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY} is
+	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * When this property is set, {@value #COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT} must also be set.
@@ -100,7 +100,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * or a String containing multiple such shard index strings separated by commas,
 	 * or a {@code Collection<Integer>} containing such shard indices.
 	 * <p>
-	 * No default: must be provided when static sharding is enabled.
+	 * No default: must be provided explicitly if you want static sharding.
 	 */
 	public static final String COORDINATION_EVENT_PROCESSOR_SHARDS_ASSIGNED = PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_SHARDS_ASSIGNED;
 
