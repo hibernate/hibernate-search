@@ -20,6 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.MultiValuedPropertyAccessor;
@@ -32,6 +33,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 /**
  * Test automatic indexing caused by single-valued association updates
@@ -48,6 +51,16 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 
 	public AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT() {
 		super( new ModelPrimitivesImpl() );
+	}
+
+	@Override
+	public void setup(OrmSetupHelper.SetupContext setupContext,
+			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		super.setup( setupContext, dataClearConfig );
+		// Avoid problems with deep chains of eager associations in ORM 6
+		// See https://github.com/hibernate/hibernate-orm/blob/main/migration-guide.adoc#fetch-behaviour-change
+		// See https://hibernate.zulipchat.com/#narrow/stream/132094-hibernate-orm-dev/topic/lazy.20associations.20with.20ORM.206
+		setupContext.withProperty( AvailableSettings.MAX_FETCH_DEPTH, 2 );
 	}
 
 	private static class ModelPrimitivesImpl
