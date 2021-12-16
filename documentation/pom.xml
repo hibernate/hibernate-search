@@ -251,11 +251,11 @@
                             <backend>html5</backend>
                             <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/reference/html_single</outputDirectory>
-                            <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                                <source-highlighter>coderay</source-highlighter>
                             </attributes>
                         </configuration>
                     </execution>
@@ -269,11 +269,11 @@
                             <backend>html5</backend>
                             <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/internals/html_single</outputDirectory>
-                            <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                                <source-highlighter>coderay</source-highlighter>
                             </attributes>
                         </configuration>
                     </execution>
@@ -287,11 +287,11 @@
                             <backend>html5</backend>
                             <sourceDocumentName>migration/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/migration/html_single</outputDirectory>
-                            <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                                <source-highlighter>coderay</source-highlighter>
                             </attributes>
                         </configuration>
                     </execution>
@@ -377,7 +377,6 @@
                                     <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/reference/pdf</outputDirectory>
                                     <outputFile>hibernate_search_reference.pdf</outputFile>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
                                         <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
@@ -385,6 +384,7 @@
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
                                         <idseparator>-</idseparator>
+                                        <source-highlighter>coderay</source-highlighter>
                                     </attributes>
                                 </configuration>
                             </execution>
@@ -399,7 +399,6 @@
                                     <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/internals/pdf</outputDirectory>
                                     <outputFile>hibernate_search_internals.pdf</outputFile>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
                                         <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
@@ -407,6 +406,7 @@
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
                                         <idseparator>-</idseparator>
+                                        <source-highlighter>coderay</source-highlighter>
                                     </attributes>
                                 </configuration>
                             </execution>
@@ -421,7 +421,6 @@
                                     <sourceDocumentName>migration/index.asciidoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/migration/pdf</outputDirectory>
                                     <outputFile>hibernate_search_migration.pdf</outputFile>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
                                         <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
@@ -429,6 +428,7 @@
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
                                         <idseparator>-</idseparator>
+                                        <source-highlighter>coderay</source-highlighter>
                                     </attributes>
                                 </configuration>
                             </execution>
