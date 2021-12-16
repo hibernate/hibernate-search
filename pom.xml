@@ -1465,6 +1465,9 @@
                     <serverId>${ossrh.releases.repo.id}</serverId>
                     <!-- The following, by default, is only used for actual releases, not for snapshot deployments -->
                     <nexusUrl>${ossrh.releases.repo.baseUrl}</nexusUrl>
+                    <!-- oss.sonatype.org has been very slow when closing repositories lately;
+                         let's raise the timeout until we switch to s01.sonatype.org -->
+                    <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
                 </configuration>
                 <executions>
                     <execution>
