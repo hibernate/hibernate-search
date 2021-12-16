@@ -47,6 +47,10 @@ public final class OrmUtils {
 		with( sessionFactory ).runInTransaction( action );
 	}
 
+	public static void withinTransaction(SessionFactory sessionFactory, String tenantId, Consumer<Session> action) {
+		with( sessionFactory, tenantId ).runInTransaction( action );
+	}
+
 	public static void withinJPATransaction(EntityManagerFactory entityManagerFactory, Consumer<EntityManager> action) {
 		with( entityManagerFactory ).runInTransaction( action );
 	}
