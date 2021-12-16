@@ -12,6 +12,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
@@ -150,5 +151,17 @@ public interface Log extends BasicLogger {
 			value = "Invalid target for Outbox Polling extension: '%1$s'."
 					+ " This extension can only be applied to components created by a Outbox Polling mapper.")
 	SearchException outboxPollingExtensionOnUnknownType(Object context);
+
+	@Message(id = ID_OFFSET + 24,
+			value = "Multi-tenancy is enabled but no tenant id is specified. Available tenants are: '%1$s'.")
+	SearchException noTenantIdSpecified(Set<String> tenantIds);
+
+	@Message(id = ID_OFFSET + 25,
+			value = "Multi-tenancy is not enabled but a tenant id is specified. Trying to using the tenant id: '%1$s'.")
+	SearchException multiTenancyNotEnabled(String tenantId);
+
+	@Message(id = ID_OFFSET + 26,
+			value = "The specified tenant id '%1$s' has not been defined. Available tenants are: '%2$s'.")
+	SearchException wrongTenantId(String tenantId, Set<String> tenantIds);
 
 }
