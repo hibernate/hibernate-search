@@ -4,9 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontained;
-
-import static org.junit.Assume.assumeTrue;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,68 +33,30 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
-import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 /**
  * Test automatic indexing caused by single-valued association updates
  * or by updates of associated (contained) entities,
- * with a {@code @OneToOne} association owned by the contained side,
- * and with a lazy containing side.
+ * with a {@code @OneToOne} association owned by the containing side,
+ * and with lazy associations on the containing side.
  */
 @RunWith(BytecodeEnhancerRunner.class) // So that we can have lazy *ToOne associations
 @EnhancementOptions(lazyLoading = true)
-@TestForIssue(jiraKey = "HSEARCH-4305")
-public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
+@Ignore("HSEARCH-4417 likely ORM bugs")
+public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 		extends AbstractAutomaticIndexingAssociationBaseIT<
-						AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT.IndexedEntity,
-						AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT.ContainingEntity,
-						AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT.ContainedEntity
+						AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT.IndexedEntity,
+						AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT.ContainingEntity,
+						AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT.ContainedEntity
 				> {
 
-	public AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT() {
+	public AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT() {
 		super( new ModelPrimitivesImpl() );
-	}
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
-		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
-		setupContext.withTcclLookupPrecedenceBefore();
-	}
-
-	@Override
-	public void directAssociationUpdate_indexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305();
-	}
-
-	@Override
-	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		notTestedBecauseOfHSEARCH4305();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_indexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		notTestedBecauseOfHSEARCH4305();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_usedInCrossEntityDerivedProperty() {
-		notTestedBecauseOfHSEARCH4305();
-	}
-
-	private void notTestedBecauseOfHSEARCH4305() {
-		assumeTrue( "Association update tests fail because of https://hibernate.atlassian.net/browse/HSEARCH-4305",
-				false );
 	}
 
 	private static class ModelPrimitivesImpl
@@ -114,7 +74,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 
 		@Override
 		public boolean isAssociationOwnedByContainedSide() {
-			return true;
+			return false;
 		}
 
 		@Override
@@ -181,8 +141,7 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 
 		@Override
 		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbedded() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbedded,
-					ContainedEntity::getContainingAsIndexedEmbedded );
+			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbedded );
 		}
 
 		@Override
@@ -311,27 +270,31 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 		})
 		private ContainingEntity child;
 
-		@OneToOne(mappedBy = "containingAsIndexedEmbedded", fetch = FetchType.LAZY)
+		@OneToOne(fetch = FetchType.LAZY)
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private ContainedEntity containedIndexedEmbedded;
 
-		@OneToOne(mappedBy = "containingAsNonIndexedEmbedded", fetch = FetchType.LAZY)
+		@OneToOne(fetch = FetchType.LAZY)
 		private ContainedEntity containedNonIndexedEmbedded;
 
-		@OneToOne(mappedBy = "containingAsIndexedEmbeddedShallowReindexOnUpdate", fetch = FetchType.LAZY)
+		@OneToOne(fetch = FetchType.LAZY)
+		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private ContainedEntity containedIndexedEmbeddedShallowReindexOnUpdate;
 
-		@OneToOne(mappedBy = "containingAsIndexedEmbeddedNoReindexOnUpdate", fetch = FetchType.LAZY)
+		@OneToOne(fetch = FetchType.LAZY)
+		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private ContainedEntity containedIndexedEmbeddedNoReindexOnUpdate;
 
-		@OneToOne(mappedBy = "containingAsUsedInCrossEntityDerivedProperty", fetch = FetchType.LAZY)
+		@OneToOne(fetch = FetchType.LAZY)
+		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
 
-		@OneToOne(mappedBy = "containingAsIndexedEmbeddedWithCast", targetEntity = ContainedEntity.class, fetch = FetchType.LAZY)
+		@OneToOne(targetEntity = ContainedEntity.class, fetch = FetchType.LAZY)
+		@JoinColumn(name = "CIndexedEmbeddedCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
 
@@ -453,28 +416,22 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideBaseIT
 		@Id
 		private Integer id;
 
-		@OneToOne
-		@JoinColumn(name = "CIndexedEmbedded")
+		@OneToOne(mappedBy = "containedIndexedEmbedded")
 		private ContainingEntity containingAsIndexedEmbedded;
 
-		@OneToOne
-		@JoinColumn(name = "CNonIndexedEmbedded")
+		@OneToOne(mappedBy = "containedNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
-		@OneToOne
-		@JoinColumn(name = "CIndexedEmbeddedSROU")
+		@OneToOne(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
 		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
 
-		@OneToOne
-		@JoinColumn(name = "CIndexedEmbeddedNROU")
+		@OneToOne(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
 
-		@OneToOne
-		@JoinColumn(name = "CCrossEntityDerived")
+		@OneToOne(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
-		@OneToOne(targetEntity = ContainingEntity.class)
-		@JoinColumn(name = "CIndexedEmbeddedCast")
+		@OneToOne(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class)
 		private Object containingAsIndexedEmbeddedWithCast;
 
 		@Basic
