@@ -425,21 +425,20 @@ by setting the following configuration properties:
 
 [source]
 ----
-hibernate.search.coordination.event_processor.shards.static = true
 hibernate.search.coordination.event_processor.shards.total_count = 4
 hibernate.search.coordination.event_processor.shards.assigned = 0
 ----
 
-* `shards.static` defines sharding as static.
-It defaults to `false` and must be set to `true` explicitly in order for
-the other configuration properties to be taken into account.
 * `shards.total_count` defines the total number of shards
 as an <<configuration-property-types,integer value>>.
-This property has no default and must be set explicitly when static sharding is enabled.
+This property has no default and must be set explicitly if you want static sharding.
 It must be set to the same value on all application nodes with assigned shards.
+When this property is set, `shards.assigned` must also be set
 * `shards.assigned` defines the shards assigned to the application node
 as an <<configuration-property-types,integer value>>, or multiple comma-separated integer values.
-This property has no default and must be set explicitly when static sharding is enabled.
+This property has no default and must be set explicitly if you want static sharding.
+When this property is set, `shards.total_count` must also be set.
++
 Shards are referred to by an index in the range `[0, total_count - 1]` (see above for `total_count`).
 A given application node must be assigned at least one shard
 but may be assigned multiple shards by setting `shards.assigned` to a comma-separated list,
@@ -462,7 +461,6 @@ and no shard at all to application nodes #2 and #3:
 ----
 # Node #0
 hibernate.search.coordination.strategy = outbox-polling
-hibernate.search.coordination.event_processor.shards.static = true
 hibernate.search.coordination.event_processor.shards.total_count = 2
 hibernate.search.coordination.event_processor.shards.assigned = 0
 ----
@@ -471,7 +469,6 @@ hibernate.search.coordination.event_processor.shards.assigned = 0
 ----
 # Node #1
 hibernate.search.coordination.strategy = outbox-polling
-hibernate.search.coordination.event_processor.shards.static = true
 hibernate.search.coordination.event_processor.shards.total_count = 2
 hibernate.search.coordination.event_processor.shards.assigned = 1
 ----
