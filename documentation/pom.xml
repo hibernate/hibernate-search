@@ -236,6 +236,7 @@
                             <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/reference/html_single</outputDirectory>
                             <attributes>
+                                <imagesdir>images</imagesdir>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
@@ -254,6 +255,7 @@
                             <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/internals/html_single</outputDirectory>
                             <attributes>
+                                <imagesdir>images</imagesdir>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
@@ -272,6 +274,7 @@
                             <sourceDocumentName>migration/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/migration/html_single</outputDirectory>
                             <attributes>
+                                <imagesdir>images</imagesdir>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
                                 <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
@@ -367,7 +370,7 @@
                                     <outputDirectory>${asciidoctor.base-output-dir}/reference/pdf</outputDirectory>
                                     <outputFile>hibernate_search_reference.pdf</outputFile>
                                     <attributes>
-                                        <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
+                                        <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
                                         <pdf-style>hibernate</pdf-style>
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
@@ -389,7 +392,7 @@
                                     <outputDirectory>${asciidoctor.base-output-dir}/internals/pdf</outputDirectory>
                                     <outputFile>hibernate_search_internals.pdf</outputFile>
                                     <attributes>
-                                        <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
+                                        <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
                                         <pdf-style>hibernate</pdf-style>
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
@@ -411,7 +414,7 @@
                                     <outputDirectory>${asciidoctor.base-output-dir}/migration/pdf</outputDirectory>
                                     <outputFile>hibernate_search_migration.pdf</outputFile>
                                     <attributes>
-                                        <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
+                                        <imagesdir>${asciidoctor.aggregated-resources-dir}/images/</imagesdir>
                                         <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
                                         <pdf-style>hibernate</pdf-style>
                                         <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
