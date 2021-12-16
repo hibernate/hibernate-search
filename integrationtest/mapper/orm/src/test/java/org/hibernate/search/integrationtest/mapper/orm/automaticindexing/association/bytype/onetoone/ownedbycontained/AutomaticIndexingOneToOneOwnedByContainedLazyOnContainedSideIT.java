@@ -17,6 +17,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -34,23 +35,38 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+
+import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
+import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
+import org.junit.runner.RunWith;
 
 /**
  * Test automatic indexing caused by single-valued association updates
  * or by updates of associated (contained) entities,
- * with a {@code @OneToOne} association owned by the contained side.
+ * with a {@code @OneToOne} association owned by the contained side,
+ * and with lazy associations on the contained side.
  */
+@RunWith(BytecodeEnhancerRunner.class) // So that we can have lazy *ToOne associations
+@EnhancementOptions(lazyLoading = true)
 @TestForIssue(jiraKey = "HSEARCH-4305")
-public class AutomaticIndexingOneToOneOwnedByContainedBaseIT
+public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT
 		extends AbstractAutomaticIndexingAssociationBaseIT<
-						AutomaticIndexingOneToOneOwnedByContainedBaseIT.IndexedEntity,
-						AutomaticIndexingOneToOneOwnedByContainedBaseIT.ContainingEntity,
-						AutomaticIndexingOneToOneOwnedByContainedBaseIT.ContainedEntity
+						AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT.IndexedEntity,
+						AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT.ContainingEntity,
+						AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT.ContainedEntity
 				> {
 
-	public AutomaticIndexingOneToOneOwnedByContainedBaseIT() {
+	public AutomaticIndexingOneToOneOwnedByContainedLazyOnContainedSideIT() {
 		super( new ModelPrimitivesImpl() );
+	}
+
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
+		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
+		setupContext.withTcclLookupPrecedenceBefore();
 	}
 
 	@Override
@@ -276,10 +292,10 @@ public class AutomaticIndexingOneToOneOwnedByContainedBaseIT
 
 		private String nonIndexedField;
 
-		@OneToOne
+		@OneToOne(fetch = FetchType.LAZY)
 		private ContainingEntity parent;
 
-		@OneToOne(mappedBy = "parent")
+		@OneToOne(mappedBy = "parent", fetch = FetchType.LAZY)
 		@IndexedEmbedded(includePaths = {
 				"containedIndexedEmbedded.indexedField",
 				"containedIndexedEmbedded.indexedElementCollectionField",
@@ -437,27 +453,27 @@ public class AutomaticIndexingOneToOneOwnedByContainedBaseIT
 		@Id
 		private Integer id;
 
-		@OneToOne
+		@OneToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "CIndexedEmbedded")
 		private ContainingEntity containingAsIndexedEmbedded;
 
-		@OneToOne
+		@OneToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "CNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
-		@OneToOne
+		@OneToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "CIndexedEmbeddedSROU")
 		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
 
-		@OneToOne
+		@OneToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "CIndexedEmbeddedNROU")
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
 
-		@OneToOne
+		@OneToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "CCrossEntityDerived")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
-		@OneToOne(targetEntity = ContainingEntity.class)
+		@OneToOne(targetEntity = ContainingEntity.class, fetch = FetchType.LAZY)
 		@JoinColumn(name = "CIndexedEmbeddedCast")
 		private Object containingAsIndexedEmbeddedWithCast;
 
