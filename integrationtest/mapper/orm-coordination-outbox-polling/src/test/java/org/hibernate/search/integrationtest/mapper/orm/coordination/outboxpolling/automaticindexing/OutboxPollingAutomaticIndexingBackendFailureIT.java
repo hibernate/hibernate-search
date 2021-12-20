@@ -282,7 +282,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 		assertThat( entityFailure.failingOperation() ).isEqualTo( "Processing an outbox event." );
 		assertThat( entityFailure.throwable() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Max '3' retries exhausted to process the event. Event will be lost." );
+				.hasMessageContaining( "Max '3' retries exhausted to process the event. Event will be aborted." );
 		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
 	}
 
