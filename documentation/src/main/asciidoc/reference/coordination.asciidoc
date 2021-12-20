@@ -605,3 +605,42 @@ hibernate.search.coordination.tenants.tenant1.event_processor.enabled = true <2>
 <1> This node will not process events for any tenant...
 <2> ... *except* `tenant1`.
 ====
+
+=== Aborted events
+
+If something goes wrong when an outbox event is processed, the event processor will try to re-process the events
+two times, after that the event will be marked as aborted.
+Aborted events won't be processed by the processor.
+
+Hibernate Search exposes some APIs to work on aborted events.
+
+.Use the API for the aborted events
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+OutboxPollingSearchMapping searchMapping = Search.mapping( sessionFactory ).extension( OutboxPollingExtension.get() ); // <1>
+long count = searchMapping.countAbortedEvents(); // <2>
+searchMapping.reprocessAbortedEvents(); // <3>
+searchMapping.clearAllAbortedEvents(); // <4>
+----
+<1> To have the access to the API we need to pass the `OutboxPollingExtension`
+<2> Count aborted events
+<3> Re-process aborted events
+<4> Clear all the aborted events
+====
+
+If multi-tenancy is enabled, it will be necessary to pass
+the tenant id to target the tenant operations are performed on.
+
+.Use the API for the aborted events with multi-tenancy
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+long count = searchMapping.countAbortedEvents( tenantId ); // <1>
+searchMapping.reprocessAbortedEvents( tenantId ); // <2>
+searchMapping.clearAllAbortedEvents( tenantId ); // <3>
+----
+<1> Count aborted events for the given tenantId
+<2> Re-process aborted events for the given tenantId
+<3> Clear all the aborted events for the given tenantId
+====
