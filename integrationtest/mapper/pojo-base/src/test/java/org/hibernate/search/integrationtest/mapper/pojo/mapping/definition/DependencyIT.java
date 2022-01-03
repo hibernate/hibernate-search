@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
@@ -22,6 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -171,6 +173,51 @@ public class DependencyIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4423")
+	public void derivedFrom_cycleFalsePositive() {
+		final String indexName = "myindex";
+		class DerivedFromCycle {
+			@Indexed(index = indexName)
+			class A {
+				@DocumentId
+				Integer id;
+				B b;
+				@GenericField
+				@IndexingDependency(derivedFrom = @ObjectPath({
+						@PropertyValue(propertyName = "b"),
+						@PropertyValue(propertyName = "c"),
+						@PropertyValue(propertyName = "derivedA")
+				}))
+				public String getDerivedA() {
+					throw new UnsupportedOperationException( "Should not be called" );
+				}
+			}
+			class B {
+				C c;
+			}
+			class C {
+				A a;
+				// Important: this property must have the same name as the property in A
+				public String getDerivedA() {
+					throw new UnsupportedOperationException( "Should not be called" );
+				}
+			}
+		}
+
+		backendMock.expectSchema( indexName, b -> b
+				.field( "derivedA", String.class )
+		);
+
+		assertThatCode(
+				() -> setupHelper.start()
+						.withAnnotatedEntityTypes( DerivedFromCycle.A.class )
+						.withAnnotatedTypes( DerivedFromCycle.B.class, DerivedFromCycle.C.class )
+						.setup()
+		)
+				.doesNotThrowAnyException();
 	}
 
 	@Test
