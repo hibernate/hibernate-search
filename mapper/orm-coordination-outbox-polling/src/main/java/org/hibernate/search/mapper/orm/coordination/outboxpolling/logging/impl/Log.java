@@ -149,7 +149,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 23,
 			value = "Invalid target for Outbox Polling extension: '%1$s'."
-					+ " This extension can only be applied to components created by a Outbox Polling mapper.")
+					+ " This extension can only be applied when Hibernate Search is configured to use the 'outbox-polling' coordination strategy.")
 	SearchException outboxPollingExtensionOnUnknownType(Object context);
 
 	@Message(id = ID_OFFSET + 24,
@@ -157,7 +157,7 @@ public interface Log extends BasicLogger {
 	SearchException noTenantIdSpecified(Set<String> tenantIds);
 
 	@Message(id = ID_OFFSET + 25,
-			value = "Multi-tenancy is not enabled but a tenant id is specified. Trying to using the tenant id: '%1$s'.")
+			value = "Multi-tenancy is not enabled but a tenant id is specified. Trying to use the tenant id: '%1$s'.")
 	SearchException multiTenancyNotEnabled(String tenantId);
 
 	@Message(id = ID_OFFSET + 26,

@@ -52,7 +52,7 @@ public class OutboxPollingSearchMappingIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Multi-tenancy is not enabled but a tenant id is specified.",
-						"Trying to using the tenant id: 'tenantX'."
+						"Trying to use the tenant id: 'tenantX'."
 				);
 	}
 
@@ -62,7 +62,7 @@ public class OutboxPollingSearchMappingIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Multi-tenancy is not enabled but a tenant id is specified.",
-						"Trying to using the tenant id: 'tenantX'."
+						"Trying to use the tenant id: 'tenantX'."
 				);
 	}
 
@@ -72,7 +72,7 @@ public class OutboxPollingSearchMappingIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Multi-tenancy is not enabled but a tenant id is specified.",
-						"Trying to using the tenant id: 'tenantX'."
+						"Trying to use the tenant id: 'tenantX'."
 				);
 	}
 
