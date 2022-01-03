@@ -324,7 +324,7 @@
         <version.org.google.guava>31.0.1-jre</version.org.google.guava>
 
         <!-- >>> Spring integration tests -->
-        <version.org.springframework.boot>2.6.1</version.org.springframework.boot>
+        <version.org.springframework.boot>2.6.2</version.org.springframework.boot>
 
         <!-- Maven plugins versions -->
 
