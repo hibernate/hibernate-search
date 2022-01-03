@@ -145,7 +145,7 @@ public class OutboxPollingCoordinationStrategy implements CoordinationStrategy {
 			}
 		}
 
-		outboxPollingSearchMapping = new OutboxPollingSearchMappingImpl( context, tenantIds );
+		outboxPollingSearchMapping = new OutboxPollingSearchMappingImpl( context, tenancyConfiguration );
 		return CompletableFuture.completedFuture( null );
 	}
 	@Override
