@@ -257,7 +257,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 30,
 			value = "Unable to resolve dependencies of a derived property:"
 					+ " there is a cyclic dependency involving path '%2$s' on type '%1$s'."
-					+ " A derived properties cannot be marked as derived from itself, even indirectly through other "
+					+ " A derived property cannot be marked as derived from itself, even indirectly through other "
 					+ " derived properties."
 					+ " If your model actually contains such cyclic dependency, "
 					+ " you should consider disabling automatic reindexing, at least partially "
