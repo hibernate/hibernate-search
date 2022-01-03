@@ -16,8 +16,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -288,7 +290,9 @@ public final class OutboxPollingEventProcessor {
 				// For more information, see
 				// org.hibernate.search.mapper.orm.coordination.outboxpolling.impl.OutboxEventLoader.tryLoadLocking
 				while ( eventUpdater.thereAreStillEventsToProcess() ) {
-					transactionHelper.inTransaction( session, transactionTimeout, s -> eventUpdater.process() );
+					transactionHelper.inTransaction( session, transactionTimeout,
+							(Consumer<SharedSessionContractImplementor>) s -> eventUpdater.process()
+					);
 				}
 
 				return CompletableFuture.completedFuture( null );

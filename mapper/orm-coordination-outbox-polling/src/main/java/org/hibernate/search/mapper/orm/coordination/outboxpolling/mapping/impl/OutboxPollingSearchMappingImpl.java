@@ -10,8 +10,6 @@ import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.i
 
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -50,92 +48,80 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	public long countAbortedEvents() {
 		checkNoTenant();
 
-		AtomicLong result = new AtomicLong();
 		try ( Session session = sessionFactory.openSession() ) {
-			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				result.set( query.getSingleResult() );
+				return query.getSingleResult();
 			} );
 		}
-		return result.get();
 	}
 
 	@Override
 	public long countAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
 
-		AtomicLong result = new AtomicLong();
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				result.set( query.getSingleResult() );
+				return query.getSingleResult();
 			} );
 		}
-		return result.get();
 	}
 
 	@Override
 	public int reprocessAbortedEvents() {
 		checkNoTenant();
 
-		AtomicInteger result = new AtomicInteger();
 		try ( Session session = sessionFactory.openSession() ) {
-			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
 				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
-				result.set( query.executeUpdate() );
+				return query.executeUpdate();
 			} );
 		}
-		return result.get();
 	}
 
 	@Override
 	public int reprocessAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
 
-		AtomicInteger result = new AtomicInteger();
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
 				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
-				result.set( query.executeUpdate() );
+				return query.executeUpdate();
 			} );
 		}
-		return result.get();
 	}
 
 	@Override
 	public int clearAllAbortedEvents() {
 		checkNoTenant();
 
-		AtomicInteger result = new AtomicInteger();
 		try ( Session session = sessionFactory.openSession() ) {
-			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
 				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				result.set( query.executeUpdate() );
+				return query.executeUpdate();
 			} );
 		}
-		return result.get();
 	}
 
 	@Override
 	public int clearAllAbortedEvents(String tenantId) {
 		checkTenant( tenantId );
 
-		AtomicInteger result = new AtomicInteger();
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
 				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
-				result.set( query.executeUpdate() );
+				return query.executeUpdate();
 			} );
 		}
-		return result.get();
 	}
 
 	private void checkNoTenant() {

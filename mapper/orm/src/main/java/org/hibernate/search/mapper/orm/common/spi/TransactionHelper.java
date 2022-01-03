@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.common.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -57,6 +58,22 @@ public final class TransactionHelper {
 			throw e;
 		}
 		commit( session );
+	}
+
+	public <T> T inTransaction(SharedSessionContractImplementor session, Integer transactionTimeout,
+			Function<SharedSessionContractImplementor, T> function) {
+		begin( session, transactionTimeout );
+
+		T result;
+		try {
+			result = function.apply( session );
+		}
+		catch (Exception e) {
+			rollbackSafely( session, e );
+			throw e;
+		}
+		commit( session );
+		return result;
 	}
 
 	public void begin(SharedSessionContractImplementor session, Integer transactionTimeout) {
