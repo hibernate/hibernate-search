@@ -160,8 +160,4 @@ public interface Log extends BasicLogger {
 			value = "Multi-tenancy is not enabled but a tenant id is specified. Trying to use the tenant id: '%1$s'.")
 	SearchException multiTenancyNotEnabled(String tenantId);
 
-	@Message(id = ID_OFFSET + 26,
-			value = "The specified tenant id '%1$s' has not been defined. Available tenants are: '%2$s'.")
-	SearchException wrongTenantId(String tenantId, Set<String> tenantIds);
-
 }

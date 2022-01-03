@@ -68,8 +68,8 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"The specified tenant id 'tenantX' has not been defined.",
-						"Available tenants are: '[tenant1, tenant2, tenant3]'."
+						"Cannot target tenant 'tenantX'",
+						"Currently configured tenant identifiers: [tenant1, tenant2, tenant3]."
 				);
 	}
 
@@ -88,8 +88,8 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"The specified tenant id 'tenantX' has not been defined.",
-						"Available tenants are: '[tenant1, tenant2, tenant3]'."
+						"Cannot target tenant 'tenantX'",
+						"Currently configured tenant identifiers: [tenant1, tenant2, tenant3]."
 				);
 	}
 
@@ -108,8 +108,8 @@ public class OutboxPollingSearchMappingMultiTenancyIT {
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"The specified tenant id 'tenantX' has not been defined.",
-						"Available tenants are: '[tenant1, tenant2, tenant3]'."
+						"Cannot target tenant 'tenantX'",
+						"Currently configured tenant identifiers: [tenant1, tenant2, tenant3]."
 				);
 	}
 

@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrat
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.OutboxPollingSearchMapping;
+import org.hibernate.search.mapper.orm.tenancy.spi.TenancyConfiguration;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMapping {
@@ -32,12 +33,15 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 	private final TransactionHelper transactionHelper;
 	private final SessionFactoryImplementor sessionFactory;
+	private final TenancyConfiguration tenancyConfiguration;
 	private final Set<String> tenantIds;
 
-	public OutboxPollingSearchMappingImpl(CoordinationStrategyStartContext context, Set<String> tenantIds) {
+	public OutboxPollingSearchMappingImpl(CoordinationStrategyStartContext context,
+			TenancyConfiguration tenancyConfiguration) {
 		this.sessionFactory = context.mapping().sessionFactory();
 		this.transactionHelper = new TransactionHelper( sessionFactory );
-		this.tenantIds = tenantIds;
+		this.tenancyConfiguration = tenancyConfiguration;
+		this.tenantIds = this.tenancyConfiguration.tenantIdsOrFail();
 	}
 
 	@Override
@@ -143,7 +147,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 			throw log.multiTenancyNotEnabled( tenantId );
 		}
 		if ( !tenantIds.contains( tenantId ) ) {
-			throw log.wrongTenantId( tenantId, tenantIds );
+			throw tenancyConfiguration.invalidTenantId( tenantId );
 		}
 	}
 }
