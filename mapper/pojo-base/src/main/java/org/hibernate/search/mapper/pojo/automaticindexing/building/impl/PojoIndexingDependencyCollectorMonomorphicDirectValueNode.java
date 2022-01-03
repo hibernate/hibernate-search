@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -100,8 +101,12 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 		}
 
 		if ( initialNodeCollectingDependency != null ) {
-			if ( initialNodeCollectingDependency.unboundModelPathFromLastTypeNode.equals(
-					unboundModelPathFromLastTypeNode ) ) {
+			PojoRawTypeModel<?> initialType = initialNodeCollectingDependency.modelPathFromLastTypeNode
+					.getRootType().rawType();
+			PojoModelPathValueNode initialValuePath = initialNodeCollectingDependency.unboundModelPathFromLastTypeNode;
+			PojoRawTypeModel<?> latestType = modelPathFromLastTypeNode.getRootType().rawType();
+			PojoModelPathValueNode latestValuePath = unboundModelPathFromLastTypeNode;
+			if ( initialType.equals( latestType ) && initialValuePath.equals( latestValuePath ) ) {
 				/*
 				 * We found a cycle in the derived from dependencies.
 				 * This can happen for example if:
@@ -114,10 +119,7 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 				 * we cannot support it here because we need to model dependencies as a static tree,
 				 * which in such case would have an infinite depth.
 				 */
-				throw log.infiniteRecursionForDerivedFrom(
-						modelPathFromLastTypeNode.getRootType().rawType(),
-						modelPathFromLastTypeNode.toUnboundPath()
-				);
+				throw log.infiniteRecursionForDerivedFrom( latestType, latestValuePath );
 			}
 		}
 		else {
