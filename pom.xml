@@ -376,7 +376,7 @@
             check for regressions. Which is obviously good for us, too.
          -->
         <puppycrawl.checkstyle.version>8.41</puppycrawl.checkstyle.version>
-        <version.com.puppycrawl.tools.checkstyle>9.2</version.com.puppycrawl.tools.checkstyle>
+        <version.com.puppycrawl.tools.checkstyle>9.2.1</version.com.puppycrawl.tools.checkstyle>
 
         <!-- Asciidoctor -->
 
