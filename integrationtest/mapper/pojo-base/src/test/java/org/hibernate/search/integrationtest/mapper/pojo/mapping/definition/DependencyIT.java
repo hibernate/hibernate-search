@@ -168,7 +168,7 @@ public class DependencyIT {
 						.failure( "Unable to resolve dependencies of a derived property:"
 								+ " there is a cyclic dependency involving path '.derivedA<no value extractors>'"
 								+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
-								"A derived properties cannot be marked as derived from itself",
+								"A derived property cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
 						)
 						.build()
