@@ -64,7 +64,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"        <property name=\"payload\" type=\"materialized_blob\" />\n" +
 			"        <property name=\"retries\" type=\"integer\" />\n" +
 			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" />\n" +
-			"        <property name=\"status\" nullable=\"false\" />\n" +
+			"        <property name=\"status\" index=\"status\" nullable=\"false\" />\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 
