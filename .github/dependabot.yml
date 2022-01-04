@@ -10,7 +10,9 @@ updates:
     schedule:
       interval: "weekly"
     assignees: ["yrodiere"]
-    open-pull-requests-limit: 5
+    # We don't trigger Jenkins or GitHub Actions builds on pull requests from dependabot,
+    # so we can safely use a high limit here.
+    open-pull-requests-limit: 20
     ignore:
       # AWS SDK releases way too often (every week?); ignore all patch updates
       - dependency-name: "software.amazon.awssdk:*"
