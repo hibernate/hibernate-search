@@ -19,6 +19,10 @@ on:
       - '4.*'
       - '3.*'
 
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-search' }}
+
 env:
   # Maven Wagon options are supposed to work around a problem on GitHub Actions' hosting platform, Azure
   # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-691957310
