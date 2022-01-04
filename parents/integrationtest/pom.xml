@@ -90,6 +90,13 @@
                                              it's not practical for testing, so we disable that.
                                          -->
                                         <xpack.security.enabled>false</xpack.security.enabled>
+                                        <!-- Limit the RAM usage.
+                                             Recent versions of ES limit themselves to 50% of the total available RAM,
+                                             but on CI this is sometimes too much, as we also have the Maven JVM
+                                             and the JVM that runs tests taking up a significant amount of RAM,
+                                             leaving too little for filesystem caches and resulting in freezes.
+                                         -->
+                                        <ES_JAVA_OPTS>-Xms2g -Xmx2g</ES_JAVA_OPTS>
                                     </env>
                                     <ports>
                                         <port>9200:9200</port>
