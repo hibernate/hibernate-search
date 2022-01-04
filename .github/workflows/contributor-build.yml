@@ -28,7 +28,7 @@ jobs:
     name: Build and test on Java 11
     runs-on: ubuntu-latest
     # Ignore dependabot PRs; we'll batch dependency upgrades manually in a single PR before we test them.
-    if: github.actor != 'app/dependabot'
+    if: github.actor != 'dependabot'
     steps:
       - uses: actions/checkout@v2
       - name: Set up Java 11
