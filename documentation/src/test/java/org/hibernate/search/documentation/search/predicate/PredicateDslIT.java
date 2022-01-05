@@ -16,6 +16,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -740,6 +741,18 @@ public class PredicateDslIT {
 							.matching( "r.*t" ) )
 					.fetchHits( 20 );
 			// end::regexp[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK4_ID );
+
+			// tag::regexp-flags[]
+			hits = searchSession.search( Book.class )
+					.where( f -> f.regexp().field( "description" )
+							.matching( "r@t" )
+							.flags( RegexpQueryFlag.ANY_STRING, RegexpQueryFlag.COMPLEMENT )
+					)
+					.fetchHits( 20 );
+			// end::regexp-flags[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK4_ID );
