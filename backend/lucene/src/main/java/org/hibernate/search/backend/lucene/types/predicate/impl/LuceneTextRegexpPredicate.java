@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RegexpQuery;
+import org.apache.lucene.util.automaton.RegExp;
 
 public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
@@ -32,8 +36,8 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements RegexpPredicateBuilder {
-
 		private String pattern;
+		private int flags = RegExp.NONE;
 
 		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
@@ -45,6 +49,11 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 		}
 
 		@Override
+		public void flags(Set<RegexpQueryFlag> flags) {
+			this.flags = buildFlag( flags );
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new LuceneTextRegexpPredicate( this );
 		}
@@ -52,7 +61,32 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 		@Override
 		protected Query buildQuery() {
 			// set no optional flag as default
-			return new RegexpQuery( new Term( absoluteFieldPath, pattern ), 0 );
+			return new RegexpQuery( new Term( absoluteFieldPath, pattern ), flags );
 		}
+	}
+
+	private static int buildFlag(Set<RegexpQueryFlag> flags) {
+		int flag = 0;
+		if ( flags == null || flags.isEmpty() ) {
+			return RegExp.NONE;
+		}
+
+		for ( RegexpQueryFlag operation : flags ) {
+			switch ( operation ) {
+				case COMPLEMENT:
+					flag |= RegExp.COMPLEMENT;
+					break;
+				case INTERVAL:
+					flag |= RegExp.INTERVAL;
+					break;
+				case INTERSECTION:
+					flag |= RegExp.INTERSECTION;
+					break;
+				case ANY_STRING:
+					flag |= RegExp.ANYSTRING;
+					break;
+			}
+		}
+		return flag;
 	}
 }
