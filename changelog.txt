@@ -1,6 +1,44 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.0.Beta2 (2022-01-05)
+-------------------------
+
+** Bug
+    * HSEARCH-4423 False positive in detection of cycles in indexing dependency graph
+    * HSEARCH-4401 Lucene backend ignores limit when offset + limit is higher than Integer.MAX_VALUE instead of reporting that it cannot handle it
+
+** Improvement
+    * HSEARCH-4422 Upgrade to Jackson 2.13.1
+    * HSEARCH-4420 Upgrade to Lucene 8.11.1
+    * HSEARCH-4412 Compatibility with OpenSearch 1.2.1
+    * HSEARCH-4410 Upgrade to Elasticsearch client 7.16.2
+    * HSEARCH-4400 Upgrade to Hibernate ORM 5.6.2.Final
+    * HSEARCH-4396 Upgrade to Elasticsearch client 7.16.0
+    * HSEARCH-4283 Solutions for persistent indexing errors
+
+** New Feature
+    * HSEARCH-4404 Methods in Lucene analysis configurers to define analyzers/normalizers without referring to Lucene classes
+
+** Task
+    * HSEARCH-4421 Upgrade to Log4j 2.17.1
+    * HSEARCH-4416 Upgrade to log4j 2.16.0
+    * HSEARCH-4414 Raise timeout when publishing to oss.sonatype.org
+    * HSEARCH-4413 Run tests against Elasticsearch 7.16.2
+    * HSEARCH-4411 Run tests against Elasticsearch 7.16 by default instead of 7.10
+    * HSEARCH-4409 Upgrade build dependencies to the latest version
+    * HSEARCH-4408 Fix syntax highlighting for code example not working anymore in 6.0/6.1 documentation
+    * HSEARCH-4407 Fix flaky tests involving rebalancing
+    * HSEARCH-4406 Upgrade to jruby-complete 9.3.2.0
+    * HSEARCH-4405 Upgrade to log4j 2.15
+    * HSEARCH-4402 Upgrade to ECJ 3.28.0
+    * HSEARCH-4398 Remove the unnecessary transitive dependency to lucene-sandbox
+    * HSEARCH-4397 Switch to elastic/elasticsearch:* rather than the root elasticsearch:* for container images used in testing
+    * HSEARCH-4391 Fix images not being displayed in the documentation
+    * HSEARCH-4390 Fix flaky tests involving Spring and JTA timeout
+    * HSEARCH-4389 Remove mentions of hibernate.search.coordination.event_processor.shards.static from the documentation
+    * HSEARCH-4340 Run tests against Elasticsearch 7.16
+
 6.1.0.Beta1 (2021-12-03)
 -------------------------
 
