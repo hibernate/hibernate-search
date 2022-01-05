@@ -44,6 +44,22 @@ public class RegexpPredicateSpecificsIT {
 	private static final String TEXT_4 = "     Hibernate        Search   will transparently index every entity persisted, updated or removed through Hibernate ORM";
 	private static final String TEXT_5 = "7.39";
 
+	private static final String TEXT_COMPLEMENT = "a~bc";
+	private static final String TEXT_COMPLEMENT_MATCHING = "adc";
+	private static final String TEXT_COMPLEMENT_NOT_MATCHING = "abc";
+
+	private static final String TEXT_INTERVAL = "foo<1-100>";
+	private static final String TEXT_INTERVAL_MATCHING = "foo99";
+	private static final String TEXT_INTERVAL_NOT_MATCHING = "foo101";
+
+	private static final String TEXT_INTERSECTION = "aaa.+&.+bbb";
+	private static final String TEXT_INTERSECTION_MATCHING = "aaabbb";
+	private static final String TEXT_INTERSECTION_NOT_MATCHING = "aabbb";
+
+	private static final String TEXT_ANYSTRING = "@abc";
+	private static final String TEXT_ANYSTRING_MATCHING = "abcabc";
+	private static final String TEXT_ANYSTRING_NOT_MATCHING = "foo99";
+
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -137,10 +153,68 @@ public class RegexpPredicateSpecificsIT {
 				.hasNoHits();
 	}
 
+	@Test
+	public void flag_complement() {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().complementField.relativeFieldName;
+
+		// test the default
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_COMPLEMENT ) ) )
+				// TODO HSEARCH-4362 Make optional flags not enabled by default
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void flag_interval() {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().intervalField.relativeFieldName;
+
+		// test the default
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERVAL ) ) )
+				// TODO HSEARCH-4362 Make optional flags not enabled by default
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+	}
+
+	@Test
+	public void flag_intersection() {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().intersectionField.relativeFieldName;
+
+		// test the default
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERSECTION ) ) )
+				// TODO HSEARCH-4362 Make optional flags not enabled by default
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void flag_anyString() {
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().anyStringField.relativeFieldName;
+
+		// test the default
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_ANYSTRING ) ) )
+				// TODO HSEARCH-4362 Make optional flags not enabled by default
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
 	private static class IndexBinding {
 		final SimpleFieldModel<String> analyzedField;
 		final SimpleFieldModel<String> normalizedField;
 		final SimpleFieldModel<String> nonAnalyzedField;
+
+		// fields to test optional flags:
+		final SimpleFieldModel<String> complementField;
+		final SimpleFieldModel<String> intervalField;
+		final SimpleFieldModel<String> intersectionField;
+		final SimpleFieldModel<String> anyStringField;
 
 		IndexBinding(IndexSchemaElement root) {
 			analyzedField = SimpleFieldModel.mapperWithOverride( AnalyzedStringFieldTypeDescriptor.INSTANCE,
@@ -151,6 +225,16 @@ public class RegexpPredicateSpecificsIT {
 					.map( root, "normalized" );
 			nonAnalyzedField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "nonAnalyzed" );
+
+			// fields to test optional flags:
+			complementField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
+					.map( root, "complement" );
+			intervalField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
+					.map( root, "interval" );
+			intersectionField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
+					.map( root, "intersection" );
+			anyStringField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
+					.map( root, "anyString" );
 		}
 	}
 
@@ -164,16 +248,30 @@ public class RegexpPredicateSpecificsIT {
 						document.addValue( index.binding().analyzedField.reference, TEXT_1 );
 						document.addValue( index.binding().normalizedField.reference, TEXT_1 );
 						document.addValue( index.binding().nonAnalyzedField.reference, TEXT_1 );
+						document.addValue( index.binding().complementField.reference, TEXT_COMPLEMENT );
+						document.addValue( index.binding().intervalField.reference, TEXT_INTERVAL );
+						document.addValue( index.binding().intersectionField.reference, TEXT_INTERSECTION );
+						document.addValue( index.binding().anyStringField.reference, TEXT_ANYSTRING );
+
 					} )
 					.add( DOCUMENT_2, document -> {
 						document.addValue( index.binding().analyzedField.reference, TEXT_2 );
 						document.addValue( index.binding().normalizedField.reference, TEXT_2 );
 						document.addValue( index.binding().nonAnalyzedField.reference, TEXT_2 );
+						document.addValue( index.binding().complementField.reference, TEXT_COMPLEMENT_MATCHING );
+						document.addValue( index.binding().intervalField.reference, TEXT_INTERVAL_MATCHING );
+						document.addValue( index.binding().intersectionField.reference, TEXT_INTERSECTION_MATCHING );
+						document.addValue( index.binding().anyStringField.reference, TEXT_ANYSTRING_MATCHING );
 					} )
 					.add( DOCUMENT_3, document -> {
 						document.addValue( index.binding().analyzedField.reference, TEXT_3 );
 						document.addValue( index.binding().normalizedField.reference, TEXT_3 );
 						document.addValue( index.binding().nonAnalyzedField.reference, TEXT_3 );
+						document.addValue( index.binding().complementField.reference, TEXT_COMPLEMENT_NOT_MATCHING );
+						document.addValue( index.binding().intervalField.reference, TEXT_INTERVAL_NOT_MATCHING );
+						document.addValue(
+								index.binding().intersectionField.reference, TEXT_INTERSECTION_NOT_MATCHING );
+						document.addValue( index.binding().anyStringField.reference, TEXT_ANYSTRING_NOT_MATCHING );
 					} )
 					.add( DOCUMENT_4, document -> {
 						document.addValue( index.binding().analyzedField.reference, TEXT_4 );
