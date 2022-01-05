@@ -32,7 +32,7 @@ public class StubSearchPredicateBuilderFactory
 
 	@Override
 	public SimpleQueryStringPredicateBuilder simpleQueryString() {
-		return new StubSearchPredicate.Builder();
+		return new StubSearchPredicate.SimpleQueryStringBuilder();
 	}
 
 }
