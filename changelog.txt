@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.8.Final (2022-01-05)
+-------------------------
+
+** Bug
+    * HSEARCH-4423 False positive in detection of cycles in indexing dependency graph
+    * HSEARCH-4363 NPE on SingletonTask
+    * HSEARCH-4352 MappingException: property [xxx] not found on entity [yyy]
+    * HSEARCH-4348 Mapping does not work when the properties are defined inside Groovy Traits
+
+** Improvement
+    * HSEARCH-4354 Avoid retrieving additional metadata for properties that are not used by Hibernate Search
+
+** Task
+    * HSEARCH-4421 Upgrade to Log4j 2.17.1
+    * HSEARCH-4416 Upgrade to log4j 2.16.0
+    * HSEARCH-4414 Raise timeout when publishing to oss.sonatype.org
+    * HSEARCH-4408 Fix syntax highlighting for code example not working anymore in 6.0/6.1 documentation
+    * HSEARCH-4405 Upgrade to log4j 2.15
+    * HSEARCH-4391 Fix images not being displayed in the documentation
+    * HSEARCH-4388 Stop all containers before starting builds
+
 6.0.7.Final (2021-10-18)
 -------------------------
 
