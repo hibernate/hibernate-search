@@ -58,12 +58,12 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"                <param name=\"increment_size\">1</param>\n" +
 			"            </generator>\n" +
 			"        </id>\n" +
-			"        <property name=\"entityName\" type=\"string\" length=\"256\" />\n" +
-			"        <property name=\"entityId\" type=\"string\" length=\"256\" />\n" +
-			"        <property name=\"entityIdHash\" type=\"integer\" index=\"entityIdHash\" />\n" +
-			"        <property name=\"payload\" type=\"materialized_blob\" />\n" +
-			"        <property name=\"retries\" type=\"integer\" />\n" +
-			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" />\n" +
+			"        <property name=\"entityName\" type=\"string\" length=\"256\" nullable=\"false\" />\n" +
+			"        <property name=\"entityId\" type=\"string\" length=\"256\" nullable=\"false\" />\n" +
+			"        <property name=\"entityIdHash\" type=\"integer\" index=\"entityIdHash\" nullable=\"false\" />\n" +
+			"        <property name=\"payload\" type=\"materialized_blob\" nullable=\"false\" />\n" +
+			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
+			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" nullable=\"true\" />\n" +
 			"        <property name=\"status\" index=\"status\" nullable=\"false\" />\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
