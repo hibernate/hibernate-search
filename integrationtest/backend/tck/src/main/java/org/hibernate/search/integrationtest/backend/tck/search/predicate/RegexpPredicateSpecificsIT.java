@@ -162,8 +162,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_COMPLEMENT ) ) )
-				// TODO HSEARCH-4362 Make optional flags not enabled by default
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -175,8 +174,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERVAL ) ) )
-				// TODO HSEARCH-4362 Make optional flags not enabled by default
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -188,8 +186,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERSECTION ) ) )
-				// TODO HSEARCH-4362 Make optional flags not enabled by default
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -201,8 +198,7 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_ANYSTRING ) ) )
-				// TODO HSEARCH-4362 Make optional flags not enabled by default
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	private static class IndexBinding {

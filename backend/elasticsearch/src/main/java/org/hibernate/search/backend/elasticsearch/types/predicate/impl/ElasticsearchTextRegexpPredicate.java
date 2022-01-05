@@ -25,6 +25,9 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	private static final JsonObjectAccessor REGEXP_ACCESSOR = JsonAccessor.root().property( "regexp" ).asObject();
 
 	private static final JsonAccessor<JsonElement> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
+	private static final JsonAccessor<String> FLAGS_ACCESSOR = JsonAccessor.root().property( "flags" ).asString();
+
+	private static final String NO_OPTIONAL_OPERATORS_FLAG_MARK = "NONE";
 
 	private final JsonPrimitive pattern;
 
@@ -37,6 +40,9 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
 		VALUE_ACCESSOR.set( innerObject, pattern );
+
+		// set no optional flag as default
+		FLAGS_ACCESSOR.set( innerObject, NO_OPTIONAL_OPERATORS_FLAG_MARK );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
