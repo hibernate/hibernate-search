@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
@@ -14,7 +17,9 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,10 +35,12 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	private static final String NO_OPTIONAL_OPERATORS_FLAG_MARK = "NONE";
 
 	private final JsonPrimitive pattern;
+	private final EnumSet<RegexpQueryFlag> flags;
 
 	public ElasticsearchTextRegexpPredicate(Builder builder) {
 		super( builder );
 		this.pattern = builder.pattern;
+		this.flags = builder.flags;
 	}
 
 	@Override
@@ -42,7 +49,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 		VALUE_ACCESSOR.set( innerObject, pattern );
 
 		// set no optional flag as default
-		FLAGS_ACCESSOR.set( innerObject, NO_OPTIONAL_OPERATORS_FLAG_MARK );
+		FLAGS_ACCESSOR.set( innerObject, buildFlag( flags ) );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
@@ -62,6 +69,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 
 	private static class Builder extends AbstractBuilder implements RegexpPredicateBuilder {
 		private JsonPrimitive pattern;
+		private EnumSet<RegexpQueryFlag> flags;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
@@ -73,8 +81,47 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 		}
 
 		@Override
+		public void flags(Set<RegexpQueryFlag> flags) {
+			this.flags = EnumSet.copyOf( flags );
+		}
+
+		@Override
 		public SearchPredicate build() {
 			return new ElasticsearchTextRegexpPredicate( this );
+		}
+	}
+
+	private static String buildFlag(Set<RegexpQueryFlag> flags) {
+		if ( flags == null || flags.isEmpty() ) {
+			return NO_OPTIONAL_OPERATORS_FLAG_MARK;
+		}
+		StringBuilder flagsMask = new StringBuilder();
+
+		for ( RegexpQueryFlag flag : flags ) {
+			if ( flagsMask.length() > 0 ) {
+				flagsMask.append( "|" );
+			}
+			flagsMask.append( getFlagName( flag ) );
+		}
+		return flagsMask.toString();
+	}
+
+	/**
+	 * @param flag The flag as defined in Hibernate Search.
+	 * @return The name of this flag in Elasticsearch (might be different from flag.name()).
+	 */
+	private static String getFlagName(RegexpQueryFlag flag) {
+		switch ( flag ) {
+			case COMPLEMENT:
+				return "COMPLEMENT";
+			case INTERVAL:
+				return "INTERVAL";
+			case INTERSECTION:
+				return "INTERSECTION";
+			case ANY_STRING:
+				return "ANYSTRING";
+			default:
+				throw new AssertionFailure( "Unexpected flag: " + flag );
 		}
 	}
 }

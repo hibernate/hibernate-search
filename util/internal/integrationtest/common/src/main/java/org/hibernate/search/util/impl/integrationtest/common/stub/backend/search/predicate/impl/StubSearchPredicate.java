@@ -12,6 +12,7 @@ import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -67,6 +68,11 @@ public class StubSearchPredicate implements SearchPredicate {
 	}
 
 	public static class RegexpBuilder extends Builder implements RegexpPredicateBuilder {
+
+		@Override
+		public void flags(Set<RegexpQueryFlag> flags) {
+			// No-op, just simulates a call on this object
+		}
 
 	}
 

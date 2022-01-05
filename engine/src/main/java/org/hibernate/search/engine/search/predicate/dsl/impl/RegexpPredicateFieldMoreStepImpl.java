@@ -9,12 +9,14 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
@@ -86,6 +88,16 @@ class RegexpPredicateFieldMoreStepImpl
 
 		@Override
 		protected CommonState thisAsS() {
+			return this;
+		}
+
+		@Override
+		public CommonState flags(Set<RegexpQueryFlag> flags) {
+			for ( RegexpPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( RegexpPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.flags( flags );
+				}
+			}
 			return this;
 		}
 	}
