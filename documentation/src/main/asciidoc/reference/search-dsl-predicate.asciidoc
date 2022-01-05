@@ -623,6 +623,38 @@ In that case, the predicate will match documents for which _any_ of the given fi
 
 See <<search-dsl-predicate-common-multiple-fields>>.
 
+[[search-dsl-predicate-regexp-flags]]
+=== `flags`: enabling only specific syntax constructs
+
+By default, Hibernate Search does not enable any optional operators.
+To enable some of them, it is possible to specify the `flags` attribute.
+
+.Matching a regular expression pattern with flags
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=regexp-flags]
+----
+====
+
+The following flags/operators are available:
+* `COMPLEMENT`: the `~` operator will negate the following pattern.
++
+For example `a~bc` matches `aac` but not `abc`.
++
+Don't forget to use parentheses if you need to negate a composite pattern, e.g. `a~(bc)`
+* `INTERVAL`: the `<>` operator matches a non-negative integer range, both ends included.
++
+For example `a<1-10>` matches `a1`, `a2`, ... `a9`, `a10`, but not `a11`.
++
+Leading zeroes are meaningful, e.g. `a<01-10>` matches `a01` and `a02` but not `a1` nor `a2`.
+* `INTERSECTION`: the `&` operator combines two regexps with an AND operator.
++
+For example `.*a.*&.*z.*` matches `az`, `za`, `babzb`, `bzbab`, but not `a` nor `z`.
+* `ANYSTRING`: the `@` operator matches any string; equivalent to `.*`.
++
+This operator is mostly useful to negate a pattern, e.g. `@&~(ab)` matches anything except the string `ab`.
+
 [[search-dsl-predicate-regexp-other]]
 === Other options
 
