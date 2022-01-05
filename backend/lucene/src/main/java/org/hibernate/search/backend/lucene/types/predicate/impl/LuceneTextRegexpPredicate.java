@@ -51,7 +51,8 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 
 		@Override
 		protected Query buildQuery() {
-			return new RegexpQuery( new Term( absoluteFieldPath, pattern ) );
+			// set no optional flag as default
+			return new RegexpQuery( new Term( absoluteFieldPath, pattern ), 0 );
 		}
 	}
 }
