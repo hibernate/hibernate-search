@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpQueryFlag;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
@@ -163,6 +164,30 @@ public class RegexpPredicateSpecificsIT {
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_COMPLEMENT ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// alone
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_COMPLEMENT )
+						.flags( RegexpQueryFlag.COMPLEMENT )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		// more flags
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_COMPLEMENT )
+						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERSECTION, RegexpQueryFlag.ANY_STRING )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		// other flags only
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_COMPLEMENT )
+						.flags( RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION, RegexpQueryFlag.ANY_STRING )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -174,6 +199,30 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERVAL ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// alone
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERVAL )
+						.flags( RegexpQueryFlag.INTERVAL )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+
+		// more flags
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERVAL )
+						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.ANY_STRING )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+
+		// other flags only
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERVAL )
+						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERSECTION, RegexpQueryFlag.ANY_STRING )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
@@ -187,6 +236,30 @@ public class RegexpPredicateSpecificsIT {
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERSECTION ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// alone
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERSECTION )
+						.flags( RegexpQueryFlag.INTERSECTION )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		// more flags
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERSECTION )
+						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		// other flags only
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERSECTION )
+						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.ANY_STRING )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -198,6 +271,30 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_ANYSTRING ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// alone
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_ANYSTRING )
+						.flags( RegexpQueryFlag.ANY_STRING )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		// more flags
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_ANYSTRING )
+						.flags( RegexpQueryFlag.ANY_STRING, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		// other flags only
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_ANYSTRING )
+						.flags( RegexpQueryFlag.COMPLEMENT, RegexpQueryFlag.INTERVAL, RegexpQueryFlag.INTERSECTION )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
