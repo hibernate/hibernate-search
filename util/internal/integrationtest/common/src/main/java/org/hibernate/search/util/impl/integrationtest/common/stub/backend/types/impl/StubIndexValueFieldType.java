@@ -68,11 +68,14 @@ public final class StubIndexValueFieldType<F>
 					PredicateTypeKeys.EXISTS,
 					PredicateTypeKeys.PHRASE,
 					PredicateTypeKeys.WILDCARD,
-					PredicateTypeKeys.REGEXP,
 					PredicateTypeKeys.TERMS,
 					PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
 					PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,
 					PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX
+			);
+			stubFactories(
+					new StubSearchPredicate.RegexpFactory(),
+					PredicateTypeKeys.REGEXP
 			);
 			stubFactories(
 					new StubSearchSort.Factory(),

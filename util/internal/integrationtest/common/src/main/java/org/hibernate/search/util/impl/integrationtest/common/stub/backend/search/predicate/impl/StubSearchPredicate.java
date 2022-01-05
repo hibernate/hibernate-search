@@ -59,6 +59,41 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 	}
 
+	public static class RegexpFactory extends AbstractStubSearchQueryElementFactory<RegexpBuilder> {
+		@Override
+		public RegexpBuilder create(StubSearchIndexScope scope, StubSearchIndexNodeContext node) {
+			return new RegexpBuilder();
+		}
+	}
+
+	public static class RegexpBuilder extends Builder implements RegexpPredicateBuilder {
+
+	}
+
+	public static class SimpleQueryStringBuilder extends Builder implements SimpleQueryStringPredicateBuilder {
+
+		@Override
+		public FieldState field(String fieldPath) {
+			return new StubFieldState();
+		}
+
+		@Override
+		public void defaultOperator(BooleanOperator operator) {
+			// No-op
+		}
+
+		@Override
+		public void simpleQueryString(String simpleQueryString) {
+			// No-op
+		}
+
+		@Override
+		public void flags(Set<SimpleQueryFlag> flags) {
+			// No-op, just simulates a call on this object
+		}
+
+	}
+
 	public static class Builder implements MatchAllPredicateBuilder,
 			BooleanPredicateBuilder,
 			MatchIdPredicateBuilder,
@@ -66,9 +101,7 @@ public class StubSearchPredicate implements SearchPredicate {
 			RangePredicateBuilder,
 			PhrasePredicateBuilder,
 			WildcardPredicateBuilder,
-			RegexpPredicateBuilder,
 			TermsPredicateBuilder,
-			SimpleQueryStringPredicateBuilder,
 			NestedPredicateBuilder,
 			ExistsPredicateBuilder,
 			SpatialWithinCirclePredicateBuilder,
@@ -168,21 +201,6 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public FieldState field(String fieldPath) {
-			return new StubFieldState();
-		}
-
-		@Override
-		public void defaultOperator(BooleanOperator operator) {
-			// No-op
-		}
-
-		@Override
-		public void simpleQueryString(String simpleQueryString) {
-			// No-op
-		}
-
-		@Override
 		public void boost(float boost) {
 			// No-op
 		}
@@ -220,11 +238,6 @@ public class StubSearchPredicate implements SearchPredicate {
 
 		@Override
 		public void param(String name, Object value) {
-			// No-op, just simulates a call on this object
-		}
-
-		@Override
-		public void flags(Set<SimpleQueryFlag> flags) {
 			// No-op, just simulates a call on this object
 		}
 	}
