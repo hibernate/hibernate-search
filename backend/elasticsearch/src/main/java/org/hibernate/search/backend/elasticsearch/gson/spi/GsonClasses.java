@@ -36,7 +36,9 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ro
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingTypeJsonAdapter;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.AnalysisJsonAdapterFactory;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettingsJsonAdapterFactory;
 
 public final class GsonClasses {
 
@@ -59,7 +61,9 @@ public final class GsonClasses {
 				RootTypeMappingJsonAdapterFactory.class,
 				RoutingType.class,
 				IndexSettings.class,
+				IndexSettingsJsonAdapterFactory.class,
 				Analysis.class,
+				AnalysisJsonAdapterFactory.class,
 				AnalysisDefinition.class,
 				AnalyzerDefinition.class,
 				AnalyzerDefinitionJsonAdapterFactory.class,
