@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.hibernate.boot.jaxb.Origin;
 import org.hibernate.boot.jaxb.SourceType;
@@ -20,10 +21,16 @@ import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.service.ServiceRegistry;
 
 import org.jboss.jandex.IndexView;
 
@@ -47,7 +54,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	// because our override actually matches the default for the native entity name.
 	public static final String ENTITY_NAME = CLASS_NAME;
 
-	private static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+	public static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping>\n" +
 			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"" + TABLE_NAME + "\">\n" +
 			"        <id name=\"id\" type=\"long\">\n" +
@@ -68,15 +75,28 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 
+	private static final ConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSpiSettings.OUTBOXEVENT_ENTITY_MAPPING )
+					.asString()
+					.withDefault( ENTITY_DEFINITION )
+					.build();
+
 	@Override
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
+	@SuppressWarnings("unchecked")
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
-		log.outboxEventGeneratedEntityMapping( ENTITY_DEFINITION );
+		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
+		ConfigurationService service = HibernateOrmUtils.getServiceOrFail(
+				serviceRegistry, ConfigurationService.class );
+		String entityDefinition = OUTBOXEVENT_ENTITY_MAPPING.get(
+				AllAwareConfigurationPropertySource.fromMap( (Map<String, ?>) service.getSettings() ) );
+
+		log.outboxEventGeneratedEntityMapping( entityDefinition );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
 
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( ENTITY_DEFINITION.getBytes() );
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
 		Binding<?> binding = mappingBinder.bind( bufferedInputStream, origin );
 
