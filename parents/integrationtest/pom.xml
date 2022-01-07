@@ -96,7 +96,7 @@
                                              and the JVM that runs tests taking up a significant amount of RAM,
                                              leaving too little for filesystem caches and resulting in freezes.
                                          -->
-                                        <ES_JAVA_OPTS>-Xms2g -Xmx2g</ES_JAVA_OPTS>
+                                        <ES_JAVA_OPTS>-Xms1g -Xmx1g</ES_JAVA_OPTS>
                                     </env>
                                     <ports>
                                         <port>9200:9200</port>
