@@ -7,16 +7,14 @@
 package org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.test.file.FileUtils;
 
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -74,7 +72,7 @@ public class TemporaryFileHolder {
 
 		if ( cleanup ) {
 			if ( Files.exists( path ) ) {
-				deleteRecursively( path );
+				FileUtils.deleteRecursively( path );
 			}
 			toCleanUp.add( path );
 		}
@@ -88,23 +86,7 @@ public class TemporaryFileHolder {
 
 	private void deleteAll(Set<Path> paths) throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.pushAll( this::deleteRecursively, paths );
+			closer.pushAll( FileUtils::deleteRecursively, paths );
 		}
-	}
-
-	private void deleteRecursively(Path path) throws IOException {
-		Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				Files.delete( file );
-				return FileVisitResult.CONTINUE;
-			}
-
-			@Override
-			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				Files.delete( dir );
-				return FileVisitResult.CONTINUE;
-			}
-		} );
 	}
 }
