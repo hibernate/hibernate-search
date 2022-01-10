@@ -247,7 +247,7 @@
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
         <version.org.slf4j>1.7.25</version.org.slf4j>
-        <version.log4j>2.13.3</version.log4j>
+        <version.log4j>2.17.1</version.log4j>
         <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
 
