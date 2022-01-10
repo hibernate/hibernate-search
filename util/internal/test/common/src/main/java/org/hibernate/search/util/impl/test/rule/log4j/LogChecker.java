@@ -15,7 +15,7 @@ import org.hamcrest.Description;
 public class LogChecker {
 
 	private final LogExpectation expectation;
-	private int count = 0;
+	private volatile int count = 0;
 	private List<LogEvent> matchingEvents;
 	private List<LogEvent> extraEvents;
 
@@ -43,26 +43,30 @@ public class LogChecker {
 		}
 	}
 
-	// This must be synchronized to avoid problems when multiple threads issue log events concurrently
-	synchronized void process(LogEvent event) {
+	void process(LogEvent event) {
 		if ( expectation.getMaxExpectedCount() == null && expectation.getMinExpectedCount() <= count ) {
 			// We don't care about events anymore, expectations are met and it won't change
 			return;
 		}
 		if ( expectation.getMatcher().matches( event ) ) {
-			++count;
-			if ( expectation.getMaxExpectedCount() != null && count > expectation.getMaxExpectedCount() ) {
-				if ( extraEvents == null ) {
-					extraEvents = new ArrayList<>();
-				}
-				extraEvents.add( event.toImmutable() );
+			processMatching( event );
+		}
+	}
+
+	// This must be synchronized to avoid problems when multiple threads issue log events concurrently
+	private synchronized void processMatching(LogEvent event) {
+		++count;
+		if ( expectation.getMaxExpectedCount() != null && count > expectation.getMaxExpectedCount() ) {
+			if ( extraEvents == null ) {
+				extraEvents = new ArrayList<>();
 			}
-			else {
-				if ( matchingEvents == null ) {
-					matchingEvents = new ArrayList<>();
-				}
-				matchingEvents.add( event.toImmutable() );
+			extraEvents.add( event.toImmutable() );
+		}
+		else {
+			if ( matchingEvents == null ) {
+				matchingEvents = new ArrayList<>();
 			}
+			matchingEvents.add( event.toImmutable() );
 		}
 	}
 
