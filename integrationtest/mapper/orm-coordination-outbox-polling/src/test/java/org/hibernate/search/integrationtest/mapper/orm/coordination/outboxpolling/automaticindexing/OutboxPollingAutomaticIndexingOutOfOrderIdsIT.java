@@ -122,7 +122,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// that's because we don't trust events to tell us whether the document already exists in the index.
 		// We don't trust the events for this because they can arrive in the wrong order
 		// (and that's the case here).
-		backendMock.expectWorks( OutboxPollingAutomaticIndexingLifecycleIT.IndexedEntity.NAME )
+		backendMock.expectWorks( IndexedEntity.INDEX )
 				.delete( "1" );
 
 		// The events were hidden until now, to ensure they were not processed in separate batches.
