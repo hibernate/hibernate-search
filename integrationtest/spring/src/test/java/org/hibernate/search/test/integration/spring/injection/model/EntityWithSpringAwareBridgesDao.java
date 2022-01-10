@@ -44,6 +44,13 @@ public class EntityWithSpringAwareBridgesDao {
 	}
 
 	@Transactional
+	public void purge() {
+		entityManager.createQuery( "delete from " + EntityWithSpringAwareBridges.class.getName() )
+				.executeUpdate();
+		Search.getFullTextEntityManager( entityManager ).purgeAll( EntityWithSpringAwareBridges.class );
+	}
+
+	@Transactional
 	@SuppressWarnings("unchecked")
 	public List<EntityWithSpringAwareBridges> searchFieldBridge(String terms) {
 		FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );

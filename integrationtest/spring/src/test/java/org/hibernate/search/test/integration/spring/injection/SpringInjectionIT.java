@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.function.Function;
-
 import javax.inject.Inject;
 
 import org.hibernate.search.test.integration.spring.injection.i18n.InternationalizedValue;
@@ -18,11 +17,12 @@ import org.hibernate.search.test.integration.spring.injection.model.EntityWithSp
 import org.hibernate.search.test.integration.spring.injection.model.EntityWithSpringAwareBridgesDao;
 import org.hibernate.search.test.integration.spring.injection.search.NonSpringBridge;
 import org.hibernate.search.testsupport.TestForIssue;
+
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -30,13 +30,19 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringInjectionITApplicationConfiguration.class)
-// Use @DirtiesContext to reinitialize the database (thanks to hbm2ddl.auto) between test methods
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @TestForIssue(jiraKey = "HSEARCH-1316")
 public class SpringInjectionIT {
 
 	@Inject
 	private EntityWithSpringAwareBridgesDao dao;
+
+	@After
+	public void cleanUpData() {
+		// we're cleaning the data manually,
+		// in order to have a class level application context,
+		// to support the job of ExpectedLog4jLog
+		dao.purge();
+	}
 
 	@Test
 	public void injectedFieldBridge() {
