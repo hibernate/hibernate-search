@@ -24,7 +24,7 @@ import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.common.spi.HibernateOrmSpiUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -88,7 +88,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
 		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
-		ConfigurationService service = HibernateOrmUtils.getServiceOrFail(
+		ConfigurationService service = HibernateOrmSpiUtils.serviceOrFail(
 				serviceRegistry, ConfigurationService.class );
 		String entityDefinition = OUTBOXEVENT_ENTITY_MAPPING.get(
 				AllAwareConfigurationPropertySource.fromMap( (Map<String, ?>) service.getSettings() ) );
