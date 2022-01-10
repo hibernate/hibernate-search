@@ -44,7 +44,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 	public static final String HSEARCH_PREFIX = "HSEARCH_";
 
 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-	private static final String TABLE_NAME = HSEARCH_PREFIX + "AGENT";
+	public static final String TABLE_NAME = HSEARCH_PREFIX + "AGENT";
 
 	private static final String CLASS_NAME = Agent.class.getName();
 
