@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +60,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4438")
 	public void notParsable() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
@@ -66,8 +68,9 @@ public class ElasticsearchCustomIndexSettingsIT {
 				).setup() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"There are some JSON syntax errors on the given custom index settings file:",
-						"custom-index-settings/not-parsable.json"
+						"There are some JSON syntax errors on the given custom index settings file",
+						"custom-index-settings/not-parsable.json",
+						"Expected BEGIN_OBJECT but was STRING at line 1 column 1"
 				);
 	}
 
