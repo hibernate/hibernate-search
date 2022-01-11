@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
+import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 
 public interface CoordinationConfigurationContext {
 
@@ -36,7 +37,6 @@ public interface CoordinationConfigurationContext {
 	 * Adds a mapping producer, to register entities automatically without user intervention.
 	 * @param producer A mapping producer.
 	 */
-	@SuppressWarnings("deprecation")
-	void mappingProducer(org.hibernate.boot.spi.AdditionalJaxbMappingProducer producer);
+	void mappingProducer(HibernateSearchOrmMappingProducer producer);
 
 }

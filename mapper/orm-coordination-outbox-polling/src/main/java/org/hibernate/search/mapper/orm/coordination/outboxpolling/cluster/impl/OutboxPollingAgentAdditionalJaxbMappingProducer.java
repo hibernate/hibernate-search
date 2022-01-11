@@ -11,7 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 
 import org.hibernate.boot.jaxb.Origin;
 import org.hibernate.boot.jaxb.SourceType;
@@ -20,22 +19,16 @@ import org.hibernate.boot.jaxb.internal.MappingBinder;
 import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
-import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.mapper.orm.common.spi.HibernateOrmSpiUtils;
+import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.service.ServiceRegistry;
 
-import org.jboss.jandex.IndexView;
-
-@SuppressWarnings("deprecation")
 public class OutboxPollingAgentAdditionalJaxbMappingProducer
-		implements org.hibernate.boot.spi.AdditionalJaxbMappingProducer {
+		implements HibernateSearchOrmMappingProducer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -78,7 +71,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			"</hibernate-mapping>\n";
 
 	private static final ConfigurationProperty<String> AGENT_ENTITY_MAPPING =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSpiSettings.AGENT_ENTITY_MAPPING )
+			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSpiSettings.CoordinationRadicals.AGENT_ENTITY_MAPPING )
 					.asString()
 					.withDefault( ENTITY_DEFINITION )
 					.build();
@@ -86,14 +79,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 	@Override
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
-	@SuppressWarnings("unchecked")
-	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
-			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
-		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
-		ConfigurationService service = HibernateOrmSpiUtils.serviceOrFail(
-				serviceRegistry, ConfigurationService.class );
-		String entityDefinition = AGENT_ENTITY_MAPPING.get(
-				AllAwareConfigurationPropertySource.fromMap( (Map<String, ?>) service.getSettings() ) );
+	public Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource,
+			MappingBinder mappingBinder, MetadataBuildingContext buildingContext) {
+		String entityDefinition = AGENT_ENTITY_MAPPING.get( propertySource );
 
 		log.applicationNodeGeneratedEntityMapping( entityDefinition );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
