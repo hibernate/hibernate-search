@@ -83,7 +83,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			MappingBinder mappingBinder, MetadataBuildingContext buildingContext) {
 		String entityDefinition = AGENT_ENTITY_MAPPING.get( propertySource );
 
-		log.applicationNodeGeneratedEntityMapping( entityDefinition );
+		log.agentGeneratedEntityMapping( entityDefinition );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
 
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
