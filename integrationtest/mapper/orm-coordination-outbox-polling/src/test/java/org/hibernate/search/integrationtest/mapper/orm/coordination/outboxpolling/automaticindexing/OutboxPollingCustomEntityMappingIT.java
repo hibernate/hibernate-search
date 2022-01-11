@@ -100,7 +100,7 @@ public class OutboxPollingCustomEntityMappingIT {
 
 	@Test
 	public void validOutboxEventMapping() {
-		MostRecentStatementInspector statementInspector = new MostRecentStatementInspector();
+		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
@@ -140,7 +140,7 @@ public class OutboxPollingCustomEntityMappingIT {
 
 	@Test
 	public void validAgentMapping() {
-		MostRecentStatementInspector statementInspector = new MostRecentStatementInspector();
+		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
@@ -220,11 +220,11 @@ public class OutboxPollingCustomEntityMappingIT {
 		}
 	}
 
-	public static class MostRecentStatementInspector implements StatementInspector {
+	public static class KeysStatementInspector implements StatementInspector {
 
 		private Map<String, List<String>> sqlByKey = new HashMap<>();
 
-		public MostRecentStatementInspector() {
+		public KeysStatementInspector() {
 			for ( String key : SQL_KEYS ) {
 				sqlByKey.put( key, new ArrayList<>() );
 			}
