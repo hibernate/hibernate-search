@@ -94,6 +94,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private final ElasticsearchSimpleWorkOrchestrator generalPurposeOrchestrator;
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
+	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
@@ -120,6 +121,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.typeFactoryProvider = typeFactoryProvider;
+		this.userFacingGson = userFacingGson;
 		this.indexLayoutStrategyHolder = indexLayoutStrategyHolder;
 		this.typeNameMapping = typeNameMapping;
 
@@ -304,7 +306,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				throw log.customIndexSettingsFileNotFound( filePath, indexEventContext );
 			}
 			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
-				return link.getGsonProvider().getGson().fromJson( reader, IndexSettings.class );
+				return userFacingGson.fromJson( reader, IndexSettings.class );
 			}
 		}
 		catch (IOException e) {
@@ -329,7 +331,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				throw log.customIndexMappingFileNotFound( filePath, indexEventContext );
 			}
 			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
-				return link.getGsonProvider().getGson().fromJson( reader, RootTypeMapping.class );
+				return userFacingGson.fromJson( reader, RootTypeMapping.class );
 			}
 		}
 		catch (IOException e) {
