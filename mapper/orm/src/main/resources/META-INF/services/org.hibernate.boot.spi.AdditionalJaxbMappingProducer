@@ -1,1 +1,1 @@
-org.hibernate.search.mapper.orm.bootstrap.impl.HibernateSearchAdditionalJaxbMappingProducer
+org.hibernate.search.mapper.orm.bootstrap.impl.HibernateSearchCompositeMappingProducer

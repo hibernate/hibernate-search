@@ -15,6 +15,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategy;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationConfigurationContext;
@@ -48,8 +49,7 @@ public final class CoordinationConfigurationContextImpl implements CoordinationC
 
 	private final BeanHolder<? extends CoordinationStrategy> strategyHolder;
 
-	@SuppressWarnings("deprecation")
-	private final List<org.hibernate.boot.spi.AdditionalJaxbMappingProducer> mappingProducers = new ArrayList<>();
+	private final List<HibernateSearchOrmMappingProducer> mappingProducers = new ArrayList<>();
 	private Function<AutomaticIndexingEventSendingSessionContext, AutomaticIndexingQueueEventSendingPlan> senderFactory;
 	private boolean enlistsInTransaction = false;
 
@@ -76,9 +76,8 @@ public final class CoordinationConfigurationContextImpl implements CoordinationC
 		this.enlistsInTransaction = enlistsInTransaction;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public void mappingProducer(org.hibernate.boot.spi.AdditionalJaxbMappingProducer producer) {
+	public void mappingProducer(HibernateSearchOrmMappingProducer producer) {
 		mappingProducers.add( producer );
 	}
 
@@ -90,8 +89,7 @@ public final class CoordinationConfigurationContextImpl implements CoordinationC
 		return new ConfiguredAutomaticIndexingStrategy( senderFactory, enlistsInTransaction );
 	}
 
-	@SuppressWarnings("deprecation")
-	public List<org.hibernate.boot.spi.AdditionalJaxbMappingProducer> mappingProducers() {
+	public List<HibernateSearchOrmMappingProducer> mappingProducers() {
 		return mappingProducers;
 	}
 }

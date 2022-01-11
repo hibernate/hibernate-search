@@ -16,30 +16,39 @@ import org.hibernate.boot.jaxb.internal.MappingBinder;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
+import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
 import org.jboss.jandex.IndexView;
 
 @SuppressWarnings("deprecation")
-public class HibernateSearchAdditionalJaxbMappingProducer implements org.hibernate.boot.spi.AdditionalJaxbMappingProducer {
+public class HibernateSearchCompositeMappingProducer implements org.hibernate.boot.spi.AdditionalJaxbMappingProducer {
 
 	@Override
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
-		Optional<HibernateSearchPreIntegrationService> preIntegrationService =
+		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
 				HibernateOrmUtils.getServiceOrEmpty( buildingContext.getBootstrapContext().getServiceRegistry(),
 						HibernateSearchPreIntegrationService.class );
-		if ( !preIntegrationService.isPresent() ) {
+		if ( !preIntegrationServiceOptional.isPresent() ) {
 			// Hibernate Search is disabled
 			return Collections.emptyList();
 		}
+
+		HibernateSearchPreIntegrationService preIntegrationService = preIntegrationServiceOptional.get();
 		List<MappingDocument> mappings = new ArrayList<>();
-		for ( org.hibernate.boot.spi.AdditionalJaxbMappingProducer mappingProducer : preIntegrationService.get()
+		ConfigurationPropertySource propertySource = preIntegrationService.propertySource()
+				.withMask( SearchIntegrationEnvironment.CONFIGURATION_PROPERTIES_MASK )
+				.withMask( HibernateOrmMapperSettings.Radicals.COORDINATION );
+		for ( HibernateSearchOrmMappingProducer mappingProducer : preIntegrationService
 				.coordinationStrategyConfiguration().mappingProducers() ) {
-			mappings.addAll( mappingProducer.produceAdditionalMappings( metadata, jandexIndex, mappingBinder,
+			mappings.addAll( mappingProducer.produceMappings( propertySource, mappingBinder,
 					buildingContext ) );
 		}
 		return mappings;
