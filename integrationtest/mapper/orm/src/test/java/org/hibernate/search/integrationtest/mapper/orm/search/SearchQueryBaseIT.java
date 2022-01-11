@@ -174,9 +174,9 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					session.load( Book.class, 1 ),
-					session.load( Book.class, 2 ),
-					session.load( Book.class, 3 )
+					session.getReference( Book.class, 1 ),
+					session.getReference( Book.class, 2 ),
+					session.getReference( Book.class, 3 )
 			);
 		} );
 	}
@@ -206,9 +206,9 @@ public class SearchQueryBaseIT {
 				);
 
 				assertThat( query.fetchAllHits() ).containsExactly(
-						session.load( Book.class, 1 ),
-						session.load( Book.class, 2 ),
-						session.load( Book.class, 3 )
+						session.getReference( Book.class, 1 ),
+						session.getReference( Book.class, 2 ),
+						session.getReference( Book.class, 3 )
 				);
 			}
 		} );
@@ -234,8 +234,8 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					session.load( Book.class, 1 ),
-					session.load( Author.class, 2 )
+					session.getReference( Book.class, 1 ),
+					session.getReference( Author.class, 2 )
 			);
 		} );
 	}
@@ -328,9 +328,9 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					session.load( Book.class, 1 ),
-					session.load( Book.class, 2 ),
-					session.load( Book.class, 3 )
+					session.getReference( Book.class, 1 ),
+					session.getReference( Book.class, 2 ),
+					session.getReference( Book.class, 3 )
 			);
 		} );
 	}
@@ -357,8 +357,8 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					session.load( Book.class, 1 ),
-					session.load( Author.class, 2 )
+					session.getReference( Book.class, 1 ),
+					session.getReference( Author.class, 2 )
 			);
 		} );
 	}
@@ -427,9 +427,9 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactly(
-					session.load( Book.class, 1 ),
-					session.load( Book.class, 2 ),
-					session.load( Book.class, 3 )
+					session.getReference( Book.class, 1 ),
+					session.getReference( Book.class, 2 ),
+					session.getReference( Book.class, 3 )
 			);
 		} );
 	}
@@ -629,9 +629,9 @@ public class SearchQueryBaseIT {
 			);
 
 			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
-					new Book_Author_Score( new Book_Author( session.load( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
-					new Book_Author_Score( new Book_Author( session.load( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
-					new Book_Author_Score( new Book_Author( session.load( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
+					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
+					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
+					new Book_Author_Score( new Book_Author( session.getReference( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
 			);
 		} );
 	}

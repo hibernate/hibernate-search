@@ -74,7 +74,7 @@ public class ProxyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			ParentEntity proxy = session.load( ParentEntity.class, 1 );
+			ParentEntity proxy = session.getReference( ParentEntity.class, 1 );
 
 			// 'proxy' is a Hibernate proxy and accessing its fields will not work, even after the proxy is initialized
 			assertThat( proxy ).isInstanceOf( HibernateProxy.class );

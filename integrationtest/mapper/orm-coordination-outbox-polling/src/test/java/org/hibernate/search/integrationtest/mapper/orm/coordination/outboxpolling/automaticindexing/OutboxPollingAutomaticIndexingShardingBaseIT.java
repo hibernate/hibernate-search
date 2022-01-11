@@ -129,7 +129,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		backendMock.verifyExpectationsMet();
 
 		withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			entity.setText( "updated" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
@@ -138,7 +138,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		backendMock.verifyExpectationsMet();
 
 		withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			session.remove( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
@@ -169,7 +169,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		backendMock.verifyExpectationsMet();
 
 		withinTransaction( sessionFactory, session -> {
-			ContainedEntity contained = session.load( ContainedEntity.class, 2 );
+			ContainedEntity contained = session.getReference( ContainedEntity.class, 2 );
 			contained.setText( "updated" );
 
 			backendMock.expectWorks( IndexedAndContainingEntity.NAME )
@@ -180,7 +180,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		backendMock.verifyExpectationsMet();
 
 		withinTransaction( sessionFactory, session -> {
-			IndexedAndContainingEntity containing = session.load( IndexedAndContainingEntity.class, 1 );
+			IndexedAndContainingEntity containing = session.getReference( IndexedAndContainingEntity.class, 1 );
 			ContainedEntity contained = containing.getContained();
 			containing.setContained( null );
 			session.remove( contained );
@@ -226,7 +226,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 			int idEnd = Math.min( i + batchSize, entityCount );
 			withinTransaction( sessionFactory, session -> {
 				for ( int j = idStart; j < idEnd ; j++ ) {
-					IndexedEntity entity = session.load( IndexedEntity.class, j );
+					IndexedEntity entity = session.getReference( IndexedEntity.class, j );
 					entity.setText( "updated" );
 
 					backendMock.expectWorks( IndexedEntity.NAME )

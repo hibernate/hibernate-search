@@ -77,13 +77,13 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			entity.setIndexedField( "another value for the field" );
 			session.merge( entity );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
 
@@ -152,7 +152,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -187,7 +187,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
 

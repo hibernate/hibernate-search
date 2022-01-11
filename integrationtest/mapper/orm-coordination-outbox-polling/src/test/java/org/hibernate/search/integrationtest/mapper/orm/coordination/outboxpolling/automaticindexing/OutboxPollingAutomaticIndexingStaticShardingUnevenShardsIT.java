@@ -141,7 +141,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 			int idEnd = Math.min( i + batchSize, entityCount );
 			withinTransaction( sessionFactory, session -> {
 				for ( int j = idStart; j < idEnd ; j++ ) {
-					IndexedEntity entity = session.load( IndexedEntity.class, j );
+					IndexedEntity entity = session.getReference( IndexedEntity.class, j );
 					entity.setText( "updated" );
 
 					backendMock.expectWorks( IndexedEntity.NAME )

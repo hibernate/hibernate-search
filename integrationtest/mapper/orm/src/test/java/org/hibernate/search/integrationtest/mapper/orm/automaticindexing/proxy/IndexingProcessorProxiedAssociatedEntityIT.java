@@ -85,7 +85,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			IndexedEntity indexed1 = session.load( IndexedEntity.class, 1 );
+			IndexedEntity indexed1 = session.getReference( IndexedEntity.class, 1 );
 
 			// The contained entity should be a proxy, otherwise the test doesn't make sense
 			assertThat( indexed1.getContainedSingle() ).isInstanceOf( HibernateProxy.class );
@@ -129,9 +129,9 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 			// Create a proxy for contained1, so that the "containedList" list in indexed1 is populated with that proxy.
 			// The proxy will be initialized, but that's irrelevant to our test.
 			@SuppressWarnings("unused") // Keep a reference to the proxy so that it's not garbage collected, which would prevent the above from happening.
-			ContainedEntity contained1 = session.load( ContainedEntity.class, 2 );
+			ContainedEntity contained1 = session.getReference( ContainedEntity.class, 2 );
 
-			IndexedEntity indexed1 = session.load( IndexedEntity.class, 1 );
+			IndexedEntity indexed1 = session.getReference( IndexedEntity.class, 1 );
 
 			// The new contained entity should be a proxy, otherwise the test doesn't make sense
 			assertThat( indexed1.getContainedList().get( 0 ) ).isInstanceOf( HibernateProxy.class );

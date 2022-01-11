@@ -96,11 +96,11 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 	@TestForIssue(jiraKey = "HSEARCH-3857")
 	public void updateTriggeringReindexingOfPreviouslyUnknownEntity() {
 		setupHolder.runInTransaction( session -> {
-			IndexedEntity entity1 = session.load( IndexedEntity.class, 1 );
+			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			entity1.setName( "updated" );
 			// Add another entity to the indexing plan so that we're not done iterating over all entities
 			// when entity2 is added to the indexing plan due to the change in the child.
-			IndexedEntity entity3 = session.load( IndexedEntity.class, 3 );
+			IndexedEntity entity3 = session.getReference( IndexedEntity.class, 3 );
 			entity3.setName( "updated" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )

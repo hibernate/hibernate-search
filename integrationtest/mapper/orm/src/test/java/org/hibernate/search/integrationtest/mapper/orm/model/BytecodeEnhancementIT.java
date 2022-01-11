@@ -166,7 +166,7 @@ public class BytecodeEnhancementIT {
 			AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
 
 			OrmUtils.withinTransaction( sessionFactory, session -> {
-				IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+				IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 				entityFromTransaction.set( entity );
 
 				assertOnlyLoadedPropertiesAre( entity, "id" );

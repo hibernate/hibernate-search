@@ -93,7 +93,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 		backendMock.verifyExpectationsMet();
 
 		setupHolder.runInTransaction( session -> {
-			ContainedLevel2Entity contained2 = session.load( ContainedLevel2Entity.class, 3 );
+			ContainedLevel2Entity contained2 = session.getReference( ContainedLevel2Entity.class, 3 );
 
 			// The contained entity should be a proxy, otherwise the test doesn't make sense
 			assertThat( contained2.getContainingSingle() ).isInstanceOf( HibernateProxy.class );
@@ -148,9 +148,9 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 			// Create a proxy for contained1, so that the "containingList" list in contained2 is populated with that proxy.
 			// The proxy will be initialized, but that's irrelevant to our test.
 			@SuppressWarnings("unused") // Keep a reference to the proxy so that it's not garbage collected, which would prevent the above from happening.
-			ContainedLevel1Entity contained1 = session.load( ContainedLevel1Entity.class, 2 );
+			ContainedLevel1Entity contained1 = session.getReference( ContainedLevel1Entity.class, 2 );
 
-			ContainedLevel2Entity contained2 = session.load( ContainedLevel2Entity.class, 3 );
+			ContainedLevel2Entity contained2 = session.getReference( ContainedLevel2Entity.class, 3 );
 
 			// The contained entity should be a proxy, otherwise the test doesn't make sense
 			assertThat( contained2.getContainingList().get( 0 ) ).isInstanceOf( HibernateProxy.class );

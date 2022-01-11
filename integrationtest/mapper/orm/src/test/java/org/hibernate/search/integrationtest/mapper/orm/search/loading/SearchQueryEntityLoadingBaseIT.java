@@ -177,9 +177,9 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					 * to check that Search does not just get the entities from the persistence context
 					 * without initializing them.
 					 * testLoading() will assert that search results are not initialized.
-					 * NB: "session.load" does not load the entity but really creates a proxy.
+					 * NB: "session.getReference" does not load the entity but really creates a proxy.
 					 */
-					T proxy = session.load( model.getIndexedClass(), 1 );
+					T proxy = session.getReference( model.getIndexedClass(), 1 );
 					/*
 					 * We need to keep a reference to the proxy, otherwise it will be garbage collected
 					 * and ORM (who only holds a weak reference to it) will forget about it.
