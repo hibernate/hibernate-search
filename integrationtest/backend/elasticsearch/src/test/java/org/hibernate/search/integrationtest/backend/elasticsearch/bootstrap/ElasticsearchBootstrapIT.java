@@ -9,12 +9,14 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.engine.cfg.BackendSettings;
@@ -25,6 +27,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -41,6 +44,9 @@ public class ElasticsearchBootstrapIT {
 
 	@Rule
 	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
+
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
@@ -268,6 +274,49 @@ public class ElasticsearchBootstrapIT {
 		checkBackendWorks();
 
 		assertThat( elasticsearchClientSpy.getRequestCount() ).isNotZero();
+	}
+
+	/**
+	 * Check custom settings/mapping can be parsed when version_check.enabled is false,
+	 * meaning the elasticsearch link is only established *after*
+	 * the custom settings/mapping are parsed.
+	 */
+	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-4435"})
+	public void noVersionCheck_customSettingsAndMapping() {
+		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
+				+ actualVersion.major() + "." + actualVersion.minor().getAsInt();
+
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
+				.withBackendProperty( ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly )
+				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						elasticsearchClientSpy.factoryReference() )
+				.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
+						"bootstrap-it/custom-settings.json" )
+				.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,
+						"bootstrap-it/custom-mapping.json" )
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
+				.withIndex( index )
+				.setupFirstPhaseOnly();
+		// We do not expect the client to be created in the first phase
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
+
+		Map<String, Object> runtimeProperties = new HashMap<>();
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) );
+		checkBackendWorks();
+
+		assertThat( elasticsearchClient.index( index.name() ).settings( "index.number_of_replicas" ).get() )
+				.isEqualTo( "\"42\"" );
+		assertJsonEqualsIgnoringUnknownFields(
+				"{"
+					+ "'properties': {"
+							+ "'custom': {"
+							+ "}"
+					+ "}"
+				+ "}",
+				elasticsearchClient.index( index.name() ).type().getMapping() );
 	}
 
 	private void checkBackendWorks() {
