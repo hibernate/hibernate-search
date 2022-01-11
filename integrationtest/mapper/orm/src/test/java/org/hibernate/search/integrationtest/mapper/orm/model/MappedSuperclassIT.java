@@ -59,7 +59,7 @@ public class MappedSuperclassIT {
 	public void index() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
-			session.save( indexedPojo );
+			session.persist( indexedPojo );
 
 			backendMock.expectWorks( IndexedEntity.class.getSimpleName() )
 					.add( "1", b -> b.field( "text", "Using some text here" ) );

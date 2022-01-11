@@ -42,7 +42,7 @@ public class AuthorService implements AutoCloseable {
 			try {
 				Author entity = new Author();
 				entity.setName( name );
-				session.save( entity );
+				session.persist( entity );
 				session.getTransaction().commit();
 			}
 			catch (Throwable e) {

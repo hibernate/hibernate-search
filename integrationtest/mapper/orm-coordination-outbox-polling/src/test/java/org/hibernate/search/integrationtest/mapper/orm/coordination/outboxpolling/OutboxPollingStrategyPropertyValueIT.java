@@ -110,7 +110,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 	public void insert_createsOutboxEvent() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
-			session.save( indexedPojo );
+			session.persist( indexedPojo );
 		} );
 
 		setupHolder.runInTransaction( session -> {

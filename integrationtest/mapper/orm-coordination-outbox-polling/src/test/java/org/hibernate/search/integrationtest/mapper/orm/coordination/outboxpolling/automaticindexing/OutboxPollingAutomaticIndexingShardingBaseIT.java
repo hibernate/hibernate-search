@@ -121,7 +121,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "initial" );
-			session.save( entity );
+			session.persist( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b.field( "text", "initial" ) );
@@ -203,7 +203,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		withinTransaction( sessionFactory, session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
-				session.save( entity );
+				session.persist( entity );
 
 				backendMock.expectWorks( IndexedEntity.NAME )
 						.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );

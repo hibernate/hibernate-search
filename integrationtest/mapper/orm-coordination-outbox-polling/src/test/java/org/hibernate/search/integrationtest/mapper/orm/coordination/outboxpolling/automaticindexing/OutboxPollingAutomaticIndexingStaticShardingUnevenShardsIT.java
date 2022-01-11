@@ -109,7 +109,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		withinTransaction( sessionFactory, session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
-				session.save( entity );
+				session.persist( entity );
 
 				backendMock.expectWorks( IndexedEntity.NAME )
 						.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );
