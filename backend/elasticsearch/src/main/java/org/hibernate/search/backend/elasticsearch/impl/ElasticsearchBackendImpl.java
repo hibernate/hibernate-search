@@ -310,10 +310,10 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			}
 		}
 		catch (IOException e) {
-			throw log.customIndexSettingsErrorOnLoading( filePath, e, indexEventContext );
+			throw log.customIndexSettingsErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
 		}
 		catch (JsonSyntaxException e) {
-			throw log.customIndexSettingsJsonSyntaxErrors( filePath, e, indexEventContext );
+			throw log.customIndexSettingsJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
 		}
 	}
 
@@ -335,10 +335,10 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			}
 		}
 		catch (IOException e) {
-			throw log.customIndexMappingErrorOnLoading( filePath, e, indexEventContext );
+			throw log.customIndexMappingErrorOnLoading( filePath, e.getMessage(), e, indexEventContext );
 		}
 		catch (JsonSyntaxException e) {
-			throw log.customIndexMappingJsonSyntaxErrors( filePath, e, indexEventContext );
+			throw log.customIndexMappingJsonSyntaxErrors( filePath, e.getMessage(), e, indexEventContext );
 		}
 	}
 }
