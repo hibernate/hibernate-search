@@ -91,7 +91,7 @@ public class TransientPropertyIT {
 		// A is used to derive the transient property, so it should trigger reindexing.
 		// More related tests in the AutomaticIndexing*IT tests.
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			EntityWithDerivedFrom entity1 = session.load( EntityWithDerivedFrom.class, 1 );
+			EntityWithDerivedFrom entity1 = session.getReference( EntityWithDerivedFrom.class, 1 );
 			entity1.setA( 4 );
 
 			session.persist( entity1 );
@@ -105,7 +105,7 @@ public class TransientPropertyIT {
 
 		// C is not used to derive the transient property, so it should not trigger reindexing.
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			EntityWithDerivedFrom entity1 = session.load( EntityWithDerivedFrom.class, 1 );
+			EntityWithDerivedFrom entity1 = session.getReference( EntityWithDerivedFrom.class, 1 );
 			entity1.setC( 42 );
 
 			session.persist( entity1 );
@@ -140,7 +140,7 @@ public class TransientPropertyIT {
 		// A is used to derive the transient property, so it should trigger reindexing.
 		// More related tests in the AutomaticIndexing*IT tests.
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			EntityWithDerivedFromAndBridge entity1 = session.load( EntityWithDerivedFromAndBridge.class, 1 );
+			EntityWithDerivedFromAndBridge entity1 = session.getReference( EntityWithDerivedFromAndBridge.class, 1 );
 			entity1.setA( 4 );
 
 			session.persist( entity1 );
@@ -154,7 +154,7 @@ public class TransientPropertyIT {
 
 		// C is not used to derive the transient property, so it should not trigger reindexing.
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			EntityWithDerivedFromAndBridge entity1 = session.load( EntityWithDerivedFromAndBridge.class, 1 );
+			EntityWithDerivedFromAndBridge entity1 = session.getReference( EntityWithDerivedFromAndBridge.class, 1 );
 			entity1.setC( 42 );
 
 			session.persist( entity1 );

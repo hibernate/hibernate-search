@@ -105,7 +105,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
 		} );
 
@@ -117,7 +117,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			session.remove( entity );
 		} );
 
@@ -152,7 +152,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
@@ -164,7 +164,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			session.remove( entity );
 		} );
 
@@ -200,7 +200,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
@@ -212,7 +212,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			session.remove( entity );
 		} );
 
@@ -257,7 +257,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
@@ -305,7 +305,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			entity.setText( "updated" );
 		} );
 
@@ -354,7 +354,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			ContainedEntity entity = session.getReference( ContainedEntity.class, 2 );
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
 
@@ -402,7 +402,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			IndexedAndContainedEntity entity = session.getReference( IndexedAndContainedEntity.class, 2 );
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
 
@@ -480,7 +480,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		} );
 
 		setupHolder.runInTransaction( session -> {
-			RoutedIndexedEntity entity = session.load( RoutedIndexedEntity.class, 1 );
+			RoutedIndexedEntity entity = session.getReference( RoutedIndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
 			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 		} );

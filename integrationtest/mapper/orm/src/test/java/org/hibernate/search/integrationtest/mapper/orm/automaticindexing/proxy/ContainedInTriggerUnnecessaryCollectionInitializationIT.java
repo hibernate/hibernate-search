@@ -91,7 +91,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 
 		AtomicReference<Group> groupFromModifyingTransaction = new AtomicReference<>();
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			Group group = session.load( Group.class, 1 );
+			Group group = session.getReference( Group.class, 1 );
 			groupFromModifyingTransaction.set( group );
 
 			// The posts should not be initialized

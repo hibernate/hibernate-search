@@ -146,7 +146,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		outboxEventFinder.enableFilter( true );
 
 		setupHolder.runInTransaction( session -> {
-			IndexedEntity containing = session.load( IndexedEntity.class, 1 );
+			IndexedEntity containing = session.getReference( IndexedEntity.class, 1 );
 			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initialValue" );
 			containing.setContained( contained );
 			contained.setContaining( containing );
