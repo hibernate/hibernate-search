@@ -94,7 +94,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	public void insertUpdateDelete_indexed() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
-			session.save( indexedPojo );
+			session.persist( indexedPojo );
 		} );
 
 		setupHolder.runInTransaction( session -> {
@@ -427,7 +427,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		for ( int i = 1; i <= 7; i++ ) {
 			IndexedEntity indexedPojo = new IndexedEntity( i, "Using some text here" );
 			setupHolder.runInTransaction( session -> {
-				session.save( indexedPojo );
+				session.persist( indexedPojo );
 			} );
 		}
 
@@ -445,12 +445,12 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 	public void multipleTypes() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
-			session.save( indexedPojo );
+			session.persist( indexedPojo );
 		} );
 
 		setupHolder.runInTransaction( session -> {
 			AnotherIndexedEntity indexedPojo = new AnotherIndexedEntity( 1, "Using some text here" );
-			session.save( indexedPojo );
+			session.persist( indexedPojo );
 		} );
 
 		setupHolder.runInTransaction( session -> {
@@ -467,7 +467,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		setupHolder.runInTransaction( session -> {
 			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here",
 					RoutedIndexedEntity.Status.FIRST );
-			session.save( indexedPojo );
+			session.persist( indexedPojo );
 		} );
 
 		setupHolder.runInTransaction( session -> {

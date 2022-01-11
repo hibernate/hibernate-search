@@ -94,7 +94,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 			withinTransaction( sessionFactory, session -> {
 				for ( int j = idStart; j < idEnd ; j++ ) {
 					IndexedEntity entity = new IndexedEntity( j, "initial" );
-					session.save( entity );
+					session.persist( entity );
 
 					backendMock.expectWorks( IndexedEntity.NAME )
 							.add( String.valueOf( j ), b -> b.field( "text", "initial" ) );

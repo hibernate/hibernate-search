@@ -52,7 +52,7 @@ public class AutomaticIndexingMultiTenancyIT {
 
 		with( sessionFactory, TENANT_1_ID ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "value for tenant 1" );
-			session.save( entity );
+			session.persist( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME, TENANT_1_ID )
 					.add( String.valueOf( 1 ), b -> b.field( "text", "value for tenant 1" ) );
@@ -61,7 +61,7 @@ public class AutomaticIndexingMultiTenancyIT {
 
 		with( sessionFactory, TENANT_2_ID ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "value for tenant 2" );
-			session.save( entity );
+			session.persist( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME, TENANT_2_ID )
 					.add( String.valueOf( 1 ), b -> b.field( "text", "value for tenant 2" ) );

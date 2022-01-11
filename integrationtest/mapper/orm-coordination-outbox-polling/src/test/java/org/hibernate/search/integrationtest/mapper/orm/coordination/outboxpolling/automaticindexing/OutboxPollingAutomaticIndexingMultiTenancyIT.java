@@ -96,7 +96,7 @@ public class OutboxPollingAutomaticIndexingMultiTenancyIT {
 			with( sessionFactoryForAllTenants, tenantId ).runInTransaction( session -> {
 				for ( int i = 0; i < entityCount; i++ ) {
 					IndexedEntity entity = new IndexedEntity( i, "initial" );
-					session.save( entity );
+					session.persist( entity );
 
 					backendMock.expectWorks( IndexedEntity.NAME, tenantId )
 							.add( String.valueOf( i ), b -> b.field( "text", "initial" ) );

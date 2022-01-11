@@ -47,7 +47,7 @@ public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "initial" );
-			session.save( entity );
+			session.persist( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.addOrUpdate( String.valueOf( 1 ), b -> b.field( "text", "initial" ) );
@@ -118,7 +118,7 @@ public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 
 		with( sessionFactory, tenant1Id ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "initial value for tenant 1" );
-			session.save( entity );
+			session.persist( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME, tenant1Id )
 					.addOrUpdate( String.valueOf( 1 ), b -> b
@@ -127,7 +127,7 @@ public class OutboxPollingAutomaticIndexingWhileMassIndexingIT {
 
 		with( sessionFactory, tenant2Id ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "initial value for tenant 2" );
-			session.save( entity );
+			session.persist( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME, tenant2Id )
 					.addOrUpdate( String.valueOf( 1 ), b -> b
