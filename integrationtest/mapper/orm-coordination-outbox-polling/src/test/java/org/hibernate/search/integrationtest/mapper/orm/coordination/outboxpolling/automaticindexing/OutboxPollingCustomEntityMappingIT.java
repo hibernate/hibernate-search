@@ -19,6 +19,9 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MappingException;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
@@ -121,11 +124,16 @@ public class OutboxPollingCustomEntityMappingIT {
 
 		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_TABLE_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_TABLE_NAME ) ).isPositive();
-		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME ) ).isZero();
-		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_GENERATOR_NAME ) ).isPositive();
-
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isZero();
+
+		if ( getDialect() instanceof MySQLDialect ) {
+			// statements for sequences are not reported to the interceptor with this dialect
+			return;
+		}
+
+		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME ) ).isZero();
+		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_GENERATOR_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isZero();
 	}
@@ -156,13 +164,23 @@ public class OutboxPollingCustomEntityMappingIT {
 
 		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_TABLE_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_TABLE_NAME ) ).isZero();
-		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME ) ).isPositive();
-		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_GENERATOR_NAME ) ).isZero();
-
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isPositive();
+
+		if ( getDialect() instanceof MySQLDialect ) {
+			// statements for sequences are not reported to the interceptor with this dialect
+			return;
+		}
+
+		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME ) ).isPositive();
+		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_GENERATOR_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isPositive();
+	}
+
+	private Dialect getDialect() {
+		return sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
+				.getJdbcEnvironment().getDialect();
 	}
 
 	@Entity(name = IndexedEntity.INDEX)
