@@ -1,0 +1,8 @@
+{
+  "properties":{
+    "userField":{
+      "type":"keyword",
+      "someUnknownParameter":true
+    }
+  }
+}
