@@ -161,7 +161,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private void checkStarted() {
 		if ( clientImplementor == null ) {
 			throw new AssertionFailure(
-					"Attempt to retrieve Elasticsearch client or related information before the backend was started."
+					"Attempt to retrieve Elasticsearch client or related information before the Elasticsearch client was started."
 			);
 		}
 	}
