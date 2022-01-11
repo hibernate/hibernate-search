@@ -88,7 +88,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 14, value = "Generated entity mapping for agents used in the outbox-polling coordination strategy: %1$s")
-	void applicationNodeGeneratedEntityMapping(String xmlMappingDefinition);
+	void agentGeneratedEntityMapping(String xmlMappingDefinition);
 
 	@Message(id = ID_OFFSET + 15, value = "The pulse interval must be greater than or equal to the polling interval"
 			+ " i.e. in this case at least %s")
