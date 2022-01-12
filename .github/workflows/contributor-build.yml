@@ -25,8 +25,11 @@ concurrency:
 
 env:
   # Maven Wagon options are supposed to work around a problem on GitHub Actions' hosting platform, Azure
-  # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-691957310
-  MAVEN_ARGS: "-e -B -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3"
+  # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-689467080
+  # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-718396233
+  # See https://github.com/apache/pulsar/blob/60ef5e983e5e8956bd0b602b5741bd6255c6258a/.github/workflows/ci-unit.yaml#L30
+  # See https://github.com/apache/pulsar/commit/9405e6bfcba250f014faae6ba0490a8045cb4674
+  MAVEN_ARGS: "-e -B -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3"
 jobs:
   build:
     name: Build and test on Java 11
