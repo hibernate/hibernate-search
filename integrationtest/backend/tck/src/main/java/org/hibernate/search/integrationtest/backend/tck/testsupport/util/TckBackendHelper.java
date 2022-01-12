@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+
 public interface TckBackendHelper {
 
 	TckBackendFeatures getBackendFeatures();
@@ -34,5 +37,11 @@ public interface TckBackendHelper {
 	TckBackendSetupStrategy<?> createHashBasedShardingBackendSetupStrategy(int shardCount);
 
 	TckBackendSetupStrategy<?> createRarePeriodicRefreshBackendSetupStrategy();
+
+	/**
+	 * @param f A {@link SearchPredicateFactory}
+	 * @return A slow predicate, i.e. a predicate whose execution will take more than 10 milliseconds per document.
+	 */
+	PredicateFinalStep createSlowPredicate(SearchPredicateFactory f);
 
 }

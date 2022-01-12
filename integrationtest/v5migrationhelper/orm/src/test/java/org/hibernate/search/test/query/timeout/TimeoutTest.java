@@ -25,6 +25,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.query.SlowQuery;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,10 +49,7 @@ public class TimeoutTest extends SearchTestBase {
 		QueryBuilder builder = fts.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		BooleanJunction junction = builder.bool();
 		junction.must( builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery() );
-		// Lots of clauses on different fields, to make the query slow
-		for ( String fieldName : Clock.FIELD_NAMES ) {
-			junction.must( builder.keyword().onField( fieldName ).matching( Clock.BUZZ_WORDS ).createQuery() );
-		}
+		junction.must( new SlowQuery( 10 ) );
 		slowQuery = junction.createQuery();
 		storeClocks( fts );
 	}
@@ -64,7 +62,7 @@ public class TimeoutTest extends SearchTestBase {
 			if ( tx.getStatus() != TransactionStatus.ACTIVE ) {
 				tx = fts.beginTransaction();
 			}
-			assertEquals( 1000, fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+			assertEquals( 100, fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
 			fts.purgeAll( Clock.class );
 			tx.commit();
 			fts.close();
@@ -115,7 +113,7 @@ public class TimeoutTest extends SearchTestBase {
 		hibernateQuery.setTimeout( 5, TimeUnit.MINUTES );
 		List results = hibernateQuery.list();
 		assertFalse( hibernateQuery.hasPartialResults() );
-		assertEquals( 500, results.size() );
+		assertEquals( 50, results.size() );
 
 		tx.commit();
 	}
@@ -123,7 +121,7 @@ public class TimeoutTest extends SearchTestBase {
 	private void assertTimeoutOccursOnScroll() {
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.setTimeout( 10, TimeUnit.MICROSECONDS );
-		hibernateQuery.setFetchSize( 1000 );
+		hibernateQuery.setFetchSize( 100 );
 		try {
 			ScrollableResults scroll = hibernateQuery.scroll();
 			scroll.next();
@@ -157,7 +155,7 @@ public class TimeoutTest extends SearchTestBase {
 	private void assertCorrectNumberOfClocksNoTimeout() {
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 		final List results = hibernateQuery.list();
-		assertEquals( 500, results.size() );
+		assertEquals( 50, results.size() );
 		fts.clear();
 	}
 
@@ -168,13 +166,12 @@ public class TimeoutTest extends SearchTestBase {
 	 */
 	private static void storeClocks(FullTextSession fts) {
 		Transaction tx = fts.beginTransaction();
-		for ( int i = 0; i < 1000; i++ ) {
+		for ( int i = 0; i < 100; i++ ) {
 			Clock clock = new Clock(
 					(long) i,
 					"Model cat A" + i,
 					( i % 2 == 0 ) ? "Seiko" : "Swatch",
-					(long) ( i + 2000 ),
-					Clock.TEXTS[i % 3]
+					(long) ( i + 2000 )
 			);
 			fts.persist( clock );
 		}
@@ -186,7 +183,7 @@ public class TimeoutTest extends SearchTestBase {
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );
 		List results = hibernateQuery.list();
-		assertEquals( "Test below limit termination", 500, results.size() );
+		assertEquals( "Test below limit termination", 50, results.size() );
 		assertFalse( hibernateQuery.hasPartialResults() );
 		fts.clear();
 	}
