@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -95,5 +98,19 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 						"index-settings-for-tests/rare-periodic-refresh.json" );
 			}
 		};
+	}
+
+	@Override
+	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
+		return f.extension( ElasticsearchExtension.get() )
+				.fromJson( "{\"script\": {"
+						+ "\"script\": \""
+								+ "long end = System.nanoTime() + 10000000L;"
+								+ "while ( System.nanoTime() < end ) {"
+										// We can't use Thread.sleep, so let's do something slow.
+										+ "LongStream.range( 0L, 100000000L ).sum();"
+								+ "}"
+						+ "\""
+				+ "} }" );
 	}
 }

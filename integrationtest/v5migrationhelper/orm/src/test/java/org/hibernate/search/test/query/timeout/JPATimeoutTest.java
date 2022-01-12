@@ -22,6 +22,7 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.query.SlowQuery;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -43,10 +44,7 @@ public class JPATimeoutTest extends JPATestCase {
 		QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		BooleanJunction junction = builder.bool();
 		junction.must( builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery() );
-		// Lots of clauses on different fields, to make the query slow
-		for ( String fieldName : Clock.FIELD_NAMES ) {
-			junction.must( builder.keyword().onField( fieldName ).matching( Clock.BUZZ_WORDS ).createQuery() );
-		}
+		junction.must( new SlowQuery( 10 ) );
 		slowQuery = junction.createQuery();
 		storeClocks( em );
 		em.close();
@@ -75,7 +73,7 @@ public class JPATimeoutTest extends JPATestCase {
 		em.clear();
 
 		em.getTransaction().begin();
-		assertEquals( 1000, em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+		assertEquals( 100, em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
 		em.getTransaction().commit();
 
 		em.close();
@@ -87,10 +85,9 @@ public class JPATimeoutTest extends JPATestCase {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
 		em.getTransaction().begin();
-		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		FullTextQuery hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		List results = hibernateQuery.getResultList();
-		assertEquals( 500, results.size() );
+		assertEquals( 50, results.size() );
 
 		em.clear();
 
@@ -120,7 +117,7 @@ public class JPATimeoutTest extends JPATestCase {
 		hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );
 		results = hibernateQuery.getResultList();
-		assertEquals( "Test below limit termination", 500, results.size() );
+		assertEquals( "Test below limit termination", 50, results.size() );
 		assertFalse( hibernateQuery.hasPartialResults() );
 
 		em.getTransaction().commit();
@@ -128,7 +125,7 @@ public class JPATimeoutTest extends JPATestCase {
 		em.clear();
 
 		em.getTransaction().begin();
-		assertEquals( 1000, em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+		assertEquals( 100, em.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
 		em.getTransaction().commit();
 
 		em.close();
@@ -152,13 +149,12 @@ public class JPATimeoutTest extends JPATestCase {
 	 */
 	private static void storeClocks(FullTextEntityManager em) {
 		em.getTransaction().begin();
-		for ( int i = 0; i < 1000; i++ ) {
+		for ( int i = 0; i < 100; i++ ) {
 			Clock clock = new Clock(
 					(long) i,
 					"Model cat A" + i,
 					( i % 2 == 0 ) ? "Seiko" : "Swatch",
-					(long) ( i + 2000 ),
-					Clock.TEXTS[i % 3]
+					(long) ( i + 2000 )
 			);
 			em.persist( clock );
 		}
