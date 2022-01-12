@@ -66,7 +66,9 @@ public class ElasticsearchCustomIndexMappingIT {
 				.hasMessageContainingAll(
 						"Hibernate Search encountered failures during bootstrap",
 						"Elasticsearch response indicates a failure",
-						"mapper_parsing_exception", "unknown parameter", "someUnknownParameter"
+						// We cannot check for the presence of "unknown parameter"
+						// because in ES 5.6 -> 7.9 it's "unsupported parameter" instead.
+						"mapper_parsing_exception", "someUnknownParameter"
 				);
 	}
 
