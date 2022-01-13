@@ -60,6 +60,11 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			ConfigurationService ormConfigurationService =
 					HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
 			Object unknownBeanManager = ormConfigurationService.getSettings().get( AvailableSettings.CDI_BEAN_MANAGER );
+			if ( unknownBeanManager == null ) {
+				// Try jakarta settings as a default
+				// Not getting the constant from AvailableSettings because it does not exist in some ORM versions
+				unknownBeanManager = ormConfigurationService.getSettings().get( "jakarta.persistence.bean.manager" );
+			}
 			if ( unknownBeanManager instanceof ExtendedBeanManager ) {
 				ExtendedBeanManager extendedBeanManager = (ExtendedBeanManager) unknownBeanManager;
 				ExtendedBeanManagerSynchronizer synchronizer = new ExtendedBeanManagerSynchronizer();
