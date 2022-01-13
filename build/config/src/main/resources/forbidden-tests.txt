@@ -30,6 +30,14 @@ org.hibernate.annotations.QueryHints @ Hibernate ORM's QueryHints constants may 
 org.hibernate.tool.schema.Action @ Hibernate ORM doesn't support passing Action to property "hibernate.hbm2ddl.auto": you must pass a string
 
 ################################################################################################################
+@defaultMessage Favor EntityManager methods over their Session equivalent
+org.hibernate.Session.save(java.lang.Object) @ Use persist() instead
+org.hibernate.Session.save(java.lang.String, java.lang.Object) @ Use persist() instead
+org.hibernate.Session.load(java.lang.Class<T>, java.lang.Object) @ Use getReference() instead
+org.hibernate.Session.delete(java.lang.Object) @ Use remove() instead
+org.hibernate.Session.delete(java.lang.String, java.lang.Object) @ Use remove() instead
+
+################################################################################################################
 # Various, from our own code.
 # This one needs to be handled with special care to avoid tests breaking out of their isolation (see exclusions):
 org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
