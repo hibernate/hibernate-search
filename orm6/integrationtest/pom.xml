@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-integrationtest-orm6</artifactId>
+        <version>6.1.0-SNAPSHOT</version>
+        <relativePath>../parents/integrationtest</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-orm6</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search ITs - ORM6 - Aggregator POM</name>
+    <description>Aggregator POM of Hibernate Search ORM6 integration tests (except documentation)</description>
+
+    <modules>
+        <module>mapper/orm</module>
+        <module>mapper/orm-cdi</module>
+        <module>mapper/orm-envers</module>
+        <module>mapper/orm-realbackend</module>
+        <module>mapper/orm-coordination-outbox-polling</module>
+        <module>mapper/orm-batch-jsr352</module>
+        <module>v5migrationhelper/orm</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>javaModuleITs</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>!8</value>
+                </property>
+            </activation>
+            <modules>
+                <module>jdk/java-modules</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
+
