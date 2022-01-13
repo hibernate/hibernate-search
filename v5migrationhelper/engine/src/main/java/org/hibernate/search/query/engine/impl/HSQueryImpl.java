@@ -102,9 +102,14 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	@Override
-	public HSQuery maxResults(int maxResults) {
+	public HSQuery maxResults(Integer maxResults) {
 		this.limit = maxResults;
 		return this;
+	}
+
+	@Override
+	public Integer maxResults() {
+		return limit;
 	}
 
 	@Override

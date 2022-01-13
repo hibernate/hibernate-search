@@ -96,7 +96,12 @@ public interface HSQuery extends ProjectionConstants {
 	 *
 	 * @return {@code this} in order to allow method chaining
 	 */
-	HSQuery maxResults(int maxResults);
+	HSQuery maxResults(Integer maxResults);
+
+	/**
+	 * @return The last value passed to {@link #maxResults(Integer)}, or {@code null}.
+	 */
+	Integer maxResults();
 
 	/**
 	 * @return the targeted entity types
