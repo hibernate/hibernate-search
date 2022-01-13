@@ -80,7 +80,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 		setupHolder.runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 
-			session.delete( owner1 );
+			session.remove( owner1 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" );
@@ -103,7 +103,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 			// Necessary because the foreign key will no longer reference an existing row.
 			owner1.setOptionalOneToOne( null );
 
-			session.delete( nonOwner2 );
+			session.remove( nonOwner2 );
 
 			// This update is caused by the call to owner1.setOptionalOneToOne;
 			// it has nothing to do with the deletion.
@@ -125,8 +125,8 @@ public class AutomaticIndexingAssociationDeletionIT {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 			AssociationNonOwner nonOwner2 = session.getReference( AssociationNonOwner.class, 2 );
 
-			session.delete( owner1 );
-			session.delete( nonOwner2 );
+			session.remove( owner1 );
+			session.remove( nonOwner2 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" );
@@ -171,7 +171,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 		setupHolder.runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 
-			session.delete( owner1 );
+			session.remove( owner1 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" );
@@ -199,7 +199,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 			owner1.setManyToOne( null );
 			owner3.setManyToOne( null );
 
-			session.delete( nonOwner2 );
+			session.remove( nonOwner2 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					// This update is caused by the call to owner1.setManyToOne;
@@ -229,8 +229,8 @@ public class AutomaticIndexingAssociationDeletionIT {
 			// Necessary because the foreign key will no longer reference an existing row.
 			owner3.setManyToOne( null );
 
-			session.delete( owner1 );
-			session.delete( nonOwner2 );
+			session.remove( owner1 );
+			session.remove( nonOwner2 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					// This update is caused by the call to owner3.setManyToOne;
@@ -291,7 +291,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 		setupHolder.runInTransaction( session -> {
 			AssociationOwner owner1 = session.getReference( AssociationOwner.class, 1 );
 
-			session.delete( owner1 );
+			session.remove( owner1 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" );
@@ -316,7 +316,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 			owner1.getManyToMany().remove( nonOwner2 );
 			owner3.getManyToMany().remove( nonOwner2 );
 
-			session.delete( nonOwner2 );
+			session.remove( nonOwner2 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					// This update is caused by the call to owner1.getManyToMany().remove();
@@ -352,8 +352,8 @@ public class AutomaticIndexingAssociationDeletionIT {
 			// Necessary because the foreign key will no longer reference an existing row.
 			owner3.getManyToMany().remove( nonOwner2 );
 
-			session.delete( owner1 );
-			session.delete( nonOwner2 );
+			session.remove( owner1 );
+			session.remove( nonOwner2 );
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" )

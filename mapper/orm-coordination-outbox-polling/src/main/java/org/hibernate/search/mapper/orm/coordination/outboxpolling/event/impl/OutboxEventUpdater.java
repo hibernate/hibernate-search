@@ -90,7 +90,7 @@ public class OutboxEventUpdater {
 		}
 
 		for ( OutboxEvent event : eventToDelete ) {
-			session.delete( event );
+			session.remove( event );
 		}
 	}
 

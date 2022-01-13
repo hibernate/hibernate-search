@@ -116,7 +116,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, id );
-			session.delete( entity );
+			session.remove( entity );
 		} );
 
 		sessionFactory.close();

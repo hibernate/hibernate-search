@@ -177,7 +177,7 @@ public class ProgrammaticMappingSmokeIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 			session.persist( entity4 );
-			session.delete( entity1 );
+			session.remove( entity1 );
 			session.persist( entity3 );
 			session.persist( entity5 );
 			session.persist( entity6 );

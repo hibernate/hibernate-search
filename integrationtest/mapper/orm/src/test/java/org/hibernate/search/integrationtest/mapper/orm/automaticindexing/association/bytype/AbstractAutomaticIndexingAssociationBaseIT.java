@@ -610,7 +610,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// and the deletion even will simply be ignored.
 			primitives.containingAsIndexedEmbedded().get( containedEntity );
 
-			session.delete( containedEntity );
+			session.remove( containedEntity );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> { } );
@@ -669,7 +669,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// and the deletion even will simply be ignored.
 			primitives.containingAsIndexedEmbedded().get( containedEntity );
 
-			session.delete( containedEntity );
+			session.remove( containedEntity );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> { } );
@@ -1226,7 +1226,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// and the deletion even will simply be ignored.
 			primitives.containingAsIndexedEmbedded().get( containedEntity );
 
-			session.delete( containedEntity );
+			session.remove( containedEntity );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
@@ -1284,7 +1284,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			// and the deletion even will simply be ignored.
 			primitives.containingAsIndexedEmbedded().get( containedEntity );
 
-			session.delete( containedEntity );
+			session.remove( containedEntity );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
