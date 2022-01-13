@@ -2484,7 +2484,6 @@
         <profile>
             <id>dist</id>
             <modules>
-                <module>orm6</module>
                 <module>distribution</module>
                 <module>build/configuration-properties-collector</module>
             </modules>
