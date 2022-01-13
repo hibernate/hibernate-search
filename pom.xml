@@ -266,6 +266,20 @@
           -->
         <version.org.jboss.jandex>2.2.3.Final</version.org.jboss.jandex>
         <version.javax.persistence>2.2</version.javax.persistence>
+
+        <!-- >>> ORM 6 / Jakarta Persistence -->
+        <version.org.hibernate.orm>6.0.0.Beta3</version.org.hibernate.orm>
+        <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
+        <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
+        <version.org.hibernate.commons.annotations.orm6>5.1.2.Final</version.org.hibernate.commons.annotations.orm6>
+        <!-- This version must be kept in sync with the version of the dependency in Hibernate ORM 6.
+             DO NOT USE DEPENDENCY MANAGEMENT FOR THIS DEPENDENCY!
+             If we do not use dependency management for this dependency, we get a build failure
+             when the versions start diverging, thanks to the maven-enforcer-plugin
+             and to an artificial dependency in the mapper-orm artifact
+             (which is only necessary for the maven-enforcer-plugin checks to work).
+          -->
+        <version.org.jboss.jandex>2.2.3.Final</version.org.jboss.jandex>
         <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
 
         <!-- >>> JSR 352 -->
@@ -870,6 +884,11 @@
                 <version>${version.org.hibernate}</version>
             </dependency>
             <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${version.org.hibernate.orm}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-envers</artifactId>
                 <version>${version.org.hibernate}</version>
@@ -878,6 +897,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-envers-jakarta</artifactId>
                 <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-envers</artifactId>
+                <version>${version.org.hibernate.orm}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.common</groupId>
@@ -1213,6 +1237,18 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-testing</artifactId>
+                <version>${version.org.hibernate.orm}</version>
+                <exclusions>
+                    <!-- we use Log4J 2 -->
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
             <!-- JBatch runtime -->
             <dependency>
@@ -1411,13 +1447,23 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>parse-orm-version</id>
+                        <id>parse-hibernate-version</id>
                         <goals>
                             <goal>parse-version</goal>
                         </goals>
                         <configuration>
                             <propertyPrefix>parsed-version.org.hibernate</propertyPrefix>
                             <versionString>${version.org.hibernate}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-hibernate-orm-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.orm</propertyPrefix>
+                            <versionString>${version.org.hibernate.orm}</versionString>
                         </configuration>
                     </execution>
                     <execution>

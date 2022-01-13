@@ -25,6 +25,18 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm-orm6</artifactId>
         </dependency>
+        <!-- This dependency is only here to solve compilation warnings.
+             For some reason, if we rely on the transitive dependency from mapper-orm,
+             we end up with compilation warnings like this:
+                unknown enum constant XmlAccessType.FIELD
+             This seems related to the annotation processor,
+             but who knows what the exact reason is.
+         -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
