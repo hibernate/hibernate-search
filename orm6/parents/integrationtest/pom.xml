@@ -41,6 +41,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.hibernate.common</groupId>
+                <artifactId>hibernate-commons-annotations</artifactId>
+                <version>${version.org.hibernate.commons.annotations.orm6}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se-shaded</artifactId>
                 <version>${version.org.jboss.weld.jakarta}</version>
