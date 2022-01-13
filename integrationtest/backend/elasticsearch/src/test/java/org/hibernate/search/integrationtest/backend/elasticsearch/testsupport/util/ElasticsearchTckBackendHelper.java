@@ -108,7 +108,9 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 								+ "long end = System.nanoTime() + 10000000L;"
 								+ "while ( System.nanoTime() < end ) {"
 										// We can't use Thread.sleep, so let's do something slow.
-										+ "LongStream.range( 0L, 100000000L ).sum();"
+										// Note that (0L, 100000000L) takes forever to execute on AWS ES Service,
+										// so we'll stick to a shorter range.
+										+ "LongStream.range( 0L, 1000000L ).sum();"
 								+ "}"
 						+ "\""
 				+ "} }" );
