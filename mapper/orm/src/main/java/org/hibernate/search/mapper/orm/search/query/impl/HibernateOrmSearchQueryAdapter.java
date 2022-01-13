@@ -30,7 +30,6 @@ import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
-import org.hibernate.query.Query;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -199,7 +198,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Query<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
+	public HibernateOrmSearchQueryAdapter<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
 		loadingOptions.entityGraphHint( new EntityGraphHint<>( graph, semantic ), true );
 		return this;
 	}
