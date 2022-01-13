@@ -9,7 +9,6 @@ package org.hibernate.search.impl;
 import java.sql.Connection;
 import java.util.TimeZone;
 
-import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionBuilder;
@@ -65,13 +64,6 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 
 	@Deprecated
 	@Override
-	public FullTextSharedSessionBuilder flushBeforeCompletion() {
-		builder.flushBeforeCompletion();
-		return this;
-	}
-
-	@Deprecated
-	@Override
 	public FullTextSharedSessionBuilder transactionContext() {
 		builder.transactionContext();
 		return this;
@@ -95,13 +87,6 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return this;
 	}
 
-	@Deprecated
-	@Override
-	public FullTextSharedSessionBuilder connectionReleaseMode(ConnectionReleaseMode connectionReleaseMode) {
-		builder.connectionReleaseMode( connectionReleaseMode );
-		return this;
-	}
-
 	@Override
 	public FullTextSharedSessionBuilder autoJoinTransactions(boolean autoJoinTransactions) {
 		builder.autoJoinTransactions( autoJoinTransactions );
@@ -112,13 +97,6 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 	@Override
 	public FullTextSharedSessionBuilder autoClose(boolean autoClose) {
 		builder.autoClose( autoClose );
-		return this;
-	}
-
-	@Deprecated
-	@Override
-	public FullTextSharedSessionBuilder flushBeforeCompletion(boolean flushBeforeCompletion) {
-		builder.flushBeforeCompletion( flushBeforeCompletion );
 		return this;
 	}
 
