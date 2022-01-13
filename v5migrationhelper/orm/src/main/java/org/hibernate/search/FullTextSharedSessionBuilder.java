@@ -10,7 +10,6 @@ import java.sql.Connection;
 
 import jakarta.persistence.EntityManager;
 
-import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SharedSessionBuilder;
@@ -42,10 +41,6 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 
 	@Deprecated
 	@Override
-	FullTextSharedSessionBuilder flushBeforeCompletion();
-
-	@Deprecated
-	@Override
 	FullTextSharedSessionBuilder transactionContext();
 
 	@Override
@@ -57,20 +52,12 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder connection(Connection connection);
 
-	@Deprecated
-	@Override
-	FullTextSharedSessionBuilder connectionReleaseMode(ConnectionReleaseMode connectionReleaseMode);
-
 	@Override
 	FullTextSharedSessionBuilder autoJoinTransactions(boolean autoJoinTransactions);
 
 	@Deprecated
 	@Override
 	FullTextSharedSessionBuilder autoClose(boolean autoClose);
-
-	@Deprecated
-	@Override
-	FullTextSharedSessionBuilder flushBeforeCompletion(boolean flushBeforeCompletion);
 
 	@Override
 	FullTextSession openSession();
