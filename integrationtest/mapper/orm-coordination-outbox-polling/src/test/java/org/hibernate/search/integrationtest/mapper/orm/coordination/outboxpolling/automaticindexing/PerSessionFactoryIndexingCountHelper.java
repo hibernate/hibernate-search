@@ -62,7 +62,7 @@ public class PerSessionFactoryIndexingCountHelper {
 		return context.withConfiguration(
 				// For some reason the Eclipse compiler, ECJ, will throw a NullPointerException
 				// if we use a lambda here.
-				// This happens only in the -jakarta module, though, and only on CI,
+				// This happens only in the -jakarta/-orm6 modules, though, and only on CI,
 				// and even then only on the main build, not on PRs!
 				// I've been unable to reproduce the problem locally.
 				new Consumer<SimpleSessionFactoryBuilder>() {
