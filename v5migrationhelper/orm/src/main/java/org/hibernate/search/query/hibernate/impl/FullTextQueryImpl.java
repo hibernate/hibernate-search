@@ -13,11 +13,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import jakarta.persistence.FlushModeType;
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.Parameter;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -55,6 +51,10 @@ import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.transform.ResultTransformer;
 
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.QueryTimeoutException;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -118,17 +118,17 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 
 	@Override
 	public ScrollableResultsImplementor scroll() {
+		return scroll( ScrollMode.FORWARD_ONLY );
+	}
+
+	@Override
+	protected ScrollableResultsImplementor doScroll(ScrollMode scrollMode) {
 		extractQueryOptions();
 		SearchScroll<?> scroll = hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 );
 		Integer maxResults = hSearchQuery.maxResults();
 		return new HibernateOrmSearchScrollableResultsAdapter<>( scroll,
 				maxResults != null ? maxResults : Integer.MAX_VALUE,
 				Search5ScrollHitExtractor.INSTANCE );
-	}
-
-	@Override
-	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
-		return scroll();
 	}
 
 	@Override
@@ -151,8 +151,8 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
-	protected void beforeQuery(boolean requiresTxn) {
-		super.beforeQuery( requiresTxn );
+	protected void beforeQuery() {
+		super.beforeQuery();
 
 		extractQueryOptions();
 	}
@@ -201,9 +201,14 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQueryImpl applyGraph(RootGraph graph, GraphSemantic semantic) {
-		entityGraphHints.add( new EntityGraphHint<>( graph, semantic ) );
+	public FullTextQuery applyGraph(RootGraph graph, GraphSemantic semantic) {
+		applyGraph( (RootGraphImplementor) graph, semantic );
 		return this;
+	}
+
+	@Override
+	protected void applyGraph(RootGraphImplementor<?> graph, GraphSemantic semantic) {
+		entityGraphHints.add( new EntityGraphHint<>( graph, semantic ) );
 	}
 
 	@Override
@@ -252,18 +257,12 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
 			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
-				applyEntityGraphQueryHint( hintName, hintValueToEntityGraph( value ) );
+				applyEntityGraphHint( hintName, hintValueToEntityGraph( value ) );
 				break;
 			default:
 				break;
 		}
 		return this;
-	}
-
-	@Override
-	protected void applyEntityGraphQueryHint(String hintName, RootGraphImplementor entityGraph) {
-		GraphSemantic graphSemantic = GraphSemantic.fromJpaHintName( hintName );
-		this.applyGraph( entityGraph, graphSemantic );
 	}
 
 	@Override
@@ -283,7 +282,7 @@ public class FullTextQueryImpl extends AbstractQuery implements FullTextQuery {
 	}
 
 	@Override
-	protected QueryParameterBindings getQueryParameterBindings() {
+	public QueryParameterBindings getQueryParameterBindings() {
 		// parameters not supported in Hibernate Search queries
 		return QueryParameterBindings.NO_PARAM_BINDINGS;
 	}

@@ -23,7 +23,7 @@ import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
 
-@SuppressWarnings( "unchecked" ) // Hibernate ORM gives us raw types, we must make do.
+@SuppressWarnings( "unchecked" ) // Hibernate Commons annotations gives us wildcard types, we must make do.
 public class HibernateOrmBasicTypeMetadataProvider {
 
 	public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {
@@ -161,7 +161,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		else if ( value instanceof org.hibernate.mapping.Map ) {
 			org.hibernate.mapping.Map map = (org.hibernate.mapping.Map) value;
 			return HibernateOrmTypeModelFactory.map(
-					map.getCollectionType().getReturnedClass(),
+					(Class<? extends Map<?, ?>>) map.getCollectionType().getReturnedClass(),
 					/*
 					 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
 					 * but the value of the foreign key to the targeted entity...
@@ -174,7 +174,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		else if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
 			return HibernateOrmTypeModelFactory.collection(
-					collection.getCollectionType().getReturnedClass(),
+					(Class<? extends Collection<?>>) collection.getCollectionType().getReturnedClass(),
 					collectValue( metadataProviderBuilder, collection.getElement() )
 			);
 		}

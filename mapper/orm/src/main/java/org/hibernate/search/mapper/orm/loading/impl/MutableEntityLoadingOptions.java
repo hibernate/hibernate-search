@@ -50,6 +50,9 @@ public class MutableEntityLoadingOptions {
 		else if ( replaceExisting ) {
 			entityGraphHints.clear();
 		}
+		if ( entityGraphHint == null ) {
+			return;
+		}
 		this.entityGraphHints.add( entityGraphHint );
 	}
 }
