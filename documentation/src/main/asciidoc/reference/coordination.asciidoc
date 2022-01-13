@@ -356,8 +356,11 @@ after a query didn't return any event,
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `100`.
 +
-Lower values will reduce the time it takes for a change to be reflected in the index,
-but will increase the stress on the database when there are no new events.
+High values mean higher latency between an entity change and the corresponding update in the index,
+but less stress on the database when there are no events to process.
++
+Low values mean lower latency between an entity change and the corresponding update in the index,
+but more stress on the database when there are no events to process.
 * `event_processor.pulse_interval` defines how long the event processor can poll for events
 before it must perform a "pulse",
 as an <<configuration-property-types,integer value>> in milliseconds.

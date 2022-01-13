@@ -113,8 +113,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <p>
 	 * Hibernate Search will wait that long before polling again if the last polling didn't return any event:
 	 * <ul>
-	 *   <li>High values mean higher latency between DB changes and indexing, but less stress on the database when there are no events to process.</li>
-	 *   <li>Low values mean lower latency between DB changes and indexing, but more stress on the database when there are no events to process.</li>
+	 *    <li>High values mean higher latency between an entity change and the corresponding update in the index,
+	 *    but less stress on the database when there are no events to process.</li>
+	 *    <li>Low values mean lower latency between an entity change and the corresponding update in the index,
+	 *    but more stress on the database when there are no events to process.</li>
 	 * </ul>
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
