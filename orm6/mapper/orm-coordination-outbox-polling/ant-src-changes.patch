@@ -1,0 +1,62 @@
+diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
+index 6e505af6d2..f8a854ea01 100644
+--- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
++++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
+@@ -32,6 +32,8 @@
+ 
+ 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+ 
++	public static final String HIBERNATE_SEARCH = "hibernate-search";
++
+ 	// WARNING: Always use this prefix for all tables added by Hibernate Search:
+ 	// we guarantee that in the documentation.
+ 	public static final String HSEARCH_PREFIX = "HSEARCH_";
+@@ -92,7 +94,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+ 
+ 		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
+ 
+-		MappingDocument mappingDocument = new MappingDocument( root, origin, buildingContext );
++		MappingDocument mappingDocument = new MappingDocument( HIBERNATE_SEARCH, root, origin, buildingContext );
+ 		return Collections.singletonList( mappingDocument );
+ 	}
+ }
+diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
+index 296bd96e80..4cb73b0459 100644
+--- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
++++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
+@@ -33,6 +33,8 @@
+ 
+ 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+ 
++	private static final String HIBERNATE_SEARCH = OutboxPollingAgentAdditionalJaxbMappingProducer.HIBERNATE_SEARCH;
++
+ 	private static final String HSEARCH_PREFIX = OutboxPollingAgentAdditionalJaxbMappingProducer.HSEARCH_PREFIX;
+ 
+ 	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
+@@ -63,7 +65,7 @@
+ 			"        <property name=\"entityIdHash\" type=\"integer\" index=\"entityIdHash\" nullable=\"false\" />\n" +
+ 			"        <property name=\"payload\" type=\"materialized_blob\" nullable=\"false\" />\n" +
+ 			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
+-			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" nullable=\"true\" />\n" +
++			"        <property name=\"processAfter\" type=\"instant\" index=\"processAfter\" nullable=\"true\" />\n" +
+ 			"        <property name=\"status\" index=\"status\" nullable=\"false\" />\n" +
+ 			"    </class>\n" +
+ 			"</hibernate-mapping>\n";
+@@ -82,7 +84,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+ 		String entityDefinition = OUTBOXEVENT_ENTITY_MAPPING.get( propertySource );
+ 
+ 		log.outboxEventGeneratedEntityMapping( entityDefinition );
+-		Origin origin = new Origin( SourceType.OTHER, "search" );
++		Origin origin = new Origin( SourceType.OTHER, HIBERNATE_SEARCH );
+ 
+ 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
+ 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
+@@ -90,7 +92,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+ 
+ 		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
+ 
+-		MappingDocument mappingDocument = new MappingDocument( root, origin, buildingContext );
++		MappingDocument mappingDocument = new MappingDocument( HIBERNATE_SEARCH, root, origin, buildingContext );
+ 		return Collections.singletonList( mappingDocument );
+ 	}
+ }

@@ -1,0 +1,951 @@
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java
+index e556ccaf66..3cea4cab56 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java
+@@ -85,13 +85,13 @@ public void initData() {
+ 	public void next() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
++				assertThat( scroll.get() ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				for ( int i = 0; i < ENTITY_COUNT; i++ ) {
+@@ -102,18 +102,14 @@ public void next() {
+ 					assertThat( scroll.getRowNumber() ).isEqualTo( i );
+ 					assertThat( scroll.isFirst() ).isEqualTo( i == 0 );
+ 					assertThat( scroll.isLast() ).isEqualTo( i == ( ENTITY_COUNT - 1 ) );
+-					assertThat( scroll.get( 0 ) )
++					assertThat( scroll.get() )
+ 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
+-					Object[] row = scroll.get();
+-					assertThat( row ).hasSize( 1 );
+-					assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, i ) );
+ 				}
+ 
+ 				assertThat( scroll.next() ).isFalse();
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// Call next() again after reaching the end: should not do anything
+@@ -122,7 +118,6 @@ public void next() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -134,13 +129,12 @@ public void next() {
+ 	public void previous() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// Going to the previous element means going backwards: it's forbidden
+@@ -154,7 +148,6 @@ public void previous() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -165,7 +158,7 @@ public void previous() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
+ 				assertThat( scroll.isFirst() ).isTrue();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
+ 
+ 				// Going to the previous element means going backwards: it's forbidden
+@@ -179,7 +172,7 @@ public void previous() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
+ 				assertThat( scroll.isFirst() ).isTrue();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
+ 
+ 				expectScrollClose();
+@@ -191,13 +184,13 @@ public void previous() {
+ 	public void scrollMode_forwardsOnly() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll( ScrollMode.FORWARD_ONLY ) ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll( ScrollMode.FORWARD_ONLY ) ) {
+ 				backendMock.verifyExpectationsMet();
+ 				for ( int i = 0; i < ENTITY_COUNT; i++ ) {
+ 					expectScrollNextIfNecessary( i, DEFAULT_FETCH_SIZE, ENTITY_COUNT );
+ 					assertThat( scroll.next() ).isTrue();
+ 					backendMock.verifyExpectationsMet();
+-					assertThat( scroll.get( 0 ) )
++					assertThat( scroll.get() )
+ 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
+ 				}
+ 
+@@ -230,7 +223,7 @@ public void fetchSize() {
+ 			int customFetchSize = 10;
+ 			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
+ 					customFetchSize, b -> { } );
+-			try ( ScrollableResults scroll = Search.toOrmQuery( Search.session( session )
++			try ( ScrollableResults<?> scroll = Search.toOrmQuery( Search.session( session )
+ 					.search( IndexedEntity.class )
+ 					.where( f -> f.matchAll() )
+ 					.loading( o -> o.fetchSize( customFetchSize ) )
+@@ -241,7 +234,6 @@ public void fetchSize() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				for ( int i = 0; i < ENTITY_COUNT; i++ ) {
+@@ -252,18 +244,14 @@ public void fetchSize() {
+ 					assertThat( scroll.getRowNumber() ).isEqualTo( i );
+ 					assertThat( scroll.isFirst() ).isEqualTo( i == 0 );
+ 					assertThat( scroll.isLast() ).isEqualTo( i == ( ENTITY_COUNT - 1 ) );
+-					assertThat( scroll.get( 0 ) )
++					assertThat( scroll.get() )
+ 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
+-					Object[] row = scroll.get();
+-					assertThat( row ).hasSize( 1 );
+-					assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, i ) );
+ 				}
+ 
+ 				assertThat( scroll.next() ).isFalse();
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -281,13 +269,12 @@ public void maxResults() {
+ 					.toQuery() );
+ 			query.setMaxResults( maxResults );
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = query.scroll() ) {
++			try ( ScrollableResults<?> scroll = query.scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				for ( int i = 0; i < maxResults; i++ ) {
+@@ -298,18 +285,14 @@ public void maxResults() {
+ 					assertThat( scroll.getRowNumber() ).isEqualTo( i );
+ 					assertThat( scroll.isFirst() ).isEqualTo( i == 0 );
+ 					assertThat( scroll.isLast() ).isEqualTo( i == ( maxResults - 1 ) );
+-					assertThat( scroll.get( 0 ) )
++					assertThat( scroll.get() )
+ 							.isEqualTo( session.getReference( IndexedEntity.class, i ) );
+-					Object[] row = scroll.get();
+-					assertThat( row ).hasSize( 1 );
+-					assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, i ) );
+ 				}
+ 
+ 				assertThat( scroll.next() ).isFalse();
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -321,13 +304,12 @@ public void maxResults() {
+ 	public void scroll() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -338,11 +320,8 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+-				Object[] row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+ 
+ 				// Scroll 0 positions: should not do anything
+ 				assertThat( scroll.scroll( 0 ) ).isTrue();
+@@ -351,11 +330,8 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+-				row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+ 
+ 				// No call to the underlying scroll.next() is expected here
+ 				assertThat( scroll.scroll( 50 ) ).isTrue();
+@@ -364,11 +340,8 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 59 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 59 ) );
+-				row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 59 ) );
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+ 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+@@ -382,11 +355,8 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 259 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 259 ) );
+-				row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 259 ) );
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+ 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+@@ -417,7 +387,6 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// Calling scroll(<positive number>) again after reaching the end should not do anything
+@@ -426,7 +395,6 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				assertThat( scroll.scroll( 1 ) ).isFalse();
+@@ -434,7 +402,6 @@ public void scroll() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -446,13 +413,12 @@ public void scroll() {
+ 	public void scroll_backwards() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// scroll(<negative integer>) means going backwards: it's forbidden
+@@ -466,7 +432,6 @@ public void scroll_backwards() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -477,7 +442,7 @@ public void scroll_backwards() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+ 
+ 				// scroll(<negative integer>) means going backwards: it's forbidden
+@@ -491,7 +456,7 @@ public void scroll_backwards() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+ 
+ 				expectScrollClose();
+@@ -503,13 +468,12 @@ public void scroll_backwards() {
+ 	public void setRowNumber() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -520,11 +484,8 @@ public void setRowNumber() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+-				Object[] row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+ 
+ 				// No call to the underlying scroll.next() is expected here
+ 				assertThat( scroll.setRowNumber( 50 ) ).isTrue();
+@@ -533,11 +494,8 @@ public void setRowNumber() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 50 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
+-				row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+ 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+@@ -551,11 +509,8 @@ public void setRowNumber() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 220 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
+-				row = scroll.get();
+-				assertThat( row ).hasSize( 1 );
+-				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+ 						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+@@ -586,7 +541,6 @@ public void setRowNumber() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -598,13 +552,12 @@ public void setRowNumber() {
+ 	public void setRowNumber_backwards() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -615,7 +568,7 @@ public void setRowNumber_backwards() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+ 
+ 				// setRowNumber(<previous row number>) means going backwards: it's forbidden
+@@ -629,7 +582,7 @@ public void setRowNumber_backwards() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+ 
+ 				expectScrollClose();
+@@ -641,13 +594,12 @@ public void setRowNumber_backwards() {
+ 	public void setRowNumber_relativeToEnd() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -658,7 +610,7 @@ public void setRowNumber_relativeToEnd() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+ 
+ 				// setRowNumber(<negative integer>) means going to a position relative to the end: it's forbidden
+@@ -672,7 +624,175 @@ public void setRowNumber_relativeToEnd() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
++
++				expectScrollClose();
++			}
++		} );
++	}
++
++	@Test
++	public void position() {
++		setupHolder.runInTransaction( session -> {
++			expectScrollCreate();
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() ).isNull();
++
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
++				assertThat( scroll.position( 10 ) ).isTrue();
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
++
++				// No call to the underlying scroll.next() is expected here
++				assertThat( scroll.position( 50 ) ).isTrue();
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( 50 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
++
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
++				assertThat( scroll.position( 220 ) ).isTrue();
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( 220 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
++
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
++								references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.afterLast() );
++				assertThat( scroll.position( 10000 ) ).isFalse();
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() ).isNull();
++
++				expectScrollClose();
++			}
++		} );
++	}
++
++	@Test
++	public void position_backwards() {
++		setupHolder.runInTransaction( session -> {
++			expectScrollCreate();
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() ).isNull();
++
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
++				assertThat( scroll.position( 10 ) ).isTrue();
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
++
++				// position(<previous row number>) means going backwards: it's forbidden
++				assertThatThrownBy( () -> scroll.position( 5 ) )
++						.isInstanceOf( SearchException.class )
++						.hasMessageContaining(
++								"Cannot scroll backwards with Hibernate Search scrolls: they are forwards-only",
++								"Ensure you always increment the scroll position, and never decrement it" );
++
++				// We're still on the same element
++				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
++
++				expectScrollClose();
++			}
++		} );
++	}
++
++	@Test
++	public void position_relativeToEnd() {
++		setupHolder.runInTransaction( session -> {
++			expectScrollCreate();
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() ).isNull();
++
++				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
++						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
++				assertThat( scroll.position( 10 ) ).isTrue();
++				backendMock.verifyExpectationsMet();
++
++				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
++						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
++
++				// position(<negative integer>) means going to a position relative to the end: it's forbidden
++				assertThatThrownBy( () -> scroll.position( -500 ) )
++						.isInstanceOf( SearchException.class )
++						.hasMessageContaining(
++								"Cannot set the scroll position relative to the end with Hibernate Search scrolls",
++								"Ensure you always pass a positive number to position()" );
++
++				// We're still on the same element
++				assertThat( scroll.getRowNumber() ).isEqualTo( 10 );
++				assertThat( scroll.isFirst() ).isFalse();
++				assertThat( scroll.isLast() ).isFalse();
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 10 ) );
+ 
+ 				expectScrollClose();
+@@ -684,13 +804,12 @@ public void setRowNumber_relativeToEnd() {
+ 	public void beforeFirst_fromBeforeFirst() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// Calling beforeFirst() when we're before the first element should not do anything
+@@ -699,7 +818,6 @@ public void beforeFirst_fromBeforeFirst() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// next() still works after a call to beforeFirst()
+@@ -711,7 +829,7 @@ public void beforeFirst_fromBeforeFirst() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
+ 				assertThat( scroll.isFirst() ).isTrue();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
+ 
+ 				expectScrollClose();
+@@ -723,13 +841,12 @@ public void beforeFirst_fromBeforeFirst() {
+ 	public void beforeFirst_fromFirstOrAfter() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -741,7 +858,7 @@ public void beforeFirst_fromFirstOrAfter() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
+ 				assertThat( scroll.isFirst() ).isTrue();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
+ 
+ 				// Going before the first element would means going backwards: it's forbidden
+@@ -760,13 +877,12 @@ public void beforeFirst_fromFirstOrAfter() {
+ 	public void first() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -778,7 +894,7 @@ public void first() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
+ 				assertThat( scroll.isFirst() ).isTrue();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
+ 
+ 				// Calling first() when we're on the first element should not do anything
+@@ -787,7 +903,7 @@ public void first() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 0 );
+ 				assertThat( scroll.isFirst() ).isTrue();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 0 ) );
+ 
+ 				// next() still works after a call to first()
+@@ -796,7 +912,7 @@ public void first() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
+ 
+ 				// Going to the first element would means going backwards: it's forbidden
+@@ -815,7 +931,7 @@ public void first() {
+ 	public void first_fromAfterFirst() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -827,7 +943,7 @@ public void first_fromAfterFirst() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
+ 
+ 				// Going to the first element would means going backwards: it's forbidden
+@@ -846,7 +962,7 @@ public void first_fromAfterFirst() {
+ 	public void last() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -887,7 +1003,7 @@ public void last() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( ENTITY_COUNT - 1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isTrue();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, ENTITY_COUNT - 1 ) );
+ 
+ 				// Calling last() when we're on the last element should not do anything
+@@ -896,7 +1012,7 @@ public void last() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( ENTITY_COUNT - 1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isTrue();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, ENTITY_COUNT - 1 ) );
+ 
+ 				// next() still works after a call to last()
+@@ -905,7 +1021,6 @@ public void last() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				// Going to the last element would means going backwards: it's forbidden
+@@ -924,7 +1039,7 @@ public void last() {
+ 	public void afterLast_fromLastOrBefore() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -935,7 +1050,7 @@ public void afterLast_fromLastOrBefore() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( 9 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) )
++				assertThat( scroll.get() )
+ 						.isEqualTo( session.getReference( IndexedEntity.class, 9 ) );
+ 
+ 				scroll.afterLast();
+@@ -943,7 +1058,6 @@ public void afterLast_fromLastOrBefore() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -955,7 +1069,7 @@ public void afterLast_fromLastOrBefore() {
+ 	public void afterLast_fromAfterLast() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+@@ -995,7 +1109,6 @@ public void afterLast_fromAfterLast() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				scroll.afterLast();
+@@ -1004,7 +1117,6 @@ public void afterLast_fromAfterLast() {
+ 				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+ 				assertThat( scroll.isFirst() ).isFalse();
+ 				assertThat( scroll.isLast() ).isFalse();
+-				assertThat( scroll.get( 0 ) ).isNull();
+ 				assertThat( scroll.get() ).isNull();
+ 
+ 				expectScrollClose();
+@@ -1017,7 +1129,7 @@ public void afterLast_fromAfterLast() {
+ 	public void close() {
+ 		setupHolder.runInTransaction( session -> {
+ 			expectScrollCreate();
+-			try ( ScrollableResults scroll = createSimpleQuery( session ).scroll() ) {
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session ).scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+ 
+ 				ScrollableResultsImplementor implementor = (ScrollableResultsImplementor) scroll;
+@@ -1059,7 +1171,7 @@ public void timeout() {
+ 		setupHolder.runInTransaction( session -> {
+ 			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
+ 					DEFAULT_FETCH_SIZE, b -> b.failAfter( 200, TimeUnit.MILLISECONDS ) );
+-			try ( ScrollableResults scroll = createSimpleQuery( session )
++			try ( ScrollableResults<?> scroll = createSimpleQuery( session )
+ 					.setHint( "jakarta.persistence.query.timeout", 200 )
+ 					.scroll() ) {
+ 				backendMock.verifyExpectationsMet();
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/massindexing/MassIndexingCachingIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/massindexing/MassIndexingCachingIT.java
+index c032664bb9..4d205fdccf 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/massindexing/MassIndexingCachingIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/massindexing/MassIndexingCachingIT.java
+@@ -57,7 +57,7 @@ public void setup(OrmSetupHelper.SetupContext setupContext) {
+ 		backendMock.expectAnySchema( IndexedEntity.NAME );
+ 
+ 		setupContext.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLED, "false" )
+-				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
++				.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
+ 				.withProperty( AvailableSettings.GENERATE_STATISTICS, "true" )
+ 				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
+ 				.withAnnotatedTypes( IndexedEntity.class );
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
+index 1bf135620e..a897a44202 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
+@@ -19,7 +19,7 @@
+ 
+ import org.hibernate.SessionFactory;
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+-import org.hibernate.metamodel.spi.MetamodelImplementor;
++import org.hibernate.metamodel.MappingMetamodel;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+@@ -61,8 +61,8 @@ public void test() {
+ 
+ 		// Hibernate Search started successfully.
+ 		// Check that there actually is a backref:
+-		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
+-		assertThat( metamodel.entityPersister( IndexedEntity.class ).getEntityMetamodel().getPropertyNames() )
++		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
++		assertThat( metamodel.getEntityDescriptor( IndexedEntity.class ).getEntityMetamodel().getPropertyNames() )
+ 				.contains( "_containing_fk_containingidBackref" )
+ 				.contains( "_containingIndexBackref" );
+ 
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
+index d110dbb171..0796b95350 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.model;
+ 
++import java.io.Serializable;
+ import java.util.ArrayList;
+ import java.util.List;
+ import jakarta.persistence.Basic;
+@@ -121,25 +122,17 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
+ 	}
+ 
+ 	@Entity(name = "generic")
+-	public abstract static class GenericEntity<T> {
++	public abstract static class GenericEntity<T extends Serializable> {
+ 
+ 		@Id
+ 		private Integer id;
+ 
+ 		@Basic
+ 		@GenericField
+-		// Necessary for Hibernate ORM: even if we make T extend Serializable,
+-		// ORM doesn't take it into account for some reason.
+-		@SuppressWarnings("deprecation")
+-		@org.hibernate.annotations.Type(type = "serializable")
+ 		private T content;
+ 
+ 		@Basic
+ 		@GenericField
+-		// Necessary for Hibernate ORM: even if we make T extend Serializable,
+-		// ORM doesn't take it into account for some reason.
+-		@SuppressWarnings("deprecation")
+-		@org.hibernate.annotations.Type(type = "serializable")
+ 		private T[] arrayContent;
+ 
+ 		@OneToMany(mappedBy = "genericProperty")
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
+index fd7d546f8f..48b93ae1a0 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
+@@ -19,7 +19,7 @@
+ 
+ import org.hibernate.SessionFactory;
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+-import org.hibernate.metamodel.spi.MetamodelImplementor;
++import org.hibernate.metamodel.MappingMetamodel;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+@@ -56,8 +56,8 @@ public void test() {
+ 
+ 		// Hibernate Search started successfully.
+ 		// Check that there actually is a synthetic property:
+-		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
+-		assertThat( metamodel.entityPersister( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
++		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
++		assertThat( metamodel.getEntityDescriptor( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
+ 				.contains( "_" + IndexedEntity.class.getName().replace( '.', '_' ) + "_contained" );
+ 
+ 		// If we get here the bug was solved, but let's at least check that indexing works
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingCacheLookupIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingCacheLookupIT.java
+index d59ed9252b..845fd60bc9 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingCacheLookupIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingCacheLookupIT.java
+@@ -98,7 +98,7 @@ public void setup(OrmSetupHelper.SetupContext setupContext) {
+ 
+ 		setupContext.withProperty( HibernateOrmMapperSettings.QUERY_LOADING_CACHE_LOOKUP_STRATEGY,
+ 						defaultCacheLookupStrategy )
+-				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
++				.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
+ 				.withConfiguration( c -> mapping.configure( c, model ) );
+ 	}
+ 
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingMultipleTypesIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingMultipleTypesIT.java
+index fdef5e495a..e7a0abc817 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingMultipleTypesIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/search/loading/SearchQueryEntityLoadingMultipleTypesIT.java
+@@ -117,7 +117,7 @@ public void setup(OrmSetupHelper.SetupContext setupContext) {
+ 		backendMock.expectAnySchema( Hierarchy8_A_C_Cacheable.NAME );
+ 		backendMock.expectAnySchema( Hierarchy8_A_D_Cacheable.NAME );
+ 
+-		setupContext.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
++		setupContext.withProperty( AvailableSettings.JAKARTA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
+ 				.withAnnotatedTypes(
+ 						Hierarchy1_A__Abstract.class,
+ 						Hierarchy1_A_B.class,
