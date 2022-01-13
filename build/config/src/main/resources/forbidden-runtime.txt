@@ -62,6 +62,14 @@ org.hibernate.internal.**
 org.hibernate.**.internal.**
 
 ################################################################################################################
+@defaultMessage Favor EntityManager methods over their Session equivalent
+org.hibernate.Session.save(java.lang.Object) @ Use persist() instead
+org.hibernate.Session.save(java.lang.String, java.lang.Object) @ Use persist() instead
+org.hibernate.Session.load(java.lang.Class<T>, java.lang.Object) @ Use getReference() instead
+org.hibernate.Session.delete(java.lang.Object) @ Use remove() instead
+org.hibernate.Session.delete(java.lang.String, java.lang.Object) @ Use remove() instead
+
+################################################################################################################
 @defaultMessage MethodHandles do not work on GraalVM. Make sure to expose configuration options so that integrators can force the use of java.reflect instead. Once it's done, add your class to the forbiddenApis allowlist.
 java.lang.invoke.MethodHandles$Lookup#in(java.lang.Class)
 java.lang.invoke.MethodHandles$Lookup#findVirtual(java.lang.Class, java.lang.String, java.lang.invoke.MethodType)
