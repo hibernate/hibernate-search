@@ -71,7 +71,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			EntityWithJpaIdAsDocumentId entity1 = session.getReference( EntityWithJpaIdAsDocumentId.class,
 					entity1Id.get() );
 
-			session.delete( entity1 );
+			session.remove( entity1 );
 
 			// entity1.getId() will no longer return the ID...
 			assertThat( entity1.getId() ).isNull();
@@ -105,7 +105,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			EntityWithNonJpaIdAsDocumentId entity1 = session.getReference( EntityWithNonJpaIdAsDocumentId.class,
 					entity1Id.get() );
 
-			session.delete( entity1 );
+			session.remove( entity1 );
 
 			// entity1.getId() was reset...
 			assertThat( entity1.getId() ).isNull();

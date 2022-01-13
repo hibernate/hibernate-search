@@ -139,7 +139,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
-			session.delete( entity );
+			session.remove( entity );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.delete( "1" );
@@ -183,7 +183,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 			IndexedAndContainingEntity containing = session.load( IndexedAndContainingEntity.class, 1 );
 			ContainedEntity contained = containing.getContained();
 			containing.setContained( null );
-			session.delete( contained );
+			session.remove( contained );
 
 			backendMock.expectWorks( IndexedAndContainingEntity.NAME )
 					.addOrUpdate( "1", b -> b.field( "text", "initial" ) );

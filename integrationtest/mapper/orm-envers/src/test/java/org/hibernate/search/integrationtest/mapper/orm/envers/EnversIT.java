@@ -143,7 +143,7 @@ public class EnversIT {
 		// Delete the indexed entity
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexed = session.getReference( IndexedEntity.class, 1 );
-			session.delete( indexed );
+			session.remove( indexed );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.delete( "1" );

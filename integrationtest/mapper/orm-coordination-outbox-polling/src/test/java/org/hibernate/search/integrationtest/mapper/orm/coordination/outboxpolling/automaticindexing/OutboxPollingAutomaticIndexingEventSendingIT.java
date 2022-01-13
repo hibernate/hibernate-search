@@ -118,7 +118,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
-			session.delete( entity );
+			session.remove( entity );
 		} );
 
 		setupHolder.runInTransaction( session -> {
@@ -165,7 +165,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 		setupHolder.runInTransaction( session -> {
 			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
-			session.delete( entity );
+			session.remove( entity );
 		} );
 
 		setupHolder.runInTransaction( session -> {
@@ -213,7 +213,7 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 
 		setupHolder.runInTransaction( session -> {
 			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
-			session.delete( entity );
+			session.remove( entity );
 		} );
 
 		setupHolder.runInTransaction( session -> {

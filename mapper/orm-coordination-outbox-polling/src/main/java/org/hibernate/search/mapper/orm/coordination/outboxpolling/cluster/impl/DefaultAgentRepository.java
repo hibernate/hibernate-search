@@ -44,7 +44,7 @@ public class DefaultAgentRepository implements AgentRepository {
 	@Override
 	public void delete(List<Agent> agents) {
 		for ( Agent agent : agents ) {
-			session.delete( agent );
+			session.remove( agent );
 		}
 	}
 }

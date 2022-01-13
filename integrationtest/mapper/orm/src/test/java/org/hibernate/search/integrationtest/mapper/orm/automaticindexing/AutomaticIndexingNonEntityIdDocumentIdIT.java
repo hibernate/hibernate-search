@@ -95,7 +95,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
-			session.delete( entity1 );
+			session.remove( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.delete( "42" );

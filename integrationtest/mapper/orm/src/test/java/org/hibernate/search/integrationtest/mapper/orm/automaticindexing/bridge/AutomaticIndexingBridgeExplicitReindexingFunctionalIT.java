@@ -159,7 +159,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 			containedEntity.setParent( null );
-			session.delete( containedEntity );
+			session.remove( containedEntity );
 
 			// TODO HSEARCH-3567 this does not trigger any work because we do not handle asymmetric association updates
 //			backendMock.expectWorks( IndexedEntity.INDEX )
