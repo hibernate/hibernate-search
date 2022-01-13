@@ -150,13 +150,15 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * {@link #COORDINATION_EVENT_PROCESSOR_POLLING_INTERVAL polling interval}
 	 * and one third (1/3) of the {@link #COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION expiration interval}:
 	 * <ul>
-	 *   <li>Low values (closer to the polling interval) mean a shorter delay before rebalancing
+	 *   <li>Low values (closer to the polling interval) mean less time wasted not processing events
 	 *   when a node joins or leaves the cluster,
-	 *   and reduced risk of incorrectly considering an event processor disconnected,
+	 *   and reduced risk of wasting time not processing events
+	 *   because an event processor is incorrectly considered disconnected,
 	 *   but more stress on the database because of more frequent checks of the list of agents.</li>
-	 *   <li>High values (closer to the expiration interval) mean a longer delay before rebalancing
+	 *   <li>High values (closer to the expiration interval) mean more time wasted not processing events
 	 *   when a node joins or leaves the cluster,
-	 *   and increased risk of incorrectly considering an event processor disconnected,
+	 *   and increased risk of wasting time not processing events
+	 *   because an event processor is incorrectly considered disconnected,
 	 *   but less stress on the database because of less frequent checks of the list of agents.</li>
 	 * </ul>
 	 * <p>
@@ -187,12 +189,14 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * The expiration interval must be set to a value at least 3 times larger than the
 	 * {@link #COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL pulse interval}:
 	 * <ul>
-	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before rebalancing
+	 *   <li>Low values (closer to the pulse interval) mean less time wasted not processing events
 	 *   when a node abruptly leaves the cluster due to a crash or network failure,
-	 *   but increased risk of incorrectly considering an event processor disconnected.</li>
-	 *   <li>High values (much larger than the pulse interval) mean a longer delay before rebalancing
+	 *   but increased risk of wasting time not processing events
+	 *   because an event processor is incorrectly considered disconnected.</li>
+	 *   <li>High values (much larger than the pulse interval) mean more time wasted not processing events
 	 *   when a node abruptly leaves the cluster due to a crash or network failure,
-	 *   but reduced risk of incorrectly considering an event processor disconnected.</li>
+	 *   but reduced risk of wasting time not processing events
+	 *   because an event processor is incorrectly considered disconnected.</li>
 	 * </ul>
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 30000},
@@ -290,9 +294,13 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * {@link #COORDINATION_MASS_INDEXER_POLLING_INTERVAL polling interval}
 	 * and one third (1/3) of the {@link #COORDINATION_MASS_INDEXER_PULSE_EXPIRATION expiration interval}:
 	 * <ul>
-	 *   <li>Low values (closer to the polling interval) mean reduced risk of incorrectly considering a mass indexer agent disconnected,
+	 *   <li>Low values (closer to the polling interval) mean reduced risk of
+	 *   event processors starting to process events again during mass indexing
+	 *   because a mass indexer agent is incorrectly considered disconnected,
 	 *   but more stress on the database because of more frequent updates of the mass indexer agent's entry in the agent table.</li>
-	 *   <li>High values (closer to the expiration interval) mean increased risk of incorrectly considering an agent disconnected,
+	 *   <li>High values (closer to the expiration interval) mean increased risk of
+	 *   event processors starting to process events again during mass indexing
+	 *   because a mass indexer agent is incorrectly considered disconnected,
 	 *   but less stress on the database because of less frequent updates of the mass indexer agent's entry in the agent table.</li>
 	 * </ul>
 	 * <p>
@@ -323,14 +331,14 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * The expiration interval must be set to a value at least 3 times larger than the
 	 * {@link #COORDINATION_MASS_INDEXER_PULSE_INTERVAL pulse interval}:
 	 * <ul>
-	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before resuming
-	 *   event processing when a node currently performing mass indexing
-	 *   abruptly leaves the cluster due to a crash or network failure,
-	 *   but increased risk of incorrectly considering a mass indexer disconnected.</li>
-	 *   <li>High values (much larger than the pulse interval) mean a longer delay before resuming
-	 * 	 event processing when a node currently performing mass indexing
-	 *   abruptly leaves the cluster due to a crash or network failure,
-	 *   but reduced risk of incorrectly considering a mass indexer disconnected.</li>
+	 *   <li>Low values (closer to the pulse interval) mean less time wasted with event processors not processing events
+	 *   when a mass indexer agent terminates due to a crash,
+	 *   but increased risk of event processors starting to process events again during mass indexing
+	 *   because a mass indexer agent is incorrectly considered disconnected.</li>
+	 *   <li>High values (much larger than the pulse interval) mean more time wasted with event processors not processing events
+	 *   when a mass indexer agent terminates due to a crash,
+	 *   but reduced risk of event processors starting to process events again during mass indexing
+	 *   because a mass indexer agent is incorrectly considered disconnected.</li>
 	 * </ul>
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 30000},
