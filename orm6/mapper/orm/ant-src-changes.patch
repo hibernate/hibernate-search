@@ -1,0 +1,1163 @@
+diff --git a/main/java/org/hibernate/search/mapper/orm/bootstrap/impl/HibernateSearchIntegrator.java b/main/java/org/hibernate/search/mapper/orm/bootstrap/impl/HibernateSearchIntegrator.java
+index 289a060c28..60e392d528 100644
+--- a/main/java/org/hibernate/search/mapper/orm/bootstrap/impl/HibernateSearchIntegrator.java
++++ b/main/java/org/hibernate/search/mapper/orm/bootstrap/impl/HibernateSearchIntegrator.java
+@@ -12,7 +12,6 @@
+ 
+ import org.hibernate.boot.Metadata;
+ import org.hibernate.boot.spi.BootstrapContext;
+-import org.hibernate.boot.spi.MetadataImplementor;
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+ import org.hibernate.integrator.spi.Integrator;
+ 
+@@ -30,19 +29,16 @@
+ public class HibernateSearchIntegrator implements Integrator {
+ 
+ 	@Override
+-	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+-			SessionFactoryServiceRegistry serviceRegistry) {
++	public void integrate(Metadata metadata, BootstrapContext bootstrapContext,
++			SessionFactoryImplementor sessionFactory) {
+ 		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
+-				HibernateOrmUtils.getServiceOrEmpty( serviceRegistry, HibernateSearchPreIntegrationService.class );
++				HibernateOrmUtils.getServiceOrEmpty( bootstrapContext.getServiceRegistry(), HibernateSearchPreIntegrationService.class );
+ 
+ 		if ( !preIntegrationServiceOptional.isPresent() ) {
+ 			// Hibernate Search is disabled
+ 			return;
+ 		}
+ 
+-		// TODO When we'll move to Hibernate ORM 6, use the bootstrapContext parameter passed to the integrate() method
+-		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
+-				.getMetadataBuildingContext().getBootstrapContext();
+ 		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl.BuilderImpl( metadata, bootstrapContext )
+ 				.build();
+ 		// Orchestrate bootstrap and shutdown
+diff --git a/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java b/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
+index d61af877f4..411a107173 100644
+--- a/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
++++ b/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
+@@ -21,7 +21,7 @@
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+ import org.hibernate.engine.spi.SessionImplementor;
+ import org.hibernate.mapping.Property;
+-import org.hibernate.metamodel.spi.MetamodelImplementor;
++import org.hibernate.metamodel.MappingMetamodel;
+ import org.hibernate.persister.entity.EntityPersister;
+ import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+@@ -77,12 +77,12 @@ public static EntityPersister toRootEntityType(SessionFactoryImplementor session
+ 		 * where A and C are entity types and B is a mapped superclass.
+ 		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
+ 		 */
+-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
++		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+ 		String rootEntityName = entityType.getRootEntityName();
+-		return metamodel.entityPersister( rootEntityName );
++		return metamodel.getEntityDescriptor( rootEntityName );
+ 	}
+ 
+-	public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
++	public static EntityPersister toMostSpecificCommonEntitySuperType(MappingMetamodel metamodel,
+ 			EntityPersister type1, EntityPersister type2) {
+ 		/*
+ 		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
+@@ -95,7 +95,7 @@ public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImple
+ 		while ( superTypeCandidate != null && !isSuperTypeOf( superTypeCandidate, type2 ) ) {
+ 			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
+ 			superTypeCandidate = superSuperTypeEntityName == null ? null
+-					: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
++					: metamodel.getEntityDescriptor( superSuperTypeEntityName ).getEntityPersister();
+ 		}
+ 		if ( superTypeCandidate == null ) {
+ 			throw new AssertionFailure(
+@@ -116,10 +116,10 @@ public static boolean hasAtMostOneConcreteSubType(SessionFactoryImplementor sess
+ 			return true;
+ 		}
+ 
+-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
++		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+ 		int concreteSubTypesCount = 0;
+ 		for ( String subClassEntityName : subClassEntityNames ) {
+-			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
++			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
+ 				if ( ++concreteSubTypesCount > 1 ) {
+ 					return false;
+ 				}
+@@ -137,10 +137,10 @@ public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessi
+ 			return true;
+ 		}
+ 
+-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
++		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+ 		int concreteSubTypesCount = 0;
+ 		for ( String subClassEntityName : subClassEntityNames ) {
+-			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
++			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
+ 				++concreteSubTypesCount;
+ 			}
+ 		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
+index 21503d08be..e2121b5879 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
+@@ -12,7 +12,7 @@
+ import org.hibernate.AssertionFailure;
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+ import org.hibernate.engine.spi.SessionImplementor;
+-import org.hibernate.metamodel.spi.MetamodelImplementor;
++import org.hibernate.metamodel.MappingMetamodel;
+ import org.hibernate.persister.entity.EntityPersister;
+ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+@@ -149,7 +149,7 @@ private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
+ 
+ 	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
+ 			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
+-		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
++		MappingMetamodel metamodel = session.getSessionFactory().getMetamodel();
+ 		EntityPersister result = null;
+ 		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
+ 			EntityPersister type = targetTypeContext.entityPersister();
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
+index 39df0c5a24..159eb3207c 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
+@@ -29,7 +29,7 @@
+ 	private final TransactionHelper transactionHelper;
+ 	private final long totalCount;
+ 	private long totalLoaded = 0;
+-	private final ScrollableResults results;
++	private final ScrollableResults<I> results;
+ 
+ 	public HibernateOrmMassIdentifierLoader(HibernateOrmQueryLoader<E, I> typeQueryLoader,
+ 			HibernateOrmMassLoadingOptions options,
+@@ -88,8 +88,7 @@ public void loadNext() throws InterruptedException {
+ 		int batchSize = options.objectLoadingBatchSize();
+ 		ArrayList<I> destinationList = new ArrayList<>( batchSize );
+ 		while ( destinationList.size() < batchSize && totalLoaded < totalCount && results.next() ) {
+-			@SuppressWarnings("unchecked")
+-			I id = (I) results.get( 0 );
++			I id = results.get();
+ 			destinationList.add( id );
+ 			++totalLoaded;
+ 		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
+index 8220212f46..ea908f7bd3 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmSelectionEntityByIdLoader.java
+@@ -6,7 +6,6 @@
+  */
+ package org.hibernate.search.mapper.orm.loading.impl;
+ 
+-import java.io.Serializable;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+@@ -87,7 +86,7 @@ protected List<E> doLoadEntities(List<?> allIds, Long timeout) {
+ 	private EntityKey[] toEntityKeys(List<?> ids) {
+ 		EntityKey[] entityKeys = new EntityKey[ids.size()];
+ 		for ( int i = 0; i < ids.size(); i++ ) {
+-			Serializable id = (Serializable) ids.get( i );
++			Object id = ids.get( i );
+ 			EntityKey entityKey = sessionContext.session().generateEntityKey( id, entityPersister );
+ 			entityKeys[i] = ( entityKey );
+ 		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java
+index 82c86985ab..c324497a01 100644
+--- a/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java
++++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/TypeQueryFactory.java
+@@ -6,6 +6,7 @@
+  */
+ package org.hibernate.search.mapper.orm.loading.impl;
+ 
++import java.util.Map;
+ import java.util.Set;
+ 
+ import org.hibernate.MultiIdentifierLoadAccess;
+@@ -13,7 +14,7 @@
+ import org.hibernate.engine.spi.SessionImplementor;
+ import org.hibernate.engine.spi.SharedSessionContractImplementor;
+ import org.hibernate.metamodel.model.domain.EntityDomainType;
+-import org.hibernate.metamodel.spi.MetamodelImplementor;
++import org.hibernate.metamodel.model.domain.JpaMetamodel;
+ import org.hibernate.persister.entity.EntityPersister;
+ import org.hibernate.query.Query;
+ import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
+@@ -22,9 +23,9 @@
+ 
+ 	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
+ 			String uniquePropertyName) {
+-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
++		JpaMetamodel metamodel = sessionFactory.getMetamodel();
+ 		EntityDomainType<?> typeOrNull = metamodel.entity( entityPersister.getEntityName() );
+-		if ( typeOrNull != null ) {
++		if ( typeOrNull != null && !( entityPersister.getMappedClass().equals( Map.class ) ) ) {
+ 			return CriteriaTypeQueryFactory.create( typeOrNull, uniquePropertyName );
+ 		}
+ 		else {
+diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
+index e794e21dc6..d36abb098d 100644
+--- a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
++++ b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
+@@ -245,4 +245,9 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
+ 			+ " which should be set to a comma-separated string containing all possible tenant identifiers."
+ 			+ " Currently configured tenant identifiers: %2$s." )
+ 	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
++
++	@LogMessage(level = Logger.Level.INFO)
++	@Message(id = ID_OFFSET + 56, value = "Ignoring unrecognized query hint [%s]")
++	void ignoringUnrecognizedQueryHint(String hintName);
++
+ }
+diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
+index 17e33f2c15..e3b66578d9 100644
+--- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
++++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
+@@ -10,7 +10,7 @@
+ import java.util.stream.Collectors;
+ 
+ import org.hibernate.engine.spi.SessionFactoryImplementor;
+-import org.hibernate.metamodel.spi.MetamodelImplementor;
++import org.hibernate.metamodel.MappingMetamodel;
+ import org.hibernate.persister.entity.EntityPersister;
+ import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
+ import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
+@@ -43,8 +43,8 @@
+ 	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
+ 		this.typeIdentifier = builder.typeIdentifier;
+ 		this.jpaEntityName = builder.jpaEntityName;
+-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+-		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
++		MappingMetamodel metamodel = sessionFactory.getMetamodel();
++		this.entityPersister = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
+ 		this.identifierMapping = builder.identifierMapping;
+ 		this.ascendingSuperTypes = builder.ascendingSuperTypes;
+ 		if ( builder.documentIdSourcePropertyName != null ) {
+diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
+index de45790392..99b67466db 100644
+--- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
++++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
+@@ -6,10 +6,9 @@
+  */
+ package org.hibernate.search.mapper.orm.mapping.impl;
+ 
+-import org.hibernate.MultiTenancyStrategy;
+ import org.hibernate.annotations.common.reflection.ReflectionManager;
+ import org.hibernate.boot.Metadata;
+-import org.hibernate.engine.config.spi.ConfigurationService;
++import org.hibernate.boot.spi.MetadataImplementor;
+ import org.hibernate.mapping.PersistentClass;
+ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+@@ -58,13 +57,14 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionM
+ 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
+ 		HibernateOrmBootstrapIntrospector introspector = HibernateOrmBootstrapIntrospector.create(
+ 				basicTypeMetadataProvider, reflectionManager, valueReadHandleFactory );
+-		ConfigurationService ormConfigurationService =
+-				HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
+ 		HibernateSearchPreIntegrationService preIntegrationService =
+ 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
+ 
+-		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector, ormConfigurationService,
+-				preIntegrationService );
++		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions()
++				.isMultiTenancyEnabled();
++
++		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector,
++				preIntegrationService, multiTenancyEnabled );
+ 	}
+ 
+ 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
+@@ -74,26 +74,16 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionM
+ 	private BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
+ 	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
+ 
+-	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
+-			HibernateOrmBootstrapIntrospector introspector, ConfigurationService ormConfigurationService,
+-			HibernateSearchPreIntegrationService preIntegrationService) {
++	private HibernateOrmMappingInitiator(
++			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
++			HibernateOrmBootstrapIntrospector introspector,
++			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
+ 		super( introspector );
+ 
+ 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
+ 		this.introspector = introspector;
+ 
+-		/*
+-		 * This method is called when the session factory is created, and once again when HSearch boots.
+-		 * It logs a warning when the configuration property is invalid,
+-		 * so the warning will be logged twice.
+-		 * Since it only happens when the configuration is invalid,
+-		 * we can live with this quirk.
+-		 */
+-		MultiTenancyStrategy multiTenancyStrategy =
+-				MultiTenancyStrategy.determineMultiTenancyStrategy( ormConfigurationService.getSettings() );
+-
+-		tenancyMode( MultiTenancyStrategy.NONE.equals( multiTenancyStrategy ) ? TenancyMode.SINGLE_TENANCY
+-				: TenancyMode.MULTI_TENANCY );
++		tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
+ 
+ 		this.preIntegrationService = preIntegrationService;
+ 	}
+diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
+index c4fd693171..b8b6e6bd10 100644
+--- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
++++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
+@@ -10,6 +10,9 @@
+ import java.util.List;
+ import java.util.StringTokenizer;
+ 
++import org.hibernate.boot.Metadata;
++import org.hibernate.dialect.Dialect;
++import org.hibernate.engine.jdbc.Size;
+ import org.hibernate.mapping.Column;
+ import org.hibernate.mapping.Component;
+ import org.hibernate.mapping.OneToMany;
+@@ -100,13 +103,22 @@ else if ( value instanceof SimpleValue ) {
+ 	}
+ 
+ 	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
+-		Iterator<Selectable> ci = value.getColumnIterator();
+-		while ( ci.hasNext() ) {
+-			Selectable selectable = ci.next();
+-			if ( selectable instanceof Column ) {
+-				int scale = ( (Column) selectable ).getScale();
+-				collector.value( getExtractorPath( value ) ).decimalScale( scale );
++		Iterator<Selectable> columnIterator = value.getColumnIterator();
++		Dialect dialect = basicTypeMetadataProvider.getDialect();
++		Metadata metadata = basicTypeMetadataProvider.getMetadata();
++
++		while ( columnIterator.hasNext() ) {
++			Selectable mappedColumn = columnIterator.next();
++			if ( !(mappedColumn instanceof Column) ) {
++				continue;
+ 			}
++			Column column = (Column) mappedColumn;
++			Size size = column.getColumnSize( dialect, metadata );
++			Integer scale = size.getScale();
++			if ( scale == null ) {
++				continue;
++			}
++			collector.value( getExtractorPath( value ) ).decimalScale( scale );
+ 		}
+ 	}
+ 
+diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
+index 14dfc36c0f..fbbcf29649 100644
+--- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
++++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
+@@ -16,6 +16,7 @@
+ 
+ import org.hibernate.MappingException;
+ import org.hibernate.boot.Metadata;
++import org.hibernate.dialect.Dialect;
+ import org.hibernate.mapping.Component;
+ import org.hibernate.mapping.PersistentClass;
+ import org.hibernate.mapping.Property;
+@@ -34,7 +35,7 @@ public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {
+ 				new TreeSet<>( Comparator.comparing( PersistentClass::getEntityName ) );
+ 		persistentClasses.addAll( metadata.getEntityBindings() );
+ 
+-		Builder builder = new Builder();
++		Builder builder = new Builder( metadata );
+ 
+ 		for ( PersistentClass persistentClass : persistentClasses ) {
+ 			collectPersistentClass( builder, persistentClass );
+@@ -221,6 +222,8 @@ private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder me
+ 		}
+ 	}
+ 
++	private final Metadata metadata;
++
+ 	private final Map<String, PersistentClass> persistentClasses;
+ 	private final Map<Class<?>, HibernateOrmBasicClassTypeMetadata> classTypeMetadata;
+ 	private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata;
+@@ -229,6 +232,7 @@ private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder me
+ 	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
+ 
+ 	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
++		this.metadata = builder.metadata;
+ 		this.persistentClasses = builder.persistentClasses;
+ 		this.classTypeMetadata = builder.classTypeMetadata;
+ 		this.dynamicMapTypeMetadata = builder.dynamicMapTypeMetadata;
+@@ -236,6 +240,14 @@ private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
+ 		this.typeIdentifierResolver = builder.typeIdentifierResolverBuilder.build();
+ 	}
+ 
++	public Metadata getMetadata() {
++		return metadata;
++	}
++
++	public Dialect getDialect() {
++		return metadata.getDatabase().getDialect();
++	}
++
+ 	public Collection<PersistentClass> getPersistentClasses() {
+ 		return persistentClasses.values();
+ 	}
+@@ -267,6 +279,8 @@ Set<String> getKnownDynamicMapTypeNames() {
+ 	}
+ 
+ 	private static class Builder {
++		private final Metadata metadata;
++
+ 		private final Map<String, PersistentClass> persistentClasses = new LinkedHashMap<>();
+ 		private final Map<Class<?>, HibernateOrmBasicClassTypeMetadata> classTypeMetadata = new LinkedHashMap<>();
+ 		private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata = new LinkedHashMap<>();
+@@ -275,6 +289,10 @@ private static class Builder {
+ 		private final HibernateOrmRawTypeIdentifierResolver.Builder typeIdentifierResolverBuilder =
+ 				new HibernateOrmRawTypeIdentifierResolver.Builder();
+ 
++		public Builder(Metadata metadata) {
++			this.metadata = metadata;
++		}
++
+ 		HibernateOrmBasicTypeMetadataProvider build() {
+ 			return new HibernateOrmBasicTypeMetadataProvider( this );
+ 		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java
+index 355980c45a..30e334a6a0 100644
+--- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java
++++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java
+@@ -16,6 +16,7 @@
+ import org.hibernate.MappingException;
+ import org.hibernate.event.spi.PostUpdateEvent;
+ import org.hibernate.mapping.Any;
++import org.hibernate.mapping.BasicValue;
+ import org.hibernate.mapping.Component;
+ import org.hibernate.mapping.OneToMany;
+ import org.hibernate.mapping.PersistentClass;
+@@ -252,7 +253,7 @@ private Optional<Value> resolveValueNode(Set<String> pathsAsStrings, PojoModelPa
+ 				return Optional.of( baseValue );
+ 			}
+ 		}
+-		else if ( SimpleValue.class.equals( valueClass ) ) { // equals() and not isAssignableFrom(), we mean it.
++		else if ( BasicValue.class.isAssignableFrom( valueClass ) ) {
+ 			pathsAsStrings.add( propertyNode.toPropertyString() );
+ 			// The string representation of the path was added, we can stop here
+ 			return Optional.empty();
+@@ -309,7 +310,7 @@ private Optional<Value> resolveExtractorPath(Set<String> pathsAsStrings, PojoMod
+ 		if ( !extractorNameIterator.hasNext() ) {
+ 			// We managed to resolve the whole container value extractor list
+ 			Class<? extends Value> containedValueClass = containedValue.getClass();
+-			if ( SimpleValue.class.equals( containedValueClass ) // equals() and not isAssignableFrom(), we mean it.
++			if ( BasicValue.class.isAssignableFrom( containedValueClass )
+ 					|| Component.class.isAssignableFrom( containedValueClass )
+ 					|| isWholePath && isAssociation( containedValueClass ) ) {
+ 				pathsAsStrings.add( propertyNode.toPropertyString() );
+diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
+index 16dc46a2f9..f5ddb7584e 100644
+--- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
++++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
+@@ -7,52 +7,48 @@
+ package org.hibernate.search.mapper.orm.search.query.impl;
+ 
+ import java.lang.invoke.MethodHandles;
+-import java.util.Calendar;
+-import java.util.Collections;
+-import java.util.Date;
+-import java.util.Iterator;
++import java.util.Collection;
+ import java.util.List;
+ import java.util.Map;
+-import java.util.Set;
+ import java.util.concurrent.TimeUnit;
+-import jakarta.persistence.FlushModeType;
+-import jakarta.persistence.LockModeType;
+-import jakarta.persistence.Parameter;
+-import jakarta.persistence.QueryTimeoutException;
+-import jakarta.persistence.TemporalType;
++import java.util.function.Function;
+ 
+ import org.hibernate.HibernateException;
+ import org.hibernate.LockMode;
+ import org.hibernate.LockOptions;
+-import org.hibernate.QueryException;
+ import org.hibernate.ScrollMode;
+-import org.hibernate.TypeMismatchException;
+ import org.hibernate.engine.spi.SessionImplementor;
++import org.hibernate.engine.spi.SharedSessionContractImplementor;
+ import org.hibernate.graph.GraphSemantic;
+ import org.hibernate.graph.RootGraph;
+-import org.hibernate.query.QueryParameter;
+-import org.hibernate.query.internal.AbstractProducedQuery;
+-import org.hibernate.query.internal.ParameterMetadataImpl;
++import org.hibernate.graph.spi.RootGraphImplementor;
++import org.hibernate.query.ResultListTransformer;
++import org.hibernate.query.TupleTransformer;
++import org.hibernate.query.internal.QueryOptionsImpl;
++import org.hibernate.query.spi.AbstractQuery;
++import org.hibernate.query.spi.ParameterMetadataImplementor;
++import org.hibernate.query.spi.QueryImplementor;
+ import org.hibernate.query.spi.QueryParameterBindings;
+ import org.hibernate.query.spi.ScrollableResultsImplementor;
+ import org.hibernate.search.engine.search.query.SearchQuery;
+ import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
+-import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.mapper.orm.loading.impl.EntityGraphHint;
+ import org.hibernate.search.mapper.orm.loading.impl.MutableEntityLoadingOptions;
++import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
+ import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
+-import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
+ import org.hibernate.search.util.common.SearchTimeoutException;
+ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+-import org.hibernate.transform.ResultTransformer;
+-import org.hibernate.type.Type;
++
++import jakarta.persistence.LockModeType;
++import jakarta.persistence.PersistenceException;
++import jakarta.persistence.QueryTimeoutException;
+ 
+ @SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
+ 		+ " in order to implement a org.hibernate.query.Query")
+ @SuppressWarnings("unchecked") // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
+-public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
++public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
+ 
+ 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
+ 		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
+@@ -61,15 +57,16 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
+ 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+ 
+ 	private final SearchQueryImplementor<R> delegate;
+-	private final MutableEntityLoadingOptions loadingOptions;
+ 
+-	private Integer firstResult;
+-	private Integer maxResults;
++	private final SessionImplementor sessionImplementor;
++	private final MutableEntityLoadingOptions loadingOptions;
++	private final QueryOptionsImpl queryOptions = new QueryOptionsImpl();
+ 
+ 	HibernateOrmSearchQueryAdapter(SearchQueryImplementor<R> delegate, SessionImplementor sessionImplementor,
+ 			MutableEntityLoadingOptions loadingOptions) {
+-		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
++		super( sessionImplementor );
+ 		this.delegate = delegate;
++		this.sessionImplementor = sessionImplementor;
+ 		this.loadingOptions = loadingOptions;
+ 	}
+ 
+@@ -84,83 +81,26 @@ public String toString() {
+ 
+ 	@Override
+ 	@SuppressWarnings("unchecked")
+-	public <T> T unwrap(Class<T> type) {
+-		if ( type.equals( SearchQuery.class ) ) {
++	public <T> T unwrap(Class<T> cls) {
++		if ( cls.equals( SearchQuery.class ) ) {
+ 			return (T) delegate;
+ 		}
++		else if ( cls.isInstance( this ) ) {
++			return (T) this;
++		}
+ 		else {
+-			return super.unwrap( type );
++			throw new PersistenceException( "Unrecognized unwrap type [" + cls.getName() + "]" );
+ 		}
+ 	}
+ 
+ 	@Override
+ 	public List<R> list() {
+-		/*
+-		 * Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions,
+-		 * but without the beforeQuery/afterQuery calls.
+-		 * These beforeQuery/afterQuery calls make everything fail
+-		 * because they call methods related to parameters,
+-		 * which are not supported here.
+-		 */
+ 		try {
+-			return doList();
++			return super.list();
+ 		}
+ 		catch (SearchTimeoutException e) {
+ 			throw new QueryTimeoutException( e );
+ 		}
+-		catch (QueryException he) {
+-			throw new IllegalStateException( he );
+-		}
+-		catch (TypeMismatchException e) {
+-			throw new IllegalArgumentException( e );
+-		}
+-		catch (HibernateException he) {
+-			throw getExceptionConverter().convert( he );
+-		}
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setMaxResults(int maxResults) {
+-		if ( maxResults < 0L ) {
+-			throw new IllegalArgumentException(
+-					"Negative (" + maxResults + ") parameter passed in to setMaxResults"
+-			);
+-		}
+-		this.maxResults = maxResults;
+-		return this;
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setFirstResult(int firstResult) {
+-		if ( firstResult < 0 ) {
+-			throw new IllegalArgumentException(
+-					"Negative (" + firstResult + ") parameter passed in to setFirstResult"
+-			);
+-		}
+-		this.firstResult = firstResult;
+-		return this;
+-	}
+-
+-	@Override
+-	public int getMaxResults() {
+-		return maxResults == null ? Integer.MAX_VALUE : maxResults;
+-	}
+-
+-	@Override
+-	public int getFirstResult() {
+-		return firstResult == null ? 0 : firstResult;
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setFetchSize(int fetchSize) {
+-		loadingOptions.fetchSize( fetchSize );
+-		return this;
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setFlushMode(FlushModeType flushModeType) {
+-		super.setFlushMode( flushModeType );
+-		return this;
+ 	}
+ 
+ 	@Override
+@@ -168,6 +108,11 @@ public String getQueryString() {
+ 		return delegate.queryString();
+ 	}
+ 
++	@Override
++	public QueryOptionsImpl getQueryOptions() {
++		return queryOptions;
++	}
++
+ 	@Override
+ 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
+ 		switch ( hintName ) {
+@@ -178,13 +123,11 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
+ 				setTimeout( hintValueToInteger( value ) );
+ 				break;
+ 			case HibernateOrmSearchQueryHints.FETCHGRAPH:
+-				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
+-				break;
+ 			case HibernateOrmSearchQueryHints.LOADGRAPH:
+-				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
++				applyEntityGraphQueryHint( hintName, hintValueToEntityGraph( value ) );
+ 				break;
+ 			default:
+-				handleUnrecognizedHint( hintName, value );
++				log.ignoringUnrecognizedQueryHint( hintName );
+ 				break;
+ 		}
+ 		return this;
+@@ -204,141 +147,98 @@ public HibernateOrmSearchQueryAdapter<R> applyGraph(RootGraph graph, GraphSemant
+ 	}
+ 
+ 	@Override
+-	public ScrollableResultsImplementor scroll() {
++	protected void applyEntityGraphQueryHint(String hintName, RootGraphImplementor<?> entityGraph) {
++		GraphSemantic graphSemantic = GraphSemantic.fromJpaHintName( hintName );
++		this.applyGraph( entityGraph, graphSemantic );
++	}
++
++	@Override
++	public ScrollableResultsImplementor<R> scroll() {
+ 		return scroll( ScrollMode.FORWARD_ONLY );
+ 	}
+ 
+ 	@Override
+-	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
++	public ScrollableResultsImplementor<R> scroll(ScrollMode scrollMode) {
+ 		if ( !ScrollMode.FORWARD_ONLY.equals( scrollMode ) ) {
+ 			throw log.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
+ 		}
+ 
++		extractQueryOptions();
++
+ 		int chunkSize = loadingOptions.fetchSize();
+ 		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults(),
+-				ScrollHitExtractor.singleObject() );
++				Function.identity() );
+ 	}
+ 
+ 	@Override
+-	protected boolean isNativeQuery() {
+-		return false;
++	public SharedSessionContractImplementor getSession() {
++		return sessionImplementor;
+ 	}
+ 
+ 	@Override
+ 	protected List<R> doList() {
+-		return delegate.fetchHits( firstResult, maxResults );
++		// Do not use getMaxRows()/getFirstRow() directly, they return weird values to comply with the JPA spec
++		Integer limit = getQueryOptions().getLimit().getMaxRows();
++		Integer offset = getQueryOptions().getLimit().getFirstRow();
++		return delegate.fetchHits( offset, limit );
++	}
++
++	@Override
++	protected void beforeQuery(boolean requiresTxn) {
++		super.beforeQuery( requiresTxn );
++
++		extractQueryOptions();
++	}
++
++	private void extractQueryOptions() {
++		Integer queryFetchSize = getQueryOptions().getFetchSize();
++		if ( queryFetchSize != null ) {
++			loadingOptions.fetchSize( queryFetchSize );
++		}
++		Integer queryTimeout = getQueryOptions().getTimeout();
++		if ( queryTimeout != null ) {
++			delegate.failAfter( queryTimeout, TimeUnit.SECONDS );
++		}
+ 	}
+ 
+ 	//-------------------------------------------------------------
+ 	// Unsupported ORM/JPA query methods
+ 	//-------------------------------------------------------------
+ 
+-	/**
+-	 * Return an iterator on the results.
+-	 * Retrieve the object one by one (initialize it during the next() operation)
+-	 */
+-	@Override
+-	public Iterator<R> iterate() {
+-		throw new UnsupportedOperationException( "iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
+-	}
+-
+ 	@Override
+ 	public Map<String, Object> getHints() {
+ 		throw new UnsupportedOperationException( "Not implemented yet" );
+ 	}
+ 
+ 	@Override
+-	public <P> HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<P> tParameter, P t) {
++	public ParameterMetadataImplementor getParameterMetadata() {
+ 		throw parametersNoSupported();
+ 	}
+ 
+ 	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Calendar> calendarParameter, Calendar calendar, TemporalType temporalType) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Object value) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Date value, TemporalType temporalType) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(String name, Calendar value, TemporalType temporalType) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(int position, Object value) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(int position, Date value, TemporalType temporalType) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public Set<Parameter<?>> getParameters() {
+-		return Collections.emptySet();
++	public QueryParameterBindings getParameterBindings() {
++		// parameters not supported in Hibernate Search queries
++		return QueryParameterBindings.NO_PARAM_BINDINGS;
+ 	}
+ 
+ 	@Override
+ 	protected QueryParameterBindings getQueryParameterBindings() {
++		// parameters not supported in Hibernate Search queries
++		return QueryParameterBindings.NO_PARAM_BINDINGS;
++	}
++
++	@Override
++	public HibernateOrmSearchQueryAdapter<R> setParameterList(String name, Object[] values) {
+ 		throw parametersNoSupported();
+ 	}
+ 
+ 	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setParameter(int position, Calendar value, TemporalType temporalType) {
++	public QueryImplementor<R> setParameterList(String s, Collection collection, Class aClass) {
+ 		throw parametersNoSupported();
+ 	}
+ 
+ 	@Override
+-	public QueryParameter<?> getParameter(String name) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public QueryParameter<?> getParameter(int position) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public <T> QueryParameter<T> getParameter(String name, Class<T> type) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public <T> QueryParameter<T> getParameter(int position, Class<T> type) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public boolean isBound(Parameter<?> param) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public <T> T getParameterValue(Parameter<T> param) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public Object getParameterValue(String name) {
+-		throw parametersNoSupported();
+-	}
+-
+-	@Override
+-	public Object getParameterValue(int position) {
++	public QueryImplementor<R> setParameterList(int i, Collection collection, Class aClass) {
+ 		throw parametersNoSupported();
+ 	}
+ 
+@@ -347,18 +247,16 @@ private UnsupportedOperationException parametersNoSupported() {
+ 	}
+ 
+ 	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setLockOptions(LockOptions lockOptions) {
+-		throw lockOptionsNotSupported();
++	public QueryImplementor<R> setTupleTransformer(TupleTransformer transformer) {
++		throw resultOrTupleTransformerNotImplemented();
+ 	}
+ 
+-	@Deprecated
+ 	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setResultTransformer(ResultTransformer transformer) {
+-		super.setResultTransformer( transformer );
+-		throw resultTransformerNotImplemented();
++	public QueryImplementor<R> setResultListTransformer(ResultListTransformer resultListTransformer) {
++		throw resultOrTupleTransformerNotImplemented();
+ 	}
+ 
+-	private UnsupportedOperationException resultTransformerNotImplemented() {
++	private UnsupportedOperationException resultOrTupleTransformerNotImplemented() {
+ 		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
+ 	}
+ 
+@@ -388,7 +286,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+ 	}
+ 
+ 	@Override
+-	public int executeUpdate() {
++	public int executeUpdate() throws HibernateException {
++		return doExecuteUpdate();
++	}
++
++	@Override
++	protected int doExecuteUpdate() {
+ 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
+ 	}
+ 
+@@ -397,30 +300,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
+ 		throw lockOptionsNotSupported();
+ 	}
+ 
+-	@Deprecated
+-	@Override
+-	public Type[] getReturnTypes() {
+-		throw new UnsupportedOperationException( "getReturnTypes() is not implemented in Hibernate Search queries" );
+-	}
+-
+-	@Deprecated
+-	@Override
+-	public String[] getReturnAliases() {
+-		throw new UnsupportedOperationException( "getReturnAliases() is not implemented in Hibernate Search queries" );
+-	}
+-
+-	@Deprecated
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setEntity(int position, Object val) {
+-		throw new UnsupportedOperationException( "setEntity(int,Object) is not implemented in Hibernate Search queries" );
+-	}
+-
+-	@Deprecated
+-	@Override
+-	public HibernateOrmSearchQueryAdapter<R> setEntity(String name, Object val) {
+-		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
+-	}
+-
+ 	private static long hintValueToLong(Object value) {
+ 		if ( value instanceof Number ) {
+ 			return ( (Number) value ).longValue();
+@@ -439,8 +318,8 @@ private static int hintValueToInteger(Object value) {
+ 		}
+ 	}
+ 
+-	private static RootGraph<?> hintValueToEntityGraph(Object value) {
+-		return (RootGraph<?>) value;
++	private static RootGraphImplementor<?> hintValueToEntityGraph(Object value) {
++		return (RootGraphImplementor<?>) value;
+ 	}
+ 
+ }
+diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/spi/HibernateOrmSearchScrollableResultsAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/spi/HibernateOrmSearchScrollableResultsAdapter.java
+index 069f97d042..5774325d80 100644
+--- a/main/java/org/hibernate/search/mapper/orm/search/query/spi/HibernateOrmSearchScrollableResultsAdapter.java
++++ b/main/java/org/hibernate/search/mapper/orm/search/query/spi/HibernateOrmSearchScrollableResultsAdapter.java
+@@ -7,14 +7,7 @@
+ package org.hibernate.search.mapper.orm.search.query.spi;
+ 
+ import java.lang.invoke.MethodHandles;
+-import java.math.BigDecimal;
+-import java.math.BigInteger;
+-import java.sql.Blob;
+-import java.sql.Clob;
+-import java.util.Calendar;
+-import java.util.Date;
+-import java.util.Locale;
+-import java.util.TimeZone;
++import java.util.function.Function;
+ 
+ import jakarta.persistence.QueryTimeoutException;
+ 
+@@ -25,15 +18,15 @@
+ import org.hibernate.search.mapper.orm.logging.impl.Log;
+ import org.hibernate.search.util.common.SearchTimeoutException;
+ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+-import org.hibernate.type.Type;
+ 
+-public class HibernateOrmSearchScrollableResultsAdapter<H> implements ScrollableResults, ScrollableResultsImplementor {
++public class HibernateOrmSearchScrollableResultsAdapter<R, H>
++		implements ScrollableResults<R>, ScrollableResultsImplementor<R> {
+ 
+ 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+ 
+ 	private final SearchScroll<H> scroll;
+ 	private final int maxResults;
+-	private final ScrollHitExtractor<? super H> hitExtractor;
++	private final Function<? super H, ? extends R> hitExtractor;
+ 	private SearchScrollResult<H> currentChunk;
+ 	private H currentHit;
+ 	private int currentIndexInScroll;
+@@ -42,7 +35,7 @@
+ 	private boolean closed;
+ 
+ 	public HibernateOrmSearchScrollableResultsAdapter(SearchScroll<H> scroll, int maxResults,
+-			ScrollHitExtractor<? super H> hitExtractor) {
++			Function<? super H, ? extends R> hitExtractor) {
+ 		this.scroll = scroll;
+ 		this.maxResults = maxResults;
+ 		this.hitExtractor = hitExtractor;
+@@ -184,6 +177,11 @@ public int getRowNumber() {
+ 		return currentIndexInScroll;
+ 	}
+ 
++	@Override
++	public boolean position(int position) {
++		return setRowNumber( position );
++	}
++
+ 	@Override
+ 	public boolean setRowNumber(int rowNumber) {
+ 		checkNotClosed();
+@@ -203,126 +201,12 @@ public boolean isClosed() {
+ 	}
+ 
+ 	@Override
+-	public Object[] get() {
++	public R get() {
+ 		checkNotClosed();
+ 		if ( currentIndexInScroll < 0 || afterLast ) {
+ 			return null;
+ 		}
+-		return hitExtractor.toArray( currentHit );
+-	}
+-
+-	@Override
+-	public Object get(int i) {
+-		checkNotClosed();
+-		if ( currentIndexInScroll < 0 || afterLast ) {
+-			return null;
+-		}
+-		return hitExtractor.toElement( currentHit, i );
+-	}
+-
+-	@Override
+-	public Type getType(int i) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Integer getInteger(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Long getLong(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Float getFloat(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Boolean getBoolean(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Double getDouble(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Short getShort(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Byte getByte(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Character getCharacter(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public byte[] getBinary(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public String getText(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Blob getBlob(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Clob getClob(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public String getString(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public BigDecimal getBigDecimal(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public BigInteger getBigInteger(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Date getDate(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Locale getLocale(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public Calendar getCalendar(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public TimeZone getTimeZone(int col) {
+-		throw columnTypesNotSupported();
+-	}
+-
+-	@Override
+-	public int getNumberOfTypes() {
+-		throw columnTypesNotSupported();
++		return hitExtractor.apply( currentHit );
+ 	}
+ 
+ 	private SearchScrollResult<H> nextChunk() {
+@@ -334,42 +218,10 @@ private SearchScrollResult<H> nextChunk() {
+ 		}
+ 	}
+ 
+-	private UnsupportedOperationException columnTypesNotSupported() {
+-		return new UnsupportedOperationException( "column types not supported in Hibernate Search queries" );
+-	}
+-
+ 	private void checkNotClosed() {
+ 		if ( closed ) {
+ 			throw log.cannotUseClosedScrollableResults();
+ 		}
+ 	}
+ 
+-	public interface ScrollHitExtractor<H> {
+-		Object[] toArray(H hit);
+-		Object toElement(H hit, int index);
+-
+-		@SuppressWarnings({ "unchecked", "rawtypes" }) // The instance works for any H
+-		static <H> ScrollHitExtractor<H> singleObject() {
+-			return (ScrollHitExtractor) SingleObjectScrollHitExtractor.INSTANCE;
+-		}
+-	}
+-
+-	private static final class SingleObjectScrollHitExtractor<H>
+-			implements HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor<H> {
+-
+-		private static final SingleObjectScrollHitExtractor<Object> INSTANCE = new SingleObjectScrollHitExtractor<>();
+-
+-		@Override
+-		public Object[] toArray(H hit) {
+-			return new Object[] { hit };
+-		}
+-
+-		@Override
+-		public Object toElement(H hit, int index) {
+-			if ( index > 0 ) {
+-				throw new IndexOutOfBoundsException();
+-			}
+-			return hit;
+-		}
+-	}
+ }
