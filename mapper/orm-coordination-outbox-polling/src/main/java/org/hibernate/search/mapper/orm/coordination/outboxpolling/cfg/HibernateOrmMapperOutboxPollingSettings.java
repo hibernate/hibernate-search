@@ -182,7 +182,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * it will be considered disconnected: other agents will forcibly remove its entry from the table,
 	 * and will perform rebalancing (reassign shards) as necessary.
 	 * <p>
-	 * The expiration interval must be set to a value 3 times larger than the
+	 * The expiration interval must be set to a value at least 3 times larger than the
 	 * {@link #COORDINATION_EVENT_PROCESSOR_PULSE_INTERVAL pulse interval}:
 	 * <ul>
 	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before rebalancing
@@ -233,14 +233,14 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_EVENT_PROCESSOR_TRANSACTION_TIMEOUT;
 
 	/**
-	 * In the event processor,
-	 * the time after which it is possible to process again an event that has gone into error.
+	 * How long the event processor must wait before re-processing an event after its processing failed.
 	 * <p>
 	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a positive integer value in seconds, such as {@code 10},
 	 * or a String that can be parsed into such Integer value.
+	 * <p>
 	 * Use the value {@code 0} to reprocess the failed events as soon as possible, with no delay.
 	 * <p>
 	 * Defaults to {@link Defaults#COORDINATION_EVENT_PROCESSOR_RETRY_DELAY}.
@@ -318,7 +318,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * it will be considered disconnected: other agents will forcibly remove its entry from the table,
 	 * and will resume their work as if the expired agent didn't exist.
 	 * <p>
-	 * The expiration interval must be set to a value 3 times larger than the
+	 * The expiration interval must be set to a value at least 3 times larger than the
 	 * {@link #COORDINATION_MASS_INDEXER_PULSE_INTERVAL pulse interval}:
 	 * <ul>
 	 *   <li>Low values (closer to the pulse interval) mean a shorter delay before resuming
