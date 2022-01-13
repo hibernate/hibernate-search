@@ -68,7 +68,7 @@
                                 <goal>run</goal>
                             </goals>
                             <configuration>
-                                <!-- WARNING: if you update this, make sure to update the "integrationtest" parent POM, too -->
+                                <!-- WARNING: if you update this, make sure to update the "internal" and "integrationtest" parent POMs, too -->
                                 <target>
                                     <ant dir="${rootProject.directory}/jakarta/" antfile="ant-copy-and-transform-sources.xml">
                                         <target name="copy"/>
