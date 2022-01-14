@@ -467,7 +467,7 @@ stage('Default build') {
 		helper.markStageSkipped()
 		return
 	}
-	runBuildOnNode {
+	runBuildOnNode( NODE_PATTERN_BASE, [time: 2, unit: 'HOURS'] ) {
 		withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			String mavenArgs = """ \
 					--fail-at-end \
@@ -959,8 +959,12 @@ void runBuildOnNode(Closure body) {
 }
 
 void runBuildOnNode(String label, Closure body) {
+	runBuildOnNode( label, [time: 1, unit: 'HOURS'], body )
+}
+
+void runBuildOnNode(String label, def timeoutValue, Closure body) {
 	node( label ) {
-		timeout( [time: 1, unit: 'HOURS'], body )
+		timeout( timeoutValue, body )
 	}
 }
 
