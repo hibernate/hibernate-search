@@ -99,7 +99,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-lucene</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                             </classpathDependencyExcludes>
@@ -117,7 +117,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-elasticsearch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                             </classpathDependencyExcludes>

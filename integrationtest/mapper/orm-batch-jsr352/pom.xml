@@ -100,7 +100,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-lucene-jbatch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene-jbatch</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jberet-se</classpathDependencyExclude>
@@ -119,7 +119,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-lucene-jberet</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene-jberet</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
@@ -137,7 +137,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-elasticsearch-jbatch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch-jbatch</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jberet-se</classpathDependencyExclude>
@@ -156,7 +156,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-elasticsearch-jberet</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch-jberet</reportNameSuffix>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
