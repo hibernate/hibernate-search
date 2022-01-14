@@ -526,11 +526,9 @@
         <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
         <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
 
-        <!--
-            Should be set from the command line.
-            Used by CI jobs that execute tests in multiple environments.
-            Allows to distinguish between multiple executions of the same test in test reports.
-         -->
+        <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
+        <surefire.reportNameSuffix>${surefire.environment}-${project.artifactId}</surefire.reportNameSuffix>
+        <!-- This should be set from the command line by CI jobs that execute the same tests in multiple environments -->
         <surefire.environment>default</surefire.environment>
 
         <!-- Containers executions tests properties -->
@@ -2018,7 +2016,7 @@
                         </systemPropertyVariables>
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
-                        <reportNameSuffix>${surefire.environment}-${project.artifactId}</reportNameSuffix>
+                        <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
                     </configuration>
                     <dependencies>
                         <!--

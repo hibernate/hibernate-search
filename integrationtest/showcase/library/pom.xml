@@ -150,7 +150,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-lucene</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-lucene</reportNameSuffix>
                             <systemPropertyVariables>
                                 <!-- See TestActiveProfilesResolver -->
                                 <test.backend>lucene</test.backend>
@@ -163,7 +163,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
-                            <reportNameSuffix>${surefire.environment}-${project.artifactId}-elasticsearch</reportNameSuffix>
+                            <reportNameSuffix>${surefire.reportNameSuffix}-elasticsearch</reportNameSuffix>
                             <systemPropertyVariables>
                                 <!-- See TestActiveProfilesResolver -->
                                 <test.backend>elasticsearch</test.backend>
