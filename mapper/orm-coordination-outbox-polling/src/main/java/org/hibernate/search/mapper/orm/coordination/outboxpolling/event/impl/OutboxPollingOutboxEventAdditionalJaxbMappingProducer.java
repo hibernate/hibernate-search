@@ -64,7 +64,11 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"        <property name=\"payload\" type=\"materialized_blob\" nullable=\"false\" />\n" +
 			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
 			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" nullable=\"true\" />\n" +
-			"        <property name=\"status\" index=\"status\" nullable=\"false\" />\n" +
+			"        <property name=\"status\" index=\"status\" nullable=\"false\">\n" +
+			"            <type name=\"org.hibernate.type.EnumType\">\n" +
+			"                <param name=\"enumClass\">" + OutboxEvent.Status.class.getName() + "</param>\n" +
+			"            </type>\n" +
+			"        </property>\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 
