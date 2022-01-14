@@ -59,10 +59,18 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			"                <param name=\"increment_size\">1</param>\n" +
 			"            </generator>\n" +
 			"        </id>\n" +
-			"        <property name=\"type\" nullable=\"false\" />\n" +
+			"        <property name=\"type\" nullable=\"false\">\n" +
+			"            <type name=\"org.hibernate.type.EnumType\">\n" +
+			"                <param name=\"enumClass\">" + AgentType.class.getName() + "</param>\n" +
+			"            </type>\n" +
+			"        </property>\n" +
 			"        <property name=\"name\" nullable=\"false\" />\n" +
 			"        <property name=\"expiration\" nullable=\"false\" />\n" +
-			"        <property name=\"state\" nullable=\"false\" />\n" +
+			"        <property name=\"state\" nullable=\"false\">\n" +
+			"            <type name=\"org.hibernate.type.EnumType\">\n" +
+			"                <param name=\"enumClass\">" + AgentState.class.getName() + "</param>\n" +
+			"            </type>\n" +
+			"        </property>\n" +
 			"        <property name=\"totalShardCount\" nullable=\"true\" />\n" +
 			"        <property name=\"assignedShardIndex\" nullable=\"true\" />\n" +
 			// Reserved for future use
