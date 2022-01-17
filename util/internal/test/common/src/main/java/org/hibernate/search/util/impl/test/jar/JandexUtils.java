@@ -10,6 +10,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
@@ -17,10 +19,14 @@ import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 
-public final class JandexAnnotationUtils {
+public final class JandexUtils {
 	private static final DotName RETENTION = DotName.createSimple( Retention.class.getName() );
 
-	private JandexAnnotationUtils() {
+	private JandexUtils() {
+	}
+
+	public static Set<String> toStrings(Set<DotName> dotNames) {
+		return dotNames.stream().map( DotName::toString ).collect( Collectors.toCollection( TreeSet::new ) );
 	}
 
 	public static Set<DotName> findRuntimeAnnotations(Index index) {
@@ -34,7 +40,7 @@ public final class JandexAnnotationUtils {
 		return annotations;
 	}
 
-	public static ClassInfo extractClass(AnnotationTarget target) {
+	public static ClassInfo extractDeclaringClass(AnnotationTarget target) {
 		switch ( target.kind() ) {
 			case CLASS:
 				return target.asClass();
@@ -45,9 +51,38 @@ public final class JandexAnnotationUtils {
 			case METHOD_PARAMETER:
 				return target.asMethodParameter().method().declaringClass();
 			case TYPE:
-				return extractClass( target.asType().enclosingTarget() );
+				return extractDeclaringClass( target.asType().enclosingTarget() );
 			default:
 				throw new IllegalStateException( "Unsupported annotation target kind: " + target.kind() );
+		}
+	}
+
+	public static Set<DotName> collectClassHierarchiesRecursively(Index index, Set<DotName> initialClasses) {
+		Set<DotName> classes = new HashSet<>();
+		for ( DotName initialClass : initialClasses ) {
+			collectClassHierarchiesRecursively( index, initialClass, classes );
+		}
+		return classes;
+	}
+
+	private static void collectClassHierarchiesRecursively(Index index, DotName className, Set<DotName> classes) {
+		if ( className.toString().startsWith( "java." ) ) {
+			return;
+		}
+		if ( classes.contains( className ) ) {
+			return;
+		}
+		ClassInfo clazz = index.getClassByName( className );
+		if ( clazz == null ) {
+			return;
+		}
+		classes.add( className );
+		collectClassHierarchiesRecursively( index, clazz.superName(), classes );
+		for ( DotName interfaceName : clazz.interfaceNames() ) {
+			collectClassHierarchiesRecursively( index, interfaceName, classes );
+		}
+		for ( ClassInfo subclass : index.getAllKnownSubclasses( className ) ) {
+			collectClassHierarchiesRecursively( index, subclass.name(), classes );
 		}
 	}
 }

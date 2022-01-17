@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.gson.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.test.jar.JandexAnnotationUtils.extractClass;
-import static org.hibernate.search.util.impl.test.jar.JandexAnnotationUtils.findRuntimeAnnotations;
 import static org.hibernate.search.util.impl.test.jar.JandexIndexingUtils.indexJarOrDirectory;
+import static org.hibernate.search.util.impl.test.jar.JandexUtils.extractDeclaringClass;
+import static org.hibernate.search.util.impl.test.jar.JandexUtils.findRuntimeAnnotations;
 import static org.hibernate.search.util.impl.test.jar.JarUtils.determineJarOrDirectoryLocation;
 
 import java.io.IOException;
@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.util.impl.test.jar.JandexUtils;
 import org.hibernate.search.util.impl.test.logging.Log;
 
 import org.junit.BeforeClass;
@@ -50,22 +50,17 @@ public class GsonClassesTest {
 		Set<DotName> gsonAnnotations = findRuntimeAnnotations( gsonIndex );
 
 		Set<DotName> annotatedClasses = new HashSet<>();
-		Set<String> annotatedClassesAndSubclasses = new TreeSet<>();
 		for ( DotName gsonAnnotation : gsonAnnotations ) {
 			for ( AnnotationInstance annotationInstance : backendElasticsearchIndex.getAnnotations( gsonAnnotation ) ) {
-				DotName className = extractClass( annotationInstance.target() ).name();
+				DotName className = extractDeclaringClass( annotationInstance.target() ).name();
 				annotatedClasses.add( className );
-				annotatedClassesAndSubclasses.add( className.toString() );
 			}
 		}
 
-		for ( DotName annotatedClass : annotatedClasses ) {
-			for ( ClassInfo subclass : backendElasticsearchIndex.getAllKnownSubclasses( annotatedClass ) ) {
-				annotatedClassesAndSubclasses.add( subclass.name().toString() );
-			}
-		}
+		Set<String> annotatedClassesAndSubclasses = JandexUtils.toStrings(
+				JandexUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, annotatedClasses ) );
 
-		Log.INSTANCE.infof( "GSON-annotated classes and subclasses: %s", annotatedClassesAndSubclasses );
+		Log.INSTANCE.infof( "GSON-annotated classes and their class hierarchy: %s", annotatedClassesAndSubclasses );
 		assertThat( annotatedClassesAndSubclasses ).isNotEmpty();
 		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( annotatedClassesAndSubclasses );
 	}
@@ -75,16 +70,19 @@ public class GsonClassesTest {
 		List<DotName> gsonContracts = Collections.singletonList(
 				DotName.createSimple( TypeAdapterFactory.class.getName() ) );
 
-		Set<String> classes = new TreeSet<>();
+		Set<DotName> classes = new HashSet<>();
 		for ( DotName gsonContract : gsonContracts ) {
 			for ( ClassInfo implementor : backendElasticsearchIndex.getAllKnownImplementors( gsonContract ) ) {
-				classes.add( implementor.name().toString() );
+				classes.add( implementor.name() );
 			}
 		}
 
-		Log.INSTANCE.infof( "Gson contract implementations: %s", classes );
-		assertThat( classes ).isNotEmpty();
-		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( classes );
+		Set<String> classesAndSubclasses = JandexUtils.toStrings(
+				JandexUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, classes ) );
+
+		Log.INSTANCE.infof( "Gson contract implementations and their class hierarchy: %s", classesAndSubclasses );
+		assertThat( classesAndSubclasses ).isNotEmpty();
+		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( classesAndSubclasses );
 	}
 
 }
