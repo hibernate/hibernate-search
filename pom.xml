@@ -272,14 +272,6 @@
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <version.org.hibernate.commons.annotations.orm6>5.1.2.Final</version.org.hibernate.commons.annotations.orm6>
-        <!-- This version must be kept in sync with the version of the dependency in Hibernate ORM 6.
-             DO NOT USE DEPENDENCY MANAGEMENT FOR THIS DEPENDENCY!
-             If we do not use dependency management for this dependency, we get a build failure
-             when the versions start diverging, thanks to the maven-enforcer-plugin
-             and to an artificial dependency in the mapper-orm artifact
-             (which is only necessary for the maven-enforcer-plugin checks to work).
-          -->
-        <version.org.jboss.jandex>2.2.3.Final</version.org.jboss.jandex>
         <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
 
         <!-- >>> JSR 352 -->

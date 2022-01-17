@@ -59,6 +59,21 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-test-common</artifactId>
+                <version>${project.version}</version>
+                <exclusions>
+                    <!-- Trust the ORM 6 dependency to bring in the correct version of Jandex
+                         (which, unfortunately, might be different from the version used in ORM 5.x
+                         on which our utils are aligned) -->
+                    <exclusion>
+                        <groupId>org.jboss</groupId>
+                        <artifactId>jandex</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
