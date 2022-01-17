@@ -355,7 +355,7 @@
         <version.bundle.plugin>5.1.4</version.bundle.plugin>
         <version.clean.plugin>3.1.0</version.clean.plugin>
         <!-- Needing 3.6.2 at least because of MCOMPILER-294 -->
-        <version.compiler.plugin>3.8.1</version.compiler.plugin>
+        <version.compiler.plugin>3.9.0</version.compiler.plugin>
         <version.dependency.plugin>3.2.0</version.dependency.plugin>
         <!-- Check dependencies for security vulnerabilities -->
         <version.dependency-check.plugin>6.5.2</version.dependency-check.plugin>
