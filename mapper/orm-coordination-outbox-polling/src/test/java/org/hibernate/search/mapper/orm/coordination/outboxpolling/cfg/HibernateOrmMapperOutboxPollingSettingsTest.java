@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.Test;
 
@@ -15,10 +14,12 @@ public class HibernateOrmMapperOutboxPollingSettingsTest {
 
 	@Test
 	public void coordinationKey() {
+		assertThat( HibernateOrmMapperOutboxPollingSettings.coordinationKey( "foo.bar" ) )
+				.isEqualTo( "hibernate.search.coordination.foo.bar" );
 		assertThat( HibernateOrmMapperOutboxPollingSettings.coordinationKey( "myTenant", "foo.bar" ) )
 				.isEqualTo( "hibernate.search.coordination.tenants.myTenant.foo.bar" );
-		assertThatThrownBy( () -> HibernateOrmMapperOutboxPollingSettings.coordinationKey( null, "foo.bar" ) )
-				.isInstanceOf( IllegalArgumentException.class );
+		assertThat( HibernateOrmMapperOutboxPollingSettings.coordinationKey( null, "foo.bar" ) )
+				.isEqualTo( "hibernate.search.coordination.foo.bar" );
 	}
 
 }

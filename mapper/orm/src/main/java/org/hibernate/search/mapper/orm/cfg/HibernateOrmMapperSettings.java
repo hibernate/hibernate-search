@@ -148,6 +148,11 @@ public final class HibernateOrmMapperSettings {
 	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
 
 	/**
+	 * The root property for properties related to coordination.
+	 */
+	public static final String COORDINATION = PREFIX + HibernateOrmMapperSettings.Radicals.COORDINATION;
+
+	/**
 	 * The strategy for coordinating between nodes of a distributed application.
 	 * <p>
 	 * Expects a reference to a coordination strategy;
