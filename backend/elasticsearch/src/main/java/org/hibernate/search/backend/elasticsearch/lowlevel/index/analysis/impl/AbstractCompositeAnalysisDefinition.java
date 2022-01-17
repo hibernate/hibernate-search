@@ -16,7 +16,7 @@ import com.google.gson.annotations.SerializedName;
  * A superclass to both {@link AnalyzerDefinition} and {@link NormalizerDefinition}.
  *
  */
-abstract class AbstractCompositeAnalysisDefinition extends AnalysisDefinition {
+public abstract class AbstractCompositeAnalysisDefinition extends AnalysisDefinition {
 
 	@SerializedName("filter")
 	private List<String> tokenFilters;

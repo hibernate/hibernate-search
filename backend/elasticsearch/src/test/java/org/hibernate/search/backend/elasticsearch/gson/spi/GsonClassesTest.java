@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.util.impl.test.logging.Log;
@@ -46,10 +45,6 @@ public class GsonClassesTest {
 				ElasticsearchExtension.class, "hibernate-search-backend-elasticsearch" ) );
 	}
 
-	private List<String> typesRequiringReflectionAsStrings() {
-		return GsonClasses.typesRequiringReflection().stream().map( Class::getName ).collect( Collectors.toList() );
-	}
-
 	@Test
 	public void testNoMissingGsonAnnotatedClass() {
 		Set<DotName> gsonAnnotations = findRuntimeAnnotations( gsonIndex );
@@ -72,7 +67,7 @@ public class GsonClassesTest {
 
 		Log.INSTANCE.infof( "GSON-annotated classes and subclasses: %s", annotatedClassesAndSubclasses );
 		assertThat( annotatedClassesAndSubclasses ).isNotEmpty();
-		assertThat( typesRequiringReflectionAsStrings() ).containsAll( annotatedClassesAndSubclasses );
+		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( annotatedClassesAndSubclasses );
 	}
 
 	@Test
@@ -89,7 +84,7 @@ public class GsonClassesTest {
 
 		Log.INSTANCE.infof( "Gson contract implementations: %s", classes );
 		assertThat( classes ).isNotEmpty();
-		assertThat( typesRequiringReflectionAsStrings() ).containsAll( classes );
+		assertThat( GsonClasses.typesRequiringReflection() ).containsAll( classes );
 	}
 
 }
