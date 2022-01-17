@@ -7,38 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.gson.spi;
 
 import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinitionJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinitionJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinitionJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinitionJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplateJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.FormatJsonAdapter;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplateJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMappingJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMappingJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingTypeJsonAdapter;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.AnalysisJsonAdapterFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettingsJsonAdapterFactory;
 
 public final class GsonClasses {
 
@@ -46,48 +16,46 @@ public final class GsonClasses {
 	}
 
 	/**
-	 * @return A set of all classes that will be involved in GSON serialization and will require reflection support.
+	 * @return A set of names of all classes that will be involved in GSON serialization and will require reflection support.
 	 * Useful to enable reflection for these classes in GraalVM-based native images.
 	 */
-	public static Set<Class<?>> typesRequiringReflection() {
-		List<Class<?>> base = Arrays.asList(
-				AbstractTypeMapping.class,
-				DynamicType.class,
-				FormatJsonAdapter.class,
-				RoutingTypeJsonAdapter.class,
-				PropertyMapping.class,
-				PropertyMappingJsonAdapterFactory.class,
-				RootTypeMapping.class,
-				RootTypeMappingJsonAdapterFactory.class,
-				RoutingType.class,
-				IndexSettings.class,
-				IndexSettingsJsonAdapterFactory.class,
-				Analysis.class,
-				AnalysisJsonAdapterFactory.class,
-				AnalysisDefinition.class,
-				AnalyzerDefinition.class,
-				AnalyzerDefinitionJsonAdapterFactory.class,
-				NormalizerDefinition.class,
-				NormalizerDefinitionJsonAdapterFactory.class,
-				TokenizerDefinition.class,
-				TokenFilterDefinition.class,
-				CharFilterDefinition.class,
-				AnalysisDefinitionJsonAdapterFactory.class,
-				IndexAliasDefinition.class,
-				IndexAliasDefinitionJsonAdapterFactory.class,
-				DynamicTemplate.class,
-				DynamicTemplateJsonAdapterFactory.class,
-				NamedDynamicTemplate.class,
-				NamedDynamicTemplateJsonAdapterFactory.class
-		);
-		Set<Class<?>> result = new LinkedHashSet<>();
-		for ( Class<?> clazz : base ) {
-			Class<?> currentClass = clazz;
-			while ( currentClass != Object.class ) {
-				result.add( currentClass );
-				currentClass = currentClass.getSuperclass();
-			}
-		}
-		return result;
+	public static Set<String> typesRequiringReflection() {
+		return new HashSet<>( Arrays.asList(
+				"org.hibernate.search.backend.elasticsearch.gson.impl.AbstractConfiguredExtraPropertiesJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.gson.impl.AbstractConfiguredExtraPropertiesJsonAdapterFactory$Adapter",
+				"org.hibernate.search.backend.elasticsearch.gson.impl.AbstractExtraPropertiesJsonAdapter",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AbstractCompositeAnalysisDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenFilterDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.FormatJsonAdapter",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplateJsonAdapterFactory$Adapter",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingTypeJsonAdapter",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinitionJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinitionJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinitionJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinitionJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMappingJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplateJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplateJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMappingJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMappingJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.AnalysisJsonAdapterFactory",
+				"org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettingsJsonAdapterFactory"
+		) );
 	}
+
 }
