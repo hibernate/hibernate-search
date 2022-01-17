@@ -10,7 +10,6 @@ import static java.lang.String.join;
 
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.common.annotation.Incubating;
-import org.hibernate.search.util.common.impl.Contracts;
 
 @Incubating
 public final class HibernateOrmMapperOutboxPollingSettings {
@@ -418,18 +417,34 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	}
 
 	/**
+	 * Builds a configuration property key for coordination, with the given radical.
+	 * <p>
+	 * See {@link CoordinationRadicals} for available radicals.
+	 * <p>
+	 * Example result: "{@code hibernate.search.coordination.tenant.myTenant.event_processor.enabled}"
+	 *
+	 * @param radical The radical of the configuration property (see constants in {@link CoordinationRadicals})
+	 * @return the concatenated prefix + tenant ID + radical
+	 */
+	public static String coordinationKey(String radical) {
+		return join( ".", HibernateOrmMapperSettings.COORDINATION, radical );
+	}
+
+	/**
 	 * Builds a configuration property key for coordination for the given tenant, with the given radical.
 	 * <p>
 	 * See {@link CoordinationRadicals} for available radicals.
 	 * <p>
 	 * Example result: "{@code hibernate.search.coordination.tenant.myTenant.event_processor.enabled}"
 	 *
-	 * @param tenantId The identifier of the tenant whose coordination to configure.
+	 * @param tenantId The identifier of the tenant whose coordination to configure, or {@code null} to configure defaults.
 	 * @param radical The radical of the configuration property (see constants in {@link CoordinationRadicals})
 	 * @return the concatenated prefix + tenant ID + radical
 	 */
 	public static String coordinationKey(String tenantId, String radical) {
-		Contracts.assertNotNull( tenantId, "tenantId" );
+		if ( tenantId == null ) {
+			return coordinationKey( radical );
+		}
 		return join( ".", COORDINATION_TENANTS, tenantId, radical );
 	}
 
