@@ -13,7 +13,7 @@ import static org.hibernate.search.util.impl.test.jar.JandexUtils.findRuntimeAnn
 import static org.hibernate.search.util.impl.test.jar.JarUtils.determineJarOrDirectoryLocation;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +31,7 @@ import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 
 import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 
 public class GsonClassesTest {
@@ -67,12 +68,14 @@ public class GsonClassesTest {
 
 	@Test
 	public void testNoMissingGsonContractImplementations() {
-		List<DotName> gsonContracts = Collections.singletonList(
-				DotName.createSimple( TypeAdapterFactory.class.getName() ) );
+		List<DotName> gsonContracts = Arrays.asList(
+				DotName.createSimple( TypeAdapterFactory.class.getName() ),
+				DotName.createSimple( TypeAdapter.class.getName() )
+		);
 
 		Set<DotName> classes = new HashSet<>();
 		for ( DotName gsonContract : gsonContracts ) {
-			for ( ClassInfo implementor : backendElasticsearchIndex.getAllKnownImplementors( gsonContract ) ) {
+			for ( ClassInfo implementor : backendElasticsearchIndex.getAllKnownSubclasses( gsonContract ) ) {
 				classes.add( implementor.name() );
 			}
 		}
