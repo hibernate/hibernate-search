@@ -1102,11 +1102,19 @@
                 <artifactId>jberet-core</artifactId>
                 <version>${version.org.jberet}</version>
                 <exclusions>
-                    <!-- This dependency is marked as "provided" but will never be there at runtime.
-                         This confuses maven-enforcer-plugin, so we'll exclude it. -->
+                    <!-- These dependencies are marked as "provided" but will never be there at runtime.
+                         This confuses maven-enforcer-plugin, so we'll exclude them. -->
                     <exclusion>
                         <groupId>org.jboss.logging</groupId>
                         <artifactId>jboss-logging-processor</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.infinispan</groupId>
+                        <artifactId>infinispan-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.infinispan</groupId>
+                        <artifactId>infinispan-commons</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
