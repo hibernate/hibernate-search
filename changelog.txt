@@ -1,6 +1,40 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.0.CR1 (2022-01-18)
+-------------------------
+
+** Bug
+    * HSEARCH-4443 Enum properties in outbox-polling entities (agent, outboxevent) have a weird type in database
+    * HSEARCH-4435 Custom Elasticsearch settings/mapping require the backend to be started
+
+** Improvement
+    * HSEARCH-4451 Allow null tenant IDs in HibernateOrmMapperOutboxPollingSettings#coordinationKey
+    * HSEARCH-4450 Expose list of outbox-polling classes requiring reflection through an SPI
+    * HSEARCH-4449 Upgrade to slf4j 1.7.33
+    * HSEARCH-4448 Upgrade to JBoss logging 3.4.3.Final
+    * HSEARCH-4446 Upgrade to Elasticsearch client 7.16.3
+    * HSEARCH-4438 More detailed error message for syntax errors in custom mapping/settings file
+    * HSEARCH-4436 Upgrade to Hibernate ORM 5.6.3.Final
+    * HSEARCH-4425 Mark non-nullable properties as such in OutboxPollingOutboxEventAdditionalJaxbMappingProducer
+    * HSEARCH-4362 Customizable optional operators for the regexp query
+    * HSEARCH-3277 Separate artifacts for compatibility with Hibernate ORM 6 (Jakarta Persistence only, no Java EE)
+
+** New Feature
+    * HSEARCH-4330 Configurable mapping for entities added by the database-polling coordination strategy
+
+** Task
+    * HSEARCH-4442 Fix errors and clarify documentation of outbox-polling configuration
+    * HSEARCH-4440 Fix OutOfMemoryError thrown by Elasticsearch in tests
+    * HSEARCH-4439 Fix tests involving overrides of outbox-polling entity mapping on MySQL
+    * HSEARCH-4437 Fix very long Maven download timeouts when building with GitHub Actions
+    * HSEARCH-4434 Avoid unnecessary synchronization in ExpectedLog4jLog
+    * HSEARCH-4430 Upgrade to latest version of build dependencies
+    * HSEARCH-4429 Change the limit of the RAM usage by ES containers
+    * HSEARCH-4428 Add missing classes to org.hibernate.search.backend.elasticsearch.gson.spi.GsonClasses
+    * HSEARCH-4427 Run tests against Elasticsearch 6.8.22
+    * HSEARCH-4426 Update compatible versions of OpenSearch in the reference documentation
+
 6.1.0.Beta2 (2022-01-05)
 -------------------------
 
