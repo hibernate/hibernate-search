@@ -33,6 +33,9 @@ org.hibernate.tool.schema.Action @ Hibernate ORM doesn't support passing Action 
 @defaultMessage Favor EntityManager methods over their Session equivalent
 org.hibernate.Session.save(java.lang.Object) @ Use persist() instead
 org.hibernate.Session.save(java.lang.String, java.lang.Object) @ Use persist() instead
+# Allowed for test code: we need to test those methods.
+#org.hibernate.Session.update(java.lang.Object) @ Use merge() instead
+#org.hibernate.Session.update(java.lang.String, java.lang.Object) @ Use merge() instead
 org.hibernate.Session.load(java.lang.Class<T>, java.lang.Object) @ Use getReference() instead
 org.hibernate.Session.delete(java.lang.Object) @ Use remove() instead
 org.hibernate.Session.delete(java.lang.String, java.lang.Object) @ Use remove() instead
