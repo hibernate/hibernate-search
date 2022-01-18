@@ -71,6 +71,7 @@ org.hibernate.Session.save(java.lang.String, java.lang.Object) @ Use persist() i
 org.hibernate.Session.update(java.lang.Object) @ Use merge() instead
 org.hibernate.Session.update(java.lang.String, java.lang.Object) @ Use merge() instead
 org.hibernate.Session.load(java.lang.Class<T>, java.lang.Object) @ Use getReference() instead
+org.hibernate.Session.load(java.lang.String, java.lang.Object) @ Use getReference() instead
 org.hibernate.Session.delete(java.lang.Object) @ Use remove() instead
 org.hibernate.Session.delete(java.lang.String, java.lang.Object) @ Use remove() instead
 
