@@ -359,10 +359,11 @@ public class AutomaticIndexingBasicIT {
 	}
 
 	/**
-	 * Test that merging an entity to change an indexed field
+	 * Test that merging an entity using update() to change an indexed field
 	 * triggers reindexing of the indexed entity owning the property.
 	 */
 	@Test
+	@SuppressWarnings("deprecation") // This is specifically about "update", which is NOT strictly equivalent to "merge"
 	public void sessionUpdate_directValueUpdate_indexedField() {
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -387,7 +388,7 @@ public class AutomaticIndexingBasicIT {
 
 			session.update( entity1 );
 
-			// Hibernate ORM does not track dirtiness on merges: we assume everything is dirty.
+			// Hibernate ORM does not track dirtiness on calls to update(): we assume everything is dirty.
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
@@ -399,9 +400,10 @@ public class AutomaticIndexingBasicIT {
 	}
 
 	/**
-	 * Test that merging an entity to change an non-indexed field
+	 * Test that merging an entity using update() to change a non-indexed field
 	 * triggers reindexing of the indexed entity owning the property:
 	 */
+	@SuppressWarnings("deprecation") // This is specifically about "update", which is NOT strictly equivalent to "merge"
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void sessionUpdate_directValueUpdate_nonIndexedField() {
@@ -435,6 +437,78 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					);
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that merging an entity using merge() to change an indexed field
+	 * triggers reindexing of the indexed entity owning the property.
+	 */
+	@Test
+	public void sessionMerge_directValueUpdate_indexedField() {
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "updatedValue" );
+
+			session.merge( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that merging an entity using merge() to change a non-indexed field
+	 * does not trigger reindexing of the indexed entity owning the property.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void sessionMerge_directValueUpdate_nonIndexedField() {
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setNonIndexedField( "initialValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					);
+		} );
+		backendMock.verifyExpectationsMet();
+
+		setupHolder.runInTransaction( session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setNonIndexedField( "updatedValue" );
+
+			session.merge( entity1 );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

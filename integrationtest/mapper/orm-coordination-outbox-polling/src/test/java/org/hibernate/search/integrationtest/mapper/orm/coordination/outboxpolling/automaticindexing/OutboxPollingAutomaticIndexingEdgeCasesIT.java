@@ -80,18 +80,14 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 			session.persist( entity3 );
 
 			entity1.setText( "initialValue II" );
-			session.update( entity1 );
 			entity2.setText( "initialValue II" );
-			session.update( entity2 );
 			entity3.setText( "initialValue II" );
-			session.update( entity3 );
+			session.flush();
 
 			entity1.setText( "initialValue III" );
-			session.update( entity1 );
 			entity2.setText( "initialValue III" );
-			session.update( entity2 );
 			entity3.setText( "initialValue III" );
-			session.update( entity3 );
+			session.flush();
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
