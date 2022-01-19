@@ -24,12 +24,18 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-search' }}
 
 env:
-  # Maven Wagon options are supposed to work around a problem on GitHub Actions' hosting platform, Azure
-  # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-689467080
-  # See https://github.com/actions/virtual-environments/issues/1499#issuecomment-718396233
-  # See https://github.com/apache/pulsar/blob/60ef5e983e5e8956bd0b602b5741bd6255c6258a/.github/workflows/ci-unit.yaml#L30
-  # See https://github.com/apache/pulsar/commit/9405e6bfcba250f014faae6ba0490a8045cb4674
-  MAVEN_ARGS: "-e -B -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3"
+  # Timeouts during download a a real issue on GitHub Actions, because the default timeout is 15 *minutes*,
+  # so even if Maven retries 3 times, a few timeouts can quickly take the build past the 6 hour limit.
+  # We use two strategies to try to avoid timeout issues:
+  # 1. Custom Maven settings that use a Maven Central mirror instead of Maven Central itself;
+  #    the mirror seems more reliable than Maven Central itself and leads to fewer timeouts.
+  # 2. Maven Wagon options that are supposed to work around a problem on GitHub Actions' hosting platform, Azure.
+  #    To be honest this doesn't seem to work (at least not completely), but it doesn't hurt either.
+  #    See https://github.com/actions/virtual-environments/issues/1499#issuecomment-689467080
+  #    See https://github.com/actions/virtual-environments/issues/1499#issuecomment-718396233
+  #    See https://github.com/apache/pulsar/blob/60ef5e983e5e8956bd0b602b5741bd6255c6258a/.github/workflows/ci-unit.yaml#L30
+  #    See https://github.com/apache/pulsar/commit/9405e6bfcba250f014faae6ba0490a8045cb4674
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3"
 jobs:
   build:
     name: Build and test on Java 11
