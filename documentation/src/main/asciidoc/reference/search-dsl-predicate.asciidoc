@@ -615,14 +615,6 @@ This behavior is considered a bug and
 https://github.com/elastic/elasticsearch/issues/80189[was reported to the Elasticsearch project].
 ====
 
-[[search-dsl-predicate-regexp-multiple-fields]]
-=== Targeting multiple fields
-
-Optionally, the predicate can target multiple fields.
-In that case, the predicate will match documents for which _any_ of the given fields matches.
-
-See <<search-dsl-predicate-common-multiple-fields>>.
-
 [[search-dsl-predicate-regexp-flags]]
 === `flags`: enabling only specific syntax constructs
 
@@ -654,6 +646,14 @@ For example `.*a.*&.*z.*` matches `az`, `za`, `babzb`, `bzbab`, but not `a` nor 
 * `ANYSTRING`: the `@` operator matches any string; equivalent to `.*`.
 +
 This operator is mostly useful to negate a pattern, e.g. `@&~(ab)` matches anything except the string `ab`.
+
+[[search-dsl-predicate-regexp-multiple-fields]]
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
 
 [[search-dsl-predicate-regexp-other]]
 === Other options
