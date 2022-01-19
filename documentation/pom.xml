@@ -36,6 +36,7 @@
 
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
         <!-- Skip javadoc generation -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
