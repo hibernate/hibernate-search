@@ -565,43 +565,43 @@ The behavior of regexp predicates on analyzed/normalized fields is a bit complex
 so here is a summary of how it works.
 
 Regexps must match **the entirety** of analyzed/normalized tokens::
-For a field that is lowercased and tokenized on spaces (using an analyzer), the regexp `robots?`:
+For a field that is lowercased and tokenized on spaces (using an analyzer), the regexp `pass:[robots?]`:
 * will match `Robot`: the indexed token `robot` matches.
 * will match `I love robots`: the indexed token `robots` matches.
-* will **not* match `Mr. Roboto`: the indexed token `roboto` does not match.
+* will **not** match `Mr. Roboto`: the indexed token `roboto` does not match.
 +
-For a field that is lowercased but not tokenized (using a normalizer), the regexp `robots?`:
+For a field that is lowercased but not tokenized (using a normalizer), the regexp `pass:[robots?]`:
 * will match `Robot`: the indexed token `robot` matches.
 * will **not** match `I love robots`: the indexed token `i love robots` does not match.
-* will **not* match `Mr. Roboto`: the indexed token `mr. roboto` does not match.
+* will **not** match `Mr. Roboto`: the indexed token `mr. roboto` does not match.
 
 Regexps are never tokenized, even if fields are::
 Beware of spaces in regexps, in particular.
 +
-For a field that is tokenized on spaces (using an analyzer), the regexp `.*love .* robots?` will never match anything, because it requires a space inside the token and indexed tokens don't contain any (since tokenization happens on spaces).
+For a field that is tokenized on spaces (using an analyzer), the regexp `pass:[.*love .* robots?]` will never match anything, because it requires a space inside the token and indexed tokens don't contain any (since tokenization happens on spaces).
 +
-For a field that is lowercased, but not tokenized (using a normalizer), the regexp `.*love .* robots?`:
+For a field that is lowercased, but not tokenized (using a normalizer), the regexp `pass:[.*love .* robots?]`:
 * will match `I love robots`, which was indexed as `i love robots`.
 * will match `I love my Robot`, which was indexed as `i love my robot`.
 * will **not** match `I love Mr. Roboto`, which was indexed as `i love mr. roboto`: `roboto` doesn't match `robots?`.
 
 With the Lucene backend, regexps are never analyzed nor normalized::
 For a field that is lowercased and tokenized on spaces:
-* the regexp `Robots?` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
-* the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
-* the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
+* the regexp `pass:[Robots?]` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
+* the regexp `pass:[[Rr\]obots?]` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `pass:[love .* robots?]` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 
 With the Elasticsearch backend, regexps are not analyzed nor normalized on text (tokenized) fields, but **are normalized on keyword (non-tokenized) fields**::
 For a field that is lowercased and tokenized on spaces (using an analyzer):
-* the regexp `Robots?` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
-* the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
-* the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
+* the regexp `pass:[Robots?]` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
+* the regexp `pass:[[Rr\]obots?]` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `pass:[love .* robots?]` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 +
 However, **behavior differs from Lucene for normalized fields**!
 For a field that is lowercased, but not tokenized (using a normalizer):
-* the regexp `Robots?` will be normalized to `robots?` and will match `I love robots`: the indexed token `robots` matches.
-* the regexp `[Rr]obots?` will be normalized to `[rr]obots?` and will match `I love Robots`: the indexed token `robots` matches.
-* the regexp `love .* robots?` will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
+* the regexp `pass:[Robots?+]` will be normalized to `pass:[robots?]` and will match `I love robots`: the indexed token `robots` matches.
+* the regexp `pass:[[Rr\]obots?+]` will be normalized to `pass:[[rr\]obots?]` and will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `pass:[love .* robots?]` will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 +
 [WARNING]
 ====
@@ -609,7 +609,7 @@ As a result of Elasticsearch normalizing regular expressions,
 normalizers can interfere with regexp meta-characters and completely change the meaning of a regexp.
 
 For example, for a field whose normalizer replaces the characters `*` and `?` with `+_+`,
-the regexp `Robots?` will be normalized to `Robots_` and will probably never match anything.
+the regexp `pass:[Robots?]` will be normalized to `pass:[Robots_]` and will probably never match anything.
 
 This behavior is considered a bug and
 https://github.com/elastic/elasticsearch/issues/80189[was reported to the Elasticsearch project].
@@ -633,20 +633,20 @@ The following flags/operators are available:
 
 * `COMPLEMENT`: the `~` operator will negate the following pattern.
 +
-For example `a~bc` matches `aac` but not `abc`.
+For example `pass:[a~bc]` matches `aac` but not `abc`.
 +
-Don't forget to use parentheses if you need to negate a composite pattern, e.g. `a~(bc)`
+Don't forget to use parentheses if you need to negate a composite pattern, e.g. `pass:[a~(bc)]`
 * `INTERVAL`: the `<>` operator matches a non-negative integer range, both ends included.
 +
-For example `a<1-10>` matches `a1`, `a2`, ... `a9`, `a10`, but not `a11`.
+For example `pass:[a<1-10>]` matches `a1`, `a2`, ... `a9`, `a10`, but not `a11`.
 +
 Leading zeroes are meaningful, e.g. `a<01-10>` matches `a01` and `a02` but not `a1` nor `a2`.
 * `INTERSECTION`: the `&` operator combines two regexps with an AND operator.
 +
-For example `.*a.*&.*z.*` matches `az`, `za`, `babzb`, `bzbab`, but not `a` nor `z`.
-* `ANYSTRING`: the `@` operator matches any string; equivalent to `.*`.
+For example `pass:[.*a.*&.*z.*]` matches `az`, `za`, `babzb`, `bzbab`, but not `a` nor `z`.
+* `ANYSTRING`: the `@` operator matches any string; equivalent to `pass:[.*]`.
 +
-This operator is mostly useful to negate a pattern, e.g. `@&~(ab)` matches anything except the string `ab`.
+This operator is mostly useful to negate a pattern, e.g. `pass:[@&~(ab)]` matches anything except the string `ab`.
 
 [[search-dsl-predicate-regexp-multiple-fields]]
 === Targeting multiple fields
