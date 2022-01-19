@@ -630,6 +630,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ====
 
 The following flags/operators are available:
+
 * `COMPLEMENT`: the `~` operator will negate the following pattern.
 +
 For example `a~bc` matches `aac` but not `abc`.
