@@ -4,7 +4,7 @@
 # See https://docs.github.com/en/free-pro-team@latest/actions
 # for more information about GitHub actions.
 
-name: Hibernate Search contributor build
+name: Hibernate Search simple build
 
 on:
   push:
