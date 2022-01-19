@@ -566,11 +566,13 @@ so here is a summary of how it works.
 
 Regexps must match **the entirety** of analyzed/normalized tokens::
 For a field that is lowercased and tokenized on spaces (using an analyzer), the regexp `pass:[robots?]`:
++
 * will match `Robot`: the indexed token `robot` matches.
 * will match `I love robots`: the indexed token `robots` matches.
 * will **not** match `Mr. Roboto`: the indexed token `roboto` does not match.
 +
 For a field that is lowercased but not tokenized (using a normalizer), the regexp `pass:[robots?]`:
++
 * will match `Robot`: the indexed token `robot` matches.
 * will **not** match `I love robots`: the indexed token `i love robots` does not match.
 * will **not** match `Mr. Roboto`: the indexed token `mr. roboto` does not match.
@@ -578,27 +580,34 @@ For a field that is lowercased but not tokenized (using a normalizer), the regex
 Regexps are never tokenized, even if fields are::
 Beware of spaces in regexps, in particular.
 +
-For a field that is tokenized on spaces (using an analyzer), the regexp `pass:[.*love .* robots?]` will never match anything, because it requires a space inside the token and indexed tokens don't contain any (since tokenization happens on spaces).
+For a field that is tokenized on spaces (using an analyzer), the regexp `pass:[.*love .* robots?]` will never match anything,
+because it requires a space inside the token and indexed tokens don't contain any (since tokenization happens on spaces).
 +
 For a field that is lowercased, but not tokenized (using a normalizer), the regexp `pass:[.*love .* robots?]`:
++
 * will match `I love robots`, which was indexed as `i love robots`.
 * will match `I love my Robot`, which was indexed as `i love my robot`.
 * will **not** match `I love Mr. Roboto`, which was indexed as `i love mr. roboto`: `roboto` doesn't match `robots?`.
 
 With the Lucene backend, regexps are never analyzed nor normalized::
 For a field that is lowercased and tokenized on spaces:
-* the regexp `pass:[Robots?]` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
++
+* the regexp `pass:[Robots?]` will **not** be normalized and will never match anything,
+because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
 * the regexp `pass:[[Rr\]obots?]` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
 * the regexp `pass:[love .* robots?]` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 
 With the Elasticsearch backend, regexps are not analyzed nor normalized on text (tokenized) fields, but **are normalized on keyword (non-tokenized) fields**::
 For a field that is lowercased and tokenized on spaces (using an analyzer):
-* the regexp `pass:[Robots?]` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
++
+* the regexp `pass:[Robots?]` will **not** be normalized and will never match anything,
+because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
 * the regexp `pass:[[Rr\]obots?]` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
 * the regexp `pass:[love .* robots?]` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
 +
 However, **behavior differs from Lucene for normalized fields**!
 For a field that is lowercased, but not tokenized (using a normalizer):
++
 * the regexp `pass:[Robots?+]` will be normalized to `pass:[robots?]` and will match `I love robots`: the indexed token `robots` matches.
 * the regexp `pass:[[Rr\]obots?+]` will be normalized to `pass:[[rr\]obots?]` and will match `I love Robots`: the indexed token `robots` matches.
 * the regexp `pass:[love .* robots?]` will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
