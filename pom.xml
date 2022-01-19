@@ -253,7 +253,7 @@
         <version.org.slf4j>1.7.33</version.org.slf4j>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.6.3.Final</version.org.hibernate>
+        <version.org.hibernate>5.6.4.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
@@ -264,7 +264,7 @@
              and to an artificial dependency in the mapper-orm artifact
              (which is only necessary for the maven-enforcer-plugin checks to work).
           -->
-        <version.org.jboss.jandex>2.2.3.Final</version.org.jboss.jandex>
+        <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
         <version.javax.persistence>2.2</version.javax.persistence>
 
         <!-- >>> ORM 6 / Jakarta Persistence -->
