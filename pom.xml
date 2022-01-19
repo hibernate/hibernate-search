@@ -332,6 +332,7 @@
         <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
         <version.sonar.plugin>3.7.0.1746</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
+        <version.gpg.plugin>3.0.1</version.gpg.plugin>
         <version.org.codehaus.groovy-jsr223>3.0.8</version.org.codehaus.groovy-jsr223>
         <!--
             Please don't change the name of this property, it may be used and
@@ -1921,6 +1922,11 @@
                             <version>${version.org.codehaus.groovy-jsr223}</version> <!-- look for latest -->
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${version.gpg.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
