@@ -1739,7 +1739,10 @@ In Hibernate Search 6, indexing operations are handled through the indexing plan
 
 * `fullTextSession.index(entity)` is equivalent to `searchSession.indexingPlan().addOrUpdate(entity)`;
 * `fullTextSession.purge(entity)` is equivalent to `searchSession.indexingPlan().delete(entity)`;
-* `fullTextSession.purge(entityType, id)` is equivalent to `searchSession.indexingPlan().purge(entityType, id)`;
+* `fullTextSession.purge(entityType, id)` is equivalent to `searchSession.indexingPlan().purge(entityType, id, null)`
+  (if you don't use <<sharding,sharding>>)
+  or `searchSession.indexingPlan().purge(entityType, id, routingKey)`
+  (if you do use <<sharding,sharding>>).
 
 However:
 
@@ -1749,7 +1752,7 @@ but the `purge` operation still does.
 * In Hibernate Search 5, `index` only triggered indexing of the entity passed as an argument.
 In Hibernate Search 6, `addOrUpdate` will also trigger reindexing of other entities that embed it
 (through `@IndexedEmbedded` for example).
-* In Hibernate Search 5, passing `null` to `purge` used to trigger removal of all entities from the index.
+* In Hibernate Search 5, passing a `null` identifier to `purge` used to trigger removal of all entities from the index.
 In Hibernate Search 6, passing `null` to `delete`/`purge` will result in an exception being thrown.
 To remove all entities from the index, see <<fulltextsession-purgeall>>.
 
