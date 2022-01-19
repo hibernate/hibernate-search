@@ -845,7 +845,11 @@ When searching, a filter targeting the tenant ID field is added transparently to
 to only return search hits for the current tenant.
 The ID field is used to retrieve the original document IDs.
 
-=== Custom index mapping
+[[backend-elasticsearch-mapping-custom]]
+=== [[_custom_index_mapping]] Custom index mapping
+
+[[backend-elasticsearch-mapping-custom-basics]]
+==== Basics
 
 Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
 Should you need to customize some link:{elasticsearchDocUrl}/mapping-params.html[mapping parameters], it is possible to provide a custom mapping to Hibernate Search: it will include the custom mapping when creating an index.
@@ -907,7 +911,8 @@ include::{resourcesdir}/custom/index-mapping-merged.json[]
 has a `String name` property annotated with `@FullTextField`.
 ====
 
-==== Disable `_source`
+[[backend-elasticsearch-mapping-custom-disabling-source]]
+==== [[_disable_source]] Disabling `_source`
 
 Using this feature it is possible to link:{elasticsearchDocUrl}/mapping-source-field.html[disable the `_source` field].
 For instance you could pass a `custom/index-mapping.json` file like the following:

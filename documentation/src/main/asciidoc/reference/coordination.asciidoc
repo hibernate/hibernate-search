@@ -618,7 +618,8 @@ hibernate.search.coordination.tenants.tenant1.event_processor.enabled = true <2>
 <2> ... *except* `tenant1`.
 ====
 
-=== Aborted events
+[[coordination-outbox-polling-aborted-events]]
+=== [[_aborted_events]] Aborted events
 
 If something goes wrong when an outbox event is processed, the event processor will try to re-process the events
 two times, after that the event will be marked as aborted.
