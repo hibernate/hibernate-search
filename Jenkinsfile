@@ -522,9 +522,15 @@ stage('Deploy') {
 		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
 				configFileProvider([configFile(fileId: 'release.config.ssh', targetLocation: env.HOME + '/.ssh/config')]) {
-					sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
+				withCredentials([file(credentialsId: 'release.gpg.private-key', variable: 'RELEASE_GPG_PRIVATE_KEY_PATH'),
+						string(credentialsId: 'release.gpg.passphrase', variable: 'RELEASE_GPG_PASSPHRASE')]) {
+				sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
+					try {
 						sh 'cat $HOME/.ssh/config'
 						sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
+
+						env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
+						sh "bash -xe hibernate-noorm-release-scripts/setup.sh"
 						sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${releaseVersion.toString()}"
 
 						String deployCommand = "bash -xe hibernate-noorm-release-scripts/deploy.sh search"
@@ -550,6 +556,16 @@ stage('Deploy') {
 						sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${afterReleaseDevelopmentVersion.toString()}"
 						sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${releaseVersion.toString()} ${helper.scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
 					}
+					finally {
+						try {
+							sh "bash -xe hibernate-noorm-release-scripts/cleanup.sh"
+						}
+						catch (Throwable t) {
+							echo 'Error cleaning up after release: ' + t.toString()
+						}
+					}
+				}
+				}
 				}
 			}
 		}
