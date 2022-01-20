@@ -1873,6 +1873,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>${version.gpg.plugin}</version>
+                    <configuration>
+                        <homedir>${env.RELEASE_GPG_HOMEDIR}</homedir>
+                        <passphrase>${env.RELEASE_GPG_PASSPHRASE}</passphrase>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
