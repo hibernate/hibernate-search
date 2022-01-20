@@ -33,10 +33,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 import org.hibernate.testing.bytecode.enhancement.EnhancementOptions;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 /**
@@ -47,7 +48,6 @@ import org.junit.runner.RunWith;
  */
 @RunWith(BytecodeEnhancerRunner.class) // So that we can have lazy *ToOne associations
 @EnhancementOptions(lazyLoading = true)
-@Ignore("HSEARCH-4417 likely ORM bugs")
 public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 		extends AbstractAutomaticIndexingAssociationBaseIT<
 						AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT.IndexedEntity,
@@ -57,6 +57,15 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT
 
 	public AutomaticIndexingOneToOneOwnedByContainingLazyOnContainingSideIT() {
 		super( new ModelPrimitivesImpl() );
+	}
+
+	@Override
+	public void setup(OrmSetupHelper.SetupContext setupContext,
+			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+		super.setup( setupContext, dataClearConfig );
+
+		// Necessary for BytecodeEnhancerRunner, see BytecodeEnhancementIT.setup
+		setupContext.withTcclLookupPrecedenceBefore();
 	}
 
 	private static class ModelPrimitivesImpl
