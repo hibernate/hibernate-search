@@ -544,45 +544,9 @@ stage('Deploy') {
 				withCredentials([file(credentialsId: 'release.gpg.private-key', variable: 'RELEASE_GPG_PRIVATE_KEY_PATH'),
 						string(credentialsId: 'release.gpg.passphrase', variable: 'RELEASE_GPG_PASSPHRASE')]) {
 				sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
-					try {
-						sh 'cat $HOME/.ssh/config'
-						sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
-
-						env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
-						sh "bash -xe hibernate-noorm-release-scripts/setup.sh"
-						sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${releaseVersion.toString()}"
-
-						String deployCommand = "bash -xe hibernate-noorm-release-scripts/deploy.sh search"
-						if (!params.RELEASE_DRY_RUN) {
-							sh deployCommand
-						} else {
-							echo "WARNING: Not deploying. Would have executed:"
-							echo deployCommand
-						}
-
-						String uploadDistributionCommand = "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh search ${releaseVersion.toString()}"
-						String uploadDocumentationCommand = "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${releaseVersion.toString()} ${releaseVersion.family}"
-						if (!params.RELEASE_DRY_RUN) {
-							sh uploadDistributionCommand
-							sh uploadDocumentationCommand
-						}
-						else {
-							echo "WARNING: Not uploading anything. Would have executed:"
-							echo uploadDistributionCommand
-							echo uploadDocumentationCommand
-						}
-
-						sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${afterReleaseDevelopmentVersion.toString()}"
-						sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${releaseVersion.toString()} ${helper.scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
-					}
-					finally {
-						try {
-							sh "bash -xe hibernate-noorm-release-scripts/cleanup.sh"
-						}
-						catch (Throwable t) {
-							echo 'Error cleaning up after release: ' + t.toString()
-						}
-					}
+					sh 'cat $HOME/.ssh/config'
+					sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
+					sh "bash -xe hibernate-noorm-release-scripts/release.sh search ${releaseVersion.toString()} ${afterReleaseDevelopmentVersion.toString()}"
 				}
 				}
 				}
