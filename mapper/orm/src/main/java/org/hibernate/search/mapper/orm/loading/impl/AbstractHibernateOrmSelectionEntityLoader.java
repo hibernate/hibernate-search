@@ -10,11 +10,11 @@ import java.util.List;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.exception.LockTimeoutException;
-import org.hibernate.jpa.QueryHints;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
 abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelectionEntityLoader<E> {
@@ -59,7 +59,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 
 		query.setFetchSize( fetchSize );
 		if ( timeout != null ) {
-			query.setHint( QueryHints.SPEC_HINT_TIMEOUT, Math.toIntExact( timeout ) );
+			query.setHint( HibernateOrmSearchQueryHints.JAVAX_TIMEOUT, Math.toIntExact( timeout ) );
 		}
 
 		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
