@@ -308,7 +308,7 @@ public class EntityReader extends AbstractItemReader {
 		String hql = customQueryHql;
 
 		return (session, lastCheckpointInfo) -> {
-			Query<?> query = session.createQuery( hql );
+			Query<?> query = session.createQuery( hql, Object.class );
 
 			if ( lastCheckpointInfo != null ) {
 				query.setFirstResult( lastCheckpointInfo.getProcessedEntityCount() );
