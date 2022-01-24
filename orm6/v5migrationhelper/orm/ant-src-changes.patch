@@ -1,5 +1,5 @@
 diff --git a/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java b/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java
-index b767d5a847..a846f79cee 100644
+index c6481cc62e..8e34239ef1 100644
 --- a/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java
 +++ b/main/java/org/hibernate/search/query/hibernate/impl/FullTextQueryImpl.java
 @@ -7,21 +7,17 @@
@@ -237,13 +237,14 @@ index b767d5a847..a846f79cee 100644
  	@Override
  	@SuppressWarnings("deprecation")
  	public FullTextQuery setHint(String hintName, Object value) {
-@@ -264,116 +246,55 @@ public FullTextQuery setHint(String hintName, Object value) {
- 				setTimeout( hintValueToInteger( value ) );
+@@ -266,117 +248,56 @@ public FullTextQuery setHint(String hintName, Object value) {
  				break;
- 			case HibernateOrmSearchQueryHints.FETCHGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 -				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
 -				break;
- 			case HibernateOrmSearchQueryHints.LOADGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
 -				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 +				applyEntityGraphQueryHint( hintName, hintValueToEntityGraph( value ) );
  				break;
@@ -374,7 +375,7 @@ index b767d5a847..a846f79cee 100644
  		throw parametersNoSupported();
  	}
  
-@@ -388,12 +309,7 @@ public FullTextQueryImpl setFlushMode(FlushModeType flushModeType) {
+@@ -391,12 +312,7 @@ public FullTextQueryImpl setFlushMode(FlushModeType flushModeType) {
  
  	@Override
  	public FullTextQueryImpl setFetchSize(int fetchSize) {
@@ -388,7 +389,7 @@ index b767d5a847..a846f79cee 100644
  	}
  
  	@Override
-@@ -431,7 +347,12 @@ public Object unwrap(Class type) {
+@@ -434,7 +350,12 @@ public Object unwrap(Class type) {
  		if ( type == org.apache.lucene.search.Query.class ) {
  			return hSearchQuery.getLuceneQuery();
  		}
@@ -402,7 +403,7 @@ index b767d5a847..a846f79cee 100644
  	}
  
  	@Override
-@@ -454,7 +375,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+@@ -457,7 +378,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
  
  	@Override
@@ -416,7 +417,7 @@ index b767d5a847..a846f79cee 100644
  		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
  	}
  
-@@ -512,32 +438,13 @@ public String getQueryString() {
+@@ -515,32 +441,13 @@ public String getQueryString() {
  	}
  
  	@Override
@@ -453,7 +454,7 @@ index b767d5a847..a846f79cee 100644
  	}
  
  	@Override
-@@ -546,12 +453,12 @@ public String toString() {
+@@ -549,12 +456,12 @@ public String toString() {
  	}
  
  	private static final class Search5ScrollHitExtractor
@@ -468,7 +469,7 @@ index b767d5a847..a846f79cee 100644
  			if ( hit instanceof Object[] ) {
  				return (Object[]) hit;
  			}
-@@ -559,19 +466,6 @@ public Object[] toArray(Object hit) {
+@@ -562,19 +469,6 @@ public Object[] toArray(Object hit) {
  				return new Object[] { hit };
  			}
  		}
@@ -488,7 +489,7 @@ index b767d5a847..a846f79cee 100644
  	}
  
  	private static int hintValueToInteger(Object value) {
-@@ -583,7 +477,7 @@ private static int hintValueToInteger(Object value) {
+@@ -586,7 +480,7 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
  

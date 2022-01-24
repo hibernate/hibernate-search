@@ -171,16 +171,19 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
 		switch ( hintName ) {
-			case HibernateOrmSearchQueryHints.TIMEOUT_JPA:
+			case HibernateOrmSearchQueryHints.JAVAX_TIMEOUT:
+			case HibernateOrmSearchQueryHints.JAKARTA_TIMEOUT:
 				delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
 				break;
-			case HibernateOrmSearchQueryHints.TIMEOUT_HIBERNATE:
+			case HibernateOrmSearchQueryHints.HIBERNATE_TIMEOUT:
 				setTimeout( hintValueToInteger( value ) );
 				break;
-			case HibernateOrmSearchQueryHints.FETCHGRAPH:
+			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
+			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
 				break;
-			case HibernateOrmSearchQueryHints.LOADGRAPH:
+			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
+			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 				break;
 			default:

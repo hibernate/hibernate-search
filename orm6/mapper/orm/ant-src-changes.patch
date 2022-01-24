@@ -448,7 +448,7 @@ index 355980c45a..30e334a6a0 100644
  					|| isWholePath && isAssociation( containedValueClass ) ) {
  				pathsAsStrings.add( propertyNode.toPropertyString() );
 diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-index 16dc46a2f9..f5ddb7584e 100644
+index c8ca89a1e0..7203e7d6e8 100644
 --- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 @@ -7,52 +7,48 @@
@@ -644,13 +644,14 @@ index 16dc46a2f9..f5ddb7584e 100644
  	@Override
  	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
  		switch ( hintName ) {
-@@ -178,13 +123,11 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
- 				setTimeout( hintValueToInteger( value ) );
+@@ -180,14 +125,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
  				break;
- 			case HibernateOrmSearchQueryHints.FETCHGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 -				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
 -				break;
- 			case HibernateOrmSearchQueryHints.LOADGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
+ 			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
 -				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 +				applyEntityGraphQueryHint( hintName, hintValueToEntityGraph( value ) );
  				break;
@@ -660,7 +661,7 @@ index 16dc46a2f9..f5ddb7584e 100644
  				break;
  		}
  		return this;
-@@ -204,141 +147,98 @@ public HibernateOrmSearchQueryAdapter<R> applyGraph(RootGraph graph, GraphSemant
+@@ -207,141 +150,98 @@ public HibernateOrmSearchQueryAdapter<R> applyGraph(RootGraph graph, GraphSemant
  	}
  
  	@Override
@@ -849,7 +850,7 @@ index 16dc46a2f9..f5ddb7584e 100644
  		throw parametersNoSupported();
  	}
  
-@@ -347,18 +247,16 @@ private UnsupportedOperationException parametersNoSupported() {
+@@ -350,18 +250,16 @@ private UnsupportedOperationException parametersNoSupported() {
  	}
  
  	@Override
@@ -873,7 +874,7 @@ index 16dc46a2f9..f5ddb7584e 100644
  		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
  	}
  
-@@ -388,7 +286,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+@@ -391,7 +289,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
  
  	@Override
@@ -887,7 +888,7 @@ index 16dc46a2f9..f5ddb7584e 100644
  		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
  	}
  
-@@ -397,30 +300,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
+@@ -400,30 +303,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
  		throw lockOptionsNotSupported();
  	}
  
@@ -918,7 +919,7 @@ index 16dc46a2f9..f5ddb7584e 100644
  	private static long hintValueToLong(Object value) {
  		if ( value instanceof Number ) {
  			return ( (Number) value ).longValue();
-@@ -439,8 +318,8 @@ private static int hintValueToInteger(Object value) {
+@@ -442,8 +321,8 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
  
