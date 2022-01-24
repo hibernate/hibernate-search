@@ -257,16 +257,19 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	public FullTextQuery setHint(String hintName, Object value) {
 		hints.put( hintName, value );
 		switch ( hintName ) {
-			case HibernateOrmSearchQueryHints.TIMEOUT_JPA:
+			case HibernateOrmSearchQueryHints.JAVAX_TIMEOUT:
+			case HibernateOrmSearchQueryHints.JAKARTA_TIMEOUT:
 				setTimeout( hintValueToInteger( value ), TimeUnit.MILLISECONDS );
 				break;
-			case HibernateOrmSearchQueryHints.TIMEOUT_HIBERNATE:
+			case HibernateOrmSearchQueryHints.HIBERNATE_TIMEOUT:
 				setTimeout( hintValueToInteger( value ) );
 				break;
-			case HibernateOrmSearchQueryHints.FETCHGRAPH:
+			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
+			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
 				break;
-			case HibernateOrmSearchQueryHints.LOADGRAPH:
+			case HibernateOrmSearchQueryHints.JAVAX_LOADGRAPH:
+			case HibernateOrmSearchQueryHints.JAKARTA_LOADGRAPH:
 				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 				break;
 			default:
