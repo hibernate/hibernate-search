@@ -85,7 +85,7 @@ public class AutomaticIndexingSessionFlushIT {
 					.add( "1", b -> b.field( "text", "number1" ) );
 
 			// An auto flush is performed on query invocation
-			List<?> resultList = session.createQuery( "select i from IndexedEntity i" )
+			List<?> resultList = session.createQuery( "select i from IndexedEntity i", IndexedEntity.class )
 					.setHibernateFlushMode( FlushMode.AUTO )
 					.getResultList();
 

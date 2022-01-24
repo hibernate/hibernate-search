@@ -505,17 +505,21 @@ public class ReusableOrmSetupHolder implements TestRule {
 	}
 
 	private static Query<?> selectAllOfSpecificType(EntityType<?> entityType, Session session) {
-		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, "" );
+		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, QueryType.SELECT );
 	}
 
 	private static Query<?> deleteAllOfSpecificType(EntityType<?> entityType, Session session) {
-		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, "delete " );
+		return createSelectOrDeleteAllOfSpecificTypeQuery( entityType, session, QueryType.DELETE );
 	}
 
-	private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?> entityType, Session session, String prefix) {
-		StringBuilder builder = ( prefix == null || prefix.trim().isEmpty() ) ?
-				new StringBuilder( "select e " ) :
-				new StringBuilder( prefix );
+	enum QueryType {
+		SELECT,
+		DELETE
+	}
+
+	private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?> entityType, Session session,
+			QueryType queryType) {
+		StringBuilder builder = new StringBuilder( QueryType.SELECT.equals( queryType ) ? "select e " : "delete " );
 
 		builder.append( "from " ).append( entityType.getName() ).append( " e" );
 		Class<?> typeArg = null;
@@ -527,7 +531,9 @@ public class ReusableOrmSetupHolder implements TestRule {
 			builder.append( " where type( e ) in (:type)" );
 			typeArg = entityType.getJavaType();
 		}
-		Query<?> query = session.createQuery( builder.toString() );
+		Query<?> query = QueryType.SELECT.equals( queryType )
+				? session.createQuery( builder.toString(), entityType.getJavaType() )
+				: session.createQuery( builder.toString() );
 		if ( typeArg != null ) {
 			query.setParameter( "type", typeArg );
 		}
