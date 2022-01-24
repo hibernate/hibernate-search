@@ -340,7 +340,7 @@ stage('Non-default environment ITs') {
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
-			runBuildOnNode(NODE_PATTERN_BASE + '&&LegacyDBInstall') {
+			runBuildOnNode('FedoraLegacyDBInstall') {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \
