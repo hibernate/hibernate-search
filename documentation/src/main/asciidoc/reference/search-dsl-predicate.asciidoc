@@ -642,20 +642,20 @@ The following flags/operators are available:
 
 * `COMPLEMENT`: the `~` operator will negate the following pattern.
 +
-For example `pass:[a~bc]` matches `aac` but not `abc`.
+For example `+a~bc+` matches `aac` but not `abc`.
 +
-Don't forget to use parentheses if you need to negate a composite pattern, e.g. `pass:[a~(bc)]`
+Don't forget to use parentheses if you need to negate a composite pattern, e.g. `+a~(bc)+`
 * `INTERVAL`: the `<>` operator matches a non-negative integer range, both ends included.
 +
-For example `pass:[a<1-10>]` matches `a1`, `a2`, ... `a9`, `a10`, but not `a11`.
+For example `+a<1-10>+` matches `a1`, `a2`, ... `a9`, `a10`, but not `a11`.
 +
-Leading zeroes are meaningful, e.g. `a<01-10>` matches `a01` and `a02` but not `a1` nor `a2`.
+Leading zeroes are meaningful, e.g. `+a<01-10>+` matches `a01` and `a02` but not `a1` nor `a2`.
 * `INTERSECTION`: the `&` operator combines two regexps with an AND operator.
 +
-For example `pass:[.*a.*&.*z.*]` matches `az`, `za`, `babzb`, `bzbab`, but not `a` nor `z`.
-* `ANYSTRING`: the `@` operator matches any string; equivalent to `pass:[.*]`.
+For example `+.*a.*&.*z.*+` matches `az`, `za`, `babzb`, `bzbab`, but not `a` nor `z`.
+* `ANYSTRING`: the `@` operator matches any string; equivalent to `+.*+`.
 +
-This operator is mostly useful to negate a pattern, e.g. `pass:[@&~(ab)]` matches anything except the string `ab`.
+This operator is mostly useful to negate a pattern, e.g. `+@&~(ab)+` matches anything except the string `ab`.
 
 [[search-dsl-predicate-regexp-multiple-fields]]
 === Targeting multiple fields
