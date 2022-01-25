@@ -702,6 +702,7 @@ stage('Deploy') {
 				sshagent(['ed25519.Hibernate-CI.github.com', 'hibernate.filemgmt.jboss.org', 'hibernate-ci.frs.sourceforge.net']) {
 					sh 'cat $HOME/.ssh/config'
 					sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
+					env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
 					sh "bash -xe hibernate-noorm-release-scripts/release.sh search ${releaseVersion.toString()} ${afterReleaseDevelopmentVersion.toString()}"
 				}
 				}
