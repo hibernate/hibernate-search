@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.0.Final (2022-01-25)
+-------------------------
+
+** Epic
+    * HSEARCH-3280 Simple, asynchronous, distributed reindexing relying on the database only (without any extra infrastructure)
+
+** Improvement
+    * HSEARCH-4458 Accept both Java EE and Jakarta EE flavours of all query hints
+    * HSEARCH-4457 Upgrade to Hibernate ORM 5.6.4.Final
+    * HSEARCH-4445 Test against Elasticsearch 7.16.3
+
+** Task
+    * HSEARCH-4456 Update CONTRIBUTING.md to list new modules
+    * HSEARCH-4452 Fix formatting of documentation about regexp predicate's optional operators
+    * HSEARCH-4415 Sign published artifacts
+
 6.1.0.CR1 (2022-01-18)
 -------------------------
 
