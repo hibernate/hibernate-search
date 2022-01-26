@@ -18,7 +18,7 @@ which will return an appropriate bridge, or fail if there isn't any.
 
 It is possible to customize the bridge resolver,
 to override existing default bridges (indexing `java.util.Date` differently, for example)
-or to define default bridges for additional types (a geo-spatial type from an external library, for example).
+or to define default bridges for additional types (a geospatial type from an external library, for example).
 
 To that end, define a mapping configurer as explained in <<mapper-orm-programmatic-mapping>>,
 then define bridges as shown below:

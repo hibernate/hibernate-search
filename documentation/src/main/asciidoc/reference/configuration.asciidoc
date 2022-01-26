@@ -118,7 +118,7 @@ Here are the definitions of all property types.
 or a reference by type as a `java.lang.Class`
 (see <<configuration-bean-reference>>)
 |See <<configuration-bean-reference-parsing>>
-|Multi-valued bean reference of type T
+|Multivalued bean reference of type T
 |A `java.util.Collection` containing bean references (see above)
 |Comma-separated string containing bean references (see above)
 |===============
@@ -173,7 +173,7 @@ property to `ignore`.
 [[configuration-bean]]
 == Beans
 
-Hibernate Search allows to plug in references to custom beans in various places:
+Hibernate Search allows plugging in references to custom beans in various places:
 configuration properties, mapping annotations, arguments to APIs, ...
 
 This section describes <<configuration-bean-frameworks,the supported frameworks>>,
@@ -210,7 +210,7 @@ the type is implicitly set to whatever interface Hibernate Search expects for th
 ====
 For experienced users, Hibernate Search also provides the `org.hibernate.search.engine.environment.bean.BeanReference` type,
 which is accepted in configuration properties and APIs.
-This interface allows to plug in custom instantiation and cleanup code.
+This interface allows plugging in custom instantiation and cleanup code.
 See the javadoc of this interface for details.
 ====
 
@@ -265,7 +265,7 @@ the reference is resolved using the DI framework (see <<configuration-bean-frame
 Example: the name `myLayoutStrategy`,
 when used as the value of the property `hibernate.search.backend.layout.strategy`
 to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
-resolves to any bean known from CDI/Spring of type `IndexLayoutStrategy` and annotated with `@Named("myShardinStrategy")`.
+resolves to any bean known from CDI/Spring of type `IndexLayoutStrategy` and annotated with `@Named("myLayoutStrategy")`.
 ** Otherwise, if a name is given, and that name is a fully-qualified class name,
 and a managed bean of that type exists, that bean is used.
 +

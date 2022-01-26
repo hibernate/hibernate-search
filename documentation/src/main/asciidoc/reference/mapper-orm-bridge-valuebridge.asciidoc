@@ -65,7 +65,7 @@ but also when parameters to the search DSL <<search-dsl-argument-type,must be tr
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/simple/Book.java[tags=include;!getters-setters]
 ----
-<1> This this is unrelated to the value bridge,
+<1> This is unrelated to the value bridge,
 but necessary in order for Hibernate ORM to store the data correctly in the database.
 <2> Map the property to an index field.
 <3> Instruct Hibernate Search to use our custom value bridge.
@@ -152,7 +152,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valueb
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/projection/Book.java[tags=include;!getters-setters]
 ----
-<1> This this is unrelated to the value bridge,
+<1> This is unrelated to the value bridge,
 but necessary in order for Hibernate ORM to store the data correctly in the database.
 <2> Map the property to an index field.
 <3> Instruct Hibernate Search to use our custom value bridge.
@@ -181,7 +181,7 @@ The bridge may throw exceptions for invalid strings.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/indexnullas/Book.java[tags=include;!getters-setters]
 ----
-<1> This this is unrelated to the value bridge,
+<1> This is unrelated to the value bridge,
 but necessary in order for Hibernate ORM to store the data correctly in the database.
 <2> Map the property to an index field.
 <3> Instruct Hibernate Search to use our custom value bridge.
@@ -253,7 +253,7 @@ but you are obviously free to implement it in a separate java file.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/binder/Book.java[tags=include;!getters-setters]
 ----
-<1> This this is unrelated to the value bridge,
+<1> This is unrelated to the value bridge,
 but necessary in order for Hibernate ORM to store the data correctly in the database.
 <2> Map the property to an index field.
 <3> Instruct Hibernate Search to use our custom value binder.

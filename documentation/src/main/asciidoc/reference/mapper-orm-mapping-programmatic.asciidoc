@@ -6,7 +6,7 @@
 
 Most examples in this documentation use annotation-based mapping,
 which is generally enough for most applications.
-However, some applications have needs that go beyond the what annotations can offer:
+However, some applications have needs that go beyond what annotations can offer:
 
 * a single entity type must be mapped differently for different deployments -- e.g. for different customers.
 * many entity types must be mapped similarly, without code duplication.

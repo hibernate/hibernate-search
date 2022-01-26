@@ -58,7 +58,7 @@ public class DerivedFromIT {
 	public void smoke() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
-			book.setTitle( "Levianthan Wakes" );
+			book.setTitle( "Leviathan Wakes" );
 
 			book.getAuthors().add( "Daniel Abraham" );
 			book.getAuthors().add( "Ty Frank" );

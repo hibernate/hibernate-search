@@ -117,7 +117,7 @@ this behavior means that <<limitations-backend-indexing-error,index changes may 
 If this is a problem for you, you should consider switching to <<coordination-outbox-polling,another coordination strategy>>.
 +
 [[mapper-orm-indexing-automatic-concepts-notransaction-flush]]
-NOTE: When entity changes happen outside of any transaction (not recommended),
+NOTE: When entity changes happen outside any transaction (not recommended),
 indexes are updated immediately upon session `flush()`.
 Without that flush, indexes will not be updated automatically.
 [[coordination-none-indexing-visibility]]
@@ -194,7 +194,7 @@ Indexing happens in a background thread::
 When a Hibernate ORM session is flushed,
 Hibernate Search will persist entity change events within the same Hibernate ORM session and the same transaction.
 +
-A <<coordination-outbox-polling-event-processor,event processor>> polls the database for new entity change events,
+An <<coordination-outbox-polling-event-processor,event processor>> polls the database for new entity change events,
 and asynchronously performs reindexing of the appropriate entities when it finds new events
 (i.e. after the transaction is committed).
 +
@@ -214,7 +214,7 @@ The background processor responsible for reindexing entities
 does not have access to the state of the link:{hibernateDocUrl}#best-practices-caching[first level cache]
 when the entity change occurred, because it occurred in a different session.
 +
-This means each time an entity changes and has to be reindexed,
+This means each time an entity changes and has to be re-indexed,
 the background process will load that entity in full.
 Depending on your mapping, it may also need to load lazy associations to other entities.
 +
@@ -238,7 +238,7 @@ and that the indexes will be updated accordingly,
 but only when (if) the transaction succeeds.
 +
 [[coordination-outbox-polling-indexing-guarantee-notransaction]]
-NOTE: When entity changes happen outside of any transaction (not recommended),
+NOTE: When entity changes happen outside any transaction (not recommended),
 events indexes are sent immediately after the session `flush()`.
 Without that flush, indexes will not be updated automatically.
 [[coordination-outbox-polling-indexing-visibility]]
@@ -332,7 +332,7 @@ For more details about dynamic and static sharding, see the following sections.
 Among agents of the `outbox-polling` coordination strategy executing in the background,
 the most important one is the event processor:
 it polls the outbox table for events
-and then reindexes the corresponding entities when new events are found.
+and then re-indexes the corresponding entities when new events are found.
 
 The event processor can be configured using the following configuration properties:
 

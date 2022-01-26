@@ -71,8 +71,8 @@ match fields regardless of case,
 match fields ignoring diacritics,
 ...
 +
-Full-text fields should assigned an <<mapper-orm-directfieldmapping-analyzer,analyzer>>, referenced by its name.
-By default the analyzer named `default` will be used.
+Full-text fields should be assigned an <<mapper-orm-directfieldmapping-analyzer,analyzer>>, referenced by its name.
+By default, the analyzer named `default` will be used.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 +
 Note you can also define <<mapper-orm-directfieldmapping-search-analyzer,a search analyzer>>
@@ -180,7 +180,7 @@ Disabled by default.
 +
 [IMPORTANT]
 ====
-The replacement is defined as a String. Thus its value has to be parsed.
+The replacement is defined as a String. Thus, its value has to be parsed.
 Look up the column _Parsing method for 'indexNullAs'_ in <<mapper-orm-directfieldmapping-supported-types>> to find out the format used when parsing.
 ====
 
@@ -257,7 +257,7 @@ Only available on `@ScaledNumberField`.
 To index numbers that have significant digits after the decimal point, set the `decimalScale` to the number of digits you need indexed.
 The decimal point will be shifted that many times to the right before indexing, preserving that many digits from the decimal part.
 To index very large numbers that cannot fit in a long, set the decimal point to a negative value.
-The decimal point will shifted that many times to the left before indexing, dropping all digits from the decimal part.
+The decimal point will be shifted that many times to the left before indexing, dropping all digits from the decimal part.
 +
 `decimalScale` with strictly positive values is allowed only for `BigDecimal`, since `BigInteger` values have no decimal digits.
 +

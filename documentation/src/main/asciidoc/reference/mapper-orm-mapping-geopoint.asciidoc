@@ -105,7 +105,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopo
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/property/Author.java[tags=include;!getters-setters]
 ----
-<1> Model the geo-point as an embeddable.
+<1> Model the geo-point as embeddable.
 An entity would work as well.
 <2> In the geo-point type, apply `@Latitude` to the property holding the latitude.
 <3> In the geo-point type, apply `@Longitude` to the property holding the longitude.

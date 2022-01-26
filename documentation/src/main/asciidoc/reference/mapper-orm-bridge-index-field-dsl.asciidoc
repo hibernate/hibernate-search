@@ -69,22 +69,22 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 ====
 
 [[mapper-orm-bridge-index-field-dsl-multi-valued-fields]]
-== [[_multi_valued_fields]] Multi-valued fields
+== [[_multi_valued_fields]] Multivalued fields
 
 Fields are considered single-valued by default:
 if you attempt to add multiple values to a single-valued field during indexing,
 an exception will be thrown.
 
 In order to add multiple values to a field,
-this field must be marked as multi-valued during its declaration:
+this field must be marked as multivalued during its declaration:
 
-.Declaring a field as multi-valued
+.Declaring a field as multivalued
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/document/model/dsl/simple/MultiValuedNamesBinder.java[tags=bind]
 ----
-<1> Declare the field as multi-valued.
+<1> Declare the field as multivalued.
 ====
 
 [[mapper-orm-bridge-index-field-dsl-object]]
@@ -99,7 +99,7 @@ string, integer, date, ...
 * Object fields, which hold a composite value.
 
 Object fields are declared similarly to value fields,
-with an additional step to declare each sub-field,
+with an additional step to declare each subfield,
 as shown below.
 
 .Declaring an object field
@@ -111,23 +111,23 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 <1> Declare an object field with `objectField`, passing its name in parameter.
 <2> Get a reference to the declared object field
 and pass it to the bridge for later use.
-<3> Create sub-fields, get references to these fields
+<3> Create subfields, get references to these fields
 and pass them to the bridge for later use.
 ====
 
 [NOTE]
 ====
-The sub-fields of an object field can include object fields.
+The subfields of an object field can include object fields.
 ====
 
 [NOTE]
 ====
 Just as value fields, object fields are single-valued by default.
 Be sure to call `.multiValued()` during the object field definition
-if you want to make it multi-valued.
+if you want to make it multivalued.
 ====
 
-Object fields as well as their sub-fields are each assigned a reference,
+Object fields as well as their subfields are each assigned a reference,
 which will be used by the bridge to write to documents,
 as shown in the example below.
 
@@ -139,7 +139,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 ----
 <1> Add an object to the `summary` object field for the current document,
 and get a reference to that object.
-<2> Add a value to the sub-fields for the object we just added.
+<2> Add a value to the subfields for the object we just added.
 Note we're calling `addValue` on the object we just added, not on `target`.
 ====
 
@@ -164,10 +164,10 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 <1> Declare an object field with `objectField`.
 <2> Define the name of the object field.
 <3> Define the structure of the object field, here `NESTED`.
-<4> Define the object field as multi-valued.
+<4> Define the object field as multivalued.
 <5> Get a reference to the declared object field
 and pass it to the bridge for later use.
-<6> Create sub-fields, get references to these fields
+<6> Create subfields, get references to these fields
 and pass them to the bridge for later use.
 ====
 
@@ -184,7 +184,7 @@ The fields, then, are considered _dynamic_.
 
 Dynamic fields are not declared on bootstrap,
 but need to match a field _template_ that is declared on bootstrap.
-The template includes the field types and structural information (multi-valued or not, ...),
+The template includes the field types and structural information (multivalued or not, ...),
 but omits the field names.
 
 A field template is always declared in a binder: either in a <<mapper-orm-bridge-typebridge,type binder>>

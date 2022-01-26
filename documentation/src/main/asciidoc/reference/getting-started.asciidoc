@@ -75,7 +75,7 @@ make sure to check out the http://hibernate.org/search/documentation/migrate/[mi
 ====
 **To Hibernate Search 5 users**
 
-If you pull our artifacts from a Maven repository and you come from Hibernate Search 5,
+If you pull our artifacts from a Maven repository, and you come from Hibernate Search 5,
 be aware that just bumping the version number will not be enough.
 
 In particular, the group IDs changed from `org.hibernate` to `org.hibernate.search`,
@@ -148,7 +148,7 @@ you still have problems (e.g. `NoClassDefFoundError`) with some of Hibernate Sea
 look for the version of that dependency in
 https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies/{testSpringBootVersion}/pom[Spring Boot's POM]
 and https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/{hibernateSearchVersion}/pom[Hibernate Search's POM]:
-there will probably be a mistmatch,
+there will probably be a mismatch,
 and generally overriding Spring Boot's version to match Hibernate Search's version will work fine.
 ====
 
@@ -200,7 +200,7 @@ link:http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernate
 In order to use Hibernate Search, you will need at least two direct dependencies:
 
 * a dependency to the "mapper", which extracts data from your domain model and maps it to indexable documents;
-* and a dependency to the "backend", which allows to index and search these documents.
+* and a dependency to the "backend", which allows indexing and searching these documents.
 
 Below are the most common setups and matching dependencies for a quick start;
 read <<architecture>> for more information.
@@ -353,7 +353,7 @@ Here, the `Author` class defines a single indexed field, `name`.
 Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
 will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
-and the books will be reindexed automatically whenever the `name` property of their author changes.
+and the books will be re-indexed automatically whenever the `name` property of their author changes.
 See <<mapper-orm-indexedembedded>> for more information.
 <7> Entities that are only `@IndexedEmbedded` in other entities,
 but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
@@ -429,7 +429,7 @@ TIP: If no data is initially present in the database, mass indexing is not neces
 
 Hibernate Search will transparently index every entity persisted,
 updated or removed through Hibernate ORM.
-Thus this code would transparently populate your index:
+Thus, this code would transparently populate your index:
 
 .Using Hibernate ORM to persist data, and implicitly indexing it through Hibernate Search
 ====
@@ -642,7 +642,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 and set the `analyzer` parameter to the name of the custom analyzer configured earlier.
 ====
 
-That's it! Now, once the entities will be reindexed, you will be able to search for the terms
+That's it! Now, once the entities will be re-indexed, you will be able to search for the terms
 "Refactor", "refactors", "refactored" or "refactoring",
 and the book entitled "Refactoring: Improving the Design of Existing Code"
 will show up in the results.
@@ -688,7 +688,7 @@ When querying, you will probably want to know more about
 
 You can also have a look at sample applications:
 
-* The <<architecture-examples>> give an idea of how data flows inside and outside of a Hibernate Search application.
+* The <<architecture-examples>> give an idea of how data flows inside and outside a Hibernate Search application.
 * The link:https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-search-orm-elasticsearch-quickstart[Quarkus quickstart],
 a sample application using Hibernate Search with the [Quarkus](https://quarkus.io/) framework.
 * The link:https://github.com/hibernate/hibernate-search/tree/main/integrationtest/showcase/library["Library" showcase],

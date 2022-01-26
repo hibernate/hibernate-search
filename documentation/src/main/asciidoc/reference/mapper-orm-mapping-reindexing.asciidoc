@@ -31,10 +31,10 @@ and that document must include the `name` property of the `Author` entity
 Hibernate Search will need to track changes to the author's name,
 and whenever that happens,
 it will need to _retrieve all the books of that author_,
-so as to reindex these books automatically.
+to reindex these books automatically.
 
 In practice, this means that whenever an entity mapping relies on an association to another entity,
-this association must be bi-directional:
+this association must be bidirectional:
 if `Book.authors` is `@IndexedEmbedded`,
 Hibernate Search must be aware of an inverse association `Author.books`.
 An exception will be thrown on startup if the inverse association cannot be resolved.
@@ -45,7 +45,7 @@ to resolve the inverse side of an association,
 so this is all handled transparently.
 
 In some rare cases, with the more complex mappings,
-it is possible that even Hibernate ORM is not aware that an association is bi-directional,
+it is possible that even Hibernate ORM is not aware that an association is bidirectional,
 because `mappedBy` cannot be used.
 A few solutions exist:
 
@@ -54,7 +54,7 @@ This means the index will be out of date whenever associated entities change,
 but this can be an acceptable solution if the index
 is rebuilt periodically.
 See <<mapper-orm-reindexing-reindexonupdate>> for more information.
-* If the association is actually bi-directional,
+* If the association is actually bidirectional,
 its inverse side can be specified to Hibernate Search
 explicitly using `@AssociationInverseSide`.
 See <<mapper-orm-reindexing-associationinverseside>> for more information.
@@ -66,7 +66,7 @@ Given an association from an entity type `A` to entity type `B`,
 `@AssociationInverseSide` defines the inverse side of an association,
 i.e. the path from `B` to `A`.
 
-This is mostly useful when a bi-directional association
+This is mostly useful when a bidirectional association
 is not mapped as such in Hibernate ORM (no `mappedBy`).
 
 .Mapping the inverse side of an association with `@AssociationInverseSide`
@@ -83,7 +83,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/as
 where the keys are `BookEdition` entities and the values are the price of that edition.
 <2> Index-embed the editions that are actually for sale.
 <3> In Hibernate ORM, it is not possible to use `mappedBy` for an association modeled by a `Map` key.
-Thus we use `@AssociationInverseSide` to tell Hibernate Search what the inverse side
+Thus, we use `@AssociationInverseSide` to tell Hibernate Search what the inverse side
 of this association is.
 <4> We could have applied the `@AssociationInverseSide` annotation here instead:
 either side will do.
@@ -162,7 +162,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/re
 There are potentially thousands of books for each category, so calling a `getBooks()` method
 would lead to loading thousands of entities into the Hibernate ORM session at once,
 and would perform badly.
-Thus there isn't any `getBooks()` method to list all books in a category.
+Thus, there isn't any `getBooks()` method to list all books in a category.
 ====
 
 With this mapping, Hibernate Search will not be able to reindex all books when the category name changes:
@@ -187,7 +187,7 @@ See the modified mapping below:
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/correct/Book.java[tags=include;!getters-setters]
 ----
 <1> We use `ReindexOnUpdate.SHALLOW` to tell Hibernate Search that `Book`
-should be reindexed automatically when it's assigned a new category (`book.setCategory( newCategory )`),
+should be re-indexed automatically when it's assigned a new category (`book.setCategory( newCategory )`),
 but not when properties of its category change (`category.setName( newName )`).
 ====
 
@@ -264,7 +264,7 @@ Hibernate Search will *not* reindex the sensor automatically.
 [[mapper-orm-reindexing-programmatic]]
 == Programmatic mapping
 
-You can control reindexing through through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+You can control reindexing through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
 Behavior and options are identical to annotation-based mapping.
 
 .Mapping the inverse side of an association with `.associationInverseSide(...)`

@@ -49,7 +49,7 @@ include::components/incubating-warning.asciidoc[]
 
 In some cases, one may want to pass relative paths instead.
 This can be useful when calling reusable methods that can apply the same predicate
-on different object fields that have same structure (same sub-fields).
+on different object fields that have same structure (same subfields).
 By calling the `withRoot(String)` method on a factory,
 you can create a new factory which interprets paths as relative to the object field passed as argument to the method.
 

@@ -162,20 +162,20 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 ----
 <1> Start building parameters for a mass-indexing job.
 <2> Define the entity type to be indexed.
-<3> Restrict the scope of the job using a HQL restriction.
+<3> Restrict the scope of the job using an HQL restriction.
 <4> Get `JobOperator` form the framework.
 <5> Start the job.
 ====
 
 While the full indexing is useful when you perform the very first indexing, or
-after extensive changes to your whole database, it may also be time consuming.
+after extensive changes to your whole database, it may also be time-consuming.
 If your want to reindex only part of your data, you need to add restrictions using HQL:
 they help you to define a customized selection, and only the entities inside that selection will be indexed. A typical
 use-case is to index the new entities appeared since yesterday.
 
 Note that, as detailed below, some features may not be supported depending on the indexing mode.
 
-.Comparaison of each indexing mode
+.Comparison of each indexing mode
 |===
 | Indexing mode | Scope | Parallel Indexing
 
@@ -444,6 +444,6 @@ mass indexer:
 
 [CAUTION]
 ====
-If you set the `hibernate.session_factory_name` property in the Hibernate configuration
+If you set the `hibernate.session_factory_name` property in the Hibernate configuration,
 and you don't use JNDI, you will also have to set `hibernate.session_factory_name_is_jndi` to `false`.
 ====

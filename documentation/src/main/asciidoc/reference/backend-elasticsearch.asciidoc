@@ -112,7 +112,7 @@ Alternatively, it is possible to define both the protocol and hosts as one or mo
 hibernate.search.backend.uris = http://localhost:9200
 ----
 
-This property may be set to a String representing an URI such as `http://localhost` or `https://es.mycompany.com:4400`,
+This property may be set to a String representing a URI such as `http://localhost` or `https://es.mycompany.com:4400`,
 or a String containing multiple such URI strings separated by commas,
 or a `Collection<String>` containing such URI strings.
 
@@ -193,7 +193,7 @@ you will find it requires a proprietary authentication method:
 https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-request-signing.html[request signing].
 
 While request signing is not supported by default,
-you can enable it with an additional dependency and a little bit of configuration.
+you can enable it with an additional dependency and a bit of configuration.
 
 You will need to add this dependency:
 
@@ -320,7 +320,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/cl
 <1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
 <2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.
 <3> From the context it is possible to get the `HttpAsyncClientBuilder`.
-<4> Finally you can use the builder to configure the client with your custom settings.
+<4> Finally, you can use the builder to configure the client with your custom settings.
 ====
 
 .Define a custom http client configurer in the properties
@@ -550,7 +550,7 @@ specifying the data type and capabilities of each "property" (called an "index f
 
 For the most part, the Elasticsearch mapping is inferred from
 <<mapper-orm-mapping,the mapping configured through Hibernate Search's mapping APIs>>,
-which are generic and independent from Elasticsearch.
+which are generic and independent of Elasticsearch.
 
 Aspects that are specific to the Elasticsearch backend are explained in this section.
 
@@ -813,7 +813,7 @@ e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected 
 
 However, it is possible to enable multi-tenancy manually.
 
-The multi-tenancy strategy is set a the backend level:
+The multi-tenancy strategy is set at the backend level:
 
 [source]
 ----
@@ -838,8 +838,8 @@ The Elasticsearch ID of each document is set to the concatenation of the tenant 
 
 When indexing, two fields are populated transparently for each document:
 
-* `_tenant_id`: the "discriminator" field holding the tenant ID.
-* `_tenant_doc_id`: a field holding the the original (tenant-scoped) document ID.
+* `+_tenant_id+`: the "discriminator" field holding the tenant ID.
+* `+_tenant_doc_id+`: a field holding the original (tenant-scoped) document ID.
 
 When searching, a filter targeting the tenant ID field is added transparently to the search query
 to only return search hits for the current tenant.
@@ -851,14 +851,23 @@ The ID field is used to retrieve the original document IDs.
 [[backend-elasticsearch-mapping-custom-basics]]
 ==== Basics
 
-Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
-Should you need to customize some link:{elasticsearchDocUrl}/mapping-params.html[mapping parameters], it is possible to provide a custom mapping to Hibernate Search: it will include the custom mapping when creating an index.
+Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>,
+but by default created indexes will only include the bare minimum required to index and search:
+the mapping, and the analysis settings.
+Should you need to customize some link:{elasticsearchDocUrl}/mapping-params.html[mapping parameters],
+it is possible to provide a custom mapping to Hibernate Search:
+it will include the custom mapping when creating an index.
 
 [CAUTION]
 ====
-The consistency of the custom Elasticsearch mapping with the Hibernate Search mapping will not get checked in any way. You are responsible for making sure that any override in your mapping can work, e.g. that you're not changing the type of an index field from `text` to `integer`, or disabling `doc_values` on a field used for sorting.
+The consistency of the custom Elasticsearch mapping with the Hibernate Search mapping will not get checked in any way.
+You are responsible for making sure that any override in your mapping can work,
+e.g. that you're not changing the type of an index field from `text` to `integer`,
+or disabling `doc_values` on a field used for sorting.
 
-An invalid custom mapping may not trigger any exception on bootstrap, but later while indexing or querying. In the worst case, it could not trigger any exception, but simply lead to incorrect search results. Exercise extreme caution.
+An invalid custom mapping may not trigger any exception on bootstrap, but later while indexing or querying.
+In the worst case, it could not trigger any exception, but simply lead to incorrect search results.
+Exercise extreme caution.
 ====
 
 [source]
@@ -882,7 +891,8 @@ include::{resourcesdir}/custom/index-mapping.json[]
 Properties that are only defined in the custom mappings file but not mapped by Hibernate Search
 will not be visible to Hibernate Search.
 
-This means Hibernate Search will throw exceptions if you try to reference these properties in the <<search-dsl,Search DSL>>, or when <<mapper-orm-bridge-index-field-dsl-dynamic,writing to a document from a bridge>>
+This means Hibernate Search will throw exceptions if you try to reference these properties in the <<search-dsl,Search DSL>>,
+or when <<mapper-orm-bridge-index-field-dsl-dynamic,writing to a document from a bridge>>
 ====
 
 The file does not need to contain the full mapping: Hibernate Search will automatically inject
@@ -915,7 +925,7 @@ has a `String name` property annotated with `@FullTextField`.
 ==== [[_disable_source]] Disabling `_source`
 
 Using this feature it is possible to link:{elasticsearchDocUrl}/mapping-source-field.html[disable the `_source` field].
-For instance you could pass a `custom/index-mapping.json` file like the following:
+For instance, you could pass a `custom/index-mapping.json` file like the following:
 
 .Possible content of `custom/index-mapping.json` file to disable the `_source` field
 ====

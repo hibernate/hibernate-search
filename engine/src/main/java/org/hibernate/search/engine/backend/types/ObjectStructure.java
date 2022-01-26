@@ -26,7 +26,7 @@ public enum ObjectStructure {
 	 * <p>
 	 * For instance this structure:
 	 * <ul>
-	 *     <li>title = Levianthan Wakes</li>
+	 *     <li>title = Leviathan Wakes</li>
 	 *     <li>authors =
 	 *         <ul>
 	 *             <li>(first element)
@@ -46,7 +46,7 @@ public enum ObjectStructure {
 	 * </ul>
 	 * Will become:
 	 * <ul>
-	 *     <li>title = Levianthan Wakes</li>
+	 *     <li>title = Leviathan Wakes</li>
 	 *     <li>authors.firstName =
 	 *         <ul>
 	 *             <li>(first element) Daniel</li>

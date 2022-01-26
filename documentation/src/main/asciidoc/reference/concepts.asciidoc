@@ -191,7 +191,7 @@ when the backend decides to refresh the index reader.
 This behavior can be customized by setting a different <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
 * The <<mapper-orm-indexing-massindexer,mass indexer>>
 will not require any commit or refresh until the very end of mass indexing,
-so as to maximize indexing throughput.
+to maximize indexing throughput.
 * Whenever there are no particular commit or refresh requirements,
 backend defaults will apply:
 ** See <<backend-elasticsearch-io,here for Elasticsearch>>.
@@ -210,7 +210,7 @@ After a refresh, *all* changes to the index are taken into account:
 those committed to the index, but also those that are still buffered in the index writer.
 
 For this reason, commits and refreshes can be treated as completely orthogonal concepts:
-certain setups will occasionally lead to committed changes not being be visible in search queries,
+certain setups will occasionally lead to committed changes not being visible in search queries,
 while others will allow even uncommitted changes to be visible in search queries.
 ====
 

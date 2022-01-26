@@ -57,10 +57,10 @@ See <<mapper-orm-bridge-bridgedelement-dependencies>>
 for more information about declaring dependencies.
 <4> Declare the fields that are populated by this bridge.
 In this case we're creating a `summary` object field,
-which will have multiple sub-fields (see below).
+which will have multiple subfields (see below).
 See <<mapper-orm-bridge-index-field-dsl>>
 for more information about declaring index fields.
-<5> Declare the type of the sub-fields.
+<5> Declare the type of the subfields.
 We're going to index monetary amounts,
 so we will use a `BigDecimal` type with two digits after the decimal point.
 See <<mapper-orm-bridge-index-field-type-dsl>>
@@ -68,9 +68,9 @@ for more information about declaring index field types.
 <6> Call `context.bridge(...)` to define the property bridge to use,
 and pass an instance of the bridge.
 <7> Pass a reference to the `summary` object field to the bridge.
-<8> Create a sub-field for the `total` amount of the invoice,
-a sub-field for the sub-total for `books`,
-and a sub-field for the sub-total for `shipping`.
+<8> Create a subfield for the `total` amount of the invoice,
+a subfield for the subtotal for `books`,
+and a subfield for the subtotal for `shipping`.
 Pass references to these fields to the bridge.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -94,7 +94,7 @@ Note the `summary` field was declared at the root,
 so we call `addObject` directly on the `target` argument.
 <6> Add a value to each of the `summary.total`, `summary.books`
 and `summary.shipping` fields.
-Note the fields were declared as sub-fields of `summary`,
+Note the fields were declared as subfields of `summary`,
 so we call `addValue` on `summaryValue` instead of `target`.
 
 [source, JAVA, indent=0, subs="+callouts"]

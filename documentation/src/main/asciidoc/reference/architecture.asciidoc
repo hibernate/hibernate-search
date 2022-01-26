@@ -276,7 +276,7 @@ allowing retries for as long as necessary.
 ** the possibility of out-of-sync indexes caused by <<limitations-parallel-embedded-update,concurrent updates>>
 that affects other architectures is eliminated here,
 because <<coordination-outbox-polling-indexing-full-loading,each entity instance is reloaded from the database within a new transaction>>
-before being reindexed.
+before being re-indexed.
 * Easy to extend: you can easily access most Elasticsearch features,
 even those that are not exposed by Hibernate Search, by providing your own JSON.
 See for example <<search-dsl-predicate-extensions-elasticsearch-from-json,JSON-defined predicates>>,
