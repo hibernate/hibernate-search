@@ -23,7 +23,7 @@ public interface TypeQueryFactory<E, I> {
 
 	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
 			String uniquePropertyName) {
-		JpaMetamodel metamodel = sessionFactory.getMetamodel();
+		JpaMetamodel metamodel = sessionFactory.getJpaMetamodel();
 		EntityDomainType<?> typeOrNull = metamodel.entity( entityPersister.getEntityName() );
 		if ( typeOrNull != null && !( entityPersister.getMappedClass().equals( Map.class ) ) ) {
 			return CriteriaTypeQueryFactory.create( typeOrNull, uniquePropertyName );
