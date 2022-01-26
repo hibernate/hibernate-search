@@ -84,7 +84,7 @@ public class OutboxPollingDisabledIT {
 
 	@Test
 	public void metamodel_onlyUserEntities() {
-		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
+		assertThat( setupHolder.sessionFactory().getJpaMetamodel().getEntities() )
 				.extracting( EntityType::getName )
 				.containsOnly( IndexedEntity.NAME );
 	}
