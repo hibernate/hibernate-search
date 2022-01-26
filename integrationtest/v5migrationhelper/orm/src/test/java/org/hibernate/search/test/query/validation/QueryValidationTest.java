@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.query.validation;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -88,6 +89,7 @@ public class QueryValidationTest extends SearchTestBase {
 		private long id;
 
 		@Field
+		@Column(name = "\"value\"")
 		private String value;
 	}
 
@@ -99,6 +101,7 @@ public class QueryValidationTest extends SearchTestBase {
 		private long id;
 
 		@Field
+		@Column(name = "\"value\"")
 		private long value;
 	}
 

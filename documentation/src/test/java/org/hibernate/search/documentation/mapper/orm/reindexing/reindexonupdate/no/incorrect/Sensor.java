@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate.no.incorrect;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -28,6 +29,7 @@ public class Sensor {
 	@KeywordField
 	private SensorStatus status; // <1>
 
+	@Column(name = "\"value\"")
 	private double value; // <2>
 
 	@GenericField

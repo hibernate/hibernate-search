@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.test.query.nullValues;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
@@ -19,6 +21,7 @@ import org.hibernate.search.annotations.Store;
  * @author Hardy Ferentschik
  */
 @Entity
+@Table(name = "\"value\"")
 @Indexed
 public class Value {
 	@Id
@@ -27,6 +30,7 @@ public class Value {
 	private int id;
 
 	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = "_custom_token_")
+	@Column(name = "\"value\"")
 	private String value;
 
 	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = "fubar")
