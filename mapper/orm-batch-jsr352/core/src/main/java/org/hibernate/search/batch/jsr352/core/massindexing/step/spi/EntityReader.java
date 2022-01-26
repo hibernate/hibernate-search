@@ -470,7 +470,10 @@ public class EntityReader extends AbstractItemReader {
 			}
 			processedEntityCount = 0;
 			lastProcessedEntityId = null;
-			lastCheckpointInfo = new CheckpointInfo( (Serializable) lastProcessedEntityIdInPartition, processedEntityCountInPartition );
+			lastCheckpointInfo = new CheckpointInfo(
+					(Serializable) lastProcessedEntityIdInPartition,
+					processedEntityCountInPartition
+			);
 			return lastCheckpointInfo;
 		}
 

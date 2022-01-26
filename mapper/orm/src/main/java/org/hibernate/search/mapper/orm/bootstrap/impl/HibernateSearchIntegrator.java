@@ -31,7 +31,8 @@ public class HibernateSearchIntegrator implements Integrator {
 	public void integrate(Metadata metadata, BootstrapContext bootstrapContext,
 			SessionFactoryImplementor sessionFactory) {
 		Optional<HibernateSearchPreIntegrationService> preIntegrationServiceOptional =
-				HibernateOrmUtils.getServiceOrEmpty( bootstrapContext.getServiceRegistry(), HibernateSearchPreIntegrationService.class );
+				HibernateOrmUtils.getServiceOrEmpty( bootstrapContext.getServiceRegistry(),
+						HibernateSearchPreIntegrationService.class );
 
 		if ( !preIntegrationServiceOptional.isPresent() ) {
 			// Hibernate Search is disabled

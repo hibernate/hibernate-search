@@ -458,7 +458,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		for ( Class<?> entityClass : config.entityClearOrder ) {
 			EntityType<?> entityType;
 			try {
-				entityType = sessionFactory.getMetamodel().entity( entityClass );
+				entityType = sessionFactory.getJpaMetamodel().entity( entityClass );
 			}
 			catch (IllegalArgumentException e) {
 				// When using annotatedTypes to infer the clear order,
@@ -475,7 +475,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		// we try to delete all remaining entity types.
 		// Note we're stabilizing the order, because ORM uses a HashSet internally
 		// and the order may change from one execution to the next.
-		List<EntityType<?>> sortedEntityTypes = sessionFactory.getMetamodel().getEntities().stream()
+		List<EntityType<?>> sortedEntityTypes = sessionFactory.getJpaMetamodel().getEntities().stream()
 				.sorted( Comparator.comparing( EntityType::getName ) )
 				.collect( Collectors.toList() );
 		for ( EntityType<?> entityType : sortedEntityTypes ) {
@@ -564,6 +564,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 			builder.append( " where type( e ) in (:type)" );
 			typeArg = entityType.getJavaType();
 		}
+		@SuppressWarnings("deprecation")
 		Query<?> query = QueryType.SELECT.equals( queryType )
 				? session.createQuery( builder.toString(), entityType.getJavaType() )
 				: session.createQuery( builder.toString() );
@@ -574,7 +575,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	}
 
 	private static boolean hasEntitySubclass(SessionFactory sessionFactory, EntityType<?> parentEntity) {
-		Metamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
+		Metamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getJpaMetamodel();
 		for ( EntityType<?> entity : metamodel.getEntities() ) {
 			if ( parentEntity.equals( entity.getSupertype() ) ) {
 				return true;
@@ -596,7 +597,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 				case ELEMENT_COLLECTION:
 					return true;
 				case EMBEDDED:
-					EmbeddableType<?> embeddable = sessionFactory.getMetamodel().embeddable( attribute.getJavaType() );
+					EmbeddableType<?> embeddable = sessionFactory.getJpaMetamodel().embeddable( attribute.getJavaType() );
 					if ( hasPotentiallyJoinTable( sessionFactory, embeddable ) ) {
 						return true;
 					}

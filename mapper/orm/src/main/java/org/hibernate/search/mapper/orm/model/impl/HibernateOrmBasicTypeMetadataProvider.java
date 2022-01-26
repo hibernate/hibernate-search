@@ -56,7 +56,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 
 			collectClassType(
 					metadataProviderBuilder, javaClass,
-					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
+					persistentClass.getIdentifierProperty(), persistentClass.getProperties().iterator()
 			);
 
 			metadataProviderBuilder.typeIdentifierResolverBuilder.addClassEntityType(
@@ -67,7 +67,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			collectDynamicMapType(
 					metadataProviderBuilder, hibernateOrmEntityName,
 					persistentClass.getSuperclass(),
-					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
+					persistentClass.getIdentifierProperty(), persistentClass.getProperties().iterator()
 			);
 
 			metadataProviderBuilder.typeIdentifierResolverBuilder.addDynamicMapEntityType(
@@ -204,7 +204,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 				collectDynamicMapType(
 						metadataProviderBuilder, name,
 						null, /* No supertype */
-						null /* No ID */, component.getPropertyIterator()
+						null /* No ID */, component.getProperties().iterator()
 				);
 			}
 			return HibernateOrmTypeModelFactory.dynamicMap( name );
@@ -215,7 +215,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			if ( !metadataProviderBuilder.classTypeMetadata.containsKey( javaClass ) ) {
 				collectClassType(
 						metadataProviderBuilder, javaClass,
-						null /* No ID */, component.getPropertyIterator()
+						null /* No ID */, component.getProperties().iterator()
 				);
 			}
 			return HibernateOrmTypeModelFactory.rawType( javaClass );
