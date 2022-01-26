@@ -165,10 +165,10 @@ stage('Configure') {
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkBuildEnvironment(version: '8', tool: 'OpenJDK 8 Latest',
-							condition: TestCondition.AFTER_MERGE,
+							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 					new JdkBuildEnvironment(version: '11', tool: 'OpenJDK 11 Latest',
-							condition: TestCondition.BEFORE_MERGE),
+							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest',
 							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest',
