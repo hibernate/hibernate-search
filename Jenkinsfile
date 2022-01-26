@@ -528,7 +528,7 @@ stage('Deploy') {
 					sh 'cat $HOME/.ssh/config'
 					sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
 					env.RELEASE_GPG_HOMEDIR = env.WORKSPACE_TMP + '/.gpg'
-					sh "bash -xe hibernate-noorm-release-scripts/release.sh search ${releaseVersion.toString()} ${afterReleaseDevelopmentVersion.toString()}"
+					sh "bash -xe hibernate-noorm-release-scripts/release.sh ${params.RELEASE_DRY_RUN ? '-d' : ''} search ${releaseVersion.toString()} ${afterReleaseDevelopmentVersion.toString()}"
 				}
 				}
 				}
