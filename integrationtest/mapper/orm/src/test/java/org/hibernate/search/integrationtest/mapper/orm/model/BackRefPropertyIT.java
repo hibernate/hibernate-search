@@ -61,7 +61,7 @@ public class BackRefPropertyIT {
 
 		// Hibernate Search started successfully.
 		// Check that there actually is a backref:
-		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMappingMetamodel();
 		assertThat( metamodel.getEntityDescriptor( IndexedEntity.class ).getPropertyNames() )
 				.contains( "_containing_fk_containingidBackref" )
 				.contains( "_containingIndexBackref" );

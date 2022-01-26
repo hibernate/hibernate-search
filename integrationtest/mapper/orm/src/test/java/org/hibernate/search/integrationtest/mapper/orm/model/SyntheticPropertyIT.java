@@ -58,7 +58,7 @@ public class SyntheticPropertyIT {
 
 		// Hibernate Search started successfully.
 		// Check that there actually is a synthetic property:
-		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMappingMetamodel();
 		assertThat( metamodel.getEntityDescriptor( ContainedEntity.class ).getPropertyNames() )
 				.contains( "_" + IndexedEntity.class.getName().replace( '.', '_' ) + "_contained" );
 

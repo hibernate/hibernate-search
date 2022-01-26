@@ -43,7 +43,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
 		this.typeIdentifier = builder.typeIdentifier;
 		this.jpaEntityName = builder.jpaEntityName;
-		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		this.entityPersister = metamodel.getEntityDescriptor( builder.hibernateOrmEntityName );
 		this.ascendingSuperTypes = builder.ascendingSuperTypes;
 		if ( builder.documentIdSourcePropertyName != null ) {

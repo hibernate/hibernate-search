@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.mapping.PersistentClass;
@@ -38,8 +37,7 @@ public class HibernateOrmPathDefinitionProvider implements PojoPathDefinitionPro
 		this.typeModel = typeModel;
 		this.persistentClass = persistentClass;
 		this.propertyStringRepresentationByOrdinal = new ArrayList<>();
-		for ( Iterator<Property> iterator = persistentClass.getPropertyClosureIterator(); iterator.hasNext(); ) {
-			Property property = iterator.next();
+		for ( Property property : persistentClass.getPropertyClosure() ) {
 			propertyStringRepresentationByOrdinal.add( property.getName() );
 		}
 	}

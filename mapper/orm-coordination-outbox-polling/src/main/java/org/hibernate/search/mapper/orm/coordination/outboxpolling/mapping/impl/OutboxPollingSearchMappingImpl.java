@@ -14,6 +14,7 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.common.spi.CoordinationStrategyStartContext;
@@ -76,7 +77,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 		try ( Session session = sessionFactory.openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
+				MutationQuery query = session.createMutationQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
 				return query.executeUpdate();
@@ -90,7 +91,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
+				MutationQuery query = session.createMutationQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
 				return query.executeUpdate();
@@ -104,7 +105,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 		try ( Session session = sessionFactory.openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
+				MutationQuery query = session.createMutationQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.executeUpdate();
 			} );
@@ -117,7 +118,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
 			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
-				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
+				MutationQuery query = session.createMutationQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.executeUpdate();
 			} );

@@ -149,7 +149,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 
 	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
 			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
-		MappingMetamodel metamodel = session.getSessionFactory().getMetamodel();
+		MappingMetamodel metamodel = session.getSessionFactory().getMappingMetamodel();
 		EntityPersister result = null;
 		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
 			EntityPersister type = targetTypeContext.entityPersister();
