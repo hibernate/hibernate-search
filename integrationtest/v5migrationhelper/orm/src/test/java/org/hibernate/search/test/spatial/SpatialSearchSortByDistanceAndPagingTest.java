@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -217,6 +218,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		private Double lon;
 		@Transient
 		private Double distance;
+		@Column(name = "\"value\"")
 		private String value;
 
 		public GeoEntity() {

@@ -303,7 +303,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				joinColumns = @JoinColumn(name = "containing")
 		)
 		@MapKeyJoinColumn(name = "contained")
-		@Column(name = "value")
+		@Column(name = "\"value\"")
 		@OrderBy("contained asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
@@ -317,7 +317,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				joinColumns = @JoinColumn(name = "containing")
 		)
 		@MapKeyJoinColumn(name = "contained")
-		@Column(name = "value")
+		@Column(name = "\"value\"")
 		@OrderBy("contained asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<ContainedEntity, String> containedNonIndexedEmbedded = new LinkedHashMap<>();
 
@@ -327,7 +327,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				joinColumns = @JoinColumn(name = "containing")
 		)
 		@MapKeyJoinColumn(name = "contained")
-		@Column(name = "value")
+		@Column(name = "\"value\"")
 		@OrderBy("contained asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
@@ -345,7 +345,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				joinColumns = @JoinColumn(name = "containing")
 		)
 		@MapKeyJoinColumn(name = "contained")
-		@Column(name = "value")
+		@Column(name = "\"value\"")
 		@OrderBy("contained asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
@@ -363,7 +363,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 				joinColumns = @JoinColumn(name = "containing")
 		)
 		@MapKeyJoinColumn(name = "contained")
-		@Column(name = "value")
+		@Column(name = "\"value\"")
 		@OrderBy("contained asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<ContainedEntity, String> containedUsedInCrossEntityDerivedProperty = new LinkedHashMap<>();
 
@@ -374,7 +374,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 		)
 		@MapKeyClass(ContainedEntity.class)
 		@MapKeyJoinColumn(name = "contained")
-		@Column(name = "value")
+		@Column(name = "\"value\"")
 		@OrderBy("contained asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField" },
