@@ -52,9 +52,9 @@ import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
  * of documents created for {@code Book} entities.
  * <p>
  * How exactly this embedding will happen depends on the configured {@link #structure() structure}.
- * Let's consider this representation of the book "Levianthan Wakes":
+ * Let's consider this representation of the book "Leviathan Wakes":
  * <ul>
- *     <li>title = Levianthan Wakes</li>
+ *     <li>title = Leviathan Wakes</li>
  *     <li>authors =
  *         <ul>
  *             <li>(first element)
@@ -76,7 +76,7 @@ import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
  * With the default {@link ObjectStructure#FLATTENED flattened structure} (more efficient),
  * the document structure will be a little different from what one would expect:
  * <ul>
- *     <li>title = Levianthan Wakes</li>
+ *     <li>title = Leviathan Wakes</li>
  *     <li>authors.firstName =
  *         <ul>
  *             <li>(first element) Daniel</li>

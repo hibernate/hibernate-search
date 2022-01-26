@@ -11,7 +11,7 @@ With the default settings (<<coordination-none,no coordination>>),
 if two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
 and these two entity instance are updated in parallel transactions,
 there is a small risk that the transaction commits happen in just the wrong way,
-leading to the index-embedding entity being reindexed with only part of the updates.
+leading to the index-embedding entity being re-indexed with only part of the updates.
 
 For example, consider indexed entity A, which index-embeds B and C.
 The following course of events involving two parallel transactions (T1 and T2)
@@ -154,13 +154,13 @@ One can just set `B.a` to `null` in order to remove the association between `A` 
 and the effect on the database will be exactly what we want.
 
 However, Hibernate Search will only be able to detect that `B.a` changed,
-and by the time it tries to infer which entities need to be reindexed,
+and by the time it tries to infer which entities need to be re-indexed,
 it will no longer be able to know what `B.a` used to refer to.
 That change in itself is useless to Hibernate Search:
-Hibernate Search will not know that `A`, specifically, needs to be reindexed.
+Hibernate Search will not know that `A`, specifically, needs to be re-indexed.
 It will "forget" to reindex `A`, leading to an out-of-sync index where `A.b` still contains `B`.
 
-In the end, the only way for Hibernate Search to know that `A` needs to be reindexed
+In the end, the only way for Hibernate Search to know that `A` needs to be re-indexed
 is to also set `A.b` to `null`, which will cause Hibernate Search to detect that `A.b` changed,
 and thus that `A` changed too.
 
@@ -199,7 +199,7 @@ but is long-term goal.
 When <<mapper-orm-indexing-automatic,automatic indexing>> is enabled,
 Hibernate Search collects entity change events
 to build an "indexing plan" inside the ORM `EntityManager`/`Session`.
-The indexing plan holds information relative to which entities need to be reindexed,
+The indexing plan holds information relative to which entities need to be re-indexed,
 and sometimes documents that have not been indexed yet.
 
 The indexing plan cannot be serialized.

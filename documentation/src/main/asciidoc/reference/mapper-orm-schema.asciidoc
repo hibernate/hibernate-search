@@ -167,7 +167,7 @@ This method is synchronous and will only return after the operation is complete.
 ====
 
 You can also select entity types when creating a schema manager,
-so as to manage the indexes of these types only (and their indexed subtypes, if any):
+to manage the indexes of these types only (and their indexed subtypes, if any):
 
 .Reinitializing only some indexes using a `SearchSchemaManager`
 ====

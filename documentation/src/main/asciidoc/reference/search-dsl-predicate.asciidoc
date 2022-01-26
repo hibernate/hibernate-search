@@ -691,7 +691,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-With `matchingAll` we require that all of the provided terms match.
+With `matchingAll` we require that all the provided terms match.
 Functionally, this is somewhat similar to a <<search-dsl-predicate-boolean-and,boolean `AND`>> with one <<search-dsl-predicate-match,`match`>> predicate per term, but the syntax for a single `terms` predicate is more concise.
 
 NOTE: `matchingAll` expects to be passed *terms*, not just any string. The given terms will not be analyzed. See <<search-dsl-predicate-terms-analysis>>.
@@ -708,7 +708,7 @@ It is possible to raise this limit through backend-specific configuration:
 However, keep in mind the limit is there for a reason: attempts to match very large numbers of terms will perform poorly and could lead to crashes.
 ====
 
-.Matching all of the provided terms
+.Matching all the provided terms
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -717,7 +717,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ====
 
 [[search-dsl-predicate-terms-analysis]]
-=== Terms predicates and analysis
+=== `terms` predicates and analysis
 
 NOTE: For an introduction to analysis and how to configure it,
 refer to the <<concepts-analysis>> section.
@@ -833,17 +833,17 @@ they will have a `title` field matching the text `robot`
 
 A `bool` predicate with only `must` clauses will behave as an `AND` operator.
 
-.Matching a document that matches all of multiple given predicates (~`AND` operator)
+.Matching a document that matches all the multiple given predicates (~`AND` operator)
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-and]
 ----
 <1> The hits *must* have a `title` field matching the text `robot`,
-independently from other clauses in the same boolean predicate.
+independently of other clauses in the same boolean predicate.
 <2> The hits *must* have a `description` field matching the text `crime`,
-independently from other clauses in the same boolean predicate.
-<3> All returned hits will match *all* of the clauses above:
+independently of other clauses in the same boolean predicate.
+<3> All returned hits will match *all* the clauses above:
 they will have a `title` field matching the text `robot`
 *and* they will have a `description` field matching the text `crime`.
 ====
@@ -858,10 +858,10 @@ they will have a `title` field matching the text `robot`
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-mustNot]
 ----
 <1> The hits *must* have a `title` field matching the text `robot`,
-independently from other clauses in the same boolean predicate.
+independently of other clauses in the same boolean predicate.
 <2> The hits *must not* have a `description` field matching the text `investigation`,
-independently from other clauses in the same boolean predicate.
-<3> All returned hits will match *all* of the clauses above:
+independently of other clauses in the same boolean predicate.
+<3> All returned hits will match *all* the clauses above:
 they will have a `title` field matching the text `robot`
 *and* they will not have a `description` field matching the text `investigation`.
 
@@ -916,7 +916,7 @@ and their only purpose is to increase the score of documents that match these cl
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-mustAndShould]
 ----
 <1> The hits *must* have a `title` field matching the text `robot`,
-independently from other clauses in the same boolean predicate.
+independently of other clauses in the same boolean predicate.
 <2> The hits *should* have a `description` field matching the text `crime`,
 but they might not, because matching the `must` clause above is enough.
 However, matching this `should` clause will improve the score of the document.
@@ -1198,7 +1198,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ====
 
 NOTE: Other distance units are available, in particular `METERS`, `YARDS` and `MILES`.
-When the distance unit is omitted, it defaults to meters.
+When the distance unit is omitted, it defaults to `METERS`.
 
 You can also pass the coordinates of the center as two doubles (latitude, then longitude).
 

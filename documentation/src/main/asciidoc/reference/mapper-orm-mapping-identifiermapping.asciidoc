@@ -111,7 +111,7 @@ using seconds and nanoseconds only (e.g. `PT1.000000123S`).
 |-
 |java.time.YearMonth
 |Formatted according to the https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates[ISO 8601 format for a Year-Month]
-(e.g. `2017-11` for November, 2017).
+(e.g. `2017-11` for November 2017).
 |-
 |java.time.MonthDay
 |Formatted according to the https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates[ISO 8601 format for a Month-Day]

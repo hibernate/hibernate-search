@@ -146,7 +146,7 @@ Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
 See <<mapper-orm-indexing-manual-indexingplan-writes>>.
-<4> After after a `flush()`/`clear()`, call `indexingPlan.execute()`.
+<4> After a `flush()`/`clear()`, call `indexingPlan.execute()`.
 The entities will be processed and *the changes will be sent to the indexes immediately*.
 Hibernate Search will wait for index changes to be "completed"
 as required by the configured <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
@@ -248,7 +248,7 @@ Some index operations are not about a specific entity/document,
 but rather about a large number of documents, possibly all of them.
 This includes, for example, purging the index to remove all of its content.
 
-The operations are performed *outside* of the context of an ORM session,
+The operations are performed *outside* the context of an ORM session,
 using the `SearchWorkspace` interface.
 
 The `SearchWorkspace` can be retrieved from the `SearchMapping`,

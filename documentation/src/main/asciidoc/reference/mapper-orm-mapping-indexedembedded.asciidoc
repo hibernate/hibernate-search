@@ -78,7 +78,7 @@ map that identifier to a field explicitly using `@GenericField` or another `@*Fi
 ====
 When `@IndexedEmbedded` is applied to an association,
 i.e. to a property that refers to entities (like the example above),
-*the association must be bi-directional*.
+*the association must be bidirectional*.
 Otherwise, Hibernate Search will throw an exception on startup.
 
 See <<mapper-orm-indexedembedded-reindexing>> for the reasons behind this restriction
@@ -87,7 +87,7 @@ and ways to circumvent it.
 
 Index-embedding can be nested on multiple levels;
 for example you can decide to index-embed the place of birth of authors,
-so as to be able to search for books written by Russian authors exclusively:
+to be able to search for books written by Russian authors exclusively:
 
 [[example-nested-index-embedded]]
 .Nesting multiple `@IndexedEmbedded`
@@ -229,7 +229,7 @@ When the "embedded" entity changes,
 Hibernate Search will handle reindexing of the "embedding" entity.
 
 This will work transparently most of the time,
-as long as the association `@IndexedEmbedded` is applied to is bi-directional
+as long as the association `@IndexedEmbedded` is applied to is bidirectional
 (uses Hibernate ORM's `mappedBy`).
 
 When Hibernate Search is unable to handle an association,
@@ -274,10 +274,10 @@ The number of levels of indexed-embedded that will have all their fields include
 and for which all fields of the indexed-embedded element will be included,
 even if these fields are not included explicitly through `includePaths`:
 +
- * `includeDepth=0` means fields of the indexed-embedded element are *not* included,
+ * `includeDepth=0` means that fields of the indexed-embedded element are *not* included,
 nor is any field of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
- * `includeDepth=1` means fields of the indexed-embedded element *are* included,
+ * `includeDepth=1` means that fields of the indexed-embedded element *are* included,
 but *not* fields of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
  * And so on.
@@ -342,17 +342,17 @@ This mapping will declare the following fields in the `Human` index:
 (so `parents.parents.*` is included implicitly).
 * `parents.parents.parents.name`: *not* implicitly included at depth `2` because `includeDepth = 2`
 (so `parents.parents.parents` is included implicitly,
-but sub-fields can only be included explicitly)
+but subfields can only be included explicitly)
 but explicitly included because `includePaths` on `parents` includes `parents.parents.name`.
 
 The following fields in particular are excluded:
 
 * `parents.parents.parents.nickname`: *not* implicitly included at depth `2` because `includeDepth = 2`
-(so `parents.parents.parents` is included implicitly, but sub-fields must be included explicitly)
+(so `parents.parents.parents` is included implicitly, but subfields must be included explicitly)
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.nickname`.
 * `parents.parents.parents.parents.name`: *not* implicitly included at depth `3` because `includeDepth = 2`
 (so `parents.parents.parents` is included implicitly,
-but `parents.parents.parents.parents` and sub-fields can only be included explicitly)
+but `parents.parents.parents.parents` and subfields can only be included explicitly)
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.parents.name`.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -371,7 +371,7 @@ assuming the class `Book` is annotated with `@Indexed`
 and its `authors` property is annotated with  `@IndexedEmbedded`:
 
 * Book instance
-** title = Levianthan Wakes
+** title = Leviathan Wakes
 ** authors =
 *** Author instance
 **** firstName = Daniel
@@ -389,7 +389,7 @@ meaning that the tree structure is not preserved.
 The book instance mentioned above would be indexed with a structure roughly similar to this:
 
  * Book document
- ** title = Levianthan Wakes
+ ** title = Leviathan Wakes
  ** authors.firstName = [Daniel, Ty]
  ** authors.lastName = [Abraham, Frank]
 
@@ -414,7 +414,7 @@ for each indexed-embedded element.
 The book instance mentioned above would be indexed with a structure roughly similar to this:
 
  * Book document
- ** title = Levianthan Wakes
+ ** title = Leviathan Wakes
  ** Nested documents
  *** Nested document #1 for "authors"
  **** authors.firstName = Daniel

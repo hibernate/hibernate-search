@@ -203,7 +203,7 @@ See `org.apache.lucene.store.NativeFSLockFactory`.
 Locks using a Java object held in the JVM's heap.
 Since the lock is only accessible by the same JVM,
 this strategy will only work properly when it is known
-that only a single application will ever try to accesses the indexes.
+that only a single application will ever try to access the indexes.
 +
 This is the default strategy for the `local-heap` directory type.
 +
@@ -325,15 +325,15 @@ This creates a dependency to the Lucene index format.
 The Lucene developers of course attempt to keep a stable index format,
 but sometimes a change in the format can not be avoided.
 In those cases you either have to re-index all your data or use an index upgrade tool.
-Sometimes, Lucene is also able to read the old format so you don't need to take specific actions
-(besides making backup of your index).
+Sometimes, Lucene is also able to read the old format, so you don't need to take specific actions
+(beside making backup of your index).
 
 While an index format incompatibility is a rare event,
 it can happen more often that Lucene's Analyzer implementations might slightly change its behavior.
 This can lead to some documents not matching anymore, even though they used to.
 
 To avoid this analyzer incompatibility,
-Hibernate Search allows to configure to which version of Lucene
+Hibernate Search allows configuring to which version of Lucene
 the analyzers and other Lucene classes should conform their behavior.
 
 This configuration property is set at the backend level:
@@ -379,7 +379,7 @@ in order to remember which predicates/projections/sorts can be applied to each f
 
 For the most part, the schema is inferred from
 <<mapper-orm-mapping,the mapping configured through Hibernate Search's mapping APIs>>,
-which are generic and independent from Elasticsearch.
+which are generic and independent of Lucene.
 
 Aspects that are specific to the Lucene backend are explained in this section.
 
@@ -391,16 +391,16 @@ Aspects that are specific to the Lucene backend are explained in this section.
 
 [NOTE]
 ====
-Some types are not supported directly by the Elasticsearch backend,
+Some types are not supported directly by the Lucene backend,
 but will work anyway because they are "bridged" by the mapper.
 For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
-which is supported by the Elasticsearch backend.
+which is supported by the Lucene backend.
 See <<mapper-orm-directfieldmapping-supported-types>> for more information.
 ====
 
 [NOTE]
 ====
-Field types that are not in this list can still be used with a little bit more work:
+Field types that are not in this list can still be used with a bit more work:
 
 * If a property in the entity model has an unsupported type,
 but can be converted to a supported type, you will need a bridge.
@@ -531,7 +531,7 @@ e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected 
 
 However, it is possible to enable multi-tenancy manually.
 
-The multi-tenancy strategy is set a the backend level:
+The multi-tenancy strategy is set at the backend level:
 
 [source]
 ----
@@ -791,7 +791,7 @@ it is expected that there will be a lot of "indexing" operations to create/updat
 We generally want to preserve the relative order of these requests
 when they are about the same documents.
 
-For this reasons, Hibernate Search pushes these operations to internal queues and applies them in batches.
+For this reason, Hibernate Search pushes these operations to internal queues and applies them in batches.
 Each index maintains 10 queues holding at most 1000 elements each.
 Queues operate independently (in parallel), but each queue applies one operation after the other,
 so at any given time there can be at most 10 batches of indexing requests being applied for each index.
@@ -1204,7 +1204,7 @@ otherwise it won't exist.
 ====
 
 Alternatively, you can also retrieve the (composite) analyzers for a whole index.
-These analyzers behaves differently for each field,
+These analyzers behave differently for each field,
 delegating to the analyzer configured in the mapping for each field.
 
 .Retrieving the Lucene analyzers for a whole index

@@ -36,7 +36,7 @@ in `org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/Book.java[tags=explicit-extractor]
 ----
-<1> This annotation, and those below, are just Hibernate ORM configuration.
+<1> This annotation -- and those below -- are just Hibernate ORM configuration.
 <2> Declare an index field based on the `priceByFormat` property.
 <3> By default, Hibernate Search would index the map values (the book prices).
 This uses the `extraction` attribute to specify that map keys (the book formats)

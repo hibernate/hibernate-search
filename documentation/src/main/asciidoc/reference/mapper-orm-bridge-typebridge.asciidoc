@@ -121,7 +121,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 Getting the param using the `param` method assumes that the param has been defined.
 Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
 <2> In the `bind` method, use the value of parameters.
-Here use the `sortField` parameter to decide whether to add a additional, sortable field,
+Here use the `sortField` parameter to decide whether to add another, sortable field,
 but we could pass parameters for any purpose:
 defining the field name,
 defining a normalizer,custom annotation
@@ -173,7 +173,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 <1> Implement setters in the binder.
 Alternatively, we could expose a parameterized constructor.
 <2> In the `bind` method, use the value of parameters.
-Here use the `sortField` parameter to decide whether to add a additional, sortable field,
+Here use the `sortField` parameter to decide whether to add another, sortable field,
 but we could pass parameters for any purpose:
 defining the field name,
 defining a normalizer,custom annotation

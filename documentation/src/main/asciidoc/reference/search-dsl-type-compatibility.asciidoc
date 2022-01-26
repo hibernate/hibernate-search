@@ -53,7 +53,7 @@ Then we will not have an `AuthenticationOutcome` instance to pass to the DSL, on
 
 In that case, we will first need to assign some text to each enum.
 This can be achieved by defining a custom <<mapper-orm-bridge-valuebridge,`ValueBridge<AuthenticationOutcome, String>`>>
-and applying it to the `outcome` property so as to index a textual description of the outcome,
+and applying it to the `outcome` property to index a textual description of the outcome,
 instead of the default `Enum#name()`.
 
 Then, we will need to tell Hibernate Search that the value passed to the DSL should not be passed to the DSL converter,
@@ -83,7 +83,7 @@ See <<mapper-orm-bridge-typebridge>> or <<mapper-orm-bridge-propertybridge>> for
 [[search-dsl-projected-value-type]]
 == Type of projected values
 
-Generally the type of values returned by projections argument should be rather obvious:
+Generally the type of values returned by projections should be rather obvious:
 for example if you created a field by mapping an `Integer` property,
 then an `Integer` value will be returned when projecting;
 if you mapped a `java.time.LocalDate`, then a `java.time.LocalDate` will be returned,
@@ -220,7 +220,7 @@ you will just pass the "index" value to the DSL (using the same example, a `Stri
 === [[_incompatible_projection_converters]] Incompatible projection converters
 
 If, in a search query targeting multiple indexes,
-a field is encoded in a compatible way in every indexes (for example both as `String`),
+a field is encoded in a compatible way in every index (for example both as `String`),
 but that has a different projection converters
 (for example the first one converts from `String` to `String`, but the second one converts from `String` to `Integer`),
 you can still project on this field, but you will need to disable the projection converter

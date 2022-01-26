@@ -107,7 +107,7 @@ expecting those entity types to implement the `Person` interface (Hibernate Sear
 [[search-dsl-query-fetching-results-basics]]
 === [[_result_size]] Basics
 
-In Hibernate Search, the default search result is a little bit more complicated than just "a list of hits".
+In Hibernate Search, the default search result is a bit more complicated than just "a list of hits".
 This is why the default methods return a composite `SearchResult` object offering getters
 to retrieve the part of the result you want,
 as shown in the example below.
@@ -233,7 +233,11 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 
 When working with large result sets, counting the number of hits exactly can be very resource-consuming.
 
-When sorting by score (the default) and retrieving the result through `fetch(...)`, it is possible to yield significant performance improvements by allowing Hibernate Search to return a lower-bound estimate of the total hit count, instead of the exact total hit count. In that case, the underlying engine (Lucene or Elasticsearch) will be able to skip large chunks of non-competitive hits, leading to fewer index scans and thus better performance.
+When sorting by score (the default) and retrieving the result through `fetch(...)`,
+it is possible to yield significant performance improvements by allowing Hibernate Search to return
+a lower-bound estimate of the total hit count, instead of the exact total hit count.
+In that case, the underlying engine (Lucene or Elasticsearch) will be able to skip large chunks of non-competitive hits,
+leading to fewer index scans and thus better performance.
 
 To enable this performance optimization, call `totalHitCountThreshold(...)` when building the query, as shown in the example below.
 
@@ -444,7 +448,7 @@ then mention that the persistence context and second level cache should be check
 before entities are loaded from the database.
 <3> Fetch the results.
 The more entities found in the persistence context or second level cache,
-the less entities will be loaded from the database.
+the fewer entities will be loaded from the database.
 ====
 
 [[search-dsl-query-fetch-size]]
@@ -471,7 +475,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 <2> Access the loading options of the query,
 then set the fetch size to an arbitrary value (must be `1` or more).
 <3> Fetch the results, limiting to the top 200 hits.
-One query will be executed to load the hits if there are less hits than the given fetch size;
+One query will be executed to load the hits if there are fewer hits than the given fetch size;
 two queries if there are more hits than the fetch size but less than twice the fetch size,
 etc.
 ====

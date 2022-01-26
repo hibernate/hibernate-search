@@ -120,7 +120,7 @@ For text fields, "lower" means "lower in the alphabetical order".
 In order for the `field` sort to be available on a given field,
 you need to mark the field as <<mapper-orm-directfieldmapping-sortable,sortable>> in the mapping.
 
-<<mapper-orm-geopoint,Geopoint>> fields cannot be marked as sortable;
+<<mapper-orm-geopoint,GeoPoint>> fields cannot be marked as sortable;
 refer to the <<search-dsl-sort-distance,distance sort>> for these fields.
 
 <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text fields>> (multi-word text fields)
@@ -148,7 +148,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
 * The behavior on missing values
 can be <<search-dsl-sort-common-missing,controlled explicitly with `.missing()`>>.
-* The behavior on multi-valued fields
+* The behavior on multivalued fields
 can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
@@ -183,7 +183,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 
 * The sort order is ascending by default,
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
-* The behavior on multi-valued fields
+* The behavior on multivalued fields
 can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
 * For fields in nested objects, all nested objects are considered by default,
 but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
@@ -207,7 +207,7 @@ the relative order of books with the same genre is undetermined,
 and may change from one query execution to the other.
 <3> Add a `field` sort on the `title_sort` field.
 When two books have the same genre,
-their relative order will by determined by comparing their titles.
+their relative order will be determined by comparing their titles.
 If two books can have the same title,
 we can <<search-dsl-sort-stabilize,stabilize the sort even further by adding a last sort on the id>>.
 <4> The hits will be sorted by genre, then by title.
@@ -377,7 +377,7 @@ By default:
 * For <<search-dsl-sort-field,sorts by field values>>, the documents that do not have any value for a sort field
   will appear in the last position.
 * For <<search-dsl-sort-distance,sorts by distance to a point>>, the documents that do not have any value for a sort field
-  will be treated as they were at plus infinite distance from the given point.
+  will be treated as if their distance from the given point was infinite.
 
 The behavior for missing values can be controlled explicitly through the `.missing()` option:
 
@@ -387,9 +387,10 @@ The behavior for missing values can be controlled explicitly through the `.missi
 
 [NOTE]
 ====
-All these options are supported in case of sort by field values or in case of sort by distance to a point
+All these options are supported for sorts by field values and sorts by distance to a point
 using the Lucene backend.
-In case of sort by distance to a point using the Elasticsearch backend, due to limitations of the Elasticsearch APIs,
+
+When sorting by distance to a point using the Elasticsearch backend, due to limitations of the Elasticsearch APIs,
 only the following combinations are supported:
 
 * `.missing().first()` using a descending order.
@@ -438,7 +439,7 @@ but if you ever need to bypass conversion and pass an unconverted argument
 to `.use(...)`, see <<search-dsl-argument-type>>.
 
 [[search-dsl-sort-common-multi-value-mode]]
-=== Sort mode for multi-valued fields
+=== Sort mode for multivalued fields
 
 Documents that have multiple values for a sort field can be sorted too.
 A single value is picked for each document in order to compare it with order documents.

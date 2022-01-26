@@ -57,14 +57,14 @@ or to commit a transaction after it is done.
 ====
 A note to MySQL users: the `MassIndexer` uses forward only scrollable results
 to iterate on the primary keys to be loaded,
-but MySQL's JDBC driver will pre-load all values in memory.
+but MySQL's JDBC driver will preload all values in memory.
 
 To avoid this "optimization" set the <<mapper-orm-indexing-massindexer-parameters-idfetchsize,`idFetchSize` parameter>>
 to `Integer.MIN_VALUE`.
 ====
 
 You can also select entity types when creating a mass indexer,
-so as to reindex only these types (and their indexed subtypes, if any):
+to reindex only these types (and their indexed subtypes, if any):
 
 .Reindexing selected types using a `MassIndexer`
 ====
@@ -209,7 +209,7 @@ otherwise, you will end up with duplicates in the index.
 |`mergeSegmentsAfterPurge(boolean)`
 |`true`
 |Force merging of each index into a single segment after the initial index purge, just before indexing.
-This setting has no effect if {@code purgeAllOnStart} is set to false.
+This setting has no effect if `purgeAllOnStart` is set to false.
 
 |`mergeSegmentsOnFinish(boolean)`
 |`false`
@@ -339,11 +339,11 @@ for the parameters that affect parallelism:
 Should probably be a low value, like 1 or 2, depending on how much
 of your CPUs have spare cycles and how slow a database round trip will be.
 `threadsToLoadObjects`::
-Higher increases the pre-loading rate for the picked entities from
+Higher increases the preloading rate for the picked entities from
 the database, but also increases memory usage and the pressure on the threads working on subsequent
 indexing.
 Note that each thread will extract data from the entity to reindex,
-which depending on your mapping might require to access lazy associations
+which depending on your mapping might require accessing lazy associations
 and load associated entities, thus making blocking calls to the database,
 so you will probably need a high number of threads working in parallel.
 

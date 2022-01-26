@@ -42,8 +42,8 @@ so that it is correctly stored in the index.
 
 While `field` projections are certainly the most common,
 they are not the only type of projection.
-Other projections allow to
-<<search-dsl-projection-composite,compose custom beans containing extracted data>>,
+Other projections allow
+<<search-dsl-projection-composite,composing custom beans containing extracted data>>,
 get references to the <<search-dsl-projection-documentReference,extracted documents>>
 or the <<search-dsl-projection-reference,corresponding entities>>,
 or get information related to the search query itself
@@ -155,8 +155,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-NOTE: Hibernate Search will throw an exception when building the query if you do this on a multi-valued field.
-To project on multi-valued fields, see <<search-dsl-projection-field-multivalued>>.
+NOTE: Hibernate Search will throw an exception when building the query if you do this on a multivalued field.
+To project on multivalued fields, see <<search-dsl-projection-field-multivalued>>.
 
 You can omit the "field type" argument, but then you will get projections of type `Object`:
 
@@ -169,13 +169,13 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ====
 
 [[search-dsl-projection-field-multivalued]]
-=== Multi-valued fields
+=== Multivalued fields
 
-To return multiple values, and thus allow projection on multi-valued fields, use `.multi()`.
+To return multiple values, and thus allow projection on multivalued fields, use `.multi()`.
 This will change the return type of the projection to `List<T>` where `T` is what the single-valued projection
 would have returned.
 
-.Returning field values from matched documents, for multi-valued fields
+.Returning field values from matched documents, for multivalued fields
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -259,8 +259,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-NOTE: Hibernate Search will throw an exception when building the query if you do this on a multi-valued field.
-To project on multi-valued fields, see <<search-dsl-projection-distance-multivalued>>.
+NOTE: Hibernate Search will throw an exception when building the query if you do this on a multivalued field.
+To project on multivalued fields, see <<search-dsl-projection-distance-multivalued>>.
 
 The returned distance is in meters by default, but you can pick a different unit:
 
@@ -273,12 +273,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ====
 
 [[search-dsl-projection-distance-multivalued]]
-=== Multi-valued fields
+=== Multivalued fields
 
-To return multiple values, and thus allow projection on multi-valued fields, use `.multi()`.
+To return multiple values, and thus allow projection on multivalued fields, use `.multi()`.
 This will change the return type of the projection to `List<Double>`.
 
-.Returning the distance to a point, for multi-valued fields
+.Returning the distance to a point, for multivalued fields
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
