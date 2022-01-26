@@ -18,7 +18,6 @@ import org.hibernate.mapping.Component;
 import org.hibernate.mapping.OneToMany;
 import org.hibernate.mapping.OneToOne;
 import org.hibernate.mapping.Property;
-import org.hibernate.mapping.Selectable;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
@@ -98,16 +97,12 @@ public final class HibernateOrmMappingPropertiesMetadataContributor implements P
 	}
 
 	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
-		Iterator<Selectable> columnIterator = value.getColumnIterator();
+		Iterator<Column> columnIterator = value.getColumns().iterator();
 		Dialect dialect = basicTypeMetadataProvider.getDialect();
 		Metadata metadata = basicTypeMetadataProvider.getMetadata();
 
 		while ( columnIterator.hasNext() ) {
-			Selectable mappedColumn = columnIterator.next();
-			if ( !(mappedColumn instanceof Column) ) {
-				continue;
-			}
-			Column column = (Column) mappedColumn;
+			Column column = columnIterator.next();
 			Size size = column.getColumnSize( dialect, metadata );
 			Integer scale = size.getScale();
 			if ( scale == null ) {
