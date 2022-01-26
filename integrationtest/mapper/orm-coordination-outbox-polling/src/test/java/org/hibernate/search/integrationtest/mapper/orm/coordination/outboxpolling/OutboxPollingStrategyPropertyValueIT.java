@@ -104,7 +104,7 @@ public class OutboxPollingStrategyPropertyValueIT {
 
 	@Test
 	public void metamodel_userEntitiesAndOutboxEventAndAgent() {
-		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
+		assertThat( setupHolder.sessionFactory().getJpaMetamodel().getEntities() )
 				.<Class<?>>extracting( Type::getJavaType )
 				.containsExactlyInAnyOrder( IndexedEntity.class, OutboxEvent.class, Agent.class );
 	}

@@ -96,7 +96,7 @@ public final class PersistenceUtil {
 	public static List<EntityTypeDescriptor> createDescriptors(EntityManagerFactory entityManagerFactory, Set<Class<?>> types) {
 		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
 		List<EntityTypeDescriptor> result = new ArrayList<>( types.size() );
-		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		for ( Class<?> type : types ) {
 			result.add( createDescriptor( metamodel, type ) );
 		}

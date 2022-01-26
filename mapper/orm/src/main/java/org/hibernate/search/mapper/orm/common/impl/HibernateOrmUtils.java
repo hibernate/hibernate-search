@@ -78,7 +78,7 @@ public final class HibernateOrmUtils {
 		 * where A and C are entity types and B is a mapped superclass.
 		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
 		 */
-		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		String rootEntityName = entityType.getRootEntityName();
 		return metamodel.getEntityDescriptor( rootEntityName );
 	}
@@ -118,7 +118,7 @@ public final class HibernateOrmUtils {
 			return true;
 		}
 
-		MappingMetamodel metamodel = sessionFactory.getMetamodel();
+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		int concreteSubTypesCount = 0;
 		for ( String subClassEntityName : subClassEntityNames ) {
 			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
