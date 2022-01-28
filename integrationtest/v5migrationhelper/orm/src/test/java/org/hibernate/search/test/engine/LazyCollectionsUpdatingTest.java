@@ -23,7 +23,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
@@ -47,9 +46,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 			busStop.setRoadName( "new road" );
 			tx.commit();
 		}
-		catch (org.hibernate.annotations.common.AssertionFailure ass) {
-			fail( ass.getMessage() );
-		}
 		finally {
 			fullTextSession.close();
 		}
@@ -67,9 +63,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 			BusStop busStop = (BusStop) list.get( 1 );
 			busStop.setRoadName( "new road" );
 			fullTextSession.flush();
-		}
-		catch (org.hibernate.annotations.common.AssertionFailure ass) {
-			fail( ass.getMessage() );
 		}
 		finally {
 			fullTextSession.close();
