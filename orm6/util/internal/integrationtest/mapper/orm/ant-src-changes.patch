@@ -1,3 +1,51 @@
+diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
+index 8f695c5d5b..d9dd641830 100644
+--- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
++++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
+@@ -429,7 +429,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
+ 		for ( Class<?> entityClass : config.entityClearOrder ) {
+ 			EntityType<?> entityType;
+ 			try {
+-				entityType = sessionFactory.getMetamodel().entity( entityClass );
++				entityType = sessionFactory.getJpaMetamodel().entity( entityClass );
+ 			}
+ 			catch (IllegalArgumentException e) {
+ 				// When using annotatedTypes to infer the clear order,
+@@ -446,7 +446,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
+ 		// we try to delete all remaining entity types.
+ 		// Note we're stabilizing the order, because ORM uses a HashSet internally
+ 		// and the order may change from one execution to the next.
+-		List<EntityType<?>> sortedEntityTypes = sessionFactory.getMetamodel().getEntities().stream()
++		List<EntityType<?>> sortedEntityTypes = sessionFactory.getJpaMetamodel().getEntities().stream()
+ 				.sorted( Comparator.comparing( EntityType::getName ) )
+ 				.collect( Collectors.toList() );
+ 		for ( EntityType<?> entityType : sortedEntityTypes ) {
+@@ -531,6 +531,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
+ 			builder.append( " where type( e ) in (:type)" );
+ 			typeArg = entityType.getJavaType();
+ 		}
++		@SuppressWarnings("deprecation")
+ 		Query<?> query = QueryType.SELECT.equals( queryType )
+ 				? session.createQuery( builder.toString(), entityType.getJavaType() )
+ 				: session.createQuery( builder.toString() );
+@@ -541,7 +542,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
+ 	}
+ 
+ 	private static boolean hasEntitySubclass(SessionFactory sessionFactory, EntityType<?> parentEntity) {
+-		Metamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
++		Metamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getJpaMetamodel();
+ 		for ( EntityType<?> entity : metamodel.getEntities() ) {
+ 			if ( parentEntity.equals( entity.getSupertype() ) ) {
+ 				return true;
+@@ -563,7 +564,7 @@ private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor session
+ 				case ELEMENT_COLLECTION:
+ 					return true;
+ 				case EMBEDDED:
+-					EmbeddableType<?> embeddable = sessionFactory.getMetamodel().embeddable( attribute.getJavaType() );
++					EmbeddableType<?> embeddable = sessionFactory.getJpaMetamodel().embeddable( attribute.getJavaType() );
+ 					if ( hasPotentiallyJoinTable( sessionFactory, embeddable ) ) {
+ 						return true;
+ 					}
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
 index cc6c240317..a536100782 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelper.java
@@ -19,7 +67,7 @@ index cc6c240317..a536100782 100644
  				new H2LazyMultiTenantConnectionProvider( tenantIds ) );
  		// any required backend-multi-tenancy property (e.g.:*.backend.multi_tenancy.strategy = discriminator)
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java
-index d5366722a2..03a984c4e7 100644
+index d5366722a2..47e9991392 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java
 +++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/multitenancy/impl/MultitenancyTestHelperSchemaManagementTool.java
 @@ -21,6 +21,7 @@
@@ -30,7 +78,23 @@ index d5366722a2..03a984c4e7 100644
  import org.hibernate.tool.schema.spi.DelayedDropAction;
  import org.hibernate.tool.schema.spi.ExecutionOptions;
  import org.hibernate.tool.schema.spi.ExtractionTool;
-@@ -93,7 +94,8 @@ public SchemaCreator getSchemaCreator(Map options) {
+@@ -51,8 +52,7 @@ public Class<SchemaManagementTool> getServiceInitiated() {
+ 		}
+ 
+ 		@Override
+-		@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
+-		public SchemaManagementTool initiateService(Map configurationValues, ServiceRegistryImplementor registry) {
++		public SchemaManagementTool initiateService(Map<String,Object> configurationValues, ServiceRegistryImplementor registry) {
+ 			return new MultitenancyTestHelperSchemaManagementTool( tenantIds );
+ 		}
+ 	}
+@@ -88,12 +88,12 @@ private GenerationTargetToDatabase[] createSchemaTargets(ServiceRegistryImplemen
+ 	}
+ 
+ 	@Override
+-	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
+-	public SchemaCreator getSchemaCreator(Map options) {
++	public SchemaCreator getSchemaCreator(Map<String,Object> options) {
  		return new SchemaCreator() {
  			final SchemaCreatorImpl delegate = (SchemaCreatorImpl) toolDelegate.getSchemaCreator( options );
  			@Override
@@ -40,7 +104,13 @@ index d5366722a2..03a984c4e7 100644
  					TargetDescriptor targetDescriptor) {
  				delegate.doCreation( metadata, true, generationTargets );
  			}
-@@ -106,14 +108,15 @@ public SchemaDropper getSchemaDropper(Map options) {
+@@ -101,19 +101,19 @@ public void doCreation(Metadata metadata, ExecutionOptions options, SourceDescri
+ 	}
+ 
+ 	@Override
+-	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
+-	public SchemaDropper getSchemaDropper(Map options) {
++	public SchemaDropper getSchemaDropper(Map<String,Object> options) {
  		return new SchemaDropper() {
  			final SchemaDropperImpl delegate = (SchemaDropperImpl) toolDelegate.getSchemaDropper( options );
  			@Override
@@ -59,3 +129,35 @@ index d5366722a2..03a984c4e7 100644
  				return new DelayedDropAction() {
  					@Override
  					public void perform(ServiceRegistry serviceRegistry) {
+@@ -125,14 +125,12 @@ public void perform(ServiceRegistry serviceRegistry) {
+ 	}
+ 
+ 	@Override
+-	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
+-	public SchemaMigrator getSchemaMigrator(Map options) {
++	public SchemaMigrator getSchemaMigrator(Map<String,Object> options) {
+ 		throw notSupported();
+ 	}
+ 
+ 	@Override
+-	@SuppressWarnings("rawtypes") // Can't do better: Map is raw in the superclass
+-	public SchemaValidator getSchemaValidator(Map options) {
++	public SchemaValidator getSchemaValidator(Map<String,Object> options) {
+ 		throw notSupported();
+ 	}
+ 
+diff --git a/main/resources/hibernate.properties b/main/resources/hibernate.properties
+index d866f45e6d..e5542dbbc1 100644
+--- a/main/resources/hibernate.properties
++++ b/main/resources/hibernate.properties
+@@ -25,3 +25,10 @@ hibernate.cache.region.factory_class = org.hibernate.testing.cache.CachingRegion
+ 
+ hibernate.implicit_naming_strategy = component-path
+ 
++# Temporary workaround for:
++# - https://hibernate.atlassian.net/browse/HHH-15054
++#   (affects org/hibernate/search/test/proxy/ProxyTest)
++# - https://hibernate.atlassian.net/browse/HHH-15058
++#   (affects tests in org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/manytomany,
++#   in particular)
++hibernate.mapping.default_list_semantics=bag

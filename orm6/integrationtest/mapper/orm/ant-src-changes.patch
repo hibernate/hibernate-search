@@ -1,3 +1,45 @@
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
+index 52694f380c..adbce15922 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
+@@ -124,7 +124,7 @@ public void simple() {
+ 			);
+ 
+ 			assertThat( query.fetchAllHits() ).containsExactly(
+-					(Map) session.load( entityTypeName, 1 )
++					(Map) session.getReference( entityTypeName, 1 )
+ 			);
+ 		} );
+ 	}
+@@ -184,7 +184,7 @@ public void searchObject() {
+ 			);
+ 
+ 			assertThat( query.fetchAllHits() ).containsExactly(
+-					session.load( entityTypeName, 1 )
++					session.getReference( entityTypeName, 1 )
+ 			);
+ 		} );
+ 	}
+@@ -303,7 +303,7 @@ public void nonEntityIdDocumentId() {
+ 			);
+ 
+ 			assertThat( query.fetchAllHits() ).containsExactly(
+-					session.load( entityTypeName, 1 )
++					session.getReference( entityTypeName, 1 )
+ 			);
+ 		} );
+ 	}
+@@ -390,8 +390,8 @@ public void inheritance() {
+ 			);
+ 
+ 			assertThat( query.fetchAllHits() ).containsExactly(
+-					(Map) session.load( entityA_BTypeName, 1 ),
+-					(Map) session.load( entityA_CTypeName, 2 )
++					(Map) session.getReference( entityA_BTypeName, 1 ),
++					(Map) session.getReference( entityA_CTypeName, 2 )
+ 			);
+ 		} );
+ 	}
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java
 index e556ccaf66..3cea4cab56 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/hibernateormapis/ToHibernateOrmScrollableResultsIT.java
@@ -837,7 +879,7 @@ index c032664bb9..4d205fdccf 100644
  				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
  				.withAnnotatedTypes( IndexedEntity.class );
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
-index 1bf135620e..a897a44202 100644
+index 1bf135620e..97da0239d0 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
 @@ -19,7 +19,7 @@
@@ -855,7 +897,7 @@ index 1bf135620e..a897a44202 100644
  		// Check that there actually is a backref:
 -		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
 -		assertThat( metamodel.entityPersister( IndexedEntity.class ).getEntityMetamodel().getPropertyNames() )
-+		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
++		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMappingMetamodel();
 +		assertThat( metamodel.getEntityDescriptor( IndexedEntity.class ).getEntityMetamodel().getPropertyNames() )
  				.contains( "_containing_fk_containingidBackref" )
  				.contains( "_containingIndexBackref" );
@@ -900,7 +942,7 @@ index d110dbb171..0796b95350 100644
  
  		@OneToMany(mappedBy = "genericProperty")
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
-index fd7d546f8f..48b93ae1a0 100644
+index fd7d546f8f..42625565bc 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 @@ -19,7 +19,7 @@
@@ -918,7 +960,7 @@ index fd7d546f8f..48b93ae1a0 100644
  		// Check that there actually is a synthetic property:
 -		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
 -		assertThat( metamodel.entityPersister( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
-+		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
++		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMappingMetamodel();
 +		assertThat( metamodel.getEntityDescriptor( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
  				.contains( "_" + IndexedEntity.class.getName().replace( '.', '_' ) + "_contained" );
  
