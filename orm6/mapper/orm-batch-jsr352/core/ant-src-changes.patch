@@ -43,7 +43,7 @@ index c8763c2b4a..2d975eab7e 100644
  			}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java
-index ed05db3af4..a30c55ae41 100644
+index 6daddd7182..47a1fe9fcd 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/step/spi/EntityReader.java
 @@ -400,7 +400,7 @@ else if ( lowerBound != null ) {
@@ -95,7 +95,7 @@ index ed05db3af4..a30c55ae41 100644
  		}
  
 diff --git a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
-index e7132835a4..377dc213e0 100644
+index e7132835a4..e5cdce650e 100644
 --- a/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
 +++ b/main/java/org/hibernate/search/batch/jsr352/core/massindexing/util/impl/PersistenceUtil.java
 @@ -18,7 +18,7 @@
@@ -112,7 +112,7 @@ index e7132835a4..377dc213e0 100644
  		SessionFactoryImplementor sessionFactory = entityManagerFactory.unwrap( SessionFactoryImplementor.class );
  		List<EntityTypeDescriptor> result = new ArrayList<>( types.size() );
 -		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-+		MappingMetamodel metamodel = sessionFactory.getMetamodel();
++		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
  		for ( Class<?> type : types ) {
  			result.add( createDescriptor( metamodel, type ) );
  		}
