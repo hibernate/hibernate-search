@@ -194,6 +194,8 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '18', testCompilerTool: 'OpenJDK 18 Latest',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(version: '19', testCompilerTool: 'OpenJDK 19 Latest',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			compiler: [
