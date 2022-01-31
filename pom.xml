@@ -2359,8 +2359,6 @@
                 </property>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK16 yet. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make BytecodeEnhancementIT and mockito-based tests pass -->
                 <surefire.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
@@ -2381,8 +2379,6 @@
                 </property>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK17 yet. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make BytecodeEnhancementIT and mockito-based tests pass -->
                 <surefire.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
