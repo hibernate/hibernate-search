@@ -2351,17 +2351,6 @@
         </profile>
 
         <profile>
-            <id>jdk16+</id>
-            <activation>
-                <jdk>[16,)</jdk>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK16+ yet. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>testWithJdk16</id>
             <activation>
                 <property>
