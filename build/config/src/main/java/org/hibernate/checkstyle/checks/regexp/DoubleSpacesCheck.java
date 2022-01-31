@@ -50,6 +50,11 @@ public class DoubleSpacesCheck extends AbstractCheck {
 	}
 
 	@Override
+	// Suppress deprecation warning on getFileContents()
+	// because there is no alternative for CommentSuppressor/StringSuppressor.
+	// See com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineJavaCheck.beginTree
+	// See https://github.com/checkstyle/checkstyle/issues/11166
+	@SuppressWarnings("deprecation")
 	public void beginTree(DetailAST aRootAST) {
 		initializeSuppressors( getFileContents() );
 		processLines( Arrays.asList( getLines() ) );
