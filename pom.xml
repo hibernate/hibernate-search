@@ -433,8 +433,8 @@
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
 
-	<!-- Set this through a property so that it can be overridden from the commandline -->
-	<maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
+        <!-- Set this through a property so that it can be overridden from the commandline -->
+        <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
 
         <maven.compiler.release>${java-version.main.release}</maven.compiler.release>
         <maven.compiler.testRelease>${java-version.test.release}</maven.compiler.testRelease>
@@ -2336,7 +2336,7 @@
             </activation>
             <properties>
                 <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
-		<maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
+                <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
             </properties>
         </profile>
 
