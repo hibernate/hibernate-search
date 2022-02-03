@@ -363,9 +363,14 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Lucene
 
 [NOTE]
 ====
-The returned document is not _exactly_ the one that was indexed.
+The returned document is similar to the one that was indexed.
 
-In particular:
+For example, if a value was transformed by the `toIndexedValue` method
+of a <<mapper-orm-bridge-valuebridge,value bridge>> upon indexing,
+this transformed value (after encoding) will be the value included in the document:
+Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
+
+However, there are some differences between the returned document and the one that was indexed:
 
 * Only stored fields are present.
 * Even stored fields may not have the same `FieldType` as they originally had.
@@ -373,6 +378,14 @@ In particular:
 i.e. even fields from <<mapper-orm-indexedembedded-structure-nested,nested documents>>
 are all added to same returned document.
 * <<mapper-orm-bridge-index-field-dsl-dynamic,Dynamic fields>> may be missing.
+
+If you want a projection that retrieves the value as it was in your entity upon indexing,
+use a <<search-dsl-projection-field,`field` projection>>.
+====
+
+
+[NOTE]
+====
 ====
 
 [[search-dsl-projection-extensions-lucene-explanation]]
@@ -407,6 +420,21 @@ include::components/elasticsearch-json-warning.asciidoc[]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-source]
 ----
+====
+
+[NOTE]
+====
+The source is returned exactly as it appears in the response from Elasticsearch.
+In particular, Hibernate Search will not apply any kind of the conversions
+described in <<search-dsl-projected-value-type>>.
+
+For example, if a value was transformed by the `toIndexedValue` method
+of a <<mapper-orm-bridge-valuebridge,value bridge>> upon indexing,
+this transformed value will be the value included in the source:
+Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
+
+If you want a projection that retrieves the value as it was in your entity upon indexing,
+use a <<search-dsl-projection-field,`field` projection>>.
 ====
 
 [[search-dsl-projection-extensions-elasticsearch-explanation]]
