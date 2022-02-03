@@ -366,8 +366,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedd
 
 Indexed-embedded fields can be structured in one of two ways,
 configured through the `structure` attribute of the `@IndexedEmbedded` annotation.
-To illustrate structure options, let's consider the following object tree,
-assuming the class `Book` is annotated with `@Indexed`
+To illustrate structure options, let's assume the class `Book` is annotated with `@Indexed`
 and its `authors` property is annotated with  `@IndexedEmbedded`:
 
 * Book instance
@@ -383,10 +382,26 @@ and its `authors` property is annotated with  `@IndexedEmbedded`:
 [[mapper-orm-indexedembedded-structure-flattened]]
 === [[mapper-orm-indexedembedded-storage-flattened]] `DEFAULT` or `FLATTENED` structure
 
-By default, indexed-embedded fields are "flattened",
+By default, or when using `@IndexedEmbedded(structure = FLATTENED)` as shown below,
+indexed-embedded fields are "flattened",
 meaning that the tree structure is not preserved.
 
-The book instance mentioned above would be indexed with a structure roughly similar to this:
+.`@IndexedEmbedded` with a flattened structure
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/flattened/Book.java[tags=include;!getters-setters]
+----
+<1> Explicitly set the structure of indexed-embedded to `FLATTENED`.
+This is not strictly necessary, since `FLATTENED` is the default.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/flattened/Author.java[tags=include;!getters-setters]
+----
+====
+
+The book instance mentioned earlier would be indexed with a structure roughly similar to this:
 
  * Book document
  ** title = Leviathan Wakes
@@ -400,18 +415,44 @@ the knowledge of which last name corresponds to which first name has been lost.
 This is more efficient for indexing and querying,
 but can cause unexpected behavior when querying the index
 on both the author's first name and the author's last name.
-The book given in example
-would show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
-even though "Ty Abraham" is not one of this book's authors.
+
+For example, the book instance described above
+*would* show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
+even though "Ty Abraham" is not one of this book's authors:
+
+.Searching with a flattened structure
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/flattened/IndexedEmbeddedStructureFlattenedIT.java[tags=include]
+----
+<1> Require that hits have an author with the first name `Ty` and an author with the last name `Abraham`...
+but not necessarily the same author!
+<2> The hits will include a book whose authors are "Ty Daniel" and "Frank Abraham".
+====
 
 [[mapper-orm-indexedembedded-structure-nested]]
 === [[mapper-orm-indexedembedded-storage-nested]] `NESTED` structure
 
-When indexed-embedded elements are "nested",
+When indexed-embedded elements are "nested", i.e. when using `@IndexedEmbedded(structure = NESTED)` as shown below,
 the tree structure is preserved by transparently creating one separate "nested" document
 for each indexed-embedded element.
 
-The book instance mentioned above would be indexed with a structure roughly similar to this:
+.`@IndexedEmbedded` with a nested structure
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/nested/Book.java[tags=include;!getters-setters]
+----
+<1> Explicitly set the structure of indexed-embedded objects to `NESTED`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/nested/Author.java[tags=include;!getters-setters]
+----
+====
+
+The book instance mentioned earlier would be indexed with a structure roughly similar to this:
 
  * Book document
  ** title = Leviathan Wakes
@@ -435,9 +476,21 @@ If special care is taken when building predicates on fields within nested docume
 using a <<search-dsl-predicate-nested,`nested` predicate>>,
 queries containing predicates on both the author's first name and the author's last name
 will behave as one would (intuitively) expect.
-The book given in example
+
+For example, the book instance described above
 would *not* show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
-as long as a `nested` predicate is used.
+thanks to the `nested` predicate (which can only be used when indexing with the `NESTED` structure):
+
+.Searching with a nested structure
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/structure/nested/IndexedEmbeddedStructureNestedIT.java[tags=include]
+----
+<1> Require that the two constraints (first name and last name) apply to the *same* author.
+<2> Require that hits have an author with the first name `Ty` and an author with the last name `Abraham`.
+<3> The hits will *not* include a book whose authors are "Ty Daniel" and "Frank Abraham".
+====
 
 [[mapper-orm-indexedembedded-programmatic]]
 == Programmatic mapping
