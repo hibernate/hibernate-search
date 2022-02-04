@@ -568,7 +568,7 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 		null // No JDK needed for Elasticsearch: the Elasticsearch instance is remote.
 	}
 	String getNameEmbeddableVersion() {
-		version.replaceAll('\\.', '')
+		version.replaceAll('\\.', '-')
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
