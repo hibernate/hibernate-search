@@ -762,7 +762,7 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	@Override
 	String getTag() { "elasticsearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
 	String getNameEmbeddableVersion() {
-		version.replaceAll('\\.', '')
+		version.replaceAll('\\.', '-')
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
