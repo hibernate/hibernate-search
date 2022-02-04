@@ -11,6 +11,10 @@ pipeline {
 	agent {
 		label 'Worker&&Containers'
 	}
+	tools {
+		maven 'Apache Maven 3.8'
+		jdk 'OpenJDK 11 Latest'
+	}
 	options {
 		disableConcurrentBuilds(abortPrevious: false)
 	}
