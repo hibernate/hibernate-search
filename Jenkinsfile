@@ -268,6 +268,8 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE)
 			],
 			esAws: [
+					// --------------------------------------------
+					// AWS Elasticsearch service (OpenDistro)
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6',
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0',
@@ -299,8 +301,13 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '7.10', mavenProfile: 'elasticsearch-7.10',
 							condition: TestCondition.AFTER_MERGE),
 
+					// --------------------------------------------
+					// AWS OpenSearch service
+					new OpenSearchEsAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
+							condition: TestCondition.AFTER_MERGE),
+
 					// Also test static credentials, but only for the latest version
-					new EsAwsBuildEnvironment(version: '7.10', mavenProfile: 'elasticsearch-7.10',
+					new OpenSearchEsAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
 							staticCredentials: true,
 							condition: TestCondition.AFTER_MERGE)
 			]
@@ -766,6 +773,15 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
+	}
+}
+
+class OpenSearchEsAwsBuildEnvironment extends EsAwsBuildEnvironment {
+	@Override
+	String getTag() { "opensearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
+	@Override
+	String getLockedResourcesLabel() {
+		"opensearch-aws-${nameEmbeddableVersion}"
 	}
 }
 
