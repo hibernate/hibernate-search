@@ -267,13 +267,11 @@ stage('Configure') {
 					new OpenSearchEsLocalBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.2',
 							condition: TestCondition.AFTER_MERGE)
 			],
-			// Note that each of these environments will only be tested if the appropriate
-			// environment variable with the AWS ES Service URL is defined in CI.
 			esAws: [
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6',
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
 					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
 					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0',
@@ -283,21 +281,21 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.3',
 							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.4',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.4',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.8',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.8',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '7.10', mavenProfile: 'elasticsearch-7.10',
 							condition: TestCondition.AFTER_MERGE),
 
@@ -372,20 +370,6 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 	}
 	else {
 		keepOnlyEnvironmentsFromSet(params.ENVIRONMENT_SET)
-	}
-
-	environments.content.esAws.enabled.removeAll { buildEnv ->
-		buildEnv.endpointUris = env.getProperty(buildEnv.endpointVariableName)
-		if (!buildEnv.endpointUris) {
-			echo "Skipping test ${buildEnv.tag} because environment variable '${buildEnv.endpointVariableName}' is not defined."
-			return true
-		}
-		buildEnv.awsRegion = env.ES_AWS_REGION
-		if (!buildEnv.awsRegion) {
-			echo "Skipping test ${buildEnv.tag} because environment variable 'ES_AWS_REGION' is not defined."
-			return true
-		}
-		return false // Environment is fully defined, do not remove
 	}
 
 	// Determine whether ITs need to be run in the default build
@@ -609,11 +593,8 @@ stage('Non-default environments') {
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
 	environments.content.esAws.enabled.each { EsAwsBuildEnvironment buildEnv ->
-		if (!buildEnv.endpointUris) {
-			throw new IllegalStateException("Unexpected empty endpoint URI")
-		}
-		if (!buildEnv.awsRegion) {
-			throw new IllegalStateException("Unexpected empty AWS region")
+		if (!env.ES_AWS_REGION) {
+			throw new IllegalStateException("Environment variable ES_AWS_REGION is not set")
 		}
 		def awsCredentialsId = null
 		if (buildEnv.staticCredentials) {
@@ -623,7 +604,7 @@ stage('Non-default environments') {
 			}
 		}
 		executions.put(buildEnv.tag, {
-			lock(label: buildEnv.lockedResourcesLabel) {
+			lock(label: buildEnv.lockedResourcesLabel, variable: 'LOCKED_RESOURCE_URI') {
 				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
 					if (awsCredentialsId == null) {
 						// By default, rely on credentials provided by the EC2 infrastructure
@@ -646,9 +627,9 @@ stage('Non-default environments') {
 											'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
 											 ].join(',')} \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-										-Dtest.elasticsearch.connection.uris=$buildEnv.endpointUris \
+										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
-										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
+										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
 									"""
 							}
 						}
@@ -683,7 +664,7 @@ stage('Non-default environments') {
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 										-Dtest.elasticsearch.connection.uris=$buildEnv.endpointUris \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
-										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
+										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
 										-Dtest.elasticsearch.connection.aws.credentials.type=static \
 										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=\${AWS_ACCESS_KEY_ID} \
 										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=\${AWS_SECRET_ACCESS_KEY} \
@@ -777,16 +758,11 @@ class OpenSearchEsLocalBuildEnvironment extends EsLocalBuildEnvironment {
 class EsAwsBuildEnvironment extends BuildEnvironment {
 	String version
 	String mavenProfile
-	String endpointUris = null
-	String awsRegion = null
 	boolean staticCredentials = false
 	@Override
 	String getTag() { "elasticsearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
 	String getNameEmbeddableVersion() {
 		version.replaceAll('\\.', '')
-	}
-	String getEndpointVariableName() {
-		"ES_AWS_${nameEmbeddableVersion}_ENDPOINT"
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
