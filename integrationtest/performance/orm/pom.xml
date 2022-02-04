@@ -21,6 +21,12 @@
     <description>Hibernate Search ORM Performance Tests</description>
 
     <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+
         <!--
         Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
         -->
@@ -216,19 +222,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.wildfly.build</groupId>

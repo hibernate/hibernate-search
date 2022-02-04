@@ -22,8 +22,12 @@
     <description>Hibernate Search Build-Related Reports</description>
 
     <properties>
+        <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
+
         <!--
         Disable the dependency convergence rule, because the dependencies of various integration tests do not converge
         -->

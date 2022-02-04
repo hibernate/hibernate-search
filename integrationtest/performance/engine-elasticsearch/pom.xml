@@ -18,6 +18,14 @@
     <artifactId>hibernate-search-performance-engine-elasticsearch</artifactId>
     <name>Hibernate Search Engine-Elasticsearch Performance Testing</name>
     <description>Performance testing for the Hibernate Search engine module with an Elasticsearch backend</description>
+
+    <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
  
     <dependencies>
         <dependency>

@@ -22,6 +22,12 @@
     <description>Hibernate Search integration tests with Spring Framework and JTA</description>
 
     <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Override the version of Hibernate ORM in Spring Boot (5.1 or something as I'm writing this) -->
@@ -138,19 +144,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

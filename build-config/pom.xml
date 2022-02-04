@@ -18,6 +18,12 @@
     <description>Configuration for the build of Hibernate Search</description>
 
     <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+
         <!--
             This module generates the rules used in the Checkstyle and ForbiddenAPIs plugins,
             so obviously we cannot use those rules while building this module.
@@ -25,23 +31,6 @@
         <checkstyle.skip>true</checkstyle.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>

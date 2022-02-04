@@ -18,6 +18,14 @@
     <artifactId>hibernate-search-performance-engine-lucene</artifactId>
     <name>Hibernate Search Engine-Lucene Performance Testing</name>
     <description>Performance testing for the Hibernate Search engine module with an embedded Lucene backend</description>
+
+    <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
  
     <dependencies>
         <dependency>
@@ -74,19 +82,6 @@
                          </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.bsc.maven</groupId>

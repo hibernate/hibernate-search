@@ -22,6 +22,12 @@
     <description>The Hibernate Search reference manual</description>
 
     <properties>
+        <!-- Skip artifact deployment -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <gpg.skip>true</gpg.skip>
+        <!-- Skip javadoc generation -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
@@ -33,11 +39,6 @@
         <html.google-analytics.tag-manager.id>GTM-NJWS5L</html.google-analytics.tag-manager.id>
         <html.google-analytics.tag-manager.channel>Hibernate</html.google-analytics.tag-manager.channel>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
-
-        <!-- Skip artifact deployment -->
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <!-- Skip javadoc generation -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <build>
