@@ -202,13 +202,13 @@ stage('Configure') {
 			],
 			esAws: [
 					new EsAwsBuildEnvironment(version: '2.3', mavenProfile: 'elasticsearch-2.2',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '5.1', mavenProfile: 'elasticsearch-5.0',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '5.3', mavenProfile: 'elasticsearch-5.2',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '5.5', mavenProfile: 'elasticsearch-5.2',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.2',
 							condition: TestCondition.AFTER_MERGE)
 			]
@@ -277,20 +277,6 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 	}
 	else {
 		keepOnlyEnvironmentsFromSet(params.ENVIRONMENT_SET)
-	}
-
-	environments.content.esAws.enabled.removeAll { buildEnv ->
-		buildEnv.endpointUrl = env.getProperty(buildEnv.endpointVariableName)
-		if (!buildEnv.endpointUrl) {
-			echo "Skipping test ${buildEnv.tag} because environment variable '${buildEnv.endpointVariableName}' is not defined."
-			return true
-		}
-		buildEnv.awsRegion = env.ES_AWS_REGION
-		if (!buildEnv.awsRegion) {
-			echo "Skipping test ${buildEnv.tag} because environment variable 'ES_AWS_REGION' is not defined."
-			return true
-		}
-		return false // Environment is fully defined, do not remove
 	}
 
 	// Determine whether ITs need to be run in the default build
@@ -427,18 +413,15 @@ stage('Non-default environments') {
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
 	environments.content.esAws.enabled.each { EsAwsBuildEnvironment buildEnv ->
-		if (!buildEnv.endpointUrl) {
-			throw new IllegalStateException("Unexpected empty endpoint URL")
-		}
-		if (!buildEnv.awsRegion) {
-			throw new IllegalStateException("Unexpected empty AWS region")
+		if (!env.ES_AWS_REGION) {
+			throw new IllegalStateException("Environment variable ES_AWS_REGION is not set")
 		}
 		def awsCredentialsId = helper.configuration.file?.aws?.credentials
 		if (!awsCredentialsId) {
 			throw new IllegalStateException("Missing AWS credentials")
 		}
 		executions.put(buildEnv.tag, {
-			lock(label: buildEnv.lockedResourcesLabel) {
+			lock(label: buildEnv.lockedResourcesLabel, variable: 'LOCKED_RESOURCE_URI') {
 				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
 						// WARNING: Make sure credentials are evaluated by sh, not Groovy.
@@ -456,11 +439,11 @@ stage('Non-default environments') {
 								mavenNonDefaultBuild buildEnv, """ \
 									clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
 									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-									-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
+									-Dtest.elasticsearch.host.url=$env.LOCKED_RESOURCE_URI \
 									-Dtest.elasticsearch.host.aws.signing.enabled=true \
 									-Dtest.elasticsearch.host.aws.access_key=\${AWS_ACCESS_KEY_ID} \
 									-Dtest.elasticsearch.host.aws.secret_key=\${AWS_SECRET_ACCESS_KEY} \
-									-Dtest.elasticsearch.host.aws.region=$buildEnv.awsRegion \
+									-Dtest.elasticsearch.host.aws.region=$env.ES_AWS_REGION \
 								"""
 							}
 						}
@@ -578,8 +561,6 @@ class EsLocalBuildEnvironment extends BuildEnvironment {
 class EsAwsBuildEnvironment extends BuildEnvironment {
 	String version
 	String mavenProfile
-	String endpointUrl = null
-	String awsRegion = null
 	@Override
 	String getTag() { "elasticsearch-aws-$version" }
 	@Override
@@ -588,9 +569,6 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 	String getNameEmbeddableVersion() {
 		version.replaceAll('\\.', '')
-	}
-	String getEndpointVariableName() {
-		"ES_AWS_${nameEmbeddableVersion}_ENDPOINT"
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
