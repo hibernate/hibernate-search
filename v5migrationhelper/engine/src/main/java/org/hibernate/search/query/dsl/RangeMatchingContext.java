@@ -25,7 +25,7 @@ public interface RangeMatchingContext extends FieldCustomization<RangeMatchingCo
 	//FIXME: Is <T> correct or should we specialize to String and Numeric (or all the numeric types?
 	<T> FromRangeContext<T> from(T from);
 
-	public interface FromRangeContext<T> {
+	interface FromRangeContext<T> {
 		RangeTerminationExcludable to(T to);
 		FromRangeContext<T> excludeLimit();
 	}
