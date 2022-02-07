@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-integrationtest-jakarta</artifactId>
-        <version>6.1.2-SNAPSHOT</version>
+        <version>6.2.0-SNAPSHOT</version>
         <relativePath>../../../parents/integrationtest/pom.xml</relativePath>
     </parent>
 
