@@ -18,6 +18,7 @@ pipeline {
 		jdk 'OpenJDK 8 Latest'
 	}
 	options {
+		buildDiscarder logRotator(daysToKeepStr: '30', numToKeepStr: '10')
 		disableConcurrentBuilds(abortPrevious: false)
 	}
 	parameters {
