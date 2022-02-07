@@ -24,7 +24,7 @@ import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 
 @Field JobHelper helper
 
-@Field EsAwsBuildEnvironment esAwsBuildEnv = new EsAwsBuildEnvironment(version: "7.8")
+@Field EsAwsBuildEnvironment esAwsBuildEnv = new EsAwsBuildEnvironment(version: "7.10")
 
 this.helper = new JobHelper(this)
 
@@ -58,7 +58,7 @@ stage('Configure') {
 }
 
 lock(label: esAwsBuildEnv.lockedResourcesLabel, variable: 'LOCKED_RESOURCE_URI') {
-	node ('Performance') {
+	node (PERFORMANCE_NODE_PATTERN) {
 		stage ('Checkout') {
 			checkout scm
 		}
