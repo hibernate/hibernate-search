@@ -669,7 +669,7 @@ stage('Non-default environments') {
 										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-										-Dtest.elasticsearch.connection.uris=$buildEnv.endpointUris \
+										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
 										-Dtest.elasticsearch.connection.aws.credentials.type=static \

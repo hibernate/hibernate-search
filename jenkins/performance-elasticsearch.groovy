@@ -52,21 +52,12 @@ stage('Configure') {
 			helper.generateNotificationProperty()
 	])
 
-	esAwsBuildEnv.endpointUris = env.getProperty(esAwsBuildEnv.endpointVariableName)
-	if (!esAwsBuildEnv.endpointUris) {
-		throw new IllegalStateException(
-				"Cannot run performance test because environment variable '$esAwsBuildEnv.endpointVariableName' is not defined."
-		)
-	}
-	esAwsBuildEnv.awsRegion = env.ES_AWS_REGION
-	if (!esAwsBuildEnv.awsRegion) {
-		throw new IllegalStateException(
-				"Cannot run performance test because environment variable 'ES_AWS_REGION' is not defined."
-		)
+	if (!env.ES_AWS_REGION) {
+		throw new IllegalStateException("Environment variable ES_AWS_REGION is not set")
 	}
 }
 
-lock(label: esAwsBuildEnv.lockedResourcesLabel) {
+lock(label: esAwsBuildEnv.lockedResourcesLabel, variable: 'LOCKED_RESOURCE_URI') {
 	node ('Performance') {
 		stage ('Checkout') {
 			checkout scm
@@ -101,9 +92,9 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 					sh """ \
 							java \
 							-jar benchmarks.jar \
-							-jvmArgsAppend -Duris=$esAwsBuildEnv.endpointUris \
+							-jvmArgsAppend -Duris=$env.LOCKED_RESOURCE_URI \
 							-jvmArgsAppend -Daws.signing.enabled=true \
-							-jvmArgsAppend -Daws.region=$esAwsBuildEnv.awsRegion \
+							-jvmArgsAppend -Daws.region=$env.ES_AWS_REGION \
 							-jvmArgsAppend -Daws.credentials.type=static \
 							-jvmArgsAppend -Daws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
 							-jvmArgsAppend -Daws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
@@ -124,13 +115,8 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 
 class EsAwsBuildEnvironment {
 	String version
-	String endpointUris = null
-	String awsRegion = null
 	String getNameEmbeddableVersion() {
-		version.replaceAll('\\.', '')
-	}
-	String getEndpointVariableName() {
-		"ES_AWS_${nameEmbeddableVersion}_ENDPOINT"
+		version.replaceAll('\\.', '-')
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
