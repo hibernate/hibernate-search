@@ -14,8 +14,6 @@ import groovy.transform.Field
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
-import org.hibernate.jenkins.pipeline.helpers.version.Version
-
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
  *
@@ -328,7 +326,7 @@ stage('Configure') {
 
 	properties([
 			buildDiscarder(
-					logRotator(daysToKeepStr: '90')
+					logRotator(daysToKeepStr: '30', numToKeepStr: '10')
 			),
 			disableConcurrentBuilds(abortPrevious: true),
 			pipelineTriggers(
