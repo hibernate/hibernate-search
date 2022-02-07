@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.1.Final (2022-02-07)
+-------------------------
+
+** Improvement
+    * HSEARCH-4465 Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.CR1
+    * HSEARCH-4462 Upgrade to Hibernate ORM 5.6.5.Final
+
+** Task
+    * HSEARCH-4479 Clean up rendundant "public" modifiers
+    * HSEARCH-4478 Run tests against AWS OpenSearch service
+    * HSEARCH-4472 Move the release job to a separate Jenkinsfile
+    * HSEARCH-4470 Add mapping code examples to the documentation of @IndexedEmbedded.structure
+    * HSEARCH-4469 Test Hibernate Search against OpenJDK 19
+    * HSEARCH-4468 Upgrade to slf4j 1.7.35
+    * HSEARCH-4467 Upgrade build dependencies to the latest version
+    * HSEARCH-4464 Document that custom bridges or projection converters are not applied to fields for source()/document() projections
+    * HSEARCH-4463 Upgrade to H2 2.1.210 in tests
+    * HSEARCH-4461 Fix typos and grammar in documentation
+    * HSEARCH-4222 Re-enable forbiddenapis on JDK16/JDK17+
+    * HSEARCH-3244 Simplify configuration of AWS Elasticsearch endpoints in the Jenkins CI
+
 6.1.0.Final (2022-01-25)
 -------------------------
 
