@@ -39,10 +39,6 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder autoClose();
 
-	@Deprecated
-	@Override
-	FullTextSharedSessionBuilder transactionContext();
-
 	@Override
 	FullTextSharedSessionBuilder interceptor(Interceptor interceptor);
 
