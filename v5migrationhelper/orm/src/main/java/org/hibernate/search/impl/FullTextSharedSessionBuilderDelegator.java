@@ -62,13 +62,6 @@ class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuil
 		return this;
 	}
 
-	@Deprecated
-	@Override
-	public FullTextSharedSessionBuilder transactionContext() {
-		builder.transactionContext();
-		return this;
-	}
-
 	@Override
 	public FullTextSharedSessionBuilder interceptor(Interceptor interceptor) {
 		builder.interceptor( interceptor );
