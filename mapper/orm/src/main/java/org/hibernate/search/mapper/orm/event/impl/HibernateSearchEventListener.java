@@ -363,7 +363,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	 */
 	@Override
 	@SuppressWarnings("deprecation") // Deprecated but abstract, so we have to implement it...
-	public boolean requiresPostCommitHanding(EntityPersister persister) {
+	public boolean requiresPostCommitHandling(EntityPersister persister) {
 		// TODO Tests seem to pass using _false_ but we might be able to take
 		// advantage of this new hook?
 		return false;
