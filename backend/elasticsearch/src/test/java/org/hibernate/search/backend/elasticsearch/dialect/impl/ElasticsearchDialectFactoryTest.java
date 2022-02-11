@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch56ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch6ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch56ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch60ProtocolDialect;
@@ -21,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch64ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -569,29 +571,63 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3563")
+	public void elastic_7_18_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.ELASTIC, "7.18.0", "7.18.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4475")
 	public void elastic_8() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.ELASTIC, "8", "8.0.0",
-				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
 		);
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3563")
+	@TestForIssue(jiraKey = "HSEARCH-4475")
 	public void elastic_8_0() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.ELASTIC, "8.0", "8.0.0",
-				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
 		);
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2748")
+	@TestForIssue(jiraKey = "HSEARCH-4475")
 	public void elastic_8_0_0() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.ELASTIC, "8.0.0", "8.0.0",
-				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4475")
+	public void elastic_8_1() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.ELASTIC, "8.1", "8.1.0",
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4475")
+	public void elastic_8_1_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.ELASTIC, "8.1.0", "8.1.0",
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
+		);
+	}
+
+	@Test
+	public void elastic_9_0_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.ELASTIC, "9.0.0", "9.0.0",
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
 		);
 	}
 
