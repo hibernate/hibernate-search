@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +36,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.codec.Charsets;
 import org.apache.http.Header;
 import org.apache.http.nio.ContentEncoder;
 
@@ -156,7 +156,7 @@ public class GsonHttpEntityTest {
 			builder.append( "\n" );
 		}
 		this.expectedPayloadString = builder.toString();
-		this.expectedContentLength = Charsets.UTF_8.encode( expectedPayloadString ).limit();
+		this.expectedContentLength = StandardCharsets.UTF_8.encode( expectedPayloadString ).limit();
 	}
 
 	@Test
@@ -244,7 +244,7 @@ public class GsonHttpEntityTest {
 			while ( !contentEncoder.isCompleted() ) {
 				entity.produceContent( contentEncoder, StubIOControl.INSTANCE );
 			}
-			return outputStream.toString( Charsets.UTF_8.name() );
+			return outputStream.toString( StandardCharsets.UTF_8.name() );
 		}
 		finally {
 			entity.close();
@@ -254,13 +254,13 @@ public class GsonHttpEntityTest {
 	private String doWriteTo(GsonHttpEntity entity) throws IOException {
 		try ( ByteArrayOutputStream outputStream = new ByteArrayOutputStream() ) {
 			entity.writeTo( outputStream );
-			return outputStream.toString( Charsets.UTF_8.name() );
+			return outputStream.toString( StandardCharsets.UTF_8.name() );
 		}
 	}
 
 	private String doGetContent(GsonHttpEntity entity) throws IOException {
 		try ( InputStream inputStream = entity.getContent();
-				Reader reader = new InputStreamReader( inputStream, Charsets.UTF_8 );
+				Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 );
 				BufferedReader bufferedReader = new BufferedReader( reader ) ) {
 			StringBuilder builder = new StringBuilder();
 			int read;
