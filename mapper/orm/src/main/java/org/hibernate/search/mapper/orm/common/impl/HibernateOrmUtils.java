@@ -22,6 +22,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.Property;
 import org.hibernate.metamodel.MappingMetamodel;
+import org.hibernate.metamodel.mapping.EntityMappingType;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -82,8 +83,7 @@ public final class HibernateOrmUtils {
 		return metamodel.getEntityDescriptor( rootEntityName );
 	}
 
-	public static EntityPersister toMostSpecificCommonEntitySuperType(MappingMetamodel metamodel,
-			EntityPersister type1, EntityPersister type2) {
+	public static EntityPersister toMostSpecificCommonEntitySuperType(EntityPersister type1, EntityPersister type2) {
 		/*
 		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
 		 * For example there may be class hierarchies such as A > B > C
@@ -93,9 +93,8 @@ public final class HibernateOrmUtils {
 		 */
 		EntityPersister superTypeCandidate = type1;
 		while ( superTypeCandidate != null && !isSuperTypeOf( superTypeCandidate, type2 ) ) {
-			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
-			superTypeCandidate = superSuperTypeEntityName == null ? null
-					: metamodel.getEntityDescriptor( superSuperTypeEntityName ).getEntityPersister();
+			EntityMappingType superSuperType = superTypeCandidate.getSuperMappingType();
+			superTypeCandidate = superSuperType == null ? null : superSuperType.getEntityPersister();
 		}
 		if ( superTypeCandidate == null ) {
 			throw new AssertionFailure(
@@ -119,7 +118,7 @@ public final class HibernateOrmUtils {
 		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
 		int concreteSubTypesCount = 0;
 		for ( String subClassEntityName : subClassEntityNames ) {
-			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
+			if ( !metamodel.getEntityDescriptor( subClassEntityName ).isAbstract() ) {
 				++concreteSubTypesCount;
 			}
 		}
