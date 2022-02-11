@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch56ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch6ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch7ModelDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch8ModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch56ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch60ProtocolDialect;
@@ -20,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch64ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -55,8 +57,11 @@ public class ElasticsearchDialectFactory {
 		else if ( major == 6 ) {
 			return new Elasticsearch6ModelDialect();
 		}
-		else {
+		else if ( major == 7 ) {
 			return new Elasticsearch7ModelDialect();
+		}
+		else {
+			return new Elasticsearch8ModelDialect();
 		}
 	}
 
@@ -112,12 +117,15 @@ public class ElasticsearchDialectFactory {
 		else if ( major == 6 ) {
 			return createProtocolDialectElasticV6( version, minor );
 		}
+		else if ( major == 7 ) {
+			return createProtocolDialectElasticV7( version, minor );
+		}
+		else if ( major == 8 ) {
+			return createProtocolDialectElasticV8( version, minor );
+		}
 		else {
-			// Either the latest supported version, or a newer/unknown one
-			if ( major != 7 ) {
-				log.unknownElasticsearchVersion( version );
-			}
-			return new Elasticsearch70ProtocolDialect();
+			log.unknownElasticsearchVersion( version );
+			return new Elasticsearch80ProtocolDialect();
 		}
 	}
 
@@ -149,17 +157,31 @@ public class ElasticsearchDialectFactory {
 		return new Elasticsearch67ProtocolDialect();
 	}
 
+	private ElasticsearchProtocolDialect createProtocolDialectElasticV7(ElasticsearchVersion version, int minor) {
+		if ( minor > 17 ) {
+			log.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch70ProtocolDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectElasticV8(ElasticsearchVersion version, int minor) {
+		if ( minor > 0 ) {
+			log.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch80ProtocolDialect();
+	}
+
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearch(ElasticsearchVersion version) {
 		int major = version.major();
 
 		if ( major < 1 ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
+		else if ( major == 1 ) {
+			return new Elasticsearch70ProtocolDialect();
+		}
 		else {
-			// Either the latest supported version, or a newer/unknown one
-			if ( major != 1 ) {
-				log.unknownElasticsearchVersion( version );
-			}
+			log.unknownElasticsearchVersion( version );
 			return new Elasticsearch70ProtocolDialect();
 		}
 	}

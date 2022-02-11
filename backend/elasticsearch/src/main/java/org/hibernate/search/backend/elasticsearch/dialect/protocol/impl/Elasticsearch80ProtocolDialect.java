@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
 /**
- * The protocol dialect for Elasticsearch 7.0 and later 7.x.
+ * The protocol dialect for Elasticsearch 8.0 and later 8.x.
  */
-public class Elasticsearch70ProtocolDialect implements ElasticsearchProtocolDialect {
+public class Elasticsearch80ProtocolDialect implements ElasticsearchProtocolDialect {
 
 	@Override
 	public ElasticsearchIndexMetadataSyntax createIndexMetadataSyntax() {
