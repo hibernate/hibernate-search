@@ -254,7 +254,9 @@ stage('Configure') {
 					// and that was deemed a bug: https://github.com/elastic/elasticsearch/pull/53127
 					new EsLocalBuildEnvironment(versionRange: '[7.11,7.12)', mavenProfile: 'elasticsearch-7.11',
 							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[7.12,7.x)', mavenProfile: 'elasticsearch-7.12',
+					new EsLocalBuildEnvironment(versionRange: '[7.12,8.0)', mavenProfile: 'elasticsearch-7.12',
+							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(versionRange: '[8.0,8.x)', mavenProfile: 'elasticsearch-8.0',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 
