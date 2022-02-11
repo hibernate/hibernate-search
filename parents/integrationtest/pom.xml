@@ -568,9 +568,20 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 7.12+ test environment -->
+        <!-- Elasticsearch 7.12 to 7.17 test environment -->
         <profile>
             <id>elasticsearch-7.12</id>
+            <properties>
+                <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
+                <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.17}</test.elasticsearch.connection.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 8.0+ test environment -->
+        <profile>
+            <id>elasticsearch-8.0</id>
             <activation>
                 <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
                 <property>
@@ -580,7 +591,7 @@
             <properties>
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
-                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.17}</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-8.0}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
