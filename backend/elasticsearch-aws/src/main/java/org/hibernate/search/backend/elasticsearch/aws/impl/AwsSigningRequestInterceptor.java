@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
@@ -118,7 +118,7 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		int queryStart = pathAndQuery.indexOf( '?' );
 		if ( queryStart >= 0 ) {
 			path = pathAndQuery.substring( 0, queryStart );
-			queryParameters = URLEncodedUtils.parse( pathAndQuery.substring( queryStart + 1 ), Charsets.UTF_8 );
+			queryParameters = URLEncodedUtils.parse( pathAndQuery.substring( queryStart + 1 ), StandardCharsets.UTF_8 );
 		}
 		else {
 			path = pathAndQuery;
