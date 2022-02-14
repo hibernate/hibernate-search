@@ -58,7 +58,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
@@ -103,7 +103,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
@@ -148,7 +148,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									+ "'min_gram': 1,"
 									+ "'max_gram': 10"
 							+ "}"
@@ -188,7 +188,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
@@ -230,7 +230,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					// missing: 'char_filter'
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									+ "'min_gram': 1,"
 									+ "'max_gram': 10"
 							+ "}"
@@ -270,7 +270,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
@@ -322,7 +322,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									+ "'min_gram': 1,"
 									+ "'max_gram': 10"
 							+ "}"
@@ -362,7 +362,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
@@ -411,7 +411,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									+ "'min_gram': 1,"
 									+ "'max_gram': 10"
 							+ "}"
@@ -451,7 +451,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it

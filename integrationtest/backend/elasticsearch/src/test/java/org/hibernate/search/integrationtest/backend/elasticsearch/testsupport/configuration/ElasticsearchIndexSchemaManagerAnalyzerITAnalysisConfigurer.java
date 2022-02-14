@@ -22,7 +22,7 @@ public class ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer impleme
 				.param( "replacement", "0" )
 				.param( "tags", "CASE_INSENSITIVE|COMMENTS" );
 		context.tokenizer( "custom-edgeNGram" )
-				.type( "edgeNGram" )
+				.type( "edge_ngram" )
 				.param( "min_gram", 1 )
 				.param( "max_gram", 10 );
 		context.tokenFilter( "custom-keep-types" )

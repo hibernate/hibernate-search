@@ -88,7 +88,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
@@ -168,7 +168,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 					+ "},"
 					+ "'tokenizer': {"
 							+ "'custom-edgeNGram': {"
-									+ "'type': 'edgeNGram',"
+									+ "'type': 'edge_ngram',"
 									/*
 									 * Strangely enough, even if you send properly typed numbers
 									 * to Elasticsearch, when you ask for the current settings it
