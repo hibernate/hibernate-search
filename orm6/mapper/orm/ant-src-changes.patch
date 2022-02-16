@@ -34,19 +34,20 @@ index 289a060c28..60e392d528 100644
  				.build();
  		// Orchestrate bootstrap and shutdown
 diff --git a/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java b/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
-index d61af877f4..116de2331f 100644
+index d6ed099098..e3fee26f2c 100644
 --- a/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
 +++ b/main/java/org/hibernate/search/mapper/orm/common/impl/HibernateOrmUtils.java
-@@ -21,7 +21,7 @@
+@@ -21,7 +21,8 @@
  import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.engine.spi.SessionImplementor;
  import org.hibernate.mapping.Property;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
 +import org.hibernate.metamodel.MappingMetamodel;
++import org.hibernate.metamodel.mapping.EntityMappingType;
  import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.search.mapper.orm.logging.impl.Log;
  import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
-@@ -77,12 +77,12 @@ public static EntityPersister toRootEntityType(SessionFactoryImplementor session
+@@ -77,13 +78,12 @@ public static EntityPersister toRootEntityType(SessionFactoryImplementor session
  		 * where A and C are entity types and B is a mapped superclass.
  		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
  		 */
@@ -58,20 +59,24 @@ index d61af877f4..116de2331f 100644
  	}
  
 -	public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
-+	public static EntityPersister toMostSpecificCommonEntitySuperType(MappingMetamodel metamodel,
- 			EntityPersister type1, EntityPersister type2) {
+-			EntityPersister type1, EntityPersister type2) {
++	public static EntityPersister toMostSpecificCommonEntitySuperType(EntityPersister type1, EntityPersister type2) {
  		/*
  		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
-@@ -95,7 +95,7 @@ public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImple
+ 		 * For example there may be class hierarchies such as A > B > C
+@@ -93,9 +93,8 @@ public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImple
+ 		 */
+ 		EntityPersister superTypeCandidate = type1;
  		while ( superTypeCandidate != null && !isSuperTypeOf( superTypeCandidate, type2 ) ) {
- 			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
- 			superTypeCandidate = superSuperTypeEntityName == null ? null
+-			String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
+-			superTypeCandidate = superSuperTypeEntityName == null ? null
 -					: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
-+					: metamodel.getEntityDescriptor( superSuperTypeEntityName ).getEntityPersister();
++			EntityMappingType superSuperType = superTypeCandidate.getSuperMappingType();
++			superTypeCandidate = superSuperType == null ? null : superSuperType.getEntityPersister();
  		}
  		if ( superTypeCandidate == null ) {
  			throw new AssertionFailure(
-@@ -116,10 +116,10 @@ public static boolean hasAtMostOneConcreteSubType(SessionFactoryImplementor sess
+@@ -116,10 +115,10 @@ public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessi
  			return true;
  		}
  
@@ -80,45 +85,39 @@ index d61af877f4..116de2331f 100644
  		int concreteSubTypesCount = 0;
  		for ( String subClassEntityName : subClassEntityNames ) {
 -			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
-+			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
- 				if ( ++concreteSubTypesCount > 1 ) {
- 					return false;
- 				}
-@@ -137,10 +137,10 @@ public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessi
- 			return true;
- 		}
- 
--		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-+		MappingMetamodel metamodel = sessionFactory.getMappingMetamodel();
- 		int concreteSubTypesCount = 0;
- 		for ( String subClassEntityName : subClassEntityNames ) {
--			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
-+			if ( !metamodel.getEntityDescriptor( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
++			if ( !metamodel.getEntityDescriptor( subClassEntityName ).isAbstract() ) {
  				++concreteSubTypesCount;
  			}
  		}
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
-index 21503d08be..4d35daf39e 100644
+index 21503d08be..45b9fc0a50 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,6 @@
  import org.hibernate.AssertionFailure;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
  import org.hibernate.engine.spi.SessionImplementor;
 -import org.hibernate.metamodel.spi.MetamodelImplementor;
-+import org.hibernate.metamodel.MappingMetamodel;
  import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
  import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-@@ -149,7 +149,7 @@ private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
+@@ -149,7 +148,6 @@ private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
  
  	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
  			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 -		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
-+		MappingMetamodel metamodel = session.getSessionFactory().getMappingMetamodel();
  		EntityPersister result = null;
  		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
  			EntityPersister type = targetTypeContext.entityPersister();
+@@ -157,7 +155,7 @@ private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplem
+ 				result = type;
+ 			}
+ 			else {
+-				result = HibernateOrmUtils.toMostSpecificCommonEntitySuperType( metamodel, result, type );
++				result = HibernateOrmUtils.toMostSpecificCommonEntitySuperType( result, type );
+ 			}
+ 		}
+ 		return result;
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 index 39df0c5a24..159eb3207c 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
