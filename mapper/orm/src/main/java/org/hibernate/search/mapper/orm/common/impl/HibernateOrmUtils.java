@@ -107,27 +107,6 @@ public final class HibernateOrmUtils {
 		return superTypeCandidate;
 	}
 
-	public static boolean hasAtMostOneConcreteSubType(SessionFactoryImplementor sessionFactory,
-			EntityPersister parentType) {
-		@SuppressWarnings("unchecked")
-		Set<String> subClassEntityNames = parentType.getEntityMetamodel().getSubclassEntityNames();
-		// Quick check to return true immediately if there's only one type
-		if ( subClassEntityNames.size() == 1 ) {
-			return true;
-		}
-
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		int concreteSubTypesCount = 0;
-		for ( String subClassEntityName : subClassEntityNames ) {
-			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
-				if ( ++concreteSubTypesCount > 1 ) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
 			EntityPersister parentType, Collection<?> targetConcreteSubTypes) {
 		@SuppressWarnings("unchecked")

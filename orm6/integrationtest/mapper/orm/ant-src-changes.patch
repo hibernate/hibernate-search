@@ -879,7 +879,7 @@ index c032664bb9..4d205fdccf 100644
  				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
  				.withAnnotatedTypes( IndexedEntity.class );
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
-index 1bf135620e..97da0239d0 100644
+index 798418f3a9..bbfc99e232 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
 @@ -19,7 +19,7 @@
@@ -896,9 +896,9 @@ index 1bf135620e..97da0239d0 100644
  		// Hibernate Search started successfully.
  		// Check that there actually is a backref:
 -		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
--		assertThat( metamodel.entityPersister( IndexedEntity.class ).getEntityMetamodel().getPropertyNames() )
+-		assertThat( metamodel.entityPersister( IndexedEntity.class ).getPropertyNames() )
 +		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMappingMetamodel();
-+		assertThat( metamodel.getEntityDescriptor( IndexedEntity.class ).getEntityMetamodel().getPropertyNames() )
++		assertThat( metamodel.getEntityDescriptor( IndexedEntity.class ).getPropertyNames() )
  				.contains( "_containing_fk_containingidBackref" )
  				.contains( "_containingIndexBackref" );
  
@@ -942,7 +942,7 @@ index d110dbb171..0796b95350 100644
  
  		@OneToMany(mappedBy = "genericProperty")
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
-index fd7d546f8f..42625565bc 100644
+index 43bed0bfd6..16115098af 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 @@ -19,7 +19,7 @@
@@ -959,9 +959,9 @@ index fd7d546f8f..42625565bc 100644
  		// Hibernate Search started successfully.
  		// Check that there actually is a synthetic property:
 -		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
--		assertThat( metamodel.entityPersister( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
+-		assertThat( metamodel.entityPersister( ContainedEntity.class ).getPropertyNames() )
 +		MappingMetamodel metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMappingMetamodel();
-+		assertThat( metamodel.getEntityDescriptor( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
++		assertThat( metamodel.getEntityDescriptor( ContainedEntity.class ).getPropertyNames() )
  				.contains( "_" + IndexedEntity.class.getName().replace( '.', '_' ) + "_contained" );
  
  		// If we get here the bug was solved, but let's at least check that indexing works
