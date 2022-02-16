@@ -57,7 +57,7 @@ public class SyntheticPropertyIT {
 		// Hibernate Search started successfully.
 		// Check that there actually is a synthetic property:
 		MetamodelImplementor metamodel = sessionFactory.unwrap( SessionFactoryImplementor.class ).getMetamodel();
-		assertThat( metamodel.entityPersister( ContainedEntity.class ).getEntityMetamodel().getPropertyNames() )
+		assertThat( metamodel.entityPersister( ContainedEntity.class ).getPropertyNames() )
 				.contains( "_" + IndexedEntity.class.getName().replace( '.', '_' ) + "_contained" );
 
 		// If we get here the bug was solved, but let's at least check that indexing works

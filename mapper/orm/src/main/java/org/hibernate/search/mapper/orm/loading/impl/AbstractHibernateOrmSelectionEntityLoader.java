@@ -13,7 +13,6 @@ import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.Deadline;
-import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchQueryHints;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
@@ -23,7 +22,6 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 	protected final EntityPersister entityPersister;
 	protected final LoadingSessionContext sessionContext;
 	protected final MutableEntityLoadingOptions loadingOptions;
-	protected final boolean singleConcreteTypeInHierarchy;
 	protected final TypeQueryFactory<E, ?> queryFactory;
 
 	public AbstractHibernateOrmSelectionEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
@@ -31,8 +29,6 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 		this.entityPersister = entityPersister;
 		this.sessionContext = sessionContext;
 		this.loadingOptions = loadingOptions;
-		this.singleConcreteTypeInHierarchy = HibernateOrmUtils.hasAtMostOneConcreteSubType(
-				sessionContext.session().getSessionFactory(), entityPersister );
 		this.queryFactory = queryFactory;
 	}
 
