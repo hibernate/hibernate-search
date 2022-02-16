@@ -38,6 +38,7 @@ org.hibernate.SharedSessionContract#getTransaction() @ Using this method is ofte
 org.hibernate.jpa.QueryHints @ Hibernate ORM's QueryHints constants may not be correct for Jakarta artifacts.
 org.hibernate.annotations.QueryHints @ Hibernate ORM's QueryHints constants may not be correct for Jakarta artifacts.
 org.hibernate.service.ServiceRegistry#getService(java.lang.Class) @ Use HibernateOrmUtils.getServiceOrFail(...) or HibernateOrmUtils.getServiceOrEmpty(...) instead
+org.hibernate.tuple.entity.EntityMetamodel @ Use other mapping classes (e.g. EntityPersister) instead
 
 ################################################################################################################
 # Use our Contracts class instead
