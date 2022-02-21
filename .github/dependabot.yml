@@ -30,3 +30,7 @@ updates:
       - dependency-name: org.asciidoctor:asciidoctorj-pdf
       # We strictly align this dependency on the version used in Hibernate ORM.
       - dependency-name: org.jboss:jandex
+      # Newer majors of Weld follow the Jakarta specification (jakarta.* packages),
+      # but we follow Java EE (javax.* packages) for now.
+      - dependency-name: "org.jboss.weld.se:*"
+        update-types: ["version-update:semver-major"]
