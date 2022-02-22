@@ -323,9 +323,12 @@ public class CustomPropertyMappingAnnotationBaseIT {
 		backendMock.verifyExpectationsMet();
 
 		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext ).isNotNull();
+		// Ideally we would not need a regexp here,
+		// but the annotation can be rendered differently depending on the JDK in use...
+		// See https://bugs.openjdk.java.net/browse/JDK-8282230
 		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext.render() )
-				.isEqualTo( "type '" + IndexedEntityType.class.getName() + "', path '.text', annotation '@"
-						+ EventContextAwareAnnotation.class.getName() + "()'" );
+				.matches( "\\Qtype '" + IndexedEntityType.class.getName() + "', path '.text', annotation '@\\E.*"
+						+ EventContextAwareAnnotation.class.getSimpleName() + "\\Q()\\E'" );
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
