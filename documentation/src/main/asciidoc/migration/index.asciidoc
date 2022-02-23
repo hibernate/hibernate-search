@@ -3503,7 +3503,7 @@ In Hibernate Search 5, they are at the `TRACE` level.
 [[default-similarity]]
 === The default similarity for Lucene is now BM25
 
-The default similarity for the Lucene is now `BM25Similarity`, instead of `ClassicSimilarity` in Hibernate Search 5.
+The default similarity for the Lucene backend is now `BM25Similarity`, instead of `ClassicSimilarity` in Hibernate Search 5.
 
 If necessary, you can force the `ClassicSimilarity`
 through an <<analysis-definition-provider,analysis definition provider>>.
