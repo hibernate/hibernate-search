@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,6 +47,16 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 	public final boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof AbstractPojoHCAnnRawTypeModel
 				&& ( (AbstractPojoHCAnnRawTypeModel<?, ?>) other ).xClass.isAssignableFrom( xClass );
+	}
+
+	@Override
+	public Optional<PojoTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
+		return rawTypeDeclaringContext.typeArgument( rawSuperType, typeParameterIndex );
+	}
+
+	@Override
+	public Optional<PojoTypeModel<?>> arrayElementType() {
+		return rawTypeDeclaringContext.arrayElementType();
 	}
 
 	@Override

@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
@@ -27,7 +27,7 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 	private final HibernateOrmBasicDynamicMapPropertyMetadata ormPropertyMetadata;
 
 	private ValueReadHandle<T> handle;
-	private PojoGenericTypeModel<T> typeModel;
+	private PojoTypeModel<T> typeModel;
 
 	HibernateOrmDynamicMapPropertyModel(HibernateOrmBootstrapIntrospector introspector,
 			HibernateOrmDynamicMapRawTypeModel holderTypeModel,
@@ -51,10 +51,10 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // We will just trust ORM metadata on this one.
-	public PojoGenericTypeModel<T> typeModel() {
+	public PojoTypeModel<T> typeModel() {
 		if ( typeModel == null ) {
 			try {
-				typeModel = (PojoGenericTypeModel<T>) ormPropertyMetadata.getTypeModelFactory().create( introspector );
+				typeModel = (PojoTypeModel<T>) ormPropertyMetadata.getTypeModelFactory().create( introspector );
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e.getMessage(), e );

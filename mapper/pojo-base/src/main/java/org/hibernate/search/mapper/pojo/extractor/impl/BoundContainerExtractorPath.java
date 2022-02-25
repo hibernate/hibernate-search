@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * A {@link ContainerExtractorPath} bound to a given source type.
@@ -24,16 +24,16 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * @param <V> The extracted value type
  */
 public class BoundContainerExtractorPath<C, V> {
-	public static <V> BoundContainerExtractorPath<V, V> noExtractors(PojoGenericTypeModel<V> sourceType) {
+	public static <V> BoundContainerExtractorPath<V, V> noExtractors(PojoTypeModel<V> sourceType) {
 		return new BoundContainerExtractorPath<>(
 				ContainerExtractorPath.noExtractors(), sourceType
 		);
 	}
 
 	private final ContainerExtractorPath extractorPath;
-	private final PojoGenericTypeModel<V> extractedType;
+	private final PojoTypeModel<V> extractedType;
 
-	BoundContainerExtractorPath(ContainerExtractorPath extractorPath, PojoGenericTypeModel<V> extractedType) {
+	BoundContainerExtractorPath(ContainerExtractorPath extractorPath, PojoTypeModel<V> extractedType) {
 		this.extractorPath = extractorPath;
 		this.extractedType = extractedType;
 	}
@@ -42,7 +42,7 @@ public class BoundContainerExtractorPath<C, V> {
 		return extractorPath;
 	}
 
-	public PojoGenericTypeModel<V> getExtractedType() {
+	public PojoTypeModel<V> getExtractedType() {
 		return extractedType;
 	}
 }

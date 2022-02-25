@@ -13,7 +13,6 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -23,7 +22,7 @@ public class TypePatternMatcherFactory {
 
 	/**
 	 * @param introspector An introspector to use for reflection,
-	 * mainly for {@link PojoBootstrapIntrospector#genericTypeModel(Class)}
+	 * mainly for {@link PojoBootstrapIntrospector#typeModel(Class)}.
 	 */
 	public TypePatternMatcherFactory(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
@@ -99,7 +98,7 @@ public class TypePatternMatcherFactory {
 			);
 		}
 		PojoRawTypeModel<?> typePatternModel = introspector.typeModel( typePattern );
-		PojoGenericTypeModel<?> typeToExtractModel = introspector.genericTypeModel( (Class<?>) typeToExtract );
+		PojoRawTypeModel<?> typeToExtractModel = introspector.typeModel( (Class<?>) typeToExtract );
 		return new ConstantExtractingTypePatternMatcherAdapter(
 				new RawSuperTypeMatcher( typePatternModel ),
 				typeToExtractModel

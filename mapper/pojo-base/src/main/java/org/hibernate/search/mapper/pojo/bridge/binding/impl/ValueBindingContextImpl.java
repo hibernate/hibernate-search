@@ -29,8 +29,8 @@ import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Closer;
@@ -45,7 +45,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 	private final PojoBootstrapIntrospector introspector;
 
-	private final PojoGenericTypeModel<V> valueTypeModel;
+	private final PojoTypeModel<V> valueTypeModel;
 	private final boolean multiValued;
 	private final PojoModelValue<V> bridgedElement;
 
@@ -59,7 +59,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 	public ValueBindingContextImpl(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
-			PojoGenericTypeModel<V> valueTypeModel, boolean multiValued,
+			PojoTypeModel<V> valueTypeModel, boolean multiValued,
 			IndexBindingContext indexBindingContext,
 			IndexFieldTypeDefaultsProvider defaultsProvider,
 			String relativeFieldName, FieldModelContributor contributor,

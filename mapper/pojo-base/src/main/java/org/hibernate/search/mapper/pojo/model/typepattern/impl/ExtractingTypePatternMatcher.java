@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * A pattern-matching implementation for generic types that also extracts a type from matching types.
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 public interface ExtractingTypePatternMatcher extends TypePatternMatcher {
 
 	@Override
-	default boolean matches(PojoGenericTypeModel<?> typeToInspect) {
+	default boolean matches(PojoTypeModel<?> typeToInspect) {
 		return extract( typeToInspect ).isPresent();
 	}
 
@@ -31,6 +31,6 @@ public interface ExtractingTypePatternMatcher extends TypePatternMatcher {
 	 * @param typeToInspect A type that may, or may not, match the pattern.
 	 * @return The extracted type if there was a match, or an empty {@link Optional} otherwise.
 	 */
-	Optional<? extends PojoGenericTypeModel<?>> extract(PojoGenericTypeModel<?> typeToInspect);
+	Optional<? extends PojoTypeModel<?>> extract(PojoTypeModel<?> typeToInspect);
 
 }

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPa
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public final class PojoMappingConfigurationContextImpl implements PojoMappingConfigurationContext {
 
@@ -23,7 +23,7 @@ public final class PojoMappingConfigurationContextImpl implements PojoMappingCon
 	}
 
 	@Override
-	public Optional<PojoGenericTypeModel<?>> extractedValueType(PojoGenericTypeModel<?> sourceType,
+	public Optional<PojoTypeModel<?>> extractedValueType(PojoTypeModel<?> sourceType,
 				ContainerExtractorPath extractorPath) {
 		return extractorBinder.tryBindPath( sourceType, extractorPath )
 				.map( BoundContainerExtractorPath::getExtractedType );

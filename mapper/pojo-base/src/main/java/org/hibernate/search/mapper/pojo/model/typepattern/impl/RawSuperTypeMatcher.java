@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 class RawSuperTypeMatcher implements TypePatternMatcher {
 	private final PojoRawTypeModel<?> matchedRawType;
@@ -22,7 +22,7 @@ class RawSuperTypeMatcher implements TypePatternMatcher {
 	}
 
 	@Override
-	public boolean matches(PojoGenericTypeModel<?> typeToInspect) {
+	public boolean matches(PojoTypeModel<?> typeToInspect) {
 		return typeToInspect.rawType().isSubTypeOf( matchedRawType );
 	}
 }

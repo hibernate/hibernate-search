@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 import java.lang.reflect.TypeVariable;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 class ParameterizedTypeArgumentMatcher implements ExtractingTypePatternMatcher {
 	private final Class<?> matchedRawType;
@@ -42,7 +42,7 @@ class ParameterizedTypeArgumentMatcher implements ExtractingTypePatternMatcher {
 
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> extract(PojoGenericTypeModel<?> typeToInspect) {
+	public Optional<? extends PojoTypeModel<?>> extract(PojoTypeModel<?> typeToInspect) {
 		return typeToInspect.typeArgument( matchedRawType, resultTypeParameterIndex );
 	}
 }

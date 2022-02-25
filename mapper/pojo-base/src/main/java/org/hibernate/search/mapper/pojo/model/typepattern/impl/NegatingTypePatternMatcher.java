@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 class NegatingTypePatternMatcher implements TypePatternMatcher {
 	private final TypePatternMatcher delegate;
@@ -21,7 +21,7 @@ class NegatingTypePatternMatcher implements TypePatternMatcher {
 	}
 
 	@Override
-	public boolean matches(PojoGenericTypeModel<?> typeToInspect) {
+	public boolean matches(PojoTypeModel<?> typeToInspect) {
 		return !delegate.matches( typeToInspect );
 	}
 }

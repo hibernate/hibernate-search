@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.typepattern.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * A pattern-matching implementation for generic types.
@@ -23,7 +23,7 @@ public interface TypePatternMatcher {
 	 * @param typeToInspect A type that may, or may not, match the pattern.
 	 * @return {@code true} in the event of a match, {@code false} otherwise.
 	 */
-	boolean matches(PojoGenericTypeModel<?> typeToInspect);
+	boolean matches(PojoTypeModel<?> typeToInspect);
 
 	default TypePatternMatcher negate() {
 		return new NegatingTypePatternMatcher( this );

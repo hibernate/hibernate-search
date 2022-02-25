@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -71,8 +70,8 @@ public class PojoAssociationPathInverterTest {
 		when( originalSideEntityTypeMock.rawType() )
 				.thenReturn( (PojoRawTypeModel) originalSideEntityTypeMock );
 
-		PojoGenericTypeModel<?> originalSidePropertyTypeMock =
-				mock( PojoGenericTypeModel.class, "originalSidePropertyTypeMock" );
+		PojoTypeModel<?> originalSidePropertyTypeMock =
+				mock( PojoTypeModel.class, "originalSidePropertyTypeMock" );
 		setupPropertyStub(
 				originalSideEntityTypeMock, originalSidePropertyName, originalSidePropertyTypeMock
 		);
@@ -111,16 +110,16 @@ public class PojoAssociationPathInverterTest {
 		when( inverseSideEntityTypeMock.name() )
 				.thenReturn( "inverseSideEntityTypeMock" );
 
-		PojoGenericTypeModel<?> inverseSideProperty1TypeMock =
-				mock( PojoGenericTypeModel.class, "inverseSideProperty1TypeMock" );
+		PojoTypeModel<?> inverseSideProperty1TypeMock =
+				mock( PojoTypeModel.class, "inverseSideProperty1TypeMock" );
 		setupPropertyStub(
 				inverseSideEntityTypeMock, inverseSideProperty1Name, inverseSideProperty1TypeMock
 		);
 		when( inverseSideProperty1TypeMock.rawType() )
 				.thenReturn( (PojoRawTypeModel) inverseSideEmbeddableType1Mock );
 
-		PojoGenericTypeModel<?> inverseSideProperty2TypeMock =
-				mock( PojoGenericTypeModel.class, "inverseSideProperty2TypeMock" );
+		PojoTypeModel<?> inverseSideProperty2TypeMock =
+				mock( PojoTypeModel.class, "inverseSideProperty2TypeMock" );
 		setupPropertyStub(
 				inverseSideProperty1TypeMock, inverseSideProperty2Name, inverseSideProperty2TypeMock
 		);
@@ -155,7 +154,7 @@ public class PojoAssociationPathInverterTest {
 		// Let's not complicate things any further: assume that all extractor paths are noExtractors() paths
 		when( extractorBinderMock.bindPath( any(), Mockito.eq( ContainerExtractorPath.noExtractors() ) ) )
 				.thenAnswer( invocationOnMock -> {
-					PojoGenericTypeModel<?> sourceType = invocationOnMock.getArgument( 0 );
+					PojoTypeModel<?> sourceType = invocationOnMock.getArgument( 0 );
 					return BoundContainerExtractorPath.noExtractors( sourceType );
 				} );
 
@@ -180,13 +179,13 @@ public class PojoAssociationPathInverterTest {
 	}
 
 	private void setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
-			PojoGenericTypeModel<?> propertyTypeMock) {
+			PojoTypeModel<?> propertyTypeMock) {
 		PojoPropertyModel<?> propertyModelMock = mock( PojoPropertyModel.class, propertyName + "ModelMock" );
 		when( holdingTypeMock.property( propertyName ) )
 				.thenReturn( (PojoPropertyModel) propertyModelMock );
 		when( propertyModelMock.name() ).thenReturn( propertyName );
 		when( propertyModelMock.typeModel() )
-				.thenReturn( (PojoGenericTypeModel) propertyTypeMock );
+				.thenReturn( (PojoTypeModel) propertyTypeMock );
 	}
 
 	private void setupSingletonEmbeddedPropertiesAdditionalMetadataStub(PojoTypeAdditionalMetadata typeAdditionalMetadata, String propertyName) {

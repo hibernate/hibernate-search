@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -42,7 +42,7 @@ public abstract class AbstractPojoHCAnnPropertyModel<T, I extends AbstractPojoHC
 	private final List<Member> members;
 
 	private ValueReadHandle<T> handleCache;
-	private PojoGenericTypeModel<T> typeModelCache;
+	private PojoTypeModel<T> typeModelCache;
 	private Member memberCache;
 
 	public AbstractPojoHCAnnPropertyModel(I introspector, AbstractPojoHCAnnRawTypeModel<?, I> holderTypeModel,
@@ -71,11 +71,11 @@ public abstract class AbstractPojoHCAnnPropertyModel<T, I extends AbstractPojoHC
 	 * match the actual type for this property.
 	 */
 	@SuppressWarnings( "unchecked" )
-	public final PojoGenericTypeModel<T> typeModel() {
+	public final PojoTypeModel<T> typeModel() {
 		if ( typeModelCache == null ) {
 			try {
-				typeModelCache = (PojoGenericTypeModel<T>) holderTypeModel.rawTypeDeclaringContext
-						.createGenericTypeModel( getterGenericReturnType() );
+				typeModelCache = (PojoTypeModel<T>) holderTypeModel.rawTypeDeclaringContext
+						.propertyType( getterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
