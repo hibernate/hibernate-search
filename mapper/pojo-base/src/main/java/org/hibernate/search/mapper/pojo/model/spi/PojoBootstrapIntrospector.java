@@ -27,13 +27,6 @@ public interface PojoBootstrapIntrospector {
 	PojoRawTypeModel<?> typeModel(String name);
 
 	/**
-	 * @param clazz The Java class representing the raw version of the type
-	 * @param <T> The type
-	 * @return A type model for the given type.
-	 */
-	<T> PojoGenericTypeModel<T> genericTypeModel(Class<T> clazz);
-
-	/**
 	 * @return A {@link ValueReadHandleFactory} for reading annotation attributes.
 	 */
 	ValueReadHandleFactory annotationValueReadHandleFactory();

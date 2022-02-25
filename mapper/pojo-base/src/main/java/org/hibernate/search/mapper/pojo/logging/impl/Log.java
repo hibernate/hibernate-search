@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -216,7 +215,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidContainerExtractorForType(
 			String extractorName,
 			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> extractorClass,
-			@FormatWith(PojoTypeModelFormatter.class) PojoGenericTypeModel<?> extractedType);
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> extractedType);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET + 17,

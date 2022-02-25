@@ -139,7 +139,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			Map<String, HibernateOrmBasicDynamicMapPropertyMetadata> collectedProperties,
 			Property property) {
 		// This also recurses and collects embedded types
-		HibernateOrmGenericTypeModelFactory<?> typeModelFactory =
+		HibernateOrmTypeModelFactory<?> typeModelFactory =
 				collectValue( metadataProviderBuilder, property.getValue() );
 		collectedProperties.put(
 				property.getName(),
@@ -147,19 +147,19 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		);
 	}
 
-	private static HibernateOrmGenericTypeModelFactory<?> collectValue(Builder metadataProviderBuilder, Value value) {
+	private static HibernateOrmTypeModelFactory<?> collectValue(Builder metadataProviderBuilder, Value value) {
 		if ( value instanceof Component ) {
 			return collectEmbedded( metadataProviderBuilder, (Component) value );
 		}
 		else if ( value instanceof org.hibernate.mapping.Array ) {
 			org.hibernate.mapping.Array array = (org.hibernate.mapping.Array) value;
-			return HibernateOrmGenericTypeModelFactory.array(
+			return HibernateOrmTypeModelFactory.array(
 					collectValue( metadataProviderBuilder, array.getElement() )
 			);
 		}
 		else if ( value instanceof org.hibernate.mapping.Map ) {
 			org.hibernate.mapping.Map map = (org.hibernate.mapping.Map) value;
-			return HibernateOrmGenericTypeModelFactory.map(
+			return HibernateOrmTypeModelFactory.map(
 					map.getCollectionType().getReturnedClass(),
 					/*
 					 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
@@ -172,30 +172,30 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		}
 		else if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
-			return HibernateOrmGenericTypeModelFactory.collection(
+			return HibernateOrmTypeModelFactory.collection(
 					collection.getCollectionType().getReturnedClass(),
 					collectValue( metadataProviderBuilder, collection.getElement() )
 			);
 		}
 		else if ( value instanceof org.hibernate.mapping.ToOne ) {
 			org.hibernate.mapping.ToOne toOne = (org.hibernate.mapping.ToOne) value;
-			return HibernateOrmGenericTypeModelFactory.entityReference(
+			return HibernateOrmTypeModelFactory.entityReference(
 					toOne.getType().getReturnedClass(), toOne.getReferencedEntityName()
 			);
 		}
 		else if ( value instanceof org.hibernate.mapping.OneToMany ) {
 			org.hibernate.mapping.OneToMany oneToMany = (org.hibernate.mapping.OneToMany) value;
-			return HibernateOrmGenericTypeModelFactory.entityReference(
+			return HibernateOrmTypeModelFactory.entityReference(
 					oneToMany.getType().getReturnedClass(), oneToMany.getReferencedEntityName()
 			);
 		}
 		else {
 			// Basic type (mapped to a database column)
-			return HibernateOrmGenericTypeModelFactory.rawType( value.getType().getReturnedClass() );
+			return HibernateOrmTypeModelFactory.rawType( value.getType().getReturnedClass() );
 		}
 	}
 
-	private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder metadataProviderBuilder, Component component) {
+	private static HibernateOrmTypeModelFactory<?> collectEmbedded(Builder metadataProviderBuilder, Component component) {
 		if ( component.isDynamic() ) {
 			String name = component.getRoleName();
 			// We don't care about duplicates, we assume they are all the same regarding the information we need
@@ -206,7 +206,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 						null /* No ID */, component.getPropertyIterator()
 				);
 			}
-			return HibernateOrmGenericTypeModelFactory.dynamicMap( name );
+			return HibernateOrmTypeModelFactory.dynamicMap( name );
 		}
 		else {
 			Class<?> javaClass = component.getComponentClass();
@@ -217,7 +217,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 						null /* No ID */, component.getPropertyIterator()
 				);
 			}
-			return HibernateOrmGenericTypeModelFactory.rawType( javaClass );
+			return HibernateOrmTypeModelFactory.rawType( javaClass );
 		}
 	}
 

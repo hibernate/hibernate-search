@@ -43,7 +43,6 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 
@@ -80,7 +79,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <C> BoundContainerExtractorPath<C, ?> bindExtractorPath(
-			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath) {
+			PojoTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath) {
 		return extractorBinder.bindPath( pojoGenericTypeModel, extractorPath );
 	}
 
@@ -95,7 +94,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			Optional<IndexedEntityBindingContext> indexedEntityBindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
 			IdentifierBinder binder, Map<String, Object> params) {
-		PojoGenericTypeModel<I> identifierTypeModel = modelPath.valueWithoutExtractors().getTypeModel();
+		PojoTypeModel<I> identifierTypeModel = modelPath.valueWithoutExtractors().getTypeModel();
 
 		IdentifierBinder defaultedBinder = binder;
 		if ( binder == null ) {
@@ -177,7 +176,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		Integer decimalScale = typeAdditionalMetadataProvider.get( modelPath ).getDecimalScale();
 		IndexFieldTypeDefaultsProvider defaultsProvider = new IndexFieldTypeDefaultsProvider( decimalScale );
 
-		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();
+		PojoTypeModel<V> valueTypeModel = modelPath.getTypeModel();
 
 		ValueBinder defaultedBinder = binder;
 		if ( binder == null ) {

@@ -386,7 +386,7 @@ index c4fd693171..c2f2d35e35 100644
  	}
  
 diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
-index 14dfc36c0f..e73416a06f 100644
+index 77d7b8f982..d03fcba6e2 100644
 --- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
 +++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmBasicTypeMetadataProvider.java
 @@ -16,13 +16,14 @@
@@ -435,7 +435,7 @@ index 14dfc36c0f..e73416a06f 100644
 @@ -160,7 +161,7 @@ else if ( value instanceof org.hibernate.mapping.Array ) {
  		else if ( value instanceof org.hibernate.mapping.Map ) {
  			org.hibernate.mapping.Map map = (org.hibernate.mapping.Map) value;
- 			return HibernateOrmGenericTypeModelFactory.map(
+ 			return HibernateOrmTypeModelFactory.map(
 -					map.getCollectionType().getReturnedClass(),
 +					(Class<? extends Map<?, ?>>) map.getCollectionType().getReturnedClass(),
  					/*
@@ -444,13 +444,13 @@ index 14dfc36c0f..e73416a06f 100644
 @@ -173,7 +174,7 @@ else if ( value instanceof org.hibernate.mapping.Map ) {
  		else if ( value instanceof org.hibernate.mapping.Collection ) {
  			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
- 			return HibernateOrmGenericTypeModelFactory.collection(
+ 			return HibernateOrmTypeModelFactory.collection(
 -					collection.getCollectionType().getReturnedClass(),
 +					(Class<? extends Collection<?>>) collection.getCollectionType().getReturnedClass(),
  					collectValue( metadataProviderBuilder, collection.getElement() )
  			);
  		}
-@@ -203,7 +204,7 @@ private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder me
+@@ -203,7 +204,7 @@ private static HibernateOrmTypeModelFactory<?> collectEmbedded(Builder metadataP
  				collectDynamicMapType(
  						metadataProviderBuilder, name,
  						null, /* No supertype */
@@ -458,8 +458,8 @@ index 14dfc36c0f..e73416a06f 100644
 +						null /* No ID */, component.getProperties().iterator()
  				);
  			}
- 			return HibernateOrmGenericTypeModelFactory.dynamicMap( name );
-@@ -214,13 +215,15 @@ private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder me
+ 			return HibernateOrmTypeModelFactory.dynamicMap( name );
+@@ -214,13 +215,15 @@ private static HibernateOrmTypeModelFactory<?> collectEmbedded(Builder metadataP
  			if ( !metadataProviderBuilder.classTypeMetadata.containsKey( javaClass ) ) {
  				collectClassType(
  						metadataProviderBuilder, javaClass,
@@ -467,7 +467,7 @@ index 14dfc36c0f..e73416a06f 100644
 +						null /* No ID */, component.getProperties().iterator()
  				);
  			}
- 			return HibernateOrmGenericTypeModelFactory.rawType( javaClass );
+ 			return HibernateOrmTypeModelFactory.rawType( javaClass );
  		}
  	}
  
@@ -476,7 +476,7 @@ index 14dfc36c0f..e73416a06f 100644
  	private final Map<String, PersistentClass> persistentClasses;
  	private final Map<Class<?>, HibernateOrmBasicClassTypeMetadata> classTypeMetadata;
  	private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata;
-@@ -229,6 +232,7 @@ private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder me
+@@ -229,6 +232,7 @@ private static HibernateOrmTypeModelFactory<?> collectEmbedded(Builder metadataP
  	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
  
  	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {

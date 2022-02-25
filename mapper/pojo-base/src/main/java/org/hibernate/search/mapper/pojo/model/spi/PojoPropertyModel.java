@@ -21,7 +21,7 @@ public interface PojoPropertyModel<T> {
 	 * @return A model of this property's type. Implementations may decide to implement their own,
 	 * but could also simply use {@link GenericContextAwarePojoGenericTypeModel}.
 	 */
-	PojoGenericTypeModel<T> typeModel();
+	PojoTypeModel<T> typeModel();
 
 	ValueReadHandle<T> handle();
 

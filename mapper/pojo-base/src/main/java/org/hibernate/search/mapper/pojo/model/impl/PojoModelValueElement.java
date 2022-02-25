@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.impl;
 
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @param <T> The type used as a root element.
@@ -16,10 +16,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 public class PojoModelValueElement<T> implements PojoModelValue<T> {
 
 	private final PojoBootstrapIntrospector introspector;
-	private final PojoGenericTypeModel<? extends T> typeModel;
+	private final PojoTypeModel<? extends T> typeModel;
 
 	public PojoModelValueElement(PojoBootstrapIntrospector introspector,
-			PojoGenericTypeModel<? extends T> typeModel) {
+			PojoTypeModel<? extends T> typeModel) {
 		this.introspector = introspector;
 		this.typeModel = typeModel;
 	}

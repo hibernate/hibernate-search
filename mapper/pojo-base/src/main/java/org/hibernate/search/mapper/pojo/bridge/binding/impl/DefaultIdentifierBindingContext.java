@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -35,7 +35,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	private final PojoBootstrapIntrospector introspector;
 	private final Optional<IndexedEntityBindingContext> indexedEntityBindingContext;
 
-	private final PojoGenericTypeModel<I> identifierTypeModel;
+	private final PojoTypeModel<I> identifierTypeModel;
 	private final PojoModelValue<I> bridgedElement;
 
 	private PartialBinding<I> partialBinding;
@@ -43,7 +43,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	public DefaultIdentifierBindingContext(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
 			Optional<IndexedEntityBindingContext> indexedEntityBindingContext,
-			PojoGenericTypeModel<I> valueTypeModel, Map<String, Object> params) {
+			PojoTypeModel<I> valueTypeModel, Map<String, Object> params) {
 		super( beanResolver, params );
 		this.introspector = introspector;
 		this.indexedEntityBindingContext = indexedEntityBindingContext;

@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericConte
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -51,7 +50,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final PojoHCannOrmGenericContextHelper genericContextHelper;
-	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
 	/*
 	 * Note: the main purpose of these caches is not to improve performance,
@@ -73,9 +71,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
-		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
-				genericContextHelper, Object.class
-		);
 	}
 
 	@Override
@@ -110,11 +105,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
 		}
 		return (HibernateOrmClassRawTypeModel<T>) classTypeModelCache.computeIfAbsent( clazz, this::createClassTypeModel );
-	}
-
-	@Override
-	public <T> PojoGenericTypeModel<T> genericTypeModel(Class<T> clazz) {
-		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
 	@Override

@@ -82,8 +82,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -109,7 +109,7 @@ public final class BridgeResolver {
 		Collections.reverse( typePatternValueBridgeMappings );
 	}
 
-	public IdentifierBinder resolveIdentifierBinderForType(PojoGenericTypeModel<?> sourceType) {
+	public IdentifierBinder resolveIdentifierBinderForType(PojoTypeModel<?> sourceType) {
 		IdentifierBinder result = getBinderOrNull(
 				sourceType,
 				exactRawTypeIdentifierBridgeMappings,
@@ -121,7 +121,7 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	public ValueBinder resolveValueBinderForType(PojoGenericTypeModel<?> sourceType) {
+	public ValueBinder resolveValueBinderForType(PojoTypeModel<?> sourceType) {
 		ValueBinder result = getBinderOrNull(
 				sourceType,
 				exactRawTypeValueBridgeMappings,
@@ -133,7 +133,7 @@ public final class BridgeResolver {
 		return result;
 	}
 
-	private static <B> B getBinderOrNull(PojoGenericTypeModel<?> sourceType,
+	private static <B> B getBinderOrNull(PojoTypeModel<?> sourceType,
 			Map<PojoRawTypeIdentifier<?>, B> exactRawTypeBridgeMappings,
 			List<TypePatternBinderMapping<B>> typePatternBinderMappings) {
 		PojoRawTypeIdentifier<?> rawType = sourceType.rawType().typeIdentifier();
@@ -158,7 +158,7 @@ public final class BridgeResolver {
 			this.binder = binder;
 		}
 
-		B getBinderIfMatching(PojoGenericTypeModel<?> typeModel) {
+		B getBinderIfMatching(PojoTypeModel<?> typeModel) {
 			if ( matcher.matches( typeModel ) ) {
 				return binder;
 			}

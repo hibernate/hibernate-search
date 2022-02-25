@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public interface PojoMappingConfigurationContext {
 
@@ -19,7 +19,7 @@ public interface PojoMappingConfigurationContext {
 	 * @return The type of values extracted from the given source type with the given container extractor path,
 	 * or {@link Optional#empty()} if the path cannot be applied.
 	 */
-	Optional<PojoGenericTypeModel<?>> extractedValueType(PojoGenericTypeModel<?> sourceType,
+	Optional<PojoTypeModel<?>> extractedValueType(PojoTypeModel<?> sourceType,
 				ContainerExtractorPath extractorPath);
 
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
  * its name, ...
  * <p>
  * Most of the time, type models represent a Java class,
- * either {@link PojoRawTypeModel raw} or {@link PojoGenericTypeModel parameterized}.
+ * either {@link PojoRawTypeModel raw} or {@link GenericContextAwarePojoGenericTypeModel parameterized}.
  * However, it is also possible that a given type model
  * represents a <strong>subset</strong> of all instances of a given Java class,
  * which all follow a common convention regarding their structure.
@@ -47,5 +47,22 @@ public interface PojoTypeModel<T> {
 	 * so casting {@code List<Integer>} to {@code Collection} for example would return {@code Collection<Integer>}.
 	 */
 	<U> Optional<PojoTypeModel<? extends U>> castTo(Class<U> target);
+
+	/**
+	 * @param rawSuperType The supertype to resolve type parameters for
+	 * @param typeParameterIndex The index of the type parameter to resolve
+	 * @return The model for the type argument for the type parameter defined in {@code rawSuperType}
+	 * at index {@code typeParameterIndex}, or an empty optional if the current type
+	 * does not extend {@code rawSuperType}.
+	 * Implementations may decide to return a model of the raw type argument, or to retain generics information.
+	 */
+	Optional<? extends PojoTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex);
+
+	/**
+	 * @return The model for the array element type, or an empty optional if the current type
+	 * is not an array type.
+	 * Implementations may decide to return a model of the raw array element type, or to retain generics information.
+	 */
+	Optional<? extends PojoTypeModel<?>> arrayElementType();
 
 }

@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
-import java.util.Optional;
-
 /**
- * An abstract base for implementations of {@link PojoGenericTypeModel}.
+ * An abstract base for implementations of a {@link PojoTypeModel}
+ * representing a type with generic type parameters.
  */
-public abstract class AbstractPojoGenericTypeModel<T> implements PojoGenericTypeModel<T> {
+public abstract class AbstractPojoGenericTypeModel<T> implements PojoTypeModel<T> {
 
 	private final PojoRawTypeModel<? super T> rawTypeModel;
 
@@ -34,13 +33,4 @@ public abstract class AbstractPojoGenericTypeModel<T> implements PojoGenericType
 		return rawTypeModel.property( propertyName );
 	}
 
-	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> arrayElementType() {
-		return Optional.empty();
-	}
 }

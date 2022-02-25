@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElement
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorDefinition;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.ExtractingTypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
@@ -90,7 +90,7 @@ public class ContainerExtractorBinder {
 	 * @return The resolved extractor path, or an empty optional if
 	 * one of the extractors in the path cannot be applied.
 	 */
-	public <C> Optional<BoundContainerExtractorPath<C, ?>> tryBindPath(PojoGenericTypeModel<C> sourceType,
+	public <C> Optional<BoundContainerExtractorPath<C, ?>> tryBindPath(PojoTypeModel<C> sourceType,
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
@@ -124,7 +124,7 @@ public class ContainerExtractorBinder {
 	 * @throws SearchException if
 	 * one of the extractors in the path cannot be applied.
 	 */
-	public <C> BoundContainerExtractorPath<C, ?> bindPath(PojoGenericTypeModel<C> sourceType,
+	public <C> BoundContainerExtractorPath<C, ?> bindPath(PojoTypeModel<C> sourceType,
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
@@ -189,7 +189,7 @@ public class ContainerExtractorBinder {
 		}
 	}
 
-	public boolean isDefaultExtractorPath(PojoGenericTypeModel<?> sourceType, ContainerExtractorPath extractorPath) {
+	public boolean isDefaultExtractorPath(PojoTypeModel<?> sourceType, ContainerExtractorPath extractorPath) {
 		Optional<? extends BoundContainerExtractorPath<?, ?>> boundDefaultExtractorPathOptional =
 				tryBindPath(
 						sourceType,
@@ -254,7 +254,7 @@ public class ContainerExtractorBinder {
 
 		@Override
 		public boolean tryAppend(ExtractorResolutionState<?> state) {
-			Optional<? extends PojoGenericTypeModel<?>> resultTypeOptional =
+			Optional<? extends PojoTypeModel<?>> resultTypeOptional =
 					typePatternMatcher.extract( state.extractedType );
 			if ( resultTypeOptional.isPresent() ) {
 				state.append( extractorName, resultTypeOptional.get() );
@@ -296,13 +296,13 @@ public class ContainerExtractorBinder {
 	private static class ExtractorResolutionState<C> {
 
 		private final List<String> extractorNames = new ArrayList<>();
-		private PojoGenericTypeModel<?> extractedType;
+		private PojoTypeModel<?> extractedType;
 
-		ExtractorResolutionState(PojoGenericTypeModel<C> sourceType) {
+		ExtractorResolutionState(PojoTypeModel<C> sourceType) {
 			this.extractedType = sourceType;
 		}
 
-		void append(String extractorName, PojoGenericTypeModel<?> extractedType) {
+		void append(String extractorName, PojoTypeModel<?> extractedType) {
 			extractorNames.add( extractorName );
 			this.extractedType = extractedType;
 		}

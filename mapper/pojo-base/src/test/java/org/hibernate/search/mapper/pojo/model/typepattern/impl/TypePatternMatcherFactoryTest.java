@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
@@ -36,7 +36,7 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public void exactType() {
 		PojoRawTypeModel typeToMatchMock = mock( PojoRawTypeModel.class );
-		PojoGenericTypeModel typeToInspectMock = mock( PojoGenericTypeModel.class );
+		PojoTypeModel typeToInspectMock = mock( PojoTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
 
 		when( introspectorMock.typeModel( String.class ) )
@@ -83,7 +83,7 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public void concreteEnumType() {
 		PojoRawTypeModel enumTypeMock = mock( PojoRawTypeModel.class );
-		PojoGenericTypeModel typeToInspectMock = mock( PojoGenericTypeModel.class );
+		PojoTypeModel typeToInspectMock = mock( PojoTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
 
 		when( introspectorMock.typeModel( Enum.class ) )
@@ -146,13 +146,13 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public void rawSuperType() {
 		PojoRawTypeModel<String> typeToMatchMock = mock( PojoRawTypeModel.class );
-		PojoGenericTypeModel<Integer> resultTypeMock = mock( PojoGenericTypeModel.class );
-		PojoGenericTypeModel<?> typeToInspectMock = mock( PojoGenericTypeModel.class );
+		PojoRawTypeModel<Integer> resultTypeMock = mock( PojoRawTypeModel.class );
+		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
 
 		when( introspectorMock.typeModel( String.class ) )
 				.thenReturn( typeToMatchMock );
-		when( introspectorMock.genericTypeModel( Integer.class ) )
+		when( introspectorMock.typeModel( Integer.class ) )
 				.thenReturn( resultTypeMock );
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String.class, Integer.class );
 		assertThat( matcher ).isNotNull();
@@ -164,7 +164,7 @@ public class TypePatternMatcherFactoryTest {
 		assertThat( matcher.toString() )
 				.isEqualTo( "hasRawSuperType(THE_TYPE_TO_MATCH) => THE_RESULT_TYPE" );
 
-		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
+		Optional<? extends PojoTypeModel<?>> actualReturn;
 
 		when( typeToInspectMock.rawType() )
 				.thenReturn( typeToInspectRawTypeMock );
@@ -212,13 +212,13 @@ public class TypePatternMatcherFactoryTest {
 	@Test
 	public void nonGenericArrayElement() {
 		PojoRawTypeModel<String[]> typeToMatchMock = mock( PojoRawTypeModel.class );
-		PojoGenericTypeModel<Integer> resultTypeMock = mock( PojoGenericTypeModel.class );
-		PojoGenericTypeModel<?> typeToInspectMock = mock( PojoGenericTypeModel.class );
+		PojoRawTypeModel<Integer> resultTypeMock = mock( PojoRawTypeModel.class );
+		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
 
 		when( introspectorMock.typeModel( String[].class ) )
 				.thenReturn( typeToMatchMock );
-		when( introspectorMock.genericTypeModel( Integer.class ) )
+		when( introspectorMock.typeModel( Integer.class ) )
 				.thenReturn( resultTypeMock );
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String[].class, Integer.class );
 		assertThat( matcher ).isNotNull();
@@ -230,7 +230,7 @@ public class TypePatternMatcherFactoryTest {
 		assertThat( matcher.toString() )
 				.isEqualTo( "hasRawSuperType(THE_TYPE_TO_MATCH) => THE_RESULT_TYPE" );
 
-		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
+		Optional<? extends PojoTypeModel<?>> actualReturn;
 
 		when( typeToInspectMock.rawType() )
 				.thenReturn( typeToInspectRawTypeMock );
@@ -244,8 +244,8 @@ public class TypePatternMatcherFactoryTest {
 
 	@Test
 	public <T> void genericArrayElement() {
-		PojoGenericTypeModel<?> typeToInspectMock = mock( PojoGenericTypeModel.class );
-		PojoGenericTypeModel<T> resultTypeMock = mock( PojoGenericTypeModel.class );
+		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
+		PojoTypeModel<T> resultTypeMock = mock( PojoTypeModel.class );
 
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
 				new TypeCapture<T[]>() { }.getType(),
@@ -255,7 +255,7 @@ public class TypePatternMatcherFactoryTest {
 		assertThat( matcher.toString() )
 				.isEqualTo( "T[] => T" );
 
-		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
+		Optional<? extends PojoTypeModel<?>> actualReturn;
 
 		when( typeToInspectMock.arrayElementType() )
 				.thenReturn( (Optional) Optional.of( resultTypeMock ) );
@@ -309,8 +309,8 @@ public class TypePatternMatcherFactoryTest {
 
 	@Test
 	public <T> void parameterizedType() {
-		PojoGenericTypeModel<?> typeToInspectMock = mock( PojoGenericTypeModel.class );
-		PojoGenericTypeModel<Integer> resultTypeMock = mock( PojoGenericTypeModel.class );
+		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
+		PojoTypeModel<Integer> resultTypeMock = mock( PojoTypeModel.class );
 
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() { }.getType(),
@@ -320,7 +320,7 @@ public class TypePatternMatcherFactoryTest {
 		assertThat( matcher.toString() )
 				.isEqualTo( "java.util.Map<?, T> => T" );
 
-		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
+		Optional<? extends PojoTypeModel<?>> actualReturn;
 
 		when( typeToInspectMock.typeArgument( Map.class, 1 ) )
 				.thenReturn( (Optional) Optional.of( resultTypeMock ) );

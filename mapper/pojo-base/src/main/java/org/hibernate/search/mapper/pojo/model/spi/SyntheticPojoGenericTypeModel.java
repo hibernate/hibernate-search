@@ -13,33 +13,34 @@ import java.util.Optional;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
- * An abstract base for implementations of {@link PojoGenericTypeModel}.
+ * A synthetic implementation of {@link PojoTypeModel},
+ * i.e. one that is not bound to an actual Java type, but simulates one.
  */
 public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericTypeModel<T> {
 
-	public static <T> PojoGenericTypeModel<T[]> array(PojoRawTypeModel<? super T[]> rawTypeModel,
-			PojoGenericTypeModel<T> elementType) {
+	public static <T> PojoTypeModel<T[]> array(PojoRawTypeModel<? super T[]> rawTypeModel,
+			PojoTypeModel<T> elementType) {
 		return new SyntheticPojoGenericTypeModel<>( rawTypeModel, elementType, Collections.emptyList() );
 	}
 
-	public static <T> PojoGenericTypeModel<T> genericType(PojoRawTypeModel<? super T> rawTypeModel,
-			PojoGenericTypeModel<?> firstTypeArgument, PojoGenericTypeModel<?> ... otherTypeArguments) {
+	public static <T> PojoTypeModel<T> genericType(PojoRawTypeModel<? super T> rawTypeModel,
+			PojoTypeModel<?> firstTypeArgument, PojoTypeModel<?> ... otherTypeArguments) {
 		return new SyntheticPojoGenericTypeModel<>( rawTypeModel, null,
 				CollectionHelper.asList( firstTypeArgument, otherTypeArguments ) );
 	}
 
 	// For types that should not report implementing an interface, even though they do
 	// Example: dynamic Map types, that should not be treated as maps when it comes to container extractors.
-	public static <T> PojoGenericTypeModel<T> opaqueType(PojoRawTypeModel<T> rawTypeModel) {
+	public static <T> PojoTypeModel<T> opaqueType(PojoRawTypeModel<T> rawTypeModel) {
 		return new SyntheticPojoGenericTypeModel<>( rawTypeModel, null, Collections.emptyList() );
 	}
 
-	private final PojoGenericTypeModel<?> arrayElementType;
-	private final List<PojoGenericTypeModel<?>> genericTypeArguments;
+	private final PojoTypeModel<?> arrayElementType;
+	private final List<PojoTypeModel<?>> genericTypeArguments;
 
 	private SyntheticPojoGenericTypeModel(PojoRawTypeModel<? super T> rawTypeModel,
-			PojoGenericTypeModel<?> arrayElementType,
-			List<PojoGenericTypeModel<?>> genericTypeArguments) {
+			PojoTypeModel<?> arrayElementType,
+			List<PojoTypeModel<?>> genericTypeArguments) {
 		super( rawTypeModel );
 		this.arrayElementType = arrayElementType;
 		this.genericTypeArguments = genericTypeArguments;
@@ -59,7 +60,7 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 		builder.append( rawType().name() );
 		builder.append( '<' );
 		boolean first = true;
-		for ( PojoGenericTypeModel<?> genericTypeArgument : genericTypeArguments ) {
+		for ( PojoTypeModel<?> genericTypeArgument : genericTypeArguments ) {
 			if ( first ) {
 				first = false;
 			}
@@ -79,12 +80,12 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 	}
 
 	@Override
-	public Optional<PojoGenericTypeModel<?>> arrayElementType() {
+	public Optional<PojoTypeModel<?>> arrayElementType() {
 		return Optional.ofNullable( arrayElementType );
 	}
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType,
+	public Optional<? extends PojoTypeModel<?>> typeArgument(Class<?> rawSuperType,
 			int typeParameterIndex) {
 		if ( genericTypeArguments.isEmpty() ) {
 			// Raw type

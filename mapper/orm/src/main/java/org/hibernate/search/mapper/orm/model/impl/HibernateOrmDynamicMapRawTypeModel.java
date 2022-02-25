@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -54,6 +55,16 @@ public class HibernateOrmDynamicMapRawTypeModel
 	@Override
 	public Stream<PojoRawTypeModel<? super Map>> descendingSuperTypes() {
 		return Stream.concat( getSuperType().descendingSuperTypes(), Stream.of( this ) );
+	}
+
+	@Override
+	public Optional<? extends PojoTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<? extends PojoTypeModel<?>> arrayElementType() {
+		return Optional.empty();
 	}
 
 	@Override
