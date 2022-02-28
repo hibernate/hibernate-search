@@ -361,7 +361,7 @@
         <version.help.plugin>3.2.0</version.help.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.io.takari.maven>0.7.7</version.io.takari.maven>
-        <version.japicmp.plugin>0.15.6</version.japicmp.plugin>
+        <version.japicmp.plugin>0.15.7</version.japicmp.plugin>
         <version.jar.plugin>3.2.2</version.jar.plugin>
         <version.javadoc.plugin>3.3.2</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
