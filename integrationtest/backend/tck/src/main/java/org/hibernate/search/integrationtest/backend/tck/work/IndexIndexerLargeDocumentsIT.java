@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntFunction;
 
@@ -25,6 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceP
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.test.data.TextContent;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.google.common.io.Resources;
 import org.awaitility.Awaitility;
 
 /**
@@ -51,10 +50,7 @@ public class IndexIndexerLargeDocumentsIT {
 	private static final String GREAT_EXPECTATIONS;
 	static {
 		try {
-			GREAT_EXPECTATIONS = Resources.toString(
-					IndexIndexerLargeDocumentsIT.class.getResource( "/great_expectations.txt" ),
-					StandardCharsets.UTF_8
-			);
+			GREAT_EXPECTATIONS = TextContent.greatExpectations().read();
 		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
