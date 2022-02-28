@@ -48,9 +48,9 @@ final class SampleDataset implements Dataset {
 
 	public static class DataSample {
 
-		private final String shortText;
-		private final String longText;
-		private final int numeric;
+		final String shortText;
+		final String longText;
+		final int numeric;
 
 		public DataSample(String shortText, String longText, int numeric) {
 			// Just in case something turned wrong during sample generation
