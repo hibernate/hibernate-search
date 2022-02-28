@@ -25,6 +25,10 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-stub</artifactId>
         </dependency>
 
