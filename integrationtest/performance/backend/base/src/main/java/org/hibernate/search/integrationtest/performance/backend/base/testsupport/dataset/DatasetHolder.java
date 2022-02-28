@@ -8,8 +8,6 @@ package org.hibernate.search.integrationtest.performance.backend.base.testsuppor
 
 import java.io.IOException;
 
-import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
-
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -19,14 +17,14 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Benchmark)
 public class DatasetHolder {
 
-	@Param({ Datasets.HIBERNATE_DEV_ML_2016_01 })
+	@Param({ Datasets.GREAT_EXPECTATIONS })
 	private String dataset;
 
 	private Dataset datasetInstance;
 
 	@Setup(Level.Trial)
-	public void setup(TemporaryFileHolder temporaryFileHolder) throws IOException {
-		datasetInstance = Datasets.createDataset( dataset, temporaryFileHolder.getCacheDirectory() );
+	public void setup() throws IOException {
+		datasetInstance = Datasets.createDataset( dataset );
 	}
 
 	public Dataset getDataset() {
