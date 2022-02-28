@@ -26,13 +26,6 @@ public class TemporaryFileHolder {
 
 	/**
 	 * Set this system property to an alternative path if you want
-	 * cache files (downloads) to be stored in a specific place
-	 * (other than "/tmp/" + TEST_DIR_PREFIX + "cache-path").
-	 */
-	private static final String CACHE_PATH_PROPERTY_KEY = "cache-path";
-
-	/**
-	 * Set this system property to an alternative path if you want
 	 * index files to be stored in a specific place
 	 * (other than "/tmp/" + TEST_DIR_PREFIX + "indexes-path").
 	 */
@@ -49,10 +42,6 @@ public class TemporaryFileHolder {
 	@TearDown(Level.Trial)
 	public void cleanUp() throws IOException {
 		deleteAll( toCleanUp );
-	}
-
-	public Path getCacheDirectory() throws IOException {
-		return getTemporaryDirectory( CACHE_PATH_PROPERTY_KEY, false );
 	}
 
 	public Path getIndexesDirectory() throws IOException {
