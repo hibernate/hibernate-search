@@ -188,7 +188,7 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '18', testCompilerTool: 'OpenJDK 18 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '19', testCompilerTool: 'OpenJDK 19 Latest',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.ON_DEMAND)
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
