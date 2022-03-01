@@ -7,6 +7,22 @@
   -->
 <jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/rule/schema/v1.3">
 
+    <concept id="hsearch:SuppressJQAssistant">
+        <description>
+            Contributes the :SuppressJQAssistant label at the type level.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(suppressAnnotation:Type)
+            WHERE
+                suppressAnnotation.fqn = "org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant"
+            SET
+                type:SuppressJQAssistant
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
     <concept id="hsearch:MethodOverrides">
         <requiresConcept refId="java:TypeAssignableFrom" />
         <description>
@@ -637,6 +653,7 @@
     </constraint>
 
     <constraint id="hsearch:UnitTestsMustHaveProperSuffix">
+        <requiresConcept refId="hsearch:SuppressJQAssistant" />
         <requiresConcept refId="hsearch:HibernateSearch" />
         <requiresConcept refId="hsearch:IntegrationTestArtifacts" />
         <description>
@@ -650,12 +667,14 @@
                 NOT artifact:IntegrationTest
                 AND testAnnotation.fqn = "org.junit.Test"
                 AND NOT type.name ENDS WITH "Test"
+                AND NOT type:SuppressJQAssistant
             RETURN DISTINCT
                 artifact.name AS Artifact, type.fqn AS Test
         ]]></cypher>
     </constraint>
 
     <constraint id="hsearch:IntegrationTestsMustHaveProperSuffix">
+        <requiresConcept refId="hsearch:SuppressJQAssistant" />
         <requiresConcept refId="hsearch:HibernateSearch" />
         <requiresConcept refId="hsearch:IntegrationTestArtifacts" />
         <description>
@@ -668,6 +687,7 @@
             WHERE
                 testAnnotation.fqn = "org.junit.Test"
                 AND NOT type.name ENDS WITH "IT"
+                AND NOT type:SuppressJQAssistant
             RETURN DISTINCT
                 artifact.name AS Artifact, type.fqn AS Test
         ]]></cypher>
