@@ -24,6 +24,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.SortNatural;
@@ -492,6 +493,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -502,6 +504,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedMapValuesBaseIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexed")
 		@GenericField

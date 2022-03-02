@@ -18,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.cfg.AvailableSettings;
@@ -443,6 +444,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "indexedECF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -453,6 +455,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingEagerOnBothSidesIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexedECF")
 		@GenericField
