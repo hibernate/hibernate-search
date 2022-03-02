@@ -23,6 +23,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.SortNatural;
@@ -463,6 +464,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -473,6 +475,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingSortedSetBaseIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexed")
 		@GenericField

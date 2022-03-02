@@ -19,6 +19,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingAssociationBaseIT;
@@ -448,6 +449,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "indexedECF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -458,6 +460,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexedECF")
 		@GenericField

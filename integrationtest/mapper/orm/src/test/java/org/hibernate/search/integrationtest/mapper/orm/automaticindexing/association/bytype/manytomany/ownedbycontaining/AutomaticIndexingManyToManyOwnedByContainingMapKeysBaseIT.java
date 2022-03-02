@@ -25,6 +25,7 @@ import javax.persistence.MapKeyClass;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingAssociationBaseIT;
@@ -608,6 +609,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -618,6 +620,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingMapKeysBaseIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexed")
 		@GenericField

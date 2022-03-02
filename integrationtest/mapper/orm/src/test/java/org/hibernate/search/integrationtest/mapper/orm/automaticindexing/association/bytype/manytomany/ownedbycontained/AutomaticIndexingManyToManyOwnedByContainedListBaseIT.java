@@ -21,6 +21,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingMultiValuedAssociationBaseIT;
@@ -421,42 +422,42 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		@JoinTable(name = "i_containedIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "contained"),
 				inverseJoinColumns = @JoinColumn(name = "containing"))
-		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		private List<ContainingEntity> containingAsIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_containedNonIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "contained"),
 				inverseJoinColumns = @JoinColumn(name = "containing"))
-		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedShallow",
 				joinColumns = @JoinColumn(name = "contained"),
 				inverseJoinColumns = @JoinColumn(name = "containing"))
-		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_indexedEmbeddedNoReindex",
 				joinColumns = @JoinColumn(name = "contained"),
 				inverseJoinColumns = @JoinColumn(name = "containing"))
-		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "i_containedCrossEntityDP",
 				joinColumns = @JoinColumn(name = "contained"),
 				inverseJoinColumns = @JoinColumn(name = "containing"))
-		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(targetEntity = ContainingEntity.class)
 		@JoinTable(name = "i_containedIndexedEmbeddedCast",
 				joinColumns = @JoinColumn(name = "contained"),
 				inverseJoinColumns = @JoinColumn(name = "containing"))
-		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
 		@Basic
@@ -464,6 +465,7 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -474,6 +476,7 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexed")
 		@GenericField
