@@ -464,7 +464,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 		@ManyToMany
 		@JoinTable(joinColumns = @JoinColumn(name = "nonowner_id"),
 				inverseJoinColumns = @JoinColumn(name = "owner_id"))
-		@OrderColumn
+		@OrderColumn(name = "idx")
 		private List<AssociationNonOwner> manyToMany = new ArrayList<>();
 
 		AssociationOwner() {
@@ -538,7 +538,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 
 		@IndexedEmbedded(includePaths = {"basic", "elementCollection"})
 		@OneToMany(mappedBy = "manyToOne")
-		@OrderColumn
+		@OrderColumn(name = "idx")
 		private List<AssociationOwner> oneToMany = new ArrayList<>();
 
 		@IndexedEmbedded(includePaths = {"basic", "elementCollection"})
