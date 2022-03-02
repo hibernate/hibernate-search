@@ -20,7 +20,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingMultiValuedAssociationBaseIT;
@@ -411,32 +410,26 @@ public class AutomaticIndexingOneToManyListBaseIT
 		private Integer id;
 
 		@ManyToOne
-		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private ContainingEntity containingAsIndexedEmbedded;
 
 		@ManyToOne
 		@JoinColumn(name = "containedNonIndexedEmbedded")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
 		@ManyToOne
 		@JoinColumn(name = "indexedEmbeddedShallow")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
 
 		@ManyToOne
 		@JoinColumn(name = "indexedEmbeddedNoReindex")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
 
 		@ManyToOne
 		@JoinColumn(name = "containedCrossEntityDP")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
 		@ManyToOne(targetEntity = ContainingEntity.class)
 		@JoinColumn(name = "containedIndexedEmbeddedCast")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private Object containingAsIndexedEmbeddedWithCast;
 
 		@Basic
