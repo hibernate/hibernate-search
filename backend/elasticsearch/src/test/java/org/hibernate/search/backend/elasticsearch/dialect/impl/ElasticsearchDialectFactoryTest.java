@@ -591,7 +591,7 @@ public class ElasticsearchDialectFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-4475")
 	public void elastic_8_0() {
 		testSuccess(
-				ElasticsearchDistributionName.ELASTIC, "8.0", "8.0.0",
+				ElasticsearchDistributionName.ELASTIC, "8.0", "8.0.1",
 				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
 		);
 	}
@@ -601,6 +601,15 @@ public class ElasticsearchDialectFactoryTest {
 	public void elastic_8_0_0() {
 		testSuccess(
 				ElasticsearchDistributionName.ELASTIC, "8.0.0", "8.0.0",
+				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4496")
+	public void elastic_8_0_1() {
+		testSuccess(
+				ElasticsearchDistributionName.ELASTIC, "8.0.0", "8.0.1",
 				Elasticsearch8ModelDialect.class, Elasticsearch80ProtocolDialect.class
 		);
 	}
