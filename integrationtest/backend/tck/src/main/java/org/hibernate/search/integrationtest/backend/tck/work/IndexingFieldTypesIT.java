@@ -92,11 +92,10 @@ public class IndexingFieldTypesIT<F> {
 
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
-					.select( f -> f.composite(
-							(id, val) -> new IdAndValue<>( id, val ),
-							f.id( String.class ),
-							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
-					) )
+					.select( f -> f.composite()
+							.add( f.id( String.class ),
+									f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
+							.transform( (id, val) -> new IdAndValue<>( id, val ) ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -132,11 +131,10 @@ public class IndexingFieldTypesIT<F> {
 
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
-					.select( f -> f.composite(
-							(ref, val) -> new IdAndValue<>( ref.id(), val ),
-							f.entityReference(),
-							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
-					) )
+					.select( f -> f.composite()
+							.add( f.entityReference(),
+									f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
+							.transform( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -179,11 +177,10 @@ public class IndexingFieldTypesIT<F> {
 
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
-					.select( f -> f.composite(
-							(ref, val) -> new IdAndValue<>( ref.id(), val ),
-							f.entityReference(),
-							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
-					) )
+					.select( f -> f.composite()
+							.add( f.entityReference(),
+									f.field( absoluteFieldPath, typeDescriptor.getJavaType() ) )
+							.transform( (ref, val) -> new IdAndValue<>( ref.id(), val ) ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 

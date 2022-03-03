@@ -58,11 +58,9 @@ public class LuceneNativeTypeIT {
 
 			List<Result> result = searchSession.search( WebPage.class )
 					.extension( LuceneExtension.get() )
-					.select( f -> f.composite(
-							Result::new,
-							f.entity(),
-							f.field( "pageRank", Float.class )
-					) )
+					.select( f -> f.composite()
+							.add( f.entity(), f.field( "pageRank", Float.class ) )
+							.transform( Result::new ) )
 					.where( f -> f.fromLuceneQuery(
 							// This affects the document score based on the pageRank
 							FeatureField.newSaturationQuery( "pageRank", "pageRank" )

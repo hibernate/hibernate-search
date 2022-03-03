@@ -366,18 +366,16 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		StubMappingScope scope = index.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
-				.select( f ->
-						f.composite(
-								hitTransformerMock,
-								f.field( "string", String.class ).toProjection(),
-								f.field( "string_analyzed", String.class ).toProjection(),
-								f.field( "integer", Integer.class ).toProjection(),
-								f.field( "localDate", LocalDate.class ).toProjection(),
-								f.field( "geoPoint", GeoPoint.class ).toProjection(),
-								f.documentReference().toProjection(),
-								f.entityReference().toProjection(),
-								f.entity().toProjection()
-						)
+				.select( f -> f.composite()
+						.add( f.field( "string", String.class ),
+								f.field( "string_analyzed", String.class ),
+								f.field( "integer", Integer.class ),
+								f.field( "localDate", LocalDate.class ),
+								f.field( "geoPoint", GeoPoint.class ),
+								f.documentReference(),
+								f.entityReference(),
+								f.entity() )
+						.transformList( hitTransformerMock )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
@@ -428,14 +426,12 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubTransformedHit> query = scope.query( loadingContextMock )
-				.select( f ->
-						f.composite(
-								hitTransformerMock,
-								f.field( "string", String.class ).toProjection(),
+				.select( f -> f.composite()
+						.add( f.field( "string", String.class ).toProjection(),
 								f.documentReference().toProjection(),
 								f.entityReference().toProjection(),
-								f.entity().toProjection()
-						)
+								f.entity().toProjection() )
+						.transformList( hitTransformerMock )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();

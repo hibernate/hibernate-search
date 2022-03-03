@@ -56,13 +56,16 @@ public class V5MigrationJavaBeanSearchScopeAdapter implements V5MigrationSearchS
 	@Override
 	public SearchProjection<Object> idProjection() {
 		SearchProjectionFactory<EntityReference, ?> factory = delegate.projection();
-		return factory.composite( EntityReference::id, factory.entityReference() ).toProjection();
+		// Not using factory.id() because that one throws an exception if IDs have inconsistent types.
+		return factory.composite().add( factory.entityReference() )
+				.transform( EntityReference::id ).toProjection();
 	}
 
 	@Override
 	public SearchProjection<? extends Class<?>> objectClassProjection() {
 		SearchProjectionFactory<EntityReference, ?> factory = delegate.projection();
-		return factory.composite( EntityReference::type, factory.entityReference() ).toProjection();
+		return factory.composite().add( factory.entityReference() )
+				.transform( EntityReference::type ).toProjection();
 	}
 
 	@Override

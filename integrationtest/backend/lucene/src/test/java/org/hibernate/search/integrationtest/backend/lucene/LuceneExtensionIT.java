@@ -121,11 +121,10 @@ public class LuceneExtensionIT {
 		LuceneSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( LuceneExtension.get() );
 		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
-				f -> f.composite(
+				f -> f.composite()
+						.add( f.documentReference(), f.document() )
 						// We don't care about the document, it's just to test that the factory context allows Lucene-specific projection
-						(docRef, document) -> docRef,
-						f.documentReference(), f.document()
-				)
+						.transform( (docRef, document) -> docRef )
 		);
 		// Note we can use Lucene-specific predicates immediately
 		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =

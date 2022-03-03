@@ -546,17 +546,12 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
-					.select( f ->
-							f.composite(
-									Book_Author_Score::new,
-									f.composite(
-											Book_Author::new,
-											f.entity().toProjection(),
-											f.field( "author.name", String.class ).toProjection()
-									).toProjection(),
-									f.score().toProjection()
-							)
-					)
+					.select( f -> f.composite()
+							.add( f.composite()
+									.add( f.entity(), f.field( "author.name", String.class ) )
+									.transform( Book_Author::new ),
+									f.score() )
+							.transform( Book_Author_Score::new ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -594,16 +589,12 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
-					.select( f ->
-							f.composite(
-									Book_Author_Score::new,
-									f.composite(
-											Book_Author::new,
-											f.entity(),
-											f.field( "author.name", String.class )
-									),
-									f.score()
-							)
+					.select( f -> f.composite()
+							.add( f.composite()
+									.add( f.entity(), f.field( "author.name", String.class ) )
+									.transform( Book_Author::new ),
+									f.score() )
+							.transform( Book_Author_Score::new )
 					)
 					.where( f -> f.matchAll() )
 					.toQuery();

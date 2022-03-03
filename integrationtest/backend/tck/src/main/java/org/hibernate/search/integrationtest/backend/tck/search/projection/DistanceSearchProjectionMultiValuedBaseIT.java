@@ -148,11 +148,10 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 		String fieldPath = getFieldPath();
 
 		ListAssert<Pair<List<Double>, List<Double>>> hitsAssert = assertThatQuery( scope.query()
-				.select( f -> f.composite(
-						Pair::new,
-						f.distance( fieldPath, CENTER_POINT_1 ).multi(),
-						f.distance( fieldPath, CENTER_POINT_1 ).multi()
-				) )
+				.select( f -> f.composite()
+						.add( f.distance( fieldPath, CENTER_POINT_1 ).multi(),
+								f.distance( fieldPath, CENTER_POINT_1 ).multi() )
+						.transform( Pair::new ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
@@ -270,12 +269,11 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ListAssert<Triplet<List<Double>, List<Double>, List<Double>>> hitsAssert = assertThatQuery( scope.query()
-				.select( f -> f.composite(
-						Triplet::new,
-						f.distance( getFieldPath(), CENTER_POINT_1 ).multi(),
-						f.distance( getFieldPath(), CENTER_POINT_2 ).multi(),
-						f.distance( getFieldPath(), CENTER_POINT_1 ).multi().unit( DistanceUnit.KILOMETERS )
-				) )
+				.select( f -> f.composite()
+						.add( f.distance( getFieldPath(), CENTER_POINT_1 ).multi(),
+								f.distance( getFieldPath(), CENTER_POINT_2 ).multi(),
+								f.distance( getFieldPath(), CENTER_POINT_1 ).multi().unit( DistanceUnit.KILOMETERS ) )
+						.transform( Triplet::new ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
