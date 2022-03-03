@@ -110,11 +110,10 @@ public class ElasticsearchExtensionIT {
 		ElasticsearchSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
 		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
-				f -> f.composite(
+				f -> f.composite()
+						.from( f.documentReference(), f.source() )
 						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
-						(docRef, source) -> docRef,
-						f.documentReference(), f.source()
-				)
+						.as( (docRef, source) -> docRef )
 		);
 		// Note we can use Elasticsearch-specific predicates immediately
 		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =

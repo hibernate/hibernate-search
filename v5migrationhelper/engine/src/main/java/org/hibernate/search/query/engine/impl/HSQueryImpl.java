@@ -250,10 +250,13 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		}
 
 		if ( tupleTransformer != null ) {
-			return factory.composite( list -> tupleTransformer.transform( list.toArray(), projectedFields ), projections ).toProjection();
+			return factory.composite()
+					.from( projections )
+					.asList( list -> tupleTransformer.transform( list.toArray(), projectedFields ) )
+					.toProjection();
 		}
 		else {
-			return factory.composite( List::toArray, projections ).toProjection();
+			return factory.composite().from( projections ).asList( List::toArray ).toProjection();
 		}
 	}
 
@@ -262,7 +265,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		if ( field == null ) {
 			// Hack to return null when a null field name is requested,
 			// which is what Search 5 used to do...
-			return factory.composite( ignored -> null, factory.documentReference() ).toProjection();
+			return factory.composite().from( factory.documentReference() ).as( ignored -> null ).toProjection();
 		}
 		switch ( field ) {
 			case ProjectionConstants.THIS:

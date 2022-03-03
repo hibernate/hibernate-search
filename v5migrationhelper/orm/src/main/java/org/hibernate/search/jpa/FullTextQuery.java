@@ -20,7 +20,6 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -169,7 +168,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * create a search query with {@link SearchSession#search(Class)},
 	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
 	 * See in particular the composite projection, which allows applying a function to another projection:
-	 * {@link SearchProjectionFactory#composite(Function, ProjectionFinalStep)}.
+	 * {@link SearchProjectionFactory#composite()}.
 	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	@Deprecated
