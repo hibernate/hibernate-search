@@ -36,6 +36,7 @@ import org.junit.Test;
  * e.g. {@code f.composite().add( otherProjection1 ).add( otherProjection2 ).transform( MyPair::new ) },
  * which is tested in {@link CompositeSearchProjectionMultiStepIT}.
  */
+@SuppressWarnings("deprecation")
 public class CompositeSearchProjectionSingleStepIT {
 
 	private static final String DOCUMENT_1 = "1";

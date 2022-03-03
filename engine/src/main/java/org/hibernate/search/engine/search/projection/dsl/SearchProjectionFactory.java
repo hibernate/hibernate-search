@@ -195,7 +195,9 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param projections The projections used to populate the list, in order.
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( projections ).transformList( transformer )} instead.
 	 */
+	@Deprecated
 	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections) {
 		return composite().add( projections ).transformList( transformer );
 	}
@@ -207,7 +209,9 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param dslFinalSteps The final steps in the projection DSL allowing the retrieval of {@link SearchProjection}s.
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( dslFinalSteps ).transformList( transformer )} instead.
 	 */
+	@Deprecated
 	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			ProjectionFinalStep<?>... dslFinalSteps) {
 		return composite().add( dslFinalSteps ).transformList( transformer );
@@ -221,7 +225,9 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <P> The type of the element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( projection ).transform( transformer )} instead.
 	 */
+	@Deprecated
 	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
 		return composite().add( projection ).transform( transformer );
 	}
@@ -235,7 +241,9 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <P> The type of the element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( dslFinalStep ).transform( transformer )} instead.
 	 */
+	@Deprecated
 	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, ProjectionFinalStep<P> dslFinalStep) {
 		return composite().add( dslFinalStep ).transform( transformer );
 	}
@@ -250,7 +258,10 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <P2> The type of the second element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( projection1, projection2 ).transform( transformer )}
+	 * instead.
 	 */
+	@Deprecated
 	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return composite().add( projection1, projection2 ).transform( transformer );
@@ -268,7 +279,10 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <P2> The type of the second element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( dslFinalStep1, dslFinalStep2 ).transform( transformer )}
+	 * instead.
 	 */
+	@Deprecated
 	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2) {
 		return composite().add( dslFinalStep1, dslFinalStep2 ).transform( transformer );
@@ -286,7 +300,10 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <P3> The type of the third element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( projection1, projection2, projection3 ).transform( transformer )}
+	 * instead.
 	 */
+	@Deprecated
 	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return composite().add( projection1, projection2, projection3 ).transform( transformer );
@@ -307,7 +324,10 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <P3> The type of the third element passed to the transformer.
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 * @deprecated Use {@code .composite().add( dslFinalStep1, dslFinalStep2, dslFinalStep3 ).transform( transformer )}
+	 * instead.
 	 */
+	@Deprecated
 	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2,
 			ProjectionFinalStep<P3> dslFinalStep3) {
