@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -33,6 +34,12 @@ public class Book {
 
 	@KeywordField(projectable = Projectable.YES)
 	private Genre genre;
+
+	@GenericField(projectable = Projectable.YES)
+	private Integer pageCount;
+
+	@FullTextField(analyzer = "english", projectable = Projectable.YES)
+	private String description;
 
 	@ManyToMany
 	@IndexedEmbedded(structure = ObjectStructure.NESTED)
@@ -63,6 +70,22 @@ public class Book {
 
 	public void setGenre(Genre genre) {
 		this.genre = genre;
+	}
+
+	public Integer getPageCount() {
+		return pageCount;
+	}
+
+	public void setPageCount(Integer pageCount) {
+		this.pageCount = pageCount;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public List<Author> getAuthors() {
