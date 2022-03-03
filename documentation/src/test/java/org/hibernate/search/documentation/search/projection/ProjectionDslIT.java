@@ -328,6 +328,7 @@ public class ProjectionDslIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void composite() {
 		withinSearchSession( searchSession -> {
 			// tag::composite-customObject[]
