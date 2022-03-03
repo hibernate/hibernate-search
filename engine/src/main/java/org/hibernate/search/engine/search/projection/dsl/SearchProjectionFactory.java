@@ -159,6 +159,14 @@ public interface SearchProjectionFactory<R, E> {
 	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
+	 * Starts the definition of a composite projection,
+	 * which will combine multiple given projections.
+	 *
+	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 */
+	CompositeProjectionFromStep composite();
+
+	/**
 	 * Create a projection that will compose a {@link List} based on the given projections.
 	 *
 	 * @param projections The projections used to populate the list, in order.
