@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInner1Step;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
@@ -26,6 +26,7 @@ import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsS
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionFromStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DistanceToFieldProjectionValueStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DocumentReferenceProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.EntityProjectionOptionsStepImpl;
@@ -98,9 +99,8 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public CompositeProjectionInner1Step composite() {
-		// TODO
-		throw new IllegalStateException("Not implemented yet");
+	public CompositeProjectionFromStep composite() {
+		return new CompositeProjectionFromStepImpl( dslContext );
 	}
 
 	@Override
