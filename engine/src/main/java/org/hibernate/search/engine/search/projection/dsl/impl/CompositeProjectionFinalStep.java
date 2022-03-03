@@ -17,24 +17,24 @@ import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuil
 import org.hibernate.search.util.common.function.TriFunction;
 
 
-public class CompositeProjectionOptionsStepImpl<T>
-		implements CompositeProjectionOptionsStep<CompositeProjectionOptionsStepImpl<T>, T> {
+public class CompositeProjectionFinalStep<T>
+		implements CompositeProjectionOptionsStep<CompositeProjectionFinalStep<T>, T> {
 
 	private final CompositeProjectionBuilder<T> compositeProjectionBuilder;
 
-	public CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
+	public CompositeProjectionFinalStep(SearchProjectionDslContext<?> dslContext,
 			Function<List<?>, T> transformer,
 			SearchProjection<?>[] projections) {
 		this.compositeProjectionBuilder = dslContext.scope().projectionBuilders().composite( transformer, projections );
 	}
 
-	public <P> CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
+	public <P> CompositeProjectionFinalStep(SearchProjectionDslContext<?> dslContext,
 			Function<P, T> transformer,
 			SearchProjection<P> projection) {
 		this.compositeProjectionBuilder = dslContext.scope().projectionBuilders().composite( transformer, projection );
 	}
 
-	public <P1, P2> CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
+	public <P1, P2> CompositeProjectionFinalStep(SearchProjectionDslContext<?> dslContext,
 			BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1,
 			SearchProjection<P2> projection2) {
@@ -42,7 +42,7 @@ public class CompositeProjectionOptionsStepImpl<T>
 				.composite( transformer, projection1, projection2 );
 	}
 
-	public <P1, P2, P3> CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
+	public <P1, P2, P3> CompositeProjectionFinalStep(SearchProjectionDslContext<?> dslContext,
 			TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1,
 			SearchProjection<P2> projection2,

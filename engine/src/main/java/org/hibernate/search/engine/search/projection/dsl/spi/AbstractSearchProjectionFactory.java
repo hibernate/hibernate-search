@@ -25,7 +25,8 @@ import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionComponent1StepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.impl.DistanceToFieldProjectionValueStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DocumentReferenceProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.EntityProjectionOptionsStepImpl;
@@ -99,8 +100,7 @@ public abstract class AbstractSearchProjectionFactory<
 
 	@Override
 	public CompositeProjectionComponent1Step composite() {
-		// TODO
-		throw new IllegalStateException("Not implemented yet");
+		return new CompositeProjectionComponent1StepImpl( dslContext );
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public abstract class AbstractSearchProjectionFactory<
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNullNorEmpty( projections, "projections" );
 
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projections );
+		return new CompositeProjectionFinalStep<>( dslContext, transformer, projections );
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public abstract class AbstractSearchProjectionFactory<
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection, "projection" );
 
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projection );
+		return new CompositeProjectionFinalStep<>( dslContext, transformer, projection );
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public abstract class AbstractSearchProjectionFactory<
 		Contracts.assertNotNull( projection1, "projection1" );
 		Contracts.assertNotNull( projection2, "projection2" );
 
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projection1, projection2 );
+		return new CompositeProjectionFinalStep<>( dslContext, transformer, projection1, projection2 );
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public abstract class AbstractSearchProjectionFactory<
 		Contracts.assertNotNull( projection2, "projection2" );
 		Contracts.assertNotNull( projection3, "projection3" );
 
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projection1, projection2, projection3 );
+		return new CompositeProjectionFinalStep<>( dslContext, transformer, projection1, projection2, projection3 );
 	}
 
 	@Override
