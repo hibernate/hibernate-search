@@ -1,0 +1,10 @@
+[WARNING]
+====
+Features detailed in this section are _deprecated_: they should be avoided in favor of non-deprecated alternatives.
+
+The usual https://hibernate.org/community/compatibility-policy/[compatibility policy] applies,
+meaning the features are expected to remain available at least until the next major version of Hibernate Search.
+Beyond that, they may be altered in a backward-incompatible way -- or even removed.
+
+Usage of deprecated features is not recommended.
+====
