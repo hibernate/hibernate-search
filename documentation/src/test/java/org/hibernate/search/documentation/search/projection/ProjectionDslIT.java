@@ -328,16 +328,14 @@ public class ProjectionDslIT {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void composite() {
 		withinSearchSession( searchSession -> {
 			// tag::composite-customObject[]
 			List<MyPair<String, Genre>> hits = searchSession.search( Book.class )
-					.select( f -> f.composite( // <1>
-							MyPair::new, // <2>
-							f.field( "title", String.class ), // <3>
-							f.field( "genre", Genre.class ) // <4>
-					) )
+					.select( f -> f.composite() // <1>
+							.from( f.field( "title", String.class ), // <2>
+									f.field( "genre", Genre.class ) ) // <3>
+							.as( MyPair::new ) )// <4>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <5>
 			// end::composite-customObject[]
@@ -363,7 +361,117 @@ public class ProjectionDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// tag::composite-customObject-asList[]
+			List<MyTuple4<String, Genre, Integer, String>> hits = searchSession.search( Book.class )
+					.select( f -> f.composite() // <1>
+							.from( f.field( "title", String.class ), // <2>
+									f.field( "genre", Genre.class ), // <3>
+									f.field( "pageCount", Integer.class ), // <4>
+									f.field( "description", String.class ) ) // <5>
+							.asList( list -> // <6>
+								new MyTuple4<>( (String) list.get( 0 ), (Genre) list.get( 1 ),
+										(Integer) list.get( 2 ), (String) list.get( 3 ) ) ) )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <7>
+			// end::composite-customObject-asList[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					new MyTuple4<>(
+							session.getReference( Book.class, BOOK1_ID ).getTitle(),
+							session.getReference( Book.class, BOOK1_ID ).getGenre(),
+							session.getReference( Book.class, BOOK1_ID ).getPageCount(),
+							session.getReference( Book.class, BOOK1_ID ).getDescription()
+					),
+					new MyTuple4<>(
+							session.getReference( Book.class, BOOK2_ID ).getTitle(),
+							session.getReference( Book.class, BOOK2_ID ).getGenre(),
+							session.getReference( Book.class, BOOK2_ID ).getPageCount(),
+							session.getReference( Book.class, BOOK2_ID ).getDescription()
+					),
+					new MyTuple4<>(
+							session.getReference( Book.class, BOOK3_ID ).getTitle(),
+							session.getReference( Book.class, BOOK3_ID ).getGenre(),
+							session.getReference( Book.class, BOOK3_ID ).getPageCount(),
+							session.getReference( Book.class, BOOK3_ID ).getDescription()
+					),
+					new MyTuple4<>(
+							session.getReference( Book.class, BOOK4_ID ).getTitle(),
+							session.getReference( Book.class, BOOK4_ID ).getGenre(),
+							session.getReference( Book.class, BOOK4_ID ).getPageCount(),
+							session.getReference( Book.class, BOOK4_ID ).getDescription()
+					)
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
 			// tag::composite-list[]
+			List<List<?>> hits = searchSession.search( Book.class )
+					.select( f -> f.composite() // <1>
+							.from( f.field( "title", String.class ), // <2>
+									f.field( "genre", Genre.class ) ) // <3>
+							.asList() ) // <4>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <5>
+			// end::composite-list[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					Arrays.asList(
+							session.getReference( Book.class, BOOK1_ID ).getTitle(),
+							session.getReference( Book.class, BOOK1_ID ).getGenre()
+					),
+					Arrays.asList(
+							session.getReference( Book.class, BOOK2_ID ).getTitle(),
+							session.getReference( Book.class, BOOK2_ID ).getGenre()
+					),
+					Arrays.asList(
+							session.getReference( Book.class, BOOK3_ID ).getTitle(),
+							session.getReference( Book.class, BOOK3_ID ).getGenre()
+					),
+					Arrays.asList(
+							session.getReference( Book.class, BOOK4_ID ).getTitle(),
+							session.getReference( Book.class, BOOK4_ID ).getGenre()
+					)
+			);
+		} );
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void composite_singleStep() {
+		withinSearchSession( searchSession -> {
+			// tag::composite-customObject-singlestep[]
+			List<MyPair<String, Genre>> hits = searchSession.search( Book.class )
+					.select( f -> f.composite( // <1>
+							MyPair::new, // <2>
+							f.field( "title", String.class ), // <3>
+							f.field( "genre", Genre.class ) // <4>
+					) )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <5>
+			// end::composite-customObject-singlestep[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					new MyPair<>(
+							session.getReference( Book.class, BOOK1_ID ).getTitle(),
+							session.getReference( Book.class, BOOK1_ID ).getGenre()
+					),
+					new MyPair<>(
+							session.getReference( Book.class, BOOK2_ID ).getTitle(),
+							session.getReference( Book.class, BOOK2_ID ).getGenre()
+					),
+					new MyPair<>(
+							session.getReference( Book.class, BOOK3_ID ).getTitle(),
+							session.getReference( Book.class, BOOK3_ID ).getGenre()
+					),
+					new MyPair<>(
+							session.getReference( Book.class, BOOK4_ID ).getTitle(),
+							session.getReference( Book.class, BOOK4_ID ).getGenre()
+					)
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::composite-list-singlestep[]
 			List<List<?>> hits = searchSession.search( Book.class )
 					.select( f -> f.composite( // <1>
 							f.field( "title", String.class ), // <2>
@@ -371,7 +479,7 @@ public class ProjectionDslIT {
 					) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <4>
-			// end::composite-list[]
+			// end::composite-list-singlestep[]
 			Session session = searchSession.toOrmSession();
 			assertThat( hits ).containsExactlyInAnyOrder(
 					Arrays.asList(
@@ -418,6 +526,8 @@ public class ProjectionDslIT {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );
+			book1.setDescription( "A robot becomes self-aware." );
+			book1.setPageCount( 250 );
 			book1.setGenre( Genre.SCIENCE_FICTION );
 			book1.getAuthors().add( isaacAsimov );
 			isaacAsimov.getBooks().add( book1 );
@@ -425,6 +535,8 @@ public class ProjectionDslIT {
 			Book book2 = new Book();
 			book2.setId( BOOK2_ID );
 			book2.setTitle( "The Caves of Steel" );
+			book2.setDescription( "A robot helps investigate a murder on an extrasolar colony." );
+			book2.setPageCount( 206 );
 			book2.setGenre( Genre.SCIENCE_FICTION );
 			book2.getAuthors().add( isaacAsimov );
 			isaacAsimov.getBooks().add( book2 );
@@ -432,6 +544,8 @@ public class ProjectionDslIT {
 			Book book3 = new Book();
 			book3.setId( BOOK3_ID );
 			book3.setTitle( "The Robots of Dawn" );
+			book3.setDescription( "A crime story about the first \"roboticide\"." );
+			book3.setPageCount( 435 );
 			book3.setGenre( Genre.SCIENCE_FICTION );
 			book3.getAuthors().add( isaacAsimov );
 			isaacAsimov.getBooks().add( book3 );
@@ -439,10 +553,11 @@ public class ProjectionDslIT {
 			Book book4 = new Book();
 			book4.setId( BOOK4_ID );
 			book4.setTitle( "The Automatic Detective" );
+			book4.setDescription( "A robot cab driver turns PI after the disappearance of a neighboring family." );
+			book4.setPageCount( 222 );
 			book4.setGenre( Genre.CRIME_FICTION );
 			book4.getAuthors().add( aLeeMartinez );
 			aLeeMartinez.getBooks().add( book3 );
-
 			entityManager.persist( isaacAsimov );
 			entityManager.persist( aLeeMartinez );
 
@@ -474,6 +589,35 @@ public class ProjectionDslIT {
 		@Override
 		public int hashCode() {
 			return Objects.hash( first, second );
+		}
+	}
+
+	private static class MyTuple4<T1, T2, T3, T4> {
+		private final T1 first;
+		private final T2 second;
+		private final T3 third;
+		private final T4 fourth;
+
+		MyTuple4(T1 first, T2 second, T3 third, T4 fourth) {
+			this.first = first;
+			this.second = second;
+			this.third = third;
+			this.fourth = fourth;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( obj == null || !MyTuple4.class.equals( obj.getClass() ) ) {
+				return false;
+			}
+			MyTuple4<?, ?, ?, ?> other = (MyTuple4<?, ?, ?, ?>) obj;
+			return Objects.equals( first, other.first ) && Objects.equals( second, other.second )
+					&& Objects.equals( third, other.third ) && Objects.equals( fourth, other.fourth );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( first, second, third, fourth );
 		}
 	}
 }
