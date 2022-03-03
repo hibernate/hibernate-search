@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.query.dsl;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -98,7 +97,7 @@ public interface SearchQuerySelectStep<
 	 * Note that using this method will force you to use casts when consuming the results,
 	 * since the returned lists are not typed ({@code List<?>} instead of {@code List<T>}).
 	 * You can replace calls to this method advantageously with calls to {@link #select(Function)}
-	 * defining a {@link SearchProjectionFactory#composite(BiFunction, SearchProjection, SearchProjection) composite projection}.
+	 * defining a {@link SearchProjectionFactory#composite() composite projection}.
 	 *
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return The next step.
