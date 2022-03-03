@@ -172,9 +172,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param projections The projections used to populate the list, in order.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default CompositeProjectionOptionsStep<?, List<?>> composite(SearchProjection<?>... projections) {
-		return composite( Function.identity(), projections );
-	}
+	CompositeProjectionOptionsStep<?, List<?>> composite(SearchProjection<?>... projections);
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given almost-built projections.
@@ -183,7 +181,11 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
 	default CompositeProjectionOptionsStep<?, List<?>> composite(ProjectionFinalStep<?>... dslFinalSteps) {
-		return composite( Function.identity(), dslFinalSteps );
+		SearchProjection<?>[] projections = new SearchProjection<?>[dslFinalSteps.length];
+		for ( int i = 0; i < dslFinalSteps.length; i++ ) {
+			projections[i] = dslFinalSteps[i].toProjection();
+		}
+		return composite( projections );
 	}
 
 	/**
@@ -194,7 +196,9 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
+	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections) {
+		return composite().from( projections ).asList( transformer );
+	}
 
 	/**
 	 * Create a projection that will compose a custom object based on the given almost-built projections.
@@ -206,11 +210,7 @@ public interface SearchProjectionFactory<R, E> {
 	 */
 	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			ProjectionFinalStep<?>... dslFinalSteps) {
-		SearchProjection<?>[] projections = new SearchProjection<?>[dslFinalSteps.length];
-		for ( int i = 0; i < dslFinalSteps.length; i++ ) {
-			projections[i] = dslFinalSteps[i].toProjection();
-		}
-		return composite( transformer, projections );
+		return composite().from( dslFinalSteps ).asList( transformer );
 	}
 
 	/**
@@ -222,7 +222,9 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
+		return composite().from( projection ).as( transformer );
+	}
 
 	/**
 	 * Create a projection that will compose a custom object based on one almost-built projection.
@@ -235,7 +237,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
 	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, ProjectionFinalStep<P> dslFinalStep) {
-		return composite( transformer, dslFinalStep.toProjection() );
+		return composite().from( dslFinalStep ).as( transformer );
 	}
 
 	/**
@@ -249,8 +251,10 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
+	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
+		return composite().from( projection1, projection2 ).as( transformer );
+	}
 
 	/**
 	 * Create a projection that will compose a custom object based on two almost-built projections.
@@ -267,10 +271,7 @@ public interface SearchProjectionFactory<R, E> {
 	 */
 	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2) {
-		return composite(
-				transformer,
-				dslFinalStep1.toProjection(), dslFinalStep2.toProjection()
-		);
+		return composite().from( dslFinalStep1, dslFinalStep2 ).as( transformer );
 	}
 
 	/**
@@ -286,8 +287,10 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
+	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
+		return composite().from( projection1, projection2, projection3 ).as( transformer );
+	}
 
 	/**
 	 * Create a projection that will compose a custom object based on three almost-built projections.
@@ -308,10 +311,7 @@ public interface SearchProjectionFactory<R, E> {
 	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2,
 			ProjectionFinalStep<P3> dslFinalStep3) {
-		return composite(
-				transformer,
-				dslFinalStep1.toProjection(), dslFinalStep2.toProjection(), dslFinalStep3.toProjection()
-		);
+		return composite().from( dslFinalStep1, dslFinalStep2, dslFinalStep3 ).as( transformer );
 	}
 
 	/**
