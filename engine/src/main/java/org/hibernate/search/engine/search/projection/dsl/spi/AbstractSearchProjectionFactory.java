@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.projection.dsl.spi;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
@@ -37,7 +36,6 @@ import org.hibernate.search.engine.search.projection.dsl.impl.ScoreProjectionOpt
 import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionFactoryExtensionStep;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
@@ -104,41 +102,8 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
-			SearchProjection<?>... projections) {
-		Contracts.assertNotNull( transformer, "transformer" );
-		Contracts.assertNotNullNorEmpty( projections, "projections" );
-
-		return new CompositeProjectionFinalStep<>( dslContext, transformer, projections );
-	}
-
-	@Override
-	public <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
-		Contracts.assertNotNull( transformer, "transformer" );
-		Contracts.assertNotNull( projection, "projection" );
-
-		return new CompositeProjectionFinalStep<>( dslContext, transformer, projection );
-	}
-
-	@Override
-	public <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		Contracts.assertNotNull( transformer, "transformer" );
-		Contracts.assertNotNull( projection1, "projection1" );
-		Contracts.assertNotNull( projection2, "projection2" );
-
-		return new CompositeProjectionFinalStep<>( dslContext, transformer, projection1, projection2 );
-	}
-
-	@Override
-	public <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		Contracts.assertNotNull( transformer, "transformer" );
-		Contracts.assertNotNull( projection1, "projection1" );
-		Contracts.assertNotNull( projection2, "projection2" );
-		Contracts.assertNotNull( projection3, "projection3" );
-
-		return new CompositeProjectionFinalStep<>( dslContext, transformer, projection1, projection2, projection3 );
+	public CompositeProjectionOptionsStep<?, List<?>> composite(SearchProjection<?>... projections) {
+		return new CompositeProjectionFinalStep<>( dslContext, Function.identity(), projections );
 	}
 
 	@Override
