@@ -29,7 +29,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CompositeSearchProjectionIT {
+/**
+ * Tests composite projections created through the single-step DSL,
+ * e.g. {@code f.composite( MyPair::new, otherProjection1, otherProjection2 ) },
+ * as opposed to the multi-step DSL,
+ * e.g. {@code f.composite().add( otherProjection1 ).add( otherProjection2 ).transform( MyPair::new ) },
+ * which is tested in {@link CompositeSearchProjectionMultiStepIT}.
+ */
+public class CompositeSearchProjectionSingleStepIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";

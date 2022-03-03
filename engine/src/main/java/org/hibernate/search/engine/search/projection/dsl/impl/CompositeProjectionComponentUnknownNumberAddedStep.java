@@ -22,7 +22,7 @@ class CompositeProjectionComponentUnknownNumberAddedStep
 
 	@Override
 	SearchProjection<?>[] toProjectionArray(SearchProjection<?>... otherProjections) {
-		SearchProjection<?>[] array = new SearchProjection[1 + otherProjections.length];
+		SearchProjection<?>[] array = new SearchProjection[components.length + otherProjections.length];
 		System.arraycopy( components, 0, array, 0, components.length );
 		System.arraycopy( otherProjections, 0, array, components.length, otherProjections.length );
 		return array;
