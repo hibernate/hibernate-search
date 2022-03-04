@@ -26,6 +26,6 @@ public interface CompositeProjectionFrom1AsStep<V1>
 	 * @return The next DSL step.
 	 * @param <V> The type of values returned by the transformer.
 	 */
-	<V> CompositeProjectionOptionsStep<?, V> as(Function<V1, V> transformer);
+	<V> CompositeProjectionValueStep<?, V> as(Function<V1, V> transformer);
 
 }

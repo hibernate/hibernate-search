@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
 class CompositeProjectionFrom1AsStepImpl<V1> extends AbstractCompositeProjectionAsStep
@@ -25,8 +25,8 @@ class CompositeProjectionFrom1AsStepImpl<V1> extends AbstractCompositeProjection
 	}
 
 	@Override
-	public <V> CompositeProjectionOptionsStep<?, V> as(Function<V1, V> transformer) {
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, inner1 );
+	public <V> CompositeProjectionValueStep<?, V> as(Function<V1, V> transformer) {
+		return new CompositeProjectionValueStepImpl<>( dslContext, transformer, inner1 );
 	}
 
 	@Override

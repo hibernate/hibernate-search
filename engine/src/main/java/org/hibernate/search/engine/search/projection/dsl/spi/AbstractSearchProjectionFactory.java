@@ -13,7 +13,7 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
@@ -24,8 +24,8 @@ import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionFromStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionValueStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DistanceToFieldProjectionValueStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DocumentReferenceProjectionOptionsStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.EntityProjectionOptionsStepImpl;
@@ -97,13 +97,19 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
+	public CompositeProjectionFromStep object(String objectFieldPath) {
+		// TODO HSEARCH-3943 implement object projection
+		throw new IllegalStateException( "Not implemented yet" );
+	}
+
+	@Override
 	public CompositeProjectionFromStep composite() {
 		return new CompositeProjectionFromStepImpl( dslContext );
 	}
 
 	@Override
-	public CompositeProjectionOptionsStep<?, List<?>> composite(SearchProjection<?>... projections) {
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, Function.identity(), projections );
+	public CompositeProjectionValueStep<?, List<?>> composite(SearchProjection<?>... projections) {
+		return new CompositeProjectionValueStepImpl<>( dslContext, Function.identity(), projections );
 	}
 
 	@Override
