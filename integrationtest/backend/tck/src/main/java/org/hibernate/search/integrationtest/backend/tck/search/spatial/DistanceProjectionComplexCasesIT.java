@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.search.predicate.AbstractSpatialWithinSearchPredicateIT;
+import org.hibernate.search.integrationtest.backend.tck.search.predicate.AbstractSpatialWithinPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceProjectionSingleValuedBaseIT;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import org.assertj.core.api.ListAssert;
 
-public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinSearchPredicateIT {
+public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final Comparator<? super Double> APPROX_M_COMPARATOR = TestComparators.approximateDouble( 10.0 );
 	private static final Comparator<? super Double> APPROX_KM_COMPARATOR = TestComparators.approximateDouble( 0.010 );

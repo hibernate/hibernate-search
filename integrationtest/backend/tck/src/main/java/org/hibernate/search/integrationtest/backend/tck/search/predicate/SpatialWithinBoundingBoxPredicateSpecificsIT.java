@@ -13,7 +13,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.junit.Test;
 
-public class SpatialWithinBoundingBoxPredicateSpecificsIT extends AbstractSpatialWithinSearchPredicateIT {
+public class SpatialWithinBoundingBoxPredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final GeoBoundingBox BOUNDING_BOX_1 = GeoBoundingBox.of(
 			GeoPoint.of( 45.785889, 4.819749 ),
