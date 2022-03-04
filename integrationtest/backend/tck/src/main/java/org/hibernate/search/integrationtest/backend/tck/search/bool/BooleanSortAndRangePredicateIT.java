@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangePredicateSpecificsIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortBaseIT;
+import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSortBaseIT;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -35,7 +35,7 @@ import org.junit.Test;
 /**
  * Tests sorting and ranging behaviour querying a boolean type field
  *
- * @see FieldSearchSortBaseIT
+ * @see FieldSortBaseIT
  * @see RangePredicateSpecificsIT
  */
 public class BooleanSortAndRangePredicateIT {

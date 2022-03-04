@@ -35,7 +35,7 @@ import org.junit.runners.Parameterized;
  * i.e. error messages.
  */
 @RunWith(Parameterized.class)
-public class FieldSearchSortUnsupportedTypesIT<F> {
+public class FieldSortUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
@@ -63,7 +63,7 @@ public class FieldSearchSortUnsupportedTypesIT<F> {
 
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 
-	public FieldSearchSortUnsupportedTypesIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	public FieldSortUnsupportedTypesIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 	}
 

@@ -52,7 +52,7 @@ import org.junit.Test;
  * Tests behavior related to type checking and type conversion of DSL arguments
  * for sorts by field value.
  */
-public class DistanceSearchSortTypeCheckingAndConversionIT {
+public class DistanceSortTypeCheckingAndConversionIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 

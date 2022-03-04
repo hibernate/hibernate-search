@@ -45,7 +45,7 @@ import org.junit.Test;
 
 /**
  * Generic tests for sorts. More specific tests can be found in other classes,
- * such as {@link FieldSearchSortBaseIT} or {@link DistanceSearchSortBaseIT}.
+ * such as {@link FieldSortBaseIT} or {@link DistanceSortBaseIT}.
  */
 public class SearchSortIT {
 
