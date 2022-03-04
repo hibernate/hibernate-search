@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +18,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -33,13 +36,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * Tests basic behavior of projections on a multi-valued field, common to all supported types.
+ * Tests basic behavior of projections on a single-valued field, common to all supported types.
  * <p>
- * See {@link FieldSearchProjectionSingleValuedBaseIT} for single-valued fields.
+ * See {@link FieldProjectionMultiValuedBaseIT} for multi-valued fields.
  */
 @RunWith(Parameterized.class)
-@TestForIssue(jiraKey = "HSEARCH-3391")
-public class FieldSearchProjectionMultiValuedBaseIT<F> {
+public class FieldProjectionSingleValuedBaseIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
 	private static List<DataSet<?>> dataSets;
@@ -50,7 +52,7 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 			for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
-				if ( fieldStructure.isSingleValued() ) {
+				if ( fieldStructure.isMultiValued() ) {
 					continue;
 				}
 				DataSet<?> dataSet = new DataSet<>( fieldStructure, fieldType );
@@ -65,7 +67,8 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.projectable( Projectable.YES ) );
+			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields( root, supportedFieldTypes,
+					c -> c.projectable( Projectable.YES ) );
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
 
@@ -84,7 +87,7 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 	private final FieldTypeDescriptor<F> fieldType;
 	private final DataSet<F> dataSet;
 
-	public FieldSearchProjectionMultiValuedBaseIT(TestedFieldStructure fieldStructure,
+	public FieldProjectionSingleValuedBaseIT(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		this.fieldStructure = fieldStructure;
 		this.fieldType = fieldType;
@@ -98,15 +101,15 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath();
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						dataSet.getFieldValues( 1 ),
-						dataSet.getFieldValues( 2 ),
-						dataSet.getFieldValues( 3 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldValue( 1 ),
+						dataSet.getFieldValue( 2 ),
+						dataSet.getFieldValue( 3 ),
+						null // Empty document
 				);
 	}
 
@@ -117,15 +120,41 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 		String fieldPath = getFieldPath();
 
 		assertThatQuery( scope.query()
-				.select( f -> f.field( fieldPath ).multi() )
+				.select( f -> f.field( fieldPath ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						Collections.unmodifiableList( dataSet.getFieldValues( 1 ) ),
-						Collections.unmodifiableList( dataSet.getFieldValues( 2 ) ),
-						Collections.unmodifiableList( dataSet.getFieldValues( 3 ) ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldValue( 1 ),
+						dataSet.getFieldValue( 2 ),
+						dataSet.getFieldValue( 3 ),
+						null // Empty document
+				);
+	}
+
+	/**
+	 * Test requesting a multi-valued projection on a single-valued field.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3391")
+	public void multi() {
+		StubMappingScope scope = index.createScope();
+
+		String fieldPath = getFieldPath();
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						Collections.singletonList( dataSet.getFieldValue( 1 ) ),
+						Collections.singletonList( dataSet.getFieldValue( 2 ) ),
+						Collections.singletonList( dataSet.getFieldValue( 3 ) ),
+						// Empty document
+						TckConfiguration.get().getBackendFeatures().projectionPreservesNulls()
+								? Collections.singletonList( null )
+								: Collections.emptyList()
 				);
 	}
 
@@ -141,18 +170,40 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 		assertThatQuery( scope.query()
 				.select( f ->
 						f.composite(
-								f.field( fieldPath, fieldType.getJavaType() ).multi(),
-								f.field( fieldPath, fieldType.getJavaType() ).multi()
+								f.field( fieldPath, fieldType.getJavaType() ),
+								f.field( fieldPath, fieldType.getJavaType() )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
 				.hasHitsAnyOrder(
-						Arrays.asList( dataSet.getFieldValues( 1 ), dataSet.getFieldValues( 1 ) ),
-						Arrays.asList( dataSet.getFieldValues( 2 ), dataSet.getFieldValues( 2 ) ),
-						Arrays.asList( dataSet.getFieldValues( 3 ), dataSet.getFieldValues( 3 ) ),
-						Arrays.asList( Collections.emptyList(), Collections.emptyList() ) // Empty document
+						Arrays.asList( dataSet.getFieldValue( 1 ), dataSet.getFieldValue( 1 ) ),
+						Arrays.asList( dataSet.getFieldValue( 2 ), dataSet.getFieldValue( 2 ) ),
+						Arrays.asList( dataSet.getFieldValue( 3 ), dataSet.getFieldValue( 3 ) ),
+						Arrays.asList( null, null ) // Empty document
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		assertThatQuery( index.query()
+				.select( f -> f.withRoot( parentObjectBinding.absolutePath )
+						.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), fieldType.getJavaType() ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValue( 1 ),
+						dataSet.getFieldValue( 2 ),
+						dataSet.getFieldValue( 3 ),
+						null // Empty document
 				);
 	}
 
@@ -181,21 +232,21 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 
 		private void contribute(BulkIndexer indexer) {
 			indexer.add( documentProvider( emptyDocId( 1 ), routingKey,
-					document -> index.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, Collections.emptyList() ) ) );
+					document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, null ) ) );
 			indexer.add( documentProvider( docId( 1 ), routingKey,
-					document -> index.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getFieldValues( 1 ) ) ) );
+					document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getFieldValue( 1 ) ) ) );
 			indexer.add( documentProvider( docId( 2 ), routingKey,
-					document -> index.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getFieldValues( 2 ) ) ) );
+					document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getFieldValue( 2 ) ) ) );
 			indexer.add( documentProvider( docId( 3 ), routingKey,
-					document -> index.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getFieldValues( 3 ) ) ) );
+					document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getFieldValue( 3 ) ) ) );
 		}
 
-		private List<F> getFieldValues(int documentNumber) {
-			return fieldType.getIndexableValues().getMulti().get( documentNumber - 1 );
+		private F getFieldValue(int documentNumber) {
+			return fieldType.getIndexableValues().getSingle().get( documentNumber - 1 );
 		}
 	}
 }

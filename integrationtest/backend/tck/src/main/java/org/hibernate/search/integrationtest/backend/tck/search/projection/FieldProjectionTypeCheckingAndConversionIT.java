@@ -47,7 +47,7 @@ import org.junit.runners.Parameterized;
  * projections on field value.
  */
 @RunWith(Parameterized.class)
-public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
+public class FieldProjectionTypeCheckingAndConversionIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
 
@@ -94,7 +94,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 	private final FieldTypeDescriptor<F> fieldType;
 
-	public FieldSearchProjectionTypeCheckingAndConversionIT(FieldTypeDescriptor<F> fieldType) {
+	public FieldProjectionTypeCheckingAndConversionIT(FieldTypeDescriptor<F> fieldType) {
 		this.fieldType = fieldType;
 	}
 

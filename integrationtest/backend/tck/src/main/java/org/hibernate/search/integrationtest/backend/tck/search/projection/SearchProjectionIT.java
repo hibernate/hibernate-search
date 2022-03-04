@@ -57,7 +57,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 /**
- * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldSearchProjectionSingleValuedBaseIT}.
+ * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldProjectionSingleValuedBaseIT}.
  */
 @SuppressWarnings("unchecked") // Mocking parameterized types
 public class SearchProjectionIT {
