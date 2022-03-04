@@ -13,7 +13,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 
 import org.junit.Test;
 
-public class SpatialWithinPolygonPredicateSpecificsIT extends AbstractSpatialWithinSearchPredicateIT {
+public class SpatialWithinPolygonPredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final GeoPolygon POLYGON_1 = GeoPolygon.of(
 			GeoPoint.of( 45.785889, 4.819749 ),

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.junit.Test;
 
-public class SpatialWithinCirclePredicateSpecificsIT extends AbstractSpatialWithinSearchPredicateIT {
+public class SpatialWithinCirclePredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final GeoPoint METRO_HOTEL_DE_VILLE = GeoPoint.of( 45.7673396, 4.833743 );
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );

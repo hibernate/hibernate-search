@@ -18,7 +18,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.junit.Before;
 import org.junit.Rule;
 
-public abstract class AbstractSpatialWithinSearchPredicateIT {
+public abstract class AbstractSpatialWithinPredicateIT {
 
 	protected static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687,4.835233 );
