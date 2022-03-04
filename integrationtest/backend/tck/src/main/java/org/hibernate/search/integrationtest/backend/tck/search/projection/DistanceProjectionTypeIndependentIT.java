@@ -30,9 +30,9 @@ import org.junit.Test;
  * for distance projections.
  * <p>
  * Behavior that is specific to the field type is tested elsewhere,
- * e.g. {@link DistanceSearchProjectionSingleValuedBaseIT} and {@link DistanceSearchProjectionTypeCheckingAndConversionIT}.
+ * e.g. {@link DistanceProjectionSingleValuedBaseIT} and {@link DistanceProjectionTypeCheckingAndConversionIT}.
  */
-public class DistanceSearchProjectionTypeIndependentIT {
+public class DistanceProjectionTypeIndependentIT {
 
 	private static final GeoPoint SOME_POINT = GeoPoint.of( 45.749828, 4.854172 );
 

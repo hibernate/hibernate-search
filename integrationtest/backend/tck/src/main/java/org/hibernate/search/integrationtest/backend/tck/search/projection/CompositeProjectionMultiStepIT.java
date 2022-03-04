@@ -50,10 +50,10 @@ import org.junit.runners.Parameterized;
  * e.g. {@code f.composite().add( otherProjection1 ).add( otherProjection2 ).transform( MyPair::new ) },
  * as opposed to the single-step DSL,
  * e.g. {@code f.composite( MyPair::new, otherProjection1, otherProjection2 ) },
- * which is tested in {@link CompositeSearchProjectionSingleStepIT}.
+ * which is tested in {@link CompositeProjectionSingleStepIT}.
  */
 @RunWith(Enclosed.class)
-public class CompositeSearchProjectionMultiStepIT {
+public class CompositeProjectionMultiStepIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";

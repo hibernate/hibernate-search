@@ -51,7 +51,7 @@ import org.assertj.core.api.ListAssert;
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3391")
-public class DistanceSearchProjectionMultiValuedBaseIT {
+public class DistanceProjectionMultiValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
@@ -110,7 +110,7 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 	private final TestedFieldStructure fieldStructure;
 	private final DataSet dataSet;
 
-	public DistanceSearchProjectionMultiValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	public DistanceProjectionMultiValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		this.fieldStructure = fieldStructure;
 		this.dataSet = dataSet;
 	}

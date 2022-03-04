@@ -53,7 +53,7 @@ import org.assertj.core.api.ListAssert;
  * Tests basic behavior of projections on the distance between a given point and the value of a single-valued field.
  */
 @RunWith(Parameterized.class)
-public class DistanceSearchProjectionSingleValuedBaseIT {
+public class DistanceProjectionSingleValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
@@ -105,7 +105,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 	private final TestedFieldStructure fieldStructure;
 	private final DataSet dataSet;
 
-	public DistanceSearchProjectionSingleValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	public DistanceProjectionSingleValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		this.fieldStructure = fieldStructure;
 		this.dataSet = dataSet;
 	}
