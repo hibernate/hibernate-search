@@ -1323,7 +1323,7 @@ but using the Lucene extension so that Lucene-specific options are available.
 [[search-dsl-predicate-extensions-elasticsearch-from-json]]
 === Elasticsearch: `fromJson`
 
-`.fromLuceneQuery(...)` turns JSON representing an Elasticsearch query into a Hibernate Search predicate.
+`.fromJson(...)` turns JSON representing an Elasticsearch query into a Hibernate Search predicate.
 
 include::components/elasticsearch-json-warning.asciidoc[]
 
