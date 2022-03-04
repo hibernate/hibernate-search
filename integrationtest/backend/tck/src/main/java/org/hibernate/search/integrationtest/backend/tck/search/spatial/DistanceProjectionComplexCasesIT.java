@@ -14,7 +14,7 @@ import java.util.List;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.AbstractSpatialWithinSearchPredicateIT;
-import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceSearchProjectionSingleValuedBaseIT;
+import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceProjectionSingleValuedBaseIT;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -22,13 +22,13 @@ import org.junit.Test;
 
 import org.assertj.core.api.ListAssert;
 
-public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithinSearchPredicateIT {
+public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinSearchPredicateIT {
 
 	private static final Comparator<? super Double> APPROX_M_COMPARATOR = TestComparators.approximateDouble( 10.0 );
 	private static final Comparator<? super Double> APPROX_KM_COMPARATOR = TestComparators.approximateDouble( 0.010 );
 
 	/**
-	 * See also {@link DistanceSearchProjectionSingleValuedBaseIT#several()}.
+	 * See also {@link DistanceProjectionSingleValuedBaseIT#several()}.
 	 * <p>
 	 * The main difference is that we're targeting multiple fields here.
 	 */
@@ -75,7 +75,7 @@ public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithi
 	}
 
 	/**
-	 * See also {@link DistanceSearchProjectionSingleValuedBaseIT#sortable_withSort()}.
+	 * See also {@link DistanceProjectionSingleValuedBaseIT#sortable_withSort()}.
 	 * <p>
 	 * The main difference is that we're composing multiple sorts here.
 	 */

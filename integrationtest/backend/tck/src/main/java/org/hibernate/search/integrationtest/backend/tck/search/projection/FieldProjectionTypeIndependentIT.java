@@ -28,9 +28,9 @@ import org.junit.Test;
  * for projections on field value.
  * <p>
  * Behavior that is specific to the field type is tested elsewhere,
- * e.g. {@link FieldSearchProjectionSingleValuedBaseIT} and {@link FieldSearchProjectionTypeCheckingAndConversionIT}.
+ * e.g. {@link FieldProjectionSingleValuedBaseIT} and {@link FieldProjectionTypeCheckingAndConversionIT}.
  */
-public class FieldSearchProjectionTypeIndependentIT {
+public class FieldProjectionTypeIndependentIT {
 
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();

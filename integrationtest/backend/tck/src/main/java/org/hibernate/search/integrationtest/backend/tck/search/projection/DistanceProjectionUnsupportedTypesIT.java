@@ -32,7 +32,7 @@ import org.junit.runners.Parameterized;
  * i.e. error messages.
  */
 @RunWith(Parameterized.class)
-public class DistanceSearchProjectionUnsupportedTypesIT<F> {
+public class DistanceProjectionUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
@@ -60,7 +60,7 @@ public class DistanceSearchProjectionUnsupportedTypesIT<F> {
 
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 
-	public DistanceSearchProjectionUnsupportedTypesIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	public DistanceProjectionUnsupportedTypesIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 	}
 

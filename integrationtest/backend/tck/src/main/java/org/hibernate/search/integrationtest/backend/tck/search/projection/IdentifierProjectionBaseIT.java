@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class IdentifierSearchProjectionBaseIT {
+public class IdentifierProjectionBaseIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -52,7 +52,7 @@ public class IdentifierSearchProjectionBaseIT {
 	private final String[] compatibleIndexIds = new String[3];
 	private final String[] compatibleIndexNames = new String[3];
 
-	public IdentifierSearchProjectionBaseIT() {
+	public IdentifierProjectionBaseIT() {
 		initValues();
 	}
 

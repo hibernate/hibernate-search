@@ -34,10 +34,10 @@ import org.junit.Test;
  * e.g. {@code f.composite( MyPair::new, otherProjection1, otherProjection2 ) },
  * as opposed to the multi-step DSL,
  * e.g. {@code f.composite().from( otherProjection1, otherProjection2 ).as( MyPair::new ) },
- * which is tested in {@link CompositeSearchProjectionMultiStepIT}.
+ * which is tested in {@link CompositeProjectionMultiStepIT}.
  */
 @SuppressWarnings("deprecation")
-public class CompositeSearchProjectionSingleStepIT {
+public class CompositeProjectionSingleStepIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";

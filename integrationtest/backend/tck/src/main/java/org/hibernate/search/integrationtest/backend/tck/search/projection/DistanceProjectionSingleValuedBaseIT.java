@@ -9,25 +9,28 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_2;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_KM_COMPARATOR;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_MILES_COMPARATOR;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_M_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
@@ -47,29 +50,21 @@ import org.junit.runners.Parameterized;
 import org.assertj.core.api.ListAssert;
 
 /**
- * Tests basic behavior of projections on the distance between a given point and the value of a multi-valued field.
+ * Tests basic behavior of projections on the distance between a given point and the value of a single-valued field.
  */
 @RunWith(Parameterized.class)
-@TestForIssue(jiraKey = "HSEARCH-3391")
-public class DistanceSearchProjectionMultiValuedBaseIT {
+public class DistanceProjectionSingleValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
 	private static List<DataSet> dataSets;
-
-	private static final Comparator<Iterable<Double>> APPROX_M_COMPARATOR =
-			TestComparators.lexicographic( TestComparators.APPROX_M_COMPARATOR );
-	private static final Comparator<Iterable<Double>> APPROX_KM_COMPARATOR =
-			TestComparators.lexicographic( TestComparators.APPROX_KM_COMPARATOR );
-	private static final Comparator<Iterable<Double>> APPROX_MILES_COMPARATOR =
-			TestComparators.lexicographic( TestComparators.APPROX_MILES_COMPARATOR );
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] parameters() {
 		dataSets = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
 		for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
-			if ( fieldStructure.isSingleValued() ) {
+			if ( fieldStructure.isMultiValued() ) {
 				continue;
 			}
 			DataSet dataSet = new DataSet( fieldStructure );
@@ -83,13 +78,13 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
-			SimpleMappedIndex.of( root -> SingleFieldIndexBinding.create(
+			SimpleMappedIndex.of( root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
 					root, supportedFieldTypes,
 					c -> c.projectable( Projectable.YES )
 			) )
 					.name( "main" );
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> sortableIndex =
-			SimpleMappedIndex.of( root -> SingleFieldIndexBinding.create(
+			SimpleMappedIndex.of( root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
 					root, supportedFieldTypes,
 					c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
 			) )
@@ -110,7 +105,7 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 	private final TestedFieldStructure fieldStructure;
 	private final DataSet dataSet;
 
-	public DistanceSearchProjectionMultiValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
+	public DistanceProjectionSingleValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		this.fieldStructure = fieldStructure;
 		this.dataSet = dataSet;
 	}
@@ -123,34 +118,61 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 
 		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
-				.select( f -> f.distance( fieldPath, CENTER_POINT_1 ).multi() )
+				.select( f -> f.distance( fieldPath, CENTER_POINT_1 ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
 				.hits().asIs()
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						dataSet.getFieldDistancesFromCenter1( 1 ),
-						dataSet.getFieldDistancesFromCenter1( 2 ),
-						dataSet.getFieldDistancesFromCenter1( 3 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ),
+						dataSet.getFieldDistanceFromCenter1( 2 ),
+						dataSet.getFieldDistanceFromCenter1( 3 ),
+						null // Empty document
+				);
+	}
+
+	/**
+	 * Test requesting a multi-valued projection on a single-valued field.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3391")
+	public void multi() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = getFieldPath();
+
+		assertThatQuery( scope.query()
+				.select( f -> f.distance( fieldPath, CENTER_POINT_1 ).multi() )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hits().asIs()
+				.usingElementComparator( TestComparators.lexicographic( APPROX_M_COMPARATOR ) )
+				.containsExactlyInAnyOrder(
+						Collections.singletonList( dataSet.getFieldDistanceFromCenter1( 1 ) ),
+						Collections.singletonList( dataSet.getFieldDistanceFromCenter1( 2 ) ),
+						Collections.singletonList( dataSet.getFieldDistanceFromCenter1( 3 ) ),
+						// Empty document
+						TckConfiguration.get().getBackendFeatures().projectionPreservesNulls()
+								? Collections.singletonList( null )
+								: Collections.emptyList()
 				);
 	}
 
 	/**
 	 * Test that mentioning the same projection twice works as expected.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void duplicated() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getFieldPath();
 
-		ListAssert<Pair<List<Double>, List<Double>>> hitsAssert = assertThatQuery( scope.query()
+		ListAssert<Pair<Double, Double>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite()
-						.from( f.distance( fieldPath, CENTER_POINT_1 ).multi(),
-								f.distance( fieldPath, CENTER_POINT_1 ).multi() )
+						.from( f.distance( fieldPath, CENTER_POINT_1 ),
+								f.distance( fieldPath, CENTER_POINT_1 ) )
 						.as( Pair::new ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -160,18 +182,18 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 		hitsAssert.extracting( Pair::elem0 )
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						dataSet.getFieldDistancesFromCenter1( 1 ),
-						dataSet.getFieldDistancesFromCenter1( 2 ),
-						dataSet.getFieldDistancesFromCenter1( 3 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ),
+						dataSet.getFieldDistanceFromCenter1( 2 ),
+						dataSet.getFieldDistanceFromCenter1( 3 ),
+						null
 				);
 		hitsAssert.extracting( Pair::elem1 )
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						dataSet.getFieldDistancesFromCenter1( 1 ),
-						dataSet.getFieldDistancesFromCenter1( 2 ),
-						dataSet.getFieldDistancesFromCenter1( 3 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ),
+						dataSet.getFieldDistanceFromCenter1( 2 ),
+						dataSet.getFieldDistanceFromCenter1( 3 ),
+						null
 				);
 	}
 
@@ -184,16 +206,16 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 
 		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
-				.select( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ).multi() )
+				.select( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.toQuery() )
 				.hits().asIs()
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						dataSet.getSortableFieldDistancesFromCenter( 1 ),
-						dataSet.getSortableFieldDistancesFromCenter( 2 ),
-						dataSet.getSortableFieldDistancesFromCenter( 3 )
+						dataSet.getSortableFieldDistanceFromCenter( 1 ),
+						dataSet.getSortableFieldDistanceFromCenter( 2 ),
+						dataSet.getSortableFieldDistanceFromCenter( 3 )
 				);
 	}
 
@@ -210,7 +232,7 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 
 		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
-				.select( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ).multi() )
+				.select( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ) )
 				.where( f -> f.matchAll() )
 				.sort( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ) )
 				.routing( dataSet.routingKey )
@@ -218,9 +240,9 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 				.hits().asIs()
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactly( // in this order
-						dataSet.getSortableFieldDistancesFromCenter( 1 ),
-						dataSet.getSortableFieldDistancesFromCenter( 2 ),
-						dataSet.getSortableFieldDistancesFromCenter( 3 )
+						dataSet.getSortableFieldDistanceFromCenter( 1 ),
+						dataSet.getSortableFieldDistanceFromCenter( 2 ),
+						dataSet.getSortableFieldDistanceFromCenter( 3 )
 				);
 	}
 
@@ -229,7 +251,7 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 ).multi()
+				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 )
 						.unit( DistanceUnit.KILOMETERS ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -237,10 +259,10 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 				.hits().asIs()
 				.usingElementComparator( APPROX_KM_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						divideAll( dataSet.getFieldDistancesFromCenter1( 1 ), 1000 ),
-						divideAll( dataSet.getFieldDistancesFromCenter1( 2 ), 1000 ),
-						divideAll( dataSet.getFieldDistancesFromCenter1( 3 ), 1000 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ) / 1000,
+						dataSet.getFieldDistanceFromCenter1( 2 ) / 1000,
+						dataSet.getFieldDistanceFromCenter1( 3 ) / 1000,
+						null
 				);
 	}
 
@@ -249,7 +271,7 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 ).multi()
+				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 )
 						.unit( DistanceUnit.MILES ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -257,10 +279,10 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 				.hits().asIs()
 				.usingElementComparator( APPROX_MILES_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						divideAll( dataSet.getFieldDistancesFromCenter1( 1 ), 1_609.344 ),
-						divideAll( dataSet.getFieldDistancesFromCenter1( 2 ), 1_609.344 ),
-						divideAll( dataSet.getFieldDistancesFromCenter1( 3 ), 1_609.344 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ) / 1_609.344,
+						dataSet.getFieldDistanceFromCenter1( 2 ) / 1_609.344,
+						dataSet.getFieldDistanceFromCenter1( 3 ) / 1_609.344,
+						null
 				);
 	}
 
@@ -268,11 +290,11 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 	public void several() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		ListAssert<Triplet<List<Double>, List<Double>, List<Double>>> hitsAssert = assertThatQuery( scope.query()
+		ListAssert<Triplet<Double, Double, Double>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite()
-						.from( f.distance( getFieldPath(), CENTER_POINT_1 ).multi(),
-								f.distance( getFieldPath(), CENTER_POINT_2 ).multi(),
-								f.distance( getFieldPath(), CENTER_POINT_1 ).multi().unit( DistanceUnit.KILOMETERS ) )
+						.from( f.distance( getFieldPath(), CENTER_POINT_1 ),
+								f.distance( getFieldPath(), CENTER_POINT_2 ),
+								f.distance( getFieldPath(), CENTER_POINT_1 ).unit( DistanceUnit.KILOMETERS ) )
 						.as( Triplet::new ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -282,35 +304,55 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 		hitsAssert.extracting( Triplet::elem0 )
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						dataSet.getFieldDistancesFromCenter1( 1 ),
-						dataSet.getFieldDistancesFromCenter1( 2 ),
-						dataSet.getFieldDistancesFromCenter1( 3 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ),
+						dataSet.getFieldDistanceFromCenter1( 2 ),
+						dataSet.getFieldDistanceFromCenter1( 3 ),
+						null
 				);
 		hitsAssert.extracting( Triplet::elem1 )
 				.usingElementComparator( APPROX_M_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						dataSet.getFieldDistancesFromCenter2( 1 ),
-						dataSet.getFieldDistancesFromCenter2( 2 ),
-						dataSet.getFieldDistancesFromCenter2( 3 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter2( 1 ),
+						dataSet.getFieldDistanceFromCenter2( 2 ),
+						dataSet.getFieldDistanceFromCenter2( 3 ),
+						null
 				);
 		hitsAssert.extracting( Triplet::elem2 )
 				.usingElementComparator( APPROX_KM_COMPARATOR )
 				.containsExactlyInAnyOrder(
-						divideAll( dataSet.getFieldDistancesFromCenter1( 1 ), 1000 ),
-						divideAll( dataSet.getFieldDistancesFromCenter1( 2 ), 1000 ),
-						divideAll( dataSet.getFieldDistancesFromCenter1( 3 ), 1000 ),
-						Collections.emptyList() // Empty document
+						dataSet.getFieldDistanceFromCenter1( 1 ) / 1000,
+						dataSet.getFieldDistanceFromCenter1( 2 ) / 1000,
+						dataSet.getFieldDistanceFromCenter1( 3 ) / 1000,
+						null
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		AbstractObjectBinding parentObjectBinding = mainIndex.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		assertThatQuery( mainIndex.query()
+				.select( f -> f.withRoot( parentObjectBinding.absolutePath )
+						.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), CENTER_POINT_1 ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hits().asIs()
+				.usingElementComparator( APPROX_M_COMPARATOR )
+				.containsExactlyInAnyOrder(
+						dataSet.getFieldDistanceFromCenter1( 1 ),
+						dataSet.getFieldDistanceFromCenter1( 2 ),
+						dataSet.getFieldDistanceFromCenter1( 3 ),
+						null // Empty document
 				);
 	}
 
 	private String getFieldPath() {
 		return mainIndex.binding().getFieldPath( fieldStructure, fieldType );
-	}
-
-	private static List<Double> divideAll(List<Double> distances, double denominator) {
-		return distances.stream().map( v -> v / denominator ).collect( Collectors.toList() );
 	}
 
 	private static class DataSet {
@@ -332,50 +374,49 @@ public class DistanceSearchProjectionMultiValuedBaseIT {
 
 		private void contribute(BulkIndexer mainIndexer, BulkIndexer sortableIndexer) {
 			mainIndexer.add( documentProvider( emptyDocId( 1 ), routingKey,
-					document -> mainIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, Collections.emptyList() ) ) );
+					document -> mainIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, null ) ) );
 			mainIndexer.add( documentProvider( docId( 1 ), routingKey,
-					document -> mainIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getFieldValues( 1 ) ) ) );
+					document -> mainIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getFieldValue( 1 ) ) ) );
 			mainIndexer.add( documentProvider( docId( 2 ), routingKey,
-					document -> mainIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getFieldValues( 2 ) ) ) );
+					document -> mainIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getFieldValue( 2 ) ) ) );
 			mainIndexer.add( documentProvider( docId( 3 ), routingKey,
-					document -> mainIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getFieldValues( 3 ) ) ) );
+					document -> mainIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getFieldValue( 3 ) ) ) );
 
 			sortableIndexer.add( documentProvider( docId( 2 ), routingKey,
-					document -> sortableIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getSortableFieldValues( 2 ) ) ) );
+					document -> sortableIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getSortableFieldValue( 2 ) ) ) );
 			sortableIndexer.add( documentProvider( docId( 1 ), routingKey,
-					document -> sortableIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getSortableFieldValues( 1 ) ) ) );
+					document -> sortableIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getSortableFieldValue( 1 ) ) ) );
 			sortableIndexer.add( documentProvider( docId( 3 ), routingKey,
-					document -> sortableIndex.binding().initMultiValued( fieldType, fieldStructure.location,
-							document, getSortableFieldValues( 3 ) ) ) );
+					document -> sortableIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+							document, getSortableFieldValue( 3 ) ) ) );
 		}
 
-		private List<GeoPoint> getFieldValues(int documentNumber) {
-			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getMulti().get( documentNumber - 1 );
+		private GeoPoint getFieldValue(int documentNumber) {
+			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getSingle().get( documentNumber - 1 );
 		}
 
-		private List<GeoPoint> getSortableFieldValues(int documentNumber) {
-			return AscendingUniqueDistanceFromCenterValues.INSTANCE.getMultiResultingInSingle( SortMode.MIN )
+		private GeoPoint getSortableFieldValue(int documentNumber) {
+			return AscendingUniqueDistanceFromCenterValues.INSTANCE.getSingle().get( documentNumber - 1 );
+		}
+
+		private double getFieldDistanceFromCenter1(int documentNumber) {
+			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getSingleDistancesFromCenterPoint1()
 					.get( documentNumber - 1 );
 		}
 
-		private List<Double> getFieldDistancesFromCenter1(int documentNumber) {
-			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getMultiDistancesFromCenterPoint1()
+		private double getFieldDistanceFromCenter2(int documentNumber) {
+			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getSingleDistancesFromCenterPoint2()
 					.get( documentNumber - 1 );
 		}
 
-		private List<Double> getFieldDistancesFromCenter2(int documentNumber) {
-			return IndexableGeoPointWithDistanceFromCenterValues.INSTANCE.getMultiDistancesFromCenterPoint2()
-					.get( documentNumber - 1 );
-		}
-
-		private List<Double> getSortableFieldDistancesFromCenter(int documentNumber) {
-			return AscendingUniqueDistanceFromCenterValues.INSTANCE.getMultiDistancesFromCenterPointForMinDataset()
+		private Double getSortableFieldDistanceFromCenter(int documentNumber) {
+			return AscendingUniqueDistanceFromCenterValues.INSTANCE.getSingleDistancesFromCenterPoint()
 					.get( documentNumber - 1 );
 		}
 	}

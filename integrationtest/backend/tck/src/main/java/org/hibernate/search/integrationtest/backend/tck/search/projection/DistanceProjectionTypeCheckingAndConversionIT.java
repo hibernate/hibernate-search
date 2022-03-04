@@ -44,7 +44,7 @@ import org.junit.Test;
  * Tests behavior related to type checking and type conversion of
  * projections on the distance between a field value and a given point.
  */
-public class DistanceSearchProjectionTypeCheckingAndConversionIT {
+public class DistanceProjectionTypeCheckingAndConversionIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 
