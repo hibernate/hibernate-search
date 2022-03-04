@@ -26,9 +26,9 @@ import org.junit.Test;
  * for sorts by field value.
  * <p>
  * Behavior that is specific to the field type is tested elsewhere,
- * e.g. {@link FieldSearchSortBaseIT} and {@link FieldSearchSortUnsupportedTypesIT}.
+ * e.g. {@link FieldSortBaseIT} and {@link FieldSortUnsupportedTypesIT}.
  */
-public class FieldSearchSortTypeIndependentIT {
+public class FieldSortTypeIndependentIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();

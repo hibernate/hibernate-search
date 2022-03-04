@@ -56,7 +56,7 @@ import org.junit.runners.Parameterized;
  * Tests basic behavior of sorts by field value common to all supported types.
  */
 @RunWith(Parameterized.class)
-public class FieldSearchSortBaseIT<F> {
+public class FieldSortBaseIT<F> {
 
 	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
 	private static List<DataSet<?>> dataSets;
@@ -124,7 +124,7 @@ public class FieldSearchSortBaseIT<F> {
 	private final DataSet<F> dataSetForAsc;
 	private final DataSet<F> dataSetForDesc;
 
-	public FieldSearchSortBaseIT(TestedFieldStructure fieldStructure,
+	public FieldSortBaseIT(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, SortMode sortMode,
 			DataSet<F> dataSetForAsc, DataSet<F> dataSetForDesc) {
 		this.fieldStructure = fieldStructure;

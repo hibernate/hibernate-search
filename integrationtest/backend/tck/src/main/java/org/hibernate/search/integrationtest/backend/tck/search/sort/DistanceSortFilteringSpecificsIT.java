@@ -33,9 +33,9 @@ import org.junit.Test;
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
- * that is not tested in {@link DistanceSearchSortBaseIT}.
+ * that is not tested in {@link DistanceSortBaseIT}.
  */
-public class DistanceSearchSortFilteringSpecificsIT {
+public class DistanceSortFilteringSpecificsIT {
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
