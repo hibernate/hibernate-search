@@ -10,7 +10,7 @@ import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
 class CompositeProjectionFrom2AsStepImpl<V1, V2>
@@ -28,8 +28,8 @@ class CompositeProjectionFrom2AsStepImpl<V1, V2>
 	}
 
 	@Override
-	public <V> CompositeProjectionOptionsStep<?, V> as(BiFunction<V1, V2, V> transformer) {
-		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, inner1, inner2 );
+	public <V> CompositeProjectionValueStep<?, V> as(BiFunction<V1, V2, V> transformer) {
+		return new CompositeProjectionValueStepImpl<>( dslContext, transformer, inner1, inner2 );
 	}
 
 	@Override

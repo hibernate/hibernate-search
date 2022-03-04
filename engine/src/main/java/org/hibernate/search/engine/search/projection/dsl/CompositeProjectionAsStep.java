@@ -22,7 +22,7 @@ public interface CompositeProjectionAsStep {
 	 *
 	 * @return The next DSL step.
 	 */
-	CompositeProjectionOptionsStep<?, List<?>> asList();
+	CompositeProjectionValueStep<?, List<?>> asList();
 
 	/**
 	 * Defines the result of the composite projection
@@ -33,6 +33,6 @@ public interface CompositeProjectionAsStep {
 	 * @return The next DSL step.
 	 * @param <V> The type of values returned by the transformer.
 	 */
-	<V> CompositeProjectionOptionsStep<?, V> asList(Function<List<?>, V> transformer);
+	<V> CompositeProjectionValueStep<?, V> asList(Function<List<?>, V> transformer);
 
 }

@@ -159,8 +159,30 @@ public interface SearchProjectionFactory<R, E> {
 	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
+	 * Starts the definition of an object projection,
+	 * which will yield one value per object in a given object field,
+	 * the value being the result of combining multiple given projections
+	 * (usually on fields within the object field).
+	 * <p>
+	 * Compared to the basic {@link #composite() composite projection},
+	 * an object projection is bound to a specific object field,
+	 * and thus it yield zero, one or many values, as many as there are objects in the targeted object field.
+	 * Therefore, you must take care of calling {@link CompositeProjectionValueStep#multi()}
+	 * if the object field is multi-valued.
+	 *
+	 * @param objectFieldPath The <a href="#field-paths">path</a> to the object field whose object(s) will be extracted.
+	 * @return A DSL step where the "composite" projection can be defined in more details.
+	 */
+	CompositeProjectionFromStep object(String objectFieldPath);
+
+	/**
 	 * Starts the definition of a composite projection,
 	 * which will combine multiple given projections.
+	 * <p>
+	 * On contrary to the {@link #object(String)  object projection},
+	 * a composite projection is not bound to a specific object field,
+	 * and thus it will always yield one and only one value,
+	 * regardless of whether {@link CompositeProjectionValueStep#multi()} is called.
 	 *
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
@@ -172,7 +194,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param projections The projections used to populate the list, in order.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	CompositeProjectionOptionsStep<?, List<?>> composite(SearchProjection<?>... projections);
+	CompositeProjectionValueStep<?, List<?>> composite(SearchProjection<?>... projections);
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given almost-built projections.
@@ -180,7 +202,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param dslFinalSteps The final steps in the projection DSL allowing the retrieval of {@link SearchProjection}s.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default CompositeProjectionOptionsStep<?, List<?>> composite(ProjectionFinalStep<?>... dslFinalSteps) {
+	default CompositeProjectionValueStep<?, List<?>> composite(ProjectionFinalStep<?>... dslFinalSteps) {
 		SearchProjection<?>[] projections = new SearchProjection<?>[dslFinalSteps.length];
 		for ( int i = 0; i < dslFinalSteps.length; i++ ) {
 			projections[i] = dslFinalSteps[i].toProjection();

@@ -28,6 +28,6 @@ public interface CompositeProjectionFrom3AsStep<V1, V2, V3>
 	 * @return The next DSL step.
 	 * @param <V> The type of values returned by the transformer.
 	 */
-	<V> CompositeProjectionOptionsStep<?, V> as(TriFunction<V1, V2, V3, V> transformer);
+	<V> CompositeProjectionValueStep<?, V> as(TriFunction<V1, V2, V3, V> transformer);
 
 }
