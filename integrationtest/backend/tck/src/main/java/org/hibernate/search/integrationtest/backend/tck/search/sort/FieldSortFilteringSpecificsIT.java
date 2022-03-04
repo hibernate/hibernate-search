@@ -38,10 +38,10 @@ import org.junit.runners.Parameterized;
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
- * that is not tested in {@link FieldSearchSortBaseIT}.
+ * that is not tested in {@link FieldSortBaseIT}.
  */
 @RunWith(Parameterized.class)
-public class FieldSearchSortFilteringSpecificsIT<F> {
+public class FieldSortFilteringSpecificsIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
@@ -69,7 +69,7 @@ public class FieldSearchSortFilteringSpecificsIT<F> {
 
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 
-	public FieldSearchSortFilteringSpecificsIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	public FieldSortFilteringSpecificsIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 	}
 

@@ -58,7 +58,7 @@ import org.junit.runners.Parameterized;
  * for sorts by field value.
  */
 @RunWith(Parameterized.class)
-public class FieldSearchSortTypeCheckingAndConversionIT<F> {
+public class FieldSortTypeCheckingAndConversionIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 
-	public FieldSearchSortTypeCheckingAndConversionIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	public FieldSortTypeCheckingAndConversionIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 	}
 

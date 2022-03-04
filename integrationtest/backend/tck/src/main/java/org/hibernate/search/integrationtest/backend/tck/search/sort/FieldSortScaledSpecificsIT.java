@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class FieldSearchSortScaledSpecificsIT {
+public class FieldSortScaledSpecificsIT {
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();

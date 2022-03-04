@@ -50,7 +50,7 @@ import org.junit.runners.Parameterized;
  * Tests basic behavior of sorts by distance.
  */
 @RunWith(Parameterized.class)
-public class DistanceSearchSortBaseIT {
+public class DistanceSortBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
@@ -112,7 +112,7 @@ public class DistanceSearchSortBaseIT {
 	private final DataSet dataSetForAsc;
 	private final DataSet dataSetForDesc;
 
-	public DistanceSearchSortBaseIT(TestedFieldStructure fieldStructure, SortMode sortMode,
+	public DistanceSortBaseIT(TestedFieldStructure fieldStructure, SortMode sortMode,
 			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		this.fieldStructure = fieldStructure;
 		this.sortMode = sortMode;

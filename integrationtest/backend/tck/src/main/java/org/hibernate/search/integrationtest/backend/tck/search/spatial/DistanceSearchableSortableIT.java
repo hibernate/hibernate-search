@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class DistanceSearchSearchableSortableIT {
+public class DistanceSearchableSortableIT {
 
 	private static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	private static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687, 4.835233 );
