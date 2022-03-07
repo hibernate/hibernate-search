@@ -279,7 +279,7 @@
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0.1</version.javax.batch>
         <version.jakarta.batch>2.0.0</version.jakarta.batch>
-        <version.org.jberet>1.4.0.Final</version.org.jberet>
+        <version.org.jberet>2.0.4.Final</version.org.jberet>
         <version.org.jberet.jakarta>2.0.2.Final</version.org.jberet.jakarta>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
