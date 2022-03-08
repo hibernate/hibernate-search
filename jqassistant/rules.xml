@@ -16,6 +16,7 @@
                 (type:Type)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(suppressAnnotation:Type)
             WHERE
                 suppressAnnotation.fqn = "org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant"
+                OR suppressAnnotation.fqn = "org.hibernate.search.util.impl.test.annotation.SuppressJQAssistant"
             SET
                 type:SuppressJQAssistant
             RETURN

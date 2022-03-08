@@ -1823,6 +1823,7 @@
                                 </excludes>
                                 <suppressAnnotations>
                                     <suppressAnnotation>org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis</suppressAnnotation>
+                                    <suppressAnnotation>org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis</suppressAnnotation>
                                 </suppressAnnotations>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
