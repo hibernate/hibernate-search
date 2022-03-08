@@ -20,6 +20,13 @@ java.beans.** @ It will be removed from future versions of the JDK
 java.lang.StringBuffer @ Do not use java.lang.StringBuffer: use java.lang.StringBuilder
 
 ################################################################################################################
+# These APIs have side effects beyond Hibernate Search
+@defaultMessage Do not set properties in main code; for tests, use org.hibernate.search.util.impl.test.SystemHelper.setSystemProperty
+java.lang.System.setProperty
+java.lang.System.clearProperty
+java.lang.System.setProperties
+
+################################################################################################################
 # Probably meant the other Objects:
 
 org.jboss.logging.processor.util.Objects @ Bad import, use java.util.Objects

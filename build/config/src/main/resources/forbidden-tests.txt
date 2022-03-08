@@ -16,6 +16,13 @@ junit.framework.**
 java.beans.**
 
 ################################################################################################################
+# These APIs have side effects beyond Hibernate Search
+@defaultMessage Do not set properties in main code; for tests, use org.hibernate.search.util.impl.test.SystemHelper.setSystemProperty
+java.lang.System.setProperty
+java.lang.System.clearProperty
+java.lang.System.setProperties
+
+################################################################################################################
 # Probably meant the other Objects:
 org.jboss.logging.processor.util.Objects
 
