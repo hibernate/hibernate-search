@@ -20,11 +20,11 @@ public class Elasticsearch7SearchResultExtractorFactory implements Elasticsearch
 	@Override
 	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
 		return new Elasticsearch7SearchResultExtractor<>(
 				requestContext,
-				rootProjection, aggregations
+				rootExtractor, aggregations
 		);
 	}
 }

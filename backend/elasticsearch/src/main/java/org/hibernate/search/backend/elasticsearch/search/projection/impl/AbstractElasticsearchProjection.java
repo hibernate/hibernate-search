@@ -11,7 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
-public abstract class AbstractElasticsearchProjection<E, P> implements ElasticsearchSearchProjection<E, P> {
+public abstract class AbstractElasticsearchProjection<P> implements ElasticsearchSearchProjection<P> {
 
 	protected final Set<String> indexNames;
 

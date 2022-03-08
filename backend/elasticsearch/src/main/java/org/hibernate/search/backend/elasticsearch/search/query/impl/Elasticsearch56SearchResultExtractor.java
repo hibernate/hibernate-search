@@ -33,9 +33,9 @@ class Elasticsearch56SearchResultExtractor<H> extends Elasticsearch7SearchResult
 
 	Elasticsearch56SearchResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
-		super( requestContext, rootProjection, aggregations );
+		super( requestContext, rootExtractor, aggregations );
 	}
 
 	@Override

@@ -19,7 +19,8 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
+class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<JsonObject>
+		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -35,8 +36,9 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, JsonObject> request(JsonObject requestBody, ProjectionRequestContext context) {
 		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, WILDCARD_ALL );
+		return this;
 	}
 
 	@Override

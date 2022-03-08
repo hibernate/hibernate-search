@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
+class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection<JsonObject>
+		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
 
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
@@ -30,8 +31,9 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, JsonObject> request(JsonObject requestBody, ProjectionRequestContext context) {
 		REQUEST_EXPLAIN_ACCESSOR.set( requestBody, true );
+		return this;
 	}
 
 	@Override

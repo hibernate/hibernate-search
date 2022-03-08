@@ -16,7 +16,8 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjec
 import com.google.gson.JsonObject;
 
 class ElasticsearchDocumentReferenceProjection
-		extends AbstractElasticsearchProjection<DocumentReference, DocumentReference> {
+		extends AbstractElasticsearchProjection<DocumentReference>
+		implements ElasticsearchSearchProjection.Extractor<DocumentReference, DocumentReference> {
 
 	private final DocumentReferenceExtractionHelper helper;
 
@@ -32,8 +33,9 @@ class ElasticsearchDocumentReferenceProjection
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, DocumentReference> request(JsonObject requestBody, ProjectionRequestContext context) {
 		helper.request( requestBody, context );
+		return this;
 	}
 
 	@Override

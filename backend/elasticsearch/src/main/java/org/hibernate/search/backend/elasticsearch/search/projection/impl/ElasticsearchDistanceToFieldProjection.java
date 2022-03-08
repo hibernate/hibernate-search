@@ -35,7 +35,8 @@ import com.google.gson.JsonObject;
  * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
  * @param <P> The type of the final projection result representing accumulated distance values.
  */
-public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasticsearchProjection<A, P> {
+public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasticsearchProjection<P>
+		implements ElasticsearchSearchProjection.Extractor<A, P> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
@@ -104,9 +105,10 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
 		if ( !multiValued && context.getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
 			// Nothing to do, we'll rely on the sort key
+			return this;
 		}
 		else if ( scriptFieldName != null ) {
 			// we rely on a script to compute the distance
@@ -114,10 +116,11 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 					.property( scriptFieldName ).asObject()
 					.property( "script" ).asObject()
 					.set( requestBody, createScript( absoluteFieldPath, center ) );
+			return this;
 		}
 		else {
 			// we rely on the _source to compute the distance
-			sourceProjection.request( requestBody, context );
+			return sourceProjection.request( requestBody, context );
 		}
 	}
 
@@ -131,13 +134,10 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			accumulated = accumulator.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
 			return accumulated;
 		}
-		else if ( scriptFieldName != null ) {
+		else {
 			A accumulated = accumulator.createInitial();
 			accumulated = accumulator.accumulate( accumulated, extractDistanceFromScriptField( hit ) );
 			return accumulated;
-		}
-		else {
-			return sourceProjection.extract( projectionHitMapper, hit, context );
 		}
 	}
 

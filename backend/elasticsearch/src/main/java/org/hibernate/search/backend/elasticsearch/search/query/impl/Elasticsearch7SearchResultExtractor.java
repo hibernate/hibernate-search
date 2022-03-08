@@ -59,15 +59,15 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 
-	private final ElasticsearchSearchProjection<?, H> rootProjection;
+	private final ElasticsearchSearchProjection.Extractor<?, H> rootExtractor;
 	private final Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
 
 	Elasticsearch7SearchResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
 		this.requestContext = requestContext;
-		this.rootProjection = rootProjection;
+		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
 	}
 
@@ -98,7 +98,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
-				rootProjection,
+				rootExtractor,
 				total,
 				extractedHits,
 				extractedAggregations,
@@ -126,7 +126,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		for ( JsonElement hit : jsonHits ) {
 			JsonObject hitObject = hit.getAsJsonObject();
 
-			extractedData.add( rootProjection.extract(
+			extractedData.add( rootExtractor.extract(
 					hitMapper, hitObject,
 					projectionExtractContext
 			) );

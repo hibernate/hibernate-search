@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjection<String, I> {
+public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjection<I>
+		implements ElasticsearchSearchProjection.Extractor<String, I> {
 
 	private final ProjectionExtractionHelper<String> extractionHelper;
 	private final ProjectionConverter<String, ? extends I> converter;
@@ -34,8 +35,9 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<String, I> request(JsonObject requestBody, ProjectionRequestContext context) {
 		extractionHelper.request( requestBody, context );
+		return this;
 	}
 
 	@Override
