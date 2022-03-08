@@ -39,25 +39,25 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new DocumentReferenceProjectionBuilder() {
 			@Override
 			public SearchProjection<DocumentReference> build() {
-				return StubDefaultSearchProjection.get();
+				return StubDefaultProjection.get();
 			}
 		};
 	}
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return StubEntitySearchProjection::get;
+		return StubEntityProjection::get;
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return StubReferenceSearchProjection::get;
+		return StubReferenceProjection::get;
 	}
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
 		SearchIndexIdentifierContext identifier = scope.identifier();
-		return new StubIdSearchProjection.Builder<>(
+		return new StubIdProjection.Builder<>(
 				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
 	}
 
@@ -66,7 +66,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new ScoreProjectionBuilder() {
 			@Override
 			public SearchProjection<Float> build() {
-				return StubDefaultSearchProjection.get();
+				return StubDefaultProjection.get();
 			}
 		};
 	}
@@ -77,7 +77,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
-				return new StubCompositeListSearchProjection<>( transformer,
+				return new StubCompositeListProjection<>( transformer,
 						Arrays.stream( projections ).map( p -> toImplementation( p ) ).collect( Collectors.toList() ) );
 			}
 
@@ -96,7 +96,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
-				return new StubCompositeFunctionSearchProjection<>( transformer, toImplementation( projection ) );
+				return new StubCompositeFunctionProjection<>( transformer, toImplementation( projection ) );
 			}
 		};
 	}
@@ -107,7 +107,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
-				return new StubCompositeBiFunctionSearchProjection<>( transformer, toImplementation( projection1 ),
+				return new StubCompositeBiFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) );
 			}
 		};
@@ -119,7 +119,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
-				return new StubCompositeTriFunctionSearchProjection<>( transformer, toImplementation( projection1 ),
+				return new StubCompositeTriFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) );
 			}
 		};

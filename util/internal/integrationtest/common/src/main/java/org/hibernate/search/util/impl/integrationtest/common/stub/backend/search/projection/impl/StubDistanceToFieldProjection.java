@@ -16,9 +16,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
-public abstract class StubDistanceToFieldSearchProjection<T> implements StubSearchProjection<T> {
+public abstract class StubDistanceToFieldProjection<T> implements StubSearchProjection<T> {
 
-	private StubDistanceToFieldSearchProjection() {
+	private StubDistanceToFieldProjection() {
 	}
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<DistanceToFieldProjectionBuilder> {

@@ -13,13 +13,13 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class StubCompositeListSearchProjection<P> implements StubCompositeSearchProjection<P> {
+class StubCompositeListProjection<P> implements StubCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
 	private final List<StubSearchProjection<?>> children;
 
-	StubCompositeListSearchProjection(Function<List<?>, P> transformer,
+	StubCompositeListProjection(Function<List<?>, P> transformer,
 			List<StubSearchProjection<?>> children) {
 		this.transformer = transformer;
 		this.children = children;

@@ -13,11 +13,11 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
-public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
+public class StubIdProjection<I> implements StubSearchProjection<I> {
 
 	private final ProjectionConverter<String, ? extends I> converter;
 
-	private StubIdSearchProjection(ProjectionConverter<String, ? extends I> converter) {
+	private StubIdProjection(ProjectionConverter<String, ? extends I> converter) {
 		this.converter = converter;
 	}
 
@@ -43,7 +43,7 @@ public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
 		private final StubSearchProjection<I> projection;
 
 		public Builder(ProjectionConverter<String, ? extends I> converter) {
-			projection = new StubIdSearchProjection<>( converter );
+			projection = new StubIdProjection<>( converter );
 		}
 
 		@Override
