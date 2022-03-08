@@ -13,12 +13,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.test.SystemHelper;
+import org.hibernate.search.util.impl.test.SystemHelper.SystemPropertyRestorer;
 
 import org.junit.After;
 import org.junit.Test;
 
 public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfigurationPropertySourceTest {
-	private final List<String> toClear = new ArrayList<>();
+	private final List<SystemPropertyRestorer> toClose = new ArrayList<>();
 
 	@Test
 	public void to_string() {
@@ -27,20 +30,19 @@ public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfi
 	}
 
 	@After
-	public void clearSystemProperties() {
-		for ( String key : toClear ) {
-			System.clearProperty( key );
+	public void restoreSystemProperties() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( SystemPropertyRestorer::close, toClose );
 		}
 	}
 
 	@Override
 	protected AllAwareConfigurationPropertySource createPropertySource(Map<String, String> content) {
-		clearSystemProperties();
+		restoreSystemProperties();
 		for ( Map.Entry<String, String> entry : content.entrySet() ) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-			toClear.add( key );
-			System.setProperty( key, value );
+			toClose.add( SystemHelper.setSystemProperty( key, value ) );
 		}
 		return AllAwareConfigurationPropertySource.system();
 	}

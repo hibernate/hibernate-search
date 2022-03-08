@@ -6,11 +6,16 @@
  */
 package org.hibernate.search.integrationtest.performance.backend.elasticsearch;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
+import org.hibernate.search.util.impl.test.SystemHelper;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +33,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
  * See README to know how to run the benchmark from the command line to obtain more reliable results.
  */
 public class SmokeIT {
+	private final List<SystemHelper.SystemPropertyRestorer> toClose = new ArrayList<>();
 
 	@Before
 	public void setupConnectionInfo() {
@@ -35,9 +41,16 @@ public class SmokeIT {
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( connectionInfo );
 		connectionInfo.forEach( (key, value) -> {
 			if ( value != null ) {
-				System.setProperty( key, value );
+				toClose.add( SystemHelper.setSystemProperty( key, value ) );
 			}
 		} );
+	}
+
+	@After
+	public void restoreSystemProperties() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( SystemHelper.SystemPropertyRestorer::close, toClose );
+		}
 	}
 
 	@Test
