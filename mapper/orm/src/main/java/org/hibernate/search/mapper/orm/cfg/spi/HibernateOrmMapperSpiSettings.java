@@ -18,6 +18,10 @@ public final class HibernateOrmMapperSpiSettings {
 	public static final String INTEGRATION_PARTIAL_BUILD_STATE =
 			PREFIX + Radicals.INTEGRATION_PARTIAL_BUILD_STATE;
 
+	public static final String JBOSS_LOG_VERSION =
+			// No Hibernate-specific prefix here; this controls the behavior of multiple JBoss libraries.
+			"jboss.log-version";
+
 	public static class Radicals {
 
 		private Radicals() {
@@ -33,6 +37,8 @@ public final class HibernateOrmMapperSpiSettings {
 
 		private Defaults() {
 		}
+
+		public static final boolean JBOSS_LOG_VERSIONS = true;
 
 	}
 
