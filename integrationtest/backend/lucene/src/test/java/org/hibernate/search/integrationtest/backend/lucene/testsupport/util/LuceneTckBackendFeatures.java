@@ -20,4 +20,9 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	public boolean projectionPreservesNulls() {
 		return false;
 	}
+
+	@Override
+	public boolean reliesOnNestedDocumentsForObjectProjection() {
+		return true;
+	}
 }

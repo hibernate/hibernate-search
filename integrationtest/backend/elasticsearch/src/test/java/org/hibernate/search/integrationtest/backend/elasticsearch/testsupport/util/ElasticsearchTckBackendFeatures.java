@@ -203,4 +203,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// Not supported in older versions of Elasticsearch
 		return dialect.ignoresFieldSortWhenNestedFieldMissing();
 	}
+
+	@Override
+	public boolean reliesOnNestedDocumentsForObjectProjection() {
+		return false;
+	}
 }
