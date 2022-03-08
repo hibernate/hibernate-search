@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import org.hibernate.search.engine.search.common.SortMode;
 
-public class TckBackendFeatures {
+public abstract class TckBackendFeatures {
 
 	public boolean geoPointIndexNullAs() {
 		return true;
@@ -106,4 +106,7 @@ public class TckBackendFeatures {
 	public boolean supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes() {
 		return true;
 	}
+
+	public abstract boolean reliesOnNestedDocumentsForObjectProjection();
+
 }
