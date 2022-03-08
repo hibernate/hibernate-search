@@ -19,6 +19,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.SystemHelper;
+import org.hibernate.search.util.impl.test.SystemHelper.SystemPropertyRestorer;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
@@ -83,7 +85,7 @@ public class BootstrapLogsIT {
 		String propertyKey = "org.hibernate.search.version";
 		String expectedHibernateSearchVersion = System.getProperty( propertyKey );
 		if ( expectedHibernateSearchVersion == null ) {
-			throw new IllegalStateException( "This test can only be executed, because system property '"
+			throw new IllegalStateException( "This test cannot be executed, because system property '"
 					+ propertyKey + "' was not defined." );
 		}
 
@@ -99,6 +101,27 @@ public class BootstrapLogsIT {
 		// Also check that retrieving the version string explicitly returns the right version string.
 		assertThat( Version.versionString() ).isEqualTo( expectedHibernateSearchVersion );
 		assertThat( Version.getVersionString() ).isEqualTo( expectedHibernateSearchVersion );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4503")
+	public void versionLoggingDisabled() {
+		String propertyKey = "org.hibernate.search.version";
+		String expectedHibernateSearchVersion = System.getProperty( propertyKey );
+		if ( expectedHibernateSearchVersion == null ) {
+			throw new IllegalStateException( "This test cannot be executed, because system property '"
+					+ propertyKey + "' was not defined." );
+		}
+
+		try ( SystemPropertyRestorer systemPropertyChange = SystemHelper.setSystemProperty( "jboss.log-version", "false" ) ) {
+			logged.expectMessage( "HSEARCH000034" ).never();
+			logged.expectMessage( "Hibernate Search version" ).never();
+
+			backendMock.expectAnySchema( IndexedEntity.NAME );
+
+			ormSetupHelper.start()
+					.setup( IndexedEntity.class, ContainedEntity.class );
+		}
 	}
 
 	private static Matcher<? extends LogEvent> suspiciousLogEventMatcher() {

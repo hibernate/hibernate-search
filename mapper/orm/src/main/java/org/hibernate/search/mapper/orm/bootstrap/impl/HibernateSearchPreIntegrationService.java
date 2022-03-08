@@ -30,6 +30,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooterBehavior;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.coordination.impl.CoordinationConfigurationContextImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -63,6 +64,12 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLED )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> LOG_VERSION =
+			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.JBOSS_LOG_VERSION )
+					.asBoolean()
+					.withDefault( HibernateOrmMapperSpiSettings.Defaults.JBOSS_LOG_VERSIONS )
+					.build();
+
 	public static class Contributor implements ServiceContributor {
 		@Override
 		public void contribute(StandardServiceRegistryBuilder serviceRegistryBuilder) {
@@ -88,7 +95,10 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 				return null;
 			}
 			initiated = true;
-			log.version( Version.versionString() );
+
+			if ( LOG_VERSION.get( AllAwareConfigurationPropertySource.system() ) ) {
+				log.version( Version.versionString() );
+			}
 
 			ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
 			@SuppressWarnings("unchecked")
