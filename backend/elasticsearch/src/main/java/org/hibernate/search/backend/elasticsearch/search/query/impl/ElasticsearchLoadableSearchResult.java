@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +30,7 @@ import org.hibernate.search.engine.common.timing.Deadline;
  */
 public class ElasticsearchLoadableSearchResult<H> {
 	private final ElasticsearchSearchQueryExtractContext extractContext;
-	private final ElasticsearchSearchProjection<?, H> rootProjection;
+	private final ElasticsearchSearchProjection.Extractor<?, H> extractor;
 
 	private final SearchResultTotal resultTotal;
 	private List<Object> extractedHits;
@@ -44,14 +42,14 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final Deadline deadline;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection.Extractor<?, H> extractor,
 			SearchResultTotal resultTotal,
 			List<Object> extractedHits,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			Integer took, Boolean timedOut, String scrollId,
 			Deadline deadline) {
 		this.extractContext = extractContext;
-		this.rootProjection = rootProjection;
+		this.extractor = extractor;
 		this.resultTotal = resultTotal;
 		this.extractedHits = extractedHits;
 		this.extractedAggregations = extractedAggregations;
@@ -72,8 +70,8 @@ public class ElasticsearchLoadableSearchResult<H> {
 		int writeIndex = 0;
 		for ( ; readIndex < extractedHits.size(); ++readIndex ) {
 			transformContext.reset();
-			H transformed = transformUnsafe(
-					rootProjection, loadingResult, extractedHits.get( readIndex ), transformContext
+			H transformed = ElasticsearchSearchProjection.Extractor.transformUnsafe(
+					extractor, loadingResult, extractedHits.get( readIndex ), transformContext
 			);
 
 			if ( transformContext.hasFailedLoad() ) {

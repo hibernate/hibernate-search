@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float, Float> {
+class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float>
+		implements ElasticsearchSearchProjection.Extractor<Float, Float> {
 
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();
@@ -30,8 +31,9 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, Float> request(JsonObject requestBody, ProjectionRequestContext context) {
 		TRACK_SCORES_ACCESSOR.set( requestBody, true );
+		return this;
 	}
 
 	@Override

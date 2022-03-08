@@ -20,11 +20,11 @@ public class Elasticsearch56SearchResultExtractorFactory implements Elasticsearc
 	@Override
 	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
 		return new Elasticsearch56SearchResultExtractor<>(
 				requestContext,
-				rootProjection, aggregations
+				rootExtractor, aggregations
 		);
 	}
 }

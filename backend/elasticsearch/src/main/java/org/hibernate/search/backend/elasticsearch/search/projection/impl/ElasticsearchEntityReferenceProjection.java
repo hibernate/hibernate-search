@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjecti
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticsearchProjection<DocumentReference, R> {
+public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticsearchProjection<R>
+		implements ElasticsearchSearchProjection.Extractor<DocumentReference, R> {
 
 	private final DocumentReferenceExtractionHelper helper;
 
@@ -30,11 +31,11 @@ public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticse
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, R> request(JsonObject requestBody, ProjectionRequestContext context) {
 		helper.request( requestBody, context );
+		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			ProjectionExtractContext context) {

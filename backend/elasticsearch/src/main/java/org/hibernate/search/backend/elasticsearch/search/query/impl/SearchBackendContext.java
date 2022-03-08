@@ -38,6 +38,6 @@ public interface SearchBackendContext {
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, H> rootProjection);
+			ElasticsearchSearchProjection<H> rootProjection);
 
 }

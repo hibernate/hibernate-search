@@ -43,7 +43,8 @@ import com.google.gson.JsonPrimitive;
  * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
  * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class ElasticsearchFieldProjection<F, V, A, P> extends AbstractElasticsearchProjection<A, P> {
+public class ElasticsearchFieldProjection<F, V, A, P> extends AbstractElasticsearchProjection<P>
+		implements ElasticsearchSearchProjection.Extractor<A, P> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -81,9 +82,10 @@ public class ElasticsearchFieldProjection<F, V, A, P> extends AbstractElasticsea
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
 		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, fieldPathJson );
+		return this;
 	}
 
 	@Override

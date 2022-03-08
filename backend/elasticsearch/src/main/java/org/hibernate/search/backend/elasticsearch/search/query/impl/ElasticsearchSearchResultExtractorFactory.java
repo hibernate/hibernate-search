@@ -17,7 +17,7 @@ public interface ElasticsearchSearchResultExtractorFactory {
 
 	<H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations);
 
 }

@@ -65,7 +65,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	private final PredicateRequestContext rootPredicateContext;
 	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
-	private final ElasticsearchSearchProjection<?, H> rootProjection;
+	private final ElasticsearchSearchProjection<H> rootProjection;
 	private final Integer scrollTimeout;
 
 	private final Set<String> routingKeys;
@@ -86,7 +86,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, H> rootProjection,
+			ElasticsearchSearchProjection<H> rootProjection,
 			Integer scrollTimeout) {
 		this.workFactory = workFactory;
 		this.searchResultExtractorFactory = searchResultExtractorFactory;
@@ -220,7 +220,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts
 		);
 
-		rootProjection.request( payload, requestContext );
+		ElasticsearchSearchProjection.Extractor<?, H> rootExtractor = rootProjection.request( payload, requestContext );
 
 		if ( aggregations != null ) {
 			JsonObject jsonAggregations = new JsonObject();
@@ -242,7 +242,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
-						rootProjection,
+						rootExtractor,
 						aggregations == null ? Collections.emptyMap() : aggregations
 				);
 

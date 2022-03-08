@@ -156,7 +156,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, H> rootProjection) {
+			ElasticsearchSearchProjection<H> rootProjection) {
 		multiTenancyStrategy.documentIdHelper().checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
 				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),

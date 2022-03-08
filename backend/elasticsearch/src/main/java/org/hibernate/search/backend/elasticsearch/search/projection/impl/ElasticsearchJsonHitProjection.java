@@ -14,7 +14,8 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
+class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<JsonObject>
+		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
 
 	private ElasticsearchJsonHitProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
@@ -26,8 +27,8 @@ class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<Jso
 	}
 
 	@Override
-	public void request(JsonObject requestBody, ProjectionRequestContext context) {
-		// No-op
+	public Extractor<?, JsonObject> request(JsonObject requestBody, ProjectionRequestContext context) {
+		return this;
 	}
 
 	@Override
