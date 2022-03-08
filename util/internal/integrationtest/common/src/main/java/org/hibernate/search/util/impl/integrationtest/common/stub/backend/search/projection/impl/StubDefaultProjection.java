@@ -9,17 +9,17 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-class StubDefaultSearchProjection<T> implements StubSearchProjection<T> {
+class StubDefaultProjection<T> implements StubSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
-	private static final StubSearchProjection INSTANCE = new StubDefaultSearchProjection();
+	private static final StubSearchProjection INSTANCE = new StubDefaultProjection();
 
 	@SuppressWarnings("unchecked")
-	static <T> StubDefaultSearchProjection<T> get() {
-		return (StubDefaultSearchProjection<T>) INSTANCE;
+	static <T> StubDefaultProjection<T> get() {
+		return (StubDefaultProjection<T>) INSTANCE;
 	}
 
-	private StubDefaultSearchProjection() {
+	private StubDefaultProjection() {
 	}
 
 	@Override

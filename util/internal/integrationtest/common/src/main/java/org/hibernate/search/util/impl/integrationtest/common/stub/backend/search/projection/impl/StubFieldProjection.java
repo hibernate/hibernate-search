@@ -20,11 +20,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
-public class StubFieldSearchProjection<F, V> implements StubSearchProjection<V> {
+public class StubFieldProjection<F, V> implements StubSearchProjection<V> {
 	private final Class<F> valueClass;
 	private final ProjectionConverter<F, ? extends V> converter;
 
-	private StubFieldSearchProjection(Class<F> valueClass, ProjectionConverter<F, ? extends V> converter) {
+	private StubFieldProjection(Class<F> valueClass, ProjectionConverter<F, ? extends V> converter) {
 		this.valueClass = valueClass;
 		this.converter = converter;
 	}
@@ -76,7 +76,7 @@ public class StubFieldSearchProjection<F, V> implements StubSearchProjection<V> 
 
 		@Override
 		public SearchProjection<V> build() {
-			return new StubFieldSearchProjection<>( valueClass, converter );
+			return new StubFieldProjection<>( valueClass, converter );
 		}
 
 		@Override

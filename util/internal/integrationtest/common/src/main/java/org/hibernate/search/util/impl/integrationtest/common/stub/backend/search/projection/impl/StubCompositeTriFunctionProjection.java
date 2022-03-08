@@ -7,24 +7,28 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.util.common.function.TriFunction;
 
-class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubCompositeSearchProjection<P> {
+class StubCompositeTriFunctionProjection<P1, P2, P3, P> implements StubCompositeProjection<P> {
 
-	private final BiFunction<P1, P2, P> transformer;
+	private final TriFunction<P1, P2, P3, P> transformer;
 
 	private final StubSearchProjection<P1> projection1;
 
 	private final StubSearchProjection<P2> projection2;
 
-	StubCompositeBiFunctionSearchProjection(BiFunction<P1, P2, P> transformer,
-			StubSearchProjection<P1> projection1, StubSearchProjection<P2> projection2) {
+	private final StubSearchProjection<P3> projection3;
+
+	StubCompositeTriFunctionProjection(TriFunction<P1, P2, P3, P> transformer,
+			StubSearchProjection<P1> projection1, StubSearchProjection<P2> projection2,
+			StubSearchProjection<P3> projection3) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
+		this.projection3 = projection3;
 	}
 
 	@Override
@@ -34,7 +38,8 @@ class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubComposit
 
 		return new Object[] {
 				projection1.extract( projectionHitMapper, listFromIndex.get( 0 ), context ),
-				projection2.extract( projectionHitMapper, listFromIndex.get( 1 ), context )
+				projection2.extract( projectionHitMapper, listFromIndex.get( 1 ), context ),
+				projection3.extract( projectionHitMapper, listFromIndex.get( 2 ), context )
 		};
 	}
 
@@ -45,7 +50,8 @@ class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubComposit
 
 		return transformer.apply(
 				projection1.transform( loadingResult, extractedElements[0], context ),
-				projection2.transform( loadingResult, extractedElements[1], context )
+				projection2.transform( loadingResult, extractedElements[0], context ),
+				projection3.transform( loadingResult, extractedElements[0], context )
 		);
 	}
 
@@ -55,6 +61,7 @@ class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubComposit
 				.append( "[" )
 				.append( "projection1=" ).append( projection1 )
 				.append( ", projection2=" ).append( projection2 )
+				.append( ", projection3=" ).append( projection3 )
 				.append( "]" );
 		return sb.toString();
 	}

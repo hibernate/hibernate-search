@@ -24,8 +24,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexValueFieldTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubDistanceToFieldSearchProjection;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubFieldSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubDistanceToFieldProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubFieldProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSort;
 
 public final class StubIndexValueFieldType<F>
@@ -82,8 +82,8 @@ public final class StubIndexValueFieldType<F>
 					SortTypeKeys.FIELD,
 					SortTypeKeys.DISTANCE
 			);
-			queryElementFactory( ProjectionTypeKeys.FIELD, new StubFieldSearchProjection.Factory() );
-			queryElementFactory( ProjectionTypeKeys.DISTANCE, new StubDistanceToFieldSearchProjection.Factory() );
+			queryElementFactory( ProjectionTypeKeys.FIELD, new StubFieldProjection.Factory() );
+			queryElementFactory( ProjectionTypeKeys.DISTANCE, new StubDistanceToFieldProjection.Factory() );
 			queryElementFactory( AggregationTypeKeys.TERMS, new StubSearchAggregation.TermsFactory() );
 			queryElementFactory( AggregationTypeKeys.RANGE, new StubSearchAggregation.RangeFactory() );
 		}
