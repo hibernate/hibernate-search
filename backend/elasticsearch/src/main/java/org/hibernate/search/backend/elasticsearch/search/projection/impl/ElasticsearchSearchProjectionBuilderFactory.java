@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -14,6 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
@@ -67,44 +67,39 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <P> CompositeProjectionBuilder<P> composite(Function<List<?>, P> transformer,
+	public <V> CompositeProjectionBuilder<V> composite(Function<List<?>, V> transformer,
 			SearchProjection<?>... projections) {
-		List<ElasticsearchSearchProjection<?, ?>> typedProjections = new ArrayList<>( projections.length );
-		for ( SearchProjection<?> projection : projections ) {
-			typedProjections.add( toImplementation( projection ) );
+		ElasticsearchSearchProjection<?, ?>[] typedProjections = new ElasticsearchSearchProjection<?, ?>[ projections.length ];
+		for ( int i = 0; i < projections.length; i++ ) {
+			typedProjections[i] = toImplementation( projections[i] );
 		}
-
-		return new ElasticsearchCompositeListProjection.Builder<>(
-				new ElasticsearchCompositeListProjection<>( scope, transformer, typedProjections )
-		);
+		return new ElasticsearchCompositeProjection.Builder<>( scope,
+				ProjectionCompositor.fromList( projections.length, transformer ),
+				typedProjections );
 	}
 
 	@Override
-	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
+	public <P1, V> CompositeProjectionBuilder<V> composite(Function<P1, V> transformer,
 			SearchProjection<P1> projection) {
-		return new ElasticsearchCompositeFunctionProjection.Builder<>(
-				new ElasticsearchCompositeFunctionProjection<>( scope, transformer,
-						toImplementation( projection ) )
-		);
+		return new ElasticsearchCompositeProjection.Builder<>( scope,
+				ProjectionCompositor.from( transformer ),
+				toImplementation( projection ) );
 	}
 
 	@Override
-	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
+	public <P1, P2, V> CompositeProjectionBuilder<V> composite(BiFunction<P1, P2, V> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new ElasticsearchCompositeBiFunctionProjection.Builder<>(
-				new ElasticsearchCompositeBiFunctionProjection<>( scope, transformer,
-						toImplementation( projection1 ), toImplementation( projection2 ) )
-		);
+		return new ElasticsearchCompositeProjection.Builder<>( scope,
+				ProjectionCompositor.from( transformer ),
+				toImplementation( projection1 ), toImplementation( projection2 ) );
 	}
 
 	@Override
-	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
+	public <P1, P2, P3, V> CompositeProjectionBuilder<V> composite(TriFunction<P1, P2, P3, V> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new ElasticsearchCompositeTriFunctionProjection.Builder<>(
-				new ElasticsearchCompositeTriFunctionProjection<>( scope, transformer,
-						toImplementation( projection1 ), toImplementation( projection2 ),
-						toImplementation( projection3 ) )
-		);
+		return new ElasticsearchCompositeProjection.Builder<>( scope,
+				ProjectionCompositor.from( transformer ),
+				toImplementation( projection1 ), toImplementation( projection2 ), toImplementation( projection3 ) );
 	}
 
 	public SearchProjectionBuilder<JsonObject> source() {

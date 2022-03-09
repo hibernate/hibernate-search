@@ -31,13 +31,13 @@ public interface SearchProjectionBuilderFactory {
 
 	ScoreProjectionBuilder score();
 
-	<P> CompositeProjectionBuilder<P> composite(Function<List<?>, P> transformer, SearchProjection<?>... projections);
+	<V> CompositeProjectionBuilder<V> composite(Function<List<?>, V> transformer, SearchProjection<?>... projections);
 
-	<P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer, SearchProjection<P1> projection);
+	<P1, V> CompositeProjectionBuilder<V> composite(Function<P1, V> transformer, SearchProjection<P1> projection);
 
-	<P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
+	<P1, P2, V> CompositeProjectionBuilder<V> composite(BiFunction<P1, P2, V> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
-	<P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
+	<P1, P2, P3, V> CompositeProjectionBuilder<V> composite(TriFunction<P1, P2, P3, V> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 }

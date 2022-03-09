@@ -4,23 +4,27 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
+package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
-import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
-class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
+import com.google.gson.JsonObject;
+
+class ElasticsearchCompositeProjection<E, V>
+		extends AbstractElasticsearchProjection<E, V> {
 
 	private final ProjectionCompositor<E, V> compositor;
-	private final StubSearchProjection<?>[] inners;
+	private final ElasticsearchSearchProjection<?, ?>[] inners;
 
-	private StubCompositeProjection(Builder<E, V> builder) {
+	private ElasticsearchCompositeProjection(Builder<E, V> builder) {
+		super( builder.scope );
 		this.compositor = builder.compositor;
 		this.inners = builder.inners;
 	}
@@ -34,13 +38,19 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			StubSearchProjectionContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
+		for ( ElasticsearchSearchProjection<?, ?> inner : inners ) {
+			inner.request( requestBody, context );
+		}
+	}
+
+	@Override
+	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+			ProjectionExtractContext context) {
 		E extractedData = compositor.createInitial();
 
-		List<?> listFromIndex = (List<?>) projectionFromIndex;
 		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = inners[i].extract( projectionHitMapper, listFromIndex.get( i ), context );
+			Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, context );
 			extractedData = compositor.set( extractedData, i, extractedDataForInner );
 		}
 
@@ -48,13 +58,14 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public V transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
-		E transformedData = (E) extractedData;
+	public final V transform(LoadingResult<?, ?> loadingResult, E extractedData,
+			ProjectionTransformContext context) {
+		E transformedData = extractedData;
 		// Transform in-place
 		for ( int i = 0; i < inners.length; i++ ) {
 			Object extractedDataForInner = compositor.get( transformedData, i );
-			Object transformedDataForInner = inners[i].transform( loadingResult, extractedDataForInner, context );
+			Object transformedDataForInner = ElasticsearchSearchProjection.transformUnsafe( inners[i], loadingResult,
+					extractedDataForInner, context );
 			transformedData = compositor.set( transformedData, i, transformedDataForInner );
 		}
 
@@ -63,17 +74,20 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 
 	static class Builder<E, V> implements CompositeProjectionBuilder<V> {
 
+		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ProjectionCompositor<E, V> compositor;
-		private final StubSearchProjection<?>[] inners;
+		private final ElasticsearchSearchProjection<?, ?>[] inners;
 
-		Builder(ProjectionCompositor<E, V> compositor, StubSearchProjection<?> ... inners) {
+		Builder(ElasticsearchSearchIndexScope<?> scope, ProjectionCompositor<E, V> compositor,
+				ElasticsearchSearchProjection<?, ?> ... inners) {
+			this.scope = scope;
 			this.compositor = compositor;
 			this.inners = inners;
 		}
 
 		@Override
 		public SearchProjection<V> build() {
-			return new StubCompositeProjection<>( this );
+			return new ElasticsearchCompositeProjection<>( this );
 		}
 	}
 }
