@@ -512,7 +512,8 @@ public class ObjectFieldTemplateIT {
 						)
 		) )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field '" + objectFieldPath + "'.",
-						"If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data" );
+						"Some object field features require a nested structure; "
+								+ "try setting the field structure to 'NESTED' and reindexing all your data" );
 		assertThatQuery( query(
 				f -> f.bool()
 						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )

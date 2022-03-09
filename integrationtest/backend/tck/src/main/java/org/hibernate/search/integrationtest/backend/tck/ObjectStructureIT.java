@@ -174,7 +174,8 @@ public class ObjectStructureIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject'.",
-						"If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data" );
+						"Some object field features require a nested structure; "
+								+ "try setting the field structure to 'NESTED' and reindexing all your data" );
 	}
 
 	@Test
