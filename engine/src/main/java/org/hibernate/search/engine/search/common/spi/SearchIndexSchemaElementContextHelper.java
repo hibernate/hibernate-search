@@ -64,7 +64,7 @@ public abstract class SearchIndexSchemaElementContextHelper {
 	public static final SearchIndexSchemaElementContextHelper COMPOSITE = new SearchIndexSchemaElementContextHelper() {
 		@Override
 		protected String missingSupportHint(SearchQueryElementTypeKey<?> key) {
-			return log.missingSupportHintForCompositNode();
+			return log.missingSupportHintForCompositeNode();
 		}
 
 		@Override

@@ -452,9 +452,10 @@ public interface Log extends BasicLogger {
 			+ " If it already is, then '%1$s' is not available for fields of this type.")
 	String missingSupportHintForValueField(SearchQueryElementTypeKey<?> key);
 
-	@Message(value = "If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data."
-			+ " If you are trying to use another predicate, it probably isn't available for this field")
-	String missingSupportHintForCompositNode();
+	@Message(value = "Some object field features require a nested structure;"
+			+ " try setting the field structure to 'NESTED' and reindexing all your data."
+			+ " If you are trying to use another feature, it probably isn't available for this field.")
+	String missingSupportHintForCompositeNode();
 
 	@Message(id = ID_OFFSET + 105, value = "Cannot use '%2$s' on %1$s: %3$s")
 	SearchException cannotUseQueryElementForIndexElementBecauseCreationException(
