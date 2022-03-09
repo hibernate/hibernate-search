@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import java.util.List;
+
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
@@ -31,6 +33,16 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * @param <R> The type of the final result containing values of type {@code V}.
  */
 public interface ProjectionAccumulator<E, V, A, R> {
+
+	@SuppressWarnings("unchecked") // PROVIDER works for any V.
+	static <V> ProjectionAccumulator.Provider<V, V> single() {
+		return SingleValuedProjectionAccumulator.PROVIDER;
+	}
+
+	@SuppressWarnings("unchecked") // PROVIDER works for any V.
+	static <V> Provider<V, List<V>> list() {
+		return ListProjectionAccumulator.PROVIDER;
+	}
 
 	/**
 	 * Creates the initial accumulated container.

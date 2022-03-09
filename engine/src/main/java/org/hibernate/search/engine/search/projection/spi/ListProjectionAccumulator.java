@@ -15,10 +15,10 @@ import java.util.List;
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-public final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, List<Object>, List<V>> {
+final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, List<Object>, List<V>> {
 
 	@SuppressWarnings("rawtypes")
-	private static final Provider PROVIDER = new Provider() {
+	static final Provider PROVIDER = new Provider() {
 		private final ListProjectionAccumulator instance = new ListProjectionAccumulator();
 		@Override
 		public ProjectionAccumulator get() {
@@ -29,11 +29,6 @@ public final class ListProjectionAccumulator<E, V> implements ProjectionAccumula
 			return false;
 		}
 	};
-
-	@SuppressWarnings("unchecked") // PROVIDER works for any V.
-	public static <V> Provider<V, List<V>> provider() {
-		return PROVIDER;
-	}
 
 	private ListProjectionAccumulator() {
 	}

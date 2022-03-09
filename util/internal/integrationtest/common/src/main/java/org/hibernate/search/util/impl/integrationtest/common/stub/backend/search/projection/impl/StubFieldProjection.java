@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
-import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexValueFieldContext;
@@ -82,7 +81,7 @@ public class StubFieldProjection<F, V> implements StubSearchProjection<V> {
 		@Override
 		@SuppressWarnings("unchecked")
 		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( accumulatorProvider == SingleValuedProjectionAccumulator.provider() ) {
+			if ( accumulatorProvider.isSingleValued() ) {
 				return (SearchProjection<P>) build();
 			}
 			else {
