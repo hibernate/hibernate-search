@@ -16,15 +16,21 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * <ul>
  *     <li>There is no concept of parallel execution.</li>
  *     <li>All operations are expected to be non-blocking,
- *     except for {@link #finish(Object, ProjectionConverter, FromDocumentValueConvertContext)}</li>
+ *     except for {@link #transformAll(Object, ProjectionConverter, FromDocumentValueConvertContext)}
+ *     and {@link #finish(Object)}.</li>
+ *     <li>Values to accumulate are expected to be {@link #transform(Object, int, Object) transformed} exactly once
+ *     after accumulation, changing their type from {@link E} to {@link V}.
+ *     Clients are responsible for ensuring values to accumulate have been transformed
+ *     upon calling {@link #finish(Object)}.
  * </ul>
  *
- * @param <F> The type of (unconverted) field values.
- * @param <V> The type of field values after the projection converter was applied.
- * @param <U> The type of the temporary storage for collected field values of type {@code F}.
+ * @param <E> The type of extracted values to accumulate before being transformed.
+ * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
+ * @param <A> The type of the temporary storage for accumulated values,
+ * before and after being transformed.
  * @param <R> The type of the final result containing values of type {@code V}.
  */
-public interface ProjectionAccumulator<F, V, U, R> {
+public interface ProjectionAccumulator<E, V, A, R> {
 
 	/**
 	 * Creates the initial accumulated container.
@@ -34,7 +40,7 @@ public interface ProjectionAccumulator<F, V, U, R> {
 	 * @return The initial accumulated container,
 	 * to pass to the first call to {@link #accumulate(Object, Object)}.
 	 */
-	U createInitial();
+	A createInitial();
 
 	/**
 	 * Folds a new value in the given accumulated container.
@@ -47,37 +53,90 @@ public interface ProjectionAccumulator<F, V, U, R> {
 	 * @param value The value to accumulate.
 	 * @return The new accumulated value.
 	 */
-	U accumulate(U accumulated, F value);
+	A accumulate(A accumulated, E value);
 
 	/**
-	 * Finishes the collecting, converting the accumulated container into the final result.
+	 * @param accumulated The accumulated value so far,
+	 * returned by the last call to {@link #accumulate(Object, Object)}.
+	 * @return The number of elements in the accumulated value.
+	 */
+	int size(A accumulated);
+
+	/**
+	 * Retrieves the value at the given index.
+	 * <p>
+	 * This operation should be non-blocking.
+	 *
+	 * @param accumulated The accumulated value so far,
+	 * returned by the last call to {@link #accumulate(Object, Object)}.
+	 * @param index The index of the value to retrieve.
+	 * @return The value at the given index.
+	 */
+	E get(A accumulated, int index);
+
+	/**
+	 * Transforms the value at the given index,
+	 * replacing it with the given transformed value.
+	 * <p>
+	 * This operation should be non-blocking.
+	 *
+	 * @param accumulated The accumulated value so far,
+	 * returned by the last call to {@link #accumulate(Object, Object)}.
+	 * @param index The index of the value being transformed.
+	 * @param transformed The transformed value.
+	 * @return The new accumulated value.
+	 */
+	A transform(A accumulated, int index, V transformed);
+
+	/**
+	 * Transforms all values with the given converter and the given context.
 	 * <p>
 	 * This operation may be blocking.
 	 *
-	 * @param accumulated The temporary storage created by {@link #createInitial()} and populated
-	 * by successive calls to {@link #accumulate(Object, Object)}.
+	 * @param accumulated The accumulated value so far,
+	 * returned by the last call to {@link #accumulate(Object, Object)}.
 	 * @param converter The projection converter (from {@code F} to {@code V}).
 	 * @param context The context to be passed to the projection converter.
-	 * @return The final result of the collecting.
+	 * @return The new accumulated value.
 	 */
-	R finish(U accumulated, ProjectionConverter<? super F, ? extends V> converter,
-			FromDocumentValueConvertContext context);
+	default A transformAll(A accumulated, ProjectionConverter<? super E, ? extends V> converter,
+			FromDocumentValueConvertContext context) {
+		for ( int i = 0; i < size( accumulated ); i++ ) {
+			E initial = get( accumulated, i );
+			V transformed = converter.fromDocumentValue( initial, context );
+			accumulated = transform( accumulated, i, transformed );
+		}
+		return accumulated;
+	}
 
 	/**
-	 * Provides an accumulator for a given underlying field type ({@code F}).
+	 * Finishes the accumulation, converting the accumulated container into the final result.
+	 * <p>
+	 * This operation may be blocking.
+	 *
+	 * @param accumulated The temporary storage created by {@link #createInitial()},
+	 * then populated by successive calls to {@link #accumulate(Object, Object)},
+	 * then transformed by a single call to {@link #transformAll(Object, ProjectionConverter, FromDocumentValueConvertContext)}
+	 * or by successive calls to {@link #transform(Object, int, Object)}.
+	 * @return The final result of the accumulation.
+	 */
+	R finish(A accumulated);
+
+	/**
+	 * Provides an accumulator for a given type of values to accumulate ({@code T}).
 	 * <p>
 	 * The provider may always return the same accumulator,
 	 * if generics are irrelevant and it's safe to do so.
 	 *
-	 * @param <V> The type of field values after the projection converter was applied.
+	 * @param <U> The type of values to accumulate after being transformed.
 	 * @param <R> The type of the final result containing values of type {@code V}.
 	 */
-	interface Provider<V, R> {
+	interface Provider<U, R> {
 		/**
-		 * @param <F> The type of field values.
+		 * @param <T> The type of values to accumulate before being transformed.
 		 * @return An accumulator for the given type.
 		 */
-		<F> ProjectionAccumulator<F, V, ?, R> get();
+		<T> ProjectionAccumulator<T, U, ?, R> get();
 
 		/**
 		 * @return {@code true} if accumulators returned by {@link #get()} can only accept a single value,

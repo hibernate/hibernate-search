@@ -30,28 +30,28 @@ import org.apache.lucene.index.IndexableField;
 /**
  * A projection on the values of an index field.
  *
- * @param <E> The type of the aggregated value extracted from the Lucene index (before conversion).
- * @param <P> The type of the aggregated value returned by the projection (after conversion).
  * @param <F> The type of individual field values obtained from the backend (before conversion).
  * @param <V> The type of individual field values after conversion.
+ * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
+ * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<E, P> {
+public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<A, P> {
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 
 	private final Function<IndexableField, F> decodeFunction;
 	private final ProjectionConverter<F, ? extends V> converter;
-	private final ProjectionAccumulator<F, V, E, P> accumulator;
+	private final ProjectionAccumulator<F, V, A, P> accumulator;
 
-	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
+	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, A, P> accumulator) {
 		this( builder.scope, builder.field, builder.codec::decode, builder.converter, accumulator );
 	}
 
 	LuceneFieldProjection(LuceneSearchIndexScope<?> scope,
 			LuceneSearchIndexValueFieldContext<?> field,
 			Function<IndexableField, F> decodeFunction, ProjectionConverter<F, ? extends V> converter,
-			ProjectionAccumulator<F, V, E, P> accumulator) {
+			ProjectionAccumulator<F, V, A, P> accumulator) {
 		super( scope );
 		this.absoluteFieldPath = field.absolutePath();
 		this.nestedDocumentPath = field.nestedDocumentPath();
@@ -74,23 +74,24 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	}
 
 	@Override
-	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			ProjectionExtractContext context) {
-		E extracted = accumulator.createInitial();
+		A accumulated = accumulator.createInitial();
 		for ( IndexableField field : documentResult.getDocument().getFields() ) {
 			if ( field.name().equals( absoluteFieldPath ) ) {
 				F decoded = decodeFunction.apply( field );
-				extracted = accumulator.accumulate( extracted, decoded );
+				accumulated = accumulator.accumulate( accumulated, decoded );
 			}
 		}
-		return extracted;
+		return accumulated;
 	}
 
 	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
 			ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-		return accumulator.finish( extractedData, converter, convertContext );
+		A transformedData = accumulator.transformAll( extractedData, converter, convertContext );
+		return accumulator.finish( transformedData );
 	}
 
 	public static class Factory<F>

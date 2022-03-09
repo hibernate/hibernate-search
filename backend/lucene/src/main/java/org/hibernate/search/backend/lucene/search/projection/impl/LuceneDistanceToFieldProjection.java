@@ -14,12 +14,11 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExec
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -36,10 +35,10 @@ import org.apache.lucene.util.SloppyMath;
 /**
  * A projection on the distance from a given center to the GeoPoint defined in an index field.
  *
- * @param <E> The type of aggregated values extracted from the backend response (before conversion).
- * @param <P> The type of aggregated values returned by the projection (after conversion).
+ * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
+ * @param <P> The type of the final projection result representing accumulated distance values.
  */
-public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProjection<E, P>
+public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProjection<A, P>
 		implements CollectorFactory<GeoPointDistanceCollector> {
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
@@ -53,13 +52,13 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	private final GeoPoint center;
 	private final DistanceUnit unit;
 
-	private final ProjectionAccumulator<Double, Double, E, P> accumulator;
+	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
 
 	private final DistanceCollectorKey collectorKey;
-	private final LuceneFieldProjection<E, P, Double, Double> fieldProjection;
+	private final LuceneFieldProjection<Double, Double, A, P> fieldProjection;
 
 	private LuceneDistanceToFieldProjection(Builder builder, boolean singleValued,
-			ProjectionAccumulator<Double, Double, E, P> accumulator) {
+			ProjectionAccumulator<Double, Double, A, P> accumulator) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.nestedDocumentPath = builder.field.nestedDocumentPath();
@@ -104,10 +103,10 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	}
 
 	@Override
-	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			ProjectionExtractContext context) {
 		if ( collectorKey != null ) {
-			E accumulated = accumulator.createInitial();
+			A accumulated = accumulator.createInitial();
 			GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
 			Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
 			if ( distanceOrNull != null ) {
@@ -121,10 +120,10 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	}
 
 	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
 			ProjectionTransformContext context) {
-		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
+		// Nothing to transform: we take the values as they are.
+		return accumulator.finish( extractedData );
 	}
 
 	private Double computeDistanceWithUnit(IndexableField field) {

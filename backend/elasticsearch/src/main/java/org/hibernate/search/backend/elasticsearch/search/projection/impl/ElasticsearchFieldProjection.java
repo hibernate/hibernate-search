@@ -38,12 +38,12 @@ import com.google.gson.JsonPrimitive;
 /**
  * A projection on the values of an index field.
  *
- * @param <E> The type of aggregated values extracted from the backend response (before conversion).
- * @param <P> The type of aggregated values returned by the projection (after conversion).
  * @param <F> The type of individual field values obtained from the backend (before conversion).
  * @param <V> The type of individual field values after conversion.
+ * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
+ * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsearchProjection<E, P> {
+public class ElasticsearchFieldProjection<F, V, A, P> extends AbstractElasticsearchProjection<A, P> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -53,9 +53,9 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 	private final Function<JsonElement, F> decodeFunction;
 	private final ProjectionConverter<? super F, ? extends V> converter;
-	private final ProjectionAccumulator<F, V, E, P> accumulator;
+	private final ProjectionAccumulator<F, V, A, P> accumulator;
 
-	private ElasticsearchFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
+	private ElasticsearchFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, A, P> accumulator) {
 		this( builder.scope, builder.field.absolutePath(), builder.field.absolutePathComponents(),
 				builder.codec::decode, builder.converter, accumulator );
 	}
@@ -63,7 +63,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope<?> scope,
 			String absoluteFieldPath, String[] absoluteFieldPathComponents,
 			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, ? extends V> converter,
-			ProjectionAccumulator<F, V, E, P> accumulator) {
+			ProjectionAccumulator<F, V, A, P> accumulator) {
 		super( scope );
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
@@ -87,21 +87,22 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	}
 
 	@Override
-	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			ProjectionExtractContext context) {
-		E extracted = accumulator.createInitial();
+		A extracted = accumulator.createInitial();
 		JsonObject source = HIT_SOURCE_ACCESSOR.get( hit ).get();
 		extracted = collect( source, extracted, 0 );
 		return extracted;
 	}
 
 	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, E extractedData, ProjectionTransformContext context) {
+	public P transform(LoadingResult<?, ?> loadingResult, A extractedData, ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-		return accumulator.finish( extractedData, converter, convertContext );
+		A transformedData = accumulator.transformAll( extractedData, converter, convertContext );
+		return accumulator.finish( transformedData );
 	}
 
-	private E collect(JsonObject parent, E accumulated, int currentPathComponentIndex) {
+	private A collect(JsonObject parent, A accumulated, int currentPathComponentIndex) {
 		JsonElement child = parent.get( absoluteFieldPathComponents[currentPathComponentIndex] );
 
 		if ( currentPathComponentIndex == (absoluteFieldPathComponents.length - 1) ) {
@@ -211,7 +212,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		}
 
 		@Override
-		public <R> SearchProjection<R> build(ProjectionAccumulator.Provider<V, R> accumulatorProvider) {
+		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 			if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 			}

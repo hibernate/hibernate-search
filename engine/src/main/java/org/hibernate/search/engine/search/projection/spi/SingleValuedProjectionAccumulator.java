@@ -16,10 +16,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * A {@link ProjectionAccumulator} that can accumulate up to one value, and will throw an exception beyond that.
  *
- * @param <F> The type of (unconverted) field values.
- * @param <V> The type of field values after the projection converter was applied.
+ * @param <E> The type of extracted values to accumulate before being transformed.
+ * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-public final class SingleValuedProjectionAccumulator<F, V> implements ProjectionAccumulator<F, V, F, V> {
+public final class SingleValuedProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, Object, V> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -50,12 +50,12 @@ public final class SingleValuedProjectionAccumulator<F, V> implements Projection
 	}
 
 	@Override
-	public F createInitial() {
+	public E createInitial() {
 		return null;
 	}
 
 	@Override
-	public F accumulate(F accumulated, F value) {
+	public E accumulate(Object accumulated, E value) {
 		if ( accumulated != null ) {
 			throw log.unexpectedMultiValuedField( accumulated, value );
 		}
@@ -63,8 +63,34 @@ public final class SingleValuedProjectionAccumulator<F, V> implements Projection
 	}
 
 	@Override
-	public V finish(F accumulated, ProjectionConverter<? super F, ? extends V> converter,
+	public int size(Object accumulated) {
+		return accumulated == null ? 0 : 1;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public E get(Object accumulated, int index) {
+		return (E) accumulated;
+	}
+
+	@Override
+	public Object transform(Object accumulated, int index, V transformed) {
+		if ( index != 0 ) {
+			throw new IndexOutOfBoundsException( "Invalid index passed to " + this + ": " + index );
+		}
+		return transformed;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object transformAll(Object accumulated, ProjectionConverter<? super E, ? extends V> converter,
 			FromDocumentValueConvertContext context) {
-		return converter.fromDocumentValue( accumulated, context );
+		return converter.fromDocumentValue( (E) accumulated, context );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public V finish(Object accumulated) {
+		return (V) accumulated;
 	}
 }
