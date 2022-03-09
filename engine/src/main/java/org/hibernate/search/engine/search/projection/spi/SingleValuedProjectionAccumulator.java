@@ -19,12 +19,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <E> The type of extracted values to accumulate before being transformed.
  * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-public final class SingleValuedProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, Object, V> {
+final class SingleValuedProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, Object, V> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@SuppressWarnings("rawtypes")
-	private static final ProjectionAccumulator.Provider PROVIDER = new ProjectionAccumulator.Provider() {
+	static final ProjectionAccumulator.Provider PROVIDER = new ProjectionAccumulator.Provider() {
 		private final SingleValuedProjectionAccumulator instance = new SingleValuedProjectionAccumulator();
 		@Override
 		public ProjectionAccumulator get() {
@@ -35,11 +35,6 @@ public final class SingleValuedProjectionAccumulator<E, V> implements Projection
 			return true;
 		}
 	};
-
-	@SuppressWarnings("unchecked") // PROVIDER works for any V.
-	public static <V> ProjectionAccumulator.Provider<V, V> provider() {
-		return PROVIDER;
-	}
 
 	private SingleValuedProjectionAccumulator() {
 	}

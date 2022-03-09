@@ -17,7 +17,7 @@ public interface FieldProjectionBuilder<T> extends SearchProjectionBuilder<T> {
 
 	@Override
 	default SearchProjection<T> build() {
-		return build( SingleValuedProjectionAccumulator.provider() );
+		return build( ProjectionAccumulator.single() );
 	}
 
 	<P> SearchProjection<P> build(ProjectionAccumulator.Provider<T, P> accumulatorProvider);

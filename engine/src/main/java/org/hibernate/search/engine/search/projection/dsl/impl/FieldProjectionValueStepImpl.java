@@ -13,9 +13,8 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
-import org.hibernate.search.engine.search.projection.spi.ListProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
-import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 
 
 public final class FieldProjectionValueStepImpl<T>
@@ -27,12 +26,12 @@ public final class FieldProjectionValueStepImpl<T>
 			ValueConvert convert) {
 		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.FIELD )
 						.type( clazz, convert ),
-				SingleValuedProjectionAccumulator.provider() );
+				ProjectionAccumulator.single() );
 	}
 
 	@Override
 	public FieldProjectionOptionsStep<?, List<T>> multi() {
-		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, ListProjectionAccumulator.provider() );
+		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, ProjectionAccumulator.list() );
 	}
 
 	@Override
