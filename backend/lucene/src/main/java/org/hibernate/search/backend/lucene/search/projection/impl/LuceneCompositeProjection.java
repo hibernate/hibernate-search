@@ -4,23 +4,26 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
+package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Arrays;
-import java.util.List;
 
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
-class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
+class LuceneCompositeProjection<E, V>
+		extends AbstractLuceneProjection<E, V> {
 
 	private final ProjectionCompositor<E, V> compositor;
-	private final StubSearchProjection<?>[] inners;
+	private final LuceneSearchProjection<?, ?>[] inners;
 
-	private StubCompositeProjection(Builder<E, V> builder) {
+	private LuceneCompositeProjection(Builder<E, V> builder) {
+		super( builder.scope );
 		this.compositor = builder.compositor;
 		this.inners = builder.inners;
 	}
@@ -34,13 +37,19 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			StubSearchProjectionContext context) {
+	public void request(ProjectionRequestContext context) {
+		for ( LuceneSearchProjection<?, ?> inner : inners ) {
+			inner.request( context );
+		}
+	}
+
+	@Override
+	public final E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+			ProjectionExtractContext context) {
 		E extractedData = compositor.createInitial();
 
-		List<?> listFromIndex = (List<?>) projectionFromIndex;
 		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = inners[i].extract( projectionHitMapper, listFromIndex.get( i ), context );
+			Object extractedDataForInner = inners[i].extract( mapper, documentResult, context );
 			extractedData = compositor.set( extractedData, i, extractedDataForInner );
 		}
 
@@ -48,13 +57,14 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public V transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
-		E transformedData = (E) extractedData;
+	public final V transform(LoadingResult<?, ?> loadingResult, E extractedData,
+			ProjectionTransformContext context) {
+		E transformedData = extractedData;
 		// Transform in-place
 		for ( int i = 0; i < inners.length; i++ ) {
 			Object extractedDataForInner = compositor.get( transformedData, i );
-			Object transformedDataForInner = inners[i].transform( loadingResult, extractedDataForInner, context );
+			Object transformedDataForInner = LuceneSearchProjection.transformUnsafe( inners[i], loadingResult,
+					extractedDataForInner, context );
 			transformedData = compositor.set( transformedData, i, transformedDataForInner );
 		}
 
@@ -63,17 +73,20 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 
 	static class Builder<E, V> implements CompositeProjectionBuilder<V> {
 
+		private final LuceneSearchIndexScope<?> scope;
 		private final ProjectionCompositor<E, V> compositor;
-		private final StubSearchProjection<?>[] inners;
+		private final LuceneSearchProjection<?, ?>[] inners;
 
-		Builder(ProjectionCompositor<E, V> compositor, StubSearchProjection<?> ... inners) {
+		Builder(LuceneSearchIndexScope<?> scope, ProjectionCompositor<E, V> compositor,
+				LuceneSearchProjection<?, ?> ... inners) {
+			this.scope = scope;
 			this.compositor = compositor;
 			this.inners = inners;
 		}
 
 		@Override
 		public SearchProjection<V> build() {
-			return new StubCompositeProjection<>( this );
+			return new LuceneCompositeProjection<>( this );
 		}
 	}
 }
