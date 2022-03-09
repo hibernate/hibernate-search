@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -33,20 +32,18 @@ import com.google.gson.JsonObject;
 /**
  * A projection on the distance from a given center to the GeoPoint defined in an index field.
  *
- * @param <E> The type of aggregated values extracted from the backend response (before conversion).
- * @param <P> The type of aggregated values returned by the projection (after conversion).
+ * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
+ * @param <P> The type of the final projection result representing accumulated distance values.
  */
-public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasticsearchProjection<E, P> {
+public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasticsearchProjection<A, P> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
 	private static final JsonArrayAccessor SORT_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
 	private static final ElasticsearchGeoPointFieldCodec CODEC = ElasticsearchGeoPointFieldCodec.INSTANCE;
 
-	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER = new ProjectionConverter<>(
-			Double.class,
-			(value, context) -> value
-	);
+	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
+			ProjectionConverter.passThrough( Double.class );
 
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
@@ -66,13 +63,13 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	private final GeoPoint center;
 	private final DistanceUnit unit;
 
-	private final ProjectionAccumulator<Double, Double, E, P> accumulator;
+	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
 
 	private final String scriptFieldName;
-	private final ElasticsearchFieldProjection<E, P, ?, Double> sourceProjection;
+	private final ElasticsearchFieldProjection<?, Double, A, P> sourceProjection;
 
 	private ElasticsearchDistanceToFieldProjection(Builder builder, boolean multiValued,
-			ProjectionAccumulator<Double, Double, E, P> accumulator) {
+			ProjectionAccumulator<Double, Double, A, P> accumulator) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.multiValued = multiValued;
@@ -125,17 +122,17 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	}
 
 	@Override
-	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			ProjectionExtractContext context) {
 		Integer distanceSortIndex = multiValued ? null : context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex != null ) {
-			E accumulated = accumulator.createInitial();
+			A accumulated = accumulator.createInitial();
 			accumulated = accumulator.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
 			return accumulated;
 		}
 		else if ( scriptFieldName != null ) {
-			E accumulated = accumulator.createInitial();
+			A accumulated = accumulator.createInitial();
 			accumulated = accumulator.accumulate( accumulated, extractDistanceFromScriptField( hit ) );
 			return accumulated;
 		}
@@ -145,10 +142,10 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	}
 
 	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
 			ProjectionTransformContext context) {
-		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
+		// Nothing to transform: we take the values as they are.
+		return accumulator.finish( extractedData );
 	}
 
 	private Double extractDistanceFromScriptField(JsonObject hit) {

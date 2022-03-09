@@ -8,18 +8,14 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 /**
  * A {@link ProjectionAccumulator} that can accumulate any number of values into a {@link java.util.List}.
  *
- * @param <F> The type of (unconverted) field values.
- * @param <V> The type of field values after the projection converter was applied.
+ * @param <E> The type of extracted values to accumulate before being transformed.
+ * @param <V> The type of values to accumulate obtained by transforming extracted values ({@code E}).
  */
-public final class ListProjectionAccumulator<F, V> implements ProjectionAccumulator<F, V, List<F>, List<V>> {
+public final class ListProjectionAccumulator<E, V> implements ProjectionAccumulator<E, V, List<Object>, List<V>> {
 
 	@SuppressWarnings("rawtypes")
 	private static final Provider PROVIDER = new Provider() {
@@ -48,29 +44,39 @@ public final class ListProjectionAccumulator<F, V> implements ProjectionAccumula
 	}
 
 	@Override
-	public List<F> createInitial() {
+	public List<Object> createInitial() {
 		return new ArrayList<>();
 	}
 
 	@Override
-	public List<F> accumulate(List<F> accumulated, F value) {
+	public List<Object> accumulate(List<Object> accumulated, E value) {
 		accumulated.add( value );
 		return accumulated;
 	}
 
 	@Override
+	public int size(List<Object> accumulated) {
+		return accumulated.size();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public E get(List<Object> accumulated, int index) {
+		return (E) accumulated.get( index );
+	}
+
+	@Override
+	public List<Object> transform(List<Object> accumulated, int index, V transformed) {
+		accumulated.set( index, transformed );
+		return accumulated;
+	}
+
+	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<V> finish(List<F> accumulated, ProjectionConverter<? super F, ? extends V> converter,
-			FromDocumentValueConvertContext context) {
-		// Hack to avoid instantiating another list: we convert a List<F> into a List<V> just by replacing its elements.
+	public List<V> finish(List<Object> accumulated) {
+		// Hack to avoid instantiating another list: we convert a List<Object> into a List<U> just by replacing its elements.
 		// It works *only* because we know the actual underlying type of the list,
-		// and we know it can work just as well with V as with F.
-		ListIterator<F> iterator = accumulated.listIterator();
-		while ( iterator.hasNext() ) {
-			F fieldValue = iterator.next();
-			V convertedValue = converter.fromDocumentValue( fieldValue, context );
-			( (ListIterator) iterator ).set( convertedValue );
-		}
+		// and we know it can work just as well with U as with Object.
 		return (List<V>) (List) accumulated;
 	}
 }
