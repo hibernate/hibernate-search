@@ -81,14 +81,14 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
 		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, fieldPathJson );
 	}
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		E extracted = accumulator.createInitial();
 		JsonObject source = HIT_SOURCE_ACCESSOR.get( hit ).get();
 		extracted = collect( source, extracted, 0 );
@@ -96,7 +96,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	}
 
 	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
+	public P transform(LoadingResult<?, ?> loadingResult, E extractedData, ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, converter, convertContext );
 	}

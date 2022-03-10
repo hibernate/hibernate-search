@@ -27,19 +27,19 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document, Docume
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireAllStoredFields();
 	}
 
 	@Override
 	public Document extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return documentResult.getDocument();
 	}
 
 	@Override
 	public Document transform(LoadingResult<?, ?> loadingResult, Document extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

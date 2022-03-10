@@ -85,7 +85,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		if ( multiValued ) {
 			// For multi-valued fields, use storage, because we need order to be preserved.
 			context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
@@ -98,7 +98,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		E accumulated = accumulator.createInitial();
 		if ( multiValued ) {
 			for ( IndexableField field : documentResult.getDocument().getFields() ) {
@@ -123,7 +123,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
 	}
@@ -144,7 +144,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 
 	/**
 	 * Necessary in order to share a single collector if there are multiple similar projections.
-	 * See {@link #createCollector(CollectorExecutionContext)}, {@link #request(SearchProjectionRequestContext)}.
+	 * See {@link #createCollector(CollectorExecutionContext)}, {@link #request(ProjectionRequestContext)}.
 	 */
 	private static final class DistanceCollectorKey implements CollectorKey<GeoPointDistanceCollector> {
 

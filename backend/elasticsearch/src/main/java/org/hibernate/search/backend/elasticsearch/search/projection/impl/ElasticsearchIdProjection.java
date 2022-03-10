@@ -34,19 +34,19 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		extractionHelper.request( requestBody, context );
 	}
 
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return extractionHelper.extract( hit, context );
 	}
 
 	@Override
 	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
 	}
 

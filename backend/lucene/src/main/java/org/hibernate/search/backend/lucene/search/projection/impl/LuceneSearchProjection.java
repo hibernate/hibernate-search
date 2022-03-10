@@ -25,30 +25,30 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 
 	/**
 	 * Request the collection of per-document data that will be used in
-	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)},
+	 * {@link #extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)},
 	 * making sure that the requirements for this projection are met.
 	 *
 	 * @param context A context that will share its state with the context passed to
-	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)} .
+	 * {@link #extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)} .
 	 */
-	void request(SearchProjectionRequestContext context);
+	void request(ProjectionRequestContext context);
 
 	/**
 	 * Perform hit extraction.
 	 * <p>
 	 * Implementations should only perform operations relative to extracting content from the index,
 	 * delaying operations that rely on the mapper until
-	 * {@link #transform(LoadingResult, Object, SearchProjectionTransformContext)} is called,
+	 * {@link #transform(LoadingResult, Object, ProjectionTransformContext)} is called,
 	 * so that blocking mapper operations (if any) do not pollute backend threads.
 	 *
 	 * @param projectionHitMapper The projection hit mapper used to transform hits to entities.
 	 * @param luceneResult A wrapper on top of the Lucene document extracted from the index.
 	 * @param context An execution context for the extraction.
 	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
-	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, SearchProjectionTransformContext)}.
+	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, ProjectionTransformContext)}.
 	 */
 	E extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-			SearchProjectionExtractContext context);
+			ProjectionExtractContext context);
 
 	/**
 	 * Transform the extracted data to the actual projection result.
@@ -56,12 +56,12 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 	 * @param loadingResult Container containing all the entities that have been loaded by the
 	 * {@link ProjectionHitMapper}.
 	 * @param extractedData The extracted data to transform, coming from the
-	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)} method.
+	 * {@link #extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)} method.
 	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */
 	P transform(LoadingResult<?, ?> loadingResult, E extractedData,
-			SearchProjectionTransformContext context);
+			ProjectionTransformContext context);
 
 	static <P> LuceneSearchProjection<?, P> from(LuceneSearchIndexScope<?> scope, SearchProjection<P> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
@@ -83,7 +83,7 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <Z> Z transformUnsafe(LuceneSearchProjection<?, Z> projection, LoadingResult<?, ?> loadingResult,
-			Object extractedData, SearchProjectionTransformContext context) {
+			Object extractedData, ProjectionTransformContext context) {
 		return (Z) ( (LuceneSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}
 }

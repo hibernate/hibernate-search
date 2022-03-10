@@ -27,13 +27,13 @@ public class LuceneEntityProjection<E> extends AbstractLuceneProjection<Object, 
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireCollector( DocumentReferenceCollector.FACTORY );
 	}
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		DocumentReference documentReference =
 				context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
 		return mapper.planLoading( documentReference );
@@ -42,7 +42,7 @@ public class LuceneEntityProjection<E> extends AbstractLuceneProjection<Object, 
 	@SuppressWarnings("unchecked")
 	@Override
 	public E transform(LoadingResult<?, ?> loadingResult, Object extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		E loaded = (E) loadingResult.get( extractedData );
 		if ( loaded == null ) {
 			context.reportFailedLoad();

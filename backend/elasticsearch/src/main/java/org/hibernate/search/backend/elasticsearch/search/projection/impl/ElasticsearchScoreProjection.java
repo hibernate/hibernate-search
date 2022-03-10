@@ -30,19 +30,19 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		TRACK_SCORES_ACCESSOR.set( requestBody, true );
 	}
 
 	@Override
 	public Float extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return hit.get( "_score" ).getAsFloat();
 	}
 
 	@Override
 	public Float transform(LoadingResult<?, ?> loadingResult, Float extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

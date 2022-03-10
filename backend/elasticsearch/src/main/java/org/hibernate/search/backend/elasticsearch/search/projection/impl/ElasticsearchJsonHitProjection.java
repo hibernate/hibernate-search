@@ -26,19 +26,19 @@ class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<Jso
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		// No-op
 	}
 
 	@Override
 	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return hit;
 	}
 
 	@Override
 	public JsonObject transform(LoadingResult<?, ?> loadingResult, JsonObject extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

@@ -61,13 +61,13 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
 	}
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		E extracted = accumulator.createInitial();
 		for ( IndexableField field : documentResult.getDocument().getFields() ) {
 			if ( field.name().equals( absoluteFieldPath ) ) {
@@ -80,7 +80,7 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, converter, convertContext );
 	}

@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTransformContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
@@ -51,12 +51,12 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 		return projectionHitMapper;
 	}
 
-	SearchProjectionExtractContext createProjectionExtractContext() {
-		return new SearchProjectionExtractContext( requestContext );
+	ProjectionExtractContext createProjectionExtractContext() {
+		return new ProjectionExtractContext( requestContext );
 	}
 
-	SearchProjectionTransformContext createProjectionTransformContext() {
-		return new SearchProjectionTransformContext( fromDocumentValueConvertContext );
+	ProjectionTransformContext createProjectionTransformContext() {
+		return new ProjectionTransformContext( fromDocumentValueConvertContext );
 	}
 
 }

@@ -23,13 +23,13 @@ public final class DocumentReferenceExtractionHelper implements ProjectionExtrac
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		mappedTypeNameHelper.request( requestBody, context );
 		idHelper.request( requestBody, context );
 	}
 
 	@Override
-	public DocumentReference extract(JsonObject hit, SearchProjectionExtractContext context) {
+	public DocumentReference extract(JsonObject hit, ProjectionExtractContext context) {
 		String mappedTypeName = mappedTypeNameHelper.extract( hit, context );
 		String id = idHelper.extract( hit, context );
 		return new ElasticsearchDocumentReference( mappedTypeName, id );

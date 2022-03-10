@@ -17,12 +17,12 @@ public final class SingleTypeNameExtractionHelper implements ProjectionExtractio
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		// Nothing to do
 	}
 
 	@Override
-	public String extract(JsonObject hit, SearchProjectionExtractContext context) {
+	public String extract(JsonObject hit, ProjectionExtractContext context) {
 		return mappedTypeName;
 	}
 }

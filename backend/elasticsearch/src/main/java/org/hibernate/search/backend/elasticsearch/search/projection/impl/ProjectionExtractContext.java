@@ -8,11 +8,11 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class SearchProjectionExtractContext {
+public class ProjectionExtractContext {
 
-	private final SearchProjectionRequestContext requestContext;
+	private final ProjectionRequestContext requestContext;
 
-	public SearchProjectionExtractContext(SearchProjectionRequestContext requestContext) {
+	public ProjectionExtractContext(ProjectionRequestContext requestContext) {
 		this.requestContext = requestContext;
 	}
 

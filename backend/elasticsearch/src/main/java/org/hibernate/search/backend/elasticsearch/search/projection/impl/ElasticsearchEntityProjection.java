@@ -30,20 +30,20 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		helper.request( requestBody, context );
 	}
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return projectionHitMapper.planLoading( helper.extract( hit, context ) );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public E transform(LoadingResult<?, ?> loadingResult, Object extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		E loaded = (E) loadingResult.get( extractedData );
 		if ( loaded == null ) {
 			context.reportFailedLoad();

@@ -26,7 +26,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequ
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionRequestContext;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSort;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
@@ -207,8 +207,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		);
 
 		ExtractionRequirements.Builder extractionRequirementsBuilder = new ExtractionRequirements.Builder();
-		SearchProjectionRequestContext projectionRequestContext =
-				new SearchProjectionRequestContext( extractionRequirementsBuilder );
+		ProjectionRequestContext projectionRequestContext =
+				new ProjectionRequestContext( extractionRequirementsBuilder );
 		rootProjection.request( projectionRequestContext );
 		if ( aggregations != null ) {
 			AggregationRequestContext aggregationRequestContext =

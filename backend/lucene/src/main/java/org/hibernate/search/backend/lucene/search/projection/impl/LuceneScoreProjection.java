@@ -25,19 +25,19 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireScore();
 	}
 
 	@Override
 	public Float extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return documentResult.getScore();
 	}
 
 	@Override
 	public Float transform(LoadingResult<?, ?> loadingResult, Float extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

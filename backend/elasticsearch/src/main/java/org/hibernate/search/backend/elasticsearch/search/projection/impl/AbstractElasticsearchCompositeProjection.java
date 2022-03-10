@@ -36,7 +36,7 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	@Override
 	public final void request(JsonObject requestBody,
-			SearchProjectionRequestContext context) {
+			ProjectionRequestContext context) {
 		for ( ElasticsearchSearchProjection<?, ?> child : children ) {
 			child.request( requestBody, context );
 		}
@@ -44,7 +44,7 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	@Override
 	public final Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		Object[] extractedData = new Object[children.length];
 
 		for ( int i = 0; i < extractedData.length; i++ ) {
@@ -59,7 +59,7 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	@Override
 	public final P transform(LoadingResult<?, ?> loadingResult, Object[] extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		// Transform in-place
 		for ( int i = 0; i < extractedData.length; i++ ) {
 			ElasticsearchSearchProjection<?, ?> child = children[i];
@@ -74,11 +74,11 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	/**
 	 * @param childResults An object array guaranteed to contain
-	 * the result of calling {@link ElasticsearchSearchProjection#extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)},
-	 * then {@link ElasticsearchSearchProjection#transform(LoadingResult, Object, SearchProjectionTransformContext)},
+	 * the result of calling {@link ElasticsearchSearchProjection#extract(ProjectionHitMapper, JsonObject, ProjectionExtractContext)},
+	 * then {@link ElasticsearchSearchProjection#transform(LoadingResult, Object, ProjectionTransformContext)},
 	 * for each child projection.
 	 * Each result has the same index as the child projection it originated from.
-	 * @return The combination of the child results to return from {@link #transform(LoadingResult, Object[], SearchProjectionTransformContext)}.
+	 * @return The combination of the child results to return from {@link #transform(LoadingResult, Object[], ProjectionTransformContext)}.
 	 */
 	abstract P doTransform(Object[] childResults);
 

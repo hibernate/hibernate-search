@@ -11,11 +11,11 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequ
 
 import org.apache.lucene.search.Collector;
 
-public final class SearchProjectionRequestContext {
+public final class ProjectionRequestContext {
 
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
 
-	public SearchProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder) {
+	public ProjectionRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder) {
 		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
 	}
 

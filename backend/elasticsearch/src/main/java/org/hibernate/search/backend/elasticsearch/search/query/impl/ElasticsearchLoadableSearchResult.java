@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTransformContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
@@ -63,7 +63,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 	}
 
 	ElasticsearchSearchResultImpl<H> loadBlocking() {
-		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
+		ProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
 		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper()
 				.loadBlocking( deadline );

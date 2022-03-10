@@ -34,7 +34,7 @@ abstract class AbstractLuceneCompositeProjection<P>
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		for ( LuceneSearchProjection<?, ?> child : children ) {
 			child.request( context );
 		}
@@ -42,7 +42,7 @@ abstract class AbstractLuceneCompositeProjection<P>
 
 	@Override
 	public final Object[] extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		Object[] extractedData = new Object[children.length];
 
 		for ( int i = 0; i < extractedData.length; i++ ) {
@@ -57,7 +57,7 @@ abstract class AbstractLuceneCompositeProjection<P>
 
 	@Override
 	public final P transform(LoadingResult<?, ?> loadingResult, Object[] extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		// Transform in-place
 		for ( int i = 0; i < extractedData.length; i++ ) {
 			LuceneSearchProjection<?, ?> child = children[i];
@@ -72,11 +72,11 @@ abstract class AbstractLuceneCompositeProjection<P>
 
 	/**
 	 * @param childResults An object array guaranteed to contain
-	 * the result of calling {@link LuceneSearchProjection#extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)},
-	 * then {@link LuceneSearchProjection#transform(LoadingResult, Object, SearchProjectionTransformContext)},
+	 * the result of calling {@link LuceneSearchProjection#extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)},
+	 * then {@link LuceneSearchProjection#transform(LoadingResult, Object, ProjectionTransformContext)},
 	 * for each child projection.
 	 * Each result has the same index as the child projection it originated from.
-	 * @return The combination of the child results to return from {@link #transform(LoadingResult, Object[], SearchProjectionTransformContext)}.
+	 * @return The combination of the child results to return from {@link #transform(LoadingResult, Object[], ProjectionTransformContext)}.
 	 */
 	abstract P doTransform(Object[] childResults);
 

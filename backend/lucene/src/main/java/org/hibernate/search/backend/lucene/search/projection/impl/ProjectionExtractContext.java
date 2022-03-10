@@ -19,7 +19,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
-public class SearchProjectionExtractContext {
+public class ProjectionExtractContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -27,7 +27,7 @@ public class SearchProjectionExtractContext {
 	private final Query luceneQuery;
 	private final CollectorSet collectors;
 
-	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
+	public ProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
 			CollectorSet collectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
