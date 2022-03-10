@@ -38,7 +38,7 @@ public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticse
 
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			ProjectionExtractContext context) {
+			JsonObject source, ProjectionExtractContext context) {
 		return helper.extract( hit, context );
 	}
 

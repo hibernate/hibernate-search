@@ -126,7 +126,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 
 	@Override
 	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			ProjectionExtractContext context) {
+			JsonObject source, ProjectionExtractContext context) {
 		Integer distanceSortIndex = multiValued ? null : context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex != null ) {

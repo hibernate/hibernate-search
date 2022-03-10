@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
@@ -46,8 +45,8 @@ import com.google.gson.JsonPrimitive;
 public class ElasticsearchFieldProjection<F, V, A, P> extends AbstractElasticsearchProjection<P>
 		implements ElasticsearchSearchProjection.Extractor<A, P> {
 
-	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
-	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
+	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR =
+			JsonAccessor.root().property( "_source" ).asArray();
 
 	private final String absoluteFieldPath;
 	private final String[] absoluteFieldPathComponents;
@@ -89,10 +88,9 @@ public class ElasticsearchFieldProjection<F, V, A, P> extends AbstractElasticsea
 	}
 
 	@Override
-	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit, JsonObject source,
 			ProjectionExtractContext context) {
 		A extracted = accumulator.createInitial();
-		JsonObject source = HIT_SOURCE_ACCESSOR.get( hit ).get();
 		extracted = collect( source, extracted, 0 );
 		return extracted;
 	}

@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -23,7 +20,6 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
-	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
 
 	private ElasticsearchSourceProjection(ElasticsearchSearchIndexScope<?> scope) {
@@ -43,14 +39,8 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 
 	@Override
 	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			ProjectionExtractContext context) {
-		Optional<JsonObject> sourceElement = HIT_SOURCE_ACCESSOR.get( hit );
-		if ( sourceElement.isPresent() ) {
-			return sourceElement.get();
-		}
-		else {
-			return null;
-		}
+			JsonObject source, ProjectionExtractContext context) {
+		return source;
 	}
 
 	@Override
