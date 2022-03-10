@@ -55,6 +55,9 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	private static final JsonAccessor<String> SCROLL_ID_ACCESSOR =
 			JsonAccessor.root().property( "_scroll_id" ).asString();
 
+	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR =
+			JsonAccessor.root().property( "_source" ).asObject();
+
 	private static final String HITS_TOTAL_RELATION_EXACT_VALUE = "eq";
 
 	private final ElasticsearchSearchQueryRequestContext requestContext;
@@ -125,10 +128,9 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 
 		for ( JsonElement hit : jsonHits ) {
 			JsonObject hitObject = hit.getAsJsonObject();
-
+			JsonObject source = HIT_SOURCE_ACCESSOR.get( hitObject ).orElse( null );
 			extractedData.add( rootExtractor.extract(
-					hitMapper, hitObject,
-					projectionExtractContext
+					hitMapper, hitObject, source, projectionExtractContext
 			) );
 		}
 

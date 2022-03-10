@@ -38,7 +38,7 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			ProjectionExtractContext context) {
+			JsonObject source, ProjectionExtractContext context) {
 		return projectionHitMapper.planLoading( helper.extract( hit, context ) );
 	}
 

@@ -77,12 +77,12 @@ class ElasticsearchCompositeProjection<E, V, A, P>
 
 		@Override
 		public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-				ProjectionExtractContext context) {
+				JsonObject source, ProjectionExtractContext context) {
 			A accumulated = accumulator.createInitial();
 
 			E components = compositor.createInitial();
 			for ( int i = 0; i < inners.length; i++ ) {
-				Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, context );
+				Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, source, context );
 				components = compositor.set( components, i, extractedDataForInner );
 			}
 			// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)

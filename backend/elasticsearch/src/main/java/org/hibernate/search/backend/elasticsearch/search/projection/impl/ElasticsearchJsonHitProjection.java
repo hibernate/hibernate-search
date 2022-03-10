@@ -33,7 +33,7 @@ class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<Jso
 
 	@Override
 	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			ProjectionExtractContext context) {
+			JsonObject source, ProjectionExtractContext context) {
 		return hit;
 	}
 

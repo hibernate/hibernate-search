@@ -42,7 +42,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			ProjectionExtractContext context) {
+			JsonObject source, ProjectionExtractContext context) {
 		return extractionHelper.extract( hit, context );
 	}
 
