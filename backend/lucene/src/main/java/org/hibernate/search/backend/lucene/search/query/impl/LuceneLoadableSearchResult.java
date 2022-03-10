@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -69,7 +69,7 @@ public class LuceneLoadableSearchResult<H> {
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
-		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext(
+		ProjectionTransformContext transformContext = new ProjectionTransformContext(
 				fromDocumentValueConvertContext );
 		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager.hardDeadlineOrNull() );
 

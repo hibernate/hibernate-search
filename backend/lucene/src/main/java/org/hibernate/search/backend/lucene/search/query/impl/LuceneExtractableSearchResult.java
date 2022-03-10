@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchA
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -108,7 +108,7 @@ public class LuceneExtractableSearchResult<H> {
 
 		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
 
-		SearchProjectionExtractContext projectionExtractContext = new SearchProjectionExtractContext(
+		ProjectionExtractContext projectionExtractContext = new ProjectionExtractContext(
 				indexSearcher, requestContext.getLuceneQuery(),
 				luceneCollectors.getCollectorsForTopDocs()
 		);

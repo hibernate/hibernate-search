@@ -107,7 +107,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		if ( !multiValued && context.getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
 			// Nothing to do, we'll rely on the sort key
 		}
@@ -126,7 +126,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		Integer distanceSortIndex = multiValued ? null : context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex != null ) {
@@ -146,7 +146,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
 	}

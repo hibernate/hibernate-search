@@ -20,8 +20,8 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -136,12 +136,12 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		private static final JsonPrimitive ID_FIELD_NAME_JSON = new JsonPrimitive( ID_FIELD_NAME );
 
 		@Override
-		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+		public void request(JsonObject requestBody, ProjectionRequestContext context) {
 			context.getSearchSyntax().requestDocValues( requestBody, ID_FIELD_NAME_JSON );
 		}
 
 		@Override
-		public String extract(JsonObject hit, SearchProjectionExtractContext context) {
+		public String extract(JsonObject hit, ProjectionExtractContext context) {
 			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		}
 	}

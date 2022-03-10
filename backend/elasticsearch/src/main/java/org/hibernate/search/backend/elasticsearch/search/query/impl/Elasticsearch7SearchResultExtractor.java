@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -120,7 +120,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		ProjectionHitMapper<?, ?> hitMapper = extractContext.getProjectionHitMapper();
 		JsonArray jsonHits = HITS_HITS_ACCESSOR.get( responseBody ).orElseGet( JsonArray::new );
 
-		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
+		ProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
 		List<Object> extractedData = new ArrayList<>( jsonHits.size() );
 
 		for ( JsonElement hit : jsonHits ) {

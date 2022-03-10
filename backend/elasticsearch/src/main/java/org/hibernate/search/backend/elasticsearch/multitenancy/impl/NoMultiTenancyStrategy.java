@@ -15,8 +15,8 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadata
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -84,12 +84,12 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 				JsonAccessor.root().property( "_id" ).asString();
 
 		@Override
-		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+		public void request(JsonObject requestBody, ProjectionRequestContext context) {
 			// No need to request any additional information, Elasticsearch metadata is enough
 		}
 
 		@Override
-		public String extract(JsonObject hit, SearchProjectionExtractContext context) {
+		public String extract(JsonObject hit, ProjectionExtractContext context) {
 			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		}
 	}

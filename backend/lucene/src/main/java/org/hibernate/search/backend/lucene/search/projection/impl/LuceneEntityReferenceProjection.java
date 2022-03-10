@@ -27,21 +27,21 @@ public class LuceneEntityReferenceProjection<R> extends AbstractLuceneProjection
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireCollector( DocumentReferenceCollector.FACTORY );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return (R) loadingResult.convertReference( extractedData );
 	}
 

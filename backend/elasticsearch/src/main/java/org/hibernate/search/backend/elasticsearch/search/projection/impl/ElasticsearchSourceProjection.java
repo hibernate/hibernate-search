@@ -35,13 +35,13 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, WILDCARD_ALL );
 	}
 
 	@Override
 	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		Optional<JsonObject> sourceElement = HIT_SOURCE_ACCESSOR.get( hit );
 		if ( sourceElement.isPresent() ) {
 			return sourceElement.get();
@@ -53,7 +53,7 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 
 	@Override
 	public JsonObject transform(LoadingResult<?, ?> loadingResult, JsonObject extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

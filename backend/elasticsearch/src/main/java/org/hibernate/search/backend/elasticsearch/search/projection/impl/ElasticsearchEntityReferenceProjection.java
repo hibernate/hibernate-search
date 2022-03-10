@@ -30,21 +30,21 @@ public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticse
 	}
 
 	@Override
-	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+	public void request(JsonObject requestBody, ProjectionRequestContext context) {
 		helper.request( requestBody, context );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return helper.extract( hit, context );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return (R) loadingResult.convertReference( extractedData );
 	}
 

@@ -22,19 +22,19 @@ class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation, 
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		// We do not need anything specific.
 	}
 
 	@Override
 	public Explanation extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return context.explain( documentResult.getDocId() );
 	}
 
 	@Override
 	public Explanation transform(LoadingResult<?, ?> loadingResult, Explanation extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

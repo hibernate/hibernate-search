@@ -28,26 +28,26 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * Contribute to the request, making sure that the requirements for this projection are met.
 	 * @param requestBody The request body.
 	 * @param context An execution context that will share state with the context passed to
-	 * {@link #extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)}.
+	 * {@link #extract(ProjectionHitMapper, JsonObject, ProjectionExtractContext)}.
 	 */
-	void request(JsonObject requestBody, SearchProjectionRequestContext context);
+	void request(JsonObject requestBody, ProjectionRequestContext context);
 
 	/**
 	 * Perform hit extraction.
 	 * <p>
 	 * Implementations should only perform operations relative to extracting content from the index,
 	 * delaying operations that rely on the mapper until
-	 * {@link #transform(LoadingResult, Object, SearchProjectionTransformContext)} is called,
+	 * {@link #transform(LoadingResult, Object, ProjectionTransformContext)} is called,
 	 * so that blocking mapper operations (if any) do not pollute backend threads.
 	 *
 	 * @param projectionHitMapper The projection hit mapper used to transform hits to entities.
 	 * @param hit The part of the response body relevant to the hit to extract.
 	 * @param context An execution context for the extraction.
 	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
-	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, SearchProjectionTransformContext)}.
+	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, ProjectionTransformContext)}.
 	 */
 	E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
-			SearchProjectionExtractContext context);
+			ProjectionExtractContext context);
 
 	/**
 	 * Transform the extracted data to the actual projection result.
@@ -55,11 +55,11 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * @param loadingResult Container containing all the entities that have been loaded by the
 	 * {@link ProjectionHitMapper}.
 	 * @param extractedData The extracted data to transform, coming from the
-	 * {@link #extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)} method.
+	 * {@link #extract(ProjectionHitMapper, JsonObject, ProjectionExtractContext)} method.
 	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */
-	P transform(LoadingResult<?, ?> loadingResult, E extractedData, SearchProjectionTransformContext context);
+	P transform(LoadingResult<?, ?> loadingResult, E extractedData, ProjectionTransformContext context);
 
 	static <P> ElasticsearchSearchProjection<?, P> from(ElasticsearchSearchIndexScope<?> scope, SearchProjection<P> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
@@ -81,7 +81,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <Z> Z transformUnsafe(ElasticsearchSearchProjection<?, Z> projection, LoadingResult<?, ?> loadingResult,
-			Object extractedData, SearchProjectionTransformContext context) {
+			Object extractedData, ProjectionTransformContext context) {
 		return (Z) ( (ElasticsearchSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}
 }

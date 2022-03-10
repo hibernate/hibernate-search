@@ -30,19 +30,19 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireCollector( IdentifierCollector.FACTORY );
 	}
 
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return context.getCollector( IdentifierCollector.KEY ).get( documentResult.getDocId() );
 	}
 
 	@Override
 	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
 	}
 

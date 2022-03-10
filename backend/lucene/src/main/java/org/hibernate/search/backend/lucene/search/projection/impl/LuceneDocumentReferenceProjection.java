@@ -27,19 +27,19 @@ class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<Documen
 	}
 
 	@Override
-	public void request(SearchProjectionRequestContext context) {
+	public void request(ProjectionRequestContext context) {
 		context.requireCollector( DocumentReferenceCollector.FACTORY );
 	}
 
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExtractContext context) {
+			ProjectionExtractContext context) {
 		return context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
 	}
 
 	@Override
 	public DocumentReference transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
-			SearchProjectionTransformContext context) {
+			ProjectionTransformContext context) {
 		return extractedData;
 	}
 

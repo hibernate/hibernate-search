@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.Aggreg
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -32,7 +32,7 @@ import com.google.gson.JsonObject;
  *     ({@link #createExtractContext(JsonObject)}</li>
  * </ul>
  */
-class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext, AggregationRequestContext {
+class ElasticsearchSearchQueryRequestContext implements ProjectionRequestContext, AggregationRequestContext {
 
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
