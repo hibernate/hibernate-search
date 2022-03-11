@@ -15,8 +15,6 @@ package org.hibernate.search.engine.search.common.spi;
 public interface SearchIndexValueFieldContext<SC extends SearchIndexScope<?>>
 		extends SearchIndexNodeContext<SC> {
 
-	boolean multiValuedInRoot();
-
 	SearchIndexValueFieldTypeContext<SC, ?, ?> type();
 
 }

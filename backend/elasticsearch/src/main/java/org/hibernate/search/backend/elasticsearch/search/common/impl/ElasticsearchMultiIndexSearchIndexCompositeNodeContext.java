@@ -19,7 +19,7 @@ public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 						ElasticsearchSearchIndexNodeContext
 				>
 		implements ElasticsearchSearchIndexCompositeNodeContext,
-		ElasticsearchSearchIndexCompositeNodeTypeContext {
+				ElasticsearchSearchIndexCompositeNodeTypeContext {
 
 	public ElasticsearchMultiIndexSearchIndexCompositeNodeContext(ElasticsearchSearchIndexScope<?> scope,
 			String absolutePath,

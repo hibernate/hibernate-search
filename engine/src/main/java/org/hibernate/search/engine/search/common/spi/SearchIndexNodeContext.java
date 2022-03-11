@@ -26,9 +26,13 @@ public interface SearchIndexNodeContext<SC extends SearchIndexScope<?>>
 
 	boolean isComposite();
 
+	boolean isObjectField();
+
 	boolean isValueField();
 
 	SearchIndexCompositeNodeContext<SC> toComposite();
+
+	SearchIndexCompositeNodeContext<SC> toObjectField();
 
 	SearchIndexValueFieldContext<SC> toValueField();
 
@@ -44,6 +48,12 @@ public interface SearchIndexNodeContext<SC extends SearchIndexScope<?>>
 				// nested path is the LAST element on the path hierarchy
 				hierarchy.get( hierarchy.size() - 1 );
 	}
+
+	String closestMultiValuedParentAbsolutePath();
+
+	boolean multiValued();
+
+	boolean multiValuedInRoot();
 
 	// Query elements: predicates, sorts, projections, aggregations, ...
 

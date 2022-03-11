@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.common.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -62,6 +63,32 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 	public String nestedDocumentPath() {
 		return fromNodeIfCompatible( SearchIndexNodeContext::nestedDocumentPath,
 				Object::equals, "nestedDocumentPath" );
+	}
+
+	@Override
+	public String closestMultiValuedParentAbsolutePath() {
+		return fromNodeIfCompatible( SearchIndexNodeContext::closestMultiValuedParentAbsolutePath,
+				Objects::equals, "closestMultiValuedParentAbsolutePath" );
+	}
+
+	@Override
+	public boolean multiValued() {
+		for ( S field : nodeForEachIndex ) {
+			if ( field.multiValued() ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public final boolean multiValuedInRoot() {
+		for ( S field : nodeForEachIndex ) {
+			if ( field.multiValuedInRoot() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

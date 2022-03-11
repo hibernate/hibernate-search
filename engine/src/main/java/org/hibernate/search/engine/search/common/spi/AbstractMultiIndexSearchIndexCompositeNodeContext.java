@@ -46,6 +46,11 @@ public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 	}
 
 	@Override
+	public boolean isObjectField() {
+		return absolutePath != null;
+	}
+
+	@Override
 	public final boolean isValueField() {
 		return false;
 	}
@@ -53,6 +58,16 @@ public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 	@Override
 	public final S toComposite() {
 		return self();
+	}
+
+	@Override
+	public S toObjectField() {
+		if ( isObjectField() ) {
+			return self();
+		}
+		else {
+			return SearchIndexSchemaElementContextHelper.throwingToObjectField( this );
+		}
 	}
 
 	@Override

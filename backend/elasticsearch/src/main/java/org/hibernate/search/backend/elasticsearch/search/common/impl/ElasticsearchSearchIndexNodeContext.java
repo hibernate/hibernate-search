@@ -15,6 +15,9 @@ public interface ElasticsearchSearchIndexNodeContext
 	ElasticsearchSearchIndexCompositeNodeContext toComposite();
 
 	@Override
+	ElasticsearchSearchIndexCompositeNodeContext toObjectField();
+
+	@Override
 	ElasticsearchSearchIndexValueFieldContext<?> toValueField();
 
 }

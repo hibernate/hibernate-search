@@ -36,6 +36,11 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
+	public boolean isObjectField() {
+		return false;
+	}
+
+	@Override
 	public final boolean isValueField() {
 		return true;
 	}
@@ -46,18 +51,13 @@ public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 	}
 
 	@Override
-	public final S toValueField() {
-		return self();
+	public SearchIndexCompositeNodeContext<SC> toObjectField() {
+		return SearchIndexSchemaElementContextHelper.throwingToObjectField( this );
 	}
 
 	@Override
-	public final boolean multiValuedInRoot() {
-		for ( S field : nodeForEachIndex ) {
-			if ( field.multiValuedInRoot() ) {
-				return true;
-			}
-		}
-		return false;
+	public final S toValueField() {
+		return self();
 	}
 
 	@Override
