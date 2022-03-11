@@ -50,6 +50,11 @@ public class ElasticsearchMultiIndexSearchIndexValueFieldContext<F>
 	}
 
 	@Override
+	public ElasticsearchSearchIndexCompositeNodeContext toObjectField() {
+		return SearchIndexSchemaElementContextHelper.throwingToObjectField( this );
+	}
+
+	@Override
 	public JsonPrimitive elasticsearchTypeAsJson() {
 		return fromTypeIfCompatible( ElasticsearchSearchIndexValueFieldTypeContext::elasticsearchTypeAsJson, Object::equals,
 				"elasticsearchType" );

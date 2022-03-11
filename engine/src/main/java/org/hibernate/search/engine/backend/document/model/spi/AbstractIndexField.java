@@ -26,7 +26,7 @@ public abstract class AbstractIndexField<
 	protected final String relativeName;
 	protected final IndexFieldInclusion inclusion;
 	protected final boolean multiValued;
-	protected final boolean multiValuedInRoot;
+	private final String closestMultiValuedParentAbsolutePath;
 
 	public AbstractIndexField(C parent, String relativeFieldName, NT type, IndexFieldInclusion inclusion,
 			boolean multiValued) {
@@ -37,7 +37,8 @@ public abstract class AbstractIndexField<
 		this.relativeName = relativeFieldName;
 		this.inclusion = inclusion;
 		this.multiValued = multiValued;
-		this.multiValuedInRoot = multiValued || parent.multiValuedInRoot();
+		this.closestMultiValuedParentAbsolutePath = parent.multiValued() ? parent.absolutePath()
+				: parent.closestMultiValuedParentAbsolutePath();
 	}
 
 	@Override
@@ -81,8 +82,13 @@ public abstract class AbstractIndexField<
 	}
 
 	@Override
-	public final boolean multiValuedInRoot() {
-		return multiValuedInRoot;
+	public boolean multiValuedInRoot() {
+		return multiValued || closestMultiValuedParentAbsolutePath != null;
+	}
+
+	@Override
+	public String closestMultiValuedParentAbsolutePath() {
+		return closestMultiValuedParentAbsolutePath;
 	}
 
 }

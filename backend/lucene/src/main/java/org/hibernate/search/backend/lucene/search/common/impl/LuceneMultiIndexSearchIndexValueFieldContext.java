@@ -48,6 +48,11 @@ public class LuceneMultiIndexSearchIndexValueFieldContext<F>
 	}
 
 	@Override
+	public LuceneSearchIndexCompositeNodeContext toObjectField() {
+		return SearchIndexSchemaElementContextHelper.throwingToObjectField( this );
+	}
+
+	@Override
 	public Analyzer searchAnalyzerOrNormalizer() {
 		return fromTypeIfCompatible( LuceneSearchIndexValueFieldTypeContext::searchAnalyzerOrNormalizer, Object::equals,
 				"searchAnalyzerOrNormalizer" );

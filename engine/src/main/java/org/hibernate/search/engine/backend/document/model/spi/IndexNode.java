@@ -15,12 +15,11 @@ public interface IndexNode<SC extends SearchIndexScope<?>>
 	@Override
 	IndexCompositeNode<SC, ?, ?> toComposite();
 
+	@Override
 	IndexObjectField<SC, ?, ?, ?> toObjectField();
 
 	@Override
 	IndexValueField<SC, ?, ?> toValueField();
-
-	boolean multiValuedInRoot();
 
 	IndexFieldInclusion inclusion();
 

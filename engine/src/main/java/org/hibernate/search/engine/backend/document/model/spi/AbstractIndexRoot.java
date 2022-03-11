@@ -104,8 +104,18 @@ public abstract class AbstractIndexRoot<
 	}
 
 	@Override
+	public final boolean multiValued() {
+		return false;
+	}
+
+	@Override
 	public boolean multiValuedInRoot() {
 		return false;
+	}
+
+	@Override
+	public final String closestMultiValuedParentAbsolutePath() {
+		return null;
 	}
 
 	@Override
