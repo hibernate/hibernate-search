@@ -84,6 +84,11 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	}
 
 	@Override
+	public Short valueFromInteger(int integer) {
+		return (short) integer;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Short>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				(short) 0, (short) 67

@@ -149,6 +149,8 @@ public abstract class FieldTypeDescriptor<F> {
 
 	protected abstract List<F> createNonMatchingValues();
 
+	public abstract F valueFromInteger(int integer);
+
 	public boolean isFieldSortSupported() {
 		// Assume supported by default: this way, we'll get test failures if we forget to override this method.
 		return true;

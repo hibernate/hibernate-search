@@ -84,6 +84,11 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	}
 
 	@Override
+	public Float valueFromInteger(int integer) {
+		return (float) integer;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Float>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0.0f, 67.0f

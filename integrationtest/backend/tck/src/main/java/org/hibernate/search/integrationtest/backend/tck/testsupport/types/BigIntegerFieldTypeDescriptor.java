@@ -111,6 +111,11 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
+	public BigInteger valueFromInteger(int integer) {
+		return BigInteger.valueOf( integer );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<BigInteger>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				BigInteger.TEN, BigInteger.valueOf( 6700 )

@@ -85,6 +85,11 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	}
 
 	@Override
+	public Byte valueFromInteger(int integer) {
+		return (byte) integer;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Byte>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				(byte) 0, (byte) 42

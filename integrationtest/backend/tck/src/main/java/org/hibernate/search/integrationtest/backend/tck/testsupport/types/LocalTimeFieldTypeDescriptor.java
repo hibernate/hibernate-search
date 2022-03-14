@@ -88,6 +88,12 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 	}
 
 	@Override
+	public LocalTime valueFromInteger(int integer) {
+		return LocalTime.of( 0, 0, 0 )
+				.plus( integer, ChronoUnit.SECONDS );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<LocalTime>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalTime.of( 0, 0, 0 ),

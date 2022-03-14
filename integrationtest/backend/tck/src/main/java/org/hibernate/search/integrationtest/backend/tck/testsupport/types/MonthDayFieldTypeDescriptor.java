@@ -100,6 +100,11 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	}
 
 	@Override
+	public MonthDay valueFromInteger(int integer) {
+		return MonthDay.of( Month.JANUARY, integer + 1 );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<MonthDay>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				MonthDay.of( Month.JANUARY, 1 ),

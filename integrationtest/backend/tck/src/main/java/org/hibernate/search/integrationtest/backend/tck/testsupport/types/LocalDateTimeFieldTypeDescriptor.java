@@ -104,6 +104,12 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	}
 
 	@Override
+	public LocalDateTime valueFromInteger(int integer) {
+		return LocalDateTime.of( 2017, 11, 1, 0, 0, 0 )
+				.plus( integer, ChronoUnit.SECONDS );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<LocalDateTime>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),

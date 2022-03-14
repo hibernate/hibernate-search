@@ -78,6 +78,11 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	}
 
 	@Override
+	public Long valueFromInteger(int integer) {
+		return (long) integer;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Long>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0L, 67L

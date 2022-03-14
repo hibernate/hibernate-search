@@ -127,6 +127,11 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	}
 
 	@Override
+	public OffsetDateTime valueFromInteger(int integer) {
+		return LocalDateTimeFieldTypeDescriptor.INSTANCE.valueFromInteger( integer ).atOffset( ZoneOffset.ofHours( 2 ) );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<OffsetDateTime>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atOffset( ZoneOffset.UTC ),
