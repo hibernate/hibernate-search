@@ -89,6 +89,19 @@ index d6ed099098..e3fee26f2c 100644
  				++concreteSubTypesCount;
  			}
  		}
+diff --git a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
+index ca9492a6a8..6875a0c582 100644
+--- a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
++++ b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
+@@ -318,7 +318,7 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
+ 	 */
+ 	@Override
+ 	@SuppressWarnings("deprecation") // Deprecated but abstract, so we have to implement it...
+-	public boolean requiresPostCommitHanding(EntityPersister persister) {
++	public boolean requiresPostCommitHandling(EntityPersister persister) {
+ 		// TODO Tests seem to pass using _false_ but we might be able to take
+ 		// advantage of this new hook?
+ 		return false;
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
 index 21503d08be..45b9fc0a50 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmEntityIdEntityLoadingStrategy.java
