@@ -109,6 +109,11 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	}
 
 	@Override
+	public BigDecimal valueFromInteger(int integer) {
+		return new BigDecimal( BigInteger.valueOf( integer ), 2 );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<BigDecimal>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				BigDecimal.ZERO, BigDecimal.valueOf( 42.1 )

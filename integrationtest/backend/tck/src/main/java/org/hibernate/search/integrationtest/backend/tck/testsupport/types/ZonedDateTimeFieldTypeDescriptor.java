@@ -159,6 +159,12 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	}
 
 	@Override
+	public ZonedDateTime valueFromInteger(int integer) {
+		return LocalDateTimeFieldTypeDescriptor.INSTANCE.valueFromInteger( integer )
+				.atZone( ZoneId.of( "Europe/Paris" ) );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<ZonedDateTime>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) ),

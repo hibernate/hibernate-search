@@ -89,6 +89,11 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 	}
 
 	@Override
+	public LocalDate valueFromInteger(int integer) {
+		return LocalDate.of( 2017, 11, 1 ).plus( integer, ChronoUnit.DAYS );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<LocalDate>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalDate.of( 1970, 1, 1 ),

@@ -78,6 +78,11 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	}
 
 	@Override
+	public Integer valueFromInteger(int integer) {
+		return integer;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Integer>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0, 12

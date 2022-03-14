@@ -76,6 +76,11 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
+	public Boolean valueFromInteger(int integer) {
+		return integer % 2 == 0;
+	}
+
+	@Override
 	public boolean isFieldSortSupported() {
 		return false;
 	}

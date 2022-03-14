@@ -107,6 +107,11 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
+	public String valueFromInteger(int integer) {
+		return "string_" + integer;
+	}
+
+	@Override
 	public boolean isFieldSortSupported() {
 		return false;
 	}

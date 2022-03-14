@@ -76,6 +76,11 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
+	public GeoPoint valueFromInteger(int integer) {
+		return GeoPoint.of( 0, integer );
+	}
+
+	@Override
 	public boolean isFieldSortSupported() {
 		return false;
 	}

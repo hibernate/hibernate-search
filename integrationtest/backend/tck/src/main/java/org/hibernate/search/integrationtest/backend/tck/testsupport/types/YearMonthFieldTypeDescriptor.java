@@ -89,6 +89,11 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
+	public YearMonth valueFromInteger(int integer) {
+		return YearMonth.of( 2000 + integer, Month.SEPTEMBER );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<YearMonth>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				YearMonth.of( 0, Month.JANUARY ),

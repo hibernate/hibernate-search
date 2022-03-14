@@ -90,6 +90,12 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	}
 
 	@Override
+	public Instant valueFromInteger(int integer) {
+		return LocalDateTimeFieldTypeDescriptor.INSTANCE.valueFromInteger( integer )
+				.atOffset( ZoneOffset.UTC ).toInstant();
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Instant>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				Instant.EPOCH, Instant.parse( "2018-02-01T10:15:30.00Z" )

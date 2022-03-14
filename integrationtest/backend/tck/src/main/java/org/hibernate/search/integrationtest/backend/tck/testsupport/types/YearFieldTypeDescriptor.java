@@ -92,6 +92,11 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	}
 
 	@Override
+	public Year valueFromInteger(int integer) {
+		return Year.of( 2000 + integer );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Year>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				Year.of( 1970 ), Year.of( 4302 )

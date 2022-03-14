@@ -46,14 +46,29 @@ public class IndexableGeoPointWithDistanceFromCenterValues extends IndexableValu
 	@Override
 	protected List<GeoPoint> createSingle() {
 		return asList(
-				CENTER_POINT_1, // ~0km / ~1km
-				CENTER_POINT_2, // ~1km / ~0km
-				GeoPoint.of( 46.059852, 3.978235 ), // ~2km / ~2km
-				GeoPoint.of( 46.039763, 3.914977 ), // ~5km / ~4km
-				GeoPoint.of( 46.000833, 3.931265 ), // ~5.5km / ~5km
-				GeoPoint.of( 46.094712, 4.044507 ), // ~8km / ~9km
-				GeoPoint.of( 46.018378, 4.196792 ), // ~14km / ~13km
-				GeoPoint.of( 46.123025, 3.845305 ) // ~17km / ~18km
+				CENTER_POINT_1, // ~ 0km / ~ 1km
+				CENTER_POINT_2, // ~ 1km / ~ 0km
+				GeoPoint.of( 46.059852, 3.978235 ), // ~ 2km / ~ 3km
+				GeoPoint.of( 46.039763, 3.914977 ), // ~ 5km / ~ 4km
+				GeoPoint.of( 46.000833, 3.931265 ), // ~ 6km / ~ 5km
+				GeoPoint.of( 46.094712, 4.044507 ), // ~ 8km / ~ 9km
+				GeoPoint.of( 46.018378, 4.196792 ), // ~17km / ~18km
+				GeoPoint.of( 46.123025, 3.845305 ), // ~14km / ~13km
+				GeoPoint.of( 46.018378, 4.226792 ), // ~19km / ~20km
+				GeoPoint.of( 46.018378, 4.286792 ), // ~24km / ~25km
+				GeoPoint.of( 46.018378, 4.326792 ), // ~27km / ~28km
+				GeoPoint.of( 46.018378, 4.386792 ), // ~32km / ~33km
+				GeoPoint.of( 46.018378, 4.446792 ), // ~36km / ~37km
+				GeoPoint.of( 46.018378, 4.506792 ), // ~41km / ~42km
+				GeoPoint.of( 46.018378, 4.566792 ), // ~45km / ~47km
+				GeoPoint.of( 46.018378, 4.626792 ), // ~50km / ~51km
+				GeoPoint.of( 46.018378, 4.686792 ), // ~55km / ~56km
+				GeoPoint.of( 46.018378, 4.746792 ), // ~59km / ~60km
+				GeoPoint.of( 46.018378, 4.806792 ), // ~64km / ~65km
+				GeoPoint.of( 46.018378, 4.866792 ), // ~69km / ~70km
+				GeoPoint.of( 46.018378, 4.926792 ), // ~73km / ~74km
+				GeoPoint.of( 46.018378, 4.986792 ), // ~78km / ~79km
+				GeoPoint.of( 46.018378, 5.046792 ) // ~83km / ~84km
 		);
 	}
 
@@ -62,11 +77,26 @@ public class IndexableGeoPointWithDistanceFromCenterValues extends IndexableValu
 				0.0,
 				1_073.8,
 				2_355.1,
-				4_909.5,
+				4_909.6,
 				5_571.5,
-				8_044.3,
-				13_914.5,
-				16_998.3
+				8_044.4,
+				16_998.3,
+				13_914.6,
+				19_296.4,
+				23_902.9,
+				26_978.8,
+				31_597.1,
+				36_218.9,
+				40_843.1,
+				45_468.8,
+				50_095.8,
+				54_723.6,
+				59_352.1,
+				63_981.1,
+				68_610.5,
+				73_240.2,
+				77_870.2,
+				82_500.5
 		);
 	}
 
@@ -78,8 +108,23 @@ public class IndexableGeoPointWithDistanceFromCenterValues extends IndexableValu
 				3_836.2,
 				4_935.5,
 				8_761.8,
+				18_063.5,
 				13_141.2,
-				18_063.5
+				20_363.5,
+				24_972.4,
+				28_049.2,
+				32_668.4,
+				37_290.9,
+				41_915.5,
+				46_541.6,
+				51_168.7,
+				55_796.7,
+				60_425.3,
+				65_054.4,
+				69_683.9,
+				74_313.7,
+				78_943.8,
+				83_574.0
 		);
 	}
 

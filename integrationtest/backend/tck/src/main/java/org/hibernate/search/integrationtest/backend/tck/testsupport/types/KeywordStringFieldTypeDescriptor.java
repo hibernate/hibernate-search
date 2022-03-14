@@ -92,6 +92,11 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 	}
 
 	@Override
+	public String valueFromInteger(int integer) {
+		return "string_" + integer;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<String>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				"NULL", "Aaron"
