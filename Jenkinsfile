@@ -256,8 +256,9 @@ stage('Configure') {
 							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[7.12,8.0)', mavenProfile: 'elasticsearch-7.12',
 							condition: TestCondition.AFTER_MERGE),
+					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
 					new EsLocalBuildEnvironment(versionRange: '[8.0,8.1)', mavenProfile: 'elasticsearch-8.0',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[8.1,8.x)', mavenProfile: 'elasticsearch-8.1',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
