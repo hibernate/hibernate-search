@@ -1989,7 +1989,7 @@ As to migrating existing complex queries, let's consider the query below:
 
 [source, JAVA]
 ----
-MySearchParameters params = ...;
+MySearchParameters searchParameters = ...;
 FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
 QueryBuilder qb = fullTextEntityManager.getSearchFactory()
         .buildQueryBuilder().forEntity( Book.class ).get();
@@ -2025,7 +2025,7 @@ It would look like this in Hibernate Search 6:
 
 [source, JAVA]
 ----
-MySearchParameters params = ...;
+MySearchParameters searchParameters = ...;
 SearchSession session = Search.session( entityManager );
 List<Book> hits = searchSession.search( Book.class )
         .where( f -> f.bool( b -> {
@@ -2044,14 +2044,15 @@ List<Book> hits = searchSession.search( Book.class )
                         .atMost( searchParameters.getMaxBookLength() ) );
             }
         } ) )
-        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );
+        .fetchHits( searchParameters.getPageIndex() * searchParameters.getPageSize(),
+                searchParameters.getPageSize() );
 ----
 
 Alternatively, if for some reasons predicate objects are necessary:
 
 [source, JAVA]
 ----
-MySearchParameters params = ...;
+MySearchParameters searchParameters = ...;
 SearchSession session = Search.session( entityManager );
 SearchPredicateFactory pf = session.scope( Book.class ).predicate();
 List<SearchPredicate> predicates = new ArrayList<>();
@@ -2080,7 +2081,8 @@ List<Book> hits = searchSession.search( Book.class )
             	b.must( predicate );
             }
         } )
-        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );
+        .fetchHits( searchParameters.getPageIndex() * searchParameters.getPageSize(),
+                searchParameters.getPageSize() );
 ----
 
 [[queries-reference]]
