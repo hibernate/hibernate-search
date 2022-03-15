@@ -207,6 +207,7 @@ In Hibernate Search 6, constants are provided through classes whose name ends wi
 * `org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings`
 * `org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings`
 * `org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings`
+* `org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings`
 
 [[configuration-property-reference]]
 === [[_configuration_property_reference]] Configuration property reference
@@ -240,6 +241,30 @@ Hibernate Search 6 will automatically turn entities to documents
 and hold documents in memory until the transaction commit.
 +
 See also link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual[this section of the documentation].
+`hibernate.search.default.elasticsearch.aws.*`::
+The syntax for configuring AWS authentication changed slightly in Hibernate Search 6.
++
+In short, the following configuration in Hibernate Search 5:
+[source]
+----
+hibernate.search.default.elasticsearch.aws.signing.enabled = true
+hibernate.search.default.elasticsearch.aws.region = us-east-1
+hibernate.search.default.elasticsearch.aws.access_key = AKIDEXAMPLE
+hibernate.search.default.elasticsearch.aws.secret_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY
+----
++
+Will look like this in Hibernate Search 6:
+[source]
+----
+hibernate.search.backend.aws.signing.enabled = true
+hibernate.search.backend.aws.region = us-east-1
+hibernate.search.backend.aws.credentials.type = static
+hibernate.search.backend.aws.credentials.access_key_id = AKIDEXAMPLE
+hibernate.search.backend.aws.credentials.secret_access_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY
+----
++
+Other types of credentials are available in Hibernate Search 6,
+see link:{hibernateSearchDocUrl}#backend-elasticsearch-configuration-aws[this section of the documentation]
 `hibernate.search.default.elasticsearch.connection_timeout`::
 Hibernate Search 6 equivalent: `hibernate.search.backend.connection_timeout`.
 +
