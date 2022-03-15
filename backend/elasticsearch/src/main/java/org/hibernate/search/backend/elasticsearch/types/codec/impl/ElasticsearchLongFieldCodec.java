@@ -7,11 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.LongSerializationPolicy;
 
 public class ElasticsearchLongFieldCodec implements ElasticsearchFieldCodec<Long> {
 	public static final ElasticsearchLongFieldCodec INSTANCE = new ElasticsearchLongFieldCodec();
@@ -28,9 +28,8 @@ public class ElasticsearchLongFieldCodec implements ElasticsearchFieldCodec<Long
 	}
 
 	@Override
-	public JsonElement encodeForAggregation(Long value) {
-		// Workaround for https://github.com/elastic/elasticsearch/issues/81529
-		return LongSerializationPolicy.STRING.serialize( value );
+	public JsonElement encodeForAggregation(ElasticsearchSearchSyntax searchSyntax, Long value) {
+		return searchSyntax.encodeLongForAggregation( value );
 	}
 
 	@Override
