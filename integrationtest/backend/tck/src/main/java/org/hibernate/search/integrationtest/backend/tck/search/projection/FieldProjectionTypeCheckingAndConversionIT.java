@@ -191,13 +191,13 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3391")
 	public void singleValuedFieldInMultiValuedObjectField_flattened_singleValuedProjection() {
-		StubMappingScope scope = mainIndex.createScope();
-
 		String fieldPath = mainIndex.binding().flattenedObjectWithMultipleValues.relativeFieldName
 				+ "." + mainIndex.binding().flattenedObjectWithMultipleValues.fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy( () -> scope.projection()
-				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
+		assertThatThrownBy( () -> mainIndex.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ) )
+				.where( f -> f.matchAll() )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Invalid cardinality for projection on field '" + fieldPath + "'",
@@ -209,13 +209,13 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3391")
 	public void singleValuedFieldInMultiValuedObjectField_nested_singleValuedProjection() {
-		StubMappingScope scope = mainIndex.createScope();
-
 		String fieldPath = mainIndex.binding().nestedObjectWithMultipleValues.relativeFieldName
 				+ "." + mainIndex.binding().nestedObjectWithMultipleValues.fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy( () -> scope.projection()
-				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
+		assertThatThrownBy( () -> mainIndex.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ) )
+				.where( f -> f.matchAll() )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Invalid cardinality for projection on field '" + fieldPath + "'",
