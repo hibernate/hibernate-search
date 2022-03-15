@@ -161,12 +161,12 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomMappingIT {
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
 				"    '_source':{ " +
-				"       'enabled':true " +
+				"       'enabled': false " +
 				"    } " +
 				" } "
 		);
 
-		assertThatThrownBy( () -> setupAndUpdateIndex( "no-overlapping.json" ) )
+		assertThatThrownBy( () -> setupAndUpdateIndex( "source-enabled.json" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "conflicts", "_source" );
 	}
