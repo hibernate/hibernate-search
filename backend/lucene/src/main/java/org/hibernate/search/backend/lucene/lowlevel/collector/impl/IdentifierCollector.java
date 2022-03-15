@@ -7,11 +7,11 @@
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
@@ -37,7 +37,7 @@ public final class IdentifierCollector extends SimpleCollector {
 	private BinaryDocValues currentLeafIdDocValues;
 	private int currentLeafDocBase;
 
-	private Map<Integer, String> collected = new HashMap<>();
+	private final IntObjectMap<String> collected = new IntObjectHashMap<>();
 
 	private IdentifierCollector() {
 	}

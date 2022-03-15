@@ -7,14 +7,14 @@
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.util.common.AssertionFailure;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -68,7 +68,7 @@ public class StoredFieldsCollector extends SimpleCollector {
 	private DocIdSetIterator currentLeafChildDocs;
 	private LeafReader currentLeafReader;
 
-	private final Map<Integer, Document> documents = new HashMap<>();
+	private final IntObjectMap<Document> documents = new IntObjectHashMap<>();
 
 	public StoredFieldsCollector(NestedDocsProvider nestedDocsProvider,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
