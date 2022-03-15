@@ -2003,13 +2003,17 @@ if ( searchParameters.getSearchTerms() != null ) {
             .matching( searchParameters.getSearchTerms() )
             .createQuery() );
 }
-if ( searchParameters.getGenre() != null ) {
-    junction.must( qb.keyword().onField( "genre" )
-            .matching( searchParameters.getGenre() ) );
-}
 if ( searchParameters.getMaxBookLength() != null ) {
     junction.must( qb.range().onField( "pageCount" )
             .below( searchParameters.getMaxBookLength() ) );
+}
+if ( !searchParameters.getGenres().isEmpty() ) {
+    BooleanJunction junction2 = qb.bool();
+	for ( Genre genre : searchParameters.getGenres() ) {
+        junction2.should( qb.keyword().onField( "genre" )
+                .matching( genre ) );
+	}
+	junction.must( junction2.createQuery() );
 }
 
 org.apache.lucene.search.Query luceneQuery = junction.createQuery();
@@ -2035,13 +2039,17 @@ List<Book> hits = searchSession.search( Book.class )
                         .matching( searchParameters.getSearchTerms() )
                         .defaultOperator( BooleanOperator.AND ) );
             }
-            if ( searchParameters.getGenre() != null ) {
-                b.must( f.match().field( "genre" )
-                        .matching( searchParameters.getGenre() ) );
-            }
             if ( searchParameters.getMaxBookLength() != null ) {
                 b.must( f.range().field( "pageCount" )
                         .atMost( searchParameters.getMaxBookLength() ) );
+            }
+            if ( !searchParameters.getGenres().isEmpty() ) {
+                b.must( f.bool( b2 -> {
+                    for ( Genre genre : searchParameters.getGenres() ) {
+                        b2.should( f.match().field( "genre" )
+                                .matching( genre ) );
+                    }
+                } ) );
             }
         } ) )
         .fetchHits( searchParameters.getPageIndex() * searchParameters.getPageSize(),
@@ -2063,24 +2071,30 @@ if ( searchParameters.getSearchTerms() != null ) {
             .defaultOperator( BooleanOperator.AND )
             .toPredicate() );
 }
-if ( searchParameters.getGenre() != null ) {
-    predicates.add( pf.match().field( "genre" )
-            .matching( searchParameters.getGenre() )
-            .toPredicate() );
-}
 if ( searchParameters.getMaxBookLength() != null ) {
     predicates.add( pf.range().field( "pageCount" )
             .atMost( searchParameters.getMaxBookLength() )
             .toPredicate() );
 }
+if ( !searchParameters.getGenres().isEmpty() ) {
+    predicates.add( f.bool( b -> {
+        for ( Genre genre : searchParameters.getGenres() ) {
+            b.should( f.match().field( "genre" )
+                    .matching( genre ) );
+        }
+    } )
+            .toPredicate() );
+}
+
+SearchPredicate topLevelPredicate = pf.bool( b -> {
+    b.must( f.matchAll() );
+    for ( SearchPredicate predicate : predicates ) {
+        b.must( predicate );
+    }
+} );
 
 List<Book> hits = searchSession.search( Book.class )
-        .where( f -> f.bool( b -> {
-            b.must( f.matchAll() );
-            for ( SearchPredicate predicate : predicates ) {
-            	b.must( predicate );
-            }
-        } )
+        .where( topLevelPredicate )
         .fetchHits( searchParameters.getPageIndex() * searchParameters.getPageSize(),
                 searchParameters.getPageSize() );
 ----
