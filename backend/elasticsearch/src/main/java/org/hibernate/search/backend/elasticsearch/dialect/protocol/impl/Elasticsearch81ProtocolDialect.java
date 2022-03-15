@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.Elasticsearch64IndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch7SearchSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch81SearchSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch7SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
 /**
- * The protocol dialect for Elasticsearch 8.0.
+ * The protocol dialect for Elasticsearch 8.1 and later 8.x.
  */
-public class Elasticsearch80ProtocolDialect implements ElasticsearchProtocolDialect {
+public class Elasticsearch81ProtocolDialect implements ElasticsearchProtocolDialect {
 
 	@Override
 	public ElasticsearchIndexMetadataSyntax createIndexMetadataSyntax() {
@@ -28,7 +28,7 @@ public class Elasticsearch80ProtocolDialect implements ElasticsearchProtocolDial
 
 	@Override
 	public ElasticsearchSearchSyntax createSearchSyntax() {
-		return new Elasticsearch7SearchSyntax();
+		return new Elasticsearch81SearchSyntax();
 	}
 
 	@Override

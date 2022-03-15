@@ -22,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch80ProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch81ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -125,7 +126,7 @@ public class ElasticsearchDialectFactory {
 		}
 		else {
 			log.unknownElasticsearchVersion( version );
-			return new Elasticsearch80ProtocolDialect();
+			return new Elasticsearch81ProtocolDialect();
 		}
 	}
 
@@ -165,10 +166,13 @@ public class ElasticsearchDialectFactory {
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectElasticV8(ElasticsearchVersion version, int minor) {
-		if ( minor > 0 ) {
+		if ( minor > 1 ) {
 			log.unknownElasticsearchVersion( version );
 		}
-		return new Elasticsearch80ProtocolDialect();
+		else if ( minor == 0 ) {
+			return new Elasticsearch80ProtocolDialect();
+		}
+		return new Elasticsearch81ProtocolDialect();
 	}
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearch(ElasticsearchVersion version) {

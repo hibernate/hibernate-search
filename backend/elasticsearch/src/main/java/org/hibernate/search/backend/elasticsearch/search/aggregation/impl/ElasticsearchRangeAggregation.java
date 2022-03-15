@@ -153,7 +153,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		private JsonElement convertToFieldValue(K value) {
 			try {
 				F converted = toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
-				return codec.encodeForAggregation( converted );
+				return codec.encodeForAggregation( scope.searchSyntax(), converted );
 			}
 			catch (RuntimeException e) {
 				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );

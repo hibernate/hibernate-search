@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+
 import com.google.gson.JsonElement;
 
 /**
@@ -26,10 +28,12 @@ public interface ElasticsearchFieldCodec<F> {
 	/**
 	 * Encodes a value for inclusion in an aggregation request.
 	 *
+	 *
+	 * @param searchSyntax The search syntax.
 	 * @param value The value to encode.
 	 * @return The encoded value.
 	 */
-	default JsonElement encodeForAggregation(F value) {
+	default JsonElement encodeForAggregation(ElasticsearchSearchSyntax searchSyntax, F value) {
 		return encode( value );
 	}
 
