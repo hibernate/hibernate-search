@@ -7,14 +7,14 @@
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
@@ -43,7 +43,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 	private BinaryDocValues currentLeafIdDocValues;
 	private int currentLeafDocBase;
 
-	private Map<Integer, DocumentReference> collected = new HashMap<>();
+	private final IntObjectMap<DocumentReference> collected = new IntObjectHashMap<>();
 
 	private DocumentReferenceCollector(CollectorExecutionContext executionContext) {
 		this.metadataResolver = executionContext.getMetadataResolver();
