@@ -38,8 +38,9 @@ import org.apache.lucene.util.SloppyMath;
  * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
  * @param <P> The type of the final projection result representing accumulated distance values.
  */
-public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProjection<A, P>
-		implements CollectorFactory<GeoPointDistanceCollector> {
+public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProjection<P>
+		implements CollectorFactory<GeoPointDistanceCollector>,
+				LuceneSearchProjection.Extractor<A, P> {
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
 			ProjectionConverter.passThrough( Double.class );
@@ -93,30 +94,26 @@ public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProject
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
+	public Extractor<A, P> request(ProjectionRequestContext context) {
 		if ( collectorKey != null ) {
 			context.requireCollector( this );
+			return this;
 		}
 		else {
-			fieldProjection.request( context );
+			return fieldProjection.request( context );
 		}
 	}
 
 	@Override
 	public A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		if ( collectorKey != null ) {
-			A accumulated = accumulator.createInitial();
-			GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
-			Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
-			if ( distanceOrNull != null ) {
-				accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
-			}
-			return accumulated;
+		ProjectionExtractContext context) {
+		A accumulated = accumulator.createInitial();
+		GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
+		Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
+		if ( distanceOrNull != null ) {
+			accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
 		}
-		else {
-			return fieldProjection.extract( mapper, documentResult, context );
-		}
+		return accumulated;
 	}
 
 	@Override

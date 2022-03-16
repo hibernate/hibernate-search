@@ -26,13 +26,13 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
  * @param <P> The type of the final projection result representing an accumulation of composed values of type {@code V}.
  */
 class LuceneCompositeProjection<E, V, A, P>
-		extends AbstractLuceneProjection<A, P> {
+		extends AbstractLuceneProjection<P> {
 
-	private final LuceneSearchProjection<?, ?>[] inners;
+	private final LuceneSearchProjection<?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
 	private final ProjectionAccumulator<E, V, A, P> accumulator;
 
-	public LuceneCompositeProjection(Builder builder, LuceneSearchProjection<?, ?>[] inners,
+	public LuceneCompositeProjection(Builder builder, LuceneSearchProjection<?>[] inners,
 			ProjectionCompositor<E, V> compositor, ProjectionAccumulator<E, V, A, P> accumulator) {
 		super( builder.scope );
 		this.inners = inners;
@@ -50,43 +50,62 @@ class LuceneCompositeProjection<E, V, A, P>
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
-		for ( LuceneSearchProjection<?, ?> inner : inners ) {
-			inner.request( context );
-		}
-	}
-
-	@Override
-	public final A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		A accumulated = accumulator.createInitial();
-
-		E components = compositor.createInitial();
+	public Extractor<?, P> request(ProjectionRequestContext context) {
+		Extractor<?, ?>[] innerExtractors = new Extractor[inners.length];
 		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = inners[i].extract( mapper, documentResult, context );
-			components = compositor.set( components, i, extractedDataForInner );
+			innerExtractors[i] = inners[i].request( context );
 		}
-		// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
-		accumulated = accumulator.accumulate( accumulated, components );
-
-		return accumulated;
+		return new CompositeExtractor( innerExtractors );
 	}
 
-	@Override
-	public final P transform(LoadingResult<?, ?> loadingResult, A accumulated,
-			ProjectionTransformContext context) {
-		for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
-			E transformedData = accumulator.get( accumulated, i );
-			// Transform in-place
-			for ( int j = 0; j < inners.length; j++ ) {
-				Object extractedDataForInner = compositor.get( transformedData, j );
-				Object transformedDataForInner = LuceneSearchProjection.transformUnsafe( inners[j], loadingResult,
-						extractedDataForInner, context );
-				transformedData = compositor.set( transformedData, j, transformedDataForInner );
-			}
-			accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
+	private class CompositeExtractor implements Extractor<A, P> {
+		private final Extractor<?, ?>[] inners;
+
+		private CompositeExtractor(Extractor<?, ?>[] inners) {
+			this.inners = inners;
 		}
-		return accumulator.finish( accumulated );
+
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "["
+					+ "inners=" + Arrays.toString( inners )
+					+ ", compositor=" + compositor
+					+ ", accumulator=" + accumulator
+					+ "]";
+		}
+
+		@Override
+		public final A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+				ProjectionExtractContext context) {
+			A accumulated = accumulator.createInitial();
+
+			E components = compositor.createInitial();
+			for ( int i = 0; i < inners.length; i++ ) {
+				Object extractedDataForInner = inners[i].extract( mapper, documentResult, context );
+				components = compositor.set( components, i, extractedDataForInner );
+			}
+			// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
+			accumulated = accumulator.accumulate( accumulated, components );
+
+			return accumulated;
+		}
+
+		@Override
+		public final P transform(LoadingResult<?, ?> loadingResult, A accumulated,
+				ProjectionTransformContext context) {
+			for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
+				E transformedData = accumulator.get( accumulated, i );
+				// Transform in-place
+				for ( int j = 0; j < inners.length; j++ ) {
+					Object extractedDataForInner = compositor.get( transformedData, j );
+					Object transformedDataForInner = Extractor.transformUnsafe( inners[j], loadingResult,
+							extractedDataForInner, context );
+					transformedData = compositor.set( transformedData, j, transformedDataForInner );
+				}
+				accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
+			}
+			return accumulator.finish( accumulated );
+		}
 	}
 
 	static class Builder implements CompositeProjectionBuilder {
@@ -100,8 +119,8 @@ class LuceneCompositeProjection<E, V, A, P>
 		@Override
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			LuceneSearchProjection<?, ?>[] typedInners =
-					new LuceneSearchProjection<?, ?>[ inners.length ];
+			LuceneSearchProjection<?>[] typedInners =
+					new LuceneSearchProjection<?>[ inners.length ];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = LuceneSearchProjection.from( scope, inners[i] );
 			}

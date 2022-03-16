@@ -62,7 +62,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private final Set<String> routingKeys;
 
 	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
-	private final LuceneSearchProjection<?, H> rootProjection;
+	private final LuceneSearchProjection<H> rootProjection;
 
 	private Query luceneQuery;
 	private List<SortField> sortFields;
@@ -78,7 +78,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 			LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
-			LuceneSearchProjection<?, H> rootProjection) {
+			LuceneSearchProjection<H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 
@@ -209,7 +209,8 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 		ExtractionRequirements.Builder extractionRequirementsBuilder = new ExtractionRequirements.Builder();
 		ProjectionRequestContext projectionRequestContext =
 				new ProjectionRequestContext( extractionRequirementsBuilder );
-		rootProjection.request( projectionRequestContext );
+		LuceneSearchProjection.Extractor<?, H> rootExtractor =
+				rootProjection.request( projectionRequestContext );
 		if ( aggregations != null ) {
 			AggregationRequestContext aggregationRequestContext =
 					new AggregationRequestContext( extractionRequirementsBuilder );
@@ -223,7 +224,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
-				rootProjection,
+				rootExtractor,
 				aggregations == null ? Collections.emptyMap() : aggregations,
 				extractionRequirements,
 				timeoutManager

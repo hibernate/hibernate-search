@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 import org.apache.lucene.document.Document;
 
-class LuceneDocumentProjection extends AbstractLuceneProjection<Document, Document> {
+class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
+		implements LuceneSearchProjection.Extractor<Document, Document> {
 
 	private LuceneDocumentProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
@@ -27,8 +28,9 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document, Docume
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
+	public Extractor<?, Document> request(ProjectionRequestContext context) {
 		context.requireAllStoredFields();
+		return this;
 	}
 
 	@Override

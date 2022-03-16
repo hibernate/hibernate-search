@@ -38,20 +38,20 @@ public class LuceneExtractableSearchResult<H> {
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
 	private final IndexSearcher indexSearcher;
 	private final LuceneCollectors luceneCollectors;
-	private final LuceneSearchProjection<?, H> rootProjection;
+	private final LuceneSearchProjection.Extractor<?, H> rootExtractor;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private final TimeoutManager timeoutManager;
 
 	public LuceneExtractableSearchResult(LuceneSearchQueryRequestContext requestContext,
 			IndexSearcher indexSearcher,
 			LuceneCollectors luceneCollectors,
-			LuceneSearchProjection<?, H> rootProjection,
+			LuceneSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
 		this.fromDocumentValueConvertContext = new FromDocumentValueConvertContextImpl( requestContext.getSessionContext() );
 		this.indexSearcher = indexSearcher;
 		this.luceneCollectors = luceneCollectors;
-		this.rootProjection = rootProjection;
+		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
 		this.timeoutManager = timeoutManager;
 	}
@@ -81,7 +81,7 @@ public class LuceneExtractableSearchResult<H> {
 				Collections.emptyMap() : extractAggregations();
 
 		return new LuceneLoadableSearchResult<>(
-				fromDocumentValueConvertContext, rootProjection,
+				fromDocumentValueConvertContext, rootExtractor,
 				luceneCollectors.getResultTotal(), luceneCollectors.getTopDocs(),
 				extractedData, extractedAggregations, projectionHitMapper,
 				timeoutManager.tookTime(),
@@ -128,7 +128,7 @@ public class LuceneExtractableSearchResult<H> {
 
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
-			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
+			extractedData.add( rootExtractor.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
 		}
 
 		return extractedData;

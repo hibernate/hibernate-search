@@ -35,7 +35,8 @@ import org.apache.lucene.index.IndexableField;
  * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
  * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<A, P> {
+public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<P>
+		implements LuceneSearchProjection.Extractor<A, P> {
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
@@ -69,8 +70,9 @@ public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
+	public Extractor<A, P> request(ProjectionRequestContext context) {
 		context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
+		return this;
 	}
 
 	@Override

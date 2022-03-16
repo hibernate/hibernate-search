@@ -39,19 +39,19 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private final LuceneSearchQueryRequestContext requestContext;
 
-	private final LuceneSearchProjection<?, H> rootProjection;
+	private final LuceneSearchProjection.Extractor<?, H> rootExtractor;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private final ExtractionRequirements extractionRequirements;
 
 	private TimeoutManager timeoutManager;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
-			LuceneSearchProjection<?, H> rootProjection,
+			LuceneSearchProjection.Extractor<?, H> rootExtractor,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
 			ExtractionRequirements extractionRequirements,
 			TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
-		this.rootProjection = rootProjection;
+		this.rootExtractor = rootExtractor;
 		this.aggregations = aggregations;
 		this.extractionRequirements = extractionRequirements;
 		this.timeoutManager = timeoutManager;
@@ -96,7 +96,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 				collectMatchingDocsWithPrefetch( indexSearcher, metadataResolver, offset, limit, maxDocs, totalHitCountThreshold );
 
 		return new LuceneExtractableSearchResult<>( requestContext, indexSearcher, luceneCollectors,
-				rootProjection, aggregations, timeoutManager );
+				rootExtractor, aggregations, timeoutManager );
 	}
 
 	@Override
