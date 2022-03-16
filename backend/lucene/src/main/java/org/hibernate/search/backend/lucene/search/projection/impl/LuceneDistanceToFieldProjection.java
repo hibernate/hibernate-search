@@ -42,14 +42,11 @@ import org.apache.lucene.util.SloppyMath;
 public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProjection<E, P>
 		implements CollectorFactory<GeoPointDistanceCollector> {
 
-	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER = new ProjectionConverter<>(
-			Double.class,
-			(value, context) -> value
-	);
+	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
+			ProjectionConverter.passThrough( Double.class );
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
-	private final boolean multiValued;
 
 	private final LuceneFieldCodec<GeoPoint> codec;
 
@@ -59,18 +56,30 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	private final ProjectionAccumulator<Double, Double, E, P> accumulator;
 
 	private final DistanceCollectorKey collectorKey;
+	private final LuceneFieldProjection<E, P, Double, Double> fieldProjection;
 
-	private LuceneDistanceToFieldProjection(Builder builder, boolean multiValued,
+	private LuceneDistanceToFieldProjection(Builder builder, boolean singleValued,
 			ProjectionAccumulator<Double, Double, E, P> accumulator) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.nestedDocumentPath = builder.field.nestedDocumentPath();
-		this.multiValued = multiValued;
 		this.codec = builder.codec;
 		this.center = builder.center;
 		this.unit = builder.unit;
 		this.accumulator = accumulator;
-		this.collectorKey = new DistanceCollectorKey( absoluteFieldPath, center );
+		if ( singleValued ) {
+			// For single-valued fields, we can use the docvalues.
+			this.collectorKey = new DistanceCollectorKey( absoluteFieldPath, center );
+			this.fieldProjection = null;
+		}
+		else {
+			// For multi-valued fields, use a field projection, because we need order to be preserved.
+			this.collectorKey = null;
+			this.fieldProjection = new LuceneFieldProjection<>(
+					builder.scope, builder.field,
+					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulator
+			);
+		}
 	}
 
 	@Override
@@ -86,39 +95,29 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 
 	@Override
 	public void request(ProjectionRequestContext context) {
-		if ( multiValued ) {
-			// For multi-valued fields, use storage, because we need order to be preserved.
-			context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
+		if ( collectorKey != null ) {
+			context.requireCollector( this );
 		}
 		else {
-			// For single-valued fields, we can use the docvalues.
-			context.requireCollector( this );
+			fieldProjection.request( context );
 		}
 	}
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			ProjectionExtractContext context) {
-		E accumulated = accumulator.createInitial();
-		if ( multiValued ) {
-			for ( IndexableField field : documentResult.getDocument().getFields() ) {
-				if ( field.name().equals( absoluteFieldPath ) ) {
-					GeoPoint decoded = codec.decode( field );
-					double distanceInMeters = SloppyMath.haversinMeters( center.latitude(), center.longitude(),
-							decoded.latitude(), decoded.longitude() );
-					double distance = unit.fromMeters( distanceInMeters );
-					accumulated = accumulator.accumulate( accumulated, distance );
-				}
-			}
-		}
-		else {
+		if ( collectorKey != null ) {
+			E accumulated = accumulator.createInitial();
 			GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
 			Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
 			if ( distanceOrNull != null ) {
 				accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
 			}
+			return accumulated;
 		}
-		return accumulated;
+		else {
+			return fieldProjection.extract( mapper, documentResult, context );
+		}
 	}
 
 	@Override
@@ -126,6 +125,18 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 			ProjectionTransformContext context) {
 		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
+	}
+
+	private Double computeDistanceWithUnit(IndexableField field) {
+		GeoPoint decoded = codec.decode( field );
+		if ( decoded == null ) {
+			return null;
+		}
+		double distanceInMeters = SloppyMath.haversinMeters(
+				center.latitude(), center.longitude(),
+				decoded.latitude(), decoded.longitude()
+		);
+		return unit.fromMeters( distanceInMeters );
 	}
 
 	@Override
@@ -223,7 +234,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 			if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 			}
-			return new LuceneDistanceToFieldProjection<>( this, !accumulatorProvider.isSingleValued(),
+			return new LuceneDistanceToFieldProjection<>( this, accumulatorProvider.isSingleValued(),
 					accumulatorProvider.get() );
 		}
 	}

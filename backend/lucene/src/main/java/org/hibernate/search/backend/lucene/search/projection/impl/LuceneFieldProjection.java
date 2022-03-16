@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
@@ -39,16 +40,23 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 
-	private final LuceneFieldCodec<F> codec;
+	private final Function<IndexableField, F> decodeFunction;
 	private final ProjectionConverter<F, ? extends V> converter;
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
-		super( builder );
-		this.absoluteFieldPath = builder.field.absolutePath();
-		this.nestedDocumentPath = builder.field.nestedDocumentPath();
-		this.codec = builder.codec;
-		this.converter = builder.converter;
+		this( builder.scope, builder.field, builder.codec::decode, builder.converter, accumulator );
+	}
+
+	LuceneFieldProjection(LuceneSearchIndexScope<?> scope,
+			LuceneSearchIndexValueFieldContext<?> field,
+			Function<IndexableField, F> decodeFunction, ProjectionConverter<F, ? extends V> converter,
+			ProjectionAccumulator<F, V, E, P> accumulator) {
+		super( scope );
+		this.absoluteFieldPath = field.absolutePath();
+		this.nestedDocumentPath = field.nestedDocumentPath();
+		this.decodeFunction = decodeFunction;
+		this.converter = converter;
 		this.accumulator = accumulator;
 	}
 
@@ -71,7 +79,7 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 		E extracted = accumulator.createInitial();
 		for ( IndexableField field : documentResult.getDocument().getFields() ) {
 			if ( field.name().equals( absoluteFieldPath ) ) {
-				F decoded = codec.decode( field );
+				F decoded = decodeFunction.apply( field );
 				extracted = accumulator.accumulate( extracted, decoded );
 			}
 		}
