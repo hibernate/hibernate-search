@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
-class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
+class LuceneScoreProjection extends AbstractLuceneProjection<Float>
+		implements LuceneSearchProjection.Extractor<Float, Float> {
 
 	private LuceneScoreProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
@@ -25,8 +26,9 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
+	public Extractor<?, Float> request(ProjectionRequestContext context) {
 		context.requireScore();
+		return this;
 	}
 
 	@Override

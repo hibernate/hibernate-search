@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
-public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
+public class LuceneIdProjection<I> extends AbstractLuceneProjection<I>
+		implements LuceneSearchProjection.Extractor<String, I> {
 
 	private final ProjectionConverter<String, I> converter;
 
@@ -30,8 +31,9 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
+	public Extractor<?, I> request(ProjectionRequestContext context) {
 		context.requireCollector( IdentifierCollector.FACTORY );
+		return this;
 	}
 
 	@Override

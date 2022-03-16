@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
+import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.Extractor.transformUnsafe;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -38,7 +38,7 @@ import org.apache.lucene.search.TopDocs;
  */
 public class LuceneLoadableSearchResult<H> {
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
-	private final LuceneSearchProjection<?, H> rootProjection;
+	private final LuceneSearchProjection.Extractor<?, H> rootExtractor;
 
 	private final SearchResultTotal resultTotal;
 	private final TopDocs topDocs;
@@ -51,13 +51,13 @@ public class LuceneLoadableSearchResult<H> {
 	private final TimeoutManager timeoutManager;
 
 	LuceneLoadableSearchResult(FromDocumentValueConvertContext fromDocumentValueConvertContext,
-			LuceneSearchProjection<?, H> rootProjection,
+			LuceneSearchProjection.Extractor<?, H> rootExtractor,
 			SearchResultTotal resultTotal, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			Duration took, boolean timedOut, TimeoutManager timeoutManager) {
 		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
-		this.rootProjection = rootProjection;
+		this.rootExtractor = rootExtractor;
 		this.resultTotal = resultTotal;
 		this.topDocs = topDocs;
 		this.extractedData = extractedData;
@@ -78,7 +78,7 @@ public class LuceneLoadableSearchResult<H> {
 		for ( ; readIndex < extractedData.size(); ++readIndex ) {
 			transformContext.reset();
 			H transformed = transformUnsafe(
-					rootProjection, loadingResult, extractedData.get( readIndex ), transformContext
+					rootExtractor, loadingResult, extractedData.get( readIndex ), transformContext
 			);
 
 			if ( transformContext.hasFailedLoad() ) {

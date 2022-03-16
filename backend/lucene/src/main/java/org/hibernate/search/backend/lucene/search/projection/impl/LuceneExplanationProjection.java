@@ -15,15 +15,16 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 import org.apache.lucene.search.Explanation;
 
-class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation, Explanation> {
+class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation>
+		implements LuceneSearchProjection.Extractor<Explanation, Explanation> {
 
 	private LuceneExplanationProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
-		// We do not need anything specific.
+	public Extractor<?, Explanation> request(ProjectionRequestContext context) {
+		return this;
 	}
 
 	@Override

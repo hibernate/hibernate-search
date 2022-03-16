@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
-class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<DocumentReference, DocumentReference> {
+class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<DocumentReference>
+		implements LuceneSearchProjection.Extractor<DocumentReference, DocumentReference> {
 
 	private LuceneDocumentReferenceProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
@@ -27,8 +28,9 @@ class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<Documen
 	}
 
 	@Override
-	public void request(ProjectionRequestContext context) {
+	public Extractor<?, DocumentReference> request(ProjectionRequestContext context) {
 		context.requireCollector( DocumentReferenceCollector.FACTORY );
+		return this;
 	}
 
 	@Override
