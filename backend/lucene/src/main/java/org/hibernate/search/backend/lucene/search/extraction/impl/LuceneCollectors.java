@@ -162,7 +162,7 @@ public class LuceneCollectors {
 		try {
 			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 			ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( scoreDocs, startInclusive, endExclusive );
-			this.collectorsForTopDocs = buildTopdDocsDataCollectors();
+			this.collectorsForTopDocs = buildTopDocsDataCollectors();
 			indexSearcher.search( topDocsQuery, collectorsForTopDocs.getComposed() );
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
@@ -225,7 +225,7 @@ public class LuceneCollectors {
 		}
 	}
 
-	private CollectorSet buildTopdDocsDataCollectors() throws IOException {
+	private CollectorSet buildTopDocsDataCollectors() throws IOException {
 		CollectorExecutionContext executionContext = new CollectorExecutionContext(
 				metadataResolver, indexSearcher,
 				// Allocate just enough memory to handle the top documents.
