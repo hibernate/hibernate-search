@@ -9,25 +9,29 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
 
-public class CompositeProjectionOptionsStepImpl<T>
-		implements CompositeProjectionOptionsStep<CompositeProjectionOptionsStepImpl<T>, T> {
+public class CompositeProjectionOptionsStepImpl<T, P>
+		implements CompositeProjectionOptionsStep<CompositeProjectionOptionsStepImpl<T, P>, P> {
 
-	private final CompositeProjectionBuilder builder;
-	private final SearchProjection<?>[] inners;
-	private final ProjectionCompositor<?, T> compositor;
+	final CompositeProjectionBuilder builder;
+	final SearchProjection<?>[] inners;
+	final ProjectionCompositor<?, T> compositor;
+	private final ProjectionAccumulator.Provider<T, P> accumulatorProvider;
 
 	public CompositeProjectionOptionsStepImpl(CompositeProjectionBuilder builder,
-			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor) {
+			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor,
+			ProjectionAccumulator.Provider<T, P> accumulatorProvider) {
 		this.builder = builder;
 		this.inners = inners;
 		this.compositor = compositor;
+		this.accumulatorProvider = accumulatorProvider;
 	}
 
 	@Override
-	public SearchProjection<T> toProjection() {
-		return builder.build( inners, compositor );
+	public SearchProjection<P> toProjection() {
+		return builder.build( inners, compositor, accumulatorProvider );
 	}
 }

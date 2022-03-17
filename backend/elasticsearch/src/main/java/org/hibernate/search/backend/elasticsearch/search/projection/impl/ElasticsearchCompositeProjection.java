@@ -12,22 +12,33 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchCompositeProjection<E, V>
-		extends AbstractElasticsearchProjection<E, V> {
+/**
+ * A projection that composes the result of multiple inner projections into a single value.
+ *
+ * @param <E> The type of the temporary storage for component values.
+ * @param <V> The type of a single composed value.
+ * @param <A> The type of the temporary storage for accumulated values, before and after being composed.
+ * @param <P> The type of the final projection result representing an accumulation of composed values of type {@code V}.
+ */
+class ElasticsearchCompositeProjection<E, V, A, P>
+		extends AbstractElasticsearchProjection<A, P> {
 
 	private final ElasticsearchSearchProjection<?, ?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
+	private final ProjectionAccumulator<E, V, A, P> accumulator;
 
 	public ElasticsearchCompositeProjection(Builder builder, ElasticsearchSearchProjection<?,?>[] inners,
-			ProjectionCompositor<E, V> compositor) {
+			ProjectionCompositor<E, V> compositor, ProjectionAccumulator<E, V, A, P> accumulator) {
 		super( builder.scope );
 		this.inners = inners;
 		this.compositor = compositor;
+		this.accumulator = accumulator;
 	}
 
 	@Override
@@ -35,6 +46,7 @@ class ElasticsearchCompositeProjection<E, V>
 		return getClass().getSimpleName() + "["
 				+ "inners=" + Arrays.toString( inners )
 				+ ", compositor=" + compositor
+				+ ", accumulator=" + accumulator
 				+ "]";
 	}
 
@@ -46,31 +58,36 @@ class ElasticsearchCompositeProjection<E, V>
 	}
 
 	@Override
-	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			ProjectionExtractContext context) {
-		E extractedData = compositor.createInitial();
+		A accumulated = accumulator.createInitial();
 
-		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, context );
-			extractedData = compositor.set( extractedData, i, extractedDataForInner );
-		}
+			E components = compositor.createInitial();
+			for ( int i = 0; i < inners.length; i++ ) {
+				Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, context );
+				components = compositor.set( components, i, extractedDataForInner );
+			}
+			// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
+			accumulated = accumulator.accumulate( accumulated, components );
 
-		return extractedData;
+		return accumulated;
 	}
 
 	@Override
-	public final V transform(LoadingResult<?, ?> loadingResult, E extractedData,
+	public final P transform(LoadingResult<?, ?> loadingResult, A accumulated,
 			ProjectionTransformContext context) {
-		E transformedData = extractedData;
-		// Transform in-place
-		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = compositor.get( transformedData, i );
-			Object transformedDataForInner = ElasticsearchSearchProjection.transformUnsafe( inners[i], loadingResult,
-					extractedDataForInner, context );
-			transformedData = compositor.set( transformedData, i, transformedDataForInner );
+		for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
+			E transformedData = accumulator.get( accumulated, i );
+			// Transform in-place
+			for ( int j = 0; j < inners.length; j++ ) {
+				Object extractedDataForInner = compositor.get( transformedData, j );
+				Object transformedDataForInner = ElasticsearchSearchProjection.transformUnsafe( inners[j], loadingResult,
+						extractedDataForInner, context );
+				transformedData = compositor.set( transformedData, j, transformedDataForInner );
+	}
+			accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
 		}
-
-		return compositor.finish( transformedData );
+		return accumulator.finish( accumulated );
 	}
 
 	static class Builder implements CompositeProjectionBuilder {
@@ -82,13 +99,15 @@ class ElasticsearchCompositeProjection<E, V>
 		}
 
 		@Override
-		public <E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 			ElasticsearchSearchProjection<?, ?>[] typedInners =
 					new ElasticsearchSearchProjection<?, ?>[ inners.length ];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = ElasticsearchSearchProjection.from( scope, inners[i] );
 			}
-			return new ElasticsearchCompositeProjection<>( this, typedInners, compositor );
+			return new ElasticsearchCompositeProjection<>( this, typedInners,
+					compositor, accumulatorProvider.get() );
 		}
 	}
 }
