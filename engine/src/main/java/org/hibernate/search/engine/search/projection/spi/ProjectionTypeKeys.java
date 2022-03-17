@@ -19,5 +19,6 @@ public final class ProjectionTypeKeys {
 
 	public static final SearchQueryElementTypeKey<FieldProjectionBuilder.TypeSelector> FIELD = key( "field" );
 	public static final SearchQueryElementTypeKey<DistanceToFieldProjectionBuilder> DISTANCE = key( "distance" );
+	public static final SearchQueryElementTypeKey<CompositeProjectionBuilder> OBJECT = key( "object" );
 
 }

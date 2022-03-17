@@ -98,8 +98,8 @@ public abstract class AbstractSearchProjectionFactory<
 
 	@Override
 	public CompositeProjectionFromStep object(String objectFieldPath) {
-		// TODO HSEARCH-3943 implement object projection
-		throw new IllegalStateException( "Not implemented yet" );
+		Contracts.assertNotNull( objectFieldPath, "objectFieldPath" );
+		return new CompositeProjectionFromStepImpl( dslContext, objectFieldPath );
 	}
 
 	@Override
