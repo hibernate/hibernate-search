@@ -10,6 +10,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 
 public interface CompositeProjectionBuilder {
 
-	<E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor);
+	<E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+			ProjectionAccumulator.Provider<V, P> accumulatorProvider);
 
 }

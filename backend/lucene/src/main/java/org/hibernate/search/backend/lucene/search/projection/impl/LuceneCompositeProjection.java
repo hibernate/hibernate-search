@@ -13,20 +13,31 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
-class LuceneCompositeProjection<E, V>
-		extends AbstractLuceneProjection<E, V> {
+/**
+ * A projection that composes the result of multiple inner projections into a single value.
+ *
+ * @param <E> The type of the temporary storage for component values.
+ * @param <V> The type of a single composed value.
+ * @param <A> The type of the temporary storage for accumulated values, before and after being composed.
+ * @param <P> The type of the final projection result representing an accumulation of composed values of type {@code V}.
+ */
+class LuceneCompositeProjection<E, V, A, P>
+		extends AbstractLuceneProjection<A, P> {
 
 	private final LuceneSearchProjection<?, ?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
+	private final ProjectionAccumulator<E, V, A, P> accumulator;
 
 	public LuceneCompositeProjection(Builder builder, LuceneSearchProjection<?, ?>[] inners,
-			ProjectionCompositor<E, V> compositor) {
+			ProjectionCompositor<E, V> compositor, ProjectionAccumulator<E, V, A, P> accumulator) {
 		super( builder.scope );
 		this.inners = inners;
 		this.compositor = compositor;
+		this.accumulator = accumulator;
 	}
 
 	@Override
@@ -34,6 +45,7 @@ class LuceneCompositeProjection<E, V>
 		return getClass().getSimpleName() + "["
 				+ "inners=" + Arrays.toString( inners )
 				+ ", compositor=" + compositor
+				+ ", accumulator=" + accumulator
 				+ "]";
 	}
 
@@ -45,31 +57,36 @@ class LuceneCompositeProjection<E, V>
 	}
 
 	@Override
-	public final E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public final A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			ProjectionExtractContext context) {
-		E extractedData = compositor.createInitial();
+		A accumulated = accumulator.createInitial();
 
+		E components = compositor.createInitial();
 		for ( int i = 0; i < inners.length; i++ ) {
 			Object extractedDataForInner = inners[i].extract( mapper, documentResult, context );
-			extractedData = compositor.set( extractedData, i, extractedDataForInner );
+			components = compositor.set( components, i, extractedDataForInner );
 		}
+		// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
+		accumulated = accumulator.accumulate( accumulated, components );
 
-		return extractedData;
+		return accumulated;
 	}
 
 	@Override
-	public final V transform(LoadingResult<?, ?> loadingResult, E extractedData,
+	public final P transform(LoadingResult<?, ?> loadingResult, A accumulated,
 			ProjectionTransformContext context) {
-		E transformedData = extractedData;
-		// Transform in-place
-		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = compositor.get( transformedData, i );
-			Object transformedDataForInner = LuceneSearchProjection.transformUnsafe( inners[i], loadingResult,
-					extractedDataForInner, context );
-			transformedData = compositor.set( transformedData, i, transformedDataForInner );
+		for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
+			E transformedData = accumulator.get( accumulated, i );
+			// Transform in-place
+			for ( int j = 0; j < inners.length; j++ ) {
+				Object extractedDataForInner = compositor.get( transformedData, j );
+				Object transformedDataForInner = LuceneSearchProjection.transformUnsafe( inners[j], loadingResult,
+						extractedDataForInner, context );
+				transformedData = compositor.set( transformedData, j, transformedDataForInner );
+			}
+			accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
 		}
-
-		return compositor.finish( transformedData );
+		return accumulator.finish( accumulated );
 	}
 
 	static class Builder implements CompositeProjectionBuilder {
@@ -81,13 +98,15 @@ class LuceneCompositeProjection<E, V>
 		}
 
 		@Override
-		public <E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 			LuceneSearchProjection<?, ?>[] typedInners =
 					new LuceneSearchProjection<?, ?>[ inners.length ];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = LuceneSearchProjection.from( scope, inners[i] );
 			}
-			return new LuceneCompositeProjection<>( this, typedInners, compositor );
+			return new LuceneCompositeProjection<>( this, typedInners,
+					compositor, accumulatorProvider.get() );
 		}
 	}
 }

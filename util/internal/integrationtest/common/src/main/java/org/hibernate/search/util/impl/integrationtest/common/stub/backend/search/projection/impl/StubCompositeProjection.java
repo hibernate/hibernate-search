@@ -13,7 +13,9 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.util.common.AssertionFailure;
 
 class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 
@@ -67,13 +69,18 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 		}
 
 		@Override
-		public <E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+		@SuppressWarnings("unchecked")
+		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+			if ( !accumulatorProvider.isSingleValued() ) {
+				throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
+			}
 			StubSearchProjection<?>[] typedInners =
 					new StubSearchProjection<?>[ inners.length ];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = StubSearchProjection.from( inners[i] );
 			}
-			return new StubCompositeProjection<>( typedInners, compositor );
+			return (SearchProjection<P>) new StubCompositeProjection<>( typedInners, compositor );
 		}
 	}
 }

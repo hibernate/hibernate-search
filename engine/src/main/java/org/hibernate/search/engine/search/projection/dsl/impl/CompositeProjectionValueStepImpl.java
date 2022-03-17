@@ -12,21 +12,22 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
 
 public class CompositeProjectionValueStepImpl<T>
-		extends CompositeProjectionOptionsStepImpl<T>
-		implements CompositeProjectionValueStep<CompositeProjectionOptionsStepImpl<T>, T> {
+		extends CompositeProjectionOptionsStepImpl<T, T>
+		implements CompositeProjectionValueStep<CompositeProjectionOptionsStepImpl<T, T>, T> {
 
 	public CompositeProjectionValueStepImpl(CompositeProjectionBuilder builder,
 			SearchProjection<?>[] inners, ProjectionCompositor<?, T> compositor) {
-		super( builder, inners, compositor );
+		super( builder, inners, compositor, ProjectionAccumulator.single() );
 	}
 
 	@Override
 	public CompositeProjectionOptionsStep<?, List<T>> multi() {
-		// TODO HSEARCH-3943 implement multi()
-		throw new IllegalStateException( "Not implemented yet" );
+		return new CompositeProjectionOptionsStepImpl<>( builder, inners, compositor,
+				ProjectionAccumulator.list() );
 	}
 }
