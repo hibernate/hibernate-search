@@ -19,13 +19,14 @@ import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuil
 class LuceneCompositeProjection<E, V>
 		extends AbstractLuceneProjection<E, V> {
 
-	private final ProjectionCompositor<E, V> compositor;
 	private final LuceneSearchProjection<?, ?>[] inners;
+	private final ProjectionCompositor<E, V> compositor;
 
-	private LuceneCompositeProjection(Builder<E, V> builder) {
+	public LuceneCompositeProjection(Builder builder, LuceneSearchProjection<?, ?>[] inners,
+			ProjectionCompositor<E, V> compositor) {
 		super( builder.scope );
-		this.compositor = builder.compositor;
-		this.inners = builder.inners;
+		this.inners = inners;
+		this.compositor = compositor;
 	}
 
 	@Override
@@ -71,22 +72,22 @@ class LuceneCompositeProjection<E, V>
 		return compositor.finish( transformedData );
 	}
 
-	static class Builder<E, V> implements CompositeProjectionBuilder<V> {
+	static class Builder implements CompositeProjectionBuilder {
 
 		private final LuceneSearchIndexScope<?> scope;
-		private final ProjectionCompositor<E, V> compositor;
-		private final LuceneSearchProjection<?, ?>[] inners;
 
-		Builder(LuceneSearchIndexScope<?> scope, ProjectionCompositor<E, V> compositor,
-				LuceneSearchProjection<?, ?> ... inners) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			this.scope = scope;
-			this.compositor = compositor;
-			this.inners = inners;
 		}
 
 		@Override
-		public SearchProjection<V> build() {
-			return new LuceneCompositeProjection<>( this );
+		public <E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+			LuceneSearchProjection<?, ?>[] typedInners =
+					new LuceneSearchProjection<?, ?>[ inners.length ];
+			for ( int i = 0; i < inners.length; i++ ) {
+				typedInners[i] = LuceneSearchProjection.from( scope, inners[i] );
+			}
+			return new LuceneCompositeProjection<>( this, typedInners, compositor );
 		}
 	}
 }

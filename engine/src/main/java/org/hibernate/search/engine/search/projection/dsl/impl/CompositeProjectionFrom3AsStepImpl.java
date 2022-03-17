@@ -9,7 +9,8 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom3AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.util.common.function.TriFunction;
 
 class CompositeProjectionFrom3AsStepImpl<V1, V2, V3>
@@ -20,9 +21,9 @@ class CompositeProjectionFrom3AsStepImpl<V1, V2, V3>
 	final SearchProjection<V2> inner2;
 	final SearchProjection<V3> inner3;
 
-	public CompositeProjectionFrom3AsStepImpl(SearchProjectionDslContext<?> dslContext,
+	public CompositeProjectionFrom3AsStepImpl(CompositeProjectionBuilder builder,
 			SearchProjection<V1> inner1, SearchProjection<V2> inner2, SearchProjection<V3> inner3) {
-		super( dslContext );
+		super( builder );
 		this.inner1 = inner1;
 		this.inner2 = inner2;
 		this.inner3 = inner3;
@@ -30,7 +31,9 @@ class CompositeProjectionFrom3AsStepImpl<V1, V2, V3>
 
 	@Override
 	public <V> CompositeProjectionValueStep<?, V> as(TriFunction<V1, V2, V3, V> transformer) {
-		return new CompositeProjectionValueStepImpl<>( dslContext, transformer, inner1, inner2, inner3 );
+		return new CompositeProjectionValueStepImpl<>( builder, toProjectionArray(),
+				ProjectionCompositor.from( transformer )
+		);
 	}
 
 	@Override

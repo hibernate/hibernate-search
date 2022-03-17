@@ -17,12 +17,12 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
 class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 
-	private final ProjectionCompositor<E, V> compositor;
 	private final StubSearchProjection<?>[] inners;
+	private final ProjectionCompositor<E, V> compositor;
 
-	private StubCompositeProjection(Builder<E, V> builder) {
-		this.compositor = builder.compositor;
-		this.inners = builder.inners;
+	private StubCompositeProjection(StubSearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+		this.inners = inners;
+		this.compositor = compositor;
 	}
 
 	@Override
@@ -61,19 +61,19 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 		return compositor.finish( transformedData );
 	}
 
-	static class Builder<E, V> implements CompositeProjectionBuilder<V> {
+	static class Builder implements CompositeProjectionBuilder {
 
-		private final ProjectionCompositor<E, V> compositor;
-		private final StubSearchProjection<?>[] inners;
-
-		Builder(ProjectionCompositor<E, V> compositor, StubSearchProjection<?> ... inners) {
-			this.compositor = compositor;
-			this.inners = inners;
+		Builder() {
 		}
 
 		@Override
-		public SearchProjection<V> build() {
-			return new StubCompositeProjection<>( this );
+		public <E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+			StubSearchProjection<?>[] typedInners =
+					new StubSearchProjection<?>[ inners.length ];
+			for ( int i = 0; i < inners.length; i++ ) {
+				typedInners[i] = StubSearchProjection.from( inners[i] );
+			}
+			return new StubCompositeProjection<>( typedInners, compositor );
 		}
 	}
 }

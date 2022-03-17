@@ -116,6 +116,10 @@ public interface ProjectionCompositor<E, V> {
 		};
 	}
 
+	static ProjectionCompositor<Object[], List<?>> fromList(int size) {
+		return fromList( size, Function.identity() );
+	}
+
 	static <V> ProjectionCompositor<Object[], V> fromList(int size, Function<List<?>, V> transformer) {
 		return new ObjectArrayProjectionCompositor<V>( size ) {
 			@Override

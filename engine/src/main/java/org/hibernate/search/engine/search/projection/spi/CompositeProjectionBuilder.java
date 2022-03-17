@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-public interface CompositeProjectionBuilder<T> extends SearchProjectionBuilder<T> {
+import org.hibernate.search.engine.search.projection.SearchProjection;
+
+public interface CompositeProjectionBuilder {
+
+	<E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor);
 
 }

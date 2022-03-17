@@ -14,37 +14,38 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 
 public class CompositeProjectionFromStepImpl implements CompositeProjectionFromStep {
 
-	private final SearchProjectionDslContext<?> dslContext;
+	private final CompositeProjectionBuilder builder;
 
 	public CompositeProjectionFromStepImpl(SearchProjectionDslContext<?> dslContext) {
-		this.dslContext = dslContext;
+		this.builder = dslContext.scope().projectionBuilders().composite();
 	}
 
 	@Override
 	public <V1> CompositeProjectionFrom1AsStep<V1> from(SearchProjection<V1> projection) {
-		return new CompositeProjectionFrom1AsStepImpl<>( dslContext, projection );
+		return new CompositeProjectionFrom1AsStepImpl<>( builder, projection );
 	}
 
 	@Override
 	public <V1, V2> CompositeProjectionFrom2AsStep<V1, V2> from(SearchProjection<V1> projection1,
 			SearchProjection<V2> projection2) {
-		return new CompositeProjectionFrom2AsStepImpl<>( dslContext, projection1, projection2 );
+		return new CompositeProjectionFrom2AsStepImpl<>( builder, projection1, projection2 );
 	}
 
 	@Override
 	public <V1, V2, V3> CompositeProjectionFrom3AsStep<V1, V2, V3> from(SearchProjection<V1> projection1,
 			SearchProjection<V2> projection2, SearchProjection<V3> projection3) {
-		return new CompositeProjectionFrom3AsStepImpl<>( dslContext, projection1, projection2, projection3 );
+		return new CompositeProjectionFrom3AsStepImpl<>( builder, projection1, projection2, projection3 );
 	}
 
 	@Override
 	public CompositeProjectionAsStep from(SearchProjection<?>... projections) {
 		Contracts.assertNotNullNorEmpty( projections, "projections" );
-		return new CompositeProjectionFromAnyNumberAsStep( dslContext, projections );
+		return new CompositeProjectionFromAnyNumberAsStep( builder, projections );
 	}
 
 	@Override
