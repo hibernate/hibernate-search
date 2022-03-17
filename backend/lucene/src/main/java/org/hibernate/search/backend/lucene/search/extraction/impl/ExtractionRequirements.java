@@ -13,8 +13,8 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
@@ -36,12 +36,12 @@ public final class ExtractionRequirements {
 
 	private final boolean requireScore;
 	private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories;
-	private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories;
+	private final StoredFieldsValuesDelegate.Factory storedFieldsSourceFactoryOrNull;
 
 	private ExtractionRequirements(Builder builder) {
 		requireScore = builder.requireScore;
 		requiredCollectorForAllMatchingDocsFactories = builder.requiredCollectorForAllMatchingDocsFactories;
-		requiredCollectorForTopDocsFactories = builder.requiredCollectorForTopDocsFactories;
+		storedFieldsSourceFactoryOrNull = builder.createStoredFieldsSourceFactoryOrNull();
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query originalLuceneQuery, Sort sort,
@@ -108,7 +108,7 @@ public final class ExtractionRequirements {
 				rewrittenLuceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
 				collectorsForAllMatchingDocs,
-				requiredCollectorForTopDocsFactories,
+				storedFieldsSourceFactoryOrNull,
 				timeoutManager
 		);
 	}
@@ -137,7 +137,6 @@ public final class ExtractionRequirements {
 
 		private boolean requireScore;
 		private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories = new LinkedHashSet<>();
-		private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories = new LinkedHashSet<>();
 
 		private boolean requireAllStoredFields = false;
 		private final Set<String> requiredStoredFields = new HashSet<>();
@@ -149,10 +148,6 @@ public final class ExtractionRequirements {
 
 		public <C extends Collector> void requireCollectorForAllMatchingDocs(CollectorFactory<C> collectorFactory) {
 			requiredCollectorForAllMatchingDocsFactories.add( collectorFactory );
-		}
-
-		public <C extends Collector> void requireCollectorForTopDocs(CollectorFactory<C> collectorFactory) {
-			requiredCollectorForTopDocsFactories.add( collectorFactory );
 		}
 
 		public void requireAllStoredFields() {
@@ -170,14 +165,10 @@ public final class ExtractionRequirements {
 		}
 
 		public ExtractionRequirements build() {
-			CollectorFactory<StoredFieldsCollector> storedFieldCollectorFactory = createStoredFieldCollectorFactoryOrNull();
-			if ( storedFieldCollectorFactory != null ) {
-				requiredCollectorForTopDocsFactories.add( storedFieldCollectorFactory );
-			}
 			return new ExtractionRequirements( this );
 		}
 
-		private CollectorFactory<StoredFieldsCollector> createStoredFieldCollectorFactoryOrNull() {
+		private StoredFieldsValuesDelegate.Factory createStoredFieldsSourceFactoryOrNull() {
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 			if ( requireAllStoredFields ) {
 				storedFieldVisitor = new ReusableDocumentStoredFieldVisitor();
@@ -189,7 +180,7 @@ public final class ExtractionRequirements {
 				return null;
 			}
 
-			return StoredFieldsCollector.factory( storedFieldVisitor, requiredNestedDocumentPathsForStoredFields );
+			return new StoredFieldsValuesDelegate.Factory( storedFieldVisitor, requiredNestedDocumentPathsForStoredFields );
 		}
 	}
 }

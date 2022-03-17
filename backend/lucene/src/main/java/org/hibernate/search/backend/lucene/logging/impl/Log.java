@@ -309,10 +309,6 @@ public interface Log extends BasicLogger {
 	SearchException unableToDeleteAllEntriesFromIndex(Query query, String causeMessage, @Param EventContext context,
 			@Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 69,
-			value = "Unable to explain search query: %1$s")
-	SearchException ioExceptionOnExplain(String causeMessage, @Cause IOException cause);
-
 	@Message(id = ID_OFFSET + 70,
 			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")
 	SearchException fullTextFeaturesNotSupportedByFieldType(@Param EventContext context);

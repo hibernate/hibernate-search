@@ -7,17 +7,16 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionExtractContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
@@ -27,7 +26,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -72,8 +70,6 @@ public class LuceneExtractableSearchResult<H> {
 			endExclusive = Math.min( endExclusive, scoreDocs.length );
 		}
 
-		luceneCollectors.collectTopDocsData( startInclusive, endExclusive );
-
 		ProjectionHitMapper<?, ?> projectionHitMapper = requestContext.getLoadingContext().createProjectionHitMapper();
 		List<Object> extractedData = extractHits( projectionHitMapper, startInclusive, endExclusive );
 
@@ -100,38 +96,15 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper, int startInclusive,
-			int endExclusive) {
+			int endExclusive) throws IOException {
 		TopDocs topDocs = luceneCollectors.getTopDocs();
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}
 
-		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
+		TopDocsDataCollectorFactory collectorFactory = new TopDocsDataCollectorFactory( projectionHitMapper );
 
-		ProjectionExtractContext projectionExtractContext = new ProjectionExtractContext(
-				indexSearcher, requestContext.getLuceneQuery(),
-				luceneCollectors.getCollectorsForTopDocs()
-		);
-
-		StoredFieldsCollector storedFieldsCollector =
-				projectionExtractContext.getCollector( StoredFieldsCollector.KEY );
-
-		for ( int i = startInclusive; i < endExclusive; i++ ) {
-			// Check for timeout every 16 elements.
-			// Do this *before* the element, so that we don't fail after the last element.
-			if ( i % 16 == 0 && timeoutManager.checkTimedOut() ) {
-				break;
-			}
-
-			ScoreDoc hit = topDocs.scoreDocs[i];
-			Document document = storedFieldsCollector == null ? null : storedFieldsCollector.getDocument( hit.doc );
-
-			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
-
-			extractedData.add( rootExtractor.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
-		}
-
-		return extractedData;
+		return luceneCollectors.collectTopDocsData( collectorFactory, startInclusive, endExclusive );
 	}
 
 	private Map<AggregationKey<?>, ?> extractAggregations() throws IOException {
@@ -158,5 +131,20 @@ public class LuceneExtractableSearchResult<H> {
 		}
 
 		return extractedMap;
+	}
+
+	private class TopDocsDataCollectorFactory implements TopDocsDataCollector.Factory<Object> {
+		private final ProjectionHitMapper<?, ?> projectionHitMapper;
+
+		public TopDocsDataCollectorFactory(ProjectionHitMapper<?, ?> projectionHitMapper) {
+			this.projectionHitMapper = projectionHitMapper;
+		}
+
+		@Override
+		public TopDocsDataCollector<Object> create(TopDocsDataCollectorExecutionContext context) throws IOException {
+			ProjectionExtractContext projectionExtractContext =
+					new ProjectionExtractContext( context, projectionHitMapper );
+			return new TopDocsDataCollector<>( context, rootExtractor.values( projectionExtractContext ) );
+		}
 	}
 }

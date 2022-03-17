@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DocumentReferenceCollector;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DocumentReferenceValues;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
@@ -29,14 +28,12 @@ class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<Documen
 
 	@Override
 	public Extractor<?, DocumentReference> request(ProjectionRequestContext context) {
-		context.requireCollector( DocumentReferenceCollector.FACTORY );
 		return this;
 	}
 
 	@Override
-	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		return context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
+	public Values<DocumentReference> values(ProjectionExtractContext context) {
+		return DocumentReferenceValues.simple( context.collectorExecutionContext() );
 	}
 
 	@Override

@@ -6,16 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+
+import org.apache.lucene.index.LeafReaderContext;
 
 /**
  * A projection that composes the result of multiple inner projections into a single value.
@@ -75,19 +77,42 @@ class LuceneCompositeProjection<E, V, A, P>
 		}
 
 		@Override
-		public final A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-				ProjectionExtractContext context) {
-			A accumulated = accumulator.createInitial();
-
-			E components = compositor.createInitial();
+		public Values<A> values(ProjectionExtractContext context) {
+			Values<?>[] innerValues = new Values<?>[inners.length];
 			for ( int i = 0; i < inners.length; i++ ) {
-				Object extractedDataForInner = inners[i].extract( mapper, documentResult, context );
-				components = compositor.set( components, i, extractedDataForInner );
+				innerValues[i] = inners[i].values( context );
 			}
-			// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
-			accumulated = accumulator.accumulate( accumulated, components );
+			return new CompositeValues( innerValues );
+		}
 
-			return accumulated;
+		private class CompositeValues implements Values<A> {
+			private final Values<?>[] inners;
+
+			private CompositeValues(Values<?>[] inners) {
+				this.inners = inners;
+			}
+
+			@Override
+			public void context(LeafReaderContext context) throws IOException {
+				for ( Values<?> inner : inners ) {
+					inner.context( context );
+				}
+			}
+
+			@Override
+			public A get(int doc) throws IOException {
+				A accumulated = accumulator.createInitial();
+
+				E components = compositor.createInitial();
+				for ( int i = 0; i < inners.length; i++ ) {
+					Object extractedDataForInner = inners[i].get( doc );
+					components = compositor.set( components, i, extractedDataForInner );
+				}
+				// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
+				accumulated = accumulator.accumulate( accumulated, components );
+
+				return accumulated;
+			}
 		}
 
 		@Override

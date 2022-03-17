@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetad
 
 import org.apache.lucene.search.IndexSearcher;
 
-public final class CollectorExecutionContext {
+public class CollectorExecutionContext {
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
