@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.9.Final (2022-03-17)
+-------------------------
+
+** Task
+    * HSEARCH-4510 Improve documentation of predicate basics in migration guide
+    * HSEARCH-4508 Document the equivalent of aws.* properties in the Search 5 => Search 6 migration guide
+    * HSEARCH-4501 Fix copy/paste error in documentation of Elasticsearch's fromJson() predicate
+    * HSEARCH-4494 Fix performance test failure caused by https://lists.jboss.org/pipermail/hibernate-dev/2016-January.txt not being available anymore
+    * HSEARCH-4472 Move the release job to a separate Jenkinsfile
+    * HSEARCH-4441 Fix call to purge() in migration guide so that it compiles
+    * HSEARCH-4415 Sign published artifacts
+    * HSEARCH-3244 Simplify configuration of AWS Elasticsearch endpoints in the Jenkins CI
+
 6.0.8.Final (2022-01-05)
 -------------------------
 
