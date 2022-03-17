@@ -25,6 +25,8 @@ public interface ElasticsearchSearchIndexScope<S extends ElasticsearchSearchInde
 	@Override
 	ElasticsearchSearchIndexNodeContext child(SearchIndexCompositeNodeContext<?> parent, String name);
 
+	ElasticsearchSearchIndexNodeContext field(String fieldPath);
+
 	Gson userFacingGson();
 
 	ElasticsearchSearchSyntax searchSyntax();

@@ -15,4 +15,12 @@ public interface ProjectionRequestContext {
 
 	ElasticsearchSearchSyntax getSearchSyntax();
 
+	void checkValidField(String absoluteFieldPath);
+
+	ProjectionRequestContext forField(String absoluteFieldPath, String[] absoluteFieldPathComponents);
+
+	String absoluteCurrentFieldPath();
+
+	String[] relativeCurrentFieldPathComponents();
+
 }

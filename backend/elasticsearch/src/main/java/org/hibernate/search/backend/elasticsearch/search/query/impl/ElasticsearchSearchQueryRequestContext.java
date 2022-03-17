@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.Aggreg
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -70,6 +71,26 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestContext
 	@Override
 	public ElasticsearchSearchSyntax getSearchSyntax() {
 		return scope.searchSyntax();
+	}
+
+	@Override
+	public void checkValidField(String absoluteFieldPath) {
+		// All fields are valid at the root.
+	}
+
+	@Override
+	public ProjectionRequestContext forField(String absoluteFieldPath, String[] absoluteFieldPathComponents) {
+		return new FieldProjectionRequestContext( this, absoluteFieldPath, absoluteFieldPathComponents );
+	}
+
+	@Override
+	public String absoluteCurrentFieldPath() {
+		return null;
+	}
+
+	@Override
+	public String[] relativeCurrentFieldPathComponents() {
+		return null;
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

@@ -193,6 +193,11 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
+	public ElasticsearchSearchIndexNodeContext field(String fieldPath) {
+		return super.field( fieldPath );
+	}
+
+	@Override
 	public Gson userFacingGson() {
 		return userFacingGson;
 	}
