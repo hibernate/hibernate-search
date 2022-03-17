@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.2.Final (2022-03-17)
+-------------------------
+
+** Task
+    * HSEARCH-4509 Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.CR2
+    * HSEARCH-4501 Fix copy/paste error in documentation of Elasticsearch's fromJson() predicate
+    * HSEARCH-4495 Disable JDK 19 testing on older branches
+    * HSEARCH-4494 Fix performance test failure caused by https://lists.jboss.org/pipermail/hibernate-dev/2016-January.txt not being available anymore
+    * HSEARCH-4482 Avoid uses of Hibernate ORM's org.hibernate.tuple.entity.EntityMetamodel internally where possible
+
 6.1.1.Final (2022-02-07)
 -------------------------
 
