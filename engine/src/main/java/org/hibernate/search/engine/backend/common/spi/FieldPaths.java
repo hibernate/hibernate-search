@@ -67,6 +67,17 @@ public class FieldPaths {
 		);
 	}
 
+	public static boolean isStrictPrefix(String prefixCandidatePath, String path) {
+		if ( prefixCandidatePath == null ) {
+			return !path.isEmpty();
+		}
+		if ( prefixCandidatePath.length() >= path.length() ) {
+			return false;
+		}
+		return path.startsWith( prefixCandidatePath )
+				&& path.charAt( prefixCandidatePath.length() ) == PATH_SEPARATOR;
+	}
+
 	public static String[] split(String absoluteFieldPath) {
 		return absoluteFieldPath.split( PATH_SEPARATOR_REGEX_STRING );
 	}

@@ -59,7 +59,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			" }";
 
 	private final String absoluteFieldPath;
-	private final boolean multiValued;
+	private final boolean singleValuedInRoot;
 
 	private final GeoPoint center;
 	private final DistanceUnit unit;
@@ -67,17 +67,18 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
 
 	private final String scriptFieldName;
-	private final ElasticsearchFieldProjection<?, Double, A, P> sourceProjection;
+	private final ElasticsearchFieldProjection<?, Double, P> sourceProjection;
 
-	private ElasticsearchDistanceToFieldProjection(Builder builder, boolean multiValued,
+	private ElasticsearchDistanceToFieldProjection(Builder builder,
+			ProjectionAccumulator.Provider<Double, P> accumulatorProvider,
 			ProjectionAccumulator<Double, Double, A, P> accumulator) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
-		this.multiValued = multiValued;
+		this.singleValuedInRoot = !builder.field.multiValuedInRoot();
 		this.center = builder.center;
 		this.unit = builder.unit;
 		this.accumulator = accumulator;
-		if ( !multiValued && builder.field.nestedPathHierarchy().isEmpty() ) {
+		if ( singleValuedInRoot && builder.field.nestedPathHierarchy().isEmpty() ) {
 			// Rely on docValues when there is no sort to extract the distance from.
 			scriptFieldName = createScriptFieldName( absoluteFieldPath, center );
 			sourceProjection = null;
@@ -86,27 +87,26 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 			// Rely on _source when there is no sort to extract the distance from.
 			scriptFieldName = null;
 			this.sourceProjection = new ElasticsearchFieldProjection<>(
-					builder.scope, absoluteFieldPath, builder.field.absolutePathComponents(),
-					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulator
+					builder.scope, builder.field,
+					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
 			);
 		}
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
-				.append( ", center=" ).append( center )
-				.append( ", unit=" ).append( unit )
-				.append( ", accumulator=" ).append( accumulator )
-				.append( "]" );
-		return sb.toString();
+		return getClass().getSimpleName() + "["
+				+ "absoluteFieldPath=" + absoluteFieldPath
+				+ ", center=" + center
+				+ ", unit=" + unit
+				+ ", accumulator=" + accumulator
+				+ "]";
 	}
 
 	@Override
 	public Extractor<?, P> request(JsonObject requestBody, ProjectionRequestContext context) {
-		if ( !multiValued && context.getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
+		context.checkValidField( absoluteFieldPath );
+		if ( singleValuedInRoot && context.getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
 			// Nothing to do, we'll rely on the sort key
 			return this;
 		}
@@ -127,7 +127,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 	@Override
 	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			JsonObject source, ProjectionExtractContext context) {
-		Integer distanceSortIndex = multiValued ? null : context.getDistanceSortIndex( absoluteFieldPath, center );
+		Integer distanceSortIndex = singleValuedInRoot ? context.getDistanceSortIndex( absoluteFieldPath, center ) : null;
 
 		if ( distanceSortIndex != null ) {
 			A accumulated = accumulator.createInitial();
@@ -255,7 +255,7 @@ public class ElasticsearchDistanceToFieldProjection<A, P> extends AbstractElasti
 
 		@Override
 		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-			return new ElasticsearchDistanceToFieldProjection<>( this, !accumulatorProvider.isSingleValued(),
+			return new ElasticsearchDistanceToFieldProjection<>( this, accumulatorProvider,
 					accumulatorProvider.get() );
 		}
 	}

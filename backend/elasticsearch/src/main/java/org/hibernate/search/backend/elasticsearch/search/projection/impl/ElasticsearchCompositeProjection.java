@@ -20,6 +20,8 @@ import com.google.gson.JsonObject;
 
 /**
  * A projection that composes the result of multiple inner projections into a single value.
+ * <p>
+ * Not to be confused with {@link ElasticsearchObjectProjection}.
  *
  * @param <E> The type of the temporary storage for component values.
  * @param <V> The type of a single composed value.
@@ -85,7 +87,6 @@ class ElasticsearchCompositeProjection<E, V, A, P>
 				Object extractedDataForInner = inners[i].extract( projectionHitMapper, hit, source, context );
 				components = compositor.set( components, i, extractedDataForInner );
 			}
-			// TODO HSEARCH-3943 actually accumulate multiple values (based on nesting context)
 			accumulated = accumulator.accumulate( accumulated, components );
 
 			return accumulated;
