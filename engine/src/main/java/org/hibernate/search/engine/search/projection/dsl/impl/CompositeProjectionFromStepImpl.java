@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 
 public class CompositeProjectionFromStepImpl implements CompositeProjectionFromStep {
@@ -23,6 +24,10 @@ public class CompositeProjectionFromStepImpl implements CompositeProjectionFromS
 
 	public CompositeProjectionFromStepImpl(SearchProjectionDslContext<?> dslContext) {
 		this.builder = dslContext.scope().projectionBuilders().composite();
+	}
+
+	public CompositeProjectionFromStepImpl(SearchProjectionDslContext<?> dslContext, String objectFieldPath) {
+		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, ProjectionTypeKeys.OBJECT );
 	}
 
 	@Override
