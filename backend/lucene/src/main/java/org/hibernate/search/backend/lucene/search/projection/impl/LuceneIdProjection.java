@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.IdentifierCollector;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.IdentifierValues;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
@@ -32,14 +31,12 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<I>
 
 	@Override
 	public Extractor<?, I> request(ProjectionRequestContext context) {
-		context.requireCollector( IdentifierCollector.FACTORY );
 		return this;
 	}
 
 	@Override
-	public String extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		return context.getCollector( IdentifierCollector.KEY ).get( documentResult.getDocId() );
+	public Values<String> values(ProjectionExtractContext context) {
+		return new IdentifierValues();
 	}
 
 	@Override

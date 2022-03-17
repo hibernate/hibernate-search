@@ -7,11 +7,13 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.engine.common.timing.Deadline;
@@ -48,18 +50,18 @@ public class LuceneCollectors {
 	private final Integer scoreSortFieldIndexForRescoring;
 
 	private final CollectorSet collectorsForAllMatchingDocs;
-	private final Set<CollectorFactory<?>> collectorsForTopDocsFactories;
-	private CollectorSet collectorsForTopDocs;
+	private final StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull;
 
 	private final TimeoutManager timeoutManager;
 
 	private SearchResultTotal resultTotal;
 	private TopDocs topDocs = null;
 
-	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher, Query rewrittenLuceneQuery,
+	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher,
+			Query rewrittenLuceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			CollectorSet collectorsForAllMatchingDocs,
-			Set<CollectorFactory<?>> collectorsForTopDocsFactories,
+			StoredFieldsValuesDelegate.Factory storedFieldsValuesDelegateOrNull,
 			TimeoutManager timeoutManager) {
 		this.metadataResolver = metadataResolver;
 		this.indexSearcher = indexSearcher;
@@ -67,7 +69,7 @@ public class LuceneCollectors {
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 		this.collectorsForAllMatchingDocs = collectorsForAllMatchingDocs;
-		this.collectorsForTopDocsFactories = collectorsForTopDocsFactories;
+		this.storedFieldsValuesDelegateOrNull = storedFieldsValuesDelegateOrNull;
 		this.timeoutManager = timeoutManager;
 	}
 
@@ -149,21 +151,25 @@ public class LuceneCollectors {
 	/**
 	 * Phase 2: collect data relative to top docs.
 	 *
+	 * @param collectorFactory The factory to create a collector able to retrieve data for all top docs.
 	 * @param startInclusive The index of the first top doc whose data to collect.
 	 * @param endExclusive The index after the last top doc whose data to collect.
+	 * @param <T> The type of value collected for each top doc.
 	 *
 	 * @throws IOException If Lucene throws an {@link IOException}.
 	 */
-	public void collectTopDocsData(int startInclusive, int endExclusive) throws IOException {
-		if ( collectorsForTopDocsFactories.isEmpty() || topDocs == null ) {
-			this.collectorsForTopDocs = null;
-			return;
-		}
+	public <T> List<T> collectTopDocsData(TopDocsDataCollector.Factory<T> collectorFactory,
+			int startInclusive, int endExclusive) throws IOException {
+		List<T> extractedData = new ArrayList<>( endExclusive - startInclusive );
 		try {
 			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 			ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( scoreDocs, startInclusive, endExclusive );
-			this.collectorsForTopDocs = buildTopDocsDataCollectors();
+			CollectorSet collectorsForTopDocs = buildTopDocsDataCollectors( collectorFactory );
 			indexSearcher.search( topDocsQuery, collectorsForTopDocs.getComposed() );
+			TopDocsDataCollector<T> topDocsDataCollector = collectorsForTopDocs.get( collectorFactory );
+			for ( int i = startInclusive; i < endExclusive; i++ ) {
+				extractedData.add( topDocsDataCollector.get( scoreDocs[i].doc ) );
+			}
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			Deadline deadline = timeoutManager.deadlineOrNull();
@@ -172,10 +178,7 @@ public class LuceneCollectors {
 			}
 			deadline.forceTimeout( e );
 		}
-	}
-
-	public CollectorSet getCollectorsForTopDocs() {
-		return collectorsForTopDocs;
+		return extractedData;
 	}
 
 	public SearchResultTotal getResultTotal() {
@@ -225,16 +228,17 @@ public class LuceneCollectors {
 		}
 	}
 
-	private CollectorSet buildTopDocsDataCollectors() throws IOException {
-		CollectorExecutionContext executionContext = new CollectorExecutionContext(
+	private <T> CollectorSet buildTopDocsDataCollectors(TopDocsDataCollector.Factory<T> collectorFactory) throws IOException {
+		TopDocsDataCollectorExecutionContext executionContext = new TopDocsDataCollectorExecutionContext(
 				metadataResolver, indexSearcher,
-				// Allocate just enough memory to handle the top documents.
-				topDocs.scoreDocs.length
+				rewrittenLuceneQuery,
+				topDocs,
+				storedFieldsValuesDelegateOrNull
 		);
 
 		CollectorSet.Builder collectorForTopDocsBuilder =
 				new CollectorSet.Builder( executionContext, timeoutManager );
-		collectorForTopDocsBuilder.addAll( collectorsForTopDocsFactories );
+		collectorForTopDocsBuilder.add( collectorFactory, collectorFactory.create( executionContext ) );
 		return collectorForTopDocsBuilder.build();
 	}
 }

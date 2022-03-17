@@ -6,22 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.GeoPointDistanceDocValues;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -29,7 +26,10 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.SloppyMath;
 
 /**
@@ -39,8 +39,7 @@ import org.apache.lucene.util.SloppyMath;
  * @param <P> The type of the final projection result representing accumulated distance values.
  */
 public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProjection<P>
-		implements CollectorFactory<GeoPointDistanceCollector>,
-				LuceneSearchProjection.Extractor<A, P> {
+		implements LuceneSearchProjection.Extractor<A, P> {
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
 			ProjectionConverter.passThrough( Double.class );
@@ -55,7 +54,6 @@ public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProject
 
 	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
 
-	private final DistanceCollectorKey collectorKey;
 	private final LuceneFieldProjection<Double, Double, A, P> fieldProjection;
 
 	private LuceneDistanceToFieldProjection(Builder builder, boolean singleValued,
@@ -69,12 +67,10 @@ public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProject
 		this.accumulator = accumulator;
 		if ( singleValued ) {
 			// For single-valued fields, we can use the docvalues.
-			this.collectorKey = new DistanceCollectorKey( absoluteFieldPath, center );
 			this.fieldProjection = null;
 		}
 		else {
 			// For multi-valued fields, use a field projection, because we need order to be preserved.
-			this.collectorKey = null;
 			this.fieldProjection = new LuceneFieldProjection<>(
 					builder.scope, builder.field,
 					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulator
@@ -95,25 +91,47 @@ public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProject
 
 	@Override
 	public Extractor<A, P> request(ProjectionRequestContext context) {
-		if ( collectorKey != null ) {
-			context.requireCollector( this );
-			return this;
+		if ( fieldProjection != null ) {
+			return fieldProjection.request( context );
 		}
 		else {
-			return fieldProjection.request( context );
+			return this;
 		}
 	}
 
 	@Override
-	public A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-		ProjectionExtractContext context) {
-		A accumulated = accumulator.createInitial();
-		GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
-		Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
-		if ( distanceOrNull != null ) {
-			accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+	public Values<A> values(ProjectionExtractContext context) {
+		// Note that if this method gets called, we're dealing with a single-valued projection,
+		// so we don't care that the order of doc values is not the same
+		// as the order of values in the original document.
+		return new DocValuesBasedDistanceValues( context.collectorExecutionContext() );
+	}
+
+	private class DocValuesBasedDistanceValues
+			extends AbstractNestingAwareAccumulatingValues<Double, A> {
+		private GeoPointDistanceDocValues currentLeafValues;
+
+		public DocValuesBasedDistanceValues(TopDocsDataCollectorExecutionContext context) {
+			super( nestedDocumentPath, LuceneDistanceToFieldProjection.this.accumulator, context );
 		}
-		return accumulated;
+
+		@Override
+		protected DocIdSetIterator doContext(LeafReaderContext context) throws IOException {
+			currentLeafValues = new GeoPointDistanceDocValues(
+					DocValues.getSortedNumeric( context.reader(), absoluteFieldPath ), center );
+			return currentLeafValues;
+		}
+
+		@Override
+		protected A accumulate(A accumulated, int docId) throws IOException {
+			if ( currentLeafValues.advanceExact( docId ) ) {
+				for ( int i = 0; i < currentLeafValues.docValueCount(); i++ ) {
+					Double distanceOrNull = currentLeafValues.nextValue();
+					accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+				}
+			}
+			return accumulated;
+		}
 	}
 
 	@Override
@@ -133,52 +151,6 @@ public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProject
 				decoded.latitude(), decoded.longitude()
 		);
 		return unit.fromMeters( distanceInMeters );
-	}
-
-	@Override
-	public GeoPointDistanceCollector createCollector(CollectorExecutionContext context) {
-		return new GeoPointDistanceCollector(
-				absoluteFieldPath,
-				nestedDocumentPath == null ? null : context.createNestedDocsProvider( nestedDocumentPath ),
-				center, context.getMaxDocs()
-		);
-	}
-
-	@Override
-	public CollectorKey<GeoPointDistanceCollector> getCollectorKey() {
-		return collectorKey;
-	}
-
-	/**
-	 * Necessary in order to share a single collector if there are multiple similar projections.
-	 * See {@link #createCollector(CollectorExecutionContext)}, {@link #request(ProjectionRequestContext)}.
-	 */
-	private static final class DistanceCollectorKey implements CollectorKey<GeoPointDistanceCollector> {
-
-		private final String absoluteFieldPath;
-		private final GeoPoint center;
-
-		private DistanceCollectorKey(String absoluteFieldPath, GeoPoint center) {
-			this.absoluteFieldPath = absoluteFieldPath;
-			this.center = center;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( obj == this ) {
-				return true;
-			}
-			if ( obj == null || !obj.getClass().equals( getClass() ) ) {
-				return false;
-			}
-			DistanceCollectorKey other = (DistanceCollectorKey) obj;
-			return absoluteFieldPath.equals( other.absoluteFieldPath ) && center.equals( other.center );
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash( absoluteFieldPath, center );
-		}
 	}
 
 	public static class Factory

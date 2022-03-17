@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DocumentReferenceCollector;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DocumentReferenceValues;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -29,16 +29,18 @@ public class LuceneEntityProjection<E> extends AbstractLuceneProjection<E>
 
 	@Override
 	public Extractor<?, E> request(ProjectionRequestContext context) {
-		context.requireCollector( DocumentReferenceCollector.FACTORY );
 		return this;
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		DocumentReference documentReference =
-				context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
-		return mapper.planLoading( documentReference );
+	public Values<Object> values(ProjectionExtractContext context) {
+		ProjectionHitMapper<?, ?> mapper = context.projectionHitMapper();
+		return new DocumentReferenceValues<Object>( context.collectorExecutionContext() ) {
+			@Override
+			protected Object toReference(String typeName, String identifier) {
+				return mapper.planLoading( new LuceneDocumentReference( typeName, identifier ) );
+			}
+		};
 	}
 
 	@SuppressWarnings("unchecked")

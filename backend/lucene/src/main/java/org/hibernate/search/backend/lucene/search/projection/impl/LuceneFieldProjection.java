@@ -10,22 +10,24 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReaderContext;
 
 /**
  * A projection on the values of an index field.
@@ -76,16 +78,34 @@ public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<
 	}
 
 	@Override
-	public A extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		A accumulated = accumulator.createInitial();
-		for ( IndexableField field : documentResult.getDocument().getFields() ) {
-			if ( field.name().equals( absoluteFieldPath ) ) {
-				F decoded = decodeFunction.apply( field );
-				accumulated = accumulator.accumulate( accumulated, decoded );
-			}
+	public Values<A> values(ProjectionExtractContext context) {
+		return new StoredFieldValues( context.collectorExecutionContext().storedFieldsValuesDelegate() );
+	}
+
+	private class StoredFieldValues implements Values<A> {
+		private final StoredFieldsValuesDelegate delegate;
+
+		private StoredFieldValues(StoredFieldsValuesDelegate delegate) {
+			this.delegate = delegate;
 		}
-		return accumulated;
+
+		@Override
+		public void context(LeafReaderContext context) {
+			// Nothing to do
+		}
+
+		@Override
+		public A get(int doc) {
+			Document document = delegate.get( doc );
+			A accumulated = accumulator.createInitial();
+			for ( IndexableField field : document.getFields() ) {
+				if ( field.name().equals( absoluteFieldPath ) ) {
+					F decoded = decodeFunction.apply( field );
+					accumulated = accumulator.accumulate( accumulated, decoded );
+				}
+			}
+			return accumulated;
+		}
 	}
 
 	@Override

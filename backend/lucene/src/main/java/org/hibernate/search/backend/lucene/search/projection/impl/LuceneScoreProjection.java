@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ScoreValues;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
@@ -32,9 +32,8 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float>
 	}
 
 	@Override
-	public Float extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		return documentResult.getScore();
+	public Values<Float> values(ProjectionExtractContext context) {
+		return new ScoreValues( context.collectorExecutionContext() );
 	}
 
 	@Override

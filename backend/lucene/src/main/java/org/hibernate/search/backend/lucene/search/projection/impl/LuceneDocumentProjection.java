@@ -6,14 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.LeafReaderContext;
 
 class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
 		implements LuceneSearchProjection.Extractor<Document, Document> {
@@ -34,9 +35,19 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
 	}
 
 	@Override
-	public Document extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			ProjectionExtractContext context) {
-		return documentResult.getDocument();
+	public Values<Document> values(ProjectionExtractContext context) {
+		StoredFieldsValuesDelegate delegate = context.collectorExecutionContext().storedFieldsValuesDelegate();
+		return new Values<Document>() {
+			@Override
+			public void context(LeafReaderContext context) {
+				// Nothing to do
+			}
+
+			@Override
+			public Document get(int doc) {
+				return delegate.get( doc );
+			}
+		};
 	}
 
 	@Override

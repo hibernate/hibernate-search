@@ -10,7 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -25,11 +26,10 @@ public interface LuceneSearchProjection<P> extends SearchProjection<P> {
 
 	/**
 	 * Request the collection of per-document data that will be used in
-	 * {@link Extractor#extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)},
+	 * {@link Extractor#values(ProjectionExtractContext)},
 	 * making sure that the requirements for this projection are met.
 	 *
-	 * @param context A context that will share its state with the context passed to
-	 * {@link Extractor#extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)} .
+	 * @param context An execution context for the request.
 	 * @return An {@link Extractor}, to extract the result of the projection from the Elasticsearch response.
 	 */
 	Extractor<?, P> request(ProjectionRequestContext context);
@@ -44,29 +44,24 @@ public interface LuceneSearchProjection<P> extends SearchProjection<P> {
 	 */
 	interface Extractor<E, P> {
 		/**
-		 * Performs hit extraction.
+		 * Creates low-level values for use in a {@link TopDocsDataCollector}.
 		 * <p>
-		 * Implementations should only perform operations relative to extracting content from the index,
+		 * The returned {@link Values} should only perform operations relative to extracting content from the index,
 		 * delaying operations that rely on the mapper until
 		 * {@link #transform(LoadingResult, Object, ProjectionTransformContext)} is called,
 		 * so that blocking mapper operations (if any) do not pollute backend threads.
-		 *
-		 * @param projectionHitMapper The projection hit mapper used to transform hits to entities.
-		 * @param luceneResult A wrapper on top of the Lucene document extracted from the index.
 		 * @param context An execution context for the extraction.
-		 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
-		 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, ProjectionTransformContext)}.
+		 * @return The {@link Values} to use during Lucene collection of top docs data.
 		 */
-		E extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-				ProjectionExtractContext context);
+		Values<E> values(ProjectionExtractContext context);
 
 		/**
 		 * Transforms the extracted data to the actual projection result.
 		 *
 		 * @param loadingResult Container containing all the entities that have been loaded by the
 		 * {@link ProjectionHitMapper}.
-		 * @param extractedData The extracted data to transform, coming from the
-		 * {@link #extract(ProjectionHitMapper, LuceneResult, ProjectionExtractContext)} method.
+		 * @param extractedData The extracted data to transform, returned by the
+		 * {@link #values(ProjectionExtractContext) value source}.
 		 * @param context An execution context for the transforming.
 		 * @return The final result considered as a hit.
 		 */
