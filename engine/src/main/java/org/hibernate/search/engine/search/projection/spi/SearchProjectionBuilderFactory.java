@@ -6,13 +6,6 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.util.common.function.TriFunction;
-
 /**
  * A factory for search projection builders.
  * <p>
@@ -31,13 +24,6 @@ public interface SearchProjectionBuilderFactory {
 
 	ScoreProjectionBuilder score();
 
-	<V> CompositeProjectionBuilder<V> composite(Function<List<?>, V> transformer, SearchProjection<?>... projections);
+	CompositeProjectionBuilder composite();
 
-	<P1, V> CompositeProjectionBuilder<V> composite(Function<P1, V> transformer, SearchProjection<P1> projection);
-
-	<P1, P2, V> CompositeProjectionBuilder<V> composite(BiFunction<P1, P2, V> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
-
-	<P1, P2, P3, V> CompositeProjectionBuilder<V> composite(TriFunction<P1, P2, P3, V> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 }

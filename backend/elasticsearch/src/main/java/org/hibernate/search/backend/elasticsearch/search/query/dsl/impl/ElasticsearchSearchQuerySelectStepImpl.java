@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
@@ -74,7 +75,8 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		return select( scope.projectionBuilders().composite( Function.identity(), projections ).build() );
+		return select( scope.projectionBuilders().composite()
+				.build( projections, ProjectionCompositor.fromList( projections.length ) ) );
 	}
 
 	@Override

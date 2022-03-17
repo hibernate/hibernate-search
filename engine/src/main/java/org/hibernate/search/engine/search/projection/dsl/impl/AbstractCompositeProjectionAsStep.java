@@ -12,15 +12,16 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
 abstract class AbstractCompositeProjectionAsStep
 		implements CompositeProjectionAsStep {
 
-	final SearchProjectionDslContext<?> dslContext;
+	final CompositeProjectionBuilder builder;
 
-	public AbstractCompositeProjectionAsStep(SearchProjectionDslContext<?> dslContext) {
-		this.dslContext = dslContext;
+	public AbstractCompositeProjectionAsStep(CompositeProjectionBuilder builder) {
+		this.builder = builder;
 	}
 
 	@Override
@@ -30,7 +31,9 @@ abstract class AbstractCompositeProjectionAsStep
 
 	@Override
 	public final <V> CompositeProjectionValueStep<?, V> asList(Function<List<?>, V> transformer) {
-		return new CompositeProjectionValueStepImpl<>( dslContext, transformer, toProjectionArray() );
+		SearchProjection<?>[] inners = toProjectionArray();
+		return new CompositeProjectionValueStepImpl<>( builder, inners,
+				ProjectionCompositor.fromList( inners.length, transformer ) );
 	}
 
 	abstract SearchProjection<?>[] toProjectionArray();

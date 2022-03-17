@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public interface StubSearchProjection<P> extends SearchProjection<P> {
 
@@ -16,4 +17,11 @@ public interface StubSearchProjection<P> extends SearchProjection<P> {
 			StubSearchProjectionContext context);
 
 	P transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context);
+
+	static <U> StubSearchProjection<U> from(SearchProjection<U> projection) {
+		if ( !( projection instanceof StubSearchProjection ) ) {
+			throw new AssertionFailure( "Projection " + projection + " must be a StubSearchProjection" );
+		}
+		return (StubSearchProjection<U>) projection;
+	}
 }

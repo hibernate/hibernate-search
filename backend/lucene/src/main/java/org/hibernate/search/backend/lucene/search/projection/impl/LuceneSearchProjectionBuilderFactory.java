@@ -6,14 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
@@ -22,7 +16,6 @@ import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
-import org.hibernate.search.util.common.function.TriFunction;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -63,39 +56,8 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
-	public <V> CompositeProjectionBuilder<V> composite(Function<List<?>, V> transformer,
-			SearchProjection<?>... projections) {
-		LuceneSearchProjection<?, ?>[] typedProjections = new LuceneSearchProjection<?, ?>[ projections.length ];
-		for ( int i = 0; i < projections.length; i++ ) {
-			typedProjections[i] = toImplementation( projections[i] );
-		}
-		return new LuceneCompositeProjection.Builder<>( scope,
-				ProjectionCompositor.fromList( projections.length, transformer ),
-				typedProjections );
-	}
-
-	@Override
-	public <P1, V> CompositeProjectionBuilder<V> composite(Function<P1, V> transformer,
-			SearchProjection<P1> projection) {
-		return new LuceneCompositeProjection.Builder<>( scope,
-				ProjectionCompositor.from( transformer ),
-				toImplementation( projection ) );
-	}
-
-	@Override
-	public <P1, P2, V> CompositeProjectionBuilder<V> composite(BiFunction<P1, P2, V> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new LuceneCompositeProjection.Builder<>( scope,
-				ProjectionCompositor.from( transformer ),
-				toImplementation( projection1 ), toImplementation( projection2 ) );
-	}
-
-	@Override
-	public <P1, P2, P3, V> CompositeProjectionBuilder<V> composite(TriFunction<P1, P2, P3, V> transformer,
-			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new LuceneCompositeProjection.Builder<>( scope,
-				ProjectionCompositor.from( transformer ),
-				toImplementation( projection1 ), toImplementation( projection2 ), toImplementation( projection3 ) );
+	public CompositeProjectionBuilder composite() {
+		return new LuceneCompositeProjection.Builder( scope );
 	}
 
 	public SearchProjectionBuilder<Document> document() {
@@ -106,7 +68,4 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		return new LuceneExplanationProjection.Builder( scope );
 	}
 
-	private <T> LuceneSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
-		return LuceneSearchProjection.from( scope, projection );
-	}
 }

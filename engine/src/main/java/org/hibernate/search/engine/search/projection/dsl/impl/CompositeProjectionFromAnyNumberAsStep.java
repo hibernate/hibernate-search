@@ -8,16 +8,16 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionAsStep;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 class CompositeProjectionFromAnyNumberAsStep extends AbstractCompositeProjectionAsStep
 		implements CompositeProjectionAsStep {
 
 	final SearchProjection<?>[] inner;
 
-	public CompositeProjectionFromAnyNumberAsStep(SearchProjectionDslContext<?> dslContext,
+	public CompositeProjectionFromAnyNumberAsStep(CompositeProjectionBuilder builder,
 			SearchProjection<?>[] inner) {
-		super( dslContext );
+		super( builder );
 		this.inner = inner;
 	}
 

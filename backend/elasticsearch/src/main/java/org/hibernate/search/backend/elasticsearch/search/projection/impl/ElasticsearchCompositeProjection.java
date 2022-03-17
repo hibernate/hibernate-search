@@ -20,13 +20,14 @@ import com.google.gson.JsonObject;
 class ElasticsearchCompositeProjection<E, V>
 		extends AbstractElasticsearchProjection<E, V> {
 
-	private final ProjectionCompositor<E, V> compositor;
 	private final ElasticsearchSearchProjection<?, ?>[] inners;
+	private final ProjectionCompositor<E, V> compositor;
 
-	private ElasticsearchCompositeProjection(Builder<E, V> builder) {
+	public ElasticsearchCompositeProjection(Builder builder, ElasticsearchSearchProjection<?,?>[] inners,
+			ProjectionCompositor<E, V> compositor) {
 		super( builder.scope );
-		this.compositor = builder.compositor;
-		this.inners = builder.inners;
+		this.inners = inners;
+		this.compositor = compositor;
 	}
 
 	@Override
@@ -72,22 +73,22 @@ class ElasticsearchCompositeProjection<E, V>
 		return compositor.finish( transformedData );
 	}
 
-	static class Builder<E, V> implements CompositeProjectionBuilder<V> {
+	static class Builder implements CompositeProjectionBuilder {
 
 		private final ElasticsearchSearchIndexScope<?> scope;
-		private final ProjectionCompositor<E, V> compositor;
-		private final ElasticsearchSearchProjection<?, ?>[] inners;
 
-		Builder(ElasticsearchSearchIndexScope<?> scope, ProjectionCompositor<E, V> compositor,
-				ElasticsearchSearchProjection<?, ?> ... inners) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			this.scope = scope;
-			this.compositor = compositor;
-			this.inners = inners;
 		}
 
 		@Override
-		public SearchProjection<V> build() {
-			return new ElasticsearchCompositeProjection<>( this );
+		public <E, V> SearchProjection<V> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+			ElasticsearchSearchProjection<?, ?>[] typedInners =
+					new ElasticsearchSearchProjection<?, ?>[ inners.length ];
+			for ( int i = 0; i < inners.length; i++ ) {
+				typedInners[i] = ElasticsearchSearchProjection.from( scope, inners[i] );
+			}
+			return new ElasticsearchCompositeProjection<>( this, typedInners, compositor );
 		}
 	}
 }
