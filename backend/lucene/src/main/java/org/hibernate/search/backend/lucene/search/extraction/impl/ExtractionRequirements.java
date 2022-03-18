@@ -68,7 +68,7 @@ public final class ExtractionRequirements {
 		boolean requireFieldDocRescoring = false;
 
 		CollectorExecutionContext executionContext =
-				new CollectorExecutionContext( metadataResolver, indexSearcher, rewrittenLuceneQuery, maxDocs );
+				new CollectorExecutionContext( metadataResolver, indexSearcher, maxDocs );
 
 		CollectorSet.Builder collectorsForAllMatchingDocsBuilder =
 				new CollectorSet.Builder( executionContext, timeoutManager );
