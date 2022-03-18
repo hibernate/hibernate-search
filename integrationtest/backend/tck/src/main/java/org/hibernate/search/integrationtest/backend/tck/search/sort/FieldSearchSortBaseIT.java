@@ -31,6 +31,7 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
@@ -391,6 +392,37 @@ public class FieldSearchSortBaseIT<F> {
 		assertThatHits( docRefHits ).ordinals( 2, 3, 4, 5, 6 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.doc3Id, dataSet.emptyDoc1Id,
 						dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-4513" })
+	public void concurrentQueriesUsingSameSort() {
+		assumeTestParametersWork();
+
+		DataSet<F> dataSet;
+		String fieldPath = getFieldPath();
+
+		StubMappingScope scope = index.createScope();
+
+		SearchSort sort = applyFilter( applySortMode( scope.sort().field( fieldPath ) ) ).toSort();
+
+		dataSet = dataSetForAsc;
+		SearchQuery<DocumentReference> query1 = scope.query()
+				.where( f -> f.id().matchingAny( Arrays.asList( dataSet.doc1Id, dataSet.doc2Id ) ) )
+				.routing( dataSet.routingKey )
+				// Reuse the same sort in multiple queries
+				.sort( sort )
+				.toQuery();
+		SearchQuery<DocumentReference> query2 = scope.query()
+				.where( f -> f.id().matching( "NOT_MATCHING_ANYTHING" ) )
+				.routing( dataSet.routingKey )
+				// Reuse the same sort in multiple queries
+				.sort( sort )
+				.toQuery();
+		assertThatQuery( query1 )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id );
+		assertThatQuery( query2 )
+				.hasNoHits();
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
