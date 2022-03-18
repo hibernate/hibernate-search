@@ -13,21 +13,10 @@ import org.apache.lucene.search.Query;
 
 public abstract class LuceneFieldComparatorSource extends FieldComparatorSource {
 
-	protected final String nestedDocumentPath;
-	protected final Query filter;
-
 	protected NestedDocsProvider nestedDocsProvider;
 
 	public LuceneFieldComparatorSource(String nestedDocumentPath, Query filter) {
-		this.nestedDocumentPath = nestedDocumentPath;
-		this.filter = filter;
-	}
-
-	public String getNestedDocumentPath() {
-		return nestedDocumentPath;
-	}
-
-	public void setOriginalParentQuery(Query luceneQuery) {
-		this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, luceneQuery, filter );
+		this.nestedDocsProvider = nestedDocumentPath == null ? null
+				: new NestedDocsProvider( nestedDocumentPath, filter );
 	}
 }

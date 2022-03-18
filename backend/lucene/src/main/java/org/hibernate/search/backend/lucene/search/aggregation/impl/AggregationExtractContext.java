@@ -18,15 +18,13 @@ import org.apache.lucene.search.Query;
 public class AggregationExtractContext {
 
 	private final IndexReader indexReader;
-	private final Query luceneQuery;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final CollectorSet collectors;
 
-	public AggregationExtractContext(IndexReader indexReader, Query luceneQuery,
+	public AggregationExtractContext(IndexReader indexReader,
 			FromDocumentFieldValueConvertContext convertContext,
 			CollectorSet collectors) {
 		this.indexReader = indexReader;
-		this.luceneQuery = luceneQuery;
 		this.convertContext = convertContext;
 		this.collectors = collectors;
 	}
@@ -44,6 +42,6 @@ public class AggregationExtractContext {
 	}
 
 	public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {
-		return new NestedDocsProvider( nestedDocumentPath, luceneQuery, nestedFilter );
+		return new NestedDocsProvider( nestedDocumentPath, nestedFilter );
 	}
 }

@@ -60,8 +60,6 @@ public class LuceneSearchQueryBuilder<H>
 	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
-	private List<LuceneFieldComparatorSource> nestedFieldSorts;
-
 	private Query luceneQuery;
 	private List<SortField> sortFields;
 	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
@@ -135,14 +133,6 @@ public class LuceneSearchQueryBuilder<H>
 	@Override
 	public void collectSortField(SortField sortField, LuceneFieldComparatorSource nestedFieldSort) {
 		collectSortField( sortField );
-		if ( nestedFieldSort == null ) {
-			return;
-		}
-
-		if ( nestedFieldSorts == null ) {
-			nestedFieldSorts = new ArrayList<>( 5 );
-		}
-		nestedFieldSorts.add( nestedFieldSort );
 	}
 
 	@Override
@@ -193,12 +183,6 @@ public class LuceneSearchQueryBuilder<H>
 		Sort luceneSort = null;
 		if ( sortFields != null && !sortFields.isEmpty() ) {
 			luceneSort = new Sort( sortFields.toArray( new SortField[0] ) );
-		}
-
-		if ( nestedFieldSorts != null ) {
-			for ( LuceneFieldComparatorSource nestedField : nestedFieldSorts ) {
-				nestedField.setOriginalParentQuery( definitiveLuceneQuery );
-			}
 		}
 
 		LuceneSearchQueryRequestContext requestContext = new LuceneSearchQueryRequestContext(

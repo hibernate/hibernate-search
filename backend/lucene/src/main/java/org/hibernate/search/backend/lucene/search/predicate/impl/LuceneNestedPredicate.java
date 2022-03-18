@@ -17,6 +17,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.join.BitSetProducer;
+import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 
@@ -48,7 +49,7 @@ class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 		// Note: this filter should include *all* parents, not just the matched ones.
 		// Otherwise we will not "see" non-matched parents,
 		// and we will consider its matching children as children of the next matching parent.
-		BitSetProducer parentFilter = Queries.parentFilter( parentNestedDocumentPath );
+		BitSetProducer parentFilter = new QueryBitSetProducer( Queries.parentsFilterQuery( parentNestedDocumentPath ) );
 
 		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode
 		return new ToParentBlockJoinQuery( childQueryBuilder.build(), parentFilter, ScoreMode.Avg );
