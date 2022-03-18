@@ -17,7 +17,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.join.BitSetProducer;
-import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 
 public class Queries {
@@ -76,25 +75,22 @@ public class Queries {
 		return queryBuilder.build();
 	}
 
-	public static BitSetProducer parentFilter(String parentNestedDocumentPath) {
-		Query parentQuery;
+	public static Query parentsFilterQuery(String parentNestedDocumentPath) {
 		if ( parentNestedDocumentPath == null ) {
-			parentQuery = Queries.mainDocumentQuery();
+			return Queries.mainDocumentQuery();
 		}
 		else {
-			parentQuery = Queries.nestedDocumentPathQuery( parentNestedDocumentPath );
+			return Queries.nestedDocumentPathQuery( parentNestedDocumentPath );
 		}
-		return new QueryBitSetProducer( parentQuery );
 	}
 
-	public static BooleanQuery findChildQuery(BitSetProducer parentFilter,
-				Set<String> nestedDocumentPaths, Query originalParentQuery,
-				Query nestedFilter) {
-		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( originalParentQuery, parentFilter );
+	public static BooleanQuery findChildQuery(Query parentQuery, BitSetProducer parentFilter,
+			Set<String> nestedDocumentPaths, Query nestedFilter) {
+		ToChildBlockJoinQuery childQuery = new ToChildBlockJoinQuery( parentQuery, parentFilter );
 
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 
-		builder.add( parentQuery, Occur.MUST )
+		builder.add( childQuery, Occur.MUST )
 				.add( createNestedDocumentPathSubQuery( nestedDocumentPaths ), Occur.FILTER )
 				.add( childDocumentQuery(), Occur.FILTER );
 
