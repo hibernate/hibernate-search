@@ -10,18 +10,16 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.DoubleValuesSource;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.util.BitSet;
 
 /**
  * An implementation of {@link DoubleValuesSource} for docvalues with multiple values per document,
@@ -97,9 +95,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 			return select( values );
 		}
 
-		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
-		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return select( values, rootDocs, innerDocs );
+		return select( values, nestedDocsProvider.childDocs( ctx, values ) );
 	}
 
 	protected abstract SortedNumericDoubleDocValues getSortedNumericDoubleDocValues(LeafReaderContext ctx) throws IOException;
@@ -131,13 +127,10 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 		}
 	}
 
-	protected NumericDoubleValues select(SortedNumericDoubleDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) {
-		if ( parentDocs == null || childDocs == null ) {
+	protected NumericDoubleValues select(SortedNumericDoubleDocValues values, ChildDocIds childDocsWithValues) {
+		if ( childDocsWithValues == null ) {
 			return NumericDoubleValues.EMPTY;
 		}
-
-		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new NumericDoubleValues() {
 
@@ -156,13 +149,13 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 					return true;
 				}
 
-				if ( !joinIterator.advanceExact( parentDoc ) ) {
+				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
 					// No child of this parent has a value
 					return false;
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = mode.pick( values, joinIterator );
+				lastEmittedValue = mode.pick( values, childDocsWithValues );
 				return true;
 			}
 

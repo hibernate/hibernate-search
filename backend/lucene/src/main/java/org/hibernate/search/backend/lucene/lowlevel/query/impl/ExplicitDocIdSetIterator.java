@@ -8,9 +8,9 @@ package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 
 import org.apache.lucene.search.DocIdSetIterator;
 
-final class ExplicitDocIdSetIterator extends DocIdSetIterator {
+public final class ExplicitDocIdSetIterator extends DocIdSetIterator {
 
-	static DocIdSetIterator of(int[] sortedTopLevelDocIds, int leafDocBase, int leafMaxLeafId) {
+	public static DocIdSetIterator of(int[] sortedTopLevelDocIds, int leafDocBase, int leafMaxLeafId) {
 		int firstIndex = findFirstGreaterThanOrEqualTo( sortedTopLevelDocIds, leafDocBase );
 		if ( firstIndex < 0 ) {
 			return null;

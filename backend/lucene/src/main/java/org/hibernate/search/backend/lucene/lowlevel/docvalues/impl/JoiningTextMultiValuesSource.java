@@ -9,14 +9,13 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.BitSet;
 
 /**
  * A source of {@link TextMultiValues} that automatically fetches values from nested documents if necessary.
@@ -65,20 +64,15 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 			return TextMultiValues.fromDocValues( values );
 		}
 
-		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
-		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return join( values, rootDocs, innerDocs );
+		return select( values, nestedDocsProvider.childDocs( ctx, values ) );
 	}
 
 	protected abstract SortedSetDocValues getSortedSetDocValues(LeafReaderContext ctx) throws IOException;
 
-	protected TextMultiValues join(SortedSetDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) {
-		if ( parentDocs == null || childDocs == null ) {
+	protected TextMultiValues select(SortedSetDocValues values, ChildDocIds childDocsWithValues) {
+		if ( childDocsWithValues == null ) {
 			return TextMultiValues.EMPTY;
 		}
-
-		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new TextMultiValues.DocValuesTextMultiValues( values ) {
 			int currentParentDoc = -1;
@@ -93,7 +87,7 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 				currentParentDoc = parentDoc;
 				nextOrd = SortedSetDocValues.NO_MORE_ORDS; // To be set in the next call to hasNextValue()
 
-				return joinIterator.advanceExact( parentDoc );
+				return childDocsWithValues.advanceExactParent( parentDoc );
 			}
 
 			@Override
@@ -102,7 +96,7 @@ public abstract class JoiningTextMultiValuesSource extends TextMultiValuesSource
 					return true;
 				}
 
-				if ( joinIterator.advanceValuesToNextChild() ) {
+				if ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 					nextOrd = values.nextOrd();
 					return true;
 				}
