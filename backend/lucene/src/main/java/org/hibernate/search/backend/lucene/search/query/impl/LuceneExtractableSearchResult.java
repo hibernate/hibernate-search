@@ -136,7 +136,7 @@ public class LuceneExtractableSearchResult<H> {
 
 	private Map<AggregationKey<?>, ?> extractAggregations() throws IOException {
 		AggregationExtractContext aggregationExtractContext = new AggregationExtractContext(
-				indexSearcher.getIndexReader(), requestContext.getLuceneQuery(),
+				indexSearcher.getIndexReader(),
 				fromDocumentValueConvertContext,
 				luceneCollectors.getCollectorsForAllMatchingDocs()
 		);
