@@ -8,10 +8,11 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
+import org.apache.lucene.search.DocIdSetIterator;
 
 /**
  * Defines what values to pick in the case a document contains multiple values
@@ -31,9 +32,9 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+		long pick(SortedNumericDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long result = 0;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				final int valueCountForChild = values.docValueCount();
 				for ( int index = 0; index < valueCountForChild; ++index ) {
 					result += values.nextValue();
@@ -53,10 +54,10 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, JoinChildrenIdIterator joinIterator)
+		double pick(SortedNumericDoubleDocValues values, ChildDocIds childDocsWithValues)
 				throws IOException {
 			double result = 0;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				final int valueCountForChild = values.docValueCount();
 				for ( int index = 0; index < valueCountForChild; ++index ) {
 					result += values.nextValue();
@@ -78,10 +79,10 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+		long pick(SortedNumericDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long returnValue = 0;
 			int valueCount = 0;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				final int valueCountForChild = values.docValueCount();
 				for ( int index = 0; index < valueCountForChild; ++index ) {
 					returnValue += values.nextValue();
@@ -109,11 +110,11 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, JoinChildrenIdIterator joinIterator)
+		double pick(SortedNumericDoubleDocValues values, ChildDocIds childDocsWithValues)
 				throws IOException {
 			double result = 0;
 			int valueCount = 0;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				final int valueCountForChild = values.docValueCount();
 				for ( int index = 0; index < valueCountForChild; ++index ) {
 					result += values.nextValue();
@@ -137,9 +138,9 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+		long pick(SortedNumericDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long result = Long.MAX_VALUE;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				// Values are sorted; the first value is the min for this document.
 				result = Math.min( result, values.nextValue() );
 			}
@@ -153,10 +154,10 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, JoinChildrenIdIterator joinIterator)
+		double pick(SortedNumericDoubleDocValues values, ChildDocIds childDocsWithValues)
 				throws IOException {
 			double result = Double.POSITIVE_INFINITY;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				// Values are sorted; the first value is the min for this document.
 				result = Math.min( result, values.nextValue() );
 			}
@@ -173,9 +174,9 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		long pick(SortedSetDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+		long pick(SortedSetDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long result = Long.MAX_VALUE;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
 					result = Math.min( result, ord );
 				}
@@ -195,9 +196,9 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+		long pick(SortedNumericDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long result = Long.MIN_VALUE;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				final int valueCountForChild = values.docValueCount();
 				// Values are sorted; the last value is the max for this document.
 				for ( int index = 0; index < valueCountForChild - 1; ++index ) {
@@ -219,10 +220,10 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, JoinChildrenIdIterator joinIterator)
+		double pick(SortedNumericDoubleDocValues values, ChildDocIds childDocsWithValues)
 				throws IOException {
 			double result = Double.NEGATIVE_INFINITY;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				final int valueCountForChild = values.docValueCount();
 				// Values are sorted; the last value is the max for this document.
 				for ( int index = 0; index < valueCountForChild - 1; ++index ) {
@@ -243,9 +244,9 @@ public enum MultiValueMode {
 		}
 
 		@Override
-		long pick(SortedSetDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+		long pick(SortedSetDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 			long returnValue = Long.MIN_VALUE;
-			while ( joinIterator.advanceValuesToNextChild() ) {
+			while ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 				for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
 					returnValue = Math.max( returnValue, ord );
 				}
@@ -289,13 +290,13 @@ public enum MultiValueMode {
 
 	abstract long pick(SortedNumericDocValues values) throws IOException;
 
-	long pick(SortedNumericDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+	long pick(SortedNumericDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 		throw unsupportedSortMode();
 	}
 
 	abstract double pick(SortedNumericDoubleDocValues values) throws IOException;
 
-	double pick(SortedNumericDoubleDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+	double pick(SortedNumericDoubleDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 		throw unsupportedSortMode();
 	}
 
@@ -303,7 +304,7 @@ public enum MultiValueMode {
 		throw unsupportedSortMode();
 	}
 
-	long pick(SortedSetDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
+	long pick(SortedSetDocValues values, ChildDocIds childDocsWithValues) throws IOException {
 		throw unsupportedSortMode();
 	}
 

@@ -9,15 +9,13 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.BytesRef;
 
 /**
@@ -76,9 +74,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 			return select( values );
 		}
 
-		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
-		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return select( values, rootDocs, innerDocs );
+		return select( values, nestedDocsProvider.childDocs( ctx, values ) );
 	}
 
 	protected abstract SortedSetDocValues getSortedSetDocValues(LeafReaderContext ctx) throws IOException;
@@ -116,13 +112,10 @@ public abstract class TextMultiValuesToSingleValuesSource {
 		}
 	}
 
-	protected SortedDocValues select(final SortedSetDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) {
-		if ( parentDocs == null || childDocs == null ) {
+	protected SortedDocValues select(SortedSetDocValues values, ChildDocIds childDocsWithValues) {
+		if ( childDocsWithValues == null ) {
 			return DocValues.emptySorted();
 		}
-
-		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new SortedSetDocValuesToSortedDocValuesWrapper( values ) {
 			int lastSeenParentDoc = -1;
@@ -145,13 +138,13 @@ public abstract class TextMultiValuesToSingleValuesSource {
 					return true;
 				}
 
-				if ( !joinIterator.advanceExact( parentDoc ) ) {
+				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
 					// No child of this parent has a value
 					return false;
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedOrd = (int) mode.pick( values, joinIterator );
+				lastEmittedOrd = (int) mode.pick( values, childDocsWithValues );
 				return true;
 			}
 		};
