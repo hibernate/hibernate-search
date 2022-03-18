@@ -22,6 +22,7 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.search.join.BitSetProducer;
+import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.util.BitSet;
 
 /**
@@ -36,24 +37,31 @@ public class NestedDocsProvider {
 	private final BitSetProducer parentFilter;
 	private final Query childQuery;
 
-	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
-		this( Collections.singleton( nestedDocumentPath ), originalParentQuery, null );
+	public NestedDocsProvider(String nestedDocumentPath) {
+		this( Collections.singleton( nestedDocumentPath ), null );
 	}
 
-	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery, Query nestedFilter) {
-		this( Collections.singleton( nestedDocumentPath ), originalParentQuery, nestedFilter );
+	public NestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {
+		this( Collections.singleton( nestedDocumentPath ), nestedFilter );
 	}
 
-	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query originalParentQuery) {
-		this( nestedDocumentPaths, originalParentQuery, null );
+	public NestedDocsProvider(Set<String> nestedDocumentPaths) {
+		this( nestedDocumentPaths, null );
 	}
 
-	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query originalParentQuery, Query nestedFilter) {
+	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query nestedFilter) {
+		Query parentsFilterQuery = Queries.parentsFilterQuery( null );
 		// Note: this filter should include *all* parents, not just the matched ones.
 		// Otherwise we will not "see" non-matched parents,
 		// and we will consider its matching children as children of the next matching parent.
-		this.parentFilter = Queries.parentFilter( null );
-		this.childQuery = Queries.findChildQuery( parentFilter, nestedDocumentPaths, originalParentQuery, nestedFilter );
+		this.parentFilter = new QueryBitSetProducer( parentsFilterQuery );
+		this.childQuery = Queries.findChildQuery(
+				// Given how we will use this query (to list children of a particular matching document),
+				// we don't need a more precise parent query than "all parents".
+				// It would be another story if we intended to list all children of all matching documents,
+				// but that's not what we need here.
+				parentsFilterQuery,
+				parentFilter, nestedDocumentPaths, nestedFilter );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {

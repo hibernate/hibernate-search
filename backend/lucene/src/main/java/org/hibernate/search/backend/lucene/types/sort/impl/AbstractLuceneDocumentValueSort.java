@@ -33,18 +33,16 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final SortField sortField;
-	protected final LuceneFieldComparatorSource nestedFieldSort;
 
 	protected AbstractLuceneDocumentValueSort(AbstractBuilder builder) {
 		super( builder );
 		LuceneFieldComparatorSource fieldComparatorSource = builder.toFieldComparatorSource();
 		sortField = new SortField( builder.absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
-		nestedFieldSort = builder.nestedDocumentPath != null ? fieldComparatorSource : null;
 	}
 
 	@Override
 	public void toSortFields(LuceneSearchSortCollector collector) {
-		collector.collectSortField( sortField, nestedFieldSort );
+		collector.collectSortField( sortField );
 	}
 
 	public abstract static class AbstractBuilder extends AbstractLuceneReversibleSort.AbstractBuilder {
