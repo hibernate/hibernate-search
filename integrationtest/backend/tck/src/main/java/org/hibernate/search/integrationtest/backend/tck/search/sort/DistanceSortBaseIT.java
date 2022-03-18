@@ -14,6 +14,7 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -38,6 +40,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
@@ -370,6 +373,37 @@ public class DistanceSortBaseIT {
 						} ) ) )
 				.hasDocRefHitsExactOrder( index.typeName(),
 						dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-4513" })
+	public void concurrentQueriesUsingSameSort() {
+		assumeTestParametersWork();
+
+		DataSet dataSet;
+		String fieldPath = getFieldPath();
+
+		StubMappingScope scope = index.createScope();
+
+		SearchSort sort = applyFilter( applySortMode( scope.sort().distance( fieldPath, CENTER_POINT ) ) ).toSort();
+
+		dataSet = dataSetForAsc;
+		SearchQuery<DocumentReference> query1 = scope.query()
+				.where( f -> f.id().matchingAny( Arrays.asList( dataSet.doc1Id, dataSet.doc2Id ) ) )
+				.routing( dataSet.routingKey )
+				// Reuse the same sort in multiple queries
+				.sort( sort )
+				.toQuery();
+		SearchQuery<DocumentReference> query2 = scope.query()
+				.where( f -> f.id().matching( "NOT_MATCHING_ANYTHING" ) )
+				.routing( dataSet.routingKey )
+				// Reuse the same sort in multiple queries
+				.sort( sort )
+				.toQuery();
+		assertThatQuery( query1 )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id );
+		assertThatQuery( query2 )
+				.hasNoHits();
 	}
 
 	private void assumeTestParametersWork() {
