@@ -12,14 +12,12 @@ import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
-import org.apache.lucene.util.BitSet;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
@@ -95,9 +93,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 			return select( values );
 		}
 
-		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
-		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return select( values, rootDocs, innerDocs );
+		return select( values, nestedDocsProvider.childDocs( ctx, values ) );
 	}
 
 	/**
@@ -153,13 +149,10 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		}
 	}
 
-	protected LongValues select(final SortedNumericDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) {
-		if ( parentDocs == null || childDocs == null ) {
+	protected LongValues select(SortedNumericDocValues values, ChildDocIds childDocsWithValues) {
+		if ( childDocsWithValues == null ) {
 			return DocValuesUtils.LONG_VALUES_EMPTY;
 		}
-
-		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new LongValues() {
 			int lastSeenParentDoc = -1;
@@ -177,13 +170,13 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 					return true;
 				}
 
-				if ( !joinIterator.advanceExact( parentDoc ) ) {
+				if ( !childDocsWithValues.advanceExactParent( parentDoc ) ) {
 					// No child of this parent has a value
 					return false;
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = mode.pick( values, joinIterator );
+				lastEmittedValue = mode.pick( values, childDocsWithValues );
 				return true;
 			}
 		};

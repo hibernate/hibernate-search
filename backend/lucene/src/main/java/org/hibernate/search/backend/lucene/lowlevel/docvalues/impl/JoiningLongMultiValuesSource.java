@@ -9,14 +9,13 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.BitSet;
 
 /**
  * A source of {@link LongMultiValues} that automatically fetches values from nested documents if necessary.
@@ -80,20 +79,15 @@ public abstract class JoiningLongMultiValuesSource extends LongMultiValuesSource
 			return LongMultiValues.fromDocValues( values );
 		}
 
-		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
-		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return join( values, rootDocs, innerDocs );
+		return select( values, nestedDocsProvider.childDocs( ctx, values ) );
 	}
 
 	protected abstract SortedNumericDocValues getSortedNumericDocValues(LeafReaderContext ctx) throws IOException;
 
-	protected LongMultiValues join(SortedNumericDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) {
-		if ( parentDocs == null || childDocs == null ) {
+	protected LongMultiValues select(SortedNumericDocValues values, ChildDocIds childDocsWithValues) {
+		if ( childDocsWithValues == null ) {
 			return LongMultiValues.EMPTY;
 		}
-
-		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new LongMultiValues() {
 			int currentParentDoc = -1;
@@ -109,7 +103,7 @@ public abstract class JoiningLongMultiValuesSource extends LongMultiValuesSource
 				currentParentDoc = parentDoc;
 				remainingValuesForChild = 0; // To be set in the next call to hasNextValue()
 
-				return joinIterator.advanceExact( parentDoc );
+				return childDocsWithValues.advanceExactParent( parentDoc );
 			}
 
 			@Override
@@ -118,7 +112,7 @@ public abstract class JoiningLongMultiValuesSource extends LongMultiValuesSource
 					return true;
 				}
 
-				if ( joinIterator.advanceValuesToNextChild() ) {
+				if ( childDocsWithValues.nextChild() != DocIdSetIterator.NO_MORE_DOCS ) {
 					remainingValuesForChild = values.docValueCount();
 					return true;
 				}
