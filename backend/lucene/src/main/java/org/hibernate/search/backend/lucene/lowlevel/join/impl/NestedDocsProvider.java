@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.join.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.ReaderUtil;
+import org.apache.lucene.search.ConjunctionDISI;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -26,8 +28,7 @@ import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.util.BitSet;
 
 /**
- * Provides the {@link #parentDocs(LeafReaderContext)} and {@link #childDocs(LeafReaderContext)},
- * relatives to the current sort.
+ * Provides various representations of nested docs for a pre-defined nested document path.
  * <p>
  * Copied and adapted from {@code org.elasticsearch.index.fielddata.IndexFieldData.Nested} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
@@ -58,18 +59,28 @@ public class NestedDocsProvider {
 		this.childQuery = Queries.childDocumentsQuery( nestedDocumentPaths, nestedFilter );
 	}
 
-	public BitSet parentDocs(LeafReaderContext context) throws IOException {
-		return parentFilter.getBitSet( context );
-	}
+	public ChildDocIds childDocs(LeafReaderContext context, DocIdSetIterator childFilter) throws IOException {
+		BitSet parentDocs = parentFilter.getBitSet( context );
+		if ( parentDocs == null ) {
+			return null;
+		}
 
-	public DocIdSetIterator childDocs(LeafReaderContext context) throws IOException {
 		final IndexReaderContext topLevelCtx = ReaderUtil.getTopLevelContext( context );
 
 		// Maybe we can cache on shard-base. See Elasticsearch code.
 		IndexSearcher indexSearcher = new IndexSearcher( topLevelCtx );
 
 		Weight weight = childDocsWeight( indexSearcher );
-		return childDocs( weight, context );
+		DocIdSetIterator childDocs = childDocs( weight, context );
+		if ( childDocs == null ) {
+			return null;
+		}
+
+		if ( childFilter != null ) {
+			childDocs = ConjunctionDISI.intersectIterators( Arrays.asList( childDocs, childFilter ) );
+		}
+
+		return new ChildDocIds( parentDocs, childDocs );
 	}
 
 	public Weight childDocsWeight(IndexSearcher indexSearcher) throws IOException {
