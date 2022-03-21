@@ -55,13 +55,7 @@ public class NestedDocsProvider {
 		// Otherwise we will not "see" non-matched parents,
 		// and we will consider its matching children as children of the next matching parent.
 		this.parentFilter = new QueryBitSetProducer( parentsFilterQuery );
-		this.childQuery = Queries.findChildQuery(
-				// Given how we will use this query (to list children of a particular matching document),
-				// we don't need a more precise parent query than "all parents".
-				// It would be another story if we intended to list all children of all matching documents,
-				// but that's not what we need here.
-				parentsFilterQuery,
-				parentFilter, nestedDocumentPaths, nestedFilter );
+		this.childQuery = Queries.childDocumentsQuery( nestedDocumentPaths, nestedFilter );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {

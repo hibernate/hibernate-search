@@ -16,8 +16,6 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.join.BitSetProducer;
-import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 
 public class Queries {
 
@@ -84,27 +82,15 @@ public class Queries {
 		}
 	}
 
-	public static BooleanQuery findChildQuery(Query parentQuery, BitSetProducer parentFilter,
-			Set<String> nestedDocumentPaths, Query nestedFilter) {
-		ToChildBlockJoinQuery childQuery = new ToChildBlockJoinQuery( parentQuery, parentFilter );
-
-		BooleanQuery.Builder builder = new BooleanQuery.Builder();
-
-		builder.add( childQuery, Occur.MUST )
-				.add( createNestedDocumentPathSubQuery( nestedDocumentPaths ), Occur.FILTER )
-				.add( childDocumentQuery(), Occur.FILTER );
-
-		if ( nestedFilter != null ) {
-			builder.add( nestedFilter, Occur.FILTER );
-		}
-
-		return builder.build();
-	}
-
-	private static BooleanQuery createNestedDocumentPathSubQuery(Set<String> nestedDocumentPaths) {
+	// Users of this query will target a specific parent ID which is guaranteed to already match the main Lucene query,
+	// so we don't need to filter parent documents nor to use a ToChildBlockJoinQuery.
+	public static BooleanQuery childDocumentsQuery(Set<String> nestedDocumentPaths, Query nestedFilter) {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		for ( String nestedDocumentPath : nestedDocumentPaths ) {
 			builder.add( nestedDocumentPathQuery( nestedDocumentPath ), Occur.SHOULD );
+		}
+		if ( nestedFilter != null ) {
+			builder.add( nestedFilter, Occur.FILTER );
 		}
 		builder.setMinimumNumberShouldMatch( 1 );
 		return builder.build();
