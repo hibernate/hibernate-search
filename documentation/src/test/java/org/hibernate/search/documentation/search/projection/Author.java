@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.documentation.search.projection;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Embedded;
@@ -30,6 +31,9 @@ public class Author {
 
 	@FullTextField(analyzer = "name", projectable = Projectable.YES)
 	private String lastName;
+
+	@GenericField(projectable = Projectable.YES)
+	private LocalDate birthDate;
 
 	@Embedded
 	@GenericField(projectable = Projectable.YES)
@@ -63,6 +67,14 @@ public class Author {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public LocalDate getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public EmbeddableGeoPoint getPlaceOfBirth() {

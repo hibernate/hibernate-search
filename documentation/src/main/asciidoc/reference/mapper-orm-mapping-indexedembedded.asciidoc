@@ -492,6 +492,9 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedd
 <3> The hits will *not* include a book whose authors are "Ty Daniel" and "Frank Abraham".
 ====
 
+NOTE: With the <<backend-lucene,Lucene backend>>, the nested structure is also necessary if
+you want to perform <<search-dsl-projection-object,`object` projections>>.
+
 [[mapper-orm-indexedembedded-programmatic]]
 == Programmatic mapping
 

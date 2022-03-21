@@ -9,7 +9,10 @@ package org.hibernate.search.documentation.search.projection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -29,11 +32,14 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
 public class ProjectionDslIT {
 
@@ -502,6 +508,150 @@ public class ProjectionDslIT {
 		} );
 	}
 
+	@Test
+	public void object() {
+		withinSearchSession( searchSession -> {
+			// tag::object-customObject[]
+			List<List<MyAuthorName>> hits = searchSession.search( Book.class )
+					.select( f -> f.object( "authors" ) // <1>
+							.from( f.field( "authors.firstName", String.class ), // <2>
+									f.field( "authors.lastName", String.class ) ) // <3>
+							.as( MyAuthorName::new ) // <4>
+							.multi() ) // <5>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <6>
+			// end::object-customObject[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).usingRecursiveFieldByFieldElementComparator()
+					.containsExactlyInAnyOrder(
+					Collections.singletonList(
+							new MyAuthorName(
+									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					),
+					Collections.singletonList(
+							new MyAuthorName(
+									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					),
+					Collections.singletonList(
+							new MyAuthorName(
+									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					),
+					Collections.singletonList(
+							new MyAuthorName(
+									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					)
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::object-customObject-asList[]
+			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );
+			List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>> hits = searchSession
+					.search( Book.class )
+					.select( f -> f.object( "authors" ) // <1>
+							.from( f.field( "authors.firstName", String.class ), // <2>
+									f.field( "authors.lastName", String.class ), // <3>
+									f.field( "authors.birthDate", LocalDate.class ), // <4>
+									f.distance( "authors.placeOfBirth", center ) // <5>
+											.unit( DistanceUnit.KILOMETERS ) )
+							.asList( list -> // <6>
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											(String) list.get( 0 ), (String) list.get( 1 ),
+											(LocalDate) list.get( 2 ), (Double) list.get( 3 ) ) )
+							.multi() ) // <7>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <8>
+			// end::object-customObject-asList[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits )
+					.usingRecursiveFieldByFieldElementComparator( RecursiveComparisonConfiguration.builder()
+							.withComparatorForType( TestComparators.APPROX_KM_COMPARATOR, Double.class )
+							.build() )
+					.containsExactlyInAnyOrder(
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getBirthDate(),
+											0.888
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getBirthDate(),
+											0.888
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getBirthDate(),
+											0.888
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getBirthDate(),
+											9680.93
+									)
+							)
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::object-list[]
+			List<List<List<?>>> hits = searchSession.search( Book.class )
+					.select( f -> f.object( "authors" ) // <1>
+							.from( f.field( "authors.firstName", String.class ), // <2>
+									f.field( "authors.lastName", String.class ) ) // <3>
+							.asList() // <4>
+							.multi() ) // <5>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <6>
+			// end::object-list[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					Collections.singletonList(
+							Arrays.asList(
+									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					),
+					Collections.singletonList(
+							Arrays.asList(
+									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					),
+					Collections.singletonList(
+							Arrays.asList(
+									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					),
+					Collections.singletonList(
+							Arrays.asList(
+									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
+							)
+					)
+			);
+		} );
+	}
+
 	private void withinSearchSession(Consumer<SearchSession> action) {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -515,12 +665,14 @@ public class ProjectionDslIT {
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );
 			isaacAsimov.setLastName( "Asimov" );
+			isaacAsimov.setBirthDate( LocalDate.of( 1920, Month.JANUARY, 2 ) );
 			isaacAsimov.setPlaceOfBirth( EmbeddableGeoPoint.of( 53.976177, 32.158627 ) );
 
 			Author aLeeMartinez = new Author();
 			aLeeMartinez.setId( MARTINEZ_ID );
 			aLeeMartinez.setFirstName( "A. Lee" );
 			aLeeMartinez.setLastName( "Martinez" );
+			aLeeMartinez.setBirthDate( LocalDate.of( 1973, Month.JANUARY, 12 ) );
 			aLeeMartinez.setPlaceOfBirth( EmbeddableGeoPoint.of( 31.814315, -106.475524 ) );
 
 			Book book1 = new Book();
@@ -620,4 +772,48 @@ public class ProjectionDslIT {
 			return Objects.hash( first, second, third, fourth );
 		}
 	}
+
+	private static class MyAuthorName {
+		private final String firstName;
+		private final String lastName;
+
+		MyAuthorName(String firstName, String lastName) {
+			this.firstName = firstName;
+			this.lastName = lastName;
+		}
+
+		@Override
+		public String toString() {
+			return "MyAuthorName{" +
+					"firstName='" + firstName + '\'' +
+					", lastName='" + lastName + '\'' +
+					'}';
+		}
+	}
+
+	private static class MyAuthorNameAndBirthDateAndPlaceOfBirthDistance {
+		private final String firstName;
+		private final String lastName;
+		private final LocalDate birthDate;
+		private final Double placeOfBirthDistance;
+
+		private MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(String firstName, String lastName,
+				LocalDate birthDate, Double placeOfBirthDistance) {
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.birthDate = birthDate;
+			this.placeOfBirthDistance = placeOfBirthDistance;
+		}
+
+		@Override
+		public String toString() {
+			return "MyAuthorNameAndBirthDateAndPlaceOfBirthDistance{" +
+					"firstName='" + firstName + '\'' +
+					", lastName='" + lastName + '\'' +
+					", birthDate=" + birthDate +
+					", placeOfBirthDistance=" + placeOfBirthDistance +
+					'}';
+		}
+	}
+
 }
