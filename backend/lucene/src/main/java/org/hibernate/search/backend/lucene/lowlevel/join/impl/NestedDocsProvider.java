@@ -61,7 +61,9 @@ public class NestedDocsProvider {
 
 	public ChildDocIds childDocs(LeafReaderContext context, DocIdSetIterator childFilter) throws IOException {
 		final IndexReaderContext topLevelCtx = ReaderUtil.getTopLevelContext( context );
-		// Maybe we can cache on shard-base. See Elasticsearch code.
+		// See HSEARCH-4514; ideally we would use the calling searcher here,
+		// but it's not easy to pass it to this method
+		// and it hasn't been proven that creating a new searcher has a performance impact.
 		IndexSearcher indexSearcher = new IndexSearcher( topLevelCtx );
 		Weight childDocsWeight = childDocsWeight( indexSearcher );
 		return childDocs( childDocsWeight, context, childFilter );
