@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import java.io.IOException;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.ChildDocIds;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -65,7 +66,7 @@ public class StoredFieldsCollector extends SimpleCollector {
 
 	private int currentLeafDocBase;
 	private int currentLeafLastSeenParentDoc;
-	private DocIdSetIterator currentLeafChildDocs;
+	private ChildDocIds currentLeafChildDocs;
 	private LeafReader currentLeafReader;
 
 	private final IntObjectMap<Document> documents = new IntObjectHashMap<>();
@@ -80,10 +81,7 @@ public class StoredFieldsCollector extends SimpleCollector {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder( "ChildrenCollector{" );
-		sb.append( "documents=" ).append( documents );
-		sb.append( '}' );
-		return sb.toString();
+		return "StoredFieldsCollector{" + "documents=" + documents + '}';
 	}
 
 	@Override
@@ -103,22 +101,15 @@ public class StoredFieldsCollector extends SimpleCollector {
 		if ( parentDoc < currentLeafLastSeenParentDoc ) {
 			throw new AssertionFailure( "Collector.collect called in unexpected order" );
 		}
-
-		final int firstChildDoc;
-		if ( currentLeafChildDocs.docID() > currentLeafLastSeenParentDoc ) {
-			firstChildDoc = currentLeafChildDocs.docID();
-		}
-		else {
-			firstChildDoc = currentLeafChildDocs.advance( currentLeafLastSeenParentDoc + 1 );
-		}
 		currentLeafLastSeenParentDoc = parentDoc;
 
-		if ( firstChildDoc > parentDoc ) {
+		if ( !currentLeafChildDocs.advanceExactParent( parentDoc ) ) {
 			// No child
 			return;
 		}
 
-		for ( int childDoc = firstChildDoc; childDoc < parentDoc; childDoc = currentLeafChildDocs.nextDoc() ) {
+		for ( int childDoc = currentLeafChildDocs.nextChild(); childDoc != DocIdSetIterator.NO_MORE_DOCS;
+				childDoc = currentLeafChildDocs.nextChild() ) {
 			currentLeafReader.document( childDoc, storedFieldVisitor );
 		}
 	}
@@ -138,6 +129,7 @@ public class StoredFieldsCollector extends SimpleCollector {
 		this.currentLeafLastSeenParentDoc = -1;
 		this.currentLeafReader = context.reader();
 
-		this.currentLeafChildDocs = nestedDocsProvider == null ? null : nestedDocsProvider.childDocs( childrenWeight, context );
+		this.currentLeafChildDocs = nestedDocsProvider == null ? null
+				: nestedDocsProvider.childDocs( childrenWeight, context, null );
 	}
 }

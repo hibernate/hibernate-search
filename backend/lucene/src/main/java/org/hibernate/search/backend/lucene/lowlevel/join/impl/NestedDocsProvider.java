@@ -60,18 +60,22 @@ public class NestedDocsProvider {
 	}
 
 	public ChildDocIds childDocs(LeafReaderContext context, DocIdSetIterator childFilter) throws IOException {
+		final IndexReaderContext topLevelCtx = ReaderUtil.getTopLevelContext( context );
+		// Maybe we can cache on shard-base. See Elasticsearch code.
+		IndexSearcher indexSearcher = new IndexSearcher( topLevelCtx );
+		Weight childDocsWeight = childDocsWeight( indexSearcher );
+		return childDocs( childDocsWeight, context, childFilter );
+	}
+
+	public ChildDocIds childDocs(Weight childDocsWeight, LeafReaderContext context,
+			DocIdSetIterator childFilter) throws IOException {
 		BitSet parentDocs = parentFilter.getBitSet( context );
 		if ( parentDocs == null ) {
 			return null;
 		}
 
-		final IndexReaderContext topLevelCtx = ReaderUtil.getTopLevelContext( context );
-
-		// Maybe we can cache on shard-base. See Elasticsearch code.
-		IndexSearcher indexSearcher = new IndexSearcher( topLevelCtx );
-
-		Weight weight = childDocsWeight( indexSearcher );
-		DocIdSetIterator childDocs = childDocs( weight, context );
+		Scorer s = childDocsWeight.scorer( context );
+		DocIdSetIterator childDocs = s == null ? null : s.iterator();
 		if ( childDocs == null ) {
 			return null;
 		}
@@ -87,8 +91,4 @@ public class NestedDocsProvider {
 		return indexSearcher.createWeight( indexSearcher.rewrite( childQuery ), ScoreMode.COMPLETE_NO_SCORES, 1f );
 	}
 
-	public DocIdSetIterator childDocs(Weight weight, LeafReaderContext context) throws IOException {
-		Scorer s = weight.scorer( context );
-		return s == null ? null : s.iterator();
-	}
 }
