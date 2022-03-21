@@ -14,6 +14,8 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.util.common.AssertionFailure;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -62,6 +64,7 @@ public class StoredFieldsValuesDelegate {
 
 	private int currentRootDoc;
 	private Document currentRootDocValue;
+	private final IntObjectMap<Document> currentChildDocValues;
 
 	public StoredFieldsValuesDelegate(NestedDocsProvider nestedDocsProvider,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
@@ -69,6 +72,7 @@ public class StoredFieldsValuesDelegate {
 		this.childrenWeight = nestedDocsProvider == null ? null : nestedDocsProvider.childDocsWeight( indexSearcher );
 		this.nestedDocsProvider = nestedDocsProvider;
 		this.storedFieldVisitor = storedFieldVisitor;
+		this.currentChildDocValues = nestedDocsProvider == null ? null : new IntObjectHashMap<>();
 	}
 
 	@Override
@@ -85,6 +89,9 @@ public class StoredFieldsValuesDelegate {
 
 		this.currentRootDoc = -1;
 		this.currentRootDocValue = null;
+		if ( currentChildDocValues != null ) {
+			this.currentChildDocValues.clear();
+		}
 	}
 
 	void collect(int parentDoc) throws IOException {
@@ -95,21 +102,25 @@ public class StoredFieldsValuesDelegate {
 			for ( int childDoc = currentLeafChildDocs.nextChild(); childDoc != DocIdSetIterator.NO_MORE_DOCS;
 					childDoc = currentLeafChildDocs.nextChild() ) {
 				currentLeafReader.document( childDoc, storedFieldVisitor );
+				currentChildDocValues.put( childDoc, storedFieldVisitor.getDocumentAndReset() );
 			}
 		}
 
 		// collect root document
 		currentLeafReader.document( parentDoc, storedFieldVisitor );
-
 		this.currentRootDocValue = storedFieldVisitor.getDocumentAndReset();
 	}
 
-	public Document get(int doc) {
-		if ( doc != currentRootDoc ) {
-			throw new AssertionFailure( "Getting value for " + doc + ", but current root document is "
-					+ currentRootDoc );
+	public Document get(int docId) {
+		if ( docId == currentRootDoc ) {
+			return currentRootDocValue;
 		}
-		return currentRootDocValue;
+		Document doc = currentChildDocValues.get( docId );
+		if ( doc == null ) {
+			throw new AssertionFailure( "Getting value for " + docId + ", which is neither root document "
+					+ currentRootDoc + " nor children " + currentChildDocValues.keys() );
+		}
+		return doc;
 	}
 
 }

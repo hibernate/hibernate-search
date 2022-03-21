@@ -35,110 +35,140 @@ import org.apache.lucene.util.SloppyMath;
 /**
  * A projection on the distance from a given center to the GeoPoint defined in an index field.
  *
- * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
  * @param <P> The type of the final projection result representing accumulated distance values.
  */
-public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProjection<P>
-		implements LuceneSearchProjection.Extractor<A, P> {
+public class LuceneDistanceToFieldProjection<P> extends AbstractLuceneProjection<P> {
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER =
 			ProjectionConverter.passThrough( Double.class );
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
+	private final String requiredContextAbsoluteFieldPath;
 
 	private final LuceneFieldCodec<GeoPoint> codec;
 
 	private final GeoPoint center;
 	private final DistanceUnit unit;
 
-	private final ProjectionAccumulator<Double, Double, A, P> accumulator;
+	private final ProjectionAccumulator.Provider<Double, P> accumulatorProvider;
 
-	private final LuceneFieldProjection<Double, Double, A, P> fieldProjection;
+	private final LuceneFieldProjection<Double, Double, P> fieldProjection;
 
-	private LuceneDistanceToFieldProjection(Builder builder, boolean singleValued,
-			ProjectionAccumulator<Double, Double, A, P> accumulator) {
+	private LuceneDistanceToFieldProjection(Builder builder,
+			ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
 		super( builder );
 		this.absoluteFieldPath = builder.field.absolutePath();
 		this.nestedDocumentPath = builder.field.nestedDocumentPath();
+		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
+				? builder.field.closestMultiValuedParentAbsolutePath() : null;
 		this.codec = builder.codec;
 		this.center = builder.center;
 		this.unit = builder.unit;
-		this.accumulator = accumulator;
-		if ( singleValued ) {
-			// For single-valued fields, we can use the docvalues.
-			this.fieldProjection = null;
-		}
-		else {
+		this.accumulatorProvider = accumulatorProvider;
+		if ( builder.field.multiValued() ) {
 			// For multi-valued fields, use a field projection, because we need order to be preserved.
 			this.fieldProjection = new LuceneFieldProjection<>(
 					builder.scope, builder.field,
-					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulator
+					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulatorProvider
 			);
+		}
+		else {
+			// For single-valued fields, we can use the docvalues.
+			this.fieldProjection = null;
 		}
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
-				.append( ", center=" ).append( center )
-				.append( ", accumulator=" ).append( accumulator )
-				.append( "]" );
-		return sb.toString();
+		return getClass().getSimpleName() + "["
+				+ "absoluteFieldPath=" + absoluteFieldPath
+				+ ", center=" + center
+				+ ", accumulatorProvider=" + accumulatorProvider
+				+ "]";
 	}
 
 	@Override
-	public Extractor<A, P> request(ProjectionRequestContext context) {
+	public Extractor<?, P> request(ProjectionRequestContext context) {
 		if ( fieldProjection != null ) {
 			return fieldProjection.request( context );
 		}
 		else {
-			return this;
-		}
-	}
-
-	@Override
-	public Values<A> values(ProjectionExtractContext context) {
-		// Note that if this method gets called, we're dealing with a single-valued projection,
-		// so we don't care that the order of doc values is not the same
-		// as the order of values in the original document.
-		return new DocValuesBasedDistanceValues( context.collectorExecutionContext() );
-	}
-
-	private class DocValuesBasedDistanceValues
-			extends AbstractNestingAwareAccumulatingValues<Double, A> {
-		private GeoPointDistanceDocValues currentLeafValues;
-
-		public DocValuesBasedDistanceValues(TopDocsDataCollectorExecutionContext context) {
-			super( nestedDocumentPath, LuceneDistanceToFieldProjection.this.accumulator, context );
-		}
-
-		@Override
-		protected DocIdSetIterator doContext(LeafReaderContext context) throws IOException {
-			currentLeafValues = new GeoPointDistanceDocValues(
-					DocValues.getSortedNumeric( context.reader(), absoluteFieldPath ), center );
-			return currentLeafValues;
-		}
-
-		@Override
-		protected A accumulate(A accumulated, int docId) throws IOException {
-			if ( currentLeafValues.advanceExact( docId ) ) {
-				for ( int i = 0; i < currentLeafValues.docValueCount(); i++ ) {
-					Double distanceOrNull = currentLeafValues.nextValue();
-					accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
-				}
+			context.checkValidField( absoluteFieldPath );
+			if ( requiredContextAbsoluteFieldPath != null
+					&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
+				throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+						absoluteFieldPath, requiredContextAbsoluteFieldPath );
 			}
-			return accumulated;
+			return new DocValuesBasedDistanceExtractor<>( accumulatorProvider.get(),
+					context.absoluteCurrentFieldPath() );
 		}
 	}
 
-	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
-			ProjectionTransformContext context) {
-		// Nothing to transform: we take the values as they are.
-		return accumulator.finish( extractedData );
+	/**
+	 * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
+	 */
+	private class DocValuesBasedDistanceExtractor<A> implements Extractor<A, P> {
+		private final ProjectionAccumulator<Double, Double, A, P> accumulator;
+		private final String contextAbsoluteFieldPath;
+
+		private DocValuesBasedDistanceExtractor(ProjectionAccumulator<Double, Double, A, P> accumulator,
+				String contextAbsoluteFieldPath) {
+			this.accumulator = accumulator;
+			this.contextAbsoluteFieldPath = contextAbsoluteFieldPath;
+		}
+
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "["
+					+ "absoluteFieldPath=" + absoluteFieldPath
+					+ ", center=" + center
+					+ ", accumulator=" + accumulator
+					+ "]";
+		}
+
+		@Override
+		public Values<A> values(ProjectionExtractContext context) {
+			// Note that if this method gets called, we're dealing with a single-valued projection,
+			// so we don't care that the order of doc values is not the same
+			// as the order of values in the original document.
+			return new DocValuesBasedDistanceValues( context.collectorExecutionContext() );
+		}
+
+		private class DocValuesBasedDistanceValues
+				extends AbstractNestingAwareAccumulatingValues<Double, A> {
+			private GeoPointDistanceDocValues currentLeafValues;
+
+			public DocValuesBasedDistanceValues(TopDocsDataCollectorExecutionContext context) {
+				super( contextAbsoluteFieldPath, nestedDocumentPath,
+						DocValuesBasedDistanceExtractor.this.accumulator, context );
+			}
+
+			@Override
+			protected DocIdSetIterator doContext(LeafReaderContext context) throws IOException {
+				currentLeafValues = new GeoPointDistanceDocValues(
+						DocValues.getSortedNumeric( context.reader(), absoluteFieldPath ), center );
+				return currentLeafValues;
+			}
+
+			@Override
+			protected A accumulate(A accumulated, int docId) throws IOException {
+				if ( currentLeafValues.advanceExact( docId ) ) {
+					for ( int i = 0; i < currentLeafValues.docValueCount(); i++ ) {
+						Double distanceOrNull = currentLeafValues.nextValue();
+						accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+					}
+				}
+				return accumulated;
+			}
+		}
+
+		@Override
+		public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
+				ProjectionTransformContext context) {
+			// Nothing to transform: we take the values as they are.
+			return accumulator.finish( extractedData );
+		}
 	}
 
 	private Double computeDistanceWithUnit(IndexableField field) {
@@ -199,11 +229,10 @@ public class LuceneDistanceToFieldProjection<A, P> extends AbstractLuceneProject
 
 		@Override
 		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+			if ( accumulatorProvider.isSingleValued() && field.multiValued() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 			}
-			return new LuceneDistanceToFieldProjection<>( this, accumulatorProvider.isSingleValued(),
-					accumulatorProvider.get() );
+			return new LuceneDistanceToFieldProjection<>( this, accumulatorProvider );
 		}
 	}
 }
