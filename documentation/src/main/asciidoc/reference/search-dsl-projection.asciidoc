@@ -289,6 +289,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-composite]]
 == `composite`: combine projections
 
+[[search-dsl-projection-composite-basics]]
+=== Basics
+
 The `composite` projection applies multiple projections and combines their results,
 either as a `List<?>` or as a single object generated using a custom transformer.
 
@@ -311,11 +314,14 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 The constructor of `MyPair` will be called for each matched document,
 with the value of the `title` field as its first argument,
 and the value of the `genre` field as its second argument.
-<5> The hits will be the result of calling the constructor for each matched document,
-in this case `MyPair` instances.
+<5> Each hit will be an instance of `MyPair`.
+Thus, the list of hits will be an instance of `List<MyPair>`.
 ====
 
-If you pass more than 3 projections as arguments,
+[[search-dsl-projection-composite-more-inners]]
+=== Composing more than 3 inner projections
+
+If you pass more than 3 projections as arguments to `from(...)`,
 then the transform function will have to take a `List<?>` as an argument,
 and will be set using `asList(...)` instead of `as(..,)`:
 
@@ -330,12 +336,15 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 <3> Define the second inner projection as a projection on the `genre` field.
 <4> Define the third inner projection as a projection on the `pageCount` field.
 <5> Define the fourth inner projection as a projection on the `description` field.
-<6> Define the result of the composite projection as the result of calling a lambda.
+<6> Define the result of the object projection as the result of calling a lambda.
 The lambda will take elements of the list (the results of projections defined above, in order),
 cast them, and pass them to the constructor of a custom class, `MyTuple4`.
-<7> The hits will be the result of calling the lambda for each matched document,
-in this case `MyTuple4` instances.
+<7> Each hit will be an instance of `MyTuple4`.
+Thus, the list of hits will be an instance of `List<MyTuple4>`.
 ====
+
+[[search-dsl-projection-composite-as-list]]
+=== Projecting to a `List<?>`
 
 If you don't mind receiving the result of inner projections as a `List<?>`,
 you can do without the transformer by calling `asList()`:
@@ -352,7 +361,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 <4> Define the result of the projection as a list,
 meaning the hits will be `List` instances with the value of the `title` field of the matched document at index `0`,
 and the value of the `genre` field of the matched document at index `1`.
-<5> The hits will be `List` instances holding the result of the inner projections, in the given order, for each matched document.
+<5> Each hit will be an instance of `List<?>`:
+a list containing the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<?>>`.
 ====
 
 Alternatively, to get the result as a `List<?>`,
@@ -367,9 +378,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 <1> Call `.composite(...)`.
 <2> Define the first projection to combine as a projection on the `title` field.
 <3> Define the second projection to combine as a projection on the `genre` field.
-<4> The hits will be `List` instances holding the result of the given projections, in the given order, for each matched document,
-meaning the hits will be `List` instances with the value of the `title` field of the matched document at index `0`,
-and the value of the `genre` field of the matched document at index `1`.
+<4> Each hit will be an instance of `List<?>`:
+a list containing the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<?>>`.
 ====
 
 [[search-dsl-projection-composite-deprecated-variants]]
@@ -394,8 +405,8 @@ with the value of the `title` field as its first argument.
 <4> Define the second projection to combine as a projection on the `genre` field,
 meaning the constructor of `MyPair` will be called for each matched document
 with the value of the `genre` field as its second argument.
-<5> The hits will be the result of calling the transformer for each matched document,
-in this case `MyPair` instances.
+<5> Each hit will be an instance of `MyPair`.
+Thus, the list of hits will be an instance of `List<MyPair>`.
 ====
 
 
