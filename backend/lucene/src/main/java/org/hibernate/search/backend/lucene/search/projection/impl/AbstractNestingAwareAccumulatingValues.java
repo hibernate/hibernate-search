@@ -23,10 +23,11 @@ abstract class AbstractNestingAwareAccumulatingValues<E, A> implements Values<A>
 
 	protected ChildDocIds currentLeafChildDocIds;
 
-	AbstractNestingAwareAccumulatingValues(String nestedDocumentPath,
+	AbstractNestingAwareAccumulatingValues(String parentDocumentPath, String nestedDocumentPath,
 			ProjectionAccumulator<E, ?, A, ?> accumulator, TopDocsDataCollectorExecutionContext context) {
-		this.nestedDocsProvider = nestedDocumentPath == null ? null
-				: context.createNestedDocsProvider( nestedDocumentPath );
+		this.nestedDocsProvider = nestedDocumentPath == null || nestedDocumentPath.equals( parentDocumentPath )
+				? null
+				: context.createNestedDocsProvider( parentDocumentPath, nestedDocumentPath );
 		this.accumulator = accumulator;
 	}
 

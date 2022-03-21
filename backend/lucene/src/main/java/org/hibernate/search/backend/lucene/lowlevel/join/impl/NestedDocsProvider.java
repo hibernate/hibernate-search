@@ -38,20 +38,20 @@ public class NestedDocsProvider {
 	private final BitSetProducer parentFilter;
 	private final Query childQuery;
 
-	public NestedDocsProvider(String nestedDocumentPath) {
-		this( Collections.singleton( nestedDocumentPath ), null );
+	public NestedDocsProvider(String parentDocumentPath, String nestedDocumentPath) {
+		this( parentDocumentPath, Collections.singleton( nestedDocumentPath ), null );
 	}
 
 	public NestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {
-		this( Collections.singleton( nestedDocumentPath ), nestedFilter );
+		this( null, Collections.singleton( nestedDocumentPath ), nestedFilter );
 	}
 
 	public NestedDocsProvider(Set<String> nestedDocumentPaths) {
-		this( nestedDocumentPaths, null );
+		this( null, nestedDocumentPaths, null );
 	}
 
-	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query nestedFilter) {
-		Query parentsFilterQuery = Queries.parentsFilterQuery( null );
+	public NestedDocsProvider(String parentDocumentPath, Set<String> nestedDocumentPaths, Query nestedFilter) {
+		Query parentsFilterQuery = Queries.parentsFilterQuery( parentDocumentPath );
 		// Note: this filter should include *all* parents, not just the matched ones.
 		// Otherwise we will not "see" non-matched parents,
 		// and we will consider its matching children as children of the next matching parent.

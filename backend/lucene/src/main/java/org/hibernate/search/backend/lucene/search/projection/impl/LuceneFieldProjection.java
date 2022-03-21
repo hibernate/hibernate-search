@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsValuesDelegate;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TopDocsDataCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -28,92 +29,124 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.DocIdSetIterator;
 
 /**
  * A projection on the values of an index field.
  *
  * @param <F> The type of individual field values obtained from the backend (before conversion).
  * @param <V> The type of individual field values after conversion.
- * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
  * @param <P> The type of the final projection result representing accumulated values of type {@code V}.
  */
-public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<P>
-		implements LuceneSearchProjection.Extractor<A, P> {
+public class LuceneFieldProjection<F, V, P> extends AbstractLuceneProjection<P> {
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
+	private final String requiredContextAbsoluteFieldPath;
 
 	private final Function<IndexableField, F> decodeFunction;
 	private final ProjectionConverter<F, ? extends V> converter;
-	private final ProjectionAccumulator<F, V, A, P> accumulator;
+	private final ProjectionAccumulator.Provider<V, P> accumulatorProvider;
 
-	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, A, P> accumulator) {
-		this( builder.scope, builder.field, builder.codec::decode, builder.converter, accumulator );
+	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
+		this( builder.scope, builder.field, builder.codec::decode, builder.converter, accumulatorProvider );
 	}
 
 	LuceneFieldProjection(LuceneSearchIndexScope<?> scope,
 			LuceneSearchIndexValueFieldContext<?> field,
 			Function<IndexableField, F> decodeFunction, ProjectionConverter<F, ? extends V> converter,
-			ProjectionAccumulator<F, V, A, P> accumulator) {
+			ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		super( scope );
 		this.absoluteFieldPath = field.absolutePath();
 		this.nestedDocumentPath = field.nestedDocumentPath();
+		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
+				? field.closestMultiValuedParentAbsolutePath() : null;
 		this.decodeFunction = decodeFunction;
 		this.converter = converter;
-		this.accumulator = accumulator;
+		this.accumulatorProvider = accumulatorProvider;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "["
 				+ "absoluteFieldPath=" + absoluteFieldPath
-				+ ", accumulator=" + accumulator
+				+ ", accumulatorProvider=" + accumulatorProvider
 				+ "]";
 	}
 
 	@Override
-	public Extractor<A, P> request(ProjectionRequestContext context) {
+	public ValueFieldExtractor<?> request(ProjectionRequestContext context) {
+		context.checkValidField( absoluteFieldPath );
+		if ( requiredContextAbsoluteFieldPath != null
+				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
+			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
+					absoluteFieldPath, requiredContextAbsoluteFieldPath );
+		}
 		context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
-		return this;
+		return new ValueFieldExtractor<>( context.absoluteCurrentFieldPath(), accumulatorProvider.get() );
 	}
 
-	@Override
-	public Values<A> values(ProjectionExtractContext context) {
-		return new StoredFieldValues( context.collectorExecutionContext().storedFieldsValuesDelegate() );
-	}
+	/**
+	 * @param <A> The type of the temporary storage for accumulated values, before and after being transformed.
+	 */
+	private class ValueFieldExtractor<A> implements LuceneSearchProjection.Extractor<A, P> {
 
-	private class StoredFieldValues implements Values<A> {
-		private final StoredFieldsValuesDelegate delegate;
+		private final String contextAbsoluteFieldPath;
+		private final ProjectionAccumulator<F, V, A, P> accumulator;
 
-		private StoredFieldValues(StoredFieldsValuesDelegate delegate) {
-			this.delegate = delegate;
+		public ValueFieldExtractor(String contextAbsoluteFieldPath, ProjectionAccumulator<F, V, A, P> accumulator) {
+			this.accumulator = accumulator;
+			this.contextAbsoluteFieldPath = contextAbsoluteFieldPath;
 		}
 
 		@Override
-		public void context(LeafReaderContext context) {
-			// Nothing to do
+		public String toString() {
+			return getClass().getSimpleName() + "["
+					+ "absoluteFieldPath=" + absoluteFieldPath
+					+ ", accumulator=" + accumulator
+					+ "]";
 		}
 
 		@Override
-		public A get(int doc) {
-			Document document = delegate.get( doc );
-			A accumulated = accumulator.createInitial();
-			for ( IndexableField field : document.getFields() ) {
-				if ( field.name().equals( absoluteFieldPath ) ) {
-					F decoded = decodeFunction.apply( field );
-					accumulated = accumulator.accumulate( accumulated, decoded );
-				}
+		public Values<A> values(ProjectionExtractContext context) {
+			return new StoredFieldValues( accumulator, context.collectorExecutionContext() );
+		}
+
+		private class StoredFieldValues extends AbstractNestingAwareAccumulatingValues<F, A> {
+			private final StoredFieldsValuesDelegate delegate;
+
+			public StoredFieldValues(ProjectionAccumulator<F, V, A, P> accumulator,
+					TopDocsDataCollectorExecutionContext context) {
+				super( contextAbsoluteFieldPath, nestedDocumentPath, accumulator, context );
+				this.delegate = context.storedFieldsValuesDelegate();
 			}
-			return accumulated;
-		}
-	}
 
-	@Override
-	public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
-			ProjectionTransformContext context) {
-		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
-		A transformedData = accumulator.transformAll( extractedData, converter, convertContext );
-		return accumulator.finish( transformedData );
+			@Override
+			protected DocIdSetIterator doContext(LeafReaderContext context) {
+				// We don't have a cost-effective way to iterate on children that have values for our stored field.
+				return null;
+			}
+
+			@Override
+			protected A accumulate(A accumulated, int docId) {
+				Document document = delegate.get( docId );
+				for ( IndexableField field : document.getFields() ) {
+					if ( field.name().equals( absoluteFieldPath ) ) {
+						F decoded = decodeFunction.apply( field );
+						accumulated = accumulator.accumulate( accumulated, decoded );
+					}
+				}
+				return accumulated;
+			}
+		}
+
+		@Override
+		public P transform(LoadingResult<?, ?> loadingResult, A extractedData,
+				ProjectionTransformContext context) {
+			FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
+			A transformedData = accumulator.transformAll( extractedData, converter, convertContext );
+			return accumulator.finish( transformedData );
+		}
 	}
 
 	public static class Factory<F>
@@ -171,10 +204,10 @@ public class LuceneFieldProjection<F, V, A, P> extends AbstractLuceneProjection<
 
 		@Override
 		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+			if ( accumulatorProvider.isSingleValued() && field.multiValued() ) {
 				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 			}
-			return new LuceneFieldProjection<>( this, accumulatorProvider.get() );
+			return new LuceneFieldProjection<>( this, accumulatorProvider );
 		}
 	}
 }

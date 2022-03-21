@@ -588,4 +588,21 @@ public interface Log extends BasicLogger {
 			value = "Offset + limit should be lower than Integer.MAX_VALUE, offset: '%1$s', limit: '%2$s'.")
 	IOException offsetLimitExceedsMaxValue(int offset, Integer limit);
 
+	@Message(id = ID_OFFSET + 152,
+			value = "Invalid context for projection on field '%1$s': the surrounding projection"
+					+ " is executed for each object in field '%2$s', which is not a parent of field '%1$s'."
+					+ " Check the structure of your projections.")
+	SearchException invalidContextForProjectionOnField(String absolutePath,
+			String objectFieldAbsolutePath);
+
+	@Message(id = ID_OFFSET + 153,
+			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
+					+ " but this field is effectively multi-valued in this context,"
+					+ " because parent object field '%2$s' is multi-valued."
+					+ " Either call '.multi()' when you create the projection on field '%1$s',"
+					+ " or wrap that projection in an object projection like this:"
+					+ " 'f.object(\"%2$s\").from(<the projection on field %1$s>).as(...).multi()'.")
+	SearchException invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(String absolutePath,
+			String objectFieldAbsolutePath);
+
 }

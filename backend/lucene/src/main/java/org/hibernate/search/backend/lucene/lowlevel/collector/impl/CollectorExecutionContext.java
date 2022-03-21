@@ -37,8 +37,8 @@ public class CollectorExecutionContext {
 		return indexSearcher;
 	}
 
-	public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath) {
-		return new NestedDocsProvider( nestedDocumentPath );
+	public NestedDocsProvider createNestedDocsProvider(String parentDocumentPath, String nestedDocumentPath) {
+		return new NestedDocsProvider( parentDocumentPath, nestedDocumentPath );
 	}
 
 	public NestedDocsProvider createNestedDocsProvider(Set<String> nestedDocumentPaths) {
