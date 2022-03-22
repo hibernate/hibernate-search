@@ -85,7 +85,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[query=" + queryString() + ", sort=" + luceneSort + "]";
+		return getClass().getSimpleName() + "[searcher=" + searcher + "]";
 	}
 
 	@Override

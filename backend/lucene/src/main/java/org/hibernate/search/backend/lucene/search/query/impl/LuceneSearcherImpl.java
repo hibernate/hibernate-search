@@ -59,12 +59,12 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "luceneQuery=" ).append( requestContext.getLuceneQuery() )
-				.append( ", luceneSort=" ).append( requestContext.getLuceneSort() )
-				.append( "]" );
-		return sb.toString();
+		return getClass().getSimpleName() + "["
+				+ "rootExtractor=" + rootExtractor
+				+ ", luceneQuery=" + requestContext.getLuceneQuery()
+				+ ", luceneSort=" + requestContext.getLuceneSort()
+				+ ", aggregations=" + aggregations
+				+ "]";
 	}
 
 	@Override
