@@ -68,8 +68,10 @@ public interface SearchPredicateFactory {
 	 * @param clauseContributor A consumer that will add clauses to the step passed in parameter.
 	 * Should generally be a lambda expression.
 	 * @return The final step of the boolean predicate definition.
-	 * @see BooleanPredicateClausesStep
+	 * @deprecated Use {@code .bool().with(...)} instead.
+	 * @see BooleanPredicateClausesStep#with(Consumer)
 	 */
+	@Deprecated
 	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor);
 
 	/**

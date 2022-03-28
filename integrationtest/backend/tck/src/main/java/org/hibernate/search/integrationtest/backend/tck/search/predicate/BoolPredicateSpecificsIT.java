@@ -387,6 +387,7 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void lambda() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool( b -> {
