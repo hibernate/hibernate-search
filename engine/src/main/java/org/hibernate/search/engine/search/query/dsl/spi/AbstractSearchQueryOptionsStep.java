@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,6 +20,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -65,6 +68,15 @@ public abstract class AbstractSearchQueryOptionsStep<
 	public S where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
 		SearchPredicate predicate = predicateContributor.apply( predicateFactory() ).toPredicate();
 		searchQueryBuilder.predicate( predicate );
+		return thisAsS();
+	}
+
+	@Override
+	public S where(BiConsumer<? super PDF, ? super BooleanPredicateOptionsCollector<?>> predicateContributor) {
+		PDF factory = predicateFactory();
+		BooleanPredicateClausesStep<?> boolStep = factory.bool();
+		predicateContributor.accept( factory, boolStep );
+		searchQueryBuilder.predicate( boolStep.toPredicate() );
 		return thisAsS();
 	}
 

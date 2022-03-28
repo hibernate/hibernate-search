@@ -357,6 +357,46 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
+	public void where() {
+		assertThatQuery( index.query()
+				.where( (f, b) -> {
+					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) );
+				} ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void with() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool().with( b -> {
+					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) );
+				} ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.with( b -> {
+							b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+						} )
+						.with( b -> {
+							b.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) );
+						} ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void lambda() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool( b -> {
+						b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+						b.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) );
+				} ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
 	public void minimumShouldMatchNumber_positive() {
 		// Expect default behavior (1 "should" clause has to match)
 		assertThatQuery( index.query()
