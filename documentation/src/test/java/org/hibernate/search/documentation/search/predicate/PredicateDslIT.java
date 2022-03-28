@@ -117,6 +117,20 @@ public class PredicateDslIT {
 	}
 
 	@Test
+	public void matchNone() {
+		withinSearchSession( searchSession -> {
+			// tag::matchNone[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchNone() )
+					.fetchHits( 20 );
+			// end::matchNone[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.isEmpty();
+		} );
+	}
+
+	@Test
 	public void id() {
 		// DO NOT USE THE BOOKX_ID CONSTANTS INSIDE TAGS BELOW:
 		// we don't want the constants to appear in the documentation.

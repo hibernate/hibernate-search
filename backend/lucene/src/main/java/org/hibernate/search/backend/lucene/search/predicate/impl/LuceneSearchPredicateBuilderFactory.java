@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
@@ -27,6 +28,11 @@ public class LuceneSearchPredicateBuilderFactory implements SearchPredicateBuild
 	@Override
 	public MatchAllPredicateBuilder matchAll() {
 		return new LuceneMatchAllPredicate.Builder( scope );
+	}
+
+	@Override
+	public MatchNonePredicateBuilder matchNone() {
+		return new LuceneMatchNonePredicate.Builder( scope );
 	}
 
 	@Override

@@ -44,6 +44,14 @@ public interface SearchPredicateFactory {
 	MatchAllPredicateOptionsStep<?> matchAll();
 
 	/**
+	 * Match none of the documents.
+	 *
+	 * @return The initial step of a DSL where the "match none" predicate can be defined.
+	 * @see MatchNonePredicateFinalStep
+	 */
+	MatchNonePredicateFinalStep matchNone();
+
+	/**
 	 * Match documents where the identifier is among the given values.
 	 *
 	 * @return The initial step of a DSL allowing the definition of an "id" predicate.

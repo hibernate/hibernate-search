@@ -16,6 +16,8 @@ public interface SearchPredicateBuilderFactory {
 
 	MatchAllPredicateBuilder matchAll();
 
+	MatchNonePredicateBuilder matchNone();
+
 	MatchIdPredicateBuilder id();
 
 	BooleanPredicateBuilder bool();

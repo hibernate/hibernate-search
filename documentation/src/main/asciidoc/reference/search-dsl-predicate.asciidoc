@@ -67,6 +67,19 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 * The score of a `matchAll` predicate is constant and equal to 1 by default,
 but can be <<search-dsl-predicate-common-boost,boosted with `.boost(...)`>>.
 
+[[search-dsl-predicate-match-none]]
+== `matchNone`: match no documents
+
+The `matchNone` predicate is the inverse of `matchAll` and matches no documents.
+
+.Matching no documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=matchNone]
+----
+====
+
 [[search-dsl-predicate-id]]
 == `id`: match a document identifier
 

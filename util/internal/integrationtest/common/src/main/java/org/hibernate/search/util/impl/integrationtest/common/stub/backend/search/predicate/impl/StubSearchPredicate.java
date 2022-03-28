@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchNonePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -101,6 +102,7 @@ public class StubSearchPredicate implements SearchPredicate {
 	}
 
 	public static class Builder implements MatchAllPredicateBuilder,
+			MatchNonePredicateBuilder,
 			BooleanPredicateBuilder,
 			MatchIdPredicateBuilder,
 			MatchPredicateBuilder,
