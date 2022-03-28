@@ -75,6 +75,7 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
+	@SuppressWarnings("deprecation") // javac warns about this method being deprecated, but we have to implement it
 	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor) {
 		BooleanPredicateClausesStep<?> next = bool();
 		clauseContributor.accept( next );

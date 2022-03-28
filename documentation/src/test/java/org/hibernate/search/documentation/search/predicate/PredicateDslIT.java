@@ -256,7 +256,11 @@ public class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK2_ID, BOOK4_ID );
 		} );
+	}
 
+	@Test
+	@SuppressWarnings("deprecation")
+	public void bool_deprecated() {
 		withinSearchSession( searchSession -> {
 			// tag::bool-dynamicParameters[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
