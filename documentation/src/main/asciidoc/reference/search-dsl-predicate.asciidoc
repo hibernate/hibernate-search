@@ -958,21 +958,64 @@ It is possible to define the `bool` predicate inside a lambda expression.
 This is especially useful when clauses need to be added dynamically to the `bool` predicate,
 for example based on user input.
 
-.Easily adding clauses dynamically with the lambda syntax
+.Easily adding clauses dynamically using `.where(...)` and the lambda syntax
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters-root]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.where(BiConsumer)`.
+The consumer, implemented by a lambda expression, will receive a predicate factory as well as clause collector as an argument,
+and will add clauses to that collector as necessary.
+<3> By default, a boolean predicate will match nothing if there is no clause.
+To match every document when there is no clause, add a `must` clause that matches everything.
+<4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
+to control the addition of clauses.
+In this case, we only add clauses if the relevant parameter was filled in by the user.
+====
+
+Another syntax relying on the method `with(...)` can be useful when the boolean predicate is not the root predicate:
+
+.Easily adding clauses dynamically using `with(...)` and the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters-with]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.where(BiConsumer)` to create the root predicate, which is not the one we're interested in here.
+<3> Call `.bool().with(Consumer)` to create an inner, non-root predicate.
+The consumer, implemented by a lambda expression, will receive a collector as an argument
+and will add clauses to that collector as necessary.
+<4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
+to control the addition of clauses.
+In this case, we add one clause per author filter.
+====
+
+[[search-dsl-predicate-boolean-deprecated-variants]]
+=== Deprecated variants
+
+include::components/deprecated-warning.asciidoc[]
+
+Another syntax can be used to <<search-dsl-predicate-boolean-lambda,create a boolean predicate from a lambda expression>>,
+but it is deprecated.
+
+.Deprecated variant of `.bool`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters-deprecated]
 ----
 <1> Get a custom object holding the search parameters provided by the user through a web form, for example.
 <2> Call `.bool(Consumer)`.
-The consumer, implemented by a lambda expression, will receive a builder as an argument
-and will add clauses to that builder as necessary.
+The consumer, implemented by a lambda expression, will receive a collector as an argument
+and will add clauses to that collector as necessary.
 <3> By default, a boolean predicate will match nothing if there is no clause.
 To match every document when there is no clause, add a `must` clause that matches everything.
-<4> Inside the lambda, the code is free to check conditions before adding clauses.
+<4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
+to control the addition of clauses.
 In this case, we only add clauses if the relevant parameter was filled in by the user.
-<5> The hits will match the clauses added by the lambda expression.
 ====
 
 [[search-dsl-predicate-boolean-other]]

@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.search.predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
@@ -256,13 +257,65 @@ public class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK2_ID, BOOK4_ID );
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::bool-dynamicParameters-root[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
+			List<Book> hits = searchSession.search( Book.class )
+					.where( (f, b) -> { // <2>
+						b.must( f.matchAll() ); // <3>
+						if ( searchParameters.getGenreFilter() != null ) { // <4>
+							b.must( f.match().field( "genre" )
+									.matching( searchParameters.getGenreFilter() ) );
+						}
+						if ( searchParameters.getFullTextFilter() != null ) {
+							b.must( f.match().fields( "title", "description" )
+									.matching( searchParameters.getFullTextFilter() ) );
+						}
+						if ( searchParameters.getPageCountMaxFilter() != null ) {
+							b.must( f.range().field( "pageCount" )
+									.atMost( searchParameters.getPageCountMaxFilter() ) );
+						}
+					} )
+					.fetchHits( 20 );
+			// end::bool-dynamicParameters-root[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::bool-dynamicParameters-with[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
+			List<Book> hits = searchSession.search( Book.class )
+					.where( (f, b) -> { // <2>
+						b.must( f.matchAll() );
+						if ( searchParameters.getGenreFilter() != null ) {
+							b.must( f.match().field( "genre" )
+									.matching( searchParameters.getGenreFilter() ) );
+						}
+						if ( !searchParameters.getAuthorFilters().isEmpty() ) {
+							b.must( f.bool().with( b2 -> { // <3>
+								for ( String authorFilter : searchParameters.getAuthorFilters() ) { // <4>
+									b2.should( f.match().fields( "authors.firstName", "authors.lastName" )
+											.matching( authorFilter ) );
+								}
+							} ) );
+						}
+					} )
+					.fetchHits( 20 );
+			// end::bool-dynamicParameters-with[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
 	}
 
 	@Test
 	@SuppressWarnings("deprecation")
 	public void bool_deprecated() {
 		withinSearchSession( searchSession -> {
-			// tag::bool-dynamicParameters[]
+			// tag::bool-dynamicParameters-deprecated[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.bool( b -> { // <2>
@@ -280,8 +333,8 @@ public class PredicateDslIT {
 									.atMost( searchParameters.getPageCountMaxFilter() ) );
 						}
 					} ) )
-					.fetchHits( 20 ); // <5>
-			// end::bool-dynamicParameters[]
+					.fetchHits( 20 );
+			// end::bool-dynamicParameters-deprecated[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
@@ -925,6 +978,11 @@ public class PredicateDslIT {
 			public Integer getPageCountMaxFilter() {
 				return 400;
 			}
+
+			@Override
+			public List<String> getAuthorFilters() {
+				return Collections.singletonList( "asimov" );
+			}
 		};
 	}
 
@@ -1010,5 +1068,6 @@ public class PredicateDslIT {
 		Genre getGenreFilter();
 		String getFullTextFilter();
 		Integer getPageCountMaxFilter();
+		List<String> getAuthorFilters();
 	}
 }
