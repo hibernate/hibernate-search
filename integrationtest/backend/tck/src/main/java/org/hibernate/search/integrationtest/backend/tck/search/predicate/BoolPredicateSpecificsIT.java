@@ -550,73 +550,73 @@ public class BoolPredicateSpecificsIT {
 
 		// 0 "should" clause: expect the constraints to be ignored
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
 		// 1 "should" clause: expect to require all "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// 2 "should" clauses: expect to require all "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// 4 "should" clauses: expect to require 3 "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// 5 "should" clauses: expect to require 3 "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// 6 "should" clauses: expect to require 4 "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-					b.should( f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
@@ -630,29 +630,29 @@ public class BoolPredicateSpecificsIT {
 
 		// 1 "should" clause: expect to require 1 "should" clause to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// 2 "should" clauses: expect to require 1 "should" clause to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		assertThatQuery( index.query()
-				.where( f -> f.bool( b -> {
-					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
-					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ) ) )
+				.where( f -> f.bool()
+						.minimumShouldMatch( minimumShouldMatchConstraints )
+						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// The rest should behave exactly as in the other multiple-constraints test

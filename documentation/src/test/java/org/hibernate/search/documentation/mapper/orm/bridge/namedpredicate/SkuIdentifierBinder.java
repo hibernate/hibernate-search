@@ -95,7 +95,7 @@ public class SkuIdentifierBinder implements PropertyBinder {
 
 			String pattern = (String) context.param( "pattern" ); // <3>
 
-			return f.bool( b -> { // <4>
+			return f.bool().with( b -> { // <4>
 				// An SKU identifier pattern is formatted this way: "<department code>.<collection code>.<item code>".
 				// Each part supports * and ? wildcards.
 				String[] patternParts = pattern.split( "\\." );
