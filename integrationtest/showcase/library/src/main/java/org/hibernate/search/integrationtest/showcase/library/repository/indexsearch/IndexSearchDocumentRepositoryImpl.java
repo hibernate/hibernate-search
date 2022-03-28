@@ -62,7 +62,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		return Search.session( entityManager ).search( Book.class )
-				.where( f -> f.bool( b -> {
+				.where( (f, b) -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
 								.field( "title" ).boost( 2.0f )
@@ -73,7 +73,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					b.must( f.nested().objectField( "copies" )
 							.nest( f.match().field( "copies.medium" ).matching( medium ) )
 					);
-				} ) )
+				} )
 				.sort( b -> b.field( "title_sort" ) )
 				.fetchHits( offset, limit );
 	}
@@ -84,7 +84,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			List<LibraryServiceOption> libraryServices,
 			int offset, int limit) {
 		return Search.session( entityManager ).search( DOCUMENT_CLASS )
-				.where( f -> f.bool( b -> {
+				.where( (f, b) -> {
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
@@ -96,7 +96,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					// Bridged query with complex bridge: TODO HSEARCH-3320 rely on the bridge to split the String
 					String[] splitTags = tags == null ? null : tags.split( "," );
 					if ( splitTags != null && splitTags.length > 0 ) {
-						b.must( f.bool( b2 -> {
+						b.must( f.bool().with( b2 -> {
 							for ( String tag : splitTags ) {
 								b2.must( f.match()
 										.field( "tags" )
@@ -118,7 +118,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {
 						b.must( f.nested().objectField( "copies" )
-								.nest( f.bool( b2 -> {
+								.nest( f.bool().with( b2 -> {
 									for ( LibraryServiceOption service : libraryServices ) {
 										b2.must( f.match()
 												.field( "copies.library.services" )
@@ -128,7 +128,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 								} ) )
 						);
 					}
-				} ) )
+				} )
 				.sort( f -> f.composite( b -> {
 					if ( myLocation != null ) {
 						b.add( f.distance( "copies.library.location", myLocation ) );

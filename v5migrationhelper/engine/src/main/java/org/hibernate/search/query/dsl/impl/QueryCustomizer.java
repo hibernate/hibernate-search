@@ -9,6 +9,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateScoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -65,10 +66,10 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		return step.toPredicate();
 	}
 
-	public void applyFilter(SearchPredicateFactory factory, BooleanPredicateClausesStep<?> step) {
+	public void applyFilter(SearchPredicateFactory factory, BooleanPredicateOptionsCollector<?> collector) {
 		if ( filter == null ) {
 			return;
 		}
-		step.filter( factory.extension( LuceneExtension.get() ).fromLuceneQuery( filter ) );
+		collector.filter( factory.extension( LuceneExtension.get() ).fromLuceneQuery( filter ) );
 	}
 }

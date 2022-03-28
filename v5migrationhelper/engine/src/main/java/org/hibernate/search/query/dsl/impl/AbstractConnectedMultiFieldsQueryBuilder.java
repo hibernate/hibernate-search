@@ -8,6 +8,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateScoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -43,14 +44,14 @@ abstract class AbstractConnectedMultiFieldsQueryBuilder<T, F extends PredicateSc
 			return queryCustomizer.applyFilter( factory, predicate );
 		}
 		else {
-			return factory.bool( b -> {
+			BooleanPredicateClausesStep<?> boolStep = factory.bool().with( b -> {
 				for ( FieldContext fieldContext : fieldsContext ) {
 					b.should( createPredicate( factory, fieldContext ) );
 				}
 				queryCustomizer.applyFilter( factory, b );
-				queryCustomizer.applyScoreOptions( b );
-			} )
-					.toPredicate();
+			} );
+			queryCustomizer.applyScoreOptions( boolStep );
+			return boolStep.toPredicate();
 		}
 	}
 

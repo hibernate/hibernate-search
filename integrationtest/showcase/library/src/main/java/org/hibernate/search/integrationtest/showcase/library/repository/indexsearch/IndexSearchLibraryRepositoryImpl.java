@@ -47,7 +47,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		AggregationKey<Map<LibraryServiceOption, Long>> aggByLibraryServiceKey = AggregationKey.of( "libraryService" );
 		SearchResult<Library> result = Search.session( entityManager )
 				.search( Library.class )
-				.where( f -> f.bool( b -> {
+				.where( (f, b) -> {
 					b.must( f.matchAll() ); // Match all libraries by default
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
@@ -68,7 +68,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 								);
 							}
 					}
-				} ) )
+				} )
 				.aggregation( aggByCollectionSizekey, f -> f.range()
 						.field( "collectionSize", Integer.class )
 						.range( 0, 1_000 )
