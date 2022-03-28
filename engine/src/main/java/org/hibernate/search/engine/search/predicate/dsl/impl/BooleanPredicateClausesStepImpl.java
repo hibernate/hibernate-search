@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -46,6 +47,12 @@ public final class BooleanPredicateClausesStepImpl
 	@Override
 	public BooleanPredicateClausesStep<?> constantScore() {
 		builder.constantScore();
+		return this;
+	}
+
+	@Override
+	public BooleanPredicateClausesStep<?> with(Consumer<? super BooleanPredicateOptionsCollector<?>> contributor) {
+		contributor.accept( this );
 		return this;
 	}
 

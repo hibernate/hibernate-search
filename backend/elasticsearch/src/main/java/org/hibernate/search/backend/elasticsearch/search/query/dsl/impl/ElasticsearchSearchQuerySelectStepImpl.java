@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.query.dsl.impl;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
@@ -19,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearc
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
@@ -89,6 +91,12 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	@Override
 	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(
 			Function<? super ElasticsearchSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
+		return selectEntity().where( predicateContributor );
+	}
+
+	@Override
+	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(
+			BiConsumer<? super ElasticsearchSearchPredicateFactory, ? super BooleanPredicateOptionsCollector<?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 

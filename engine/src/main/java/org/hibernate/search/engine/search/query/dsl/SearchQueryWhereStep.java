@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.engine.search.query.dsl;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
@@ -43,5 +45,14 @@ public interface SearchQueryWhereStep<
 	 * @return The next step.
 	 */
 	N where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor);
+
+	/**
+	 * Set the predicate for this query.
+	 * @param predicateContributor A consumer that will use the factory passed in parameter to create predicates
+	 * and add them to the collector passed in parameter.
+	 * Should generally be a lambda expression.
+	 * @return The next step.
+	 */
+	N where(BiConsumer<? super PDF, ? super BooleanPredicateOptionsCollector<?>> predicateContributor);
 
 }

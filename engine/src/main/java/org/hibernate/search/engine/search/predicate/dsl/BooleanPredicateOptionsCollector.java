@@ -65,6 +65,17 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOptionsCollector<?>> {
 
 	/**
+	 * Delegates setting clauses and options to a given consumer.
+	 * <p>
+	 * Best used with lambda expressions.
+	 *
+	 * @param contributor A consumer that will add clauses and options to the collector that it consumes.
+	 * Should generally be a lambda expression.
+	 * @return {@code this}, for method chaining.
+	 */
+	S with(Consumer<? super BooleanPredicateOptionsCollector<?>> contributor);
+
+	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.
 	 *
 	 * @param searchPredicate The predicate that must match.
