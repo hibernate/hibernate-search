@@ -1833,18 +1833,12 @@
                                     <!-- The jdk-reflection is not yet something we can avoid -->
                                     <!--<bundledSignature>jdk-reflection</bundledSignature>-->
 
-                                    <!-- All following signatures should be replicated for each target JDK version we intend to support -->
-                                    <bundledSignature>jdk-unsafe-1.8</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-9</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-10</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-11</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-12</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-13</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-14</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-15</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-16</bundledSignature>
-                                    <bundledSignature>jdk-unsafe-17</bundledSignature>
+                                    <!-- These signatures can safely be limited to the current JDK;
+                                         see https://github.com/policeman-tools/forbidden-apis/issues/197#issuecomment-1080370368
+                                     -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
 
+                                    <!-- All following signatures should be replicated for each target JDK version we intend to support -->
                                     <bundledSignature>jdk-deprecated-1.8</bundledSignature>
                                     <bundledSignature>jdk-deprecated-9</bundledSignature>
                                     <bundledSignature>jdk-deprecated-10</bundledSignature>
