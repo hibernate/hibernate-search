@@ -873,8 +873,7 @@ public class PredicateDslIT {
 							.must( f.match().field( "authors.firstName" ) // <1>
 									.matching( "isaac" ) ) // <2>
 							.must( f.match().field( "authors.lastName" )
-									.matching( "asimov" ) ) // <3>
-							)
+									.matching( "asimov" ) ) ) // <3>
 					.fetchHits( 20 ); // <4>
 			// end::nested-implicit-form[]
 			assertThat( hits )
