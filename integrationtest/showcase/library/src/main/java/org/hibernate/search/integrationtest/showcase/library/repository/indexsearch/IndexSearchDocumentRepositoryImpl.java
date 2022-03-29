@@ -70,9 +70,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 								.matching( terms )
 						);
 					}
-					b.must( f.nested().objectField( "copies" )
-							.nest( f.match().field( "copies.medium" ).matching( medium ) )
-					);
+					b.must( f.match().field( "copies.medium" ).matching( medium ) );
 				} )
 				.sort( b -> b.field( "title_sort" ) )
 				.fetchHits( offset, limit );
@@ -107,25 +105,23 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					}
 					// Spatial query
 					if ( myLocation != null && maxDistanceInKilometers != null ) {
-						b.must( f.nested().objectField( "copies" )
-								.nest( f.spatial()
-										.within()
-										.field( "copies.library.location" )
-										.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
-								)
+						b.must( f.spatial()
+								.within()
+								.field( "copies.library.location" )
+								.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
 						);
 					}
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {
-						b.must( f.nested().objectField( "copies" )
-								.nest( f.bool().with( b2 -> {
+						b.must( f.nested( "copies" )
+								.with( b2 -> {
 									for ( LibraryServiceOption service : libraryServices ) {
 										b2.must( f.match()
 												.field( "copies.library.services" )
 												.matching( service )
 										);
 									}
-								} ) )
+								} )
 						);
 					}
 				} )

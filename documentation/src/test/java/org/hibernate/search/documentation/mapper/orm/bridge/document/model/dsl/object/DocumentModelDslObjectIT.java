@@ -58,12 +58,12 @@ public class DocumentModelDslObjectIT {
 									.atLeast( new BigDecimal( "20.0" ) ) )
 							.must( f.range().field( "summary.shipping" )
 									.atMost( new BigDecimal( "10.0" ) ) )
-							.must( f.nested().objectField( "lineItems" ).nest( f.bool()
+							.must( f.nested( "lineItems" )
 									.must( f.range().field( "lineItems.amount" )
 											.between( new BigDecimal( "7.0" ), new BigDecimal( "9.0" ) ) )
 									.must( f.match().field( "lineItems.category" )
 											.matching( "BOOK" )
-							) ) )
+							) )
 					)
 					.fetchHits( 20 );
 

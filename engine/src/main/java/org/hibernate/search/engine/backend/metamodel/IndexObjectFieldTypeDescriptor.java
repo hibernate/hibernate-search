@@ -18,7 +18,7 @@ public interface IndexObjectFieldTypeDescriptor {
 
 	/**
 	 * @return {@code true} if this object field is represented internally as a nested document,
-	 * enabling features such as the {@link SearchPredicateFactory#nested() nested predicate}.
+	 * enabling features such as the {@link SearchPredicateFactory#nested(String) nested predicate}.
 	 */
 	boolean nested();
 

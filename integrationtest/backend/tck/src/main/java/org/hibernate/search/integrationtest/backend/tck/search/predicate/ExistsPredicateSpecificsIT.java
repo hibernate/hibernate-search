@@ -149,8 +149,8 @@ public class ExistsPredicateSpecificsIT<F> {
 				+ mainIndex.binding().nestedObject.fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
 		assertThatQuery( mainIndex.query()
-				.where( f -> f.nested().objectField( mainIndex.binding().nestedObject.relativeFieldName )
-						.nest( f.bool().mustNot( f.exists().field( fieldPath ) ) ) )
+				.where( f -> f.nested( mainIndex.binding().nestedObject.relativeFieldName )
+						.mustNot( f.exists().field( fieldPath ) ) )
 				.routing( dataSet.routingKey ) )
 				// No match for document 0, since all of its nested objects have this field
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 1 ), dataSet.docId( 2 ) );

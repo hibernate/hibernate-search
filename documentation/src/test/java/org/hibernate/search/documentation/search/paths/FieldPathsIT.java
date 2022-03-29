@@ -78,13 +78,12 @@ public class FieldPathsIT {
 		withinSearchSession( searchSession -> {
 			// tag::nested_explicit[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.nested().objectField( "writers" )
-							.nest( f.bool()
-									.must( f.match().field( "writers.firstName" ) // <1>
-											.matching( "isaac" ) )
-									.must( f.match().field( "writers.lastName" )
-											.matching( "asimov" ) )
-							) )
+					.where( f -> f.nested( "writers" )
+							.must( f.match().field( "writers.firstName" ) // <1>
+									.matching( "isaac" ) )
+							.must( f.match().field( "writers.lastName" )
+									.matching( "asimov" ) )
+					)
 					.fetchHits( 20 );
 			// end::nested_explicit[]
 			assertThat( hits )
@@ -99,12 +98,12 @@ public class FieldPathsIT {
 			// tag::withRoot[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.bool()
-							.should( f.nested().objectField( "writers" )
-									.nest( matchFirstAndLastName( // <1>
+							.should( f.nested( "writers" )
+									.must( matchFirstAndLastName( // <1>
 											f.withRoot( "writers" ), // <2>
 											"bob", "kane" ) ) )
-							.should( f.nested().objectField( "artists" )
-									.nest( matchFirstAndLastName( // <3>
+							.should( f.nested( "artists" )
+									.must( matchFirstAndLastName( // <3>
 											f.withRoot( "artists" ), // <4>
 											"bill", "finger" ) ) ) )
 					.fetchHits( 20 );

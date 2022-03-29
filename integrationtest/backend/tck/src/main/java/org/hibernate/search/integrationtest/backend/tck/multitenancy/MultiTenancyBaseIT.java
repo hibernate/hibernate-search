@@ -12,22 +12,22 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.util.List;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -136,10 +136,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.match()
-								.field( "nestedObject.string" ).matching( STRING_VALUE_1 )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match()
+								.field( "nestedObject.string" ).matching( STRING_VALUE_1 ) )
 				)
 				.toQuery();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
@@ -151,10 +150,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.match()
-								.field( "nestedObject.string" ).matching( STRING_VALUE_1 )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match()
+								.field( "nestedObject.string" ).matching( STRING_VALUE_1 ) )
 				)
 				.toQuery();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
@@ -253,10 +251,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.match()
-								.field( "nestedObject.string" ).matching( UPDATED_STRING )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match()
+								.field( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				)
 				.toQuery();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
@@ -281,10 +278,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.match()
-								.field( "nestedObject.string" ).matching( UPDATED_STRING )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match()
+								.field( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				)
 				.toQuery();
 		assertThatQuery( query ).hasNoHits();
@@ -307,10 +303,9 @@ public class MultiTenancyBaseIT {
 								f.field( "integer", Integer.class )
 						)
 				)
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.match()
-								.field( "nestedObject.string" ).matching( STRING_VALUE_1 )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match()
+								.field( "nestedObject.string" ).matching( STRING_VALUE_1 ) )
 				)
 				.toQuery();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );

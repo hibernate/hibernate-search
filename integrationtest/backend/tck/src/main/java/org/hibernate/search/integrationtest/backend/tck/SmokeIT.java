@@ -187,11 +187,9 @@ public class SmokeIT {
 
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = scope.query()
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.bool()
-								.must( f.match().field( "nestedObject.string" ).matching( "text 1_2" ) )
-								.must( f.match().field( "nestedObject.integer" ).matching( 101 ) )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match().field( "nestedObject.string" ).matching( "text 1_2" ) )
+						.must( f.match().field( "nestedObject.integer" ).matching( 101 ) )
 				)
 				.toQuery();
 		assertThatQuery( query )
@@ -200,11 +198,9 @@ public class SmokeIT {
 
 		// ... but predicates should still be able to match on the same object
 		query = scope.query()
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.bool()
-								.must( f.match().field( "nestedObject.string" ).matching( "text 1_1" ) )
-								.must( f.match().field( "nestedObject.integer" ).matching( 101 ) )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match().field( "nestedObject.string" ).matching( "text 1_1" ) )
+						.must( f.match().field( "nestedObject.integer" ).matching( 101 ) )
 				)
 				.toQuery();
 		assertThatQuery( query )
