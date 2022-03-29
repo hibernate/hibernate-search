@@ -73,7 +73,7 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S with(Consumer<? super BooleanPredicateOptionsCollector<?>> contributor);
+	S with(Consumer<? super S> contributor);
 
 	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -244,7 +244,7 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 *
 	 * @return A {@link MinimumShouldMatchConditionStep} where constraints can be defined.
 	 */
-	MinimumShouldMatchConditionStep<S> minimumShouldMatch();
+	MinimumShouldMatchConditionStep<? extends S> minimumShouldMatch();
 
 	/**
 	 * Start defining the minimum number of "should" constraints that have to match
