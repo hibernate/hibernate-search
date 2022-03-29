@@ -884,6 +884,26 @@ public class PredicateDslIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
+	public void nested_deprecated() {
+		withinSearchSession( searchSession -> {
+			// tag::nested-deprecated[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.nested().objectField( "authors" ) // <1>
+							.nest( f.bool()
+									.must( f.match().field( "authors.firstName" )
+											.matching( "isaac" ) ) // <2>
+									.must( f.match().field( "authors.lastName" )
+											.matching( "asimov" ) ) ) ) // <3>
+					.fetchHits( 20 ); // <4>
+			// end::nested-deprecated[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
 	public void within() {
 		withinSearchSession( searchSession -> {
 			// tag::within-circle[]

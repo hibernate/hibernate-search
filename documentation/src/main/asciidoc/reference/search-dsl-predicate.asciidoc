@@ -1202,7 +1202,7 @@ so implicit nesting will not give the same behavior as explicit nesting grouping
 See below for an example.
 
 [[search-dsl-predicate-nested-implicit-example]]
-.Use the implicit nested form
+.Using implicit nesting
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1217,6 +1217,31 @@ Books that happen to have multiple authors,
 one of which has a first name matching `isaac`
 and *another* of which has a last name matching `asimov`,
 will match, because we apply the nested predicate *separately* to *each match* predicate.
+====
+
+[[search-dsl-predicate-nested-deprecated-variants]]
+=== Deprecated variants
+
+include::components/deprecated-warning.asciidoc[]
+
+Another syntax can be used to create a nested predicate,
+but it is more verbose and deprecated.
+
+.Deprecated variant of `.nested`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=nested-deprecated]
+----
+<1> Create a nested predicate on the `authors` object field.
+<2> The author must have a first name matching `isaac`.
+<3> The author must have a last name matching `asimov`.
+<4> All returned hits will be books for which at least one author
+has a first name matching `isaac` and a last name matching `asimov`.
+Books that happen to have multiple authors,
+one of which has a first name matching `isaac`
+and *another* of which has a last name matching `asimov`,
+will *not* match.
 ====
 
 [[search-dsl-predicate-spatial-within]]

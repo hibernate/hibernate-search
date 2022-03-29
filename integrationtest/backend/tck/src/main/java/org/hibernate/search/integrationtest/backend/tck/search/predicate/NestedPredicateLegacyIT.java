@@ -31,6 +31,7 @@ import org.junit.Test;
 /**
  * Tests for the legacy syntax of nested predicate definition.
  */
+@SuppressWarnings("deprecation")
 public class NestedPredicateLegacyIT {
 
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
