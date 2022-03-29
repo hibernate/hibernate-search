@@ -7,13 +7,11 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * The initial and final step in a boolean predicate definition, where clauses can be added.
+ * An object where the clauses and options of a {@link SearchPredicateFactory#nested(String)} nested predicate} can be set.
  * <p>
  * Different types of clauses have different effects, see {@link BooleanPredicateOptionsCollector}.
- *
- * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface BooleanPredicateClausesStep<S extends BooleanPredicateClausesStep<?>>
-		extends GenericBooleanPredicateClausesStep<S, BooleanPredicateOptionsCollector<?>> {
+public interface NestedPredicateOptionsCollector<S extends NestedPredicateOptionsCollector<?>>
+		extends BooleanPredicateOptionsCollector<S> {
 
 }

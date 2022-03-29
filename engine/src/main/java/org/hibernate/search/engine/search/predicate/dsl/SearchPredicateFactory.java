@@ -148,6 +148,16 @@ public interface SearchPredicateFactory {
 	NestedPredicateFieldStep<?> nested();
 
 	/**
+	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches inner predicates
+	 * to be defined in the next steps.
+	 *
+	 * @param objectFieldPath The <a href="#field-paths">path</a> to the (nested) object field that must match.
+	 * @return The initial step of a DSL where the "nested" predicate can be defined.
+	 * @see NestedPredicateFieldStep
+	 */
+	NestedPredicateClausesStep<?> nested(String objectFieldPath);
+
+	/**
 	 * Match documents according to a given query string,
 	 * with a simple query language adapted to end users.
 	 * <p>
