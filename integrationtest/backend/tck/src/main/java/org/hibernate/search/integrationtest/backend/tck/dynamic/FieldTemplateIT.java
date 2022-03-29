@@ -240,12 +240,10 @@ public class FieldTemplateIT {
 		return index.createScope().query()
 				.where( f -> {
 					if ( fieldStructure.isInNested() ) {
-						return f.nested().objectField( getParentFieldPath() )
-								.nest( f.bool()
-										.must( predicateContributor )
-										.must( f.match().field( getFieldPath( "discriminator" ) )
-												.matching( "included" ) )
-								);
+						return f.nested( getParentFieldPath() )
+								.must( predicateContributor )
+								.must( f.match().field( getFieldPath( "discriminator" ) )
+										.matching( "included" ) );
 					}
 					else {
 						return predicateContributor.apply( f );

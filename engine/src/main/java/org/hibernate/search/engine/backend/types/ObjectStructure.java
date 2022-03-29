@@ -72,7 +72,7 @@ public enum ObjectStructure {
 	 * but has the advantage of preserving the original structure.
 	 * Note however that access to that information when querying
 	 * requires special care.
-	 * See in particular the {@link SearchPredicateFactory#nested() "nested" predicate}.
+	 * See in particular the {@link SearchPredicateFactory#nested(String) "nested" predicate}.
 	 */
 	NESTED
 

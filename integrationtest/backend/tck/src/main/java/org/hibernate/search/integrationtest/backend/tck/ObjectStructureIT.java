@@ -12,19 +12,20 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -110,13 +111,11 @@ public class ObjectStructureIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.bool()
-								.must( f.match().field( "nestedObject.string" ).matching( MATCHING_STRING ) )
-								.must( f.match().field( "nestedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
-								.must( f.match().field( "nestedObject.integer" ).matching( MATCHING_INTEGER ) )
-								.must( f.match().field( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
-						)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.match().field( "nestedObject.string" ).matching( MATCHING_STRING ) )
+						.must( f.match().field( "nestedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
+						.must( f.match().field( "nestedObject.integer" ).matching( MATCHING_INTEGER ) )
+						.must( f.match().field( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 				)
 				.toQuery();
 		assertThatQuery( query )
@@ -146,17 +145,15 @@ public class ObjectStructureIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.where( f -> f.nested().objectField( "nestedObject" )
-						.nest( f.bool()
-								.must( f.range().field( "nestedObject.string" )
-										.between( MATCHING_STRING, MATCHING_STRING )
-								)
-								.must( f.range().field( "nestedObject.integer" )
-										.between( MATCHING_INTEGER - 1, MATCHING_INTEGER + 1 )
-								)
-								.must( f.range().field( "nestedObject.localDate" )
-										.between( MATCHING_LOCAL_DATE.minusDays( 1 ), MATCHING_LOCAL_DATE.plusDays( 1 ) )
-								)
+				.where( f -> f.nested( "nestedObject" )
+						.must( f.range().field( "nestedObject.string" )
+								.between( MATCHING_STRING, MATCHING_STRING )
+						)
+						.must( f.range().field( "nestedObject.integer" )
+								.between( MATCHING_INTEGER - 1, MATCHING_INTEGER + 1 )
+						)
+						.must( f.range().field( "nestedObject.localDate" )
+								.between( MATCHING_LOCAL_DATE.minusDays( 1 ), MATCHING_LOCAL_DATE.plusDays( 1 ) )
 						)
 				)
 				.toQuery();
@@ -170,7 +167,7 @@ public class ObjectStructureIT {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () ->
-			scope.predicate().nested().objectField( "flattenedObject" )
+			scope.predicate().nested( "flattenedObject" )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject'.",
@@ -183,7 +180,7 @@ public class ObjectStructureIT {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () ->
-				scope.predicate().nested().objectField( "flattenedObject.string" )
+				scope.predicate().nested( "flattenedObject.string" )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject.string'.",
@@ -195,7 +192,7 @@ public class ObjectStructureIT {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () ->
-				scope.predicate().nested().objectField( "doesNotExist" )
+				scope.predicate().nested( "doesNotExist" )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unknown field", "'doesNotExist'" );

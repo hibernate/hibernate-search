@@ -851,13 +851,11 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::nested[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.nested().objectField( "authors" ) // <1>
-							.nest( f.bool()
-									.must( f.match().field( "authors.firstName" )
-											.matching( "isaac" ) ) // <2>
-									.must( f.match().field( "authors.lastName" )
-											.matching( "asimov" ) ) // <3>
-							) )
+					.where( f -> f.nested( "authors" ) // <1>
+							.must( f.match().field( "authors.firstName" )
+									.matching( "isaac" ) ) // <2>
+							.must( f.match().field( "authors.lastName" )
+									.matching( "asimov" ) ) ) // <3>
 					.fetchHits( 20 ); // <4>
 			// end::nested[]
 			assertThat( hits )
