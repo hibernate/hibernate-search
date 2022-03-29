@@ -19,7 +19,6 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchNonePredicateFinalS
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep;
@@ -38,7 +37,6 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.MatchNonePredicateF
 import org.hibernate.search.engine.search.predicate.dsl.impl.MatchPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.NamedPredicateOptionsStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateClausesStepImpl;
-import org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.PhrasePredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RangePredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RegexpPredicateFieldStepImpl;
@@ -122,8 +120,9 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public NestedPredicateFieldStep<?> nested() {
-		return new NestedPredicateFieldStepImpl( dslContext, this );
+	@Deprecated
+	public org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep<?> nested() {
+		return new org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateFieldStepImpl( dslContext, this );
 	}
 
 	@Override

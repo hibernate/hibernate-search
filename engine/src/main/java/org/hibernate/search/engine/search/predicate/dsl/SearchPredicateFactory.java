@@ -144,7 +144,9 @@ public interface SearchPredicateFactory {
 	 *
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.
 	 * @see NestedPredicateFieldStep
+	 * @deprecated Use {@link #nested(String)} instead.
 	 */
+	@Deprecated
 	NestedPredicateFieldStep<?> nested();
 
 	/**

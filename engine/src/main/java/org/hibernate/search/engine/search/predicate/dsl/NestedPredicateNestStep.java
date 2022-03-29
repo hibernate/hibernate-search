@@ -14,7 +14,9 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * The step in a "nested" predicate definition where the predicate to nest can be set.
  *
  * @param <N> The type of the next step.
+ * @deprecated Use {@link SearchPredicateFactory#nested(String)} instead.
  */
+@Deprecated
 public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<?>> {
 
 	/**
