@@ -124,6 +124,41 @@ public class NestedPredicateSpecificsIT {
 	}
 
 	@Test
+	public void with() {
+		assertThatQuery( mainIndex.query()
+				.where( (f, b) -> b
+						// This is referred to as "condition 1" in the data initialization method
+						.must( f.nested( "nestedObject.nestedObject" )
+								.with( n -> {
+									n.must( f.match()
+											.field( "nestedObject.nestedObject.field1" )
+											.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
+									);
+									n.must( f.match()
+											.field( "nestedObject.nestedObject.field2" )
+											.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
+									);
+								} )
+						)
+						// This is referred to as "condition 2" in the data initialization method
+						.must( f.nested( "nestedObject.nestedObject" )
+								.with( n -> {
+									n.must( f.match()
+											.field( "nestedObject.nestedObject.field1" )
+											.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
+									);
+									n.must( f.match()
+											.field( "nestedObject.nestedObject.field2" )
+											.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
+									);
+								} )
+						)
+				) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 )
+				.hasTotalHitCount( 2 );
+	}
+
+	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( "nestedObject" )
