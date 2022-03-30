@@ -1809,23 +1809,27 @@
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
                     <version>${version.forbiddenapis.plugin}</version>
+                    <configuration>
+                        <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                        <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                        <failOnMissingClasses>false</failOnMissingClasses>
+                        <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
+                        <excludes>
+                            <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
+                            <!-- Also, we allow JBoss Loggers to use SearchException constructors -->
+                            <exclude>**/*_$logger.class</exclude>
+                            <!-- JBoss message bundles format messages -->
+                            <exclude>**/*_$bundle.class</exclude>
+                        </excludes>
+                        <suppressAnnotations>
+                            <suppressAnnotation>org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis</suppressAnnotation>
+                            <suppressAnnotation>org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis</suppressAnnotation>
+                        </suppressAnnotations>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>verify-forbidden-apis</id>
                             <configuration>
-                                <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                <excludes>
-                                    <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
-                                    <!-- Also, we allow JBoss Loggers to use SearchException constructors -->
-                                    <exclude>**/*_$logger.class</exclude>
-                                    <!-- JBoss message bundles format messages -->
-                                    <exclude>**/*_$bundle.class</exclude>
-                                </excludes>
-                                <suppressAnnotations>
-                                    <suppressAnnotation>org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis</suppressAnnotation>
-                                    <suppressAnnotation>org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis</suppressAnnotation>
-                                </suppressAnnotations>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
                                     <bundledSignature>jdk-system-out</bundledSignature>
@@ -1861,8 +1865,6 @@
                                     <bundledSignature>jdk-internal-16</bundledSignature>
                                     <bundledSignature>jdk-internal-17</bundledSignature>
                                 </bundledSignatures>
-                                <failOnMissingClasses>false</failOnMissingClasses>
-                                <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
                                 <signaturesArtifacts>
                                     <signaturesArtifact>
                                         <groupId>org.hibernate.search</groupId>
@@ -1881,9 +1883,6 @@
                         <execution>
                             <id>verify-forbidden-test-apis</id>
                             <configuration>
-                                <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
                                 <excludes>
                                     <!--
                                         Only those two classes are allowed to build search integrators,
