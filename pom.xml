@@ -2357,6 +2357,23 @@
         </profile>
 
         <profile>
+            <id>testWithJdkSpecifiedExplicitly</id>
+            <activation>
+                <property>
+                    <name>java-version.test.compiler.java_home</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs uses the Maven JDK to resolve signatures,
+                     which leads to some trouble when using a different JDK version to compile tests
+                     (see https://hibernate.atlassian.net/browse/HSEARCH-4521)
+                     Since the main build is supposed to catch all forbidden API invocations already,
+                     we can safely disable ForbiddenAPIs in builds that target other JDKs. -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>testWithJdk16</id>
             <activation>
                 <property>
@@ -2393,8 +2410,6 @@
                 </property>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK18 yet. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- Spring isn't ready for JDK18 yet -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
             </properties>
@@ -2409,8 +2424,6 @@
                 </property>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK19 yet. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make BytecodeEnhancementIT and mockito-based tests pass -->
                 <surefire.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
