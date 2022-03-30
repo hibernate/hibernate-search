@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScrollResult;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.impl.Futures;
 public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScroll<H> {
 
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
-	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final String scrollTimeoutString;
 	private final SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> firstScroll;
@@ -29,7 +29,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	private String scrollId;
 
 	public ElasticsearchSearchScrollImpl(ElasticsearchParallelWorkOrchestrator queryOrchestrator,
-			ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchWorkFactory workFactory,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
 			String scrollTimeoutString,
 			SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> firstScroll,

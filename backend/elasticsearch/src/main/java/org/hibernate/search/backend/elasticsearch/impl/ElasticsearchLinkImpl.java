@@ -24,7 +24,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -68,7 +68,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private GsonProvider gsonProvider;
 	private ElasticsearchIndexMetadataSyntax indexMetadataSyntax;
 	private ElasticsearchSearchSyntax searchSyntax;
-	private ElasticsearchWorkBuilderFactory workBuilderFactory;
+	private ElasticsearchWorkFactory workFactory;
 	private ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private Integer scrollTimeout;
 
@@ -109,9 +109,9 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	}
 
 	@Override
-	public ElasticsearchWorkBuilderFactory getWorkBuilderFactory() {
+	public ElasticsearchWorkFactory getWorkFactory() {
 		checkStarted();
-		return workBuilderFactory;
+		return workFactory;
 	}
 
 	@Override
@@ -145,7 +145,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			gsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 			indexMetadataSyntax = protocolDialect.createIndexMetadataSyntax();
 			searchSyntax = protocolDialect.createSearchSyntax();
-			workBuilderFactory = protocolDialect.createWorkBuilderFactory( gsonProvider );
+			workFactory = protocolDialect.createWorkFactory( gsonProvider );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
 			scrollTimeout = SCROLL_TIMEOUT.get( propertySource );
 		}

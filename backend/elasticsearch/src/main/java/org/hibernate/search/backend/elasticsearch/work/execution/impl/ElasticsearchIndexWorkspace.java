@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 
@@ -22,17 +22,17 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
-	private final ElasticsearchWorkBuilderFactory builderFactory;
+	private final ElasticsearchWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchParallelWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
 	private final DetachedBackendSessionContext sessionContext;
 
-	public ElasticsearchIndexWorkspace(ElasticsearchWorkBuilderFactory builderFactory,
+	public ElasticsearchIndexWorkspace(ElasticsearchWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchParallelWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
-		this.builderFactory = builderFactory;
+		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexManagerContext.getElasticsearchIndexWriteName();
@@ -41,7 +41,7 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		return orchestrator.submit( builderFactory.mergeSegments().index( indexName ).build() );
+		return orchestrator.submit( workFactory.mergeSegments().index( indexName ).build() );
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 		);
 
 		return orchestrator.submit(
-				builderFactory.deleteByQuery( indexName, payload )
+				workFactory.deleteByQuery( indexName, payload )
 						.routingKeys( routingKeys )
 						.build()
 		);
@@ -70,11 +70,11 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return orchestrator.submit( builderFactory.flush().index( indexName ).build() );
+		return orchestrator.submit( workFactory.flush().index( indexName ).build() );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		return orchestrator.submit( builderFactory.refresh().index( indexName ).build() );
+		return orchestrator.submit( workFactory.refresh().index( indexName ).build() );
 	}
 }

@@ -28,7 +28,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSort;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -56,7 +56,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	private static final JsonAccessor<JsonElement> REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" );
 
-	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 
@@ -80,7 +80,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
-			ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchWorkFactory workFactory,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchIndexScope<?> scope,

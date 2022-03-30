@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
+package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
@@ -20,9 +20,9 @@ import com.google.gson.JsonObject;
  *     <li>We do NOT set the "allow_partial_search_results" query parameter in search APIs</li>
  * </ul>
  */
-public class Elasticsearch56WorkBuilderFactory extends Elasticsearch63WorkBuilderFactory {
+public class Elasticsearch56WorkFactory extends Elasticsearch63WorkFactory {
 
-	public Elasticsearch56WorkBuilderFactory(GsonProvider gsonProvider) {
+	public Elasticsearch56WorkFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
 	}
 
