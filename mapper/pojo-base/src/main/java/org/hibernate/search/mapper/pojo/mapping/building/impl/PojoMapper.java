@@ -130,7 +130,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 		this.extractorBinder = extractorBinder;
 
-		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
+		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinder(
 				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
 

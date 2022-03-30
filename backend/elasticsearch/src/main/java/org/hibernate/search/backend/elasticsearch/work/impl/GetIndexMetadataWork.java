@@ -134,7 +134,7 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 		}
 
 		private Builder(URLEncodedString typeName, Boolean includeTypeName) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.typeName = typeName;
 			this.includeTypeName = includeTypeName;
 		}

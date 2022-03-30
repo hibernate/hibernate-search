@@ -35,7 +35,7 @@ public class ForceMergeWork extends AbstractNonBulkableWork<Void> {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 		}
 
 		public Builder index(URLEncodedString indexName) {

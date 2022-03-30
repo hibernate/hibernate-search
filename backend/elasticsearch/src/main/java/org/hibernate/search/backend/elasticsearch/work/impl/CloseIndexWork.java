@@ -28,7 +28,7 @@ public class CloseIndexWork extends AbstractNonBulkableWork<Void> {
 		private final URLEncodedString indexName;
 
 		public Builder(URLEncodedString indexName) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 		}
 

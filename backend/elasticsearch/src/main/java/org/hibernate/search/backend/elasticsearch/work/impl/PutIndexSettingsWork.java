@@ -36,7 +36,7 @@ public class PutIndexSettingsWork extends AbstractNonBulkableWork<Void> {
 		public Builder(
 				GsonProvider gsonProvider,
 				URLEncodedString indexName, IndexSettings settings) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch

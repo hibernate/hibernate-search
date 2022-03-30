@@ -32,7 +32,7 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 		private final int requiredStatusTimeoutInMs;
 
 		public Builder(URLEncodedString indexName, IndexStatus requiredStatus, int requiredStatusTimeoutInMs) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 			this.requiredStatus = requiredStatus;
 			this.requiredStatusTimeoutInMs = requiredStatusTimeoutInMs;

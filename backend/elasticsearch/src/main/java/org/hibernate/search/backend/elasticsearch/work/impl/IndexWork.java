@@ -42,7 +42,7 @@ public class IndexWork extends AbstractSingleDocumentIndexingWork
 
 		private Builder(String entityTypeName, Object entityIdentifier, URLEncodedString elasticsearchIndexName,
 					URLEncodedString typeName, String documentIdentifier, String routingKey, JsonObject document) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE, entityTypeName, entityIdentifier,
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE, entityTypeName, entityIdentifier,
 					documentIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;

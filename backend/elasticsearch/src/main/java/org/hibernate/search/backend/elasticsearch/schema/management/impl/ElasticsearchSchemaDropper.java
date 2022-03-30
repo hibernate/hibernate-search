@@ -9,13 +9,20 @@ package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * An object responsible for dropping an indexes.
- *
+ * An object responsible for dropping an index.
+ * @author Gunnar Morling
  */
-public interface ElasticsearchSchemaDropper {
+final class ElasticsearchSchemaDropper {
+
+	private final ElasticsearchSchemaAccessor schemaAccessor;
+
+	public ElasticsearchSchemaDropper(ElasticsearchSchemaAccessor schemaAccessor) {
+		this.schemaAccessor = schemaAccessor;
+	}
 
 	/**
 	 * Drops an index, throwing an exception if dropping fails.
@@ -26,6 +33,21 @@ public interface ElasticsearchSchemaDropper {
 	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	CompletableFuture<?> dropIfExisting(IndexNames indexNames);
+	public CompletableFuture<?> dropIfExisting(IndexNames indexNames) {
+		return schemaAccessor.getCurrentIndexMetadataOrNull( indexNames )
+				.thenCompose( existingIndexMetadata -> {
+					if ( existingIndexMetadata == null ) {
+						// Index does not exist: nothing to do.
+						return CompletableFuture.completedFuture( null );
+					}
+					else {
+						// Index exists: delete.
+						// We need to use the primary name of the index: passing an alias to the drop-index call won't work.
+						return schemaAccessor.dropIndexIfExisting(
+								URLEncodedString.fromString( existingIndexMetadata.getPrimaryName() )
+						);
+					}
+				} );
+	}
 
 }

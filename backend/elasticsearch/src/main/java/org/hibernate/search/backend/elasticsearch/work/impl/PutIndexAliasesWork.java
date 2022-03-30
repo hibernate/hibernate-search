@@ -37,7 +37,7 @@ public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 
 		public Builder(GsonProvider gsonProvider, URLEncodedString indexName,
 				Map<String, IndexAliasDefinition> aliases) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.payload = createPayload( gsonProvider, indexName.original, aliases );
 		}
 
