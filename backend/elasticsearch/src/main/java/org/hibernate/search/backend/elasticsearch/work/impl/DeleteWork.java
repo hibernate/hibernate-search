@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -22,8 +21,7 @@ public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 	}
 
 	public static class Builder
-			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder>
-			implements DeleteWorkBuilder {
+			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final String routingKey;

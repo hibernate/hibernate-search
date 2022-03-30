@@ -113,5 +113,7 @@ public abstract class AbstractSingleDocumentIndexingWork
 
 		protected abstract JsonObject buildBulkableActionBody();
 
+		public abstract AbstractSingleDocumentIndexingWork build();
+
 	}
 }

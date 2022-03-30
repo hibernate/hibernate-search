@@ -9,12 +9,11 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -48,8 +47,7 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements ExplainWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final URLEncodedString id;
@@ -75,7 +73,6 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 			this.payload = payload;
 		}
 
-		@Override
 		public Builder routingKeys(Set<String> routingKeys) {
 			this.routingKeys = routingKeys;
 			return this;

@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 
@@ -28,7 +27,7 @@ public class Elasticsearch56WorkBuilderFactory extends Elasticsearch63WorkBuilde
 	}
 
 	@Override
-	public <T> SearchWorkBuilder<T> search(JsonObject payload,
+	public <T> SearchWork.Builder<T> search(JsonObject payload,
 			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		return SearchWork.Builder.forElasticsearch62AndBelow( payload, searchResultExtractor );
 	}

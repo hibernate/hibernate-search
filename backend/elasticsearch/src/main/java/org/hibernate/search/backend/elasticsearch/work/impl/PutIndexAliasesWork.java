@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexAliasesWorkBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -33,8 +32,7 @@ public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements PutIndexAliasesWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final JsonObject payload;
 
 		public Builder(GsonProvider gsonProvider, URLEncodedString indexName,

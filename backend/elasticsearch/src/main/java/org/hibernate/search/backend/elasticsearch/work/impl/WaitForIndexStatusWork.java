@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.engine.common.timing.spi.StaticDeadline;
 
 
@@ -27,8 +26,7 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements WaitForIndexStatusWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final IndexStatus requiredStatus;
 		private final int requiredStatusTimeoutInMs;

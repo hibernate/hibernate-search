@@ -11,12 +11,11 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 
 import com.google.gson.Gson;
@@ -44,8 +43,7 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements CreateIndexWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final GsonProvider gsonProvider;
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
@@ -76,7 +74,6 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			this.includeTypeName = includeTypeName;
 		}
 
-		@Override
 		public Builder aliases(Map<String, IndexAliasDefinition> aliases) {
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
@@ -87,7 +84,6 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			return this;
 		}
 
-		@Override
 		public Builder settings(IndexSettings settings) {
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
@@ -98,7 +94,6 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			return this;
 		}
 
-		@Override
 		public Builder mapping(RootTypeMapping mapping) {
 			Gson gson = gsonProvider.getGsonNoSerializeNulls();
 
@@ -119,7 +114,6 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			return this;
 		}
 
-		@Override
 		public Builder ignoreExisting() {
 			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
 					.ignoreErrorTypes( "index_already_exists_exception" )

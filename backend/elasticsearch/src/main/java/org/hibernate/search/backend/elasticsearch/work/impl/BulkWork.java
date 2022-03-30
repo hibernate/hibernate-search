@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
@@ -35,8 +34,7 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 		return new BulkResultImpl( resultItems );
 	}
 
-	public static class Builder extends AbstractNonBulkableWork.AbstractBuilder<Builder>
-			implements BulkWorkBuilder {
+	public static class Builder extends AbstractNonBulkableWork.AbstractBuilder<Builder> {
 		private final List<? extends BulkableWork<?>> bulkableWorks;
 
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
@@ -46,7 +44,6 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 			this.bulkableWorks = bulkableWorks;
 		}
 
-		@Override
 		public Builder refresh(DocumentRefreshStrategy refreshStrategy) {
 			this.refreshStrategy = refreshStrategy;
 			return this;

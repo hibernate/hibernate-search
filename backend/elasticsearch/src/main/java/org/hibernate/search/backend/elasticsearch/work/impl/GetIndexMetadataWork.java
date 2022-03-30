@@ -16,13 +16,12 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -116,8 +115,7 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements GetIndexMetadataWorkBuilder {
+			extends AbstractBuilder<Builder> {
 
 		private final Set<URLEncodedString> indexNames = new LinkedHashSet<>();
 		private final URLEncodedString typeName;
@@ -141,8 +139,7 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 			this.includeTypeName = includeTypeName;
 		}
 
-		@Override
-		public GetIndexMetadataWorkBuilder index(URLEncodedString indexName) {
+		public Builder index(URLEncodedString indexName) {
 			indexNames.add( indexName );
 			return this;
 		}

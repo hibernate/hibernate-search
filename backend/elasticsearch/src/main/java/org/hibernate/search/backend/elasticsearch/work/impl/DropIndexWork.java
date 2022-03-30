@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
 
 
 public class DropIndexWork extends AbstractNonBulkableWork<Void> {
@@ -24,8 +23,7 @@ public class DropIndexWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements DropIndexWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 
 		public Builder(URLEncodedString indexName) {
@@ -33,8 +31,7 @@ public class DropIndexWork extends AbstractNonBulkableWork<Void> {
 			this.indexName = indexName;
 		}
 
-		@Override
-		public DropIndexWorkBuilder ignoreIndexNotFound() {
+		public Builder ignoreIndexNotFound() {
 			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
 					.ignoreErrorTypes( "index_not_found_exception" )
 					.build();

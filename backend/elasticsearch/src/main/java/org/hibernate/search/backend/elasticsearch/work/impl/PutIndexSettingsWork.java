@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -30,8 +29,7 @@ public class PutIndexSettingsWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements PutIndexSettingsWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final JsonObject payload;
 
