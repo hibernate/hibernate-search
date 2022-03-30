@@ -1713,9 +1713,6 @@
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
-                                <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
-                                <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
-                                <compilerArguments>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
                                 <!-- Necessary for the Jakarta artifacts, where sources are copied from other modules -->
                                 <addCompileSourceRoots>true</addCompileSourceRoots>
                             </configuration>
@@ -1814,14 +1811,8 @@
                         <failOnUnsupportedJava>false</failOnUnsupportedJava>
                         <failOnMissingClasses>false</failOnMissingClasses>
                         <ignoreSignaturesOfMissingClasses>true</ignoreSignaturesOfMissingClasses>
-                        <excludes>
-                            <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
-                            <!-- Also, we allow JBoss Loggers to use SearchException constructors -->
-                            <exclude>**/*_$logger.class</exclude>
-                            <!-- JBoss message bundles format messages -->
-                            <exclude>**/*_$bundle.class</exclude>
-                        </excludes>
                         <suppressAnnotations>
+                            <suppressAnnotation>javax.annotation.processing.Generated</suppressAnnotation>
                             <suppressAnnotation>org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis</suppressAnnotation>
                             <suppressAnnotation>org.hibernate.search.util.impl.test.annotation.SuppressForbiddenApis</suppressAnnotation>
                         </suppressAnnotations>
