@@ -1862,7 +1862,7 @@
                                         <artifactId>hibernate-search-build-config</artifactId>
                                         <version>${project.version}</version>
                                         <type>jar</type>
-                                        <path>forbidden-runtime.txt</path>
+                                        <path>forbidden-public.txt</path>
                                     </signaturesArtifact>
                                 </signaturesArtifacts>
                             </configuration>
@@ -1887,7 +1887,7 @@
                                         <artifactId>hibernate-search-build-config</artifactId>
                                         <version>${project.version}</version>
                                         <type>jar</type>
-                                        <path>forbidden-tests.txt</path>
+                                        <path>forbidden-internal.txt</path>
                                     </signaturesArtifact>
                                 </signaturesArtifacts>
                             </configuration>
