@@ -1874,14 +1874,6 @@
                         <execution>
                             <id>verify-forbidden-test-apis</id>
                             <configuration>
-                                <excludes>
-                                    <!--
-                                        Only those two classes are allowed to build search integrators,
-                                        because they do it right (with guaranteed calls to close at the end of the test).
-                                    -->
-                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchFactoryHolder.class</exclude>
-                                    <exclude>**/org/hibernate/search/testsupport/junit/SearchIntegratorResource.class</exclude>
-                                </excludes>
                                 <bundledSignatures>
                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
                                     <bundledSignature>jdk-unsafe</bundledSignature>

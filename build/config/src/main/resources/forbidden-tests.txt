@@ -46,8 +46,3 @@ org.hibernate.Session.save(java.lang.String, java.lang.Object) @ Use persist() i
 org.hibernate.Session.load(java.lang.Class<T>, java.lang.Object) @ Use getReference() instead
 org.hibernate.Session.delete(java.lang.Object) @ Use remove() instead
 org.hibernate.Session.delete(java.lang.String, java.lang.Object) @ Use remove() instead
-
-################################################################################################################
-# Various, from our own code.
-# This one needs to be handled with special care to avoid tests breaking out of their isolation (see exclusions):
-org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
