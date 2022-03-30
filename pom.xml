@@ -1819,7 +1819,7 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>verify-forbidden-apis</id>
+                            <id>verify-forbidden-apis-main-public</id>
                             <configuration>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
@@ -1872,7 +1872,33 @@
                             </goals>
                         </execution>
                         <execution>
-                            <id>verify-forbidden-test-apis</id>
+                            <id>verify-forbidden-apis-main-internal</id>
+                            <configuration>
+                                <bundledSignatures>
+                                    <!-- This will automatically choose the right signatures based on 'targetVersion': -->
+                                    <bundledSignature>jdk-unsafe</bundledSignature>
+                                    <bundledSignature>jdk-deprecated</bundledSignature>
+                                    <bundledSignature>jdk-non-portable</bundledSignature>
+                                    <bundledSignature>jdk-internal</bundledSignature>
+                                </bundledSignatures>
+                                <signaturesArtifacts>
+                                    <signaturesArtifact>
+                                        <groupId>org.hibernate.search</groupId>
+                                        <artifactId>hibernate-search-build-config</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <path>forbidden-internal.txt</path>
+                                    </signaturesArtifact>
+                                </signaturesArtifacts>
+                            </configuration>
+                            <!-- Disabled by default; see parents/internal -->
+                            <phase>none</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify-forbidden-apis-tests</id>
                             <configuration>
                                 <bundledSignatures>
                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
