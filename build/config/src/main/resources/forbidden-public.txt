@@ -3,7 +3,8 @@
 # License: GNU Lesser General Public License (LGPL), version 2.1 or later
 # See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
 
-# This file contains forbidden API signatures common to all modules
+# This file is a list of signatures to feed into Forbidden-API.
+# It sets up strict rules for public modules that are published.
 
 @defaultMessage Should not be used
 
