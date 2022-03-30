@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
 import org.hibernate.search.engine.common.timing.Deadline;
 
 import com.google.gson.JsonObject;
@@ -34,7 +33,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		return COUNT_ACCESSOR.get( body ).get();
 	}
 
-	public static class Builder extends AbstractBuilder<Builder> implements CountWorkBuilder {
+	public static class Builder extends AbstractBuilder<Builder> {
 
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 		private JsonObject query;
@@ -45,26 +44,22 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 		}
 
-		@Override
 		public Builder index(URLEncodedString indexName) {
 			indexNames.add( indexName );
 			return this;
 		}
 
-		@Override
 		public Builder query(JsonObject query) {
 			this.query = query;
 			return this;
 		}
 
-		@Override
 		public Builder routingKeys(Set<String> routingKeys) {
 			this.routingKeys = routingKeys;
 			return this;
 		}
 
-		@Override
-		public CountWorkBuilder deadline(Deadline deadline) {
+		public Builder deadline(Deadline deadline) {
 			this.deadline = deadline;
 			return this;
 		}

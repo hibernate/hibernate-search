@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -26,8 +25,7 @@ public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements ClearScrollWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final String scrollId;
 
 		public Builder(String scrollId) {

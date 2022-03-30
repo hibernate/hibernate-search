@@ -10,9 +10,9 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScrollResult;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -23,7 +23,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final String scrollTimeoutString;
-	private final SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll;
+	private final SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> firstScroll;
 	private final TimeoutManager timeoutManager;
 
 	private String scrollId;
@@ -32,7 +32,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
 			String scrollTimeoutString,
-			SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll,
+			SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> firstScroll,
 			TimeoutManager timeoutManager) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;

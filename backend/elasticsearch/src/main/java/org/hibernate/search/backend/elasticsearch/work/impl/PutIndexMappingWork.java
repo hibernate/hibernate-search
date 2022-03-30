@@ -9,18 +9,17 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
-public class PutIndexTypeMappingWork extends AbstractNonBulkableWork<Void> {
+public class PutIndexMappingWork extends AbstractNonBulkableWork<Void> {
 
-	protected PutIndexTypeMappingWork(Builder builder) {
+	protected PutIndexMappingWork(Builder builder) {
 		super( builder );
 	}
 
@@ -30,8 +29,7 @@ public class PutIndexTypeMappingWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements PutIndexMappingWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final Boolean includeTypeName;
@@ -93,8 +91,8 @@ public class PutIndexTypeMappingWork extends AbstractNonBulkableWork<Void> {
 		}
 
 		@Override
-		public PutIndexTypeMappingWork build() {
-			return new PutIndexTypeMappingWork( this );
+		public PutIndexMappingWork build() {
+			return new PutIndexMappingWork( this );
 		}
 	}
 }

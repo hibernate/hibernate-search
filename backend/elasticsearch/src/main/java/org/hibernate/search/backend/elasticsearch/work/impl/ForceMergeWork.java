@@ -9,11 +9,10 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
 
 /**
  * A force-merge work for ES5+.
@@ -32,15 +31,13 @@ public class ForceMergeWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements MergeSegmentsWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 		}
 
-		@Override
 		public Builder index(URLEncodedString indexName) {
 			this.indexNames.add( indexName );
 			return this;

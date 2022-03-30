@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -55,8 +54,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	}
 
 	public static class Builder<R>
-			extends AbstractBuilder<Builder<R>>
-			implements SearchWorkBuilder<R> {
+			extends AbstractBuilder<Builder<R>> {
 
 		public static <T> Builder<T> forElasticsearch62AndBelow(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
@@ -98,41 +96,35 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			this.allowPartialSearchResultsSupported = allowPartialSearchResultsSupported;
 		}
 
-		@Override
-		public SearchWorkBuilder<R> index(URLEncodedString indexName) {
+		public Builder<R> index(URLEncodedString indexName) {
 			indexes.add( indexName );
 			return this;
 		}
 
-		@Override
 		public Builder<R> paging(Integer limit, Integer offset) {
 			this.from = offset;
 			this.size = limit;
 			return this;
 		}
 
-		@Override
 		public Builder<R> scrolling(int scrollSize, String scrollTimeout) {
 			this.scrollSize = scrollSize;
 			this.scrollTimeout = scrollTimeout;
 			return this;
 		}
 
-		@Override
-		public SearchWorkBuilder<R> routingKeys(Set<String> routingKeys) {
+		public Builder<R> routingKeys(Set<String> routingKeys) {
 			this.routingKeys = routingKeys;
 			return this;
 		}
 
-		@Override
-		public SearchWorkBuilder<R> deadline(Deadline deadline, boolean failOnDeadline) {
+		public Builder<R> deadline(Deadline deadline, boolean failOnDeadline) {
 			this.deadline = deadline;
 			this.failOnDeadline = failOnDeadline;
 			return this;
 		}
 
-		@Override
-		public SearchWorkBuilder<R> disableTrackTotalHits() {
+		public Builder<R> disableTrackTotalHits() {
 			// setting trackTotalHits to false only if this parameter was already set,
 			// the parameter is not supported by the older Elasticsearch server
 			if ( trackTotalHits != null && trackTotalHits ) {
@@ -141,8 +133,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			return this;
 		}
 
-		@Override
-		public SearchWorkBuilder<R> totalHitCountThreshold(Long totalHitCountThreshold) {
+		public Builder<R> totalHitCountThreshold(Long totalHitCountThreshold) {
 			// setting trackTotalHits to false only if this parameter was already set,
 			// the parameter is not supported by the older Elasticsearch server
 			if ( trackTotalHits != null && trackTotalHits ) {

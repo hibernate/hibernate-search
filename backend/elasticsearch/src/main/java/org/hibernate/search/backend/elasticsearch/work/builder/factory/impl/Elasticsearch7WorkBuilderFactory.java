@@ -15,27 +15,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.In
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteByQueryWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexAliasesWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ClearScrollWork;
@@ -53,8 +32,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexAliasesWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexSettingsWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
@@ -74,7 +53,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public IndexWorkBuilder index(String entityTypeName, Object entityIdentifier,
+	public IndexWork.Builder index(String entityTypeName, Object entityIdentifier,
 			URLEncodedString elasticsearchIndexName,
 			String documentIdentifier, String routingKey, JsonObject document) {
 		return IndexWork.Builder.forElasticsearch7AndAbove( entityTypeName, entityIdentifier,
@@ -82,106 +61,106 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public DeleteWorkBuilder delete(String entityTypeName, Object entityIdentifier,
+	public DeleteWork.Builder delete(String entityTypeName, Object entityIdentifier,
 			URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey) {
 		return DeleteWork.Builder.forElasticsearch7AndAbove( entityTypeName, entityIdentifier,
 				elasticsearchIndexName, documentIdentifier, routingKey );
 	}
 
 	@Override
-	public DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
+	public DeleteByQueryWork.Builder deleteByQuery(URLEncodedString indexName, JsonObject payload) {
 		return new DeleteByQueryWork.Builder( indexName, payload, this );
 	}
 
 	@Override
-	public FlushWorkBuilder flush() {
+	public FlushWork.Builder flush() {
 		return new FlushWork.Builder();
 	}
 
 	@Override
-	public RefreshWorkBuilder refresh() {
+	public RefreshWork.Builder refresh() {
 		return new RefreshWork.Builder();
 	}
 
 	@Override
-	public MergeSegmentsWorkBuilder mergeSegments() {
+	public ForceMergeWork.Builder mergeSegments() {
 		return new ForceMergeWork.Builder();
 	}
 
 	@Override
-	public BulkWorkBuilder bulk(List<? extends BulkableWork<?>> bulkableWorks) {
+	public BulkWork.Builder bulk(List<? extends BulkableWork<?>> bulkableWorks) {
 		return new BulkWork.Builder( bulkableWorks );
 	}
 
 	@Override
-	public <T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+	public <T> SearchWork.Builder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		return SearchWork.Builder.forElasticsearch7AndAbove( payload, searchResultExtractor );
 	}
 
 	@Override
-	public CountWorkBuilder count() {
+	public CountWork.Builder count() {
 		return new CountWork.Builder();
 	}
 
 	@Override
-	public ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
+	public ExplainWork.Builder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
 		return ExplainWork.Builder.forElasticsearch7AndAbove( indexName, id, payload );
 	}
 
 	@Override
-	public <T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout,
+	public <T> ScrollWork.Builder<T> scroll(String scrollId, String scrollTimeout,
 			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		return new ScrollWork.Builder<>( scrollId, scrollTimeout, searchResultExtractor );
 	}
 
 	@Override
-	public ClearScrollWorkBuilder clearScroll(String scrollId) {
+	public ClearScrollWork.Builder clearScroll(String scrollId) {
 		return new ClearScrollWork.Builder( scrollId );
 	}
 
 	@Override
-	public CreateIndexWorkBuilder createIndex(URLEncodedString indexName) {
+	public CreateIndexWork.Builder createIndex(URLEncodedString indexName) {
 		return CreateIndexWork.Builder.forElasticsearch7AndAbove( gsonProvider, indexName );
 	}
 
 	@Override
-	public DropIndexWorkBuilder dropIndex(URLEncodedString indexName) {
+	public DropIndexWork.Builder dropIndex(URLEncodedString indexName) {
 		return new DropIndexWork.Builder( indexName );
 	}
 
 	@Override
-	public OpenIndexWorkBuilder openIndex(URLEncodedString indexName) {
+	public OpenIndexWork.Builder openIndex(URLEncodedString indexName) {
 		return new OpenIndexWork.Builder( indexName );
 	}
 
 	@Override
-	public CloseIndexWorkBuilder closeIndex(URLEncodedString indexName) {
+	public CloseIndexWork.Builder closeIndex(URLEncodedString indexName) {
 		return new CloseIndexWork.Builder( indexName );
 	}
 
 	@Override
-	public GetIndexMetadataWorkBuilder getIndexMetadata() {
+	public GetIndexMetadataWork.Builder getIndexMetadata() {
 		return GetIndexMetadataWork.Builder.forElasticsearch7AndAbove();
 	}
 
 	@Override
-	public PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings) {
+	public PutIndexSettingsWork.Builder putIndexSettings(URLEncodedString indexName, IndexSettings settings) {
 		return new PutIndexSettingsWork.Builder( gsonProvider, indexName, settings );
 	}
 
 	@Override
-	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
-		return PutIndexTypeMappingWork.Builder.forElasticsearch7AndAbove( gsonProvider, indexName, mapping );
+	public PutIndexMappingWork.Builder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
+		return PutIndexMappingWork.Builder.forElasticsearch7AndAbove( gsonProvider, indexName, mapping );
 	}
 
 	@Override
-	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus,
+	public WaitForIndexStatusWork.Builder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus,
 			int requiredStatusTimeoutInMs) {
 		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, requiredStatusTimeoutInMs );
 	}
 
 	@Override
-	public PutIndexAliasesWorkBuilder putIndexAliases(URLEncodedString indexName,
+	public PutIndexAliasesWork.Builder putIndexAliases(URLEncodedString indexName,
 			Map<String, IndexAliasDefinition> aliases) {
 		return new PutIndexAliasesWork.Builder( gsonProvider, indexName, aliases );
 	}

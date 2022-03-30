@@ -11,13 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteByQueryWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -48,15 +46,14 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractBuilder<Builder>
-			implements DeleteByQueryWorkBuilder {
+			extends AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final JsonObject payload;
 		private final Set<URLEncodedString> typeNames = new HashSet<>();
 
 		private Collection<String> routingKeys;
 
-		private final RefreshWorkBuilder refreshWorkBuilder;
+		private final RefreshWork.Builder refreshWorkBuilder;
 
 		public Builder(URLEncodedString indexName, JsonObject payload, ElasticsearchWorkBuilderFactory workFactory) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -65,8 +62,7 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 			this.refreshWorkBuilder = workFactory.refresh().index( indexName );
 		}
 
-		@Override
-		public DeleteByQueryWorkBuilder routingKeys(Collection<String> routingKeys) {
+		public Builder routingKeys(Collection<String> routingKeys) {
 			this.routingKeys = routingKeys;
 			return this;
 		}

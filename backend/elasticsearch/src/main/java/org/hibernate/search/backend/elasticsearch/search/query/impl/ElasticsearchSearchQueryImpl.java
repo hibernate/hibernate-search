@@ -24,10 +24,10 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.impl.CountWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
@@ -177,7 +177,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		CountWorkBuilder builder = workFactory.count();
+		CountWork.Builder builder = workFactory.count();
 		for ( ElasticsearchSearchIndexContext index : scope.indexes() ) {
 			builder.index( index.names().read() );
 		}
@@ -198,7 +198,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public ElasticsearchSearchScroll<H> scroll(int chunkSize) {
 		String scrollTimeoutString = this.scrollTimeout + "s";
 
-		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()
+		SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()
 				.scrolling( chunkSize, scrollTimeoutString );
 
 		return new ElasticsearchSearchScrollImpl<>( queryOrchestrator, workFactory, searchResultExtractor,
@@ -233,8 +233,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		return doExplain( index, id );
 	}
 
-	private SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> searchWorkBuilder() {
-		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
+	private SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> searchWorkBuilder() {
+		SearchWork.Builder<ElasticsearchLoadableSearchResult<H>> builder =
 				workFactory.search( payload, searchResultExtractor );
 		for ( ElasticsearchSearchIndexContext index : scope.indexes() ) {
 			builder.index( index.names().read() );

@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 import org.hibernate.search.engine.common.timing.Deadline;
 
 import com.google.gson.JsonObject;
@@ -35,8 +34,7 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 	}
 
 	public static class Builder<R>
-			extends AbstractBuilder<Builder<R>>
-			implements ScrollWorkBuilder<R> {
+			extends AbstractBuilder<Builder<R>> {
 		private final String scrollId;
 		private final String scrollTimeout;
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
@@ -50,7 +48,6 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 			this.resultExtractor = resultExtractor;
 		}
 
-		@Override
 		public Builder<R> deadline(Deadline deadline, boolean failOnDeadline) {
 			this.deadline = deadline;
 			this.failOnDeadline = failOnDeadline;

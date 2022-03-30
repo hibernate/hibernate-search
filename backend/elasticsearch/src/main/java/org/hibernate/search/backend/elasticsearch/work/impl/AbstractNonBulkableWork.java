@@ -112,7 +112,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 
 		protected abstract ElasticsearchRequest buildRequest();
 
-		public abstract ElasticsearchWork build();
+		public abstract AbstractNonBulkableWork<?> build();
 
 	}
 }

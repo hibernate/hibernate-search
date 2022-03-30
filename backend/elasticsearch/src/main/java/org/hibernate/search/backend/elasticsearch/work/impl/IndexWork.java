@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -20,8 +19,7 @@ public class IndexWork extends AbstractSingleDocumentIndexingWork
 	}
 
 	public static class Builder
-			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder>
-			implements IndexWorkBuilder {
+			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder> {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final String routingKey;
