@@ -2730,7 +2730,7 @@
         <!--
             A profile executing jqassistant scanning and analysis for all relevant modules.
             Our rules are in jqassistant/rules.xml.
-            See README.md for usage.
+            See CONTRIBUTING.md for usage.
         -->
         <profile>
             <id>jqassistant</id>
