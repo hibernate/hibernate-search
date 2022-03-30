@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
+package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -23,9 +23,9 @@ import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexMappingWork;
  * </ul>
  */
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
-public class Elasticsearch63WorkBuilderFactory extends Elasticsearch67WorkBuilderFactory {
+public class Elasticsearch63WorkFactory extends Elasticsearch67WorkFactory {
 
-	public Elasticsearch63WorkBuilderFactory(GsonProvider gsonProvider) {
+	public Elasticsearch63WorkFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
 	}
 

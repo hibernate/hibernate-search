@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch64SearchSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch67WorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.Elasticsearch67WorkFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 
 /**
  * The protocol dialect for Elasticsearch 6.7 and later 6.x.
@@ -32,8 +32,8 @@ public class Elasticsearch67ProtocolDialect implements ElasticsearchProtocolDial
 	}
 
 	@Override
-	public ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
-		return new Elasticsearch67WorkBuilderFactory( gsonProvider );
+	public ElasticsearchWorkFactory createWorkFactory(GsonProvider gsonProvider) {
+		return new Elasticsearch67WorkFactory( gsonProvider );
 	}
 
 	@Override

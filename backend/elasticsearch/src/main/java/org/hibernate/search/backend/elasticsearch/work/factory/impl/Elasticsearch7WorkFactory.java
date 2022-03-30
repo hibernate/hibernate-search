@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
+package org.hibernate.search.backend.elasticsearch.work.factory.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -44,11 +44,11 @@ import com.google.gson.JsonObject;
 /**
  * A work builder factory for ES7.0+.
  */
-public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilderFactory {
+public class Elasticsearch7WorkFactory implements ElasticsearchWorkFactory {
 
 	protected final GsonProvider gsonProvider;
 
-	public Elasticsearch7WorkBuilderFactory(GsonProvider gsonProvider) {
+	public Elasticsearch7WorkFactory(GsonProvider gsonProvider) {
 		this.gsonProvider = gsonProvider;
 	}
 

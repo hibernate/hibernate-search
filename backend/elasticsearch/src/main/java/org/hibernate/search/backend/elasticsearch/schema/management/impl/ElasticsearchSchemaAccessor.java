@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
@@ -36,13 +36,13 @@ final class ElasticsearchSchemaAccessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
+	private final ElasticsearchWorkFactory workFactory;
 
 	private final ElasticsearchParallelWorkOrchestrator orchestrator;
 
-	public ElasticsearchSchemaAccessor(ElasticsearchWorkBuilderFactory workBuilderFactory,
+	public ElasticsearchSchemaAccessor(ElasticsearchWorkFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator orchestrator) {
-		this.workBuilderFactory = workBuilderFactory;
+		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
 	}
 
@@ -175,8 +175,8 @@ final class ElasticsearchSchemaAccessor {
 				.thenRun( () -> log.openedIndex( indexName ) );
 	}
 
-	private ElasticsearchWorkBuilderFactory getWorkFactory() {
-		return workBuilderFactory;
+	private ElasticsearchWorkFactory getWorkFactory() {
+		return workFactory;
 	}
 
 	private <T> CompletableFuture<T> execute(NonBulkableWork<T> work) {

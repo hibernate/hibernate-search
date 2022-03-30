@@ -103,7 +103,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		multiTenancyStrategy.documentIdHelper().checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexIndexingPlan(
-				link.getWorkBuilderFactory(), orchestrator,
+				link.getWorkFactory(), orchestrator,
 				indexManagerContext,
 				sessionContext,
 				refreshStrategy
@@ -117,7 +117,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.documentIdHelper().checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexIndexer( link.getWorkBuilderFactory(), orchestrator,
+		return new ElasticsearchIndexIndexer( link.getWorkFactory(), orchestrator,
 				indexManagerContext, sessionContext
 		);
 	}
@@ -128,7 +128,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		multiTenancyStrategy.documentIdHelper().checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkspace(
-				link.getWorkBuilderFactory(), multiTenancyStrategy, generalPurposeOrchestrator,
+				link.getWorkFactory(), multiTenancyStrategy, generalPurposeOrchestrator,
 				indexManagerContext, sessionContext
 		);
 	}
@@ -159,7 +159,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			ElasticsearchSearchProjection<H> rootProjection) {
 		multiTenancyStrategy.documentIdHelper().checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
-				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
+				link.getWorkFactory(), link.getSearchResultExtractorFactory(),
 				generalPurposeOrchestrator,
 				scope, sessionContext, loadingContextBuilder, rootProjection,
 				link.getScrollTimeout()
@@ -184,7 +184,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		model.contributeLowLevelMetadata( builder );
 		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexSchemaManager(
-				link.getWorkBuilderFactory(), generalPurposeOrchestrator,
+				link.getWorkFactory(), generalPurposeOrchestrator,
 				indexLayoutStrategy, model.names(), expectedMetadata,
 				lifecycleExecutionOptions
 		);

@@ -132,7 +132,7 @@ public class ElasticsearchBatchingWorkOrchestrator
 		ElasticsearchWorkBulker bulker = new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
 				(worksToBulk, refreshStrategy) ->
-						link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
+						link.getWorkFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
 				maxBulkSize
 		);
 		return new ElasticsearchBatchedWorkProcessor( sequenceBuilder, bulker );

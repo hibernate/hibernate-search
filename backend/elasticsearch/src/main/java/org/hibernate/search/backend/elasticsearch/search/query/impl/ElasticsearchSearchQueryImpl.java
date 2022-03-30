@@ -23,7 +23,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.CountWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
@@ -50,7 +50,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
@@ -69,7 +69,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private TimeoutManager timeoutManager;
 
-	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
+	ElasticsearchSearchQueryImpl(ElasticsearchWorkFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,

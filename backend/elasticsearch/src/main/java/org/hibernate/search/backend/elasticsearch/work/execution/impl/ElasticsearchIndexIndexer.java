@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -22,16 +22,16 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchIndexIndexer implements IndexIndexer {
 
-	private final ElasticsearchWorkBuilderFactory factory;
+	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 
-	public ElasticsearchIndexIndexer(ElasticsearchWorkBuilderFactory factory,
+	public ElasticsearchIndexIndexer(ElasticsearchWorkFactory workFactory,
 			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
-		this.factory = factory;
+		this.workFactory = workFactory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.tenantIdentifier();
@@ -58,7 +58,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.routingKey();
 
-		SingleDocumentIndexingWork work = factory.delete(
+		SingleDocumentIndexingWork work = workFactory.delete(
 				indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				elasticsearchId, routingKey
@@ -78,7 +78,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 
 		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
-		SingleDocumentIndexingWork work = factory.index(
+		SingleDocumentIndexingWork work = workFactory.index(
 				indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				elasticsearchId, routingKey, document
