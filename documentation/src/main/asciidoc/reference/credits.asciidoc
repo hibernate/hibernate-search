@@ -6,6 +6,7 @@ available in particular in our https://github.com/hibernate/hibernate-search/blo
 
 The following contributors have been involved in this documentation:
 
+ * Marko Bekhta
  * Emmanuel Bernard
  * Hardy Ferentschik
  * Gustavo Fernandes
