@@ -104,17 +104,14 @@
                     <!-- Override the executions defined in the parent module -->
                     <executions>
                         <execution>
-                            <id>verify-forbidden-apis</id>
+                            <id>verify-forbidden-apis-main-public</id>
                             <!-- Do not use the main rules at all in internal modules, see below -->
                             <phase>none</phase>
                         </execution>
                         <execution>
-                            <id>verify-forbidden-test-apis</id>
-                            <goals>
-                                <!-- Apply the test rules to all code in internal modules, even code in src/main -->
-                                <goal>check</goal>
-                                <goal>testCheck</goal>
-                            </goals>
+                            <id>verify-forbidden-apis-main-internal</id>
+                            <!-- Use specific rules for internal modules -->
+                            <phase>compile</phase>
                         </execution>
                     </executions>
                 </plugin>
