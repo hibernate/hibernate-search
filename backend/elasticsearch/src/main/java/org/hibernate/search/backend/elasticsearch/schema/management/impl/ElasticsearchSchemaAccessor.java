@@ -32,7 +32,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.
  * @author Gunnar Morling
  */
-public class ElasticsearchSchemaAccessor {
+final class ElasticsearchSchemaAccessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

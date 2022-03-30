@@ -67,7 +67,7 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 
 		private Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName,
 				Boolean includeTypeName) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.gsonProvider = gsonProvider;
 			this.indexName = indexName;
 			this.typeName = typeName;
@@ -115,7 +115,7 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 		}
 
 		public Builder ignoreExisting() {
-			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
+			this.resultAssessor = ElasticsearchRequestSuccessAssessor.builder()
 					.ignoreErrorTypes( "index_already_exists_exception" )
 					.build();
 			return this;

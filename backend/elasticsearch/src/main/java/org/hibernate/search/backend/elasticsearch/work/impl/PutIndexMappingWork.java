@@ -60,7 +60,7 @@ public class PutIndexMappingWork extends AbstractNonBulkableWork<Void> {
 				GsonProvider gsonProvider,
 				URLEncodedString indexName, URLEncodedString typeName, Boolean includeTypeName,
 				RootTypeMapping typeMapping) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.includeTypeName = includeTypeName;

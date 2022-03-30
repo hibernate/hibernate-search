@@ -16,6 +16,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -34,16 +35,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegistry {
+public class ActiveSessionFactoryRegistry implements EntityManagerFactoryRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final MutableSessionFactoryRegistry INSTANCE = new ActiveSessionFactoryRegistry();
+	private static final ActiveSessionFactoryRegistry INSTANCE = new ActiveSessionFactoryRegistry();
 
 	private static final String PERSISTENCE_UNIT_NAME_NAMESPACE = "persistence-unit-name";
 	private static final String SESSION_FACTORY_NAME_NAMESPACE = "session-factory-name";
 
-	public static MutableSessionFactoryRegistry getInstance() {
+	public static ActiveSessionFactoryRegistry getInstance() {
 		return INSTANCE;
 	}
 
@@ -57,7 +58,6 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 		// Use getInstance()
 	}
 
-	@Override
 	public synchronized void register(SessionFactoryImplementor sessionFactory) {
 		sessionFactories.add( sessionFactory );
 		Object persistenceUnitName = sessionFactory.getProperties().get( AvailableSettings.PERSISTENCE_UNIT_NAME );
@@ -70,7 +70,6 @@ public class ActiveSessionFactoryRegistry implements MutableSessionFactoryRegist
 		}
 	}
 
-	@Override
 	public synchronized void unregister(SessionFactoryImplementor sessionFactory) {
 		sessionFactories.remove( sessionFactory );
 		/*

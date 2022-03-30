@@ -42,7 +42,7 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 		private boolean failOnDeadline;
 
 		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
 			this.resultExtractor = resultExtractor;

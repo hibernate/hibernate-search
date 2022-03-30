@@ -37,7 +37,7 @@ public class FlushWork extends AbstractNonBulkableWork<Void> {
 		private final Set<URLEncodedString> indexNames = new HashSet<>();
 
 		public Builder() {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 		}
 
 		public Builder index(URLEncodedString indexName) {

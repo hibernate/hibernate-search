@@ -14,7 +14,7 @@ import com.google.gson.JsonObject;
 public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
-			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
+			ElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	private DeleteWork(Builder builder) {
 		super( builder );

@@ -56,7 +56,7 @@ public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 		private final RefreshWork.Builder refreshWorkBuilder;
 
 		public Builder(URLEncodedString indexName, JsonObject payload, ElasticsearchWorkBuilderFactory workFactory) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 			this.payload = payload;
 			this.refreshWorkBuilder = workFactory.refresh().index( indexName );

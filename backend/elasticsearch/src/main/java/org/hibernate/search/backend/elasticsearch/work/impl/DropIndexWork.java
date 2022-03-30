@@ -27,12 +27,12 @@ public class DropIndexWork extends AbstractNonBulkableWork<Void> {
 		private final URLEncodedString indexName;
 
 		public Builder(URLEncodedString indexName) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.indexName = indexName;
 		}
 
 		public Builder ignoreIndexNotFound() {
-			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
+			this.resultAssessor = ElasticsearchRequestSuccessAssessor.builder()
 					.ignoreErrorTypes( "index_not_found_exception" )
 					.build();
 

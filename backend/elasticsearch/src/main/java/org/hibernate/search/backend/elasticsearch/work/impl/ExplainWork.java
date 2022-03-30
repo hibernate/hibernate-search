@@ -25,7 +25,7 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
-			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
+			ElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	private final URLEncodedString indexName;
 	private final URLEncodedString id;

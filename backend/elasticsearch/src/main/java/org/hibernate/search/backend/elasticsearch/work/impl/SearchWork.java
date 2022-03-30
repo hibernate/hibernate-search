@@ -89,7 +89,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
 				boolean allowPartialSearchResultsSupported) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
 			this.trackTotalHits = trackTotalHits;

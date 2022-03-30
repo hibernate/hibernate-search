@@ -36,10 +36,10 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		this.schemaAccessor = new ElasticsearchSchemaAccessor( workBuilderFactory, workOrchestrator );
 
-		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor, indexLayoutStrategy );
-		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );
-		this.schemaValidator = new ElasticsearchSchemaValidatorImpl();
-		this.schemaMigrator = new ElasticsearchSchemaMigratorImpl( schemaAccessor, schemaValidator );
+		this.schemaCreator = new ElasticsearchSchemaCreator( schemaAccessor, indexLayoutStrategy );
+		this.schemaDropper = new ElasticsearchSchemaDropper( schemaAccessor );
+		this.schemaValidator = new ElasticsearchSchemaValidator();
+		this.schemaMigrator = new ElasticsearchSchemaMigrator( schemaAccessor, schemaValidator );
 
 		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;

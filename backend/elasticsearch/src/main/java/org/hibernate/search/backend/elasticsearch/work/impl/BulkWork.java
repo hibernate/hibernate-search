@@ -40,7 +40,7 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
 		public Builder(List<? extends BulkableWork<?>> bulkableWorks) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.bulkableWorks = bulkableWorks;
 		}
 

@@ -29,7 +29,7 @@ public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 		private final String scrollId;
 
 		public Builder(String scrollId) {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 			this.scrollId = scrollId;
 		}
 

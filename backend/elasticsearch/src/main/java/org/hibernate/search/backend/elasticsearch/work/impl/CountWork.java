@@ -41,7 +41,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		private Deadline deadline;
 
 		public Builder() {
-			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( ElasticsearchRequestSuccessAssessor.DEFAULT_INSTANCE );
 		}
 
 		public Builder index(URLEncodedString indexName) {

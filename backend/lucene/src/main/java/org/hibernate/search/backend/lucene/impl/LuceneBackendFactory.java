@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiT
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactoryImpl;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -92,7 +92,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			return new LuceneBackendImpl(
 					eventContext,
 					backendThreads,
-					new LuceneWorkFactoryImpl( multiTenancyStrategy ),
+					new LuceneWorkFactory( multiTenancyStrategy ),
 					analysisDefinitionRegistry,
 					cachingContext,
 					multiTenancyStrategy,
