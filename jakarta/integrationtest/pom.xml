@@ -33,7 +33,7 @@
                 </property>
             </activation>
             <modules>
-                <module>jdk/java-modules</module>
+                <module>java/modules</module>
             </modules>
         </profile>
     </profiles>
