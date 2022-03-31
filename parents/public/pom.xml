@@ -114,8 +114,21 @@
                                 <head>Experimental</head>
                             </tag>
                         </tags>
-                        <!-- Java 9+ supports HTML5 for javadoc generation -->
-                        <additionalOptions>-html5</additionalOptions>
+                        <additionalOptions>
+                            <!-- Java 9+ supports HTML5 for javadoc generation -->
+                            <additionalOption>-html5</additionalOption>
+                            <!-- Java 17+ adds a warning for every single class/method/etc. without a javadoc comment,
+                                 and we have lots of those.
+                                 The only way to disable those warnings is to disable the group of checks "missing",
+                                 and unfortunately this also disables checks such as "no @return" or "missing @param".
+                                 I've looked into the javadoc code and there doesn't seem to be a more precise setting.
+                                 See https://github.com/openjdk/jdk/blob/9862cd07c162fcc9cd5cbdd0aab564f446f9256c/src/jdk.javadoc/share/classes/jdk/javadoc/internal/doclets/formats/html/HtmlOptions.java#L428-L439
+                                 See https://github.com/openjdk/jdk/blob/9862cd07c162fcc9cd5cbdd0aab564f446f9256c/src/jdk.javadoc/share/classes/jdk/javadoc/internal/doclint/DocLint.java#L367
+                                 See https://github.com/openjdk/jdk/blob/9862cd07c162fcc9cd5cbdd0aab564f446f9256c/src/jdk.javadoc/share/classes/jdk/javadoc/internal/doclint/Messages.java#L181-L182
+                                 See https://github.com/openjdk/jdk/blob/9862cd07c162fcc9cd5cbdd0aab564f446f9256c/src/jdk.javadoc/share/classes/jdk/javadoc/internal/doclint/Messages.java#L74-L78
+                                  -->
+                            <additionalOption>-Xdoclint:all,-missing</additionalOption>
+                        </additionalOptions>
                     </configuration>
                 </plugin>
             </plugins>
