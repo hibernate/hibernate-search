@@ -21,7 +21,6 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
  * with different parameters, such as {@code ArrayList<String>}.
  * Thus the mapper would be unable to find which mapping to use when indexing such an instance,
  * and it would be impossible to target the index from the {@link Class} only.
- * <p>
  *
  * @see PojoTypeModel
  * @param <T> The pojo type
