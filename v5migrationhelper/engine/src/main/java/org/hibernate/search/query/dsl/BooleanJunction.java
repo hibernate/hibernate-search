@@ -11,7 +11,8 @@ import org.apache.lucene.search.Query;
 
 /**
  * Represents a boolean query that can contains one or more elements to join
- * <h3 id="minimumshouldmatch">"minimumShouldMatch" constraints</h3>
+ *
+ * <h2 id="minimumshouldmatch">"minimumShouldMatch" constraints</h2>
  * <p>
  * "minimumShouldMatch" constraints define a minimum number of "should" clauses that have to match
  * in order for the boolean junction to match.
@@ -21,7 +22,7 @@ import org.apache.lucene.search.Query;
  * in Solr or
  * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html">{@code minimum_should_match}</a>
  * in Elasticsearch.
- * <h4 id="minimumshouldmatch-minimum">Definition of the minimum</h4>
+ * <h3 id="minimumshouldmatch-minimum">Definition of the minimum</h3>
  * <p>
  * The minimum may be defined either directly as a positive number, or indirectly as a negative number
  * or positive or negative percentage representing a ratio of the total number of "should" clauses in this boolean junction.

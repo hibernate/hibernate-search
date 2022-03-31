@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * The step in a "minimum should match" constraint definition
  * where a condition can be defined as necessary for the following requirements to be enforced.
  *
- * <h3 id="minimumshouldmatch">"minimumShouldMatch" constraints</h3>
+ * <h2 id="minimumshouldmatch">"minimumShouldMatch" constraints</h2>
  * <p>
  * "minimumShouldMatch" constraints define a minimum number of "should" clauses that have to match
  * in order for the boolean predicate to match.
@@ -21,7 +21,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html">{@code minimum_should_match}</a>
  * in Elasticsearch.
  *
- * <h4 id="minimumshouldmatch-minimum">Definition of the minimum</h4>
+ * <h3 id="minimumshouldmatch-minimum">Definition of the minimum</h3>
  * <p>
  * The minimum may be defined either directly as a positive number, or indirectly as a negative number
  * or positive or negative percentage representing a ratio of the total number of "should" clauses in this boolean predicate.
@@ -54,7 +54,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * behavior is backend-specific (it may throw an exception, or produce unpredictable results,
  * or fall back to some default behavior).
  *
- * <h4 id="minimumshouldmatch-conditionalconstraints">Conditional constraints</h4>
+ * <h3 id="minimumshouldmatch-conditionalconstraints">Conditional constraints</h3>
  * <p>
  * Multiple conditional constraints may be defined,
  * only one of them being applied depending on the total number of "should" clauses.

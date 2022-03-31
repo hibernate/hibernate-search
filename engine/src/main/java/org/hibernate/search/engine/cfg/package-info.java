@@ -8,12 +8,12 @@
 /**
  * This package contains everything related to the configuration of the Hibernate Search engine.
  *
- * <h3>Common expected types for property values</h3>
+ * <h2>Common expected types for property values</h2>
  *
  * Below are some commonly used property types across all Hibernate Search settings
  * (engine, backends, mappers, ...).
  *
- * <h4 id="bean-reference">Bean reference</h4>
+ * <h2 id="bean-reference">Bean reference</h2>
  *
  * A reference to a bean of type {@code T} can be passed as either:
  * <ul>
@@ -33,7 +33,7 @@
  * representing the type of a CDI bean which happens to expose a public, no-arg constructor,
  * then Hibernate Search will retrieve the bean through CDI, not by calling the constructor directly.
  *
- * <h4 id="bean-reference-multi">Multi-valued bean reference</h4>
+ * <h2 id="bean-reference-multi">Multi-valued bean reference</h2>
  *
  * A multi-valued reference to a bean of type {@code T} can be passed as either:
  * <ul>

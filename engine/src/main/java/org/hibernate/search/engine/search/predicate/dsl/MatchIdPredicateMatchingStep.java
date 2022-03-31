@@ -21,7 +21,6 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * Target the identifier with the given id.
 	 * <p>
 	 * If used multiple times, it will target any of the specified values.
-	 * <p>
 	 * @see #matchingAny(Collection)
 	 * @param value the value of the id we want to match.
 	 * @return The next step.
@@ -34,7 +33,6 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 	 * Target the identifier with the given id.
 	 * <p>
 	 * If used multiple times, it will target any of the specified values.
-	 * <p>
 	 * @see #matchingAny(Collection)
 	 * @param value the value of the id we want to match.
 	 * @param convert Controls how the {@code value} should be converted
@@ -46,7 +44,6 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 
 	/**
 	 * Target the identifiers matching any of the values in a collection.
-	 * <p>
 	 * @param values the collection of identifiers to match.
 	 * @return The next step.
 	 */
@@ -56,7 +53,6 @@ public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatching
 
 	/**
 	 * Target the identifiers matching any of the values in a collection.
-	 * <p>
 	 * @param values the collection of identifiers to match.
 	 * @param convert Controls how the {@code value} should be converted
 	 * before Hibernate Search attempts to interpret it as an identifier value.

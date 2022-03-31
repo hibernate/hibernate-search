@@ -16,26 +16,26 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * <p>
  * Different types of clauses have different effects, see below.
  *
- * <h3 id="must">"must" clauses</h3>
+ * <h2 id="must">"must" clauses</h2>
  * <p>
  * "must" clauses are required to match: if they don't match, then the boolean predicate will not match.
  * <p>
  * Matching "must" clauses are taken into account during score computation.
  *
- * <h3 id="mustnot">"must not" clauses</h3>
+ * <h2 id="mustnot">"must not" clauses</h2>
  * <p>
  * "must not" clauses are required to not match: if they match, then the boolean predicate will not match.
  * <p>
  * "must not" clauses are ignored during score computation.
  *
- * <h3 id="filter">"filter" clauses</h3>
+ * <h2 id="filter">"filter" clauses</h2>
  * <p>
  * "filter" clauses are required to match: if they don't match, then the boolean predicate will not match.
  * <p>
  * "filter" clauses are ignored during score computation,
  * and so are any clauses of boolean predicates contained in the filter clause (even "must" or "should" clauses).
  *
- * <h3 id="should">"should" clauses</h3>
+ * <h2 id="should">"should" clauses</h2>
  * <p>
  * "should" clauses may optionally match, and are required to match depending on the context.
  * <p>
