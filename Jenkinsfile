@@ -145,7 +145,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *         settingsId: ...
  */
 
-@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 11 Latest'
+@Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.8'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -171,14 +171,14 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					// We only run the tests with JDK8, but we compile them with JDK11 (with --release 8).
+					// We only run the tests with JDK8, but we compile them with JDK17 (with --release 8).
 					new JdkBuildEnvironment(version: '8', testLauncherTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '11', testCompilerTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
-					new JdkBuildEnvironment(version: '17', testCompilerTool: 'OpenJDK 17 Latest',
-							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '18', testCompilerTool: 'OpenJDK 18 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '19', testCompilerTool: 'OpenJDK 19 Latest',

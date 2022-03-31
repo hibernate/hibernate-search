@@ -154,7 +154,7 @@ and transform it to use Hibernate ORM 6 instead of Hibernate ORM 5.x.
 
 ### Basic build
 
-You will need JDK 11 exactly;
+You will need JDK 17 exactly;
 newer JDKs will require you to [pass additional properties](#other-jdks)
 in order for tests to run correctly.
 
@@ -198,16 +198,16 @@ To test Hibernate Search against JDK 8:
 ./mvnw clean install -Djava-version.test.release=8 -Djava-version.test.launcher.java_home=/path/to/jdk8
 ```
 
-To test Hibernate Search against JDKs newer than 11:
+To test Hibernate Search against JDKs other than 8 or the default 17:
 
 ```bash
-./mvnw clean install -Djava-version.test.release=17 -Djava-version.test.compiler.java_home=/path/to/jdk17
+./mvnw clean install -Djava-version.test.release=11 -Djava-version.test.compiler.java_home=/path/to/jdk11
 ```
 
-Or more simply, if the newer JDK you want to test against is your default JDK:
+Or more simply, if the newer JDK you want to test against is newer than 17 and is your default JDK:
 
 ```bash
-./mvnw clean install -Djava-version.test.release=17
+./mvnw clean install -Djava-version.test.release=18
 ```
 
 ### Elasticsearch
