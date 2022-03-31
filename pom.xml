@@ -2376,20 +2376,6 @@
         </profile>
 
         <profile>
-            <id>testWithJdk16</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>16</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- Spring isn't ready for JDK16 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>testWithJdk17</id>
             <activation>
                 <property>
