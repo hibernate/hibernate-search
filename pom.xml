@@ -2342,6 +2342,23 @@
         </profile>
 
         <profile>
+            <id>testWithJdkSpecifiedExplicitly</id>
+            <activation>
+                <property>
+                    <name>java-version.test.compiler.java_home</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs uses the Maven JDK to resolve signatures,
+                     which leads to some trouble when using a different JDK version to compile tests
+                     (see https://hibernate.atlassian.net/browse/HSEARCH-4521)
+                     Since the main build is supposed to catch all forbidden API invocations already,
+                     we can safely disable ForbiddenAPIs in builds that target other JDKs. -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>testWithJdk8</id>
             <activation>
                 <property>
@@ -2367,43 +2384,6 @@
                 <property>
                     <name>java-version.test.release</name>
                     <value>11</value>
-                </property>
-            </activation>
-        </profile>
-
-        <profile>
-            <id>testWithJdkSpecifiedExplicitly</id>
-            <activation>
-                <property>
-                    <name>java-version.test.compiler.java_home</name>
-                </property>
-            </activation>
-            <properties>
-                <!-- ForbiddenAPIs uses the Maven JDK to resolve signatures,
-                     which leads to some trouble when using a different JDK version to compile tests
-                     (see https://hibernate.atlassian.net/browse/HSEARCH-4521)
-                     Since the main build is supposed to catch all forbidden API invocations already,
-                     we can safely disable ForbiddenAPIs in builds that target other JDKs. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>testWithJdk17</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>17</value>
-                </property>
-            </activation>
-        </profile>
-
-        <profile>
-            <id>testWithJdk18</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>18</value>
                 </property>
             </activation>
         </profile>
