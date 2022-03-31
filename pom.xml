@@ -2364,7 +2364,10 @@
                 </property>
             </activation>
             <properties>
+                <!-- JDK 8 doesn't support the settings mentioned in the default value of this property,
+                     but it doesn't need them either, so we just omit them. -->
                 <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
+                <!-- JDK 8 produces so many false positives that warnings are worthless -->
                 <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
                 <!-- JDK 8 doesn't support the add-opens mentioned in the default value of this property,
                      but it doesn't need them either, so we just omit them. -->
