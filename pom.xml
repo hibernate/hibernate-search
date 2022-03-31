@@ -505,6 +505,7 @@
         <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
         <!-- JVM args to be customized by each Maven module -->
         <surefire.jvm.args.module></surefire.jvm.args.module>
+        <surefire.jvm.args.module.add-opens></surefire.jvm.args.module.add-opens>
         <!--
              Pass these properties as system properties to be able to switch to
              a different database without re-compiling the hibernate.properties file
@@ -611,6 +612,14 @@
         <test.database.run.mssql.skip>true</test.database.run.mssql.skip>
         <test.database.run.mssql.image.name>mcr.microsoft.com/mssql/server</test.database.run.mssql.image.name>
         <test.database.run.mssql.image.tag>2019-CU8-ubuntu-16.04</test.database.run.mssql.image.tag>
+
+        <!-- Property whose sole purpose is to be referenced in the definition of surefire.jvm.args.module
+             when Weld is used. -->
+        <!-- Weld performs illegal accesses to java.base to generate proxies, so we need to allow them. -->
+        <test.weld.jvm.args>
+            --add-opens java.base/java.security=ALL-UNNAMED
+            --add-opens java.base/java.lang=ALL-UNNAMED
+        </test.weld.jvm.args>
 
         <!-- Eclipse plugin options -->
 
@@ -2357,6 +2366,9 @@
             <properties>
                 <surefire.jvm.args.java-version></surefire.jvm.args.java-version>
                 <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
+                <!-- JDK 8 doesn't support the add-opens mentioned in the default value of this property,
+                     but it doesn't need them either, so we just omit them. -->
+                <test.weld.jvm.args></test.weld.jvm.args>
             </properties>
         </profile>
 
