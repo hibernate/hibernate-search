@@ -2410,10 +2410,6 @@
                     <value>17</value>
                 </property>
             </activation>
-            <properties>
-                <!-- Spring isn't ready for JDK17 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
         </profile>
 
         <profile>
@@ -2424,10 +2420,6 @@
                     <value>18</value>
                 </property>
             </activation>
-            <properties>
-                <!-- Spring isn't ready for JDK18 yet -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
         </profile>
 
         <profile>
