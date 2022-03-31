@@ -563,6 +563,18 @@
         <test.elasticsearch.connection.aws.credentials.type></test.elasticsearch.connection.aws.credentials.type>
         <test.elasticsearch.connection.aws.credentials.access_key_id></test.elasticsearch.connection.aws.credentials.access_key_id>
         <test.elasticsearch.connection.aws.credentials.secret_access_key></test.elasticsearch.connection.aws.credentials.secret_access_key>
+        <!-- Property whose sole purpose is to be referenced in the definition of surefire.jvm.args.module
+             when elasticsearch connection is necessary -->
+        <test.elasticsearch.connection.jvm.args>
+            -Dhibernate.search.backend.uris=${test.elasticsearch.connection.uris}
+            -Dhibernate.search.backend.username=${test.elasticsearch.connection.username}
+            -Dhibernate.search.backend.password=${test.elasticsearch.connection.password}
+            -Dhibernate.search.backend.aws.signing.enabled=${test.elasticsearch.connection.aws.signing.enabled}
+            -Dhibernate.search.backend.aws.region=${test.elasticsearch.connection.aws.region}
+            -Dhibernate.search.backend.aws.credentials.type=${test.elasticsearch.connection.aws.credentials.type}
+            -Dhibernate.search.backend.aws.credentials.access_key_id=${test.elasticsearch.connection.aws.credentials.access_key_id}
+            -Dhibernate.search.backend.aws.credentials.secret_access_key=${test.elasticsearch.connection.aws.credentials.secret_access_key}
+        </test.elasticsearch.connection.jvm.args>
         <!-- Control how integration tests format the requests sent to Elasticsearch -->
         <test.elasticsearch.testdialect></test.elasticsearch.testdialect>
 
