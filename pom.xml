@@ -435,6 +435,10 @@
         <java-version.test.launcher.java_home>${java-version.test.compiler.java_home}</java-version.test.launcher.java_home>
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
 
+        <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
+        <java-version.test.java11.add-test-source-phase>generate-test-sources</java-version.test.java11.add-test-source-phase>
+        <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
+
         <!-- Set this through a property so that it can be overridden from the commandline -->
         <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
 
@@ -1545,6 +1549,30 @@
                             <versionString>${version.jakarta.persistence}</versionString>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-test-source-java11</id>
+                        <phase>${java-version.test.java11.add-test-source-phase}</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java11</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source-java17</id>
+                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java17</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Skip the deploy plugin explicitly: we use nexus-staging-maven-plugin instead -->
@@ -2374,6 +2402,9 @@
                 <!-- JDK 8 doesn't support the add-opens mentioned in the default value of this property,
                      but it doesn't need them either, so we just omit them. -->
                 <test.weld.jvm.args></test.weld.jvm.args>
+                <!-- Tests specific to Java 11+ won't work with JDK 8, so we disable them. -->
+                <java-version.test.java11.add-test-source-phase>none</java-version.test.java11.add-test-source-phase>
+                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
             </properties>
         </profile>
 
@@ -2385,6 +2416,10 @@
                     <value>11</value>
                 </property>
             </activation>
+            <properties>
+                <!-- Tests specific to Java 17+ won't work with JDK 11, so we disable them. -->
+                <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
+            </properties>
         </profile>
 
         <profile>
