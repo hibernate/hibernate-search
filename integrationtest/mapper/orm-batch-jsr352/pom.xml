@@ -17,6 +17,7 @@
 
         <surefire.jvm.args.module>
             ${test.elasticsearch.connection.jvm.args}
+            ${test.weld.jvm.args}
         </surefire.jvm.args.module>
     </properties>
 
@@ -176,25 +177,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>testWithJdk11+</id>
-            <activation>
-                <property>
-                    <name>java-version.test.release</name>
-                    <value>!8</value>
-                </property>
-            </activation>
-            <properties>
-                <!-- Weld performs illegal accesses to java.base to generate proxies, so we need to allow them -->
-                <surefire.jvm.args.module>
-                    --add-opens java.base/java.security=ALL-UNNAMED
-                    --add-opens java.base/java.lang=ALL-UNNAMED
-                </surefire.jvm.args.module>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>
 
