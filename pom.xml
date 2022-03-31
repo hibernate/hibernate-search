@@ -419,8 +419,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- JDK version required for the build; we target 8 but require at least 11 for the build -->
-        <jdk.min.version>11</jdk.min.version>
+        <!-- JDK version required for the build; we target 8 but require at least 17 for the build -->
+        <jdk.min.version>17</jdk.min.version>
         <!-- The lowest supported version of Java for applications using Hibernate Search -->
         <!-- Set statically, independently from the current JDK: we want our code to comply with this version -->
         <java-version.main.release>8</java-version.main.release>
@@ -428,7 +428,7 @@
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
         <!-- Set to the version of the JDK running Maven by default, but overridden on CI -->
-        <!-- 'java.specification.version' is only correct from Java 9 onwards, but we require Java 11 for the build anyway -->
+        <!-- 'java.specification.version' is only correct from Java 9 onwards, but we require Java 17 for the build anyway -->
         <java-version.test.release>${java.specification.version}</java-version.test.release>
         <java-version.test.compiler.java_home>${java.home}</java-version.test.compiler.java_home>
         <java-version.test.compiler>${java-version.test.compiler.java_home}/bin/javac</java-version.test.compiler>
