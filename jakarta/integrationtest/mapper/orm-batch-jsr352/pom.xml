@@ -18,14 +18,7 @@
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
 
         <surefire.jvm.args.module>
-            -Dhibernate.search.backend.uris=${test.elasticsearch.connection.uris}
-            -Dhibernate.search.backend.username=${test.elasticsearch.connection.username}
-            -Dhibernate.search.backend.password=${test.elasticsearch.connection.password}
-            -Dhibernate.search.backend.aws.signing.enabled=${test.elasticsearch.connection.aws.signing.enabled}
-            -Dhibernate.search.backend.aws.region=${test.elasticsearch.connection.aws.region}
-            -Dhibernate.search.backend.aws.credentials.type=${test.elasticsearch.connection.aws.credentials.type}
-            -Dhibernate.search.backend.aws.credentials.access_key_id=${test.elasticsearch.connection.aws.credentials.access_key_id}
-            -Dhibernate.search.backend.aws.credentials.secret_access_key=${test.elasticsearch.connection.aws.credentials.secret_access_key}
+            ${test.elasticsearch.connection.jvm.args}
         </surefire.jvm.args.module>
     </properties>
 
