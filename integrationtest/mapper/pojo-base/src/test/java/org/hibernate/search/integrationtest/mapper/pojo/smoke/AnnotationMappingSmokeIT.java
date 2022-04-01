@@ -44,7 +44,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,9 +57,6 @@ public class AnnotationMappingSmokeIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
-
-	@Rule
-	public StaticCounters counters = new StaticCounters();
 
 	private SearchMapping mapping;
 
