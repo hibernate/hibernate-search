@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.search.mapper.orm.bootstrap.impl.HibernateOrmIntegrationBooterImpl;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 public interface HibernateOrmIntegrationBooter {
 
@@ -20,7 +20,7 @@ public interface HibernateOrmIntegrationBooter {
 	}
 
 	interface Builder {
-		Builder valueReadHandleFactory(ValueReadHandleFactory valueReadHandleFactory);
+		Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory);
 
 		HibernateOrmIntegrationBooter build();
 	}

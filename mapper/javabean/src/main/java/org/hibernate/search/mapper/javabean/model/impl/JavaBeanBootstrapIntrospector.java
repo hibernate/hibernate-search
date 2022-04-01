@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -26,8 +27,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 /**
  * A very simple introspector roughly following Java Beans conventions.
@@ -40,18 +42,16 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static JavaBeanBootstrapIntrospector create(MethodHandles.Lookup lookup) {
-		ValueReadHandleFactory valueReadHandleFactory = ValueReadHandleFactory.usingMethodHandle( lookup );
-		return new JavaBeanBootstrapIntrospector( valueReadHandleFactory );
+		ValueHandleFactory valueHandleFactory = ValueHandleFactory.usingMethodHandle( lookup );
+		return new JavaBeanBootstrapIntrospector( valueHandleFactory );
 	}
 
-	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final PojoHCannOrmGenericContextHelper genericContextHelper;
 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	private JavaBeanBootstrapIntrospector(ValueReadHandleFactory valueReadHandleFactory) {
-		super( new JavaReflectionManager() );
-		this.valueReadHandleFactory = valueReadHandleFactory;
+	private JavaBeanBootstrapIntrospector(ValueHandleFactory valueHandleFactory) {
+		super( new JavaReflectionManager(), valueHandleFactory );
 		this.genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
 	}
 
@@ -74,20 +74,26 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 	}
 
 	@Override
-	public ValueReadHandleFactory annotationValueReadHandleFactory() {
-		return valueReadHandleFactory;
+	public ValueHandleFactory annotationValueReadHandleFactory() {
+		return valueHandleFactory;
+	}
+
+	@Override
+	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
+		setAccessible( constructor );
+		return valueHandleFactory.createForConstructor( constructor );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Member member) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
-			return valueReadHandleFactory.createForMethod( method );
+			return valueHandleFactory.createForMethod( method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
 			setAccessible( field );
-			return valueReadHandleFactory.createForField( field );
+			return valueHandleFactory.createForField( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

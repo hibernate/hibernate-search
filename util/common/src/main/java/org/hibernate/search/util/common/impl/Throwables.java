@@ -76,6 +76,9 @@ public final class Throwables {
 		if ( object == null ) {
 			return "null";
 		}
+		if ( object instanceof Object[] ) {
+			return safeArrayToString( throwableBeingHandled, (Object[]) object );
+		}
 		try {
 			return object.toString();
 		}
@@ -83,6 +86,22 @@ public final class Throwables {
 			throwableBeingHandled.addSuppressed( t );
 			return "<" + object.getClass().getSimpleName() + "#toString() threw " + t.getClass().getSimpleName() + ">";
 		}
+	}
+
+	private static String safeArrayToString(Throwable throwableBeingHandled, Object[] array) {
+		if ( array == null ) {
+			return "null";
+		}
+		StringBuilder b = new StringBuilder();
+		b.append( '[' );
+		for ( int i = 0; i < array.length; i++ ) {
+			if ( i > 0 ) {
+				b.append( ", " );
+			}
+			b.append( safeToString( throwableBeingHandled, array[i] ) );
+		}
+		b.append( ']' );
+		return b.toString();
 	}
 
 }

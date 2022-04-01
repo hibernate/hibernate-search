@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,17 +35,17 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 public class ValueReadHandleTest {
 
 	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> data() {
+	public static List<Object[]> params() {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		return Arrays.asList( new Object[][] {
-				{ ValueReadHandleFactory.usingMethodHandle( lookup ) },
-				{ ValueReadHandleFactory.usingJavaLangReflect() }
+				{ ValueHandleFactory.usingMethodHandle( lookup ) },
+				{ ValueHandleFactory.usingJavaLangReflect() }
 		} );
 	}
 
-	private final ValueReadHandleFactory factory;
+	private final ValueHandleFactory factory;
 
-	public ValueReadHandleTest(ValueReadHandleFactory factory) {
+	public ValueReadHandleTest(ValueHandleFactory factory) {
 		this.factory = factory;
 	}
 

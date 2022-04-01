@@ -75,7 +75,7 @@ public abstract class AbstractPojoHCAnnPropertyModel<T, I extends AbstractPojoHC
 		if ( typeModelCache == null ) {
 			try {
 				typeModelCache = (PojoTypeModel<T>) holderTypeModel.rawTypeDeclaringContext
-						.propertyType( getterGenericReturnType() );
+						.memberTypeReference( getterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );

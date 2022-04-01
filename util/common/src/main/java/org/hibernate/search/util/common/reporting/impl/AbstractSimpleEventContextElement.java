@@ -31,7 +31,7 @@ public abstract class AbstractSimpleEventContextElement<T> implements EventConte
 	@Override
 	public boolean equals(Object obj) {
 		return obj != null && getClass().equals( obj.getClass() )
-				&& Objects.equals( param, ( (AbstractSimpleEventContextElement<?>) obj ).param );
+				&& Objects.deepEquals( param, ( (AbstractSimpleEventContextElement<?>) obj ).param );
 	}
 
 	@Override

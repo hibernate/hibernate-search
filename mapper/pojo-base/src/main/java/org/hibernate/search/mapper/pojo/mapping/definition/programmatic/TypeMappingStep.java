@@ -50,9 +50,30 @@ public interface TypeMappingStep {
 	TypeMappingStep binder(TypeBinder binder, Map<String, Object> params);
 
 	/**
+	 * Starts the definition of the mapping of the main constructor of this type.
+	 * <p>
+	 * The main constructor only exists if this type defines a single constructor
+	 * and that constructor accepts at least one argument.
+	 *
+	 * @return A DSL step where the property mapping can be defined in more details.
+	 * @throws org.hibernate.search.util.common.SearchException If this type doesn't have a main constructor.
+	 */
+	ConstructorMappingStep mainConstructor();
+
+	/**
+	 * Starts the definition of the mapping of the constructor of this type accepting arguments with the given types.
+	 *
+	 * @param parameterTypes The type of parameters of a constructor in the type being mapped.
+	 * @return A DSL step where the property mapping can be defined in more details.
+	 * @throws org.hibernate.search.util.common.SearchException If this type does not declare a constructor
+	 * with the given types.
+	 */
+	ConstructorMappingStep constructor(Class<?> ... parameterTypes);
+
+	/**
 	 * Starts the definition of the mapping of a specific property.
 	 *
-	 * @param propertyName The name of a property in this type.
+	 * @param propertyName The name of a property in the type being mapped.
 	 * @return A DSL step where the property mapping can be defined in more details.
 	 */
 	PropertyMappingStep property(String propertyName);

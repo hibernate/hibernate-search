@@ -13,7 +13,9 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -51,6 +53,11 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
+	public void contributeSearchMapping(PojoSearchMappingCollectorTypeNode collector) {
+		children.contributeSearchMapping( collector );
+	}
+
+	@Override
 	public TypeMappingIndexedStep indexed() {
 		TypeMappingIndexedStepImpl child = new TypeMappingIndexedStepImpl( typeModel.typeIdentifier() );
 		children.add( child );
@@ -61,6 +68,21 @@ public class TypeMappingStepImpl
 	public TypeMappingStep binder(TypeBinder binder, Map<String, Object> params) {
 		children.add( new TypeBridgeMappingContributor( binder, params ) );
 		return this;
+	}
+
+	@Override
+	public ConstructorMappingStep mainConstructor() {
+		InitialConstructorMappingStep child = new InitialConstructorMappingStep( this, typeModel.mainConstructor() );
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public ConstructorMappingStep constructor(Class<?>... parameterTypes) {
+		InitialConstructorMappingStep child = new InitialConstructorMappingStep(
+				this, typeModel.constructor( parameterTypes ) );
+		children.add( child );
+		return child;
 	}
 
 	@Override

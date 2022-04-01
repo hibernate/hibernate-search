@@ -110,4 +110,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 11,
 			value = "'%1$s' must not contain any null element.")
 	IllegalArgumentException collectionMustNotContainNullElement(String collectionDescription);
+
+	@Message(id = ID_OFFSET + 12, value = "Exception while invoking '%1$s' with arguments %2$s: %3$s")
+	SearchException errorInvokingStaticMember(Member member, String argumentsAsString, @Cause Throwable cause, String causeMessage);
+
 }

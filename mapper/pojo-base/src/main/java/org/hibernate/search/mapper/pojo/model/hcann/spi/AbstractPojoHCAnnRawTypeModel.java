@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
@@ -62,6 +65,20 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 	@Override
 	public Stream<Annotation> annotations() {
 		return introspector.annotations( xClass );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	protected List<PojoConstructorModel<T>> createDeclaredConstructors() {
+		return Arrays.stream( toClass().getDeclaredConstructors() )
+				.<PojoConstructorModel<T>>map( constructor -> new PojoHCAnnConstructorModel<>(
+						introspector, this, (Constructor<T>) constructor ) )
+				.collect( Collectors.toList() );
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<T> toClass() {
+		return (Class<T>) introspector.toClass( xClass );
 	}
 
 	@Override

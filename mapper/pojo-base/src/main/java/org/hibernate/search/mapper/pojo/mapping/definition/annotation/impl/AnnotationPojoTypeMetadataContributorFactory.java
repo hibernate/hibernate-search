@@ -15,17 +15,22 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.ConstructorMappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyMappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeMappingAnnotationProcessorContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ConstructorMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
@@ -72,6 +77,14 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			}
 		}
 
+		for ( PojoConstructorModel<?> constructorModel : typeModel.declaredConstructors() ) {
+			Class<?>[] parametersJavaTypes = constructorModel.parametersJavaTypes();
+			ConstructorMappingStep mappingContext = typeMappingContext.constructor( parametersJavaTypes );
+			if ( processConstructorLevelAnnotations( mappingContext, typeModel, constructorModel ) ) {
+				processedAtLeastOneAnnotation = true;
+			}
+		}
+
 		for ( PojoPropertyModel<?> propertyModel : typeModel.declaredProperties() ) {
 			String propertyName = propertyModel.name();
 			PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
@@ -80,6 +93,20 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			}
 		}
 
+		return processedAtLeastOneAnnotation;
+	}
+
+	private boolean processConstructorLevelAnnotations(ConstructorMappingStep mappingContext,
+			PojoRawTypeModel<?> typeModel, PojoConstructorModel<?> constructorModel) {
+		boolean processedAtLeastOneAnnotation = false;
+		List<Annotation> annotationList = constructorModel.annotations()
+				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
+				.collect( Collectors.toList() );
+		for ( Annotation annotation : annotationList ) {
+			if ( tryApplyProcessor( mappingContext, typeModel, constructorModel, annotation ) ) {
+				processedAtLeastOneAnnotation = true;
+			}
+		}
 		return processedAtLeastOneAnnotation;
 	}
 
@@ -115,6 +142,30 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		catch (RuntimeException e) {
 			rootFailureCollector.withContext( context.eventContext() )
 					.add( e );
+		}
+
+		return true;
+	}
+
+	private <A extends Annotation> boolean tryApplyProcessor(ConstructorMappingStep mapping,
+			PojoRawTypeModel<?> typeModel, PojoConstructorModel<?> constructorModel,
+			A annotation) {
+		Optional<BeanHolder<? extends ConstructorMappingAnnotationProcessor<? super A>>> processorOptional =
+				annotationProcessorProvider.createConstructorAnnotationProcessor( annotation );
+		if ( !processorOptional.isPresent() ) {
+			return false;
+		}
+
+		ConstructorMappingAnnotationProcessorContext context =
+				new ConstructorMappingAnnotationProcessorContextImpl( typeModel, constructorModel, annotation,
+						annotationHelper );
+
+		try ( BeanHolder<? extends ConstructorMappingAnnotationProcessor<? super A>> processorHolder =
+				processorOptional.get() ) {
+			processorHolder.get().process( mapping, annotation, context );
+		}
+		catch (RuntimeException e) {
+			rootFailureCollector.withContext( context.eventContext() ).add( e );
 		}
 
 		return true;

@@ -18,4 +18,8 @@ public interface PojoTypeMetadataContributor {
 		// No-op by default
 	}
 
+	default void contributeSearchMapping(PojoSearchMappingCollectorTypeNode collector) {
+		// Defaults to no-op
+	}
+
 }

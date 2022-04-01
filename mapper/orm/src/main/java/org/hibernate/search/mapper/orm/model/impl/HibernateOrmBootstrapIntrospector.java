@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -30,8 +31,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector
 		implements PojoBootstrapIntrospector {
@@ -41,14 +43,13 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	public static HibernateOrmBootstrapIntrospector create(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ReflectionManager ormReflectionManager,
-			ValueReadHandleFactory valueReadHandleFactory) {
+			ValueHandleFactory valueHandleFactory) {
 		return new HibernateOrmBootstrapIntrospector(
-				basicTypeMetadataProvider, ormReflectionManager, valueReadHandleFactory
+				basicTypeMetadataProvider, ormReflectionManager, valueHandleFactory
 		);
 	}
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
-	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final PojoHCannOrmGenericContextHelper genericContextHelper;
 
 	/*
@@ -66,10 +67,9 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private HibernateOrmBootstrapIntrospector(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ReflectionManager reflectionManager,
-			ValueReadHandleFactory valueReadHandleFactory) {
-		super( reflectionManager );
+			ValueHandleFactory valueHandleFactory) {
+		super( reflectionManager, valueHandleFactory );
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
-		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
 	}
 
@@ -108,8 +108,9 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	@Override
-	public ValueReadHandleFactory annotationValueReadHandleFactory() {
-		return valueReadHandleFactory;
+	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
+		setAccessible( constructor );
+		return valueHandleFactory.createForConstructor( constructor );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,
@@ -117,7 +118,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
-			return valueReadHandleFactory.createForMethod( method );
+			return valueHandleFactory.createForMethod( method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
@@ -125,12 +126,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( holderClass, field );
 				if ( bytecodeEnhancerReaderMethod != null ) {
 					setAccessible( bytecodeEnhancerReaderMethod );
-					return valueReadHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
+					return valueHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
 				}
 			}
 
 			setAccessible( field );
-			return valueReadHandleFactory.createForField( field );
+			return valueHandleFactory.createForField( field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );

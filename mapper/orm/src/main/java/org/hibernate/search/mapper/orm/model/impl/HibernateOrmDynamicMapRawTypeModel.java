@@ -7,12 +7,15 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -70,6 +73,12 @@ public class HibernateOrmDynamicMapRawTypeModel
 	@Override
 	public Stream<Annotation> annotations() {
 		return Stream.empty();
+	}
+
+	@Override
+	protected List<PojoConstructorModel<Map>> createDeclaredConstructors() {
+		// No support for constructors on dynamic-map types.
+		return Collections.emptyList();
 	}
 
 	@Override

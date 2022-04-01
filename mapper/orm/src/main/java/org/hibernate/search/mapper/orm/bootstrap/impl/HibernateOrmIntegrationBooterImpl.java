@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
@@ -37,7 +37,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private final Metadata metadata;
 	private final ReflectionManager reflectionManager;
-	private final ValueReadHandleFactory valueReadHandleFactory;
+	private final ValueHandleFactory valueHandleFactory;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 
@@ -46,8 +46,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
 		this.reflectionManager = builder.bootstrapContext.getReflectionManager();
-		this.valueReadHandleFactory = builder.valueReadHandleFactory != null ? builder.valueReadHandleFactory
-				: ValueReadHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
+		this.valueHandleFactory = builder.valueHandleFactory != null ? builder.valueHandleFactory
+				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
 		this.preIntegrationService = HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 
 		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer =
@@ -86,7 +86,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			);
 		}
 
-		preIntegrationService.doBootFirstPhase( metadata, reflectionManager, valueReadHandleFactory )
+		preIntegrationService.doBootFirstPhase( metadata, reflectionManager, valueHandleFactory )
 				.set( propertyCollector );
 	}
 
@@ -170,7 +170,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmIntegrationPartialBuildState partialBuildState =
-				preIntegrationService.doBootFirstPhase( metadata, reflectionManager, valueReadHandleFactory );
+				preIntegrationService.doBootFirstPhase( metadata, reflectionManager, valueHandleFactory );
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,
@@ -187,7 +187,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		private final Metadata metadata;
 		private final BootstrapContext bootstrapContext;
 
-		private ValueReadHandleFactory valueReadHandleFactory;
+		private ValueHandleFactory valueHandleFactory;
 
 		public BuilderImpl(Metadata metadata, BootstrapContext bootstrapContext) {
 			this.metadata = metadata;
@@ -195,8 +195,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		}
 
 		@Override
-		public Builder valueReadHandleFactory(ValueReadHandleFactory valueReadHandleFactory) {
-			this.valueReadHandleFactory = valueReadHandleFactory;
+		public Builder valueReadHandleFactory(ValueHandleFactory valueHandleFactory) {
+			this.valueHandleFactory = valueHandleFactory;
 			return this;
 		}
 

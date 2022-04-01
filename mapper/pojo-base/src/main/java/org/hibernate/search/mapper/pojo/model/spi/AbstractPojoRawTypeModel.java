@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	private final Map<String, PojoPropertyModel<?>> propertyModelCache = new HashMap<>();
 
 	private List<PojoPropertyModel<?>> declaredProperties;
+	private List<PojoConstructorModel<T>> declaredConstructors;
 
 	public AbstractPojoRawTypeModel(I introspector, PojoRawTypeIdentifier<T> typeIdentifier) {
 		this.introspector = introspector;
@@ -74,6 +76,35 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	public final String name() {
 		return typeIdentifier.toString();
 	}
+
+	@Override
+	public final PojoConstructorModel<T> mainConstructor() {
+		Collection<PojoConstructorModel<T>> theDeclaredConstructors = declaredConstructors();
+		if ( theDeclaredConstructors.size() != 1 ) {
+			throw log.cannotFindMainConstructorNotExactlyOneConstructor( this );
+		}
+		return theDeclaredConstructors.iterator().next();
+	}
+
+	@Override
+	public final PojoConstructorModel<T> constructor(Class<?>... parameterTypes) {
+		for ( PojoConstructorModel<T> constructor : declaredConstructors() ) {
+			if ( Arrays.equals( parameterTypes, constructor.parametersJavaTypes() ) ) {
+				return constructor;
+			}
+		}
+		throw log.cannotFindConstructorWithParameterTypes( this, parameterTypes, declaredConstructors() );
+	}
+
+	@Override
+	public Collection<PojoConstructorModel<T>> declaredConstructors() {
+		if ( declaredConstructors == null ) {
+			declaredConstructors = createDeclaredConstructors();
+		}
+		return declaredConstructors;
+	}
+
+	protected abstract List<PojoConstructorModel<T>> createDeclaredConstructors();
 
 	@Override
 	public final PojoPropertyModel<?> property(String propertyName) {

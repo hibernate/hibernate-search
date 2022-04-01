@@ -38,7 +38,7 @@ import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceContributor;
@@ -203,7 +203,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 	abstract HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
 			ReflectionManager reflectionManager,
-			ValueReadHandleFactory valueReadHandleFactory);
+			ValueHandleFactory valueHandleFactory);
 
 	static class NotBooted extends HibernateSearchPreIntegrationService {
 
@@ -232,7 +232,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
 				ReflectionManager reflectionManager,
-				ValueReadHandleFactory valueReadHandleFactory) {
+				ValueHandleFactory valueHandleFactory) {
 			HibernateOrmMappingInitiator mappingInitiator = null;
 			SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 			try {
@@ -240,7 +240,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 				HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, reflectionManager,
-						valueReadHandleFactory, serviceRegistry );
+						valueHandleFactory, serviceRegistry );
 				builder.addMappingInitiator( mappingKey, mappingInitiator );
 
 				searchIntegrationPartialBuildState = builder.prepareBuild();
@@ -283,7 +283,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-				ReflectionManager reflectionManager, ValueReadHandleFactory valueReadHandleFactory) {
+				ReflectionManager reflectionManager, ValueHandleFactory valueHandleFactory) {
 			return partialBuildState;
 		}
 	}
