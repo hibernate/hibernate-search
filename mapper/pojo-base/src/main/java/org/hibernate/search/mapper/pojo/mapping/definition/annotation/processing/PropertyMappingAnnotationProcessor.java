@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 /**
- * A processor for mapping annotations applied to a Java type.
+ * A processor for mapping annotations applied to a Java property.
  * <p>
  * Implementations extract information from the annotation,
  * and according to that information,
