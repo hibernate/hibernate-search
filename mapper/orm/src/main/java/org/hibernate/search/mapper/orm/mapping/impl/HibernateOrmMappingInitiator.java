@@ -37,7 +37,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
@@ -56,11 +56,11 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
-			ValueReadHandleFactory valueReadHandleFactory, ServiceRegistry serviceRegistry) {
+			ValueHandleFactory valueHandleFactory, ServiceRegistry serviceRegistry) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 		HibernateOrmBootstrapIntrospector introspector = HibernateOrmBootstrapIntrospector.create(
-				basicTypeMetadataProvider, reflectionManager, valueReadHandleFactory );
+				basicTypeMetadataProvider, reflectionManager, valueHandleFactory );
 		ConfigurationService ormConfigurationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
 		HibernateSearchPreIntegrationService preIntegrationService =

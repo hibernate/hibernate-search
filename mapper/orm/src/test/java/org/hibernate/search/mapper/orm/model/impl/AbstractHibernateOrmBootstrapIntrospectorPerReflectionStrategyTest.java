@@ -21,7 +21,7 @@ import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -33,15 +33,15 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 	@Parameterized.Parameters(name = "Reflection strategy = {0}")
 	public static List<Object[]> data() {
 		return Arrays.asList( new Object[][] {
-				{ ValueReadHandleFactory.usingJavaLangReflect() },
-				{ ValueReadHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) }
+				{ ValueHandleFactory.usingJavaLangReflect() },
+				{ ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) }
 		} );
 	}
 
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
 	@Parameterized.Parameter
-	public ValueReadHandleFactory valueReadHandleFactory;
+	public ValueHandleFactory valueHandleFactory;
 
 	@After
 	public void cleanup() throws Exception {
@@ -72,7 +72,8 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 
 		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, reflectionManager,
-				valueReadHandleFactory );
+				valueHandleFactory
+		);
 	}
 
 }

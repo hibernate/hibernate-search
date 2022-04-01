@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
+
 /*
  * Notes on meta-characters used here:
  * - "\h" in a regex means "horizontal whitespace characters", i.e. spaces or tabs but not newline
@@ -48,6 +50,14 @@ public class FailureReportChecker implements Consumer<Throwable> {
 
 	public FailureReportChecker backendContext(String exactBackendName) {
 		return contextLiteral( "backend '" + exactBackendName + "'" );
+	}
+
+	public FailureReportChecker constructorContext(Class<?> ... parameterTypes) {
+		return contextLiteral( "constructor with parameter types [" + CommaSeparatedClassesFormatter.format( parameterTypes ) + "]" );
+	}
+
+	public FailureReportChecker methodParameterContext(int index, String name) {
+		return contextLiteral( "parameter at index " + index + " (" + name + ")" );
 	}
 
 	public FailureReportChecker pathContext(String pathPattern) {

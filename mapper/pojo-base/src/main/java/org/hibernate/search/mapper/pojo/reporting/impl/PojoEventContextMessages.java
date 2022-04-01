@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.reporting.impl;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.Messages;
@@ -23,6 +24,15 @@ import org.jboss.logging.annotations.MessageBundle;
 public interface PojoEventContextMessages {
 
 	PojoEventContextMessages INSTANCE = Messages.getBundle( PojoEventContextMessages.class );
+
+	@Message(value = "constructor with parameter types %1$s")
+	String constructor(@FormatWith(CommaSeparatedClassesFormatter.class) Class<?>[] parameterTypes);
+
+	@Message(value = "parameter at index %1$s (%2$s)")
+	String methodParameter(int index, String name);
+
+	@Message(value = "<unknown name>")
+	String unknownName();
 
 	@Message(value = "path '%1$s'")
 	String path(String pathString);

@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -23,10 +24,12 @@ import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
@@ -645,5 +648,23 @@ public interface Log extends BasicLogger {
 	@Message(value = "%1$s")
 	SearchProcessingWithContextException searchProcessingFailure(@Cause Throwable cause, String causeMessage,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 107,
+			value = "No main constructor for type '%1$s': this type does not declare exactly one constructor.")
+	SearchException cannotFindMainConstructorNotExactlyOneConstructor(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
+
+	@Message(id = ID_OFFSET + 109,
+			value = "No constructor with parameter types %2$s on type '%1$s'. Available constructors: %3$s")
+	SearchException cannotFindConstructorWithParameterTypes(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Class<?>[] parameterTypes,
+			Collection<? extends PojoConstructorModel<?>> constructors);
+
+	@Message(id = ID_OFFSET + 110, value = "Exception while retrieving parameter type model for parameter #%1$s of '%2$s'.")
+	SearchException errorRetrievingConstructorParameterTypeModel(int parameterIndex,
+			PojoConstructorModel<?> constructorModel, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 111, value = "Exception while retrieving constructor handle for '%1$s' on '%2$s'.")
+	SearchException errorRetrievingConstructorHandle(Constructor<?> constructor,
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 
 }

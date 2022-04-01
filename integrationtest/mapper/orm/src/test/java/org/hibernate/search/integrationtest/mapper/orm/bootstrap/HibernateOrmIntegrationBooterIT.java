@@ -37,8 +37,8 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
@@ -74,7 +74,7 @@ public class HibernateOrmIntegrationBooterIT {
 	private ValueReadHandle<String> textValueReadHandleMock;
 
 	@Mock
-	private ValueReadHandleFactory valueReadHandleFactoryMock;
+	private ValueHandleFactory valueHandleFactoryMock;
 
 	@After
 	public void cleanup() throws Exception {
@@ -95,14 +95,14 @@ public class HibernateOrmIntegrationBooterIT {
 				b2 -> b2.analyzerName( AnalyzerNames.DEFAULT ) ) );
 		// Pre-booting should retrieve value-read handles
 		// Simulate a custom handle from a framework, e.g. Quarkus
-		when( valueReadHandleFactoryMock.createForField( IndexedEntity.ID_FIELD ) )
+		when( valueHandleFactoryMock.createForField( IndexedEntity.ID_FIELD ) )
 				.thenReturn( (ValueReadHandle) idValueReadHandleMock );
-		when( valueReadHandleFactoryMock.createForField( IndexedEntity.TEXT_FIELD ) )
+		when( valueHandleFactoryMock.createForField( IndexedEntity.TEXT_FIELD ) )
 				.thenReturn( (ValueReadHandle) textValueReadHandleMock );
 		booter.preBoot( booterGeneratedProperties::put );
 		backendMock.verifyExpectationsMet();
-		verify( valueReadHandleFactoryMock ).createForField( IndexedEntity.ID_FIELD );
-		verify( valueReadHandleFactoryMock ).createForField( IndexedEntity.TEXT_FIELD );
+		verify( valueHandleFactoryMock ).createForField( IndexedEntity.ID_FIELD );
+		verify( valueHandleFactoryMock ).createForField( IndexedEntity.TEXT_FIELD );
 
 		SimpleSessionFactoryBuilder builder = new SimpleSessionFactoryBuilder()
 				.addAnnotatedClass( IndexedEntity.class )
@@ -176,7 +176,7 @@ public class HibernateOrmIntegrationBooterIT {
 				metadataImplementor.getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext();
 
 		return HibernateOrmIntegrationBooter.builder( metadata, bootstrapContext )
-				.valueReadHandleFactory( valueReadHandleFactoryMock )
+				.valueReadHandleFactory( valueHandleFactoryMock )
 				.build();
 	}
 

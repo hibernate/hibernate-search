@@ -22,12 +22,12 @@ public final class AnnotationHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ValueReadHandleFactory handleFactory;
+	private final ValueHandleFactory handleFactory;
 
 	private final Map<Class<? extends Annotation>, ValueReadHandle<Annotation[]>> containedAnnotationsHandleCache =
 			new HashMap<>();
 
-	public AnnotationHelper(ValueReadHandleFactory handleFactory) {
+	public AnnotationHelper(ValueHandleFactory handleFactory) {
 		this.handleFactory = handleFactory;
 	}
 

@@ -54,6 +54,25 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 
 	Stream<Annotation> annotations();
 
+	/**
+	 * @return The main constructor of this type.
+	 * The main constructor only exists if this type defines a single constructor.
+	 * @throws org.hibernate.search.util.common.SearchException If there is no main constructor for this type.
+	 */
+	PojoConstructorModel<T> mainConstructor();
+
+	/**
+	 * @param parameterTypes The type of parameters to the returned constructor.
+	 * @return The constructor of this type whose parameters have the given {@code parameterTypes}.
+	 * @throws org.hibernate.search.util.common.SearchException If there is no constructor with parameters of the given types.
+	 */
+	PojoConstructorModel<T> constructor(Class<?> ... parameterTypes);
+
+	/**
+	 * @return All accessible constructors of this type.
+	 */
+	Collection<PojoConstructorModel<T>> declaredConstructors();
+
 	Collection<PojoPropertyModel<?>> declaredProperties();
 
 	/**

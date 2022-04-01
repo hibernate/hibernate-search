@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,16 +23,25 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.util.common.impl.StreamHelper;
+import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
 public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final ReflectionManager reflectionManager;
-
 	private final PojoXClassOrdering typeOrdering;
+	protected final ValueHandleFactory valueHandleFactory;
 
-	public AbstractPojoHCAnnBootstrapIntrospector(ReflectionManager reflectionManager) {
+	public AbstractPojoHCAnnBootstrapIntrospector(ReflectionManager reflectionManager,
+			ValueHandleFactory valueHandleFactory) {
 		this.reflectionManager = reflectionManager;
 		this.typeOrdering = new PojoXClassOrdering( reflectionManager );
+		this.valueHandleFactory = valueHandleFactory;
+	}
+
+	@Override
+	public ValueHandleFactory annotationValueReadHandleFactory() {
+		return valueHandleFactory;
 	}
 
 	public Stream<Annotation> annotations(XAnnotatedElement xAnnotated) {
@@ -60,7 +70,10 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 		return typeOrdering.descendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	private Class<?> toClass(XClass xClass) {
+	protected abstract <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor)
+			throws IllegalAccessException;
+
+	public Class<?> toClass(XClass xClass) {
 		return reflectionManager.toClass( xClass );
 	}
 

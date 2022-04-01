@@ -96,7 +96,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 		}
 
 		/**
-		 * @param declaredType The type to create a generic type model for
+		 * @param declaredType The type to create a generic type model for.
 		 * @return A generic type model for {@code declaredType} in this context.
 		 * The type parameter can safely be assumed to be exactly the type {@code declaredType}.
 		 * For instance if {@code declaredType} is {@code String.class},
@@ -104,7 +104,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 		 * If {@code declaredType} is {@code List<String>}, it will be {@code PojoGenericTypeModel<List<String>>},
 		 * and so on.
 		 */
-		public PojoTypeModel<?> propertyType(Type declaredType) {
+		public PojoTypeModel<?> memberTypeReference(Type declaredType) {
 			/*
 			 * The declaring type, even raw, could extend parameterized types in which the given "type" was declared.
 			 * Thus we need the declaring context even for property types on raw types,

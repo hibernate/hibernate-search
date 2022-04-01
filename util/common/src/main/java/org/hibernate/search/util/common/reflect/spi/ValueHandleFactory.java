@@ -7,10 +7,13 @@
 package org.hibernate.search.util.common.reflect.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public interface ValueReadHandleFactory {
+public interface ValueHandleFactory {
+
+	<T> ValueCreateHandle<T> createForConstructor(Constructor<T> constructor) throws IllegalAccessException;
 
 	ValueReadHandle<?> createForField(Field field) throws IllegalAccessException;
 
@@ -21,8 +24,8 @@ public interface ValueReadHandleFactory {
 	 * to get the value of a field/method,
 	 * i.e {@link Method#invoke(Object, Object...)} and {@link Field#get(Object)}.
 	 */
-	static ValueReadHandleFactory usingJavaLangReflect() {
-		return new MemberValueReadHandleFactory();
+	static ValueHandleFactory usingJavaLangReflect() {
+		return new MemberValueHandleFactory();
 	}
 
 	/**
@@ -30,8 +33,8 @@ public interface ValueReadHandleFactory {
 	 * @return A factory producing value handles that rely on {@link java.lang.invoke.MethodHandle}
 	 * to get the value of a field/method.
 	 */
-	static ValueReadHandleFactory usingMethodHandle(MethodHandles.Lookup lookup) {
-		return new MethodHandleValueReadHandleFactory( lookup );
+	static ValueHandleFactory usingMethodHandle(MethodHandles.Lookup lookup) {
+		return new MethodHandleValueHandleFactory( lookup );
 	}
 
 }
