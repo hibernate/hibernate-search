@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
  * Meta-annotation for annotations that apply mapping to a property.
  * <p>
  * Whenever an annotation meta-annotated with {@link PropertyMapping}
- * is found on a type in the domain model,
+ * is found on a property in the domain model,
  * the corresponding annotation processor will be retrieved and applied to that property.
  * The processor will be passed the annotation instance through its
  * {@link PropertyMappingAnnotationProcessor#process(PropertyMappingStep, Annotation, PropertyMappingAnnotationProcessorContext)} method.
