@@ -34,6 +34,7 @@ public final class MethodHandleValueReadHandle<T> implements ValueReadHandle<T> 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public T get(Object thiz) {
 		try {
 			return (T) getter.invoke( thiz );
