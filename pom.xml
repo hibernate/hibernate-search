@@ -2546,6 +2546,13 @@
                     <name>idea.maven.embedder.version</name>
                 </property>
             </activation>
+            <properties>
+                <!-- Intellij IDEA only understands the main -release argument,
+                     so we need to do this in order for tests to compile.
+                     Here's the issue in the IDEA bug tracker: https://youtrack.jetbrains.com/issue/IDEA-85478
+                     It's fixed in 2022.1 EAP 6, so hopefully we'll be able to get rid of this soon. -->
+                <java-version.main.release>${java-version.test.release}</java-version.main.release>
+            </properties>
             <dependencies>
                 <!-- Intellij IDEA doesn't understand <annotationProcessorPaths> in
                      the maven-compiler-plugin configuration, so we need this in order
