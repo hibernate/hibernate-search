@@ -14,7 +14,7 @@ import java.util.function.Function;
  * where one or more inner projections have been defined
  * and the result of the composite projection can be defined.
  */
-public interface CompositeProjectionAsStep {
+public interface CompositeProjectionFromAsStep {
 
 	/**
 	 * Defines the result of the composite projection

@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.util.common.function.TriFunction;
 
 class CompositeProjectionFrom3AsStepImpl<V1, V2, V3>
-		extends AbstractCompositeProjectionAsStep
+		extends AbstractCompositeProjectionFromAsStep
 		implements CompositeProjectionFrom3AsStep<V1, V2, V3> {
 
 	final SearchProjection<V1> inner1;

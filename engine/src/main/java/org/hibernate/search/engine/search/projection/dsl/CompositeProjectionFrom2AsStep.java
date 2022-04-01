@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
  * @param <V2> The type of values returned by the second inner projection.
  */
 public interface CompositeProjectionFrom2AsStep<V1, V2>
-		extends CompositeProjectionAsStep {
+		extends CompositeProjectionFromAsStep {
 
 	/**
 	 * Defines the result of the composite projection

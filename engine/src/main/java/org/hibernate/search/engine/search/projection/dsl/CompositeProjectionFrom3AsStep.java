@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.function.TriFunction;
  * @param <V3> The type of values returned by the third inner projection.
  */
 public interface CompositeProjectionFrom3AsStep<V1, V2, V3>
-		extends CompositeProjectionAsStep {
+		extends CompositeProjectionFromAsStep {
 
 	/**
 	 * Defines the result of the composite projection

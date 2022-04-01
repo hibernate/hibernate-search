@@ -10,17 +10,17 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionAsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
-abstract class AbstractCompositeProjectionAsStep
-		implements CompositeProjectionAsStep {
+abstract class AbstractCompositeProjectionFromAsStep
+		implements CompositeProjectionFromAsStep {
 
 	final CompositeProjectionBuilder builder;
 
-	public AbstractCompositeProjectionAsStep(CompositeProjectionBuilder builder) {
+	public AbstractCompositeProjectionFromAsStep(CompositeProjectionBuilder builder) {
 		this.builder = builder;
 	}
 

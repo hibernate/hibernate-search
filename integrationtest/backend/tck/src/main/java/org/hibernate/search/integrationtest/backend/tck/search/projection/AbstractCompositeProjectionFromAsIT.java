@@ -21,11 +21,11 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionAsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom3AsStep;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
@@ -67,9 +67,9 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
-	protected abstract CompositeProjectionFromStep startProjection(SearchProjectionFactory<?, ?> f);
+	protected abstract CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?> f);
 
-	protected abstract CompositeProjectionFromStep startProjectionForMulti(SearchProjectionFactory<?, ?> f);
+	protected abstract CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?> f);
 
 	private abstract class AbstractFromAnyNumberIT {
 
@@ -166,18 +166,18 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 							.collect( Collectors.toList() ) );
 		}
 
-		protected CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeProjectionFromStep step) {
+		protected CompositeProjectionFromAsStep doFrom(SearchProjectionFactory<?, ?> f,
+				CompositeProjectionInnerStep step) {
 			return doFrom( f, index.binding().composite(), step );
 		}
 
-		protected CompositeProjectionAsStep doFromForMulti(SearchProjectionFactory<?, ?> f,
-				CompositeProjectionFromStep step) {
+		protected CompositeProjectionFromAsStep doFromForMulti(SearchProjectionFactory<?, ?> f,
+				CompositeProjectionInnerStep step) {
 			return doFrom( f, index.binding().compositeForMulti(), step );
 		}
 
-		protected abstract CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding,
-				CompositeProjectionFromStep step);
+		protected abstract CompositeProjectionFromAsStep doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding,
+				CompositeProjectionInnerStep step);
 
 		protected final Collection<List<?>> expectedLists() {
 			return dataSet.forEachDocument( docOrdinal -> expectedList( docOrdinal, 0 ) );
@@ -203,7 +203,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 
 	}
 
-	private abstract class AbstractFromSpecificNumberIT<S extends CompositeProjectionAsStep, T>
+	private abstract class AbstractFromSpecificNumberIT<S extends CompositeProjectionFromAsStep, T>
 			extends AbstractFromAnyNumberIT {
 
 		@Test
@@ -223,17 +223,17 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		}
 
 		@Override
-		protected final S doFrom(SearchProjectionFactory<?, ?> f, CompositeProjectionFromStep step) {
+		protected final S doFrom(SearchProjectionFactory<?, ?> f, CompositeProjectionInnerStep step) {
 			return doFrom( f, index.binding().composite(), step );
 		}
 
 		@Override
-		protected final S doFromForMulti(SearchProjectionFactory<?, ?> f, CompositeProjectionFromStep step) {
+		protected final S doFromForMulti(SearchProjectionFactory<?, ?> f, CompositeProjectionInnerStep step) {
 			return doFrom( f, index.binding().compositeForMulti(), step );
 		}
 
 		@Override
-		protected abstract S doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding, CompositeProjectionFromStep step);
+		protected abstract S doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding, CompositeProjectionInnerStep step);
 
 		protected abstract CompositeProjectionValueStep<?, T> doAs(S step);
 
@@ -254,7 +254,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom1AsStep<String>, ValueWrapper<String>> {
 		@Override
 		protected CompositeProjectionFrom1AsStep<String> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionFromStep step) {
+				CompositeBinding binding, CompositeProjectionInnerStep step) {
 			return step.from( f.field( binding.field1Path(), String.class ) );
 		}
 
@@ -279,7 +279,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom2AsStep<String, String>, Pair<String, String>> {
 		@Override
 		protected CompositeProjectionFrom2AsStep<String, String> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionFromStep step) {
+				CompositeBinding binding, CompositeProjectionInnerStep step) {
 			return step.from( f.field( binding.field1Path(), String.class ),
 					f.field( binding.field2Path(), String.class ) );
 		}
@@ -305,7 +305,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom3AsStep<String, String, LocalDate>, Triplet<String, String, LocalDate>> {
 		@Override
 		protected CompositeProjectionFrom3AsStep<String, String, LocalDate> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionFromStep step) {
+				CompositeBinding binding, CompositeProjectionInnerStep step) {
 			return step.from( f.field( binding.field1Path(), String.class ),
 					f.field( binding.field2Path(), String.class ),
 					f.field( binding.field3Path(), LocalDate.class ) );
@@ -336,8 +336,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 	public class From4IT
 			extends AbstractFromAnyNumberIT {
 		@Override
-		protected CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionFromStep step) {
+		protected CompositeProjectionFromAsStep doFrom(SearchProjectionFactory<?, ?> f,
+				CompositeBinding binding, CompositeProjectionInnerStep step) {
 			return step.from( f.field( binding.field1Path(), String.class ),
 					f.field( binding.field2Path(), String.class ),
 					f.field( binding.field3Path(), LocalDate.class ),
