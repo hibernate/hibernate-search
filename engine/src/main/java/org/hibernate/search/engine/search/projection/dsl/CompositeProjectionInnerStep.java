@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
  * A step in a "multi-step" composite projection definition
  * where one can define inner projections to get values from.
  */
-public interface CompositeProjectionFromStep {
+public interface CompositeProjectionInnerStep {
 
 	/**
 	 * Defines one inner projection to get values from,
@@ -103,7 +103,7 @@ public interface CompositeProjectionFromStep {
 	 * @param projections The inner projections, in order.
 	 * @return The next DSL step.
 	 */
-	CompositeProjectionAsStep from(SearchProjection<?>... projections);
+	CompositeProjectionFromAsStep from(SearchProjection<?>... projections);
 
 	/**
 	 * Defines multiple inner projections to get values from,
@@ -112,6 +112,6 @@ public interface CompositeProjectionFromStep {
 	 * @param dslFinalSteps The final steps in the projection DSL allowing the retrieval of inner projections, in order.
 	 * @return The next DSL step.
 	 */
-	CompositeProjectionAsStep from(ProjectionFinalStep<?>... dslFinalSteps);
+	CompositeProjectionFromAsStep from(ProjectionFinalStep<?>... dslFinalSteps);
 
 }

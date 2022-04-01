@@ -173,7 +173,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param objectFieldPath The <a href="#field-paths">path</a> to the object field whose object(s) will be extracted.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	CompositeProjectionFromStep object(String objectFieldPath);
+	CompositeProjectionInnerStep object(String objectFieldPath);
 
 	/**
 	 * Starts the definition of a composite projection,
@@ -186,7 +186,7 @@ public interface SearchProjectionFactory<R, E> {
 	 *
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	CompositeProjectionFromStep composite();
+	CompositeProjectionInnerStep composite();
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given projections.

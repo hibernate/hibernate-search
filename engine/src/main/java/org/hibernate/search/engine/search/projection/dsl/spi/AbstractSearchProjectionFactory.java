@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionFromStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionInnerStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionValueStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DistanceToFieldProjectionValueStepImpl;
 import org.hibernate.search.engine.search.projection.dsl.impl.DocumentReferenceProjectionOptionsStepImpl;
@@ -98,14 +98,14 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public CompositeProjectionFromStep object(String objectFieldPath) {
+	public CompositeProjectionInnerStep object(String objectFieldPath) {
 		Contracts.assertNotNull( objectFieldPath, "objectFieldPath" );
-		return new CompositeProjectionFromStepImpl( dslContext, objectFieldPath );
+		return new CompositeProjectionInnerStepImpl( dslContext, objectFieldPath );
 	}
 
 	@Override
-	public CompositeProjectionFromStep composite() {
-		return new CompositeProjectionFromStepImpl( dslContext );
+	public CompositeProjectionInnerStep composite() {
+		return new CompositeProjectionInnerStepImpl( dslContext );
 	}
 
 	@Override

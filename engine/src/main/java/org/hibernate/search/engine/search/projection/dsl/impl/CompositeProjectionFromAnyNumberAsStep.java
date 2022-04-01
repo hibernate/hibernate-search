@@ -7,11 +7,11 @@
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionAsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
-class CompositeProjectionFromAnyNumberAsStep extends AbstractCompositeProjectionAsStep
-		implements CompositeProjectionAsStep {
+class CompositeProjectionFromAnyNumberAsStep extends AbstractCompositeProjectionFromAsStep
+		implements CompositeProjectionFromAsStep {
 
 	final SearchProjection<?>[] inner;
 

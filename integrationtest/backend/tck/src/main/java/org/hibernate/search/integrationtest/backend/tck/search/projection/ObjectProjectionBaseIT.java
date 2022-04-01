@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -68,12 +68,12 @@ public class ObjectProjectionBaseIT {
 		}
 
 		@Override
-		protected CompositeProjectionFromStep startProjection(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?> f) {
 			return f.object( index.binding().objectField.relativeName );
 		}
 
 		@Override
-		protected CompositeProjectionFromStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
 			return f.object( index.binding().objectField_multi.relativeName );
 		}
 

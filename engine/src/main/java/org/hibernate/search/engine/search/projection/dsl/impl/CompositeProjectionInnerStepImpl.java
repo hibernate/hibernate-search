@@ -7,26 +7,26 @@
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionAsStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom3AsStep;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class CompositeProjectionFromStepImpl implements CompositeProjectionFromStep {
+public class CompositeProjectionInnerStepImpl implements CompositeProjectionInnerStep {
 
 	private final CompositeProjectionBuilder builder;
 
-	public CompositeProjectionFromStepImpl(SearchProjectionDslContext<?> dslContext) {
+	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext) {
 		this.builder = dslContext.scope().projectionBuilders().composite();
 	}
 
-	public CompositeProjectionFromStepImpl(SearchProjectionDslContext<?> dslContext, String objectFieldPath) {
+	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext, String objectFieldPath) {
 		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, ProjectionTypeKeys.OBJECT );
 	}
 
@@ -48,13 +48,13 @@ public class CompositeProjectionFromStepImpl implements CompositeProjectionFromS
 	}
 
 	@Override
-	public CompositeProjectionAsStep from(SearchProjection<?>... projections) {
+	public CompositeProjectionFromAsStep from(SearchProjection<?>... projections) {
 		Contracts.assertNotNullNorEmpty( projections, "projections" );
 		return new CompositeProjectionFromAnyNumberAsStep( builder, projections );
 	}
 
 	@Override
-	public final CompositeProjectionAsStep from(ProjectionFinalStep<?>... dslFinalSteps) {
+	public final CompositeProjectionFromAsStep from(ProjectionFinalStep<?>... dslFinalSteps) {
 		Contracts.assertNotNullNorEmpty( dslFinalSteps, "dslFinalSteps" );
 		SearchProjection<?>[] projections = new SearchProjection<?>[dslFinalSteps.length];
 		for ( int i = 0; i < dslFinalSteps.length; i++ ) {

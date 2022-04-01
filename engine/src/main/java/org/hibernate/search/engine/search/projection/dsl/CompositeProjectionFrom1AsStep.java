@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @param <V1> The type of values returned by the single inner projection.
  */
 public interface CompositeProjectionFrom1AsStep<V1>
-		extends CompositeProjectionAsStep {
+		extends CompositeProjectionFromAsStep {
 
 	/**
 	 * Defines the result of the composite projection

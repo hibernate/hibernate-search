@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValu
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 
-class CompositeProjectionFrom1AsStepImpl<V1> extends AbstractCompositeProjectionAsStep
+class CompositeProjectionFrom1AsStepImpl<V1> extends AbstractCompositeProjectionFromAsStep
 		implements CompositeProjectionFrom1AsStep<V1> {
 
 	final SearchProjection<V1> inner1;

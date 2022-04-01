@@ -12,7 +12,7 @@ import java.util.function.IntFunction;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -66,12 +66,12 @@ public class CompositeProjectionBaseIT {
 		}
 
 		@Override
-		protected CompositeProjectionFromStep startProjection(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjection(SearchProjectionFactory<?, ?> f) {
 			return f.composite();
 		}
 
 		@Override
-		protected CompositeProjectionFromStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
+		protected CompositeProjectionInnerStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
 			return f.composite();
 		}
 
