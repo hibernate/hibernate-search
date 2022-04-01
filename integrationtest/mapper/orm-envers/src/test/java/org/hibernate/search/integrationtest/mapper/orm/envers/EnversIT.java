@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,9 +45,6 @@ public class EnversIT {
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	@Rule
-	public StaticCounters counters = new StaticCounters();
 
 	private SessionFactory sessionFactory;
 

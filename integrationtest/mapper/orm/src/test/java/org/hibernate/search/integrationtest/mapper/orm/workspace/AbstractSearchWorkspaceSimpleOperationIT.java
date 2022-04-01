@@ -23,7 +23,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -50,9 +49,6 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	@Rule
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
-
-	@Rule
-	public StaticCounters counters = new StaticCounters();
 
 	@ReusableOrmSetupHolder.Setup
 	public void setup(OrmSetupHelper.SetupContext setupContext) {
