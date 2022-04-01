@@ -427,9 +427,8 @@
         <java-version.main.compiler.java_home>${java.home}</java-version.main.compiler.java_home>
         <java-version.main.compiler>${java-version.main.compiler.java_home}/bin/javac</java-version.main.compiler>
         <!-- The version of test bytecode, useful for testing compatibility with newer JDKs -->
-        <!-- Set to the version of the JDK running Maven by default, but overridden on CI -->
-        <!-- 'java.specification.version' is only correct from Java 9 onwards, but we require Java 17 for the build anyway -->
-        <java-version.test.release>${java.specification.version}</java-version.test.release>
+        <!-- Set to the expected version of the JDK running Maven by default, but overridden on CI -->
+        <java-version.test.release>${jdk.min.version}</java-version.test.release>
         <java-version.test.compiler.java_home>${java.home}</java-version.test.compiler.java_home>
         <java-version.test.compiler>${java-version.test.compiler.java_home}/bin/javac</java-version.test.compiler>
         <!-- IMPORTANT: For Java 8, this must be the path to the JDK, not to the JRE -->
