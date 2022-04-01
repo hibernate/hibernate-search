@@ -49,6 +49,11 @@ public abstract class AbstractDelegatingSearchQuerySelectStep<R, E, LOS>
 	}
 
 	@Override
+	public <P> SearchQueryWhereStep<?, P, LOS, ?> select(Class<P> objectClass) {
+		return delegate.select( objectClass );
+	}
+
+	@Override
 	public <P> SearchQueryWhereStep<?, P, LOS, ?> select(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return delegate.select( projectionContributor );

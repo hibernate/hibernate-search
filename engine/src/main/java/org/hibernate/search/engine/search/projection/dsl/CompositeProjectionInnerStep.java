@@ -15,6 +15,18 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 public interface CompositeProjectionInnerStep {
 
 	/**
+	 * Defines the result of the composite projection
+	 * as the result of applying the given function to the single inner projection defined so far.
+	 *
+	 * @param objectClass The type of objects returned by the projection.
+	 * The class is expected to be mapped (generally through annotations)
+	 * in such a way that it defines the inner projections.
+	 * @return The next DSL step.
+	 * @param <V> The type of objects returned by the projection.
+	 */
+	<V> CompositeProjectionValueStep<?, V> as(Class<V> objectClass);
+
+	/**
 	 * Defines one inner projection to get values from,
 	 * based on a previously-built {@link SearchProjection}.
 	 *

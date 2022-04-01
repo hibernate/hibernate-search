@@ -19,11 +19,13 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.util.common.impl.Futures;
 
 public class StubMappingImpl implements StubMapping, MappingImplementor<StubMappingImpl> {
 
 	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
+	private final ProjectionRegistry projectionRegistry;
 	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
 
 	private final ToDocumentValueConvertContext toDocumentFieldValueConvertContext;
@@ -31,8 +33,9 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 	private SearchIntegration integration;
 
 	StubMappingImpl(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
-			StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+			ProjectionRegistry projectionRegistry, StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
+		this.projectionRegistry = projectionRegistry;
 		this.schemaManagementStrategy = schemaManagementStrategy;
 		this.toDocumentFieldValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 	}
@@ -62,6 +65,11 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 	@Override
 	public final ToDocumentValueConvertContext toDocumentValueConvertContext() {
 		return toDocumentFieldValueConvertContext;
+	}
+
+	@Override
+	public ProjectionRegistry projectionRegistry() {
+		return projectionRegistry;
 	}
 
 	@Override

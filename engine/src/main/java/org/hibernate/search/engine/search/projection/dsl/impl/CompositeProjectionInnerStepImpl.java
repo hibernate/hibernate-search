@@ -12,7 +12,9 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom3AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionInnerStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
@@ -20,14 +22,33 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 public class CompositeProjectionInnerStepImpl implements CompositeProjectionInnerStep {
 
+	private final SearchProjectionDslContext<?> dslContext;
+	private final SearchProjectionFactory<?, ?> projectionFactory;
 	private final CompositeProjectionBuilder builder;
+	private final String objectFieldPath;
 
-	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext) {
+	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext,
+			SearchProjectionFactory<?, ?> projectionFactory) {
+		this.dslContext = dslContext;
+		this.projectionFactory = projectionFactory;
 		this.builder = dslContext.scope().projectionBuilders().composite();
+		this.objectFieldPath = null;
 	}
 
-	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext, String objectFieldPath) {
+	public CompositeProjectionInnerStepImpl(SearchProjectionDslContext<?> dslContext,
+			SearchProjectionFactory<?, ?> projectionFactory, String objectFieldPath) {
+		this.dslContext = dslContext;
+		this.projectionFactory = projectionFactory;
 		this.builder = dslContext.scope().fieldQueryElement( objectFieldPath, ProjectionTypeKeys.OBJECT );
+		this.objectFieldPath = objectFieldPath;
+	}
+
+	@Override
+	public <V> CompositeProjectionValueStep<?, V> as(Class<V> objectClass) {
+		SearchProjectionFactory<?, ?> projectionFactoryWithCorrectRoot = objectFieldPath == null
+				? projectionFactory : projectionFactory.withRoot( objectFieldPath );
+		return dslContext.scope().projectionRegistry().composite( objectClass )
+				.apply( projectionFactoryWithCorrectRoot, this );
 	}
 
 	@Override

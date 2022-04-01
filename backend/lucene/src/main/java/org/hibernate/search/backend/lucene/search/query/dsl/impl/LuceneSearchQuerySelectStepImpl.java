@@ -62,6 +62,11 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
+	public <P> LuceneSearchQueryWhereStep<P, LOS> select(Class<P> objectClass) {
+		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
+	}
+
+	@Override
 	public <P> LuceneSearchQueryWhereStep<P, LOS> select(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();

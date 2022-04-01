@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
@@ -55,6 +56,11 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	@Override
 	public DefaultSearchQueryOptionsStep<R, LOS> selectEntityReference() {
 		return select( scope.projectionBuilders().entityReference() );
+	}
+
+	@Override
+	public <P> SearchQueryWhereStep<?, P, LOS, ?> select(Class<P> objectClass) {
+		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
 	}
 
 	@Override

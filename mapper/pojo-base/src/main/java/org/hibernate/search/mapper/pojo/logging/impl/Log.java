@@ -667,4 +667,10 @@ public interface Log extends BasicLogger {
 	SearchException errorRetrievingConstructorHandle(Constructor<?> constructor,
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 
+	@Message(id = ID_OFFSET + 112,
+			value = "Invalid object class for projection: %1$s."
+					+ " Make sure that this class is mapped correctly,"
+					+ " either through annotations (@ProjectionConstructor) or programmatic mapping.")
+	SearchException invalidObjectClassForProjection(@FormatWith(ClassFormatter.class) Class<?> objectClass);
+
 }

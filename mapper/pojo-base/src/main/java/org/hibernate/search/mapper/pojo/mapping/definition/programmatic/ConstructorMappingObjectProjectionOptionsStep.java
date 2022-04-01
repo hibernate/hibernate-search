@@ -7,16 +7,8 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 /**
- * The step in a mapping definition where a constructor can be mapped.
+ * The step in a constructor-to-object-projection mapping where optional parameters can be set.
  */
-public interface ConstructorMappingStep {
-
-	/**
-	 * @return A DSL step where the mapping can be defined
-	 * for the type hosting this constructor.
-	 */
-	TypeMappingStep hostingType();
-
-	ConstructorMappingStep projectionConstructor();
+public interface ConstructorMappingObjectProjectionOptionsStep {
 
 }

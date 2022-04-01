@@ -41,4 +41,10 @@ public class InitialConstructorMappingStep implements ConstructorMappingStep, Po
 			children.contributeSearchMapping( collector.constructor( constructorModel.parametersJavaTypes() ) );
 		}
 	}
+
+	@Override
+	public ConstructorMappingStep projectionConstructor() {
+		children.add( new ProjectionConstructorMappingContributor() );
+		return this;
+	}
 }

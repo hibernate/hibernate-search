@@ -23,6 +23,7 @@ import org.hibernate.search.engine.search.common.spi.MultiIndexSearchIndexIdenti
 import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -40,7 +41,7 @@ public abstract class AbstractSearchIndexScope<
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Mapping context
-	private final BackendMappingContext mappingContext;
+	protected final BackendMappingContext mappingContext;
 
 	// Targeted indexes
 	private final Set<String> hibernateSearchIndexNames;
@@ -203,6 +204,11 @@ public abstract class AbstractSearchIndexScope<
 	@Override
 	public final <T> T fieldQueryElement(String fieldPath, SearchQueryElementTypeKey<T> key) {
 		return field( fieldPath ).queryElement( key, self() );
+	}
+
+	@Override
+	public ProjectionRegistry projectionRegistry() {
+		return mappingContext.projectionRegistry();
 	}
 
 	protected abstract C createMultiIndexSearchRootContext(List<C> rootForEachIndex);
