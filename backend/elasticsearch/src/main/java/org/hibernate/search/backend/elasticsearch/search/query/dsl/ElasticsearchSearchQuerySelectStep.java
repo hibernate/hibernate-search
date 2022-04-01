@@ -33,6 +33,9 @@ public interface ElasticsearchSearchQuerySelectStep<R, E, LOS>
 	ElasticsearchSearchQueryWhereStep<R, LOS> selectEntityReference();
 
 	@Override
+	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(Class<P> objectClass);
+
+	@Override
 	<P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 

@@ -33,6 +33,9 @@ public interface LuceneSearchQuerySelectStep<R, E, LOS>
 	LuceneSearchQueryWhereStep<R, LOS> selectEntityReference();
 
 	@Override
+	<P> LuceneSearchQueryWhereStep<P, LOS> select(Class<P> objectClass);
+
+	@Override
 	<P> LuceneSearchQueryWhereStep<P, LOS> select(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 

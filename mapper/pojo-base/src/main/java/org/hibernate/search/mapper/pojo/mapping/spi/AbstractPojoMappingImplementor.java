@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
+import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
@@ -73,6 +74,11 @@ public abstract class AbstractPojoMappingImplementor<M>
 	@Override
 	public final ToDocumentValueConvertContext toDocumentValueConvertContext() {
 		return toDocumentValueConvertContext;
+	}
+
+	@Override
+	public ProjectionRegistry projectionRegistry() {
+		return delegate.projectionRegistry();
 	}
 
 	@Override

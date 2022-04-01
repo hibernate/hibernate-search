@@ -63,6 +63,11 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
+	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(Class<P> objectClass) {
+		return select( scope.projectionFactory().composite().as( objectClass ).toProjection() );
+	}
+
+	@Override
 	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();

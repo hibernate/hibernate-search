@@ -100,12 +100,12 @@ public abstract class AbstractSearchProjectionFactory<
 	@Override
 	public CompositeProjectionInnerStep object(String objectFieldPath) {
 		Contracts.assertNotNull( objectFieldPath, "objectFieldPath" );
-		return new CompositeProjectionInnerStepImpl( dslContext, objectFieldPath );
+		return new CompositeProjectionInnerStepImpl( dslContext, this, objectFieldPath );
 	}
 
 	@Override
 	public CompositeProjectionInnerStep composite() {
-		return new CompositeProjectionInnerStepImpl( dslContext );
+		return new CompositeProjectionInnerStepImpl( dslContext, this );
 	}
 
 	@Override

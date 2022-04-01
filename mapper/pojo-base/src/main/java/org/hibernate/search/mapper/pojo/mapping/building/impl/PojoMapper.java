@@ -53,6 +53,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
+import org.hibernate.search.mapper.pojo.search.definition.impl.PojoSearchQueryElementRegistry;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
@@ -307,7 +308,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			mappingDelegate = new PojoMappingDelegateImpl(
 					threadPoolProvider, failureHandler, tenancyMode,
 					indexedTypeManagerContainerBuilder.build(),
-					containedTypeManagerContainerBuilder.build()
+					containedTypeManagerContainerBuilder.build(),
+					// TODO HSEARCH-3927 collect projection definitions on startup
+					new PojoSearchQueryElementRegistry()
 			);
 		}
 		catch (MappingAbortedException | RuntimeException e) {

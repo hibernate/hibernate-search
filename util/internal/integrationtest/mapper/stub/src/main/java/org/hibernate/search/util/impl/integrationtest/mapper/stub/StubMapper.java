@@ -25,6 +25,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityBindingMapperContext {
@@ -33,16 +34,18 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	private final TypeMetadataContributorProvider<StubMappedIndex> contributorProvider;
 
 	private final TenancyMode tenancyMode;
+	private final ProjectionRegistry projectionRegistry;
 
 	private final Map<StubTypeModel, MappedIndexManagerBuilder> indexManagerBuilders = new HashMap<>();
 	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider,
-			TenancyMode tenancyMode) {
+			TenancyMode tenancyMode, ProjectionRegistry projectionRegistry) {
 		this.failureCollector = buildContext.failureCollector();
 		this.contributorProvider = contributorProvider;
 		this.tenancyMode = tenancyMode;
+		this.projectionRegistry = projectionRegistry;
 	}
 
 	@Override
@@ -130,7 +133,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 			throw new MappingAbortedException();
 		}
 
-		return new StubMappingPartialBuildState( mappedIndexesByTypeIdentifier );
+		return new StubMappingPartialBuildState( mappedIndexesByTypeIdentifier, projectionRegistry );
 	}
 
 	@Override

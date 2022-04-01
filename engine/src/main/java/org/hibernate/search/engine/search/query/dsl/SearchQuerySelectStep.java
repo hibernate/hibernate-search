@@ -69,6 +69,19 @@ public interface SearchQuerySelectStep<
 	SearchQueryWhereStep<?, R, LOS, ?> selectEntityReference();
 
 	/**
+	 * Select an object projection
+	 * as a representation of the search hit for each matching document.
+	 *
+	 * @param objectClass The type of objects returned by the projection.
+	 * The class is expected to be mapped (generally through annotations)
+	 * in such a way that it defines the inner projections.
+	 * @param <P> The resulting type of the projection.
+	 * @return The next step.
+	 * @see SearchQueryWhereStep
+	 */
+	<P> SearchQueryWhereStep<?, P, LOS, ?> select(Class<P> objectClass);
+
+	/**
 	 * Select a given projection as a representation of the search hit for each matching document.
 	 *
 	 * @param projectionContributor A function that will use the factory passed in parameter to create a projection,
