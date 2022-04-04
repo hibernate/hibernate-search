@@ -4,7 +4,6 @@
 [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-search%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/job/hibernate-search/job/main)
 [![Coverage Status](https://img.shields.io/coveralls/github/hibernate/hibernate-search/main?logo=coveralls&style=for-the-badge)](https://coveralls.io/github/hibernate/hibernate-search?branch=main)
 [![Quality gate](https://img.shields.io/sonar/alert_status/org.hibernate.search:hibernate-search-parent?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
-[![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/hibernate/hibernate-search.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/hibernate/hibernate-search/context:java)
 
 ## Description
 
