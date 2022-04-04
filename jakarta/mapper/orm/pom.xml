@@ -49,9 +49,20 @@
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Necessary for jakarta.transaction, but unfortunately jakarta.transaction
+                 doesn't include the dependency in its POM... -->
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Necessary for jakarta.transaction, but unfortunately jakarta.transaction
+                 doesn't include the dependency in its POM... -->
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.common</groupId>
