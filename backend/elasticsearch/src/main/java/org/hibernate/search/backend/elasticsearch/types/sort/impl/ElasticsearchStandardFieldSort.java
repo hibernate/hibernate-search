@@ -43,12 +43,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	private ElasticsearchStandardFieldSort(Builder<?> builder) {
 		super( builder );
 		missing = builder.missing;
-		if ( indexNames().size() > 1 ) {
-			unmappedType = builder.field.type().elasticsearchTypeAsJson();
-		}
-		else {
-			unmappedType = null;
-		}
+		unmappedType = builder.field.type().elasticsearchTypeAsJson();
 	}
 
 	@Override
@@ -61,7 +56,9 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		// Elasticsearch complains it needs a scaling factor, but we don't have any way to provide it.
 		// See https://hibernate.atlassian.net/browse/HSEARCH-4176
 		if ( unmappedType != null && !DataTypes.SCALED_FLOAT.equals( unmappedType.getAsString() ) ) {
-			// There are multiple target indexes; some of them may not declare the field.
+			// If there are multiple target indexes, or if the field is dynamic,
+			// some target indexes may not have this field in their mapping (yet),
+			// and in that case Elasticsearch would raise an exception.
 			// Instruct ES to behave as if the field had no value in that case.
 			UNMAPPED_TYPE.set( innerObject, unmappedType );
 		}
