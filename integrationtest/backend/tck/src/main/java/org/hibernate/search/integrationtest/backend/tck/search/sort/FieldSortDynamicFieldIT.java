@@ -37,10 +37,11 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FieldSortDynamicFieldIT<F> {
 
-	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
+	private static List<FieldTypeDescriptor<?>> supportedFieldTypes;
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] parameters() {
+		supportedFieldTypes = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( fieldType.isFieldSortSupported() ) {
