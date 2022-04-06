@@ -44,7 +44,9 @@ public class FieldSortDynamicFieldIT<F> {
 		supportedFieldTypes = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
-			if ( fieldType.isFieldSortSupported() ) {
+			if ( fieldType.isFieldSortSupported()
+					&& TckConfiguration.get().getBackendFeatures()
+							.supportsValuesForDynamicField( fieldType.getJavaType() ) ) {
 				supportedFieldTypes.add( fieldType );
 				parameters.add( new Object[] { fieldType } );
 			}
