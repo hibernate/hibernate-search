@@ -48,6 +48,13 @@ public class Elasticsearch68TestDialect extends Elasticsearch70TestDialect {
 	}
 
 	@Override
+	public boolean hasBugForBigDecimalValuesForDynamicField() {
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4310,
+		// https://hibernate.atlassian.net/browse/HSEARCH-4310
+		return true;
+	}
+
+	@Override
 	public boolean supportsSkipOrLimitingTotalHitCount() {
 		return false;
 	}
