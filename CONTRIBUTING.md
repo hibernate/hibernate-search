@@ -114,7 +114,8 @@ git checkout -b HSEARCH-123 main
 
 ### Code
   
-See the [README](README.md) for details about how to build the project and about the structure of the source code.
+See [this section](#source-code-structure) for details about the structure of the source code,
+and [this section](#building-from-source) for how to build the project.
 
 If you need help, feel free to contact us, be it through comments on your JIRA ticket,
 emails on the mailing list, or directly though our chat:
@@ -156,7 +157,7 @@ git pull --rebase upstream main
 * Update the JIRA issue, using the "Link to pull request" button to include a link to
 the created pull request.
 
-## Source code structure
+## <a id="source-code-structure"></a> Source code structure
 
 The project is split in several Maven modules:
 
@@ -193,7 +194,7 @@ and transform it to use Hibernate ORM 6 instead of Hibernate ORM 5.x.
 * `reports`: Module built last, producing reports related to test coverage in particular.
 * `util`: Various modules containing util classes, both for runtime and for tests.
 
-## Building from source
+## <a id="building-from-source"></a> Building from source
 
 ### Basic build from the commandline
 
