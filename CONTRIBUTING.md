@@ -30,6 +30,52 @@ We provide [test case templates for all Hibernate projects](https://github.com/h
 to help you get started:
 just fork this repository, build your test case and attach it as an archive to a JIRA issue.
 
+## Setting up a development environment
+
+### <a id="setup-build-tools"></a> Build tools
+
+You will need JDK 17 exactly for the build.
+
+A maven wrapper script is provided at the root of the repository (`./mvnw`),
+so you can use that and don't need to care about the required version of Maven
+(it will be downloaded automatically).
+
+### <a id="setup-ide"></a> IDE
+
+#### <a id="setup-ide-intellij-idea"></a> IntelliJ IDEA
+
+Make sure you use IntelliJ IDEA 2022.1 or later, as previous versions have some
+[trouble with generated sources](https://youtrack.jetbrains.com/issue/IDEA-286455).
+
+You will need to change some settings:
+
+* `Build, Execution, Deployment > Build Tools > Maven`: set `Maven home path` to `Use Maven wrapper`
+* In `Project structure`, make sure the project JDK is JDK 17.
+* Set up [formatting rules and code style](#setup-ide-formatting).
+
+Then a few steps will initialize your workspace:
+
+* In the "Maven" side panel, click "Reload all Maven projects".
+* In the "Maven" side panel, click "Generate Sources and Update Folders For All Projects".
+  This will take a while.
+* To check your setup, click `Build > Rebuild Project`.
+  If this completes successfully, your workspace is correctly set up.
+
+#### <a id="setup-ide-eclipse"></a> Eclipse
+
+Eclipse shouldn't require any particular setup besides
+[formatting rules and code style](#setup-ide-formatting).
+
+#### <a id="setup-ide-formatting"></a> Formatting rules and style conventions
+
+The Hibernate family projects share the same style conventions,
+and we provide settings for some IDEs to help you follow these conventions.
+See:
+
+* [here for IntelliJ IDEA](https://hibernate.org/community/contribute/intellij-idea/)
+* [here for Eclipse IDE](https://hibernate.org/community/contribute/eclipse-ide/)
+
+
 ## Contributing code
 
 ### Prerequisites
@@ -44,6 +90,18 @@ As discussed in the linked page, this also includes:
     * [Setting](https://help.github.com/articles/set-up-git) up your local git install
     * Cloning your fork
     
+### Development environment
+
+Make sure to [set up your development environment](#setup) correctly.
+
+Be especially careful about setting up the [formatting rules and code style](#setup-ide-formatting).
+
+If you built the project at least once (`./mvnw clean install`),
+you can very quickly check that you have respected the formatting rules by running Checkstyle:
+```bash
+./mvnw checkstyle:check -fn
+```
+
 ### Create a topic branch
 
 Create a "topic" branch on which you will work.  The convention is to name the branch
@@ -52,21 +110,6 @@ want to do, create one.  Assuming you will be working from the main branch and w
 on the JIRA HSEARCH-123:
 ```bash
 git checkout -b HSEARCH-123 main
-```
-
-### Formatting rules and style conventions
-
-The Hibernate family projects share the same style conventions,
-and we provide settings for some IDEs to help you follow these conventions.
-See:
-
-* [here for IntelliJ IDEA](https://hibernate.org/community/contribute/intellij-idea/)
-* [here for Eclipse IDE](https://hibernate.org/community/contribute/eclipse-ide/)
-
-If you built the project at least once (`./mvnw clean install`),
-you can very quickly check that you have respected the formatting rules by running Checkstyle:
-```bash
-./mvnw checkstyle:check -fn
 ```
 
 ### Code
@@ -152,11 +195,9 @@ and transform it to use Hibernate ORM 6 instead of Hibernate ORM 5.x.
 
 ## Building from source
 
-### Basic build
+### Basic build from the commandline
 
-You will need JDK 17 exactly;
-newer JDKs will require you to [pass additional properties](#other-jdks)
-in order for tests to run correctly.
+First, make sure your [development environment is correctly set up](#setup).
 
 The following command will build Hibernate Search, install it in your local Maven repository,
 and run unit tests and integration tests.
@@ -191,6 +232,11 @@ To build the distribution bundle run:
 ```
 
 ### <a id="other-jdks"></a> Other JDKs
+
+To test Hibernate Search against another JDK
+than [the one required for the build](#setup-build-tools),
+you will need to have both JDKs installed,
+and then you will need to pass additional properties to Maven.
 
 To test Hibernate Search against JDK 8:
 
