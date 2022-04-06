@@ -2552,6 +2552,10 @@
                      Here's the issue in the IDEA bug tracker: https://youtrack.jetbrains.com/issue/IDEA-85478
                      It's fixed in 2022.1 EAP 6, so hopefully we'll be able to get rid of this soon. -->
                 <java-version.main.release>${java-version.test.release}</java-version.main.release>
+                <!-- Dependency convergence checks seem to fail in IntelliJ IDEA,
+                     for some reason. Maybe it's because of the two additional dependencies below.
+                     Anyway, let's disable these checks so the build works correctly in IDEA. -->
+                <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
             </properties>
             <dependencies>
                 <!-- Intellij IDEA doesn't understand <annotationProcessorPaths> in
