@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.4.Final (2022-04-07)
+-------------------------
+
+** Bug
+    * HSEARCH-4531 Sort on dynamic field fails on Elasticsearch if field has never been indexed yet 
+    * HSEARCH-4513 Using a SearchSort instance in multiple queries with the Lucene backend has side effects and leads to unexpected results
+
+** Improvement
+    * HSEARCH-4529 Upgrade to Hibernate Commons Annotations 6.0.0.Final for -orm6 artifacts
+    * HSEARCH-4528 Upgrade to latest version of Jakarta dependencies for -orm6/-jakarta artifacts
+    * HSEARCH-4523 Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.Final
+
+** Task
+    * HSEARCH-4534 Fix random failures for tests involving dynamic BigDecimal/BigInteger fields with Elasticsearch
+    * HSEARCH-4519 Update links markup in Getting Started Guide 
+
 6.1.3.Final (2022-03-18)
 -------------------------
 
