@@ -36,6 +36,9 @@ env:
   #    See https://github.com/apache/pulsar/blob/60ef5e983e5e8956bd0b602b5741bd6255c6258a/.github/workflows/ci-unit.yaml#L30
   #    See https://github.com/apache/pulsar/commit/9405e6bfcba250f014faae6ba0490a8045cb4674
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3"
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build and test on Java 11
