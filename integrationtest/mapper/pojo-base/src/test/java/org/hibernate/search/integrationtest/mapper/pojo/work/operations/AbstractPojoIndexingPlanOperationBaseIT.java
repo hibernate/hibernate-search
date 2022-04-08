@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -123,6 +124,67 @@ public abstract class AbstractPojoIndexingPlanOperationBaseIT extends AbstractPo
 			);
 			scenario().addTo( indexingPlan, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
+							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
+									DocumentRouteDescriptor.of( "UE-122" ),
+									DocumentRouteDescriptor.of( "UE-123" ) ) ),
+					IndexedEntity.of( 1 ) );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4538")
+	public void providedId_providedRoutes_noCurrentAndPrevious() {
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			if ( isImplicitRoutingEnabled() ) {
+				// If implicit routing is enabled,
+				// the current route will be determined by the routing bridge
+				// and will override the provided current route.
+				// If the current route is non null (and here it will be),
+				// we'll end up executing the work.
+				expectOperation( futureFromBackend, worksBeforeInSamePlan -> {
+					if ( !isAdd() ) {
+						// For operations other than add,
+						// expect a delete for the previous routes.
+						worksBeforeInSamePlan
+								.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
+								.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) )
+								.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) );
+
+						// If implicit routing is enabled, the provided current route
+						// is assumed out-of-date and turned into a previous route.
+						// But here the current route is null, so it won't be used.
+
+						// If implicit routing is enabled, previous routes are also taken from the routing bridge.
+						MyRoutingBridge.previousValues = Arrays.asList( "foo", "3" );
+						worksBeforeInSamePlan
+								.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+								.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+					}
+				}, 42, MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ), "1" );
+			}
+			else {
+				// If implicit routing is disabled,
+				// the provided current route being null means the operation will not get executed.
+				if ( !isAdd() ) {
+					// BUT for operations other than add,
+					// we still expect deletions for the previous routes.
+					BackendMock.DocumentWorkCallListContext works =
+							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+									.createAndExecuteFollowingWorks( futureFromBackend );
+					works
+							.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
+							.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) )
+							.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) );
+				}
+			}
+			scenario().addTo( indexingPlan, 42,
+					DocumentRoutesDescriptor.of( null,
 							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
 									DocumentRouteDescriptor.of( "UE-122" ),
 									DocumentRouteDescriptor.of( "UE-123" ) ) ),
