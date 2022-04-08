@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	private static final String NO_OPTIONAL_OPERATORS_FLAG_MARK = "NONE";
 
 	private final JsonPrimitive pattern;
-	private final EnumSet<RegexpQueryFlag> flags;
+	private final Set<RegexpQueryFlag> flags;
 
 	public ElasticsearchTextRegexpPredicate(Builder builder) {
 		super( builder );
@@ -69,7 +70,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 
 	private static class Builder extends AbstractBuilder implements RegexpPredicateBuilder {
 		private JsonPrimitive pattern;
-		private EnumSet<RegexpQueryFlag> flags;
+		private Set<RegexpQueryFlag> flags;
 
 		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
@@ -82,7 +83,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 
 		@Override
 		public void flags(Set<RegexpQueryFlag> flags) {
-			this.flags = EnumSet.copyOf( flags );
+			this.flags = flags.isEmpty() ? Collections.emptySet() : EnumSet.copyOf( flags );
 		}
 
 		@Override
