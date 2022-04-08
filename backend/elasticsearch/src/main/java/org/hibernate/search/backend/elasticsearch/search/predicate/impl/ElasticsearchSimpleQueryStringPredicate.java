@@ -88,14 +88,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		}
 
 		if ( flags != null ) {
-			StringBuilder flagsMask = new StringBuilder();
-			for ( SimpleQueryFlag flag : flags ) {
-				if ( flagsMask.length() > 0 ) {
-					flagsMask.append( "|" );
-				}
-				flagsMask.append( getFlagName( flag ) );
-			}
-			FLAGS_ACCESSOR.set( innerObject, flagsMask.toString() );
+			FLAGS_ACCESSOR.set( innerObject, toFlagsMask( flags ) );
 		}
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
@@ -113,11 +106,25 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		return fieldPaths;
 	}
 
+	private static String toFlagsMask(Set<SimpleQueryFlag> flags) {
+		if ( flags.isEmpty() ) {
+			return "NONE";
+		}
+		StringBuilder flagsMask = new StringBuilder();
+		for ( SimpleQueryFlag flag : flags ) {
+			if ( flagsMask.length() > 0 ) {
+				flagsMask.append( "|" );
+			}
+			flagsMask.append( getFlagName( flag ) );
+		}
+		return flagsMask.toString();
+	}
+
 	/**
 	 * @param flag The flag as defined in Hibernate Search.
 	 * @return The name of this flag in Elasticsearch (might be different from flag.name()).
 	 */
-	private String getFlagName(SimpleQueryFlag flag) {
+	private static String getFlagName(SimpleQueryFlag flag) {
 		switch ( flag ) {
 			case AND:
 				return "AND";
