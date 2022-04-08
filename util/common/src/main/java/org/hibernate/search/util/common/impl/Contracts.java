@@ -54,4 +54,10 @@ public final class Contracts {
 			throw log.stringMustNotBeNullNorEmpty( objectDescription );
 		}
 	}
+
+	public static void assertNoNullElement(Collection<?> collection, String collectionDescription) {
+		if ( collection != null && collection.contains( null ) ) {
+			throw log.collectionMustNotContainNullElement( collectionDescription );
+		}
+	}
 }
