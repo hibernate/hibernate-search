@@ -50,7 +50,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 
 		@Override
 		public void flags(Set<RegexpQueryFlag> flags) {
-			this.flags = buildFlag( flags );
+			this.flags = toFlagsMask( flags );
 		}
 
 		@Override
@@ -65,7 +65,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 		}
 	}
 
-	private static int buildFlag(Set<RegexpQueryFlag> flags) {
+	private static int toFlagsMask(Set<RegexpQueryFlag> flags) {
 		int flag = 0;
 		if ( flags == null || flags.isEmpty() ) {
 			return RegExp.NONE;
