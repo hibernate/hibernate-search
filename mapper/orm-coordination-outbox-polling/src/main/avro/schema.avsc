@@ -20,7 +20,10 @@
       "fields":[
          {
             "name":"currentRoute",
-            "type":"org.hibernate.search.mapper.orm.coordination.outboxpolling.avro.generated.impl.DocumentRouteDescriptorDto"
+            "type":[
+               "org.hibernate.search.mapper.orm.coordination.outboxpolling.avro.generated.impl.DocumentRouteDescriptorDto",
+               "null"
+            ]
          },
          {
             "name":"previousRoutes",

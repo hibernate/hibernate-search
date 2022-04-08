@@ -58,6 +58,9 @@ final class EventPayloadToDtoConverterUtils {
 	}
 
 	private static DocumentRouteDescriptorDto convert(DocumentRouteDescriptor route) {
+		if ( route == null ) {
+			return null;
+		}
 		return DocumentRouteDescriptorDto.newBuilder()
 				.setRoutingKey( route.routingKey() )
 				.build();
