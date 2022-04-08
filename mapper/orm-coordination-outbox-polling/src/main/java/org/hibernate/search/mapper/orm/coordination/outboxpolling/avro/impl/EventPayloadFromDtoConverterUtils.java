@@ -51,6 +51,9 @@ final class EventPayloadFromDtoConverterUtils {
 	}
 
 	static DocumentRouteDescriptor convert(DocumentRouteDescriptorDto route) {
+		if ( route == null ) {
+			return null;
+		}
 		CharSequence routingKey = route.getRoutingKey();
 		return DocumentRouteDescriptor.of( ( routingKey == null ) ? null : routingKey.toString() );
 	}
