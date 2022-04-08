@@ -133,7 +133,10 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 				// If there are any provided routes, we add them all to the previous routes
 				// (including the provided "current" route, which is assumed out-of-date)
 				result.addAll( providedRoutes.previousRoutes() );
-				result.add( providedRoutes.currentRoute() );
+				DocumentRouteDescriptor providedCurrentRoute = providedRoutes.currentRoute();
+				if ( providedCurrentRoute != null ) {
+					result.add( providedCurrentRoute );
+				}
 			}
 			for ( DocumentRouteImpl previousRoute : previousRoutes ) {
 				result.add( previousRoute.toDescriptor() );
