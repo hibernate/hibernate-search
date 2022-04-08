@@ -761,6 +761,19 @@ public class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::simpleQueryString-flags-none[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.simpleQueryString().field( "title" )
+							.matching( "**robot**" )
+							.flags( Collections.emptySet() ) )
+					.fetchHits( 20 );
+			// end::simpleQueryString-flags-none[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
 	}
 
 	@Test
