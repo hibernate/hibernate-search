@@ -201,6 +201,25 @@ public abstract class AbstractPojoIndexingOperationIT {
 				tenantId, String.valueOf( id ), expectedRoutingKey, value, null );
 	}
 
+	protected final void expectNoOperation(CompletableFuture<?> futureFromBackend,
+			Consumer<BackendMock.DocumentWorkCallListContext> worksBefore,
+			int id, String providedRoutingKey, String value) {
+		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
+						IndexedEntity.INDEX, commitStrategy, refreshStrategy
+				)
+				.createAndExecuteFollowingWorks( futureFromBackend );
+		worksBefore.accept( context );
+		String expectedRoutingKey;
+		if ( isImplicitRoutingEnabled() ) {
+			expectedRoutingKey = MyRoutingBridge.toRoutingKey( tenantId, id, value );
+		}
+		else {
+			expectedRoutingKey = providedRoutingKey;
+		}
+		scenario().expectedBackendOperation.expect( context,
+				tenantId, String.valueOf( id ), expectedRoutingKey, value, null );
+	}
+
 	protected final void expectUpdateCausedByContained(CompletableFuture<?> futureFromBackend, int id,
 			String value, String containedValue) {
 		expectUpdateCausedByContained( futureFromBackend, ignored -> { }, id, value, containedValue );
