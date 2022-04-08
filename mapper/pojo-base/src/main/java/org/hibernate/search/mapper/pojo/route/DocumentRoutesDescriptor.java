@@ -46,6 +46,7 @@ public final class DocumentRoutesDescriptor implements Serializable {
 			Collection<DocumentRouteDescriptor> previousRoutes) {
 		this.currentRoute = currentRoute;
 		Contracts.assertNotNull( previousRoutes, "previousRoutes" );
+		Contracts.assertNoNullElement( previousRoutes, "previousRoutes" );
 		this.previousRoutes = previousRoutes;
 	}
 

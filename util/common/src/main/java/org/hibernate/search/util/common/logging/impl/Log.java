@@ -107,4 +107,7 @@ public interface Log extends BasicLogger {
 			value = "'%1$s' must be strictly positive.")
 	IllegalArgumentException mustBeStrictlyPositive(String objectDescription);
 
+	@Message(id = ID_OFFSET + 11,
+			value = "'%1$s' must not contain any null element.")
+	IllegalArgumentException collectionMustNotContainNullElement(String collectionDescription);
 }
