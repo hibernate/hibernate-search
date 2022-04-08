@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.search.predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
@@ -686,6 +687,19 @@ public class PredicateDslIT {
 							.flags( SimpleQueryFlag.AND, SimpleQueryFlag.OR, SimpleQueryFlag.NOT ) )
 					.fetchHits( 20 );
 			// end::simpleQueryString-flags[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::simpleQueryString-flags-none[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.simpleQueryString().field( "title" )
+							.matching( "**robot**" )
+							.flags( Collections.emptySet() ) )
+					.fetchHits( 20 );
+			// end::simpleQueryString-flags-none[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );

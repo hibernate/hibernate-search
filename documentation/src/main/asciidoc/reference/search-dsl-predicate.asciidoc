@@ -1101,6 +1101,16 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+If you wish, you can disable all syntax constructs:
+
+.Matching a simple query string: disabling all syntax constructs
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-flags-none]
+----
+====
+
 [[search-dsl-predicate-simpleQueryString-multiple-fields]]
 === Targeting multiple fields
 
