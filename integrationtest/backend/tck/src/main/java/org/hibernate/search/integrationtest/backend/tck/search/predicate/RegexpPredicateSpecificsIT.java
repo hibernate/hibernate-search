@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Collections;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -165,6 +166,13 @@ public class RegexpPredicateSpecificsIT {
 						.matching( TEXT_COMPLEMENT ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
+		// no flag at all (same as default)
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_COMPLEMENT )
+						.flags( Collections.emptySet() ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
 		// alone
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
@@ -199,6 +207,13 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_INTERVAL ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// no flag at all (same as default)
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERVAL )
+						.flags( Collections.emptySet() ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// alone
@@ -237,6 +252,13 @@ public class RegexpPredicateSpecificsIT {
 						.matching( TEXT_INTERSECTION ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
+		// no flag at all (same as default)
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_INTERSECTION )
+						.flags( Collections.emptySet() ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
 		// alone
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
@@ -271,6 +293,13 @@ public class RegexpPredicateSpecificsIT {
 		assertThatQuery( scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath )
 						.matching( TEXT_ANYSTRING ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// no flag at all (same as default)
+		assertThatQuery( scope.query()
+				.where( f -> f.regexp().field( absoluteFieldPath )
+						.matching( TEXT_ANYSTRING )
+						.flags( Collections.emptySet() ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// alone
