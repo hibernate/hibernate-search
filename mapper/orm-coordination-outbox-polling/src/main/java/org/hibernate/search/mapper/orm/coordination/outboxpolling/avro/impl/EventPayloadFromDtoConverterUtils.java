@@ -30,7 +30,7 @@ final class EventPayloadFromDtoConverterUtils {
 		return new PojoIndexingQueueEventPayload( convert( payload.getRoutes() ), convert( payload.getDirtiness() ) );
 	}
 
-	static DirtinessDescriptor convert(DirtinessDescriptorDto dirtiness) {
+	private static DirtinessDescriptor convert(DirtinessDescriptorDto dirtiness) {
 		return new DirtinessDescriptor( dirtiness.getForceSelfDirty(), dirtiness.getForceContainingDirty(),
 				convertDirtyPaths( dirtiness.getDirtyPaths() ), dirtiness.getUpdateBecauseOfContained()
 		);
@@ -40,7 +40,7 @@ final class EventPayloadFromDtoConverterUtils {
 		return dirtyPaths.stream().map( CharSequence::toString ).collect( Collectors.toSet() );
 	}
 
-	static DocumentRoutesDescriptor convert(DocumentRoutesDescriptorDto routes) {
+	private static DocumentRoutesDescriptor convert(DocumentRoutesDescriptorDto routes) {
 		return new DocumentRoutesDescriptor(
 				convert( routes.getCurrentRoute() ), convertRoutes( routes.getPreviousRoutes() ) );
 	}
@@ -50,7 +50,7 @@ final class EventPayloadFromDtoConverterUtils {
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 	}
 
-	static DocumentRouteDescriptor convert(DocumentRouteDescriptorDto route) {
+	private static DocumentRouteDescriptor convert(DocumentRouteDescriptorDto route) {
 		if ( route == null ) {
 			return null;
 		}
