@@ -42,7 +42,7 @@ public final class EventPayloadSerializationUtils {
 			encoder.flush();
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToSerializeOutboxEventPayloadWithAvro( e );
+			throw log.unableToSerializeOutboxEventPayloadWithAvro( e.getMessage(), e );
 		}
 
 		return out.toByteArray();
@@ -59,7 +59,7 @@ public final class EventPayloadSerializationUtils {
 			return EventPayloadFromDtoConverterUtils.convert( reader.read( null, decoder ) );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToDeserializeOutboxEventPayloadWithAvro( e );
+			throw log.unableToDeserializeOutboxEventPayloadWithAvro( e.getMessage(), e );
 		}
 	}
 }
