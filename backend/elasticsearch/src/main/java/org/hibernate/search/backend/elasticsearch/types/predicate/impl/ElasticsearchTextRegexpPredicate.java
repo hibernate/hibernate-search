@@ -50,7 +50,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 		VALUE_ACCESSOR.set( innerObject, pattern );
 
 		// set no optional flag as default
-		FLAGS_ACCESSOR.set( innerObject, buildFlag( flags ) );
+		FLAGS_ACCESSOR.set( innerObject, toFlagsMask( flags ) );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
@@ -92,7 +92,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 		}
 	}
 
-	private static String buildFlag(Set<RegexpQueryFlag> flags) {
+	private static String toFlagsMask(Set<RegexpQueryFlag> flags) {
 		if ( flags == null || flags.isEmpty() ) {
 			return NO_OPTIONAL_OPERATORS_FLAG_MARK;
 		}
