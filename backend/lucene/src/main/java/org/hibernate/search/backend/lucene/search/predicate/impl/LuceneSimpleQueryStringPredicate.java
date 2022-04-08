@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +72,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		private String simpleQueryString;
 		private Analyzer overrideAnalyzer;
 		private boolean ignoreAnalyzer = false;
-		private EnumSet<SimpleQueryFlag> flags;
+		private int flags = -1;
 
 		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
@@ -94,7 +93,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 
 		@Override
 		public void flags(Set<SimpleQueryFlag> flags) {
-			this.flags = EnumSet.copyOf( flags );
+			this.flags = toFlagsMask( flags );
 		}
 
 		@Override
@@ -137,7 +136,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		}
 
 		private Query buildQuery() {
-			SimpleQueryParser queryParser = new SimpleQueryParser( buildAnalyzer(), buildWeights(), buildFlag() );
+			SimpleQueryParser queryParser = new SimpleQueryParser( buildAnalyzer(), buildWeights(), flags );
 			queryParser.setDefaultOperator( defaultOperator );
 			return queryParser.parse( simpleQueryString );
 		}
@@ -191,7 +190,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 			return weights;
 		}
 
-		private int buildFlag() {
+		private static int toFlagsMask(Set<SimpleQueryFlag> flags) {
 			int flag = -1;
 			if ( flags != null ) {
 				flag = 0;

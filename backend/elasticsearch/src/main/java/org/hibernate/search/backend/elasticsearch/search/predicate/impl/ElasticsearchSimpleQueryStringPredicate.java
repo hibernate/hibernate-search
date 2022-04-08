@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 	private final JsonPrimitive defaultOperator;
 	private final String simpleQueryString;
 	private final String analyzer;
-	private final EnumSet<SimpleQueryFlag> flags;
+	private final Set<SimpleQueryFlag> flags;
 
 	ElasticsearchSimpleQueryStringPredicate(Builder builder) {
 		super( builder );
@@ -150,7 +151,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 		private String simpleQueryString;
 		private String analyzer;
-		private EnumSet<SimpleQueryFlag> flags;
+		private Set<SimpleQueryFlag> flags;
 
 		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
@@ -170,7 +171,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 
 		@Override
 		public void flags(Set<SimpleQueryFlag> flags) {
-			this.flags = EnumSet.copyOf( flags );
+			this.flags = flags.isEmpty() ? Collections.emptySet() : EnumSet.copyOf( flags );
 		}
 
 		@Override
