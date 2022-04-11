@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMappingFieldOptionsStep<?>>
@@ -49,11 +48,6 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 		// The very first field contributor will just check that the field type is appropriate.
 		// It is only useful if no option is set, since setting an option will perform that check too.
 		this.fieldModelContributor.add( fieldTypeChecker );
-	}
-
-	@Override
-	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		// Nothing to do
 	}
 
 	@Override

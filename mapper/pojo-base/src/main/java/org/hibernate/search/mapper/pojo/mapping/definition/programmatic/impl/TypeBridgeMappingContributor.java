@@ -11,7 +11,6 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
 
 
@@ -23,11 +22,6 @@ class TypeBridgeMappingContributor implements PojoTypeMetadataContributor {
 	TypeBridgeMappingContributor(TypeBinder binder, Map<String, Object> params) {
 		this.binder = binder;
 		this.params = params;
-	}
-
-	@Override
-	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		// Nothing to do
 	}
 
 	@Override

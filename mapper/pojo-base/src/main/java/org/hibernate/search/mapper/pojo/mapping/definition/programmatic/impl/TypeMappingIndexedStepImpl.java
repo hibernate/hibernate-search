@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorIndexedTypeNode;
@@ -69,11 +68,6 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 		if ( typeIdentifier.equals( collector.typeIdentifier() ) && indexName != null ) {
 			indexedCollector.indexName( indexName );
 		}
-	}
-
-	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		// Nothing to do
 	}
 
 }

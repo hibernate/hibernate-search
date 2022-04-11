@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -43,11 +42,6 @@ class IndexingDependencyOptionsStepImpl
 		if ( derivedFrom != null ) {
 			collectorValueNode.derivedFrom( derivedFrom );
 		}
-	}
-
-	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		// Nothing to do
 	}
 
 	@Override
