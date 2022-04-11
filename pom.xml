@@ -295,7 +295,7 @@
              Ideally, we should remove this dependency management when the dependencies fix their dependency divergence.
          -->
         <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
-        <version.jakarta.activation>2.0.1</version.jakarta.activation>
+        <version.jakarta.activation>2.1.0</version.jakarta.activation>
         <version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec>1.0.1.Final</version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec>
         <version.jakarta.interceptor-api>2.1.0</version.jakarta.interceptor-api>
         <!-- This is used to generate a link to the Java EE javadoc -->
@@ -1047,8 +1047,8 @@
                 <version>${version.jakarta.xml.bind}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.activation</groupId>
-                <artifactId>jakarta.activation</artifactId>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
                 <version>${version.jakarta.activation}</version>
             </dependency>
 
