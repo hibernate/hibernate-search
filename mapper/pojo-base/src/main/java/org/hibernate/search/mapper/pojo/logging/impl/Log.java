@@ -226,8 +226,8 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET + 18,
-			value = "Detected entity types: %1$s, indexed types: %2$s")
-	void detectedEntityTypes(Set<PojoRawTypeModel<?>> entityTypes, Set<PojoRawTypeModel<?>> indexedTypes);
+			value = "Detected entity types: %1$s, indexed types: %2$s.")
+	void detectedMappedTypes(Set<PojoRawTypeModel<?>> entityTypes, Set<PojoRawTypeModel<?>> indexedTypes);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET + 19,

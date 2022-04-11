@@ -22,30 +22,30 @@ public interface Mapper<MPBS extends MappingPartialBuildState> {
 	void closeOnFailure();
 
 	/**
-	 * Prepare for the mapping of indexed types
+	 * Prepare for the mapping of types
 	 * and inform the engine of the names of all backends this mapper depends on.
 	 * <p>
-	 * Called exactly once just before {@link #mapIndexedTypes(MappedIndexManagerFactory)}.
+	 * Called exactly once just before {@link #mapTypes(MappedIndexManagerFactory)}.
 	 *
 	 * @param backendsInfo A collector of backend names and other info.
 	 */
-	void prepareIndexedTypes(BackendsInfo backendsInfo);
+	void prepareMappedTypes(BackendsInfo backendsInfo);
 
 	/**
-	 * Begin the creation of a mapping for all indexed types.
+	 * Begin the creation of a mapping for all mapped types.
 	 * <p>
-	 * Called exactly once just after {@link #prepareIndexedTypes(BackendsInfo)} and before {@link #prepareBuild()}.
+	 * Called exactly once just after {@link #prepareMappedTypes(BackendsInfo)} and before {@link #prepareBuild()}.
 	 *
 	 * @param indexManagerFactory A factory for index managers,
-	 * supporting all the backends declared in {@link #prepareIndexedTypes(BackendsInfo)}.
+	 * supporting all the backends declared in {@link #prepareMappedTypes(BackendsInfo)}.
 	 */
-	void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory);
+	void mapTypes(MappedIndexManagerFactory indexManagerFactory);
 
 	/**
-	 * Partially build the mapping based on the {@link #mapIndexedTypes(MappedIndexManagerFactory) indexed types}
+	 * Partially build the mapping based on the {@link #mapTypes(MappedIndexManagerFactory) indexed types}
 	 * added so far.
 	 * <p>
-	 * Called exactly once just after {@link #mapIndexedTypes(MappedIndexManagerFactory)}.
+	 * Called exactly once just after {@link #mapTypes(MappedIndexManagerFactory)}.
 	 *
 	 * @return The partially-built mapping.
 	 * @throws MappingAbortedException When aborting the mapping due to

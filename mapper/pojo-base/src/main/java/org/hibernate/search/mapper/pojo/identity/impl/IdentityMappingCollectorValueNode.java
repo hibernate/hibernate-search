@@ -13,12 +13,12 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class IdentityMappingCollectorValueNode extends AbstractIdentityMappingCollectorNode
-		implements PojoMappingCollectorValueNode {
+		implements PojoIndexMappingCollectorValueNode {
 
 	private final BoundPojoModelPathValueNode<?, ?, ?> modelPath;
 

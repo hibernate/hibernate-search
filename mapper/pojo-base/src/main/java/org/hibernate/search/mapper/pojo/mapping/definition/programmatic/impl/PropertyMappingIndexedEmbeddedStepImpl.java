@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -56,7 +56,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorPropertyNode collector) {
 		String actualPrefix;
 		if ( relativeFieldName != null ) {
 			actualPrefix = relativeFieldName + FieldPaths.PATH_SEPARATOR;

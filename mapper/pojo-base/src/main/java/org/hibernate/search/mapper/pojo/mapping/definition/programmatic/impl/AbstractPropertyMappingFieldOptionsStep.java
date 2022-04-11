@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -51,7 +51,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorPropertyNode collector) {
 		collector.value( extractorPath )
 				.valueBinder( binder, params, relativeFieldName, fieldModelContributor );
 	}

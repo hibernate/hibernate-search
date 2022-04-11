@@ -10,12 +10,12 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 
 class IdentityMappingCollectorTypeNode<T> extends AbstractIdentityMappingCollectorNode
-		implements PojoMappingCollectorTypeNode {
+		implements PojoIndexMappingCollectorTypeNode {
 
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 	private final PojoIdentityMappingCollector identityMappingCollector;
@@ -39,7 +39,7 @@ class IdentityMappingCollectorTypeNode<T> extends AbstractIdentityMappingCollect
 	}
 
 	@Override
-	public PojoMappingCollectorPropertyNode property(String propertyName) {
+	public PojoIndexMappingCollectorPropertyNode property(String propertyName) {
 		return new IdentityMappingCollectorPropertyNode<>( modelPath.property( propertyName ),
 				mappingHelper, identityMappingCollector
 		);

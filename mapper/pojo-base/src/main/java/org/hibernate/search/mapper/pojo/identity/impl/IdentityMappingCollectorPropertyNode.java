@@ -13,13 +13,13 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 
 class IdentityMappingCollectorPropertyNode<P> extends AbstractIdentityMappingCollectorNode
-		implements PojoMappingCollectorPropertyNode {
+		implements PojoIndexMappingCollectorPropertyNode {
 
 	private final BoundPojoModelPathPropertyNode<?, P> modelPath;
 	private final PojoIdentityMappingCollector identityMappingCollector;
@@ -50,7 +50,7 @@ class IdentityMappingCollectorPropertyNode<P> extends AbstractIdentityMappingCol
 	}
 
 	@Override
-	public PojoMappingCollectorValueNode value(ContainerExtractorPath extractorPath) {
+	public PojoIndexMappingCollectorValueNode value(ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				mappingHelper.indexModelBinder().bindExtractorPath(
 						modelPath.getPropertyModel().typeModel(),

@@ -12,7 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -30,7 +30,7 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorPropertyNode collector) {
 		collector.identifierBinder( binder, params );
 	}
 

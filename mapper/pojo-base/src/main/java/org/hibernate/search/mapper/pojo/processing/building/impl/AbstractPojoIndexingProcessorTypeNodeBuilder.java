@@ -22,8 +22,8 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -40,7 +40,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * @param <U> The processed type: either {@code T}, or another type if casting is necessary before processing.
  */
 public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends AbstractPojoProcessorNodeBuilder
-		implements PojoMappingCollectorTypeNode {
+		implements PojoIndexMappingCollectorTypeNode {
 
 	private final PojoIdentityMappingCollector identityMappingCollector;
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
@@ -66,7 +66,7 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	}
 
 	@Override
-	public PojoMappingCollectorPropertyNode property(String propertyName) {
+	public PojoIndexMappingCollectorPropertyNode property(String propertyName) {
 		// TODO HSEARCH-3318 also pass an access type ("default" if not mentioned by the user, method/field otherwise) and take it into account to retrieve the right property model/handle
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyNodeBuilder );
 	}

@@ -47,7 +47,7 @@ import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManagerContainer;
@@ -150,7 +150,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	@Override
-	public void prepareIndexedTypes(BackendsInfo backendsInfo) {
+	public void prepareMappedTypes(BackendsInfo backendsInfo) {
 		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.typesContributedTo();
 		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
 			try {
@@ -170,7 +170,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 		}
 
-		log.detectedEntityTypes( entityTypes, indexedEntityTypes );
+		log.detectedMappedTypes( entityTypes, indexedEntityTypes );
 	}
 
 	private void prepareEntityOrIndexedType(PojoRawTypeModel<?> rawTypeModel, BackendsInfo backendsInfo) {
@@ -193,7 +193,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	@Override
-	public void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
+	public void mapTypes(MappedIndexManagerFactory indexManagerFactory) {
 		for ( PojoRawTypeModel<?> indexedEntityType : indexedEntityTypes ) {
 			try {
 				mapIndexedType( indexedEntityType, indexManagerFactory );
@@ -244,7 +244,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( indexedEntityType, builder );
 
-		collectMapping( indexedEntityType, builder.asCollector() );
+		collectIndexMapping( indexedEntityType, builder.asCollector() );
 	}
 
 	@Override
@@ -386,7 +386,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					entityType, mappingHelper, Optional.empty(), providedIdentifierBridge,
 					mappingHelper.beanResolver()
 			);
-			collectMapping( entityType, identityMappingCollector.toMappingCollectorRootNode() );
+			collectIndexMapping( entityType, identityMappingCollector.toMappingCollectorRootNode() );
 			IdentifierMappingImplementor<?, T> identifierMapping = identityMappingCollector
 					.buildAndContributeTo( extendedMappingCollector, containedEntityIdentityMappingMode );
 
@@ -400,9 +400,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 	}
 
-	private <E> void collectMapping(PojoRawTypeModel<E> type, PojoMappingCollectorTypeNode collector) {
+	private <T> void collectIndexMapping(PojoRawTypeModel<T> type, PojoIndexMappingCollectorTypeNode collector) {
 		for ( PojoTypeMetadataContributor contributor : contributorProvider.get( type ) ) {
-			contributor.contributeMapping( collector );
+			contributor.contributeIndexMapping( collector );
 		}
 	}
 

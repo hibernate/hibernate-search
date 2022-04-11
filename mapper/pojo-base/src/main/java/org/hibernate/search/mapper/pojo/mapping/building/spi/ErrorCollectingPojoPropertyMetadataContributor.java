@@ -25,11 +25,11 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorPropertyNode collector) {
 		if ( hasContent() ) {
 			for ( PojoPropertyMetadataContributor child : children ) {
 				try {
-					child.contributeMapping( collector );
+					child.contributeIndexMapping( collector );
 				}
 				catch (RuntimeException e) {
 					collector.failureCollector().add( e );

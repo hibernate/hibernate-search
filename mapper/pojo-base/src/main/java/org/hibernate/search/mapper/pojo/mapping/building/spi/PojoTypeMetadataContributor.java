@@ -14,7 +14,7 @@ public interface PojoTypeMetadataContributor {
 		// No-op by default
 	}
 
-	default void contributeMapping(PojoMappingCollectorTypeNode collector) {
+	default void contributeIndexMapping(PojoIndexMappingCollectorTypeNode collector) {
 		// No-op by default
 	}
 

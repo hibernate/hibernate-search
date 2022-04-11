@@ -26,11 +26,11 @@ public final class ErrorCollectingPojoTypeMetadataContributor implements PojoTyp
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorTypeNode collector) {
 		if ( children != null ) {
 			for ( PojoTypeMetadataContributor child : children ) {
 				try {
-					child.contributeMapping( collector );
+					child.contributeIndexMapping( collector );
 				}
 				catch (RuntimeException e) {
 					collector.failureCollector().add( e );

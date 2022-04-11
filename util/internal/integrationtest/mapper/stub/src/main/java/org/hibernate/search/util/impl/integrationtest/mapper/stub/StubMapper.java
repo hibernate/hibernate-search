@@ -51,7 +51,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	@Override
-	public void prepareIndexedTypes(BackendsInfo backendsInfo) {
+	public void prepareMappedTypes(BackendsInfo backendsInfo) {
 		contributorProvider.typesContributedTo()
 				.forEach( type -> {
 					try {
@@ -70,7 +70,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	@Override
-	public void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
+	public void mapTypes(MappedIndexManagerFactory indexManagerFactory) {
 		contributorProvider.typesContributedTo()
 				.forEach( type -> {
 					try {

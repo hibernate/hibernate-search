@@ -12,7 +12,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
@@ -46,8 +46,8 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		children.contributeMapping( collector );
+	public void contributeIndexMapping(PojoIndexMappingCollectorTypeNode collector) {
+		children.contributeIndexMapping( collector );
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
+public interface PojoIndexMappingCollectorValueNode extends PojoMappingCollector {
 
 	void valueBinder(ValueBinder binder, Map<String, Object> params,
 			String relativeFieldName, FieldModelContributor fieldModelContributor);
