@@ -10,10 +10,10 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
-public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
+public interface PojoIndexMappingCollectorTypeNode extends PojoMappingCollector {
 
 	void typeBinder(TypeBinder builder, Map<String, Object> params);
 
-	PojoMappingCollectorPropertyNode property(String propertyName);
+	PojoIndexMappingCollectorPropertyNode property(String propertyName);
 
 }

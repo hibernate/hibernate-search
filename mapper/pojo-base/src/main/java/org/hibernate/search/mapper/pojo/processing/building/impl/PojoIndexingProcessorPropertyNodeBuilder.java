@@ -26,8 +26,8 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -44,7 +44,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * @param <P> The property type
  */
 class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcessorNodeBuilder
-		implements PojoMappingCollectorPropertyNode {
+		implements PojoIndexMappingCollectorPropertyNode {
 
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
 
@@ -85,7 +85,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	}
 
 	@Override
-	public PojoMappingCollectorValueNode value(ContainerExtractorPath extractorPath) {
+	public PojoIndexMappingCollectorValueNode value(ContainerExtractorPath extractorPath) {
 		if ( !extractorPath.isEmpty() ) {
 			PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?> containerElementNodeBuilder =
 					containerElementNodeBuilders.get( extractorPath );

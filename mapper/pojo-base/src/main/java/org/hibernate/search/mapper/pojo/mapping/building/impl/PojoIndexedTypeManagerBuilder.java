@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCol
 import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
@@ -101,7 +101,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		}
 	}
 
-	PojoMappingCollectorTypeNode asCollector() {
+	PojoIndexMappingCollectorTypeNode asCollector() {
 		return processorBuilder;
 	}
 

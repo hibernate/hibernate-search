@@ -11,8 +11,8 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
@@ -56,10 +56,10 @@ class InitialPropertyMappingStep
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorTypeNode collector) {
 		if ( children.hasContent() ) {
-			PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.name() );
-			children.contributeMapping( collectorPropertyNode );
+			PojoIndexMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.name() );
+			children.contributeIndexMapping( collectorPropertyNode );
 		}
 	}
 

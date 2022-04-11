@@ -12,12 +12,12 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
-public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
+public interface PojoIndexMappingCollectorPropertyNode extends PojoMappingCollector {
 
 	void propertyBinder(PropertyBinder binder, Map<String, Object> params);
 
 	void identifierBinder(IdentifierBinder binder, Map<String, Object> params);
 
-	PojoMappingCollectorValueNode value(ContainerExtractorPath extractorPath);
+	PojoIndexMappingCollectorValueNode value(ContainerExtractorPath extractorPath);
 
 }

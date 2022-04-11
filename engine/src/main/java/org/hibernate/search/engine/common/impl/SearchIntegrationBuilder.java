@@ -275,11 +275,11 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 		}
 
 		void determineIndexedTypes(BackendsInfo backendsInfo) {
-			mapper.prepareIndexedTypes( backendsInfo );
+			mapper.prepareMappedTypes( backendsInfo );
 		}
 
 		void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
-			mapper.mapIndexedTypes( indexManagerFactory );
+			mapper.mapTypes( indexManagerFactory );
 		}
 
 		void partiallyBuildAndAddTo(Map<MappingKey<?, ?>, MappingPartialBuildState> mappings) {

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 
 
@@ -25,7 +25,7 @@ class TypeBridgeMappingContributor implements PojoTypeMetadataContributor {
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorTypeNode collector) {
 		collector.typeBinder( binder, params );
 	}
 

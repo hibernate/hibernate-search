@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
@@ -56,11 +56,11 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 	}
 
 	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+	public void contributeIndexMapping(PojoIndexMappingCollectorPropertyNode collector) {
 		if ( contributeDefaultAnalyzer ) {
 			analyzer( AnalyzerNames.DEFAULT );
 		}
 
-		super.contributeMapping( collector );
+		super.contributeIndexMapping( collector );
 	}
 }

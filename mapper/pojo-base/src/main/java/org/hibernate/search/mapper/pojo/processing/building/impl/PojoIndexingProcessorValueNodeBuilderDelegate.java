@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathOriginalTypeNode;
@@ -48,7 +48,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <V> The type of values extracted by the container value extractor.
  */
 class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoProcessorNodeBuilder
-		implements PojoMappingCollectorValueNode {
+		implements PojoIndexMappingCollectorValueNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -140,7 +140,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		if ( !includeEmbeddedObjectId && contributors.isEmpty() ) {
 			throw log.invalidIndexedEmbedded( targetTypeModel );
 		}
-		contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+		contributors.forEach( c -> c.contributeIndexMapping( nestedProcessorBuilder ) );
 		if ( includeEmbeddedObjectId ) {
 			identityMappingCollector.contributeIdentifierField( nestedProcessorBuilder );
 		}

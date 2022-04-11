@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -47,7 +47,7 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 		);
 	}
 
-	public PojoMappingCollectorValueNode value() {
+	public PojoIndexMappingCollectorValueNode value() {
 		return valueNodeProcessorCollectionBuilder;
 	}
 

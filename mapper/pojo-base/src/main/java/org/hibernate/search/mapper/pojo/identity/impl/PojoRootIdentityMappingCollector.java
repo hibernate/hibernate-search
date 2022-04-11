@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridg
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
@@ -59,7 +59,7 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 		}
 	}
 
-	public PojoMappingCollectorTypeNode toMappingCollectorRootNode() {
+	public PojoIndexMappingCollectorTypeNode toMappingCollectorRootNode() {
 		return new IdentityMappingCollectorTypeNode<>( BoundPojoModelPath.root( typeModel ), mappingHelper, this );
 	}
 
