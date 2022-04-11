@@ -11,7 +11,6 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
 
@@ -23,11 +22,6 @@ class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributo
 	PropertyBridgeMappingContributor(PropertyBinder binder, Map<String, Object> params) {
 		this.binder = binder;
 		this.params = params;
-	}
-
-	@Override
-	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		// Nothing to do
 	}
 
 	@Override

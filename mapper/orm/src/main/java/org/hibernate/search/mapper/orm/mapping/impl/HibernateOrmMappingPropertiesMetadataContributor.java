@@ -22,7 +22,6 @@ import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -52,11 +51,6 @@ public final class HibernateOrmMappingPropertiesMetadataContributor implements P
 			collector.property( property.getName(), collectorPropertyNode ->
 					collectMetadataFromHibernateOrmMappingProperty( collectorPropertyNode, property ) );
 		}
-	}
-
-	@Override
-	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		// Nothing to do
 	}
 
 	private void collectMetadataFromHibernateOrmMappingProperty(PojoAdditionalMetadataCollectorPropertyNode collector,

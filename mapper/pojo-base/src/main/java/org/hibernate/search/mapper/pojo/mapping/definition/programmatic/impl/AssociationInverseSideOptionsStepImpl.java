@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -31,11 +30,6 @@ class AssociationInverseSideOptionsStepImpl
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		collector.value( extractorPath ).associationInverseSide( inversePath );
-	}
-
-	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		// Nothing to do
 	}
 
 	@Override

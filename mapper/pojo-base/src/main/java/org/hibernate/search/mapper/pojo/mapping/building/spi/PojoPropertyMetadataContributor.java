@@ -10,8 +10,12 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 public interface PojoPropertyMetadataContributor {
 
-	void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector);
+	default void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
+		// No-op by default
+	}
 
-	void contributeMapping(PojoMappingCollectorPropertyNode collector);
+	default void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+		// No-op by default
+	}
 
 }

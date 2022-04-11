@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
 
@@ -28,11 +27,6 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 
 	PropertyMappingDocumentIdOptionsStepImpl(PropertyMappingStep parent) {
 		super( parent );
-	}
-
-	@Override
-	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		// Nothing to do
 	}
 
 	@Override

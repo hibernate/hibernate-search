@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -54,11 +53,6 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
 		}
 		this.relativeFieldName = relativeFieldName;
-	}
-
-	@Override
-	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		// Nothing to do
 	}
 
 	@Override
