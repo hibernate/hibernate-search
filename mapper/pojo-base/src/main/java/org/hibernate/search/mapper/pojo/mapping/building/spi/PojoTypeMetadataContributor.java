@@ -8,11 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
-/**
- * An alias interface used when we don't want to write the full version of
- * {@link PojoMetadataContributor} with generic parameters.
- */
-public interface PojoTypeMetadataContributor
-		extends PojoMetadataContributor<PojoAdditionalMetadataCollectorTypeNode, PojoMappingCollectorTypeNode> {
+public interface PojoTypeMetadataContributor {
+
+	void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector);
+
+	void contributeMapping(PojoMappingCollectorTypeNode collector);
 
 }
