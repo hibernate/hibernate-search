@@ -297,7 +297,7 @@
         <version.jakarta.xml.bind>3.0.1</version.jakarta.xml.bind>
         <version.jakarta.activation>2.0.1</version.jakarta.activation>
         <version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec>1.0.1.Final</version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec>
-        <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
+        <version.jakarta.interceptor-api>2.1.0</version.jakarta.interceptor-api>
         <!-- This is used to generate a link to the Java EE javadoc -->
         <javadoc.javaee.url>https://javaee.github.io/javaee-spec/javadocs/</javadoc.javaee.url>
         <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.0/apidocs/</javadoc.jakarta.batch.url>
