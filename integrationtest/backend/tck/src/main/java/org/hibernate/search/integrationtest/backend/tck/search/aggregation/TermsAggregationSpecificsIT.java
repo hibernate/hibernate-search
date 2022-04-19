@@ -566,6 +566,53 @@ public class TermsAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must be strictly positive" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4544")
+	public void maxTermCount_integerMaxValue() {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+						.maxTermCount( Integer.MAX_VALUE ) )
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder( c -> {
+							for ( F value : dataSet.valuesInDescendingOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
+							}
+						} )
+				);
+	}
+
+	// This is interesting even if we already test Integer.MAX_VALUE (see above),
+	// because Lucene has some hardcoded limits for PriorityQueue sizes,
+	// somewhere around 2147483631, which is lower than Integer.MAX_VALUE.
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4544")
+	public void maxTermCount_veryLarge() {
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
+
+		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
+
+		assertThatQuery( matchAllQuery()
+				.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
+						.maxTermCount( 2_000_000_000 ) )
+				.routing( dataSet.name ) )
+				.aggregation(
+						aggregationKey,
+						// All buckets should be returned.
+						containsInAnyOrder( c -> {
+							for ( F value : dataSet.valuesInDescendingOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
+							}
+						} )
+				);
+	}
+
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return index.createScope().query().where( f -> f.matchAll() );
 	}
