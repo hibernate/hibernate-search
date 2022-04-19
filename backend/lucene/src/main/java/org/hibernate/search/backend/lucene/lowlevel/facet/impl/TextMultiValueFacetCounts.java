@@ -73,6 +73,12 @@ public class TextMultiValueFacetCounts extends Facets {
 	}
 
 	private FacetResult getTopChildrenSortByCount(int topN) throws IOException {
+		if ( topN > ordCount ) {
+			// HSEARCH-4544 Avoid OutOfMemoryError when passing crazy high topN values
+			// We know there will never be more than "ordCount" values anyway.
+			topN = ordCount;
+		}
+
 		TopOrdAndIntQueue q = null;
 
 		int bottomCount = 0;
