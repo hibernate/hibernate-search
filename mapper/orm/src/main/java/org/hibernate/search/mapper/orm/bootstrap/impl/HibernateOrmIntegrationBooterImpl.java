@@ -31,11 +31,14 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
+import org.jboss.jandex.IndexView;
+
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Metadata metadata;
+	private final IndexView jandexIndex;
 	private final ReflectionManager reflectionManager;
 	private final ValueHandleFactory valueHandleFactory;
 	private final HibernateSearchPreIntegrationService preIntegrationService;
@@ -45,6 +48,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
 		this.metadata = builder.metadata;
 		ServiceRegistry serviceRegistry = builder.bootstrapContext.getServiceRegistry();
+		this.jandexIndex = builder.bootstrapContext.getJandexView();
 		this.reflectionManager = builder.bootstrapContext.getReflectionManager();
 		this.valueHandleFactory = builder.valueHandleFactory != null ? builder.valueHandleFactory
 				: ValueHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
@@ -86,7 +90,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			);
 		}
 
-		preIntegrationService.doBootFirstPhase( metadata, reflectionManager, valueHandleFactory )
+		preIntegrationService.doBootFirstPhase( metadata, jandexIndex, reflectionManager, valueHandleFactory )
 				.set( propertyCollector );
 	}
 
@@ -170,7 +174,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmIntegrationPartialBuildState partialBuildState =
-				preIntegrationService.doBootFirstPhase( metadata, reflectionManager, valueHandleFactory );
+				preIntegrationService.doBootFirstPhase( metadata, jandexIndex, reflectionManager, valueHandleFactory );
 
 		try {
 			return partialBuildState.doBootSecondPhase( sessionFactoryImplementor,

@@ -8,27 +8,24 @@ package org.hibernate.search.util.impl.test.jar;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
-import org.jboss.jandex.FieldInfo;
 import org.jboss.jandex.Index;
-import org.jboss.jandex.MethodInfo;
-import org.jboss.jandex.Type;
 
-public final class JandexUtils {
+public final class JandexTestUtils {
 	private static final DotName RETENTION = DotName.createSimple( Retention.class.getName() );
 
-	private JandexUtils() {
+	private JandexTestUtils() {
 	}
 
-	public static Set<String> toStrings(Set<DotName> dotNames) {
+	public static Set<String> toStrings(Collection<DotName> dotNames) {
 		return dotNames.stream().map( DotName::toString ).collect( Collectors.toCollection( TreeSet::new ) );
 	}
 
@@ -41,23 +38,6 @@ public final class JandexUtils {
 			}
 		}
 		return annotations;
-	}
-
-	public static ClassInfo extractDeclaringClass(AnnotationTarget target) {
-		switch ( target.kind() ) {
-			case CLASS:
-				return target.asClass();
-			case FIELD:
-				return target.asField().declaringClass();
-			case METHOD:
-				return target.asMethod().declaringClass();
-			case METHOD_PARAMETER:
-				return target.asMethodParameter().method().declaringClass();
-			case TYPE:
-				return extractDeclaringClass( target.asType().enclosingTarget() );
-			default:
-				throw new IllegalStateException( "Unsupported annotation target kind: " + target.kind() );
-		}
 	}
 
 	public static Set<DotName> collectClassHierarchiesRecursively(Index index, Set<DotName> initialClasses) {

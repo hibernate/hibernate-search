@@ -108,7 +108,7 @@ public class AnnotationMappingDiscoveryIT {
 
 		setupHelper.start()
 				.withConfiguration( builder -> {
-					builder.annotatedTypeDiscoveryEnabled( false );
+					builder.annotationMapping().discoverAnnotationsFromReferencedTypes( false );
 					builder.addEntityType( IndexedEntity.class );
 
 					// Do not register NonExplicitlyRegistered* types, they should be discovered automatically if required

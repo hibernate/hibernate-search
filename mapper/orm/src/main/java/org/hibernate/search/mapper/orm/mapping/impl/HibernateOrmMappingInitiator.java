@@ -40,6 +40,8 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.service.ServiceRegistry;
 
+import org.jboss.jandex.IndexView;
+
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingConfigurationContext {
 
@@ -49,13 +51,20 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.withDefault( HibernateOrmMapperSettings.Defaults.MAPPING_PROCESS_ANNOTATIONS )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES )
+					.asBoolean()
+					.withDefault( HibernateOrmMapperSettings.Defaults.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES )
+					.build();
+
 	private static final OptionalConfigurationProperty<List<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_CONFIGURER )
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.multivalued()
 					.build();
 
-	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
+	public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView jandexIndex,
+			ReflectionManager reflectionManager,
 			ValueHandleFactory valueHandleFactory, ServiceRegistry serviceRegistry) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
@@ -66,8 +75,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		HibernateSearchPreIntegrationService preIntegrationService =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
 
-		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector, ormConfigurationService,
-				preIntegrationService );
+		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, jandexIndex, introspector,
+				ormConfigurationService, preIntegrationService );
 	}
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
@@ -78,11 +87,15 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
 
 	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			HibernateOrmBootstrapIntrospector introspector, ConfigurationService ormConfigurationService,
+			IndexView jandexIndex, HibernateOrmBootstrapIntrospector introspector,
+			ConfigurationService ormConfigurationService,
 			HibernateSearchPreIntegrationService preIntegrationService) {
 		super( introspector );
 
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
+		if ( jandexIndex != null ) {
+			annotationMapping().add( jandexIndex );
+		}
 		this.introspector = introspector;
 
 		/*
@@ -132,7 +145,11 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
 		if ( processAnnotations ) {
-			annotatedTypeDiscoveryEnabled( true );
+			annotationMapping()
+					.discoverAnnotatedTypesFromRootMappingAnnotations( true )
+					.discoverJandexIndexesFromAddedTypes( true )
+					.buildMissingDiscoveredJandexIndexes( MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES.get( propertySource ) )
+					.discoverAnnotationsFromReferencedTypes( true );
 
 			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();
 			for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {

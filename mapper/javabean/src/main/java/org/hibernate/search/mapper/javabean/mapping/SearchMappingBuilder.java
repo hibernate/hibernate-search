@@ -36,6 +36,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgesConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -69,7 +70,10 @@ public final class SearchMappingBuilder {
 		mappingKey = new JavaBeanMappingKey();
 		mappingInitiator = new JavaBeanMappingInitiator( introspector );
 		// Enable annotated type discovery by default
-		mappingInitiator.annotatedTypeDiscoveryEnabled( true );
+		mappingInitiator.annotationMapping()
+				.discoverAnnotatedTypesFromRootMappingAnnotations( true )
+				.discoverJandexIndexesFromAddedTypes( true )
+				.discoverAnnotationsFromReferencedTypes( true );
 	}
 
 	public ProgrammaticMappingConfigurationContext programmaticMapping() {
@@ -168,8 +172,17 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
-	public SearchMappingBuilder annotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
-		mappingInitiator.annotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
+	/**
+	 *
+	 * @param enabled {@code true} if Hibernate Search should automatically process mapping annotations
+	 * on types referenced in the mapping of other types (e.g. the target of an {@link IndexedEmbedded}, ...).
+	 * {@code false} if that discovery should be disabled.
+	 * @deprecated Use {@link AnnotationMappingConfigurationContext#discoverAnnotationsFromReferencedTypes(boolean)}
+	 * on the object returned by {@link #annotationMapping()} instead.
+	 */
+	@Deprecated
+	public SearchMappingBuilder annotatedTypeDiscoveryEnabled(boolean enabled) {
+		annotationMapping().discoverAnnotationsFromReferencedTypes( enabled );
 		return this;
 	}
 

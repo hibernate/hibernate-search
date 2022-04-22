@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.RootMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.ProjectionConstructorProcessor;
@@ -31,6 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
+@RootMapping
 @ConstructorMapping(processor = @ConstructorMappingAnnotationProcessorRef(type = ProjectionConstructorProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 @TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = ProjectionConstructorProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface ProjectionConstructor {

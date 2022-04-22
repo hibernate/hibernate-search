@@ -6,51 +6,98 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
-import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.spi.AnnotationScanning;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.jar.impl.JandexUtils;
+import org.hibernate.search.util.common.jar.impl.JarUtils;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
+
+import org.jboss.jandex.DotName;
+import org.jboss.jandex.Index;
+import org.jboss.jandex.IndexView;
 
 public class AnnotationMappingConfigurationContextImpl implements AnnotationMappingConfigurationContext,
 		PojoMappingConfigurationContributor {
 
-	private final PojoBootstrapIntrospector introspector;
-	// Use a LinkedHashSet for deterministic iteration
-	private final Set<Class<?>> annotatedTypes = new LinkedHashSet<>();
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private boolean annotatedTypeDiscoveryEnabled = false;
+	private final PojoBootstrapIntrospector introspector;
+
+	private boolean discoverAnnotatedTypesFromRootMappingAnnotations = false;
+	private boolean discoverJandexIndexesFromAddedTypes = false;
+	private boolean buildMissingJandexIndexes = false;
+	private boolean discoverAnnotationsFromReferencedTypes = false;
+
+	// Use a LinkedHashSet for deterministic iteration
+	private final Set<Class<?>> explicitAnnotatedTypes = new LinkedHashSet<>();
+	private final List<IndexView> explicitJandexIndexes = new ArrayList<>();
 
 	public AnnotationMappingConfigurationContextImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 
-	public void setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
-		this.annotatedTypeDiscoveryEnabled = annotatedTypeDiscoveryEnabled;
+	@Override
+	public AnnotationMappingConfigurationContext discoverAnnotatedTypesFromRootMappingAnnotations(boolean enabled) {
+		this.discoverAnnotatedTypesFromRootMappingAnnotations = enabled;
+		return this;
+	}
+
+	@Override
+	public AnnotationMappingConfigurationContext discoverJandexIndexesFromAddedTypes(boolean enabled) {
+		this.discoverJandexIndexesFromAddedTypes = enabled;
+		return this;
+	}
+
+	@Override
+	public AnnotationMappingConfigurationContext buildMissingDiscoveredJandexIndexes(boolean enabled) {
+		this.buildMissingJandexIndexes = enabled;
+		return this;
+	}
+
+	@Override
+	public AnnotationMappingConfigurationContext discoverAnnotationsFromReferencedTypes(boolean enabled) {
+		this.discoverAnnotationsFromReferencedTypes = enabled;
+		return this;
 	}
 
 	@Override
 	public AnnotationMappingConfigurationContext add(Class<?> annotatedType) {
-		this.annotatedTypes.add( annotatedType );
+		this.explicitAnnotatedTypes.add( annotatedType );
 		return this;
 	}
 
 	@Override
 	public AnnotationMappingConfigurationContext add(Set<Class<?>> annotatedTypes) {
-		this.annotatedTypes.addAll( annotatedTypes );
+		this.explicitAnnotatedTypes.addAll( annotatedTypes );
+		return this;
+	}
+
+	@Override
+	public AnnotationMappingConfigurationContext add(IndexView jandexIndex) {
+		explicitJandexIndexes.add( jandexIndex );
 		return this;
 	}
 
@@ -64,17 +111,30 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, configurationContext,
 						annotationHelper );
 
-		/*
-		 * For types that were explicitly requested for annotation scanning and their supertypes,
-		 * map the types to indexes if necessary, and add a metadata contributor.
-		 */
-		Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
-		Set<PojoRawTypeModel<?>> typesToInspect = new LinkedHashSet<>();
-		for ( Class<?> annotatedType : annotatedTypes ) {
+		Set<PojoRawTypeModel<?>> typesToProcess = new LinkedHashSet<>();
+
+		for ( Class<?> annotatedType : explicitAnnotatedTypes ) {
 			introspector.typeModel( annotatedType ).ascendingSuperTypes()
-					.forEach( typesToInspect::add );
+					.forEach( typesToProcess::add );
 		}
-		for ( PojoRawTypeModel<?> typeModel : typesToInspect ) {
+
+		if ( discoverAnnotatedTypesFromRootMappingAnnotations ) {
+			IndexView jandexIndex = buildJandexIndex();
+			if ( jandexIndex != null ) {
+				Set<DotName> rootMappingAnnotatedTypes = AnnotationScanning.scanForRootMappingAnnotatedTypes(
+						jandexIndex );
+
+				ClassResolver classResolver = buildContext.classResolver();
+				for ( DotName rootMappingAnnotatedType : rootMappingAnnotatedTypes ) {
+					Class<?> annotatedClass = classResolver.classForName( rootMappingAnnotatedType.toString() );
+					introspector.typeModel( annotatedClass ).ascendingSuperTypes()
+							.forEach( typesToProcess::add );
+				}
+			}
+		}
+
+		Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
+		for ( PojoRawTypeModel<?> typeModel : typesToProcess ) {
 			boolean neverContributed = alreadyContributedTypes.add( typeModel );
 			// Ignore types that were already contributed
 			// TODO optimize by completely ignoring standard Java types, e.g. Object or standard Java interfaces such as Serializable?
@@ -88,13 +148,49 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 		}
 
 		/*
-		 * If automatic discovery of annotated types is enabled,
+		 * If automatic discovery of annotations on referenced types is enabled,
 		 * also add a discoverer for new types (e.g. types encountered in an @IndexedEmbedded).
 		 */
-		if ( annotatedTypeDiscoveryEnabled ) {
+		if ( discoverAnnotationsFromReferencedTypes ) {
 			PojoAnnotationTypeMetadataDiscoverer discoverer =
 					new PojoAnnotationTypeMetadataDiscoverer( contributorFactory, alreadyContributedTypes );
 			collector.collectDiscoverer( discoverer );
+		}
+	}
+
+	private IndexView buildJandexIndex() {
+		List<IndexView> jandexIndexes = new ArrayList<>( explicitJandexIndexes );
+
+		if ( discoverJandexIndexesFromAddedTypes ) {
+			IndexView compositeOfExplicitJandexIndexes = JandexUtils.compositeIndex( jandexIndexes );
+			Set<Path> discoveredJarPaths = new LinkedHashSet<>();
+			for ( Class<?> annotatedType : explicitAnnotatedTypes ) {
+				DotName dotName = DotName.createSimple( annotatedType.getName() );
+				// Optimization: if a class is already in the Jandex index,
+				// there's no need to discover the Jandex index of its JAR.
+				if ( compositeOfExplicitJandexIndexes.getClassByName( dotName ) == null ) {
+					JarUtils.jarOrDirectoryPath( annotatedType ).ifPresent( discoveredJarPaths::add );
+				}
+			}
+			for ( Path path : discoveredJarPaths ) {
+				jandexIndexForJar( path ).ifPresent( jandexIndexes::add );
+			}
+		}
+
+		return jandexIndexes.isEmpty() ? null : JandexUtils.compositeIndex( jandexIndexes );
+	}
+
+	private Optional<Index> jandexIndexForJar(Path path) {
+		try {
+			if ( buildMissingJandexIndexes ) {
+				return Optional.of( JandexUtils.readOrBuildIndex( path ) );
+			}
+			else {
+				return JandexUtils.readIndex( path );
+			}
+		}
+		catch (RuntimeException e) {
+			throw log.errorDiscoveringJandexIndex( path, e.getMessage(), e );
 		}
 	}
 

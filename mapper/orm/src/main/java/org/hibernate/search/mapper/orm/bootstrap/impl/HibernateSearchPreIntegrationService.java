@@ -44,6 +44,8 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceContributor;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
+import org.jboss.jandex.IndexView;
+
 /**
  * A service that can perform the earliest steps of the integration of Hibernate Search into Hibernate ORM,
  * before {@link HibernateSearchIntegrator} is even called.
@@ -202,7 +204,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 	abstract BeanResolver beanResolver();
 
 	abstract HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-			ReflectionManager reflectionManager,
+			IndexView jandexIndex, ReflectionManager reflectionManager,
 			ValueHandleFactory valueHandleFactory);
 
 	static class NotBooted extends HibernateSearchPreIntegrationService {
@@ -231,7 +233,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 
 		@Override
 		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
-				ReflectionManager reflectionManager,
+				IndexView jandexIndex, ReflectionManager reflectionManager,
 				ValueHandleFactory valueHandleFactory) {
 			HibernateOrmMappingInitiator mappingInitiator = null;
 			SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
@@ -239,7 +241,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 				SearchIntegration.Builder builder = SearchIntegration.builder( environment );
 
 				HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
-				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, reflectionManager,
+				mappingInitiator = HibernateOrmMappingInitiator.create( metadata, jandexIndex, reflectionManager,
 						valueHandleFactory, serviceRegistry );
 				builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -282,7 +284,7 @@ public abstract class HibernateSearchPreIntegrationService implements Service, A
 		}
 
 		@Override
-		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata,
+		HibernateOrmIntegrationPartialBuildState doBootFirstPhase(Metadata metadata, IndexView jandexIndex,
 				ReflectionManager reflectionManager, ValueHandleFactory valueHandleFactory) {
 			return partialBuildState;
 		}

@@ -12,6 +12,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -673,7 +674,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 112,
 			value = "Invalid object class for projection: %1$s."
 					+ " Make sure that this class is mapped correctly,"
-					+ " either through annotations (@ProjectionConstructor) or programmatic mapping.")
+					+ " either through annotations (@ProjectionConstructor) or programmatic mapping."
+					+ " If it is, make sure the class is included in a Jandex index made available to Hibernate Search.")
 	SearchException invalidObjectClassForProjection(@FormatWith(ClassFormatter.class) Class<?> objectClass);
 
 	@Message(id = ID_OFFSET + 113,
@@ -714,5 +716,9 @@ public interface Log extends BasicLogger {
 	SearchException infiniteRecursionForProjectionConstructor(
 			@FormatWith(PojoConstructorModelFormatter.class) PojoConstructorModel<?> constructorModel,
 			String fieldPath);
+
+	@Message(id = ID_OFFSET + 119,
+			value = "Exception while retrieving the Jandex index for JAR '%1$s': %2$s")
+	SearchException errorDiscoveringJandexIndex(Path jarPath, String causeMessage, @Cause Exception cause);
 
 }
