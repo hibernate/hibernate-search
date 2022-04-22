@@ -62,6 +62,9 @@ public final class V5MigrationHelperJPASetupHelper
 			// Override the automatic indexing synchronization strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 					AutomaticIndexingSynchronizationStrategyNames.SYNC );
+			// Ensure we don't build Jandex indexes needlessly:
+			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
+			withProperty( HibernateOrmMapperSettings.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES, false );
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}

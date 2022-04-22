@@ -7,8 +7,7 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.test.jar.JandexIndexingUtils.indexJarOrDirectory;
-import static org.hibernate.search.util.impl.test.jar.JarUtils.determineJarOrDirectoryLocation;
+import static org.hibernate.search.util.common.jar.impl.JandexUtils.readOrBuildIndex;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,7 +18,9 @@ import java.util.stream.Collectors;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
-import org.hibernate.search.util.impl.test.jar.JandexUtils;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.jar.impl.JandexUtils;
+import org.hibernate.search.util.common.jar.impl.JarUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,10 +44,11 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 
 	@BeforeClass
 	public static void index() throws IOException {
-		outboxPollingIndex = indexJarOrDirectory( determineJarOrDirectoryLocation(
-				HibernateOrmMapperOutboxPollingSettings.class,
-				"hibernate-search-mapper-orm-coordination-outbox-polling"
-		) );
+		outboxPollingIndex = readOrBuildIndex(
+				JarUtils.jarOrDirectoryPath( HibernateOrmMapperOutboxPollingSettings.class )
+						.orElseThrow( () -> new AssertionFailure(
+								"Could not find hibernate-search-mapper-orm-coordination-outbox-polling JAR?" ) )
+		);
 	}
 
 	@Test

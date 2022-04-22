@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingConfigurationContextImpl;
@@ -64,8 +65,6 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		 * Make sure to create and add the annotation mapping even if the user does not call the
 		 * annotationMapping() method to register annotated types explicitly,
 		 * in case annotated type discovery is enabled.
-		 * Also, make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
-		 * which would lead to duplicate field definitions.
 		 */
 		annotationMappingConfiguration = new AnnotationMappingConfigurationContextImpl( introspector );
 		addConfigurationContributor( annotationMappingConfiguration );
@@ -109,8 +108,16 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 	}
 
-	public void annotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
-		annotationMappingConfiguration.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
+	/**
+	 * @param enabled {@code true} if Hibernate Search should automatically process mapping annotations
+	 * on types referenced in the mapping of other types (e.g. the target of an {@link IndexedEmbedded}, ...).
+	 * {@code false} if that discovery should be disabled.
+	 * @deprecated Use {@link AnnotationMappingConfigurationContext#discoverAnnotationsFromReferencedTypes(boolean)}
+	 * on the object returned by {@link #annotationMapping()} instead.
+	 */
+	@Deprecated
+	public void annotatedTypeDiscoveryEnabled(boolean enabled) {
+		annotationMapping().discoverAnnotationsFromReferencedTypes( enabled );
 	}
 
 	@Override

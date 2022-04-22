@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.gson.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.test.jar.JandexIndexingUtils.indexJarOrDirectory;
-import static org.hibernate.search.util.impl.test.jar.JandexUtils.extractDeclaringClass;
-import static org.hibernate.search.util.impl.test.jar.JandexUtils.findRuntimeAnnotations;
-import static org.hibernate.search.util.impl.test.jar.JarUtils.determineJarOrDirectoryLocation;
+import static org.hibernate.search.util.common.jar.impl.JandexUtils.extractDeclaringClass;
+import static org.hibernate.search.util.common.jar.impl.JandexUtils.readOrBuildIndex;
+import static org.hibernate.search.util.common.jar.impl.JarUtils.jarOrDirectoryPath;
+import static org.hibernate.search.util.impl.test.jar.JandexTestUtils.findRuntimeAnnotations;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.util.impl.test.jar.JandexUtils;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.test.jar.JandexTestUtils;
 import org.hibernate.search.util.impl.test.logging.Log;
 
 import org.junit.BeforeClass;
@@ -41,9 +42,10 @@ public class GsonClassesTest {
 
 	@BeforeClass
 	public static void index() throws IOException {
-		gsonIndex = indexJarOrDirectory( determineJarOrDirectoryLocation( Gson.class, "Gson" ) );
-		backendElasticsearchIndex = indexJarOrDirectory( determineJarOrDirectoryLocation(
-				ElasticsearchExtension.class, "hibernate-search-backend-elasticsearch" ) );
+		gsonIndex = readOrBuildIndex( jarOrDirectoryPath( Gson.class )
+				.orElseThrow( () -> new AssertionFailure( "Could not find Gson JAR?" ) ) );
+		backendElasticsearchIndex = readOrBuildIndex( jarOrDirectoryPath( ElasticsearchExtension.class )
+				.orElseThrow( () -> new AssertionFailure( "Could not find hibernate-search-backend-elasticsearch JAR?" ) ) );
 	}
 
 	@Test
@@ -58,8 +60,8 @@ public class GsonClassesTest {
 			}
 		}
 
-		Set<String> annotatedClassesAndSubclasses = JandexUtils.toStrings(
-				JandexUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, annotatedClasses ) );
+		Set<String> annotatedClassesAndSubclasses = JandexTestUtils.toStrings(
+				JandexTestUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, annotatedClasses ) );
 
 		Log.INSTANCE.infof( "GSON-annotated classes and their class hierarchy: %s", annotatedClassesAndSubclasses );
 		assertThat( annotatedClassesAndSubclasses ).isNotEmpty();
@@ -80,8 +82,8 @@ public class GsonClassesTest {
 			}
 		}
 
-		Set<String> classesAndSubclasses = JandexUtils.toStrings(
-				JandexUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, classes ) );
+		Set<String> classesAndSubclasses = JandexTestUtils.toStrings(
+				JandexTestUtils.collectClassHierarchiesRecursively( backendElasticsearchIndex, classes ) );
 
 		Log.INSTANCE.infof( "Gson contract implementations and their class hierarchy: %s", classesAndSubclasses );
 		assertThat( classesAndSubclasses ).isNotEmpty();

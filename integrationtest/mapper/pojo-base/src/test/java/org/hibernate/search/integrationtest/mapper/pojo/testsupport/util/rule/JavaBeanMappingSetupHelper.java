@@ -77,6 +77,9 @@ public final class JavaBeanMappingSetupHelper
 		SetupContext() {
 			properties.put( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 					SchemaManagementStrategyName.NONE );
+			// Ensure we don't build Jandex indexes needlessly:
+			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
+			withConfiguration( builder -> builder.annotationMapping().buildMissingDiscoveredJandexIndexes( false ) );
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> properties.forEach( builder::property ) );
 		}

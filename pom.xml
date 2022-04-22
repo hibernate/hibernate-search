@@ -265,10 +265,9 @@
         <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
         <!-- This version must be kept in sync with the version of the dependency in Hibernate ORM.
              DO NOT USE DEPENDENCY MANAGEMENT FOR THIS DEPENDENCY!
-             If we do not use dependency management for this dependency, we get a build failure
+             Thanks to not using dependency management for this dependency, we get a build failure
              when the versions start diverging, thanks to the maven-enforcer-plugin
-             and to an artificial dependency in the mapper-orm artifact
-             (which is only necessary for the maven-enforcer-plugin checks to work).
+             and to our own explicit dependency in the utils-common artifact.
           -->
         <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
         <version.javax.persistence>2.2</version.javax.persistence>
@@ -2065,6 +2064,7 @@
                          -->
                         <trimStackTrace>false</trimStackTrace>
                         <systemPropertyVariables>
+                            <org.hibernate.search.test.property-set-in-maven-config>someValue</org.hibernate.search.test.property-set-in-maven-config>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
@@ -2111,6 +2111,7 @@
                          -->
                         <trimStackTrace>false</trimStackTrace>
                         <systemPropertyVariables>
+                            <org.hibernate.search.test.property-set-in-maven-config>someValue</org.hibernate.search.test.property-set-in-maven-config>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>

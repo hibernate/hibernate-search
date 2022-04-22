@@ -11,6 +11,7 @@ import static org.jboss.logging.Logger.Level.ERROR;
 
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 
 import org.hibernate.search.util.common.SearchException;
 
@@ -113,5 +114,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 12, value = "Exception while invoking '%1$s' with arguments %2$s: %3$s")
 	SearchException errorInvokingStaticMember(Member member, String argumentsAsString, @Cause Throwable cause, String causeMessage);
+
+	@Message(id = ID_OFFSET + 13, value = "Exception while accessing Jandex index for '%1$s': %2$s")
+	SearchException errorAccessingJandexIndex(Path jarOrDirectoryPath, String message, @Cause Throwable e);
+
+	@Message(id = ID_OFFSET + 14, value = "Exception while building Jandex index for '%1$s': %2$s")
+	SearchException errorBuildingJandexIndex(Path jarOrDirectoryPath, String message, @Cause Throwable e);
 
 }

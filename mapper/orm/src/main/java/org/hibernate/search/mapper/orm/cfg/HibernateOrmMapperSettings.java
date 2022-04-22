@@ -124,6 +124,20 @@ public final class HibernateOrmMapperSettings {
 	public static final String MAPPING_PROCESS_ANNOTATIONS = PREFIX + Radicals.MAPPING_PROCESS_ANNOTATIONS;
 
 	/**
+	 * When annotation processing is enabled,
+	 * whether Hibernate Search should automatically build Jandex indexes for types registered for annotation processing
+	 * (entities in particular),
+	 * to ensure that all "root mapping" annotations in those JARs (e.g. {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor})
+	 * are taken into account..
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES}.
+	 */
+	public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = PREFIX + Radicals.MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES;
+
+	/**
 	 * The mapping configurer to use.
 	 * <p>
 	 * Expects a single-valued or multi-valued reference to beans of type {@link HibernateOrmSearchMappingConfigurer}.
@@ -196,6 +210,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
+		public static final String MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = "mapping.build_missing_discovered_jandex_indexes";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 		public static final String COORDINATION = "coordination";
@@ -271,6 +286,7 @@ public final class HibernateOrmMapperSettings {
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
+		public static final boolean MAPPING_BUILD_MISSING_DISCOVERED_JANDEX_INDEXES = true;
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 		public static final BeanReference<CoordinationStrategy> COORDINATION_STRATEGY =
 				BeanReference.of( CoordinationStrategy.class, NoCoordinationStrategy.NAME );
