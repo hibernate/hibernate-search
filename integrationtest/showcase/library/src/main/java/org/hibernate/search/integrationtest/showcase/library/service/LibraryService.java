@@ -7,8 +7,11 @@
 package org.hibernate.search.integrationtest.showcase.library.service;
 
 import java.util.List;
+import java.util.function.Function;
 
+import org.hibernate.Hibernate;
 import org.hibernate.search.integrationtest.showcase.library.dto.LibraryFacetedSearchResult;
+import org.hibernate.search.integrationtest.showcase.library.dto.LibrarySimpleProjection;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
@@ -38,6 +41,15 @@ public class LibraryService {
 		return libraryRepo.save( new Library( id, name, collectionSize, latitude, longitude, services ) );
 	}
 
+	public <T> T getById(int id, Function<Library, T> getter) {
+		return libraryRepo.findById( id )
+				.map( getter.andThen( v -> {
+					Hibernate.initialize( v );
+					return v;
+				} ) )
+				.orElseThrow( () -> new IllegalStateException( "Library not found for ID " + id ) );
+	}
+
 	public BookCopy createCopyInLibrary(Library library, Book book, BookMedium medium) {
 		BookCopy copy = new BookCopy();
 		copy.setLibrary( library );
@@ -60,6 +72,14 @@ public class LibraryService {
 
 	public List<Library> search(String terms, int offset, int limit) {
 		return libraryRepo.search( terms, offset, limit );
+	}
+
+	public List<LibrarySimpleProjection> searchAndProject(String terms, int offset, int limit) {
+		return libraryRepo.searchAndProject( terms, offset, limit );
+	}
+
+	public List<LibrarySimpleProjection> searchAndProjectToMethodLocalClass(String terms, int offset, int limit) {
+		return libraryRepo.searchAndProjectToMethodLocalClass( terms, offset, limit );
 	}
 
 	public LibraryFacetedSearchResult searchFaceted(String terms,

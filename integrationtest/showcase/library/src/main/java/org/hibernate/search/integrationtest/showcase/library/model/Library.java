@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
@@ -40,7 +41,7 @@ public class Library extends AbstractEntity<Integer> {
 
 	@Basic
 	// TODO HSEARCH-3465 use multi-fields here
-	@FullTextField
+	@FullTextField(projectable = Projectable.YES)
 	@KeywordField(
 			name = "name_sort",
 			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
@@ -61,7 +62,7 @@ public class Library extends AbstractEntity<Integer> {
 	private Double longitude;
 
 	@ElementCollection
-	@GenericField(aggregable = Aggregable.YES)
+	@GenericField(aggregable = Aggregable.YES, projectable = Projectable.YES)
 	private List<LibraryServiceOption> services;
 
 	@OneToMany(mappedBy = "library", cascade = CascadeType.REMOVE)
