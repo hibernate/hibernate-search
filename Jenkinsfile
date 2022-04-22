@@ -208,7 +208,7 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '5.5', mavenProfile: 'elasticsearch-5.2',
 							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.2',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.ON_DEMAND)
 			]
 	])
 
