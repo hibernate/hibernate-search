@@ -38,7 +38,7 @@ public final class SimpleSessionFactoryBuilder {
 	@SuppressForbiddenApis(reason = "Strangely, this API involves the internal TcclLookupPrecedence class,"
 			+ " and there's nothing we can do about it")
 	public SimpleSessionFactoryBuilder setTcclLookupPrecedenceBefore() {
-		return onBootstraServiceRegistryBuilder( builder -> builder.applyTcclLookupPrecedence( TcclLookupPrecedence.BEFORE ) );
+		return onBootstrapServiceRegistryBuilder( builder -> builder.applyTcclLookupPrecedence( TcclLookupPrecedence.BEFORE ) );
 	}
 
 	public SimpleSessionFactoryBuilder setProperty(String key, Object value) {
@@ -72,7 +72,7 @@ public final class SimpleSessionFactoryBuilder {
 		return onMetadataSources( sources -> paths.forEach( sources::addResource ) );
 	}
 
-	public SimpleSessionFactoryBuilder onBootstraServiceRegistryBuilder(Consumer<BootstrapServiceRegistryBuilder> contributor) {
+	public SimpleSessionFactoryBuilder onBootstrapServiceRegistryBuilder(Consumer<BootstrapServiceRegistryBuilder> contributor) {
 		bootstrapServiceRegistryBuilderContributors.add( contributor );
 		return this;
 	}
