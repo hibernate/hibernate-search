@@ -515,6 +515,68 @@ public class ProjectionConstructorBaseIT {
 		);
 	}
 
+	// If an inner projection type is not included in any Jandex index on startup,
+	// Hibernate Search can still get on its feet thanks to annotated type discovery.
+	@Test
+	public void inferredInner_object_annotatedTypeDiscovery() {
+		class Contained {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@IndexedEmbedded
+			public Contained contained;
+		}
+		class MyInnerProjection {
+			public final String text;
+			public final Integer integer;
+			@ProjectionConstructor
+			public MyInnerProjection(String text, Integer integer) {
+				this.text = text;
+				this.integer = integer;
+			}
+		}
+		class MyProjection {
+			public final String text;
+			public final MyInnerProjection contained;
+			@ProjectionConstructor
+			public MyProjection(String text, MyInnerProjection contained) {
+				this.text = text;
+				this.contained = contained;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				// We're not processing annotations on MyInnerProjection on purpose:
+				// this simulates the class not being included in any Jandex index on startup.
+				.withAnnotatedTypes( MyProjection.class )
+				.setup( IndexedEntity.class );
+
+		testSuccessfulRootProjection(
+				mapping, IndexedEntity.class, MyProjection.class,
+				Arrays.asList(
+						Arrays.asList( "result1", Arrays.asList( "result1_1", 11 ) ),
+						Arrays.asList( "result2", Arrays.asList( null, null ) ),
+						Arrays.asList( "result3", null )
+				),
+				Arrays.asList(
+						new MyProjection( "result1", new MyInnerProjection( "result1_1", 11 ) ),
+						new MyProjection( "result2", new MyInnerProjection( null, null ) ),
+						new MyProjection( "result3", null )
+				)
+		);
+	}
+
 	@Test
 	public void inferredInner_object_multiValued_list() {
 		class Contained {
@@ -827,6 +889,51 @@ public class ProjectionConstructorBaseIT {
 							MyNonProjection.class.getName(),
 							"Make sure that this class is mapped correctly, "
 									+ "either through annotations (@ProjectionConstructor) or programmatic mapping" );
+		}
+	}
+
+	// This can happen if the class is not included in any Jandex index on startup.
+	@Test
+	public void annotationNotProcessed() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String text;
+			@GenericField
+			public Integer integer;
+		}
+		class MyProjection {
+			public final String text;
+			public final Integer integer;
+			public MyProjection() {
+				this.text = "foo";
+				this.integer = 42;
+			}
+			@ProjectionConstructor
+			public MyProjection(String text, Integer integer) {
+				this.text = text;
+				this.integer = integer;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				// We're not processing annotations on MyProjection on purpose:
+				// this simulates the class not being included in any Jandex index on startup.
+				.setup( IndexedEntity.class );
+
+		try ( SearchSession session = mapping.createSession() ) {
+			assertThatThrownBy( () -> session.search( IndexedEntity.class )
+					.select( MyProjection.class ) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Invalid object class for projection",
+							MyProjection.class.getName(),
+							"Make sure that this class is mapped correctly, "
+									+ "either through annotations (@ProjectionConstructor) or programmatic mapping",
+							"If it is, make sure the class is included in a Jandex index"
+									+ " made available to Hibernate Search" );
 		}
 	}
 

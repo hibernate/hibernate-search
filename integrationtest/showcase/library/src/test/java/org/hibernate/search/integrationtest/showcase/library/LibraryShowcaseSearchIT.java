@@ -41,6 +41,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.dto.LibraryFacetedSearchResult;
+import org.hibernate.search.integrationtest.showcase.library.dto.LibrarySimpleProjection;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
@@ -397,6 +398,69 @@ public class LibraryShowcaseSearchIT {
 
 		results = documentService.getAuthorsOfBooksHavingTerms( "Indonesia", SortOrder.DESC );
 		assertThat( results ).containsExactly( "Mark Red", "Mark Red" );
+	}
+
+	@Test
+	public void searchAndProject() {
+		List<LibrarySimpleProjection> libraries = libraryService.searchAndProject( "library", 0, 10 );
+		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
+				libraryService.getById( CITY_CENTER_ID, Library::getName ),
+				libraryService.getById( UNIVERSITY_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getName ) );
+		assertThat( libraries ).extracting( l -> l.services ).containsExactly(
+				libraryService.getById( CITY_CENTER_ID, Library::getServices ),
+				libraryService.getById( UNIVERSITY_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getServices ) );
+
+		libraries = libraryService.searchAndProject( "library", 1, 2 );
+		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
+				libraryService.getById( UNIVERSITY_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getName ) );
+		assertThat( libraries ).extracting( l -> l.services ).containsExactly(
+				libraryService.getById( UNIVERSITY_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getServices ) );
+
+		libraries = libraryService.searchAndProject( "sUburban", 0, 10 );
+		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
+				libraryService.getById( SUBURBAN_1_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getName ) );
+		assertThat( libraries ).extracting( l -> l.services ).containsExactly(
+				libraryService.getById( SUBURBAN_1_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getServices ) );
+	}
+
+	// This checks that method-local classes get automatically indexed by Hibernate Search with Jandex, in particular.
+	@Test
+	public void searchAndProjectToMethodLocalClass() {
+		List<LibrarySimpleProjection> libraries = libraryService.searchAndProjectToMethodLocalClass( "library", 0, 10 );
+		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
+				libraryService.getById( CITY_CENTER_ID, Library::getName ),
+				libraryService.getById( UNIVERSITY_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getName ) );
+		assertThat( libraries ).extracting( l -> l.services ).containsExactly(
+				libraryService.getById( CITY_CENTER_ID, Library::getServices ),
+				libraryService.getById( UNIVERSITY_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getServices ) );
+
+		libraries = libraryService.searchAndProjectToMethodLocalClass( "library", 1, 2 );
+		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
+				libraryService.getById( UNIVERSITY_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getName ) );
+		assertThat( libraries ).extracting( l -> l.services ).containsExactly(
+				libraryService.getById( UNIVERSITY_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_1_ID, Library::getServices ) );
+
+		libraries = libraryService.searchAndProjectToMethodLocalClass( "sUburban", 0, 10 );
+		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
+				libraryService.getById( SUBURBAN_1_ID, Library::getName ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getName ) );
+		assertThat( libraries ).extracting( l -> l.services ).containsExactly(
+				libraryService.getById( SUBURBAN_1_ID, Library::getServices ),
+				libraryService.getById( SUBURBAN_2_ID, Library::getServices ) );
 	}
 
 	@Test

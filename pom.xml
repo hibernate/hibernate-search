@@ -373,6 +373,7 @@
         <version.help.plugin>3.2.0</version.help.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.io.takari.maven>0.7.7</version.io.takari.maven>
+        <version.jandex.plugin>1.2.2</version.jandex.plugin>
         <version.japicmp.plugin>0.15.7</version.japicmp.plugin>
         <version.jar.plugin>3.2.2</version.jar.plugin>
         <version.javadoc.plugin>3.4.0</version.javadoc.plugin>
@@ -2073,6 +2074,19 @@
                     <groupId>org.jboss.maven.plugins</groupId>
                     <artifactId>maven-injection-plugin</artifactId>
                     <version>1.0.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jboss.jandex</groupId>
+                    <artifactId>jandex-maven-plugin</artifactId>
+                    <version>${version.jandex.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>make-index</id>
+                            <goals>
+                                <goal>jandex</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
 
                 <!--
