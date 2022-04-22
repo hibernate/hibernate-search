@@ -268,7 +268,7 @@ stage('Configure') {
 					// --------------------------------------------
 					// AWS Elasticsearch service (OpenDistro)
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0',
 							condition: TestCondition.ON_DEMAND),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
