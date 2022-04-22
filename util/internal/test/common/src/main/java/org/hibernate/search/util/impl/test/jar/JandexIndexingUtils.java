@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.test.jar;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -15,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -23,10 +21,7 @@ import java.util.jar.Manifest;
 import org.hibernate.search.util.impl.test.file.FileUtils;
 import org.hibernate.search.util.impl.test.logging.Log;
 
-import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
-import org.jboss.jandex.IndexView;
 import org.jboss.jandex.Indexer;
 
 /**
@@ -43,7 +38,6 @@ import org.jboss.jandex.Indexer;
 public final class JandexIndexingUtils {
 
 	private static final String META_INF_VERSIONS = "META-INF/versions/";
-	private static final DotName OBJECT = DotName.createSimple( Object.class.getName() );
 
 	private static final int JAVA_VERSION;
 
@@ -115,92 +109,6 @@ public final class JandexIndexingUtils {
 			}
 		}
 		return indexer.complete();
-	}
-
-	public static void indexClass(String className, Indexer indexer, IndexView quarkusIndex,
-			Set<DotName> additionalIndex, ClassLoader classLoader) {
-		DotName classDotName = DotName.createSimple( className );
-		if ( additionalIndex.contains( classDotName ) ) {
-			return;
-		}
-		ClassInfo classInfo = quarkusIndex.getClassByName( classDotName );
-		if ( classInfo == null ) {
-			Log.INSTANCE.tracef( "Index class: %s", className );
-			try ( InputStream stream = readClass( classLoader, className ) ) {
-				classInfo = indexer.index( stream );
-				additionalIndex.add( classInfo.name() );
-			}
-			catch (Exception e) {
-				throw new IllegalStateException( "Failed to index: " + className, e );
-			}
-		}
-		else {
-			// The class could be indexed by quarkus - we still need to distinguish framework classes
-			additionalIndex.add( classDotName );
-		}
-		for ( DotName annotationName : classInfo.annotations().keySet() ) {
-			if ( !additionalIndex.contains( annotationName ) && quarkusIndex.getClassByName(
-					annotationName ) == null ) {
-				try ( InputStream annotationStream = readClass( classLoader, annotationName.toString() ) ) {
-					if ( annotationStream == null ) {
-						Log.INSTANCE.tracef(
-								"Could not index annotation: %s (missing class or dependency)", annotationName );
-					}
-					else {
-						Log.INSTANCE.tracef( "Index annotation: %s", annotationName );
-						indexer.index( annotationStream );
-						additionalIndex.add( annotationName );
-					}
-				}
-				catch (IOException e) {
-					throw new IllegalStateException( "Failed to index: " + className, e );
-				}
-			}
-		}
-		if ( classInfo.superName() != null && !classInfo.superName().equals( OBJECT ) ) {
-			indexClass( classInfo.superName().toString(), indexer, quarkusIndex, additionalIndex, classLoader );
-		}
-	}
-
-	public static void indexClass(String className, Indexer indexer,
-			IndexView quarkusIndex, Set<DotName> additionalIndex,
-			ClassLoader classLoader, byte[] beanData) {
-		DotName classDotName = DotName.createSimple( className );
-		if ( additionalIndex.contains( classDotName ) ) {
-			return;
-		}
-		ClassInfo classInfo = quarkusIndex.getClassByName( classDotName );
-		if ( classInfo == null ) {
-			Log.INSTANCE.tracef( "Index class: %s", className );
-			try ( InputStream stream = new ByteArrayInputStream( beanData ) ) {
-				classInfo = indexer.index( stream );
-				additionalIndex.add( classInfo.name() );
-			}
-			catch (IOException e) {
-				throw new IllegalStateException( "Failed to index: " + className, e );
-			}
-		}
-		else {
-			// The class could be indexed by quarkus - we still need to distinguish framework classes
-			additionalIndex.add( classDotName );
-		}
-		for ( DotName annotationName : classInfo.annotations().keySet() ) {
-			if ( !additionalIndex.contains( annotationName ) && quarkusIndex.getClassByName(
-					annotationName ) == null ) {
-				try ( InputStream annotationStream = readClass( classLoader, annotationName.toString() ) ) {
-					Log.INSTANCE.tracef( "Index annotation: %s", annotationName );
-					indexer.index( annotationStream );
-					additionalIndex.add( annotationName );
-				}
-				catch (IOException e) {
-					throw new IllegalStateException( "Failed to index: " + className, e );
-				}
-			}
-		}
-	}
-
-	private static InputStream readClass(ClassLoader classLoader, String className) {
-		return classLoader.getResourceAsStream( className.replace( '.', '/' ) + ".class" );
 	}
 
 	private static boolean isMultiRelease(JarFile jarFile) {
