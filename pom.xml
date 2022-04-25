@@ -269,6 +269,14 @@
           -->
         <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
         <version.javax.persistence>2.2</version.javax.persistence>
+        <!-- This version must be kept in sync with the version of the dependency in Hibernate ORM.
+             DO NOT USE DEPENDENCY MANAGEMENT IN THE ROOT POM FOR THIS DEPENDENCY!
+             If we do not use dependency management for this dependency, we get a build failure
+             when the versions start diverging, thanks to the maven-enforcer-plugin
+             and to an artificial dependency in the mapper-orm artifact
+             (which is only necessary for the maven-enforcer-plugin checks to work).
+          -->
+        <version.net.bytebuddy>1.12.9</version.net.bytebuddy>
 
         <!-- >>> ORM 6 / Jakarta Persistence -->
         <version.org.hibernate.orm>6.0.0.Final</version.org.hibernate.orm>
@@ -276,6 +284,7 @@
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <version.org.hibernate.commons.annotations.orm6>6.0.0.Final</version.org.hibernate.commons.annotations.orm6>
         <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
+        <version.net.bytebuddy.orm6>1.12.8</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0.1</version.javax.batch>

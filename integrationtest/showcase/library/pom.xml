@@ -33,6 +33,17 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- The Spring BOM uses a version of bytebuddy that's too old for Mockito to work correctly -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${version.net.bytebuddy}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${version.net.bytebuddy}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -40,6 +40,17 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <exclusions>
+                <!-- We import Bytebuddy ourselves, with a version aligned on Hibernate ORM's dependency. See below. -->
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy-agent</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -58,6 +69,12 @@
             <artifactId>jandex</artifactId>
             <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
             <version>${version.org.jboss.jandex}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
+            <version>${version.net.bytebuddy}</version>
         </dependency>
 
         <!-- Work around Surefire clearing the interrupt status when forwarding stdout/stderr -->
