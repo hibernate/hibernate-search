@@ -68,6 +68,13 @@
             <artifactId>hibernate-search-util-internal-test-orm</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE this dependency. See the version property declaration. -->
+            <version>${version.net.bytebuddy}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

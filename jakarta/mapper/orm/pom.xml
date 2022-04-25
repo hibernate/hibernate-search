@@ -45,6 +45,12 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jandex</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE this dependency. See the version property declaration. -->
+            <version>${version.org.jboss.jandex}</version>
+        </dependency>
+        <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
@@ -84,6 +90,13 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-test-orm-jakarta</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE this dependency. See the version property declaration. -->
+            <version>${version.net.bytebuddy}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
