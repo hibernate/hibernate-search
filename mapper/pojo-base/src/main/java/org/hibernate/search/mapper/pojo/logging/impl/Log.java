@@ -19,6 +19,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingWithContextException;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoConstructorModelFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -28,6 +29,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
@@ -229,8 +231,9 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET + 18,
-			value = "Detected entity types: %1$s, indexed types: %2$s.")
-	void detectedMappedTypes(Set<PojoRawTypeModel<?>> entityTypes, Set<PojoRawTypeModel<?>> indexedTypes);
+			value = "Detected entity types: %1$s, indexed types: %2$s, initial mapped types: %3$s.")
+	void detectedMappedTypes(Set<PojoRawTypeModel<?>> entityTypes, Set<PojoRawTypeModel<?>> indexedTypes,
+			Set<PojoRawTypeModel<?>> initialMappedTypes);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET + 19,
@@ -672,5 +675,44 @@ public interface Log extends BasicLogger {
 					+ " Make sure that this class is mapped correctly,"
 					+ " either through annotations (@ProjectionConstructor) or programmatic mapping.")
 	SearchException invalidObjectClassForProjection(@FormatWith(ClassFormatter.class) Class<?> objectClass);
+
+	@Message(id = ID_OFFSET + 113,
+			value = "Invalid declaring type for projection constructor: type '%1$s' is abstract."
+					+ " Projection constructors can only be declared on concrete types.")
+	SearchException invalidAbstractTypeForProjectionConstructor(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
+
+	@Message(id = ID_OFFSET + 114,
+			value = "Missing parameter names in Java metadata for projection constructor."
+					+ " When inferring inner projections from constructor parameters, constructor parameter names must be known."
+					+ " Make sure that '%1$s' was compiled with the '-parameters' compiler flag.")
+	SearchException missingParameterNameForProjectionConstructor(
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel,
+			@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 115,
+			value = "Invalid parameter type for projection constructor: %1$s."
+					+ " When inferring inner projections from constructor parameters,"
+					+ " multi-valued constructor parameters must be lists (java.util.List<...>)"
+					+ " or list supertypes (java.lang.Iterable<...>, java.util.Collection<...>)")
+	SearchException invalidMultiValuedParameterTypeForProjectionConstructor(
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> parentTypeModel,
+			@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET + 116,
+			value = "Multiple projection constructor are mapped for type '%1$s'."
+					+ " At most one projection constructor is allowed for each type.")
+	SearchException multipleProjectionConstructorsForType(Class<?> instantiatedJavaClass);
+
+	@LogMessage(level = Logger.Level.DEBUG)
+	@Message(id = ID_OFFSET + 117,
+			value = "Constructor projection for type '%1$s': %2$s")
+	void constructorProjection(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
+			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoConstructorProjectionDefinition<?> projectionDefinition);
+
+	@Message(id = ID_OFFSET + 118,
+			value = "Infinite object projection recursion starting from projection constructor %1$s and involving field path '%2$s'.")
+	SearchException infiniteRecursionForProjectionConstructor(
+			@FormatWith(PojoConstructorModelFormatter.class) PojoConstructorModel<?> constructorModel,
+			String fieldPath);
 
 }

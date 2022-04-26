@@ -8,4 +8,6 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 public interface PojoSearchMappingCollectorConstructorNode extends PojoMappingCollector {
 
+	void projectionConstructor();
+
 }
