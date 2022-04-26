@@ -17,7 +17,7 @@ class ProjectionConstructorMappingContributor implements PojoConstructorMetadata
 
 	@Override
 	public void contributeSearchMapping(PojoSearchMappingCollectorConstructorNode collector) {
-		// TODO HSEARCH-3927 collect projection definitions on startup
+		collector.projectionConstructor();
 	}
 
 }
