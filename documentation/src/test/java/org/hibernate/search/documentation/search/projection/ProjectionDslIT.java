@@ -612,6 +612,66 @@ public class ProjectionDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// tag::object-customObject-asArray[]
+			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );
+			List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>> hits = searchSession
+					.search( Book.class )
+					.select( f -> f.object( "authors" ) // <1>
+							.from( f.field( "authors.firstName", String.class ), // <2>
+									f.field( "authors.lastName", String.class ), // <3>
+									f.field( "authors.birthDate", LocalDate.class ), // <4>
+									f.distance( "authors.placeOfBirth", center ) // <5>
+											.unit( DistanceUnit.KILOMETERS ) )
+							.asArray( array -> // <6>
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											(String) array[0], (String) array[1],
+											(LocalDate) array[2], (Double) array[3] ) )
+							.multi() ) // <7>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <8>
+			// end::object-customObject-asArray[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits )
+					.usingRecursiveFieldByFieldElementComparator( RecursiveComparisonConfiguration.builder()
+							.withComparatorForType( TestComparators.APPROX_KM_COMPARATOR, Double.class )
+							.build() )
+					.containsExactlyInAnyOrder(
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getBirthDate(),
+											0.888
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getBirthDate(),
+											0.888
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getBirthDate(),
+											0.888
+									)
+							),
+							Collections.singletonList(
+									new MyAuthorNameAndBirthDateAndPlaceOfBirthDistance(
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName(),
+											session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getBirthDate(),
+											9680.93
+									)
+							)
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
 			// tag::object-list[]
 			List<List<List<?>>> hits = searchSession.search( Book.class )
 					.select( f -> f.object( "authors" ) // <1>
@@ -647,6 +707,56 @@ public class ProjectionDslIT {
 									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
 									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
 							)
+					)
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::object-array[]
+			List<List<Object[]>> hits = searchSession.search( Book.class )
+					.select( f -> f.object( "authors" ) // <1>
+							.from( f.field( "authors.firstName", String.class ), // <2>
+									f.field( "authors.lastName", String.class ) ) // <3>
+							.asArray() // <4>
+							.multi() ) // <5>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <6>
+			// end::object-array[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).usingElementComparator( (left, right) -> {
+				if ( left.size() != right.size() ) {
+					return 1;
+				}
+				for ( int i = 0; i < left.size(); i++ ) {
+					if ( !Objects.deepEquals( left.get( i ), right.get( i ) ) ) {
+						return 1;
+					}
+				}
+				return 0;
+			} ).containsExactlyInAnyOrder(
+					Collections.singletonList(
+							new Object[] {
+									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK1_ID ).getAuthors().get( 0 ).getLastName()
+							}
+					),
+					Collections.singletonList(
+							new Object[] {
+									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK2_ID ).getAuthors().get( 0 ).getLastName()
+							}
+					),
+					Collections.singletonList(
+							new Object[] {
+									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK3_ID ).getAuthors().get( 0 ).getLastName()
+							}
+					),
+					Collections.singletonList(
+							new Object[] {
+									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getFirstName(),
+									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
+							}
 					)
 			);
 		} );

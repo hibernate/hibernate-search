@@ -252,11 +252,11 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		if ( tupleTransformer != null ) {
 			return factory.composite()
 					.from( projections )
-					.asList( list -> tupleTransformer.transform( list.toArray(), projectedFields ) )
+					.asArray( array -> tupleTransformer.transform( array, projectedFields ) )
 					.toProjection();
 		}
 		else {
-			return factory.composite().from( projections ).asList( List::toArray ).toProjection();
+			return factory.composite().from( projections ).asArray().toProjection();
 		}
 	}
 

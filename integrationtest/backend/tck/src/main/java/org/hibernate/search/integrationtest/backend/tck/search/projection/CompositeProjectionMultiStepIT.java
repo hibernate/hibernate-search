@@ -111,6 +111,27 @@ public class CompositeProjectionMultiStepIT {
 							.collect( Collectors.toList() ) );
 		}
 
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-4553")
+		public void asArray() {
+			assertThatQuery( index.query()
+					.select( f -> doFrom( f, f.composite() ).asArray() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedLists().stream().map( list -> list.toArray() )
+							.collect( Collectors.toList() ) );
+		}
+
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-4553")
+		public void asArray_transformer() {
+			assertThatQuery( index.query()
+					.select( f -> doFrom( f, f.composite() ).asArray( ValueWrapper<Object[]>::new ) )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedLists().stream().map( list -> list.toArray() )
+							.<ValueWrapper<Object[]>>map( ValueWrapper::new )
+							.collect( Collectors.toList() ) );
+		}
+
 		protected abstract CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f,
 				CompositeProjectionFromStep step);
 
