@@ -70,7 +70,7 @@ public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
 			return false;
 		}
 		ValueWrapper<?> other = (ValueWrapper<?>) obj;
-		return Objects.equals( value, other.value );
+		return Objects.deepEquals( value, other.value );
 	}
 
 	@Override

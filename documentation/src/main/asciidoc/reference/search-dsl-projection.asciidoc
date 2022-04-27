@@ -501,8 +501,82 @@ instead of just `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
 Thus, the list of hits will be an instance of `List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>>`.
 ====
 
+Similarly, `asArray(...)` can be used to get passed an `Object[]` argument instead of `List<?>`.
+
+.Returning custom objects created from multiple projected values with `.object(...).from(...).asArray(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-customObject-asArray]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the third inner projection as a projection on the `birthDate` field of `authors`.
+<5> Define the fourth inner projection as a <<search-dsl-projection-distance,distance projection>>
+on the `placeOfBirth` field with the given center and unit.
+<6> Define the result of the object projection as the result of calling a lambda.
+The lambda will take elements of the array (the results of projections defined above, in order),
+cast them, and pass them to the constructor of a custom class, `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
+<7> Define the projection as multivalued,
+meaning it will yield values of type `List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>`:
+one `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance` per object in the `authors` object field.
+instead of just `MyAuthorNameAndBirthDateAndPlaceOfBirthDistance`.
+<8> Each hit will be an instance of `List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>`.
+Thus, the list of hits will be an instance of `List<List<MyAuthorNameAndBirthDateAndPlaceOfBirthDistance>>`.
+====
+
 [[search-dsl-projection-object-as-list]]
-=== Projecting to a `List<?>`
+=== Projecting to a `List<?>` or `Object[]`
+
+If you don't mind receiving the result of inner projections as a `List<?>`,
+you can do without the transformer by calling `asList()`:
+
+.Returning a `List` of projected values with `.object(...).add(...).asList()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-list]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the result of the projection as a list,
+meaning the hits will be `List` instances with at index `0` the value of the `firstName` field of `authors` ,
+and at index `1` the value of the `lastName` field of `authors`.
+<5> Define the projection as multivalued,
+meaning it will yield values of type `List<List<?>>`:
+one `List<?>` per object in the `authors` object field.
+<6> Each hit will be an instance of `List<List<?>>`:
+a list containing one list per author, which in turns contains the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<List<?>>>`.
+====
+
+Similarly, to get the result of inner projections as a `List<?>`,
+you can do without the transformer by calling `asArray()`:
+
+.Returning an array of projected values with `.object(...).add(...).asArray()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-array]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
+<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
+<4> Define the result of the projection as an array,
+meaning the hits will be `Object[]` instances with at index `0` the value of the `firstName` field of `authors` ,
+and at index `1` the value of the `lastName` field of `authors`.
+<5> Define the projection as multivalued,
+meaning it will yield values of type `List<Object[]>`:
+one `Object[]` per object in the `authors` object field.
+<6> Each hit will be an instance of `List<Object[]>`:
+a list containing one list per author, which in turns contains the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<List<Object[]>>`.
+====
+
+[[search-dsl-projection-object-as-object-array]]
+=== Projecting to an `Object[]`
 
 If you don't mind receiving the result of inner projections as a `List<?>`,
 you can do without the transformer by calling `asList()`:

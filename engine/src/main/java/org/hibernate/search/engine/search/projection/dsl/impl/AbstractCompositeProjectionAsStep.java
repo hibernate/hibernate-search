@@ -26,7 +26,9 @@ abstract class AbstractCompositeProjectionAsStep
 
 	@Override
 	public final CompositeProjectionValueStep<?, List<?>> asList() {
-		return asList( Function.identity() );
+		SearchProjection<?>[] inners = toProjectionArray();
+		return new CompositeProjectionValueStepImpl<>( builder, inners,
+				ProjectionCompositor.fromList( inners.length ) );
 	}
 
 	@Override
@@ -34,6 +36,20 @@ abstract class AbstractCompositeProjectionAsStep
 		SearchProjection<?>[] inners = toProjectionArray();
 		return new CompositeProjectionValueStepImpl<>( builder, inners,
 				ProjectionCompositor.fromList( inners.length, transformer ) );
+	}
+
+	@Override
+	public CompositeProjectionValueStep<?, Object[]> asArray() {
+		SearchProjection<?>[] inners = toProjectionArray();
+		return new CompositeProjectionValueStepImpl<>( builder, inners,
+				ProjectionCompositor.fromArray( inners.length ) );
+	}
+
+	@Override
+	public <V> CompositeProjectionValueStep<?, V> asArray(Function<Object[], V> transformer) {
+		SearchProjection<?>[] inners = toProjectionArray();
+		return new CompositeProjectionValueStepImpl<>( builder, inners,
+				ProjectionCompositor.fromArray( inners.length, transformer ) );
 	}
 
 	abstract SearchProjection<?>[] toProjectionArray();

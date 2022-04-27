@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.Normalizatio
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -362,7 +363,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
-		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class, CALLS_REAL_METHODS );
 
 		StubMappingScope scope = index.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
@@ -421,7 +422,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class, CALLS_REAL_METHODS );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();

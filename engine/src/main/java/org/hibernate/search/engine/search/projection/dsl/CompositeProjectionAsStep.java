@@ -18,7 +18,7 @@ public interface CompositeProjectionAsStep {
 
 	/**
 	 * Defines the result of the composite projection
-	 * as {@link List} that will contain the results of inner projections defined so far, in order.
+	 * as a {@link List} that will contain the results of inner projections defined so far, in order.
 	 *
 	 * @return The next DSL step.
 	 */
@@ -34,5 +34,24 @@ public interface CompositeProjectionAsStep {
 	 * @param <V> The type of values returned by the transformer.
 	 */
 	<V> CompositeProjectionValueStep<?, V> asList(Function<List<?>, V> transformer);
+
+	/**
+	 * Defines the result of the composite projection
+	 * as an object array that will contain the results of inner projections defined so far, in order.
+	 *
+	 * @return The next DSL step.
+	 */
+	CompositeProjectionValueStep<?, Object[]> asArray();
+
+	/**
+	 * Defines the result of the composite projection
+	 * as the result of applying the given function to an object array containing
+	 * the results of inner projections defined so far, in order.
+	 *
+	 * @param transformer A function to transform the values of inner projections added so far.
+	 * @return The next DSL step.
+	 * @param <V> The type of values returned by the transformer.
+	 */
+	<V> CompositeProjectionValueStep<?, V> asArray(Function<Object[], V> transformer);
 
 }
