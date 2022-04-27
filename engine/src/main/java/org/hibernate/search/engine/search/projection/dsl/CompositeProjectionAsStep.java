@@ -33,7 +33,7 @@ public interface CompositeProjectionAsStep {
 	 * @return The next DSL step.
 	 * @param <V> The type of values returned by the transformer.
 	 */
-	<V> CompositeProjectionValueStep<?, V> asList(Function<List<?>, V> transformer);
+	<V> CompositeProjectionValueStep<?, V> asList(Function<? super List<?>, ? extends V> transformer);
 
 	/**
 	 * Defines the result of the composite projection
@@ -52,6 +52,6 @@ public interface CompositeProjectionAsStep {
 	 * @return The next DSL step.
 	 * @param <V> The type of values returned by the transformer.
 	 */
-	<V> CompositeProjectionValueStep<?, V> asArray(Function<Object[], V> transformer);
+	<V> CompositeProjectionValueStep<?, V> asArray(Function<? super Object[], ? extends V> transformer);
 
 }

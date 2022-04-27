@@ -33,6 +33,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.data.Pair;
 import org.hibernate.search.util.impl.test.data.Triplet;
 
@@ -113,6 +114,18 @@ public class CompositeProjectionMultiStepIT {
 
 		@Test
 		@TestForIssue(jiraKey = "HSEARCH-4553")
+		// The most important check here is at compile time: if this compiles,
+		// then we're being flexible enough regarding function argument types.
+		public void asList_transformer_flexibleFunctionArgumentTypes() {
+			assertThatQuery( index.query()
+					.select( f -> doFrom( f, f.composite() ).asList( (Function<? super List<?>, Object>) ValueWrapper<List<?>>::new ) )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedLists().stream().<ValueWrapper<List<?>>>map( ValueWrapper::new )
+							.collect( Collectors.toList() ) );
+		}
+
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-4553")
 		public void asArray() {
 			assertThatQuery( index.query()
 					.select( f -> doFrom( f, f.composite() ).asArray() )
@@ -126,6 +139,19 @@ public class CompositeProjectionMultiStepIT {
 		public void asArray_transformer() {
 			assertThatQuery( index.query()
 					.select( f -> doFrom( f, f.composite() ).asArray( ValueWrapper<Object[]>::new ) )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedLists().stream().map( list -> list.toArray() )
+							.<ValueWrapper<Object[]>>map( ValueWrapper::new )
+							.collect( Collectors.toList() ) );
+		}
+
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-4553")
+		// The most important check here is at compile time: if this compiles,
+		// then we're being flexible enough regarding function argument types.
+		public void asArray_transformer_flexibleFunctionArgumentTypes() {
+			assertThatQuery( index.query()
+					.select( f -> doFrom( f, f.composite() ).asArray( (Function<? super Object[], Object>) ValueWrapper<Object[]>::new ) )
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedLists().stream().map( list -> list.toArray() )
 							.<ValueWrapper<Object[]>>map( ValueWrapper::new )

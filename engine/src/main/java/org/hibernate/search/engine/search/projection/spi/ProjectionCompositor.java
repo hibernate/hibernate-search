@@ -120,7 +120,7 @@ public interface ProjectionCompositor<E, V> {
 		return fromArray( size, Arrays::asList );
 	}
 
-	static <V> ProjectionCompositor<Object[], V> fromList(int size, Function<List<?>, V> transformer) {
+	static <V> ProjectionCompositor<Object[], V> fromList(int size, Function<? super List<?>, ? extends V> transformer) {
 		return fromArray( size, transformer.compose( Arrays::asList ) );
 	}
 
@@ -128,7 +128,7 @@ public interface ProjectionCompositor<E, V> {
 		return fromArray( size, Function.identity() );
 	}
 
-	static <V> ProjectionCompositor<Object[], V> fromArray(int size, Function<Object[], V> transformer) {
+	static <V> ProjectionCompositor<Object[], V> fromArray(int size, Function<? super Object[], ? extends V> transformer) {
 		return new ObjectArrayProjectionCompositor<V>( size ) {
 			@Override
 			public V finish(Object[] components) {
