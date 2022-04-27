@@ -38,4 +38,9 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "org.jberet:*"
         update-types: ["version-update:semver-major"]
-
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees: ["yrodiere"]
+    open-pull-requests-limit: 20
