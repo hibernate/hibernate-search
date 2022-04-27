@@ -70,6 +70,16 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.compiler.plugin}</version>
+                    <configuration>
+                        <compilerArgs combine.children="append">
+                            <!-- Use the -parameters for all code, even code in src/main. -->
+                            <compilerArg>-parameters</compilerArg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${version.docker.maven.plugin}</version>
