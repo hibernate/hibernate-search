@@ -1764,6 +1764,9 @@
                                 <fork>true</fork>
                                 <proc>none</proc>
                                 <executable>${java-version.test.compiler}</executable>
+                                <compilerArgs combine.self="append">
+                                    <compilerArg>-parameters</compilerArg>
+                                </compilerArgs>
                             </configuration>
                         </execution>
                     </executions>
