@@ -119,7 +119,7 @@ public final class HibernateOrmMapperSettings {
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed to such Boolean value.
 	 * <p>
-	 * Defaults to {@code Defaults#ENABLE_ANNOTATION_MAPPING}.
+	 * Defaults to {@link Defaults#MAPPING_PROCESS_ANNOTATIONS}.
 	 */
 	public static final String MAPPING_PROCESS_ANNOTATIONS = PREFIX + Radicals.MAPPING_PROCESS_ANNOTATIONS;
 
