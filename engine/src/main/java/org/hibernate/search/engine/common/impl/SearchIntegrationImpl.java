@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -16,6 +17,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
@@ -37,6 +39,8 @@ import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SearchIntegrationImpl implements SearchIntegration {
+
+	static final SavedState.Key<Map<String, SavedState>> INDEX_MANAGERS_KEY = SavedState.key( "index_managers" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -93,6 +97,14 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			throw log.noIndexManagerRegistered( indexManagerName );
 		}
 		return indexManager.toAPI();
+	}
+
+	public SavedState saveForRestart() {
+		HashMap<String, SavedState> states = new HashMap<>();
+		for ( Map.Entry<String, IndexManagerImplementor> indexManager : indexManagers.entrySet() ) {
+			states.put( indexManager.getKey(), indexManager.getValue().saveForRestart() );
+		}
+		return SavedState.builder().put( INDEX_MANAGERS_KEY, states ).build();
 	}
 
 	@Override
