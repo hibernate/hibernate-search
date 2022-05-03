@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import static org.hibernate.search.engine.common.impl.SearchIntegrationImpl.INDEX_MANAGERS_KEY;
+
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
@@ -57,6 +62,9 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private final EngineThreads engineThreads;
 	private final TimingSource timingSource;
+
+	// TODO HSEARCH-4545 Load instance here
+	private final Optional<SearchIntegrationImpl> previousIntegration = Optional.empty();
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
@@ -163,6 +171,27 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 			failureCollector.checkNoFailure();
+
+			// Pre-Start indexes
+			Map<String, SavedState> indexManagersStates = null;
+
+			for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
+				SavedState savedState = SavedState.empty();
+				if ( previousIntegration.isPresent() ) {
+					if ( indexManagersStates == null ) {
+						indexManagersStates = previousIntegration.get().saveForRestart()
+								.get( INDEX_MANAGERS_KEY ).orElse( Collections.emptyMap() );
+					}
+
+					savedState = indexManagersStates.get( entry.getKey() );
+				}
+
+				entry.getValue().preStart( savedState );
+			}
+
+			if ( previousIntegration.isPresent() ) {
+				previousIntegration.get().close();
+			}
 
 			// Start indexes
 			for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
