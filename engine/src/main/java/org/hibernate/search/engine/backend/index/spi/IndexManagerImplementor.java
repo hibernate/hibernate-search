@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.index.spi;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -27,6 +28,11 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  * This is the interface implemented by backends and provided to the engine.
  */
 public interface IndexManagerImplementor {
+
+	default SavedState saveForRestart() {
+		// TODO HSEARCH-4545 Implement this method
+		return SavedState.empty();
+	}
 
 	/**
 	 * Start any resource necessary to operate the index manager at runtime.

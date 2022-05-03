@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -32,6 +33,10 @@ class IndexManagerNonStartedState {
 		indexManager.stop();
 	}
 
+	void preStart(SavedState savedState) {
+		// TODO HSEARCH-4545 Implement this method
+	}
+
 	IndexManagerImplementor start(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
@@ -48,5 +53,4 @@ class IndexManagerNonStartedState {
 		}
 		return indexManager; // The index is now started
 	}
-
 }
