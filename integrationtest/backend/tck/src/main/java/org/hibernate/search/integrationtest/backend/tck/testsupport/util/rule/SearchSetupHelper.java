@@ -229,13 +229,19 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public PartialSetup setupFirstPhaseOnly() {
+			return setupFirstPhaseOnly( Optional.empty() );
+		}
+
+		public PartialSetup setupFirstPhaseOnly(Optional<SearchIntegration> previousIntegration) {
 			SearchIntegrationEnvironment environment =
 					SearchIntegrationEnvironment.builder( propertySource, unusedPropertyChecker )
 							.beanProvider( beanProvider )
 							.build();
 			environments.add( environment );
 
-			SearchIntegration.Builder integrationBuilder = SearchIntegration.builder( environment );
+			SearchIntegration.Builder integrationBuilder = (previousIntegration.isPresent()) ?
+					previousIntegration.get().restartBuilder( environment ) :
+					SearchIntegration.builder( environment );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
 			mappedIndexes.forEach( initiator::add );
@@ -263,6 +269,10 @@ public class SearchSetupHelper implements TestRule {
 
 		public SearchIntegration setup() {
 			return setupFirstPhaseOnly().doSecondPhase();
+		}
+
+		public SearchIntegration setup(SearchIntegration previousIntegration) {
+			return setupFirstPhaseOnly( Optional.of( previousIntegration ) ).doSecondPhase();
 		}
 
 	}
