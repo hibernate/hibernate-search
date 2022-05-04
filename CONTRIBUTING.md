@@ -288,7 +288,8 @@ The following profiles are available:
   * `elasticsearch-8.0` for 8.0
   * `elasticsearch-8.1` for 8.1+ (**the default**)
 * [OpenSearch](https://www.opensearch.org/)
-  * `opensearch-1.0` for 1.0+
+  * `opensearch-1.0` for 1.0 and later 1.x
+  * `opensearch-2.0` for 2.0+
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
