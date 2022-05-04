@@ -177,17 +177,29 @@ public class ElasticsearchDialectFactory {
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearch(ElasticsearchVersion version) {
 		int major = version.major();
-
+		OptionalInt minorOptional = version.minor();
+		if ( !minorOptional.isPresent() ) {
+			// The version is supposed to be fetched from the cluster itself, so it should be complete
+			throw new AssertionFailure( "The Elasticsearch version is incomplete when creating the protocol dialect." );
+		}
+		int minor = minorOptional.getAsInt();
 		if ( major < 1 ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 1 ) {
-			return new Elasticsearch70ProtocolDialect();
+			return createProtocolDialectOpenSearchV1( version, minor );
 		}
 		else {
 			log.unknownElasticsearchVersion( version );
 			return new Elasticsearch70ProtocolDialect();
 		}
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV1(ElasticsearchVersion version, int minor) {
+		if ( minor > 3 ) {
+			log.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch70ProtocolDialect();
 	}
 
 }
