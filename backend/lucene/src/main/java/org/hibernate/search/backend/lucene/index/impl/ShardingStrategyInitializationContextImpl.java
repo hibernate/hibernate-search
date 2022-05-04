@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolde
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -96,7 +97,8 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 		return shardingPropertySource;
 	}
 
-	public BeanHolder<? extends ShardingStrategy> create(Map<String, Shard> shardCollector) {
+	public BeanHolder<? extends ShardingStrategy> create(Map<String, Shard> shardCollector,
+			Map<String, SavedState> states) {
 		BeanHolder<? extends ShardingStrategy> shardingStrategyHolder =
 				SHARDING_STRATEGY.getAndTransform( shardingPropertySource, beanResolver()::resolve );
 
@@ -104,7 +106,8 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 		if ( shardIdentifiers == null ) {
 			// Sharding is disabled => single shard
-			contributeShardWithSilentFailure( shardCollector, Optional.empty() );
+			contributeShardWithSilentFailure( shardCollector, Optional.empty(),
+					states.getOrDefault( null, SavedState.empty() ) );
 			return null;
 		}
 
@@ -115,13 +118,15 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 		}
 
 		for ( String shardIdentifier : shardIdentifiers ) {
-			contributeShardWithSilentFailure( shardCollector, Optional.of( shardIdentifier ) );
+			contributeShardWithSilentFailure( shardCollector, Optional.of( shardIdentifier ),
+					states.getOrDefault( shardIdentifier, SavedState.empty() ) );
 		}
 
 		return shardingStrategyHolder;
 	}
 
-	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId) {
+	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId,
+			SavedState savedState) {
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( indexName(), shardId );
 		ConfigurationPropertySource shardPropertySource =
 				shardId.isPresent() ?
@@ -129,17 +134,28 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 								.withFallback( indexPropertySource )
 						: indexPropertySource;
 
+
+		Optional<DirectoryHolder> savedDirectoryHolder = savedState.get( Shard.DIRECTORY_HOLDER_KEY );
 		DirectoryHolder directoryHolder = null;
-		try ( BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
-				DIRECTORY_TYPE.getAndTransform( shardPropertySource, startContext.beanResolver()::resolve ) ) {
-			DirectoryCreationContext context = new DirectoryCreationContextImpl( shardEventContext,
-					indexName(), shardId, beanResolver(), shardPropertySource.withMask( "directory" ) );
-			directoryHolder = directoryProviderHolder.get().createDirectoryHolder( context );
+		boolean reuseAlreadyStaredDirectoryHolder = false;
+
+		try {
+			if ( savedDirectoryHolder.isPresent() ) {
+				directoryHolder = savedDirectoryHolder.get();
+				reuseAlreadyStaredDirectoryHolder = true;
+			}
+			else {
+				try ( BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
+						DIRECTORY_TYPE.getAndTransform( shardPropertySource, startContext.beanResolver()::resolve ) ) {
+					DirectoryCreationContext context = new DirectoryCreationContextImpl( shardEventContext,
+							indexName(), shardId, beanResolver(), shardPropertySource.withMask( "directory" ) );
+					directoryHolder = directoryProviderHolder.get().createDirectoryHolder( context );
+				}
+			}
 
 			IOStrategy ioStrategy = backendContext.createIOStrategy( shardPropertySource );
-
 			Shard shard = backendContext.createShard( model, shardEventContext, directoryHolder, ioStrategy,
-					shardPropertySource );
+					shardPropertySource, reuseAlreadyStaredDirectoryHolder );
 			shardCollector.put( shardId.orElse( null ), shard );
 		}
 		catch (RuntimeException e) {
