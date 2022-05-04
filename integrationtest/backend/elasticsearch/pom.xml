@@ -256,19 +256,9 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 8.0 test environment -->
+        <!-- Elasticsearch 8.0+ test environment -->
         <profile>
             <id>elasticsearch-8.0</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 8.1+ test environment -->
-        <profile>
-            <id>elasticsearch-8.1</id>
             <activation>
                 <!-- This must be re-defined here: the activation defined in the parent pom is not enough -->
                 <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
