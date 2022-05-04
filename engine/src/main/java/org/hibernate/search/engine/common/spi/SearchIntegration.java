@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.common.spi;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.common.impl.SearchIntegrationBuilder;
@@ -21,11 +23,13 @@ public interface SearchIntegration extends AutoCloseable {
 
 	IndexManager indexManager(String indexManagerName);
 
+	Builder restartBuilder(SearchIntegrationEnvironment environment);
+
 	@Override
 	void close();
 
 	static Builder builder(SearchIntegrationEnvironment environment) {
-		return new SearchIntegrationBuilder( environment );
+		return new SearchIntegrationBuilder( environment, Optional.empty() );
 	}
 
 	interface Builder {

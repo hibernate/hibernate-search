@@ -62,9 +62,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private final EngineThreads engineThreads;
 	private final TimingSource timingSource;
-
-	// TODO HSEARCH-4545 Load instance here
-	private final Optional<SearchIntegrationImpl> previousIntegration = Optional.empty();
+	private final Optional<SearchIntegrationImpl> previousIntegration;
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
@@ -74,7 +72,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			Map<String, BackendNonStartedState> nonStartedBackends,
 			Map<String, IndexManagerNonStartedState> nonStartedIndexManagers,
 			ConfigurationPropertyChecker partialConfigurationPropertyChecker,
-			EngineThreads engineThreads, TimingSource timingSource) {
+			EngineThreads engineThreads, TimingSource timingSource,
+			Optional<SearchIntegrationImpl> previousIntegration) {
 		this.beanProvider = beanProvider;
 		this.beanResolver = beanResolver;
 		this.failureHandlerHolder = failureHandlerHolder;
@@ -85,6 +84,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		this.partialConfigurationPropertyChecker = partialConfigurationPropertyChecker;
 		this.engineThreads = engineThreads;
 		this.timingSource = timingSource;
+		this.previousIntegration = previousIntegration;
 	}
 
 	@Override
@@ -102,6 +102,10 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			closer.pushAll( BeanProvider::close, beanProvider );
 			closer.pushAll( EngineThreads::onStop, engineThreads );
 			closer.pushAll( TimingSource::stop, timingSource );
+
+			if ( previousIntegration.isPresent() ) {
+				closer.pushAll( SearchIntegration::close, previousIntegration.get() );
+			}
 		}
 	}
 
