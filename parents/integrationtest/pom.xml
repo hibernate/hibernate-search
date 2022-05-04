@@ -602,18 +602,7 @@
             <properties>
                 <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
                 <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
-                <test.elasticsearch.connection.version>${version.org.opensearch.latest-1.0}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
-            </properties>
-        </profile>
-
-        <!-- OpenSearch 1.2+ test environment -->
-        <profile>
-            <id>opensearch-1.2</id>
-            <properties>
-                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
-                <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
-                <test.elasticsearch.connection.version>${version.org.opensearch.latest-1.2}</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.opensearch.latest-1.3}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
