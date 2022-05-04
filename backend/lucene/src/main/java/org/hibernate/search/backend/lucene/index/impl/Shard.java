@@ -28,7 +28,7 @@ import org.apache.lucene.index.DirectoryReader;
 
 public final class Shard {
 
-	private static final SavedState.Key<DirectoryHolder> DIRECTORY_HOLDER_KEY = SavedState.key( "directory_holder" );
+	static final SavedState.Key<DirectoryHolder> DIRECTORY_HOLDER_KEY = SavedState.key( "directory_holder" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,16 +36,19 @@ public final class Shard {
 	private final IndexAccessorImpl indexAccessor;
 	private final LuceneParallelWorkOrchestratorImpl managementOrchestrator;
 	private final LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
+	private final boolean reuseAlreadyStaredDirectoryHolder;
 
 	private boolean savedForRestart = false;
 
 	Shard(EventContext eventContext, IndexAccessorImpl indexAccessor,
 			LuceneParallelWorkOrchestratorImpl managementOrchestrator,
-			LuceneSerialWorkOrchestratorImpl indexingOrchestrator) {
+			LuceneSerialWorkOrchestratorImpl indexingOrchestrator,
+			boolean reuseAlreadyStaredDirectoryHolder) {
 		this.eventContext = eventContext;
 		this.indexAccessor = indexAccessor;
 		this.managementOrchestrator = managementOrchestrator;
 		this.indexingOrchestrator = indexingOrchestrator;
+		this.reuseAlreadyStaredDirectoryHolder = reuseAlreadyStaredDirectoryHolder;
 	}
 
 	public SavedState saveForRestart() {
@@ -61,7 +64,9 @@ public final class Shard {
 
 	void start(ConfigurationPropertySource propertySource) {
 		try {
-			indexAccessor.start();
+			if ( !reuseAlreadyStaredDirectoryHolder ) {
+				indexAccessor.start();
+			}
 			managementOrchestrator.start( propertySource );
 			indexingOrchestrator.start( propertySource );
 		}
