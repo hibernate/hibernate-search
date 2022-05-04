@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.Optional;
 
 import org.hibernate.boot.jaxb.Origin;
 import org.hibernate.boot.jaxb.SourceType;
@@ -21,7 +23,9 @@ import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
@@ -32,13 +36,6 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	// WARNING: Always use this prefix for all tables added by Hibernate Search:
-	// we guarantee that in the documentation.
-	public static final String HSEARCH_PREFIX = "HSEARCH_";
-
-	// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-	public static final String TABLE_NAME = HSEARCH_PREFIX + "AGENT";
-
 	private static final String CLASS_NAME = Agent.class.getName();
 
 	// Setting both the JPA entity name and the native entity name to the FQCN so that:
@@ -48,13 +45,13 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 	// because our override actually matches the default for the native entity name.
 	public static final String ENTITY_NAME = CLASS_NAME;
 
-	public static final String ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-			"<hibernate-mapping>\n" +
-			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"" + TABLE_NAME + "\">\n" +
+	private static final String ENTITY_DEFINITION_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+			"<hibernate-mapping schema=\"%1$s\" catalog=\"%2$s\">\n" +
+			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"%3$s\">\n" +
 			"        <id name=\"id\">\n" +
 			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
-			"                <param name=\"sequence_name\">" + TABLE_NAME + "_GENERATOR</param>\n" +
-			"                <param name=\"table_name\">" + TABLE_NAME + "_GENERATOR</param>\n" +
+			"                <param name=\"sequence_name\">%4$s</param>\n" +
+			"                <param name=\"table_name\">%4$s</param>\n" +
 			"                <param name=\"initial_value\">1</param>\n" +
 			"                <param name=\"increment_size\">1</param>\n" +
 			"            </generator>\n" +
@@ -78,10 +75,38 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 
-	private static final ConfigurationProperty<String> AGENT_ENTITY_MAPPING =
-			ConfigurationProperty.forKey( HibernateOrmMapperOutboxPollingSpiSettings.CoordinationRadicals.AGENT_ENTITY_MAPPING )
+	public static final String ENTITY_DEFINITION = String.format(
+			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "", HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_TABLE, HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_GENERATOR
+	);
+
+	private static final OptionalConfigurationProperty<String> AGENT_ENTITY_MAPPING =
+			ConfigurationProperty.forKey(
+							HibernateOrmMapperOutboxPollingSpiSettings.CoordinationRadicals.AGENT_ENTITY_MAPPING )
 					.asString()
-					.withDefault( ENTITY_DEFINITION )
+					.build();
+
+	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_SCHEMA =
+			ConfigurationProperty.forKey(
+							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_SCHEMA )
+					.asString()
+					.build();
+
+	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_CATALOG =
+			ConfigurationProperty.forKey(
+							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_CATALOG )
+					.asString()
+					.build();
+
+	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_TABLE =
+			ConfigurationProperty.forKey(
+							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_TABLE )
+					.asString()
+					.build();
+
+	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_GENERATOR =
+			ConfigurationProperty.forKey(
+							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_GENERATOR )
+					.asString()
 					.build();
 
 	@Override
@@ -89,7 +114,37 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			+ " and there's nothing we can do about it")
 	public Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource,
 			MappingBinder mappingBinder, MetadataBuildingContext buildingContext) {
-		String entityDefinition = AGENT_ENTITY_MAPPING.get( propertySource );
+
+		Optional<String> mapping = AGENT_ENTITY_MAPPING.get( propertySource );
+		Optional<String> schema = ENTITY_MAPPING_AGENT_SCHEMA.get( propertySource );
+		Optional<String> catalog = ENTITY_MAPPING_AGENT_CATALOG.get( propertySource );
+		Optional<String> table = ENTITY_MAPPING_AGENT_TABLE.get( propertySource );
+		Optional<String> generator = ENTITY_MAPPING_AGENT_GENERATOR.get( propertySource );
+
+		// only allow configuring the entire mapping or table/catalog/schema/generator names
+		if ( mapping.isPresent() && ( schema.isPresent() || catalog.isPresent() || table.isPresent() || generator.isPresent() ) ) {
+			throw log.agentConfigurationPropertyConflict(
+					AGENT_ENTITY_MAPPING.resolveOrRaw( propertySource ),
+					new String[] {
+							ENTITY_MAPPING_AGENT_SCHEMA.resolveOrRaw( propertySource ),
+							ENTITY_MAPPING_AGENT_CATALOG.resolveOrRaw( propertySource ),
+							ENTITY_MAPPING_AGENT_TABLE.resolveOrRaw( propertySource ),
+							ENTITY_MAPPING_AGENT_GENERATOR.resolveOrRaw( propertySource )
+					}
+			);
+		}
+
+		String entityDefinition = mapping.orElseGet( () ->
+				String.format(
+						Locale.ROOT,
+						ENTITY_DEFINITION_TEMPLATE,
+						schema.orElse( "" ),
+						catalog.orElse( "" ),
+						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_TABLE ),
+						generator.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_GENERATOR )
+
+				)
+		);
 
 		log.agentGeneratedEntityMapping( entityDefinition );
 		Origin origin = new Origin( SourceType.OTHER, "search" );

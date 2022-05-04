@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,12 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -37,12 +40,13 @@ import org.junit.Test;
 
 public class OutboxPollingCustomEntityMappingIT {
 
-	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME = OutboxPollingOutboxEventAdditionalJaxbMappingProducer.TABLE_NAME;
+	private static final String CUSTOM_SCHEMA = "CUSTOM_SCHEMA";
+	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
 	private static final String CUSTOM_OUTBOX_EVENT_TABLE_NAME = "CUSTOM_OUTBOX_EVENT";
 	private static final String ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME = ORIGINAL_OUTBOX_EVENT_TABLE_NAME + "_GENERATOR";
 	private static final String CUSTOM_OUTBOX_EVENT_GENERATOR_NAME = CUSTOM_OUTBOX_EVENT_TABLE_NAME + "_GENERATOR";
 
-	private static final String ORIGINAL_AGENT_TABLE_NAME = OutboxPollingAgentAdditionalJaxbMappingProducer.TABLE_NAME;
+	private static final String ORIGINAL_AGENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_TABLE;
 	private static final String CUSTOM_AGENT_TABLE_NAME = "CUSTOM_AGENT";
 	private static final String ORIGINAL_AGENT_GENERATOR_NAME = ORIGINAL_AGENT_TABLE_NAME + "_GENERATOR";
 	private static final String CUSTOM_AGENT_GENERATOR_NAME = CUSTOM_AGENT_TABLE_NAME + "_GENERATOR";
@@ -65,7 +69,8 @@ public class OutboxPollingCustomEntityMappingIT {
 				ORIGINAL_OUTBOX_EVENT_TABLE_NAME, CUSTOM_OUTBOX_EVENT_TABLE_NAME,
 				ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME, CUSTOM_OUTBOX_EVENT_GENERATOR_NAME,
 				ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME,
-				ORIGINAL_AGENT_GENERATOR_NAME, CUSTOM_AGENT_GENERATOR_NAME
+				ORIGINAL_AGENT_GENERATOR_NAME, CUSTOM_AGENT_GENERATOR_NAME,
+				CUSTOM_SCHEMA,
 		};
 	}
 
@@ -178,6 +183,77 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isPositive();
 	}
 
+	@Test
+	public void conflictingAgentMappingConfiguration() {
+		assertThatThrownBy( () -> ormSetupHelper.start()
+				.withProperty( "hibernate.search.coordination.agent.entity.mapping", VALID_AGENT_EVENT_MAPPING )
+				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", "break_it_all" )
+				.setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Outbox polling agent configuration property conflict." );
+	}
+
+	@Test
+	public void conflictingOutboxeventMappingConfiguration() {
+		assertThatThrownBy( () -> ormSetupHelper.start()
+				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", VALID_OUTBOX_EVENT_MAPPING )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", "break_it_all" )
+				.setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Outbox event configuration property conflict." );
+	}
+
+	@Test
+	public void validMappingWithCustomNames() {
+		KeysStatementInspector statementInspector = new KeysStatementInspector();
+
+		backendMock.expectAnySchema( IndexedEntity.INDEX );
+		sessionFactory = ormSetupHelper.start()
+				// Allow ORM to create schema as we want to use non-default for this testcase:
+				.withProperty( "javax.persistence.create-database-schemas", true )
+				.withProperty( "hibernate.search.coordination.entity.mapping.agent.schema", CUSTOM_SCHEMA )
+				.withProperty( "hibernate.search.coordination.entity.mapping.agent.generator", CUSTOM_AGENT_GENERATOR_NAME )
+				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", CUSTOM_AGENT_TABLE_NAME )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.schema", CUSTOM_SCHEMA )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.generator", CUSTOM_OUTBOX_EVENT_GENERATOR_NAME )
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", CUSTOM_OUTBOX_EVENT_TABLE_NAME )
+				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.add( "1", f -> f.field( "indexedField", "value for the field" ) );
+
+		int id = 1;
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setId( id );
+			entity.setIndexedField( "value for the field" );
+			session.persist( entity );
+		} );
+
+		backendMock.verifyExpectationsMet();
+
+		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_TABLE_NAME ) ).isZero();
+		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_TABLE_NAME ) ).isPositive();
+		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isZero();
+		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isPositive();
+
+		assertThat( statementInspector.countByKey( CUSTOM_SCHEMA ) ).isPositive();
+
+		if ( getDialect() instanceof MySQLDialect ) {
+			// statements for sequences are not reported to the interceptor with this dialect
+			return;
+		}
+
+		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME ) ).isZero();
+		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_GENERATOR_NAME ) ).isPositive();
+		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isZero();
+		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isPositive();
+	}
+
 	private Dialect getDialect() {
 		return sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices()
 				.getJdbcEnvironment().getDialect();
@@ -233,7 +309,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		@Override
 		public String inspect(String sql) {
 			for ( String key : SQL_KEYS ) {
-				if ( sql.contains( key ) ) {
+				if ( Arrays.stream( sql.split( "[. ]" ) ).anyMatch( token -> key.equals( token ) ) ) {
 					sqlByKey.get( key ).add( sql );
 				}
 			}

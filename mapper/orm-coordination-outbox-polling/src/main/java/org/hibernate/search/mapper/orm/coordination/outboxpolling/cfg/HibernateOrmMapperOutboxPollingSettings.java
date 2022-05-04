@@ -46,7 +46,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	/**
 	 * Whether the application will process entity change events.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
@@ -69,7 +69,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * When this property is set, {@value #COORDINATION_EVENT_PROCESSOR_SHARDS_ASSIGNED} must also be set.
@@ -88,7 +88,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Failing that, some events may not be processed or may be processed twice or in the wrong order,
 	 * resulting in errors and/or out-of-sync indexes.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * When this property is set, {@value #COORDINATION_EVENT_PROCESSOR_SHARDS_TOTAL_COUNT} must also be set.
@@ -107,7 +107,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * In the event processor, how long to wait for another query to the outbox events table
 	 * after a query didn't return any event, in milliseconds.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Hibernate Search will wait that long before polling again if the last polling didn't return any event:
@@ -130,7 +130,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * How long, in milliseconds, the event processor can poll for events
 	 * before it must perform a "pulse".
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Every agent registers itself in a database table.
@@ -173,7 +173,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * How long, in milliseconds, an event processor "pulse" remains valid
 	 * before considering the agent disconnected and forcibly removing it from the cluster.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Every agent registers itself in a database table.
@@ -209,7 +209,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	/**
 	 * In the event processor, how many outbox events, at most, are processed in a single transaction.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a positive Integer value, such as {@code 50},
@@ -223,7 +223,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	/**
 	 * In the event processor, the timeout for transactions processing outbox events.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Only effective when a JTA transaction manager is configured.
@@ -240,7 +240,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	/**
 	 * How long the event processor must wait before re-processing an event after its processing failed.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Expects a positive integer value in seconds, such as {@code 10},
@@ -257,7 +257,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * In the mass indexer, how long to wait for another query to the agent table
 	 * when actively waiting for event processors to suspend themselves, in milliseconds.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Hibernate Search will wait that long before polling again when it finds other agents haven't suspended yet:
@@ -279,7 +279,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	/**
 	 * How long, in milliseconds, the mass indexer can wait before it must perform a "pulse".
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Every agent registers itself in a database table.
@@ -315,7 +315,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * How long, in milliseconds, a mass indexer agent "pulse" remains valid
 	 * before considering the agent disconnected and forcibly removing it from the cluster.
 	 * <p>
-	 * Only available when {@link HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value #COORDINATION_STRATEGY_NAME}.
 	 * <p>
 	 * Every agent registers itself in a database table.
@@ -348,6 +348,88 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	public static final String COORDINATION_MASS_INDEXER_PULSE_EXPIRATION =
 			PREFIX + Radicals.COORDINATION_MASS_INDEXER_PULSE_EXPIRATION;
 
+
+	/**
+	 * The database catalog to use for the outbox event table.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Defaults to the default catalog configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_CATALOG}.
+	 */
+	public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
+
+	/**
+	 * The database schema to use for the outbox event table.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Defaults to the default schema configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_SCHEMA}.
+	 */
+	public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
+
+	/**
+	 * The name of the database table used to store the outbox events.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * The default for this value is {@value Defaults#ENTITY_MAPPING_OUTBOX_EVENT_TABLE}.
+	 */
+	public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
+
+	/**
+	 * The name of the identifier generator used for the outbox event table.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * The default for this value is {@value Defaults#ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR}.
+	 */
+
+	public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR;
+	/**
+	 * The database catalog to use for the agent table.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Defaults to the default catalog configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_CATALOG}.
+	 */
+	public static final String ENTITY_MAPPING_AGENT_CATALOG = PREFIX + Radicals.ENTITY_MAPPING_AGENT_CATALOG;
+
+	/**
+	 * The database schema to use for the agent table.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * Defaults to the default schema configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_SCHEMA}.
+	 */
+	public static final String ENTITY_MAPPING_AGENT_SCHEMA = PREFIX + Radicals.ENTITY_MAPPING_AGENT_SCHEMA;
+
+	/**
+	 * The name of the database table used to store the agents.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * The default for this value is {@value Defaults#ENTITY_MAPPING_AGENT_TABLE}.
+	 */
+	public static final String ENTITY_MAPPING_AGENT_TABLE = PREFIX + Radicals.ENTITY_MAPPING_AGENT_TABLE;
+
+	/**
+	 * The name of the identifier generator used for the agent table.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * The default for this value is {@value Defaults#ENTITY_MAPPING_AGENT_GENERATOR}.
+	 */
+	public static final String ENTITY_MAPPING_AGENT_GENERATOR = PREFIX + Radicals.ENTITY_MAPPING_AGENT_GENERATOR;
+
+
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
@@ -370,6 +452,15 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_MASS_INDEXER_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_POLLING_INTERVAL;
 		public static final String COORDINATION_MASS_INDEXER_PULSE_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_PULSE_INTERVAL;
 		public static final String COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_PULSE_EXPIRATION;
+
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR;
+		public static final String ENTITY_MAPPING_AGENT_CATALOG = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_CATALOG;
+		public static final String ENTITY_MAPPING_AGENT_SCHEMA = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_SCHEMA;
+		public static final String ENTITY_MAPPING_AGENT_TABLE = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_TABLE;
+		public static final String ENTITY_MAPPING_AGENT_GENERATOR = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_GENERATOR;
 	}
 
 	/**
@@ -397,6 +488,24 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String MASS_INDEXER_PULSE_EXPIRATION = MASS_INDEXER_PREFIX + "pulse_expiration";
 	}
 
+	public static final class OutboxPollingEntityMappingRadicals {
+		private OutboxPollingEntityMappingRadicals() {
+		}
+
+		private static final String EVENT_MAPPING = "entity.mapping.";
+		private static final String ENTITY_MAPPING_OUTBOXEVENT = EVENT_MAPPING + "outboxevent.";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = ENTITY_MAPPING_OUTBOXEVENT + "catalog";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT + "schema";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = ENTITY_MAPPING_OUTBOXEVENT + "table";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = ENTITY_MAPPING_OUTBOXEVENT + "generator";
+
+		private static final String ENTITY_MAPPING_AGENT = EVENT_MAPPING + "agent.";
+		public static final String ENTITY_MAPPING_AGENT_CATALOG = ENTITY_MAPPING_AGENT + "catalog";
+		public static final String ENTITY_MAPPING_AGENT_SCHEMA = ENTITY_MAPPING_AGENT + "schema";
+		public static final String ENTITY_MAPPING_AGENT_TABLE = ENTITY_MAPPING_AGENT + "table";
+		public static final String ENTITY_MAPPING_AGENT_GENERATOR = ENTITY_MAPPING_AGENT + "generator";
+	}
+
 	/**
 	 * Default values for the different settings if no values are given.
 	 */
@@ -414,6 +523,18 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final int COORDINATION_MASS_INDEXER_POLLING_INTERVAL = 100;
 		public static final int COORDINATION_MASS_INDEXER_PULSE_INTERVAL = 2000;
 		public static final int COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = 30000;
+
+		// WARNING: Always use this prefix for all tables added by Hibernate Search:
+		// we guarantee that in the documentation.
+		public static final String HSEARCH_PREFIX = "HSEARCH_";
+
+		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
+		public static final String ENTITY_MAPPING_AGENT_TABLE = HSEARCH_PREFIX + "AGENT";
+		public static final String ENTITY_MAPPING_AGENT_GENERATOR = ENTITY_MAPPING_AGENT_TABLE + "_GENERATOR";
+
+		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
+		public static final String ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
+		public static final String ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR = ENTITY_MAPPING_OUTBOX_EVENT_TABLE + "_GENERATOR";
 	}
 
 	/**
