@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 /**
- * The search syntax for ES7.0 and later.
+ * The search syntax for ES8.1 and later.
  */
 public class Elasticsearch81SearchSyntax implements ElasticsearchSearchSyntax {
 
