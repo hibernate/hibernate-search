@@ -786,28 +786,55 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4212")
+	@TestForIssue(jiraKey = "HSEARCH-4562")
 	public void openSearch_2() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.OPENSEARCH, "2", "2.0.0",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4212")
+	@TestForIssue(jiraKey = "HSEARCH-4562")
 	public void openSearch_2_0() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.OPENSEARCH, "2.0", "2.0.0",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4212")
+	@TestForIssue(jiraKey = "HSEARCH-4562")
 	public void openSearch_2_0_0() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.OPENSEARCH, "2.0.0", "2.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4562")
+	public void openSearch_3() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.OPENSEARCH, "3", "3.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4562")
+	public void openSearch_3_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.OPENSEARCH, "3.0", "3.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4562")
+	public void openSearch_3_0_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.OPENSEARCH, "3.0.0", "3.0.0",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}

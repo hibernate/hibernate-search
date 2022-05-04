@@ -189,6 +189,9 @@ public class ElasticsearchDialectFactory {
 		else if ( major == 1 ) {
 			return createProtocolDialectOpenSearchV1( version, minor );
 		}
+		else if ( major == 2 ) {
+			return createProtocolDialectOpenSearchV2( version, minor );
+		}
 		else {
 			log.unknownElasticsearchVersion( version );
 			return new Elasticsearch70ProtocolDialect();
@@ -197,6 +200,13 @@ public class ElasticsearchDialectFactory {
 
 	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV1(ElasticsearchVersion version, int minor) {
 		if ( minor > 3 ) {
+			log.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch70ProtocolDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectOpenSearchV2(ElasticsearchVersion version, int minor) {
+		if ( minor > 0 ) {
 			log.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch70ProtocolDialect();
