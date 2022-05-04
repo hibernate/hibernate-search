@@ -160,4 +160,12 @@ public interface Log extends BasicLogger {
 			value = "Multi-tenancy is not enabled but a tenant id is specified. Trying to use the tenant id: '%1$s'.")
 	SearchException multiTenancyNotEnabled(String tenantId);
 
+	@Message(id = ID_OFFSET + 26, value = "Outbox polling agent configuration property conflict."
+			+ " Either mapping property %1$s or subset of name adjustment properties %2$s should be provided at the same time.")
+	SearchException agentConfigurationPropertyConflict(String mappingPropertyName, String[] nameAdjustmentProperties);
+
+	@Message(id = ID_OFFSET + 27, value = "Outbox event configuration property conflict."
+			+ " Either mapping property %1$s or subset of name adjustment properties %2$s should be provided at the same time.")
+	SearchException outboxEventConfigurationPropertyConflict(String mappingPropertyName, String[] nameAdjustmentProperties);
+
 }
