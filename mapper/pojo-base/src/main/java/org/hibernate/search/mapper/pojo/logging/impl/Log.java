@@ -88,8 +88,8 @@ public interface Log extends BasicLogger {
 	void indexingProgressRaw(long doneCount, long elapsedMs);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
-	void indexingProgressStats(float estimateSpeed, float estimatePercentileComplete);
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Mass indexing progress: %3$.2f%%. Mass indexing speed: %1$f documents/second since last message, %2$f documents/second since start.")
+	void indexingProgressStats(float currentSpeed, float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = ERROR)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")

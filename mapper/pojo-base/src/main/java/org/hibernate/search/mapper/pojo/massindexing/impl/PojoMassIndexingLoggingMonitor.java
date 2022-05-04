@@ -9,7 +9,10 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.BinaryOperator;
+
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 
@@ -25,6 +28,7 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
+	private final AtomicReference<StatusMessageInfo> lastMessageInfo = new AtomicReference<>();
 	private final LongAdder totalCounter = new LongAdder();
 	private volatile long startTime;
 	private final int logAfterNumberOfDocuments;
@@ -48,14 +52,16 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 
 	@Override
 	public void documentsAdded(long increment) {
-		long previous = documentsDoneCounter.getAndAdd( increment );
 		if ( startTime == 0 ) {
 			synchronized (this) {
 				if ( startTime == 0 ) {
 					startTime = System.nanoTime();
+					lastMessageInfo.set( new StatusMessageInfo( startTime, 0 ) );
 				}
 			}
 		}
+
+		long previous = documentsDoneCounter.getAndAdd( increment );
 		/*
 		 * Only log if the current increment was the one that made the counter
 		 * go to a higher multiple of the period.
@@ -63,7 +69,8 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		long current = previous + increment;
 		int period = getStatusMessagePeriod();
 		if ( (previous / period) < (current / period) ) {
-			printStatusMessage( startTime, totalCounter.longValue(), current );
+			long currentTime = System.nanoTime();
+			printStatusMessage( startTime, currentTime, totalCounter.longValue(), current );
 		}
 	}
 
@@ -92,11 +99,44 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		return logAfterNumberOfDocuments;
 	}
 
-	protected void printStatusMessage(long startTime, long totalTodoCount, long doneCount) {
-		long elapsedMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - startTime );
-		log.indexingProgressRaw( doneCount, elapsedMs );
-		float estimateSpeed = doneCount * 1000f / elapsedMs;
+	protected void printStatusMessage(long startTime, long currentTime, long totalTodoCount, long doneCount) {
+		StatusMessageInfo currentStatusMessageInfo = new StatusMessageInfo( currentTime, doneCount );
+		StatusMessageInfo previousStatusMessageInfo = lastMessageInfo.getAndAccumulate( currentStatusMessageInfo,
+				StatusMessageInfo.UPDATE_IF_MORE_UP_TO_DATE_FUNCTION );
+
+		// Avoid logging outdated info if logging happened concurrently since we last called System.nanoTime()
+		if ( !currentStatusMessageInfo.isMoreUpToDateThan( previousStatusMessageInfo ) ) {
+			return;
+		}
+
+		long elapsedNano = currentTime - startTime;
+		// period between two log events might be too short to use millis as a result infinity speed will be displayed.
+		long intervalBetweenLogsNano = currentStatusMessageInfo.currentTime - previousStatusMessageInfo.currentTime;
+
+		log.indexingProgressRaw( doneCount, TimeUnit.NANOSECONDS.toMillis( elapsedNano ) );
+		float estimateSpeed = doneCount * 1_000_000_000f / elapsedNano;
+		float currentSpeed = ( currentStatusMessageInfo.documentsDone - previousStatusMessageInfo.documentsDone ) * 1_000_000_000f / intervalBetweenLogsNano;
 		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
-		log.indexingProgressStats( estimateSpeed, estimatePercentileComplete );
+		log.indexingProgressStats( currentSpeed, estimateSpeed, estimatePercentileComplete );
+	}
+
+	private static class StatusMessageInfo {
+		public static final BinaryOperator<StatusMessageInfo> UPDATE_IF_MORE_UP_TO_DATE_FUNCTION =
+				(StatusMessageInfo storedVal, StatusMessageInfo newVal) ->
+						newVal.isMoreUpToDateThan( storedVal ) ? newVal : storedVal;
+
+		public final long currentTime;
+		public final long documentsDone;
+
+		public StatusMessageInfo(long currentTime, long documentsDone) {
+			this.currentTime = currentTime;
+			this.documentsDone = documentsDone;
+		}
+
+		public boolean isMoreUpToDateThan(StatusMessageInfo other) {
+			return documentsDone > other.documentsDone
+					// Ensure we log status updates even if the mass indexer is stuck for a long time
+					|| documentsDone == other.documentsDone && currentTime > other.currentTime;
+		}
 	}
 }
