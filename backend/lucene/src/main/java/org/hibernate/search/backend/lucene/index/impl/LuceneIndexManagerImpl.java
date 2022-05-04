@@ -91,10 +91,12 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public void start(IndexManagerStartContext context) {
-		// TODO HSEARCH-4545 Move it to preStart:
-		shardHolder.preStart( context );
+	public void preStart(IndexManagerStartContext context, SavedState savedState) {
+		shardHolder.preStart( context, savedState.get( SHARD_HOLDER_KEY ).orElse( SavedState.empty() ) );
+	}
 
+	@Override
+	public void start(IndexManagerStartContext context) {
 		shardHolder.start( context );
 	}
 

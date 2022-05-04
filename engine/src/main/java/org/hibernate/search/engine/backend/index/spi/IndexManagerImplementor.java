@@ -34,10 +34,27 @@ public interface IndexManagerImplementor {
 	}
 
 	/**
-	 * Start any resource necessary to operate the index manager at runtime.
+	 * Starts a subset of resources that are necessary to operate the index manager at runtime, and are expected to be reused upon restarts.
+	 * The resources may be retrieved them from the saved state,
+	 * or created if they are not present in the saved state.
 	 * <p>
 	 * Called by the engine once after bootstrap, after
 	 * {@link org.hibernate.search.engine.backend.spi.BackendImplementor#start(BackendStartContext)}
+	 * was called on the corresponding backend.
+	 *
+	 * @param context The start context.
+	 * @param savedState The saved state returned by the corresponding index manager in the Hibernate Search integration
+	 * being restarted, or {@link SavedState#empty()} on the first start.
+	 */
+	default void preStart(IndexManagerStartContext context, SavedState savedState) {
+		// do nothing by default
+	}
+
+	/**
+	 * Start any resource necessary to operate the index manager at runtime.
+	 * <p>
+	 * Called by the engine once just after
+	 * {@link #preStart(IndexManagerStartContext, SavedState)}
 	 * was called on the corresponding backend.
 	 *
 	 * @param context The start context.

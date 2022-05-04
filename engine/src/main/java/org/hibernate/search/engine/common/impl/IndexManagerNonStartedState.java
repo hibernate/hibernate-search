@@ -21,6 +21,10 @@ class IndexManagerNonStartedState {
 	private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 	private final IndexManagerImplementor indexManager;
 
+	// created on pre-start
+	private IndexManagerStartContextImpl startContext;
+	private ContextualFailureCollector indexFailureCollector;
+
 	IndexManagerNonStartedState(EventContext eventContext,
 			ConfigurationPropertySourceExtractor propertySourceExtractor,
 			IndexManagerImplementor indexManager) {
@@ -33,18 +37,22 @@ class IndexManagerNonStartedState {
 		indexManager.stop();
 	}
 
-	void preStart(SavedState savedState) {
-		// TODO HSEARCH-4545 Implement this method
-	}
-
-	IndexManagerImplementor start(RootFailureCollector rootFailureCollector,
-			BeanResolver beanResolver,
-			ConfigurationPropertySource rootPropertySource) {
-		ContextualFailureCollector indexFailureCollector = rootFailureCollector.withContext( eventContext );
+	void preStart(RootFailureCollector rootFailureCollector, BeanResolver beanResolver,
+			ConfigurationPropertySource rootPropertySource, SavedState savedState) {
+		indexFailureCollector = rootFailureCollector.withContext( eventContext );
 		ConfigurationPropertySource indexPropertySource = propertySourceExtractor.extract( rootPropertySource );
-		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
+		startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, beanResolver, indexPropertySource
 		);
+		try {
+			indexManager.preStart( startContext, savedState );
+		}
+		catch (RuntimeException e) {
+			indexFailureCollector.add( e );
+		}
+	}
+
+	IndexManagerImplementor start() {
 		try {
 			indexManager.start( startContext );
 		}

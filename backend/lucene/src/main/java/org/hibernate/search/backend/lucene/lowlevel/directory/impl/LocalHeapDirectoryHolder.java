@@ -26,7 +26,7 @@ final class LocalHeapDirectoryHolder implements DirectoryHolder {
 
 	@Override
 	public void start() {
-		this.directory = new ByteBuffersDirectory( lockFactory );
+		directory = new ByteBuffersDirectory( lockFactory );
 	}
 
 	@Override
