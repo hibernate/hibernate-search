@@ -259,9 +259,12 @@ stage('Configure') {
 
 					// --------------------------------------------
 					// OpenSearch
+					// Not testing 1.0 - 1.2 to make the build quicker.
 					new OpenSearchEsLocalBuildEnvironment(version: '1.0', mavenProfile: 'opensearch-1.0',
-							condition: TestCondition.AFTER_MERGE),
-					new OpenSearchEsLocalBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.2',
+							condition: TestCondition.ON_DEMAND),
+					new OpenSearchEsLocalBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
+							condition: TestCondition.ON_DEMAND),
+					new OpenSearchEsLocalBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			esAws: [
@@ -302,7 +305,6 @@ stage('Configure') {
 					// AWS OpenSearch service
 					new OpenSearchEsAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE),
-
 					// Also test static credentials, but only for the latest version
 					new OpenSearchEsAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
 							staticCredentials: true,
