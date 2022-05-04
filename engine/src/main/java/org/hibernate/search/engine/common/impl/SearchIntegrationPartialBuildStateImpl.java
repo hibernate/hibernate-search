@@ -190,8 +190,9 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					savedState = indexManagersStates.get( entry.getKey() );
 				}
 
-				entry.getValue().preStart( savedState );
+				entry.getValue().preStart( failureCollector, beanResolver, propertySource, savedState );
 			}
+			failureCollector.checkNoFailure();
 
 			if ( previousIntegration.isPresent() ) {
 				previousIntegration.get().close();
@@ -201,7 +202,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
 				startedIndexManagers.put(
 						entry.getKey(),
-						entry.getValue().start( failureCollector, beanResolver, propertySource )
+						entry.getValue().start()
 				);
 			}
 			failureCollector.checkNoFailure();

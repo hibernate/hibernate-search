@@ -197,7 +197,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	Shard createShard(LuceneIndexModel model, EventContext shardEventContext, DirectoryHolder directoryHolder,
-			IOStrategy ioStrategy, ConfigurationPropertySource propertySource) {
+			IOStrategy ioStrategy, ConfigurationPropertySource propertySource,
+			boolean reuseAlreadyStaredDirectoryHolder) {
 		LuceneParallelWorkOrchestratorImpl managementOrchestrator;
 		LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
@@ -215,7 +216,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 			Shard shard = new Shard(
 					shardEventContext, indexAccessor,
-					managementOrchestrator, indexingOrchestrator
+					managementOrchestrator, indexingOrchestrator,
+					reuseAlreadyStaredDirectoryHolder
 			);
 			return shard;
 		}

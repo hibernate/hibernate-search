@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -62,13 +63,15 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		return SavedState.builder().put( SHARDS_KEY, states ).build();
 	}
 
-	void preStart(IndexManagerStartContext startContext) {
+	void preStart(IndexManagerStartContext startContext, SavedState savedState) {
 		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
 
 		try {
 			ShardingStrategyInitializationContextImpl initializationContext =
 					new ShardingStrategyInitializationContextImpl( backendContext, model, startContext, propertySource );
-			this.shardingStrategyHolder = initializationContext.create( shards );
+			Map<String, SavedState> states = savedState.get( SHARDS_KEY ).orElse( Collections.emptyMap() );
+
+			this.shardingStrategyHolder = initializationContext.create( shards, states );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
