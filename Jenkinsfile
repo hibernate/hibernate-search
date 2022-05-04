@@ -253,7 +253,10 @@ stage('Configure') {
 					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
 					new EsLocalBuildEnvironment(versionRange: '[8.0,8.1)', mavenProfile: 'elasticsearch-8.0',
 							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[8.1,8.x)', mavenProfile: 'elasticsearch-8.1',
+					// Not testing 8.1 to make the build quicker.
+					new EsLocalBuildEnvironment(versionRange: '[8.1,8.2)', mavenProfile: 'elasticsearch-8.0',
+							condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(versionRange: '[8.2,8.x)', mavenProfile: 'elasticsearch-8.0',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 
