@@ -9,6 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -105,6 +107,11 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			states.put( indexManager.getKey(), indexManager.getValue().saveForRestart() );
 		}
 		return SavedState.builder().put( INDEX_MANAGERS_KEY, states ).build();
+	}
+
+	@Override
+	public Builder restartBuilder(SearchIntegrationEnvironment environment) {
+		return new SearchIntegrationBuilder( environment, Optional.of( this ) );
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -63,12 +64,15 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 					.build();
 
 	private final SearchIntegrationEnvironment environment;
+	private final Optional<SearchIntegrationImpl> previousIntegration;
 	private final Map<MappingKey<?, ?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private boolean frozen = false;
 
-	public SearchIntegrationBuilder(SearchIntegrationEnvironment environment) {
+	public SearchIntegrationBuilder(SearchIntegrationEnvironment environment,
+			Optional<SearchIntegrationImpl> previousIntegration) {
 		this.environment = environment;
+		this.previousIntegration = previousIntegration;
 		environment.propertyChecker().beforeBoot();
 	}
 
@@ -195,7 +199,7 @@ public class SearchIntegrationBuilder implements SearchIntegration.Builder {
 					indexManagerBuildingStateHolder.getBackendNonStartedStates(),
 					indexManagerBuildingStateHolder.getIndexManagersNonStartedStates(),
 					environment.propertyChecker(),
-					engineThreads, timingSource
+					engineThreads, timingSource, previousIntegration
 			);
 		}
 		catch (RuntimeException e) {
