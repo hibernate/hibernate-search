@@ -29,6 +29,7 @@ import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaMana
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -46,6 +47,8 @@ import org.apache.lucene.analysis.Analyzer;
 public class LuceneIndexManagerImpl
 		implements IndexManagerImplementor, LuceneIndexManager,
 		LuceneScopeIndexManagerContext {
+
+	private static final SavedState.Key<SavedState> SHARD_HOLDER_KEY = SavedState.key( "shard_holder" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -78,6 +81,13 @@ public class LuceneIndexManagerImpl
 				.append( "name=" ).append( indexName )
 				.append( "]" )
 				.toString();
+	}
+
+	@Override
+	public SavedState saveForRestart() {
+		return SavedState.builder()
+				.put( SHARD_HOLDER_KEY, shardHolder.saveForRestart() )
+				.build();
 	}
 
 	@Override
@@ -138,7 +148,7 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
-		if ( ! ( builder instanceof LuceneIndexScopeBuilder ) ) {
+		if ( !( builder instanceof LuceneIndexScopeBuilder ) ) {
 			throw log.cannotMixLuceneScopeWithOtherType(
 					builder, this, backendContext.getEventContext()
 			);

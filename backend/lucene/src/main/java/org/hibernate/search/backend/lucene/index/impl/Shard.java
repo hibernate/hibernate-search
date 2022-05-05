@@ -11,11 +11,13 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestratorImpl;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -26,12 +28,16 @@ import org.apache.lucene.index.DirectoryReader;
 
 public final class Shard {
 
+	private static final SavedState.Key<DirectoryHolder> DIRECTORY_HOLDER_KEY = SavedState.key( "directory_holder" );
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
 	private final IndexAccessorImpl indexAccessor;
 	private final LuceneParallelWorkOrchestratorImpl managementOrchestrator;
 	private final LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
+
+	private boolean savedForRestart = false;
 
 	Shard(EventContext eventContext, IndexAccessorImpl indexAccessor,
 			LuceneParallelWorkOrchestratorImpl managementOrchestrator,
@@ -40,6 +46,17 @@ public final class Shard {
 		this.indexAccessor = indexAccessor;
 		this.managementOrchestrator = managementOrchestrator;
 		this.indexingOrchestrator = indexingOrchestrator;
+	}
+
+	public SavedState saveForRestart() {
+		try {
+			return SavedState.builder()
+					.put( DIRECTORY_HOLDER_KEY, indexAccessor.directoryHolder() )
+					.build();
+		}
+		finally {
+			savedForRestart = true;
+		}
 	}
 
 	void start(ConfigurationPropertySource propertySource) {
@@ -70,7 +87,12 @@ public final class Shard {
 			closer.push( LuceneSerialWorkOrchestratorImpl::stop, indexingOrchestrator );
 			closer.push( LuceneParallelWorkOrchestratorImpl::stop, managementOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( IndexAccessorImpl::close, indexAccessor );
+			if ( savedForRestart ) {
+				closer.push( IndexAccessorImpl::closeNoDir, indexAccessor );
+			}
+			else {
+				closer.push( IndexAccessorImpl::close, indexAccessor );
+			}
 		}
 	}
 

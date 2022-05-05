@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOr
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.spi.SavedState;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
@@ -32,6 +34,8 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerContext,
 		SchemaManagementIndexManagerContext {
+
+	private static final SavedState.Key<Map<String, SavedState>> SHARDS_KEY = SavedState.key( "shards" );
 
 	private final IndexManagerBackendContext backendContext;
 	private final LuceneIndexModel model;
@@ -48,6 +52,14 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[indexName=" + model.hibernateSearchName() + "]";
+	}
+
+	public SavedState saveForRestart() {
+		HashMap<String, SavedState> states = new HashMap<>();
+		for ( Map.Entry<String, Shard> shard : shards.entrySet() ) {
+			states.put( shard.getKey(), shard.getValue().saveForRestart() );
+		}
+		return SavedState.builder().put( SHARDS_KEY, states ).build();
 	}
 
 	void preStart(IndexManagerStartContext startContext) {
