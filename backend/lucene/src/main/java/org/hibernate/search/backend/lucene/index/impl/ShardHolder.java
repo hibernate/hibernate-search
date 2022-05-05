@@ -50,19 +50,31 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		return getClass().getSimpleName() + "[indexName=" + model.hibernateSearchName() + "]";
 	}
 
-	void start(IndexManagerStartContext startContext) {
+	void preStart(IndexManagerStartContext startContext) {
 		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
 
 		try {
 			ShardingStrategyInitializationContextImpl initializationContext =
 					new ShardingStrategyInitializationContextImpl( backendContext, model, startContext, propertySource );
 			this.shardingStrategyHolder = initializationContext.create( shards );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.pushAll( Shard::stop, shards.values() );
+			shards.clear();
+			throw e;
+		}
+	}
 
-			if ( startContext.failureCollector().hasFailure() ) {
-				// At least one shard creation failed; abort and don't even try to start shards.
-				return;
-			}
+	void start(IndexManagerStartContext startContext) {
+		if ( startContext.failureCollector().hasFailure() ) {
+			// At least one shard creation failed; abort and don't even try to start shards.
+			return;
+		}
 
+		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
+
+		try {
 			for ( Shard shard : shards.values() ) {
 				shard.start( propertySource );
 				managementOrchestrators.add( shard.managementOrchestrator() );
@@ -71,7 +83,6 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.pushAll( Shard::stop, shards.values() );
-			shards.clear();
 			managementOrchestrators.clear();
 			throw e;
 		}
