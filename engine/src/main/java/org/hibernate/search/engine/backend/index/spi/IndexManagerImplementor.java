@@ -30,7 +30,6 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 public interface IndexManagerImplementor {
 
 	default SavedState saveForRestart() {
-		// TODO HSEARCH-4545 Implement this method
 		return SavedState.empty();
 	}
 
