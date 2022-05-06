@@ -12,8 +12,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.spi.ClosingOperator;
 
-public class SavedState {
+public class SavedState implements AutoCloseable {
 
 	private static final SavedState EMPTY = new SavedState.Builder().build();
 
@@ -21,7 +22,7 @@ public class SavedState {
 		return EMPTY;
 	}
 
-	private final Map<Key<?>, Object> content;
+	private final Map<Key<?>, SavedValue<?, ?>> content;
 
 	private SavedState(Builder builder) {
 		this.content = builder.content;
@@ -29,13 +30,23 @@ public class SavedState {
 
 	@SuppressWarnings("unchecked") // values have always the corresponding key generic type
 	public <T> Optional<T> get(Key<T> key) {
-		T value = (T) content.get( key );
+		SavedValue<?, ?> savedValue = content.get( key );
+		if ( savedValue == null ) {
+			return Optional.empty();
+		}
+
+		T value = (T) savedValue.value();
 		return Optional.ofNullable( value );
 	}
 
 	public static <T> Key<T> key(String name) {
 		Contracts.assertNotNullNorEmpty( name, "name" );
 		return new Key<>( name );
+	}
+
+	@Override
+	public void close() {
+		content.values().forEach( SavedValue::close );
 	}
 
 	public static final class Key<T> {
@@ -74,19 +85,59 @@ public class SavedState {
 	}
 
 	public static final class Builder {
-		private final Map<Key<?>, Object> content = new LinkedHashMap<>();
+
+		private final Map<Key<?>, SavedValue<?, ?>> content = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
+		public Builder put(Key<SavedState> key, SavedState value) {
+			return put( key, value, SavedState::close );
+		}
+
+		public Builder put(SavedState.Key<Map<String, SavedState>> key, Map<String, SavedState> value) {
+			return put( key, value, (map) -> map.forEach( (k, v) -> v.close() ) );
+		}
+
 		// values have always the corresponding key generic type
-		public <T> Builder put(Key<T> key, T value) {
-			content.put( key, value );
+		public <T, E extends Exception> Builder put(Key<T> key, T value, ClosingOperator<T, ? extends E> operator) {
+			content.put( key, new SavedValue<>( value, operator ) );
 			return this;
 		}
 
 		public SavedState build() {
 			return new SavedState( this );
+		}
+	}
+
+	public static final class SavedValue<T, E extends Exception> {
+
+		private final T value;
+		private final ClosingOperator<T, ? extends E> operator;
+
+		private boolean close = true;
+
+		public SavedValue(T value, ClosingOperator<T, ? extends E> operator) {
+			this.value = value;
+			this.operator = operator;
+		}
+
+		public T value() {
+			close = false;
+			return value;
+		}
+
+		public void close() {
+			if ( !close ) {
+				return;
+			}
+
+			try {
+				operator.close( value );
+			}
+			catch (Exception e) {
+				throw new RuntimeException( e );
+			}
 		}
 	}
 }

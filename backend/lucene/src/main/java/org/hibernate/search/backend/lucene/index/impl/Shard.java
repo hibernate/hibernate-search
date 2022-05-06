@@ -54,7 +54,7 @@ public final class Shard {
 	public SavedState saveForRestart() {
 		try {
 			return SavedState.builder()
-					.put( DIRECTORY_HOLDER_KEY, indexAccessor.directoryHolder() )
+					.put( DIRECTORY_HOLDER_KEY, indexAccessor.directoryHolder(), DirectoryHolder::close )
 					.build();
 		}
 		finally {
