@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolde
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.backend.spi.SavedState;
+import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
