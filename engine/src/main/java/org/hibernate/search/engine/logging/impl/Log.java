@@ -492,4 +492,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext nestedPath1,
 			String fieldPath2, @FormatWith(EventContextNoPrefixFormatter.class) EventContext nestedPath2);
 
+	@Message(id = ID_OFFSET + 112,
+			value = "Unable to close saved value for key %1$s: %2$s")
+	SearchException unableToCloseSavedValue(String keyName, String message, @Cause Exception e);
 }
