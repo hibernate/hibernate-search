@@ -10,13 +10,11 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ScoreValues;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 class LuceneScoreProjection extends AbstractLuceneProjection<Float>
 		implements LuceneSearchProjection.Extractor<Float, Float> {
 
-	private LuceneScoreProjection(LuceneSearchIndexScope<?> scope) {
+	LuceneScoreProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -40,18 +38,5 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float>
 	public Float transform(LoadingResult<?, ?> loadingResult, Float extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
-	}
-
-	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Float>
-			implements ScoreProjectionBuilder {
-
-		public Builder(LuceneSearchIndexScope<?> scope) {
-			super( scope );
-		}
-
-		@Override
-		public SearchProjection<Float> build() {
-			return new LuceneScoreProjection( scope );
-		}
 	}
 }

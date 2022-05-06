@@ -11,13 +11,11 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<DocumentReference>
 		implements LuceneSearchProjection.Extractor<DocumentReference, DocumentReference> {
 
-	private LuceneDocumentReferenceProjection(LuceneSearchIndexScope<?> scope) {
+	LuceneDocumentReferenceProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -40,18 +38,5 @@ class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<Documen
 	public DocumentReference transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
-	}
-
-	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<DocumentReference>
-			implements DocumentReferenceProjectionBuilder {
-
-		public Builder(LuceneSearchIndexScope<?> scope) {
-			super( scope );
-		}
-
-		@Override
-		public SearchProjection<DocumentReference> build() {
-			return new LuceneDocumentReferenceProjection( scope );
-		}
 	}
 }

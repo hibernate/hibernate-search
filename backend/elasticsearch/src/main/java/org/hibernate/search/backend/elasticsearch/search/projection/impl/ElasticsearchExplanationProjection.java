@@ -11,7 +11,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 
 import com.google.gson.JsonObject;
 
@@ -21,7 +20,7 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
 
-	private ElasticsearchExplanationProjection(ElasticsearchSearchIndexScope<?> scope) {
+	ElasticsearchExplanationProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -47,20 +46,5 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 	public JsonObject transform(LoadingResult<?, ?> loadingResult, JsonObject extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
-	}
-
-	static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<JsonObject> {
-
-		private final ElasticsearchExplanationProjection projection;
-
-		Builder(ElasticsearchSearchIndexScope<?> scope) {
-			super( scope );
-			this.projection = new ElasticsearchExplanationProjection( scope );
-		}
-
-		@Override
-		public SearchProjection<JsonObject> build() {
-			return projection;
-		}
 	}
 }

@@ -10,15 +10,13 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ExplanationVa
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.search.Explanation;
 
 class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation>
 		implements LuceneSearchProjection.Extractor<Explanation, Explanation> {
 
-	private LuceneExplanationProjection(LuceneSearchIndexScope<?> scope) {
+	LuceneExplanationProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -41,18 +39,5 @@ class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation>
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
-	}
-
-	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Explanation>
-			implements SearchProjectionBuilder<Explanation> {
-
-		public Builder(LuceneSearchIndexScope<?> scope) {
-			super( scope );
-		}
-
-		@Override
-		public SearchProjection<Explanation> build() {
-			return new LuceneExplanationProjection( scope );
-		}
 	}
 }

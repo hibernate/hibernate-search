@@ -10,21 +10,20 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 
 public final class DocumentReferenceProjectionOptionsStepImpl
 		implements DocumentReferenceProjectionOptionsStep<DocumentReferenceProjectionOptionsStepImpl> {
 
-	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
+	private final SearchProjection<DocumentReference> documentReferenceProjection;
 
 	public DocumentReferenceProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
-		this.documentReferenceProjectionBuilder = dslContext.scope().projectionBuilders().documentReference();
+		this.documentReferenceProjection = dslContext.scope().projectionBuilders().documentReference();
 	}
 
 	@Override
 	public SearchProjection<DocumentReference> toProjection() {
-		return documentReferenceProjectionBuilder.build();
+		return documentReferenceProjection;
 	}
 
 }

@@ -49,12 +49,12 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	public DefaultSearchQueryOptionsStep<E, LOS> selectEntity() {
-		return select( scope.projectionBuilders().<E>entity().build() );
+		return select( scope.projectionBuilders().entity() );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<R, LOS> selectEntityReference() {
-		return select( scope.projectionBuilders().<R>entityReference().build() );
+		return select( scope.projectionBuilders().entityReference() );
 	}
 
 	@Override

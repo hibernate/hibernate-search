@@ -10,14 +10,12 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
 public class StubIdProjection<I> implements StubSearchProjection<I> {
 
 	private final ProjectionConverter<String, ? extends I> converter;
 
-	private StubIdProjection(ProjectionConverter<String, ? extends I> converter) {
+	StubIdProjection(ProjectionConverter<String, ? extends I> converter) {
 		this.converter = converter;
 	}
 
@@ -36,19 +34,5 @@ public class StubIdProjection<I> implements StubSearchProjection<I> {
 		context.fromDocumentValueConvertContext();
 		return converter.fromDocumentValue( documentReference.id(),
 				context.fromDocumentValueConvertContext() );
-	}
-
-	public static class Builder<I> implements IdProjectionBuilder<I> {
-
-		private final StubSearchProjection<I> projection;
-
-		public Builder(ProjectionConverter<String, ? extends I> converter) {
-			projection = new StubIdProjection<>( converter );
-		}
-
-		@Override
-		public SearchProjection<I> build() {
-			return projection;
-		}
 	}
 }
