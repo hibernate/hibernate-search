@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -142,10 +141,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Collections
-							.singletonList( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME ),
-					b -> {
-					},
+					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME,
 					StubSearchWorkBehavior.of(
 							2L,
 							getDocumentFieldValues().toArray()

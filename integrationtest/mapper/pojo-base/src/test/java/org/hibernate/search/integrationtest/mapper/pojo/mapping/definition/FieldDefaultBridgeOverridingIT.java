@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.Objects;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
@@ -119,8 +118,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Collections.singletonList( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME ),
-					b -> { },
+					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME,
 					StubSearchWorkBehavior.of(
 							1L,
 							getFieldValue()
