@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+
 /**
  * A factory for search projection builders.
  * <p>
@@ -14,15 +17,15 @@ package org.hibernate.search.engine.search.projection.spi;
  */
 public interface SearchProjectionBuilderFactory {
 
-	DocumentReferenceProjectionBuilder documentReference();
+	SearchProjection<DocumentReference> documentReference();
 
-	<E> EntityProjectionBuilder<E> entity();
+	<E> SearchProjection<E> entity();
 
-	<R> EntityReferenceProjectionBuilder<R> entityReference();
+	<R> SearchProjection<R> entityReference();
 
-	<I> IdProjectionBuilder<I> id(Class<I> identifierType);
+	<I> SearchProjection<I> id(Class<I> identifierType);
 
-	ScoreProjectionBuilder score();
+	SearchProjection<Float> score();
 
 	CompositeProjectionBuilder composite();
 

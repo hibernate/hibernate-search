@@ -7,14 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 import com.google.gson.JsonObject;
@@ -33,30 +29,30 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public DocumentReferenceProjectionBuilder documentReference() {
-		return new ElasticsearchDocumentReferenceProjection.Builder( scope, documentReferenceExtractionHelper );
+	public SearchProjection<DocumentReference> documentReference() {
+		return new ElasticsearchDocumentReferenceProjection( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
-	public <E> EntityProjectionBuilder<E> entity() {
-		return new ElasticsearchEntityProjection.Builder<>( scope, documentReferenceExtractionHelper );
+	public <E> SearchProjection<E> entity() {
+		return new ElasticsearchEntityProjection<>( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
-	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new ElasticsearchEntityReferenceProjection.Builder<>( scope, documentReferenceExtractionHelper );
+	public <R> SearchProjection<R> entityReference() {
+		return new ElasticsearchEntityReferenceProjection<>( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
-	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
+	public <I> SearchProjection<I> id(Class<I> identifierType) {
 		SearchIndexIdentifierContext identifier = scope.identifier();
-		return new ElasticsearchIdProjection.Builder<>( scope, idProjectionExtractionHelper,
+		return new ElasticsearchIdProjection<>( scope, idProjectionExtractionHelper,
 				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
 	}
 
 	@Override
-	public ScoreProjectionBuilder score() {
-		return new ElasticsearchScoreProjection.Builder( scope );
+	public SearchProjection<Float> score() {
+		return new ElasticsearchScoreProjection( scope );
 	}
 
 	@Override
@@ -64,16 +60,16 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		return new ElasticsearchCompositeProjection.Builder( scope );
 	}
 
-	public SearchProjectionBuilder<JsonObject> source() {
-		return new ElasticsearchSourceProjection.Builder( scope );
+	public SearchProjection<JsonObject> source() {
+		return new ElasticsearchSourceProjection( scope );
 	}
 
-	public SearchProjectionBuilder<JsonObject> explanation() {
-		return new ElasticsearchExplanationProjection.Builder( scope );
+	public SearchProjection<JsonObject> explanation() {
+		return new ElasticsearchExplanationProjection( scope );
 	}
 
-	public SearchProjectionBuilder<JsonObject> jsonHit() {
-		return new ElasticsearchJsonHitProjection.Builder( scope );
+	public SearchProjection<JsonObject> jsonHit() {
+		return new ElasticsearchJsonHitProjection( scope );
 	}
 
 }

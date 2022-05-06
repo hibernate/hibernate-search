@@ -10,8 +10,6 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -21,7 +19,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	private final ProjectionExtractionHelper<String> extractionHelper;
 	private final ProjectionConverter<String, ? extends I> converter;
 
-	private ElasticsearchIdProjection(ElasticsearchSearchIndexScope<?> scope,
+	ElasticsearchIdProjection(ElasticsearchSearchIndexScope<?> scope,
 			ProjectionExtractionHelper<String> extractionHelper,
 			ProjectionConverter<String, ? extends I> converter) {
 		super( scope );
@@ -50,21 +48,5 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
 			ProjectionTransformContext context) {
 		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
-	}
-
-	static class Builder<I> extends AbstractBuilder<I> implements IdProjectionBuilder<I> {
-
-		private final ElasticsearchIdProjection<I> projection;
-
-		Builder(ElasticsearchSearchIndexScope<?> scope, ProjectionExtractionHelper<String> extractionHelper,
-				ProjectionConverter<String, I> converter) {
-			super( scope );
-			this.projection = new ElasticsearchIdProjection<>( scope, extractionHelper, converter );
-		}
-
-		@Override
-		public SearchProjection<I> build() {
-			return projection;
-		}
 	}
 }

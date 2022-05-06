@@ -9,15 +9,13 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
 class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<JsonObject>
 		implements ElasticsearchSearchProjection.Extractor<JsonObject, JsonObject> {
 
-	private ElasticsearchJsonHitProjection(ElasticsearchSearchIndexScope<?> scope) {
+	ElasticsearchJsonHitProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -41,19 +39,5 @@ class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<Jso
 	public JsonObject transform(LoadingResult<?, ?> loadingResult, JsonObject extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
-	}
-
-	static class Builder implements SearchProjectionBuilder<JsonObject> {
-
-		private final ElasticsearchJsonHitProjection projection;
-
-		Builder(ElasticsearchSearchIndexScope<?> scope) {
-			this.projection = new ElasticsearchJsonHitProjection( scope );
-		}
-
-		@Override
-		public SearchProjection<JsonObject> build() {
-			return projection;
-		}
 	}
 }

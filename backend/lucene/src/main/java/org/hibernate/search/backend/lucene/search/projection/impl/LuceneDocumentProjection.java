@@ -10,8 +10,6 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsV
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.LeafReaderContext;
@@ -19,7 +17,7 @@ import org.apache.lucene.index.LeafReaderContext;
 class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
 		implements LuceneSearchProjection.Extractor<Document, Document> {
 
-	private LuceneDocumentProjection(LuceneSearchIndexScope<?> scope) {
+	LuceneDocumentProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -54,18 +52,5 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document>
 	public Document transform(LoadingResult<?, ?> loadingResult, Document extractedData,
 			ProjectionTransformContext context) {
 		return extractedData;
-	}
-
-	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Document>
-			implements SearchProjectionBuilder<Document> {
-
-		public Builder(LuceneSearchIndexScope<?> scope) {
-			super( scope );
-		}
-
-		@Override
-		public SearchProjection<Document> build() {
-			return new LuceneDocumentProjection( scope );
-		}
 	}
 }

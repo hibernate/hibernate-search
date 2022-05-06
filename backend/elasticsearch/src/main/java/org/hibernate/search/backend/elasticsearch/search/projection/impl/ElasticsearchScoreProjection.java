@@ -10,8 +10,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -21,7 +19,7 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();
 
-	private ElasticsearchScoreProjection(ElasticsearchSearchIndexScope<?> scope) {
+	ElasticsearchScoreProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -48,19 +46,4 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 		return extractedData;
 	}
 
-	static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<Float>
-			implements ScoreProjectionBuilder {
-
-		private final ElasticsearchScoreProjection projection;
-
-		Builder(ElasticsearchSearchIndexScope<?> scope) {
-			super( scope );
-			this.projection = new ElasticsearchScoreProjection( scope );
-		}
-
-		@Override
-		public SearchProjection<Float> build() {
-			return projection;
-		}
-	}
 }

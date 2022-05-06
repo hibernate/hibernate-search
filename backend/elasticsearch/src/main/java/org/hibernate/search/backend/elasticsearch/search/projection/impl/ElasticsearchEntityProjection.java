@@ -9,8 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
@@ -19,7 +17,7 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 
 	private final DocumentReferenceExtractionHelper helper;
 
-	private ElasticsearchEntityProjection(ElasticsearchSearchIndexScope<?> scope,
+	ElasticsearchEntityProjection(ElasticsearchSearchIndexScope<?> scope,
 			DocumentReferenceExtractionHelper helper) {
 		super( scope );
 		this.helper = helper;
@@ -53,19 +51,4 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 		return loaded;
 	}
 
-	static class Builder<E> extends AbstractElasticsearchProjection.AbstractBuilder<E>
-			implements EntityProjectionBuilder<E> {
-
-		private final ElasticsearchEntityProjection<E> projection;
-
-		Builder(ElasticsearchSearchIndexScope<?> scope, DocumentReferenceExtractionHelper helper) {
-			super( scope );
-			this.projection = new ElasticsearchEntityProjection<>( scope, helper );
-		}
-
-		@Override
-		public SearchProjection<E> build() {
-			return projection;
-		}
-	}
 }

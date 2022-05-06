@@ -9,27 +9,20 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
-import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 
 
 public final class EntityReferenceProjectionOptionsStepImpl<R>
 		implements EntityReferenceProjectionOptionsStep<EntityReferenceProjectionOptionsStepImpl<R>, R> {
 
-	private final EntityReferenceProjectionBuilder<R> entityReferenceProjectionBuilder;
+	private final SearchProjection<R> entityReferenceProjection;
 
 	public EntityReferenceProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
-		this.entityReferenceProjectionBuilder = dslContext.scope().projectionBuilders().entityReference();
+		this.entityReferenceProjection = dslContext.scope().projectionBuilders().entityReference();
 	}
 
 	@Override
-	/*
-	 * The backend has no control over the type of entities.
-	 * This cast is only safe because we make sure to only use SearchProjectionFactory
-	 * with generic type arguments that are consistent with the type of entity loaders.
-	 * See comments in MappedIndexScope.
-	 */
 	public SearchProjection<R> toProjection() {
-		return entityReferenceProjectionBuilder.build();
+		return entityReferenceProjection;
 	}
 
 }
