@@ -190,7 +190,12 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					savedState = indexManagersStates.get( entry.getKey() );
 				}
 
-				entry.getValue().preStart( failureCollector, beanResolver, propertySource, savedState );
+				try {
+					entry.getValue().preStart( failureCollector, beanResolver, propertySource, savedState );
+				}
+				finally {
+					savedState.close();
+				}
 			}
 			failureCollector.checkNoFailure();
 
