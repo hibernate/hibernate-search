@@ -601,6 +601,25 @@ a list containing one list per author, which in turns contains the result of the
 Thus, the list of hits will be an instance of `List<List<List<?>>>`.
 ====
 
+[[search-dsl-projection-constant]]
+== `constant`: return a provided constant
+
+The `constant` projection returns the same value for every single document,
+the value being provided when defining the projection.
+
+This is only useful in some edge cases where one wants to include some broader context in the representation of every single hit.
+In this case, the `constant` value will most likely be used together with
+a <<search-dsl-projection-composite,`composite` projection>>
+or an <<search-dsl-projection-object,`object` projection>>.
+
+.Returning a constant value for every single matched document
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=constant-incomposite]
+----
+====
+
 [[search-dsl-projection-extensions]]
 == Backend-specific extensions
 

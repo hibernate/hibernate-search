@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.search.projection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
@@ -758,6 +759,27 @@ public class ProjectionDslIT {
 									session.getReference( Book.class, BOOK4_ID ).getAuthors().get( 0 ).getLastName()
 							}
 					)
+			);
+		} );
+	}
+
+	@Test
+	public void constant() {
+		withinSearchSession( searchSession -> {
+			// tag::constant-incomposite[]
+			Instant searchRequestTimestamp = Instant.now();
+			List<MyPair<Integer, Instant>> hits = searchSession.search( Book.class )
+					.select( f -> f.composite()
+							.from( f.id( Integer.class ), f.constant( searchRequestTimestamp ) )
+							.as( MyPair::new ) )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::constant-incomposite[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					new MyPair<>( BOOK1_ID, searchRequestTimestamp ),
+					new MyPair<>( BOOK2_ID, searchRequestTimestamp ),
+					new MyPair<>( BOOK3_ID, searchRequestTimestamp ),
+					new MyPair<>( BOOK4_ID, searchRequestTimestamp )
 			);
 		} );
 	}
