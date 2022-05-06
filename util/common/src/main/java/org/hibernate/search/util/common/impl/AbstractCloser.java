@@ -8,6 +8,8 @@ package org.hibernate.search.util.common.impl;
 
 import java.util.function.Function;
 
+import org.hibernate.search.util.common.spi.ClosingOperator;
+
 /**
  * A base class implementing the logic behind {@link Closer} and {@link SuppressingCloser}.
  *

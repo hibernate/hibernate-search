@@ -8,6 +8,8 @@ package org.hibernate.search.util.common.impl;
 
 import java.util.function.Function;
 
+import org.hibernate.search.util.common.spi.ClosingOperator;
+
 /**
  * A helper for closing multiple resources and re-throwing a provided exception,
  * {@link Throwable#addSuppressed(Throwable) suppressing} any exceptions caught while closing.
