@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -36,13 +37,13 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
 		E extractedData = compositor.createInitial();
 
-		List<?> listFromIndex = (List<?>) projectionFromIndex;
+		Iterator<?> innerProjectionFromIndex = ( (List<?>) projectionFromIndex.next() ).iterator();
 		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = inners[i].extract( projectionHitMapper, listFromIndex.get( i ), context );
+			Object extractedDataForInner = inners[i].extract( projectionHitMapper, innerProjectionFromIndex, context );
 			extractedData = compositor.set( extractedData, i, extractedDataForInner );
 		}
 

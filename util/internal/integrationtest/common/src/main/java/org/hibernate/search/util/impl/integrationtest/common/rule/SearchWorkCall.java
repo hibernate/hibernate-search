@@ -99,7 +99,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		for ( Object rawHit : rawHits ) {
 			actualProjectionContext.reset();
 			extractedElements.add(
-					actualRootProjection.extract( actualProjectionHitMapper, rawHit, actualProjectionContext )
+					actualRootProjection.extract( actualProjectionHitMapper, Collections.singleton( rawHit ).iterator(),
+							actualProjectionContext )
 			);
 		}
 
