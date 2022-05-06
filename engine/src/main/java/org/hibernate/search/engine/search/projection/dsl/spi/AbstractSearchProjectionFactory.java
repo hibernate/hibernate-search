@@ -20,6 +20,7 @@ import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjecti
 import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
@@ -111,6 +112,11 @@ public abstract class AbstractSearchProjectionFactory<
 	public CompositeProjectionValueStep<?, List<?>> composite(SearchProjection<?>... projections) {
 		return new CompositeProjectionValueStepImpl<>( dslContext.scope().projectionBuilders().composite(),
 				projections, ProjectionCompositor.fromList( projections.length ) );
+	}
+
+	@Override
+	public <T> ProjectionFinalStep<T> constant(T value) {
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().constant( value ) );
 	}
 
 	@Override

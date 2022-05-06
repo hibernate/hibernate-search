@@ -29,4 +29,6 @@ public interface SearchProjectionBuilderFactory {
 
 	CompositeProjectionBuilder composite();
 
+	<T> SearchProjection<T> constant(T value);
+
 }
