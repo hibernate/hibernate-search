@@ -54,8 +54,7 @@ public interface IndexManagerImplementor {
 	 * Start any resource necessary to operate the index manager at runtime.
 	 * <p>
 	 * Called by the engine once just after
-	 * {@link #preStart(IndexManagerStartContext, SavedState)}
-	 * was called on the corresponding backend.
+	 * {@link #preStart(IndexManagerStartContext, SavedState)}.
 	 *
 	 * @param context The start context.
 	 */
