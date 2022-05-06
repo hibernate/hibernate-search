@@ -6,16 +6,22 @@
  */
 package org.hibernate.search.engine.common.resources.spi;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.spi.ClosingOperator;
 
 public class SavedState implements AutoCloseable {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final SavedState EMPTY = new SavedState.Builder().build();
 
@@ -48,7 +54,7 @@ public class SavedState implements AutoCloseable {
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( SavedValue::close, content.values() );
+			closer.pushAll( entry -> entry.getValue().close( entry.getKey() ), content.entrySet() );
 		}
 	}
 
@@ -89,7 +95,14 @@ public class SavedState implements AutoCloseable {
 
 	private static void closeAll(Map<?, SavedState> map) {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( SavedState::close, map.values() );
+			closer.pushAll( entry -> {
+				try {
+					entry.getValue().close();
+				}
+				catch (RuntimeException e) {
+					throw log.unableToCloseSavedValue( Throwables.safeToString( e, entry.toString() ), e.getMessage(), e );
+				}
+			}, map.entrySet() );
 		}
 	}
 
@@ -109,8 +122,8 @@ public class SavedState implements AutoCloseable {
 		}
 
 		// values have always the corresponding key generic type
-		public <T, E extends Exception> Builder put(Key<T> key, T value, ClosingOperator<T, ? extends E> operator) {
-			content.put( key, new SavedValue<>( value, operator ) );
+		public <T> Builder put(Key<T> key, T value, ClosingOperator<T, ? extends Exception> closingOperator) {
+			content.put( key, new SavedValue<>( value, closingOperator ) );
 			return this;
 		}
 
@@ -122,13 +135,13 @@ public class SavedState implements AutoCloseable {
 	public static final class SavedValue<T, E extends Exception> {
 
 		private final T value;
-		private final ClosingOperator<T, ? extends E> operator;
+		private final ClosingOperator<T, ? extends Exception> closingOperator;
 
 		private boolean close = true;
 
-		public SavedValue(T value, ClosingOperator<T, ? extends E> operator) {
+		public SavedValue(T value, ClosingOperator<T, ? extends Exception> closingOperator) {
 			this.value = value;
-			this.operator = operator;
+			this.closingOperator = closingOperator;
 		}
 
 		public T value() {
@@ -136,16 +149,16 @@ public class SavedState implements AutoCloseable {
 			return value;
 		}
 
-		public void close() {
+		public void close(Key<?> key) {
 			if ( !close ) {
 				return;
 			}
 
 			try {
-				operator.close( value );
+				closingOperator.close( value );
 			}
 			catch (Exception e) {
-				throw new RuntimeException( e );
+				throw log.unableToCloseSavedValue( key.name, e.getMessage(), e );
 			}
 		}
 	}
