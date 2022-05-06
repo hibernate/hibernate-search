@@ -101,7 +101,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 		return indexManager.toAPI();
 	}
 
-	public SavedState saveForRestart() {
+	SavedState saveForRestart() {
 		HashMap<String, SavedState> states = new HashMap<>();
 		for ( Map.Entry<String, IndexManagerImplementor> indexManager : indexManagers.entrySet() ) {
 			states.put( indexManager.getKey(), indexManager.getValue().saveForRestart() );
