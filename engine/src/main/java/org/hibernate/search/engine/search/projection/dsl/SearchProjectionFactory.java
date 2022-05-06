@@ -357,6 +357,16 @@ public interface SearchProjectionFactory<R, E> {
 	}
 
 	/**
+	 * Project to a given constant.
+	 * <p>
+	 * The projection will return the same value for every single hit.
+	 *
+	 * @param value The constant value that the projection should return.
+	 * @return A DSL step where the "entity reference" projection can be defined in more details.
+	 */
+	<T> ProjectionFinalStep<T> constant(T value);
+
+	/**
 	 * Extend the current factory with the given extension,
 	 * resulting in an extended factory offering different types of projections.
 	 *

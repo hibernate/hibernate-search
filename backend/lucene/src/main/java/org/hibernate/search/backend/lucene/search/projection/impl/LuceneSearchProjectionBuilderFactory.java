@@ -56,6 +56,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		return new LuceneCompositeProjection.Builder( scope );
 	}
 
+	@Override
+	public <T> SearchProjection<T> constant(T value) {
+		return new LuceneConstantProjection<>( scope, value );
+	}
+
 	public SearchProjection<Document> document() {
 		return new LuceneDocumentProjection( scope );
 	}

@@ -255,6 +255,80 @@ public class SearchProjectionIT {
 		assertThat( score2 ).isNotNull().isNotNaN();
 	}
 
+	@Test
+	public void constant_nonNull() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String constantValue = "foo";
+		assertThatQuery( scope.query()
+				.select( f -> f.composite( f.id(), f.constant( "foo" ) ) )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.score().desc() ) )
+				.hasListHitsAnyOrder( b -> {
+					b.list(
+							DOCUMENT_1,
+							constantValue
+					);
+					b.list(
+							DOCUMENT_2,
+							constantValue
+					);
+					b.list(
+							DOCUMENT_3,
+							constantValue
+					);
+					b.list(
+							EMPTY,
+							constantValue
+					);
+				} );
+	}
+
+	@Test
+	public void constant_null() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		assertThatQuery( scope.query()
+				.select( f -> f.composite( f.id(), f.constant( null ) ) )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.score().desc() ) )
+				.hasListHitsAnyOrder( b -> {
+					b.list(
+							DOCUMENT_1,
+							(Object) null
+					);
+					b.list(
+							DOCUMENT_2,
+							(Object) null
+					);
+					b.list(
+							DOCUMENT_3,
+							(Object) null
+					);
+					b.list(
+							EMPTY,
+							(Object) null
+					);
+				} );
+	}
+
+	@Test
+	public void constant_root() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String constantValue = "foo";
+		assertThatQuery( scope.query()
+				.select( f -> f.constant( "foo" ) )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.score().desc() ) )
+				.hasHitsAnyOrder(
+						constantValue, // Doc 1
+						constantValue, // Doc 2
+						constantValue, // Doc 3
+						constantValue // Empty doc
+				);
+	}
+
 	/**
 	 * Test mixing multiple projection types (field projections, special projections, ...),
 	 * and also multiple field projections.

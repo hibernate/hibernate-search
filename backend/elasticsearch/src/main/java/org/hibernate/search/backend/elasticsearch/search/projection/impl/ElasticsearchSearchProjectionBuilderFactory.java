@@ -60,6 +60,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		return new ElasticsearchCompositeProjection.Builder( scope );
 	}
 
+	@Override
+	public <T> SearchProjection<T> constant(T value) {
+		return new ElasticsearchConstantProjection<>( scope, value );
+	}
+
 	public SearchProjection<JsonObject> source() {
 		return new ElasticsearchSourceProjection( scope );
 	}

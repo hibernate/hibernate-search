@@ -53,4 +53,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new StubCompositeProjection.Builder();
 	}
 
+	@Override
+	public <T> SearchProjection<T> constant(T value) {
+		return new StubConstantProjection<>( value );
+	}
+
 }
