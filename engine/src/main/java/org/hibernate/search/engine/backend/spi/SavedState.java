@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.spi.ClosingOperator;
 
@@ -46,7 +47,9 @@ public class SavedState implements AutoCloseable {
 
 	@Override
 	public void close() {
-		content.values().forEach( SavedValue::close );
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( SavedValue::close, content.values() );
+		}
 	}
 
 	public static final class Key<T> {
@@ -84,6 +87,12 @@ public class SavedState implements AutoCloseable {
 		return new Builder();
 	}
 
+	private static void closeAll(Map<?, SavedState> map) {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( SavedState::close, map.values() );
+		}
+	}
+
 	public static final class Builder {
 
 		private final Map<Key<?>, SavedValue<?, ?>> content = new LinkedHashMap<>();
@@ -96,7 +105,7 @@ public class SavedState implements AutoCloseable {
 		}
 
 		public Builder put(SavedState.Key<Map<String, SavedState>> key, Map<String, SavedState> value) {
-			return put( key, value, (map) -> map.forEach( (k, v) -> v.close() ) );
+			return put( key, value, SavedState::closeAll );
 		}
 
 		// values have always the corresponding key generic type
