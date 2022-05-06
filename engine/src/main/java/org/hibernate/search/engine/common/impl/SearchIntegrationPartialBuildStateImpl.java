@@ -177,24 +177,12 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			failureCollector.checkNoFailure();
 
 			// Pre-Start indexes
-			Map<String, SavedState> indexManagersStates = null;
-
-			for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
-				SavedState savedState = SavedState.empty();
-				if ( previousIntegration.isPresent() ) {
-					if ( indexManagersStates == null ) {
-						indexManagersStates = previousIntegration.get().saveForRestart()
-								.get( INDEX_MANAGERS_KEY ).orElse( Collections.emptyMap() );
-					}
-
-					savedState = indexManagersStates.get( entry.getKey() );
-				}
-
-				try {
+			try ( SavedState previousIntegrationSavedState =
+					previousIntegration.map( SearchIntegrationImpl::saveForRestart ).orElse( SavedState.empty() ) ) {
+				for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
+					SavedState savedState = previousIntegrationSavedState.get( INDEX_MANAGERS_KEY )
+							.orElse( Collections.emptyMap() ).getOrDefault( entry.getKey(), SavedState.empty() );
 					entry.getValue().preStart( failureCollector, beanResolver, propertySource, savedState );
-				}
-				finally {
-					savedState.close();
 				}
 			}
 			failureCollector.checkNoFailure();
