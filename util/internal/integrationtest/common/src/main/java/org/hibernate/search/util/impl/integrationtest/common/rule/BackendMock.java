@@ -9,7 +9,6 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -215,9 +214,17 @@ public class BackendMock implements TestRule {
 		return expectSearch( indexNames, contributor, behavior );
 	}
 
-	public BackendMock expectSearchProjections(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWorkBehavior<List<?>> behavior) {
-		return expectSearch( indexNames, contributor, behavior );
+	public BackendMock expectSearchProjection(String indexNames, StubSearchWorkBehavior<?> behavior) {
+		return expectSearch( Collections.singleton( indexNames ), ignored -> { }, behavior );
+	}
+
+	public BackendMock expectSearchProjection(String indexNames, Consumer<StubSearchWork.Builder> contributor,
+			StubSearchWorkBehavior<?> behavior) {
+		return expectSearch( Collections.singleton( indexNames ), contributor, behavior );
+	}
+
+	public BackendMock expectSearchProjection(Collection<String> indexNames, StubSearchWorkBehavior<?> behavior) {
+		return expectSearch( indexNames, ignored -> { }, behavior );
 	}
 
 	public BackendMock expectSearchProjection(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,

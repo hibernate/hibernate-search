@@ -449,8 +449,7 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.NAME ),
-					b -> { },
+					Book.NAME,
 					StubSearchWorkBehavior.of(
 							3L,
 							TITLE_4_3_2_1,
@@ -486,8 +485,7 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.NAME ),
-					b -> { },
+					Book.NAME,
 					StubSearchWorkBehavior.of(
 							3L,
 							Arrays.asList(
@@ -556,8 +554,7 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.NAME ),
-					b -> { },
+					Book.NAME,
 					StubSearchWorkBehavior.of(
 							3L,
 							Arrays.asList(
@@ -600,8 +597,7 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.NAME ),
-					b -> { },
+					Book.NAME,
 					StubSearchWorkBehavior.of(
 							3L,
 							Arrays.asList(
@@ -669,8 +665,7 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.NAME ),
-					b -> { },
+					Book.NAME,
 					StubSearchWorkBehavior.of(
 							3L,
 							StubBackendUtils.reference( Book.NAME, "1" ),

@@ -482,9 +482,8 @@ public class ProgrammaticMappingSmokeIT {
 					.where( f -> f.matchAll() )
 					.toQuery();
 
-			backendMock.expectSearchProjections(
+			backendMock.expectSearchProjection(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
-					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
 							Arrays.asList(
