@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
@@ -30,6 +31,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
@@ -63,15 +65,36 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		return SavedState.builder().put( SHARDS_KEY, states ).build();
 	}
 
-	void preStart(IndexManagerStartContext startContext, SavedState savedState) {
-		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
+	private ConfigurationPropertySource toShardPropertySource(ConfigurationPropertySource indexPropertySource, String shardIdOrNull) {
+		return shardIdOrNull != null
+				? indexPropertySource.withMask( LuceneIndexSettings.SHARDS ).withMask( shardIdOrNull )
+						.withFallback( indexPropertySource )
+				: indexPropertySource;
+	}
 
+	void preStart(IndexManagerStartContext startContext, SavedState savedState) {
+		ConfigurationPropertySource indexPropertySource = startContext.configurationPropertySource();
 		try {
 			ShardingStrategyInitializationContextImpl initializationContext =
-					new ShardingStrategyInitializationContextImpl( backendContext, model, startContext, propertySource );
+					new ShardingStrategyInitializationContextImpl( backendContext, model, startContext, indexPropertySource );
 			Map<String, SavedState> states = savedState.get( SHARDS_KEY ).orElse( Collections.emptyMap() );
 
-			this.shardingStrategyHolder = initializationContext.create( shards, states );
+			this.shardingStrategyHolder = initializationContext.create( shards );
+
+			for ( Map.Entry<String, Shard> entry : shards.entrySet() ) {
+				String shardId = entry.getKey();
+				Shard shard = entry.getValue();
+				ConfigurationPropertySource shardPropertySource = toShardPropertySource( indexPropertySource, shardId );
+				try {
+					shard.preStart( shardPropertySource, startContext.beanResolver(),
+							states.getOrDefault( entry.getKey(), SavedState.empty() ) );
+				}
+				catch (RuntimeException e) {
+					startContext.failureCollector()
+							.withContext( shardId == null ? null : EventContexts.fromShardId( shardId ) )
+							.add( e );
+				}
+			}
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -82,17 +105,21 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	void start(IndexManagerStartContext startContext) {
-		if ( startContext.failureCollector().hasFailure() ) {
-			// At least one shard creation failed; abort and don't even try to start shards.
-			return;
-		}
-
-		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
-
+		ConfigurationPropertySource indexPropertySource = startContext.configurationPropertySource();
 		try {
-			for ( Shard shard : shards.values() ) {
-				shard.start( propertySource );
-				managementOrchestrators.add( shard.managementOrchestrator() );
+			for ( Map.Entry<String, Shard> entry : shards.entrySet() ) {
+				String shardId = entry.getKey();
+				Shard shard = entry.getValue();
+				ConfigurationPropertySource shardPropertySource = toShardPropertySource( indexPropertySource, shardId );
+				try {
+					shard.start( shardPropertySource );
+					managementOrchestrators.add( shard.managementOrchestrator() );
+				}
+				catch (RuntimeException e) {
+					startContext.failureCollector()
+							.withContext( shardId == null ? null : EventContexts.fromShardId( shardId ) )
+							.add( e );
+				}
 			}
 		}
 		catch (RuntimeException e) {
