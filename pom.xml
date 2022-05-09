@@ -271,7 +271,7 @@
         <version.org.hibernate.orm>6.0.1.Final</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
-        <version.org.hibernate.commons.annotations.orm6>6.0.0.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.org.hibernate.commons.annotations.orm6>6.0.1.Final</version.org.hibernate.commons.annotations.orm6>
         <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
 
         <!-- >>> JSR 352 -->
