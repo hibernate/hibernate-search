@@ -49,29 +49,11 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 		this.indexReaderProvider = indexReaderProvider;
 	}
 
-	public void start() throws IOException {
-		directoryHolder.start();
-	}
-
 	@Override
-	public void close() {
+	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( IndexWriterProvider::clear, indexWriterProvider );
 			closer.push( IndexReaderProvider::clear, indexReaderProvider );
-			closer.push( DirectoryHolder::close, directoryHolder );
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToShutdownIndexAccessor( e.getMessage(), e );
-		}
-	}
-
-	public void closeNoDir() {
-		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( IndexWriterProvider::clear, indexWriterProvider );
-			closer.push( IndexReaderProvider::clear, indexReaderProvider );
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToShutdownIndexAccessor( e.getMessage(), e );
 		}
 	}
 
@@ -214,10 +196,6 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 		}
 
 		return totalSize;
-	}
-
-	public DirectoryHolder directoryHolder() {
-		return directoryHolder;
 	}
 
 	public Directory getDirectoryForTests() {

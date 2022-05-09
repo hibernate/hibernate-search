@@ -53,7 +53,6 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.similarities.Similarity;
@@ -196,40 +195,19 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneIndexSchemaManager( workFactory, context );
 	}
 
-	Shard createShard(LuceneIndexModel model, EventContext shardEventContext, DirectoryHolder directoryHolder,
-			IOStrategy ioStrategy, ConfigurationPropertySource propertySource,
-			boolean reuseAlreadyStaredDirectoryHolder) {
-		LuceneParallelWorkOrchestratorImpl managementOrchestrator;
-		LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
-		IndexAccessorImpl indexAccessor = null;
+	IndexAccessorImpl createIndexAccessor(LuceneIndexModel model, EventContext shardEventContext,
+			DirectoryHolder directoryHolder, IOStrategy ioStrategy,
+			ConfigurationPropertySource propertySource) {
 		String indexName = model.hibernateSearchName();
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
 				similarity, model.getIndexingAnalyzer(), propertySource, shardEventContext
 		);
-
-		try {
-			indexAccessor = ioStrategy.createIndexAccessor(
-					indexName, shardEventContext, directoryHolder, writerConfigSource
-			);
-			managementOrchestrator = createIndexManagementOrchestrator( shardEventContext, indexAccessor );
-			indexingOrchestrator = createIndexingOrchestrator( shardEventContext, indexAccessor );
-
-			Shard shard = new Shard(
-					shardEventContext, indexAccessor,
-					managementOrchestrator, indexingOrchestrator,
-					reuseAlreadyStaredDirectoryHolder
-			);
-			return shard;
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					// No need to stop the orchestrators, we didn't start them
-					.push( indexAccessor );
-			throw e;
-		}
+		return ioStrategy.createIndexAccessor(
+				indexName, shardEventContext, directoryHolder, writerConfigSource
+		);
 	}
 
-	private LuceneParallelWorkOrchestratorImpl createIndexManagementOrchestrator(EventContext eventContext,
+	LuceneParallelWorkOrchestratorImpl createIndexManagementOrchestrator(EventContext eventContext,
 			IndexAccessorImpl indexAccessor) {
 		return new LuceneParallelWorkOrchestratorImpl(
 				"Lucene index management orchestrator for " + eventContext.render(),
@@ -239,7 +217,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		);
 	}
 
-	private LuceneSerialWorkOrchestratorImpl createIndexingOrchestrator(EventContext eventContext,
+	LuceneSerialWorkOrchestratorImpl createIndexingOrchestrator(EventContext eventContext,
 			IndexAccessorImpl indexAccessor) {
 		return new LuceneSerialWorkOrchestratorImpl(
 				"Lucene indexing orchestrator for " + eventContext.render(),

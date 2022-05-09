@@ -64,8 +64,6 @@ public class IndexAccessorTest {
 	public void start() throws IOException {
 		accessor = new IndexAccessorImpl( indexEventContext, directoryHolderMock,
 				indexWriterProviderMock, indexReaderProviderMock );
-		accessor.start();
-		verify( directoryHolderMock ).start();
 	}
 
 	@After
