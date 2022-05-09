@@ -299,8 +299,8 @@ public interface Log extends BasicLogger {
 			value = "Invalid search projection: '%1$s'. You must build the projection from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
-	@Message(id = ID_OFFSET + 61, value = "Unable to shut down index accessor: %1$s")
-	SearchException unableToShutdownIndexAccessor(String causeMessage, @Cause Exception cause);
+	@Message(id = ID_OFFSET + 61, value = "Unable to shut down index: %1$s")
+	SearchException unableToShutdownShard(String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 62, value = "No built-in index field type for class: '%1$s'.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
@@ -604,5 +604,9 @@ public interface Log extends BasicLogger {
 					+ " 'f.object(\"%2$s\").from(<the projection on field %1$s>).as(...).multi()'.")
 	SearchException invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(String absolutePath,
 			String objectFieldAbsolutePath);
+
+	@Message(id = ID_OFFSET + 154,
+			value = "Unable to start index: %1$s")
+	SearchException unableToStartShard(String causeMessage, @Cause Exception cause);
 
 }
