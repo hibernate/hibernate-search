@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -15,32 +18,60 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexValueFieldContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
-public class StubFieldProjection<F, V> implements StubSearchProjection<V> {
-	private final Class<F> valueClass;
+public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> {
+	private final Class<F> fieldType;
 	private final ProjectionConverter<F, ? extends V> converter;
+	private final ProjectionAccumulator<F, V, A, P> accumulator;
+	private final boolean singleValued;
 
-	private StubFieldProjection(Class<F> valueClass, ProjectionConverter<F, ? extends V> converter) {
-		this.valueClass = valueClass;
+
+	public StubFieldProjection(Class<F> fieldType, ProjectionConverter<F,? extends V> converter,
+			ProjectionAccumulator<F, V, A, P> accumulator, boolean singleValued) {
+		this.fieldType = fieldType;
 		this.converter = converter;
+		this.accumulator = accumulator;
+		this.singleValued = singleValued;
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
-			StubSearchProjectionContext context) {
-		return converter.fromDocumentValue( valueClass.cast( projectionFromIndex.next() ),
-				context.fromDocumentValueConvertContext() );
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "fieldType=" + fieldType
+				+ ", converter=" + converter
+				+ ", accumulator=" + accumulator
+				+ "]";
 	}
 
 	@Override
-	public V transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+	public A extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
-		return converter.valueType().cast( extractedData );
+		List<?> fieldValues;
+		if ( singleValued ) {
+			Object singleValue = projectionFromIndex.next();
+			fieldValues = singleValue == null ? Collections.emptyList() : Arrays.asList( singleValue );
+		}
+		else {
+			fieldValues = (List<?>) projectionFromIndex.next();
+		}
+		A accumulated = accumulator.createInitial();
+		for ( Object fieldValue : fieldValues ) {
+			accumulated = accumulator.accumulate( accumulated, fieldType.cast( fieldValue ) );
+		}
+		return accumulated;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData,
+			StubSearchProjectionContext context) {
+		A accumulated = (A) extractedData;
+		A transformedData = accumulator.transformAll( accumulated, converter, context.fromDocumentValueConvertContext() );
+		return accumulator.finish( transformedData );
 	}
 
 	public static class Factory extends AbstractStubSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector> {
@@ -76,19 +107,10 @@ public class StubFieldProjection<F, V> implements StubSearchProjection<V> {
 		}
 
 		@Override
-		public SearchProjection<V> build() {
-			return new StubFieldProjection<>( valueClass, converter );
-		}
-
-		@Override
 		@SuppressWarnings("unchecked")
 		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( accumulatorProvider.isSingleValued() ) {
-				return (SearchProjection<P>) build();
-			}
-			else {
-				throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
-			}
+			return new StubFieldProjection<>( valueClass, converter,
+					accumulatorProvider.get(), accumulatorProvider.isSingleValued() );
 		}
 	}
 }
