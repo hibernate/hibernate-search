@@ -253,7 +253,7 @@ but it will remain asynchronous.
 
 [[coordination-outbox-polling-schema]]
 === [[coordination-database-polling-schema]] Impact on the database schema
-
+==== Basics
 The `outbox-polling` coordination strategy needs to store data in additional tables in the application database,
 so that this data can be consumed by background threads.
 
@@ -276,6 +276,68 @@ See link:{hibernateDocUrl}#configurations-hbmddl[automatic schema generation],
 in particular the Hibernate ORM properties `javax.persistence.schema-generation.scripts.action`,
 `javax.persistence.schema-generation.scripts.create-target`
 and `javax.persistence.schema-generation.scripts.drop-target`.
+
+==== Custom schema/table name/etc.
+By default, outbox and agent tables, mentioned in the previous section, are expected to be found
+in the default catalog/schema, and are using uppercased table names prefixed with `HSEARCH_`.
+Identity generator names used for these tables are prefixed with `HSEARCH_` and suffixed with `_GENERATOR`.
+Sometimes there are specific naming conventions for database objects, or a need to separate the domain
+and technical tables.
+
+To allow some flexibility in this area, Hibernate Search provides a set of configuration properties
+to specify catalog/schema/table/identity generator names for outbox event and agent tables:
+
+[source]
+----
+# Configure the agent mapping:
+hibernate.search.coordination.entity.mapping.agent.catalog=CUSTOM_CATALOG
+hibernate.search.coordination.entity.mapping.agent.schema=CUSTOM_SCHEMA
+hibernate.search.coordination.entity.mapping.agent.generator=CUSTOM_AGENT_GENERATOR
+hibernate.search.coordination.entity.mapping.agent.table=CUSTOM_AGENT_TABLE
+# Configure the outbox event mapping:
+hibernate.search.coordination.entity.mapping.outboxevent.catalog=CUSTOM_CATALOG
+hibernate.search.coordination.entity.mapping.outboxevent.schema=CUSTOM_SCHEMA
+hibernate.search.coordination.entity.mapping.outboxevent.generator=CUSTOM_OUTBOX_GENERATOR
+hibernate.search.coordination.entity.mapping.outboxevent.table=CUSTOM_OUTBOX_TABLE
+----
+
+* `agent.catalog` defines the database catalog to use for the agent table.
++
+Defaults to the default catalog configured in Hibernate ORM.
+* `agent.schema` defines the database schema to use for the agent table.
++
+Defaults to the default schema configured in Hibernate ORM.
+* `agent.generator` defines the identifier generator used for the agent table .
++
+Defaults to `HSEARCH_AGENT_GENERATOR`.
+* `agent.table` defines the database table name for the agent table.
++
+Defaults to `HSEARCH_AGENT`.
+
+* `outboxevent.catalog` defines the database catalog to use for the outbox event table.
++
+Defaults to the default catalog configured in Hibernate ORM.
+* `outboxevent.schema` defines the database schema to use for the outbox event table.
++
+Defaults to the default schema configured in Hibernate ORM.
+* `outboxevent.generator` defines the identifier generator used for the outbox event table.
++
+Defaults to `HSEARCH_OUTBOX_EVENT_GENERATOR`.
+* `outboxevent.table` defines the database table name for the outbox events table.
++
+Defaults to `HSEARCH_OUTBOX_EVENT`.
+
+[TIP]
+====
+If your application relies on autogeneration, make sure that the underlying database supports catalogs/schemas
+when specifying them. Also check if there are any constraints on name length and case sensitivity.
+====
+
+[TIP]
+====
+It is not required to provide all properties at the same time. For example, you can customize the schema only.
+Unspecified properties will use their defaults.
+====
 
 [[coordination-outbox-polling-sharding]]
 === [[coordination-database-polling-sharding]] [[coordination-outbox-polling-sharding-basics]] Sharding and pulse
