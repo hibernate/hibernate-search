@@ -98,6 +98,9 @@ public final class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public synchronized ContextualFailureCollectorImpl withContext(EventContext context) {
+			if ( context == null ) {
+				return withDefaultContext();
+			}
 			List<EventContextElement> elements = context.elements();
 			try {
 				NonRootFailureCollector failureCollector = this;
@@ -116,6 +119,9 @@ public final class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public synchronized ContextualFailureCollectorImpl withContext(EventContextElement contextElement) {
+			if ( contextElement == null ) {
+				return withDefaultContext();
+			}
 			return children.computeIfAbsent(
 					contextElement,
 					element -> new ContextualFailureCollectorImpl( this, element )
