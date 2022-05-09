@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,16 +17,20 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
-import org.hibernate.search.util.common.AssertionFailure;
 
-class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
+class StubCompositeProjection<E, V, A, P> implements StubSearchProjection<P> {
 
 	private final StubSearchProjection<?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
+	private final ProjectionAccumulator<E, V, A, P> accumulator;
+	private final boolean singleValued;
 
-	private StubCompositeProjection(StubSearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor) {
+	private StubCompositeProjection(StubSearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
+			ProjectionAccumulator<E, V, A, P> accumulator, boolean singleValued) {
 		this.inners = inners;
 		this.compositor = compositor;
+		this.accumulator = accumulator;
+		this.singleValued = singleValued;
 	}
 
 	@Override
@@ -33,35 +38,50 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 		return getClass().getSimpleName() + "["
 				+ "inners=" + Arrays.toString( inners )
 				+ ", compositor=" + compositor
+				+ ", accumulator=" + accumulator
 				+ "]";
 	}
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Iterator<?> projectionFromIndex,
 			StubSearchProjectionContext context) {
-		E extractedData = compositor.createInitial();
-
-		Iterator<?> innerProjectionFromIndex = ( (List<?>) projectionFromIndex.next() ).iterator();
-		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = inners[i].extract( projectionHitMapper, innerProjectionFromIndex, context );
-			extractedData = compositor.set( extractedData, i, extractedDataForInner );
+		List<?> allInnerProjectionsFromIndex;
+		if ( singleValued ) {
+			Object singleValue = projectionFromIndex.next();
+			allInnerProjectionsFromIndex = singleValue == null ? Collections.emptyList() : Arrays.asList( singleValue );
+		}
+		else {
+			allInnerProjectionsFromIndex = (List<?>) projectionFromIndex.next();
 		}
 
-		return extractedData;
+		A accumulated = accumulator.createInitial();
+		for ( Object innerProjectionsFromIndex : allInnerProjectionsFromIndex ) {
+			E extractedData = compositor.createInitial();
+			Iterator<?> innerProjectionFromIndex = ( (List<?>) innerProjectionsFromIndex ).iterator();
+			for ( int i = 0; i < inners.length; i++ ) {
+				Object extractedDataForInner = inners[i].extract( projectionHitMapper, innerProjectionFromIndex, context );
+				extractedData = compositor.set( extractedData, i, extractedDataForInner );
+			}
+			accumulated = accumulator.accumulate( accumulated, extractedData );
+		}
+		return accumulated;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public V transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
-		E transformedData = (E) extractedData;
-		// Transform in-place
-		for ( int i = 0; i < inners.length; i++ ) {
-			Object extractedDataForInner = compositor.get( transformedData, i );
-			Object transformedDataForInner = inners[i].transform( loadingResult, extractedDataForInner, context );
-			transformedData = compositor.set( transformedData, i, transformedDataForInner );
+	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context) {
+		A accumulated = (A) extractedData;
+		for ( int i = 0; i < accumulator.size( accumulated ); i++ ) {
+			E transformedData = accumulator.get( accumulated, i );
+			// Transform in-place
+			for ( int j = 0; j < inners.length; j++ ) {
+				Object extractedDataForInner = compositor.get( transformedData, j );
+				Object transformedDataForInner = inners[j].transform( loadingResult, extractedDataForInner, context );
+				transformedData = compositor.set( transformedData, j, transformedDataForInner );
+			}
+			accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
 		}
-
-		return compositor.finish( transformedData );
+		return accumulator.finish( accumulated );
 	}
 
 	static class Builder implements CompositeProjectionBuilder {
@@ -69,19 +89,18 @@ class StubCompositeProjection<E, V> implements StubSearchProjection<V> {
 		Builder() {
 		}
 
+
 		@Override
 		@SuppressWarnings("unchecked")
 		public <E, V, P> SearchProjection<P> build(SearchProjection<?>[] inners, ProjectionCompositor<E, V> compositor,
 				ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-			if ( !accumulatorProvider.isSingleValued() ) {
-				throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
-			}
 			StubSearchProjection<?>[] typedInners =
 					new StubSearchProjection<?>[ inners.length ];
 			for ( int i = 0; i < inners.length; i++ ) {
 				typedInners[i] = StubSearchProjection.from( inners[i] );
 			}
-			return (SearchProjection<P>) new StubCompositeProjection<>( typedInners, compositor );
+			return new StubCompositeProjection<>( typedInners, compositor,
+					accumulatorProvider.get(), accumulatorProvider.isSingleValued() );
 		}
 	}
 }
