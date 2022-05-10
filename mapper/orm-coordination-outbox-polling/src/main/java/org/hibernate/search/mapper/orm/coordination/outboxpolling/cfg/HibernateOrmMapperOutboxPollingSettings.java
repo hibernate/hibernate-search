@@ -357,7 +357,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <p>
 	 * Defaults to the default catalog configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_CATALOG}.
 	 */
-	public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
+	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
 
 	/**
 	 * The database schema to use for the outbox event table.
@@ -367,7 +368,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <p>
 	 * Defaults to the default schema configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_SCHEMA}.
 	 */
-	public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
+	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
 
 	/**
 	 * The name of the outbox event table.
@@ -375,9 +377,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * The default for this value is {@value Defaults#ENTITY_MAPPING_OUTBOX_EVENT_TABLE}.
+	 * The default for this value is {@value Defaults#COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE}.
 	 */
-	public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
+	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
 
 	/**
 	 * The name of the identifier generator used for the outbox event table.
@@ -385,10 +388,11 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * The default for this value is {@value Defaults#ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR}.
+	 * The default for this value is {@value Defaults#COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR}.
 	 */
 
-	public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR;
+	public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_GENERATOR =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_GENERATOR;
 	/**
 	 * The database catalog to use for the agent table.
 	 * <p>
@@ -397,7 +401,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <p>
 	 * Defaults to the default catalog configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_CATALOG}.
 	 */
-	public static final String ENTITY_MAPPING_AGENT_CATALOG = PREFIX + Radicals.ENTITY_MAPPING_AGENT_CATALOG;
+	public static final String COORDINATION_ENTITY_MAPPING_AGENT_CATALOG =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_CATALOG;
 
 	/**
 	 * The database schema to use for the agent table.
@@ -407,7 +412,8 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * <p>
 	 * Defaults to the default schema configured in Hibernate ORM. See {@link org.hibernate.cfg.AvailableSettings#DEFAULT_SCHEMA}.
 	 */
-	public static final String ENTITY_MAPPING_AGENT_SCHEMA = PREFIX + Radicals.ENTITY_MAPPING_AGENT_SCHEMA;
+	public static final String COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA;
 
 	/**
 	 * The name of the agent table.
@@ -415,9 +421,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * The default for this value is {@value Defaults#ENTITY_MAPPING_AGENT_TABLE}.
+	 * The default for this value is {@value Defaults#COORDINATION_ENTITY_MAPPING_AGENT_TABLE}.
 	 */
-	public static final String ENTITY_MAPPING_AGENT_TABLE = PREFIX + Radicals.ENTITY_MAPPING_AGENT_TABLE;
+	public static final String COORDINATION_ENTITY_MAPPING_AGENT_TABLE =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
 
 	/**
 	 * The name of the identifier generator used for the agent table.
@@ -425,10 +432,10 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
 	 * <p>
-	 * The default for this value is {@value Defaults#ENTITY_MAPPING_AGENT_GENERATOR}.
+	 * The default for this value is {@value Defaults#COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR}.
 	 */
-	public static final String ENTITY_MAPPING_AGENT_GENERATOR = PREFIX + Radicals.ENTITY_MAPPING_AGENT_GENERATOR;
-
+	public static final String COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR =
+			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR;
 
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
@@ -452,15 +459,14 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_MASS_INDEXER_POLLING_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_POLLING_INTERVAL;
 		public static final String COORDINATION_MASS_INDEXER_PULSE_INTERVAL = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_PULSE_INTERVAL;
 		public static final String COORDINATION_MASS_INDEXER_PULSE_EXPIRATION = COORDINATION_PREFIX + CoordinationRadicals.MASS_INDEXER_PULSE_EXPIRATION;
-
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR;
-		public static final String ENTITY_MAPPING_AGENT_CATALOG = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_CATALOG;
-		public static final String ENTITY_MAPPING_AGENT_SCHEMA = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_SCHEMA;
-		public static final String ENTITY_MAPPING_AGENT_TABLE = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_TABLE;
-		public static final String ENTITY_MAPPING_AGENT_GENERATOR = COORDINATION_PREFIX + OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_GENERATOR;
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR;
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_CATALOG = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_CATALOG;
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_SCHEMA;
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_TABLE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_TABLE;
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_GENERATOR;
 	}
 
 	/**
@@ -486,24 +492,18 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String MASS_INDEXER_POLLING_INTERVAL = MASS_INDEXER_PREFIX + "polling_interval";
 		public static final String MASS_INDEXER_PULSE_INTERVAL = MASS_INDEXER_PREFIX + "pulse_interval";
 		public static final String MASS_INDEXER_PULSE_EXPIRATION = MASS_INDEXER_PREFIX + "pulse_expiration";
-	}
 
-	public static final class OutboxPollingEntityMappingRadicals {
-		private OutboxPollingEntityMappingRadicals() {
-		}
-
-		private static final String EVENT_MAPPING = "entity.mapping.";
-		private static final String ENTITY_MAPPING_OUTBOXEVENT = EVENT_MAPPING + "outboxevent.";
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = ENTITY_MAPPING_OUTBOXEVENT + "catalog";
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT + "schema";
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = ENTITY_MAPPING_OUTBOXEVENT + "table";
-		public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = ENTITY_MAPPING_OUTBOXEVENT + "generator";
-
-		private static final String ENTITY_MAPPING_AGENT = EVENT_MAPPING + "agent.";
-		public static final String ENTITY_MAPPING_AGENT_CATALOG = ENTITY_MAPPING_AGENT + "catalog";
-		public static final String ENTITY_MAPPING_AGENT_SCHEMA = ENTITY_MAPPING_AGENT + "schema";
-		public static final String ENTITY_MAPPING_AGENT_TABLE = ENTITY_MAPPING_AGENT + "table";
-		public static final String ENTITY_MAPPING_AGENT_GENERATOR = ENTITY_MAPPING_AGENT + "generator";
+		public static final String ENTITY_MAPPING_PREFIX = "entity.mapping.";
+		public static final String ENTITY_MAPPING_AGENT_PREFIX = ENTITY_MAPPING_PREFIX + "agent.";
+		public static final String ENTITY_MAPPING_AGENT_GENERATOR = ENTITY_MAPPING_AGENT_PREFIX + "generator";
+		public static final String ENTITY_MAPPING_AGENT_TABLE = ENTITY_MAPPING_AGENT_PREFIX + "table";
+		public static final String ENTITY_MAPPING_AGENT_SCHEMA = ENTITY_MAPPING_AGENT_PREFIX + "schema";
+		public static final String ENTITY_MAPPING_AGENT_CATALOG = ENTITY_MAPPING_AGENT_PREFIX + "catalog";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_PREFIX = ENTITY_MAPPING_PREFIX + "outboxevent.";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_GENERATOR = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "generator";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "table";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "schema";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "catalog";
 	}
 
 	/**
@@ -529,12 +529,12 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String HSEARCH_PREFIX = "HSEARCH_";
 
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-		public static final String ENTITY_MAPPING_AGENT_TABLE = HSEARCH_PREFIX + "AGENT";
-		public static final String ENTITY_MAPPING_AGENT_GENERATOR = ENTITY_MAPPING_AGENT_TABLE + "_GENERATOR";
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_TABLE = HSEARCH_PREFIX + "AGENT";
+		public static final String COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR = COORDINATION_ENTITY_MAPPING_AGENT_TABLE + "_GENERATOR";
 
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
-		public static final String ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
-		public static final String ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR = ENTITY_MAPPING_OUTBOX_EVENT_TABLE + "_GENERATOR";
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
+		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR = COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE + "_GENERATOR";
 	}
 
 	/**

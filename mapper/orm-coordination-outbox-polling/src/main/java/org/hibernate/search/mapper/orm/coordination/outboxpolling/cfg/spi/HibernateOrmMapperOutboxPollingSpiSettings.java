@@ -39,10 +39,10 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * <p>
 	 * As this configuration entirely overrides the entity mapping it cannot be used in combination with any properties
 	 * that define names of catalog/schema/table/identity generator for the outbox event table (
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_OUTBOXEVENT_CATALOG},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_OUTBOXEVENT_SCHEMA},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_OUTBOXEVENT_TABLE},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_OUTBOXEVENT_GENERATOR}).
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_GENERATOR}).
 	 * An exception ({@link org.hibernate.search.util.common.SearchException} will be thrown in case of such misconfiguration.
 	 */
 	public static final String OUTBOXEVENT_ENTITY_MAPPING = PREFIX + Radicals.OUTBOXEVENT_ENTITY_MAPPING;
@@ -59,10 +59,10 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * <p>
 	 * As this configuration entirely overrides the entity mapping it cannot be used in combination with any properties
 	 * that define names of catalog/schema/table/identity generator for the agent table (
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_AGENT_CATALOG},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_AGENT_SCHEMA},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_AGENT_TABLE},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_AGENT_GENERATOR}).
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_CATALOG},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_TABLE},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR}).
 	 * An exception ({@link org.hibernate.search.util.common.SearchException} will be thrown in case of such misconfiguration.
 	 */
 	public static final String AGENT_ENTITY_MAPPING = PREFIX + Radicals.AGENT_ENTITY_MAPPING;
