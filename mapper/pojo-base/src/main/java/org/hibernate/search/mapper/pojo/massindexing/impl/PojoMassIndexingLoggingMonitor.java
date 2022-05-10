@@ -55,8 +55,10 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 		if ( startTime == 0 ) {
 			synchronized (this) {
 				if ( startTime == 0 ) {
-					startTime = System.nanoTime();
+					long theStartTime = System.nanoTime();
 					lastMessageInfo.set( new StatusMessageInfo( startTime, 0 ) );
+					// Do this last, so other threads will block until we're done initializing lastMessageInfo.
+					startTime = theStartTime;
 				}
 			}
 		}
