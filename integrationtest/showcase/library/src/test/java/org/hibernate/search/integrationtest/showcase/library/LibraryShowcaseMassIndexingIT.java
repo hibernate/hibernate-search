@@ -93,7 +93,11 @@ public class LibraryShowcaseMassIndexingIT {
 	@Test
 	public void testMassIndexingMonitor() {
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
-		MassIndexer indexer = adminService.createMassIndexer();
+		MassIndexer indexer = adminService.createMassIndexer()
+				// Concurrency leads to an unpredictable number of log events,
+				// because we skip logging in some cases where it's triggered concurrently.
+				// So, for this test which needs assertions on the number of log events, we avoid concurrency.
+				.threadsToLoadObjects( 1 );
 		try {
 			/*
 			 * The default period for logging in the default mass indexing monitor is 50.
