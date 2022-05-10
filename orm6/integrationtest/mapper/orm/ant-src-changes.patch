@@ -903,7 +903,7 @@ index 798418f3a9..bbfc99e232 100644
  				.contains( "_containingIndexBackref" );
  
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
-index d110dbb171..0796b95350 100644
+index aa24c725e1..66c2063aea 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 @@ -6,6 +6,7 @@
@@ -914,7 +914,7 @@ index d110dbb171..0796b95350 100644
  import java.util.ArrayList;
  import java.util.List;
  import jakarta.persistence.Basic;
-@@ -121,25 +122,17 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
+@@ -117,25 +118,17 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
  	}
  
  	@Entity(name = "generic")
