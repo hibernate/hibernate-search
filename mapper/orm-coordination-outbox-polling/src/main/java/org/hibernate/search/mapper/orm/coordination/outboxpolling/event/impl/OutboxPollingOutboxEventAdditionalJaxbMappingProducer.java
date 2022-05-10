@@ -71,7 +71,9 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"</hibernate-mapping>\n";
 
 	public static final String ENTITY_DEFINITION = String.format(
-			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "", HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_OUTBOX_EVENT_TABLE, HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR
+			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "",
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE,
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR
 	);
 
 	private static final OptionalConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
@@ -82,25 +84,25 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_OUTBOXEVENT_SCHEMA =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_OUTBOXEVENT_CATALOG =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_OUTBOXEVENT_TABLE =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_OUTBOXEVENT_GENERATOR =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR )
 					.asString()
 					.build();
 
@@ -135,8 +137,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 						ENTITY_DEFINITION_TEMPLATE,
 						schema.orElse( "" ),
 						catalog.orElse( "" ),
-						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_OUTBOX_EVENT_TABLE ),
-						generator.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR )
+						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE ),
+						generator.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR )
 
 				)
 		);

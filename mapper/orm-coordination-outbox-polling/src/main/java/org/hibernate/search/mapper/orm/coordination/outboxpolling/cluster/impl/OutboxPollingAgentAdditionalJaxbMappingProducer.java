@@ -76,7 +76,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			"</hibernate-mapping>\n";
 
 	public static final String ENTITY_DEFINITION = String.format(
-			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "", HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_TABLE, HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_GENERATOR
+			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "",
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE,
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR
 	);
 
 	private static final OptionalConfigurationProperty<String> AGENT_ENTITY_MAPPING =
@@ -87,25 +89,25 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_SCHEMA =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_SCHEMA )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_AGENT_SCHEMA )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_CATALOG =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_CATALOG )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_AGENT_CATALOG )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_TABLE =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_TABLE )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_AGENT_TABLE )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_AGENT_GENERATOR =
 			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.OutboxPollingEntityMappingRadicals.ENTITY_MAPPING_AGENT_GENERATOR )
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_AGENT_GENERATOR )
 					.asString()
 					.build();
 
@@ -140,8 +142,8 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 						ENTITY_DEFINITION_TEMPLATE,
 						schema.orElse( "" ),
 						catalog.orElse( "" ),
-						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_TABLE ),
-						generator.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_GENERATOR )
+						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE ),
+						generator.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR )
 
 				)
 		);

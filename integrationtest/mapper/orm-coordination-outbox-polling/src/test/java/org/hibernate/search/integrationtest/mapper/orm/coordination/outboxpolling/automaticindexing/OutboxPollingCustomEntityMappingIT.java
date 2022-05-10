@@ -41,12 +41,12 @@ import org.junit.Test;
 public class OutboxPollingCustomEntityMappingIT {
 
 	private static final String CUSTOM_SCHEMA = "CUSTOM_SCHEMA";
-	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
+	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE;
 	private static final String CUSTOM_OUTBOX_EVENT_TABLE_NAME = "CUSTOM_OUTBOX_EVENT";
 	private static final String ORIGINAL_OUTBOX_EVENT_GENERATOR_NAME = ORIGINAL_OUTBOX_EVENT_TABLE_NAME + "_GENERATOR";
 	private static final String CUSTOM_OUTBOX_EVENT_GENERATOR_NAME = CUSTOM_OUTBOX_EVENT_TABLE_NAME + "_GENERATOR";
 
-	private static final String ORIGINAL_AGENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.ENTITY_MAPPING_AGENT_TABLE;
+	private static final String ORIGINAL_AGENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
 	private static final String CUSTOM_AGENT_TABLE_NAME = "CUSTOM_AGENT";
 	private static final String ORIGINAL_AGENT_GENERATOR_NAME = ORIGINAL_AGENT_TABLE_NAME + "_GENERATOR";
 	private static final String CUSTOM_AGENT_GENERATOR_NAME = CUSTOM_AGENT_TABLE_NAME + "_GENERATOR";
