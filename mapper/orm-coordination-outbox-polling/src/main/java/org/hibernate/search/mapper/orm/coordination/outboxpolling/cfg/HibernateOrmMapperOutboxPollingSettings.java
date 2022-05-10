@@ -370,7 +370,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
 
 	/**
-	 * The name of the database table used to store the outbox events.
+	 * The name of the outbox event table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
@@ -410,7 +410,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 	public static final String ENTITY_MAPPING_AGENT_SCHEMA = PREFIX + Radicals.ENTITY_MAPPING_AGENT_SCHEMA;
 
 	/**
-	 * The name of the database table used to store the agents.
+	 * The name of the agent table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
