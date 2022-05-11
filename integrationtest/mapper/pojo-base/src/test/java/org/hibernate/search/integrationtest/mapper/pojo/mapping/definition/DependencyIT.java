@@ -692,6 +692,77 @@ public class DependencyIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4565")
+	public void derivedFrom_error_cycle_buried() {
+		class DerivedFromCycle {
+			@Indexed
+			class Zero {
+				@DocumentId
+				Integer id;
+				A a;
+				@GenericField
+				@IndexingDependency(derivedFrom = @ObjectPath({
+						@PropertyValue(propertyName = "a"),
+						@PropertyValue(propertyName = "derivedA")
+				}))
+				public String getDerivedZero() {
+					throw new UnsupportedOperationException( "Should not be called" );
+				}
+			}
+			class A {
+				B b;
+				@GenericField
+				@IndexingDependency(derivedFrom = @ObjectPath({
+						@PropertyValue(propertyName = "b"),
+						@PropertyValue(propertyName = "derivedB")
+				}))
+				public String getDerivedA() {
+					throw new UnsupportedOperationException( "Should not be called" );
+				}
+			}
+			class B {
+				C c;
+				@GenericField
+				@IndexingDependency(derivedFrom = @ObjectPath({
+						@PropertyValue(propertyName = "c"),
+						@PropertyValue(propertyName = "derivedC")
+				}))
+				public String getDerivedB() {
+					throw new UnsupportedOperationException( "Should not be called" );
+				}
+			}
+			class C {
+				A a;
+				@GenericField
+				@IndexingDependency(derivedFrom = @ObjectPath({
+						@PropertyValue(propertyName = "a"),
+						@PropertyValue(propertyName = "derivedA")
+				}))
+				public String getDerivedC() {
+					throw new UnsupportedOperationException( "Should not be called" );
+				}
+			}
+		}
+		assertThatThrownBy(
+				() -> setupHelper.start()
+						.withAnnotatedEntityTypes( DerivedFromCycle.Zero.class )
+						.withAnnotatedTypes( DerivedFromCycle.A.class, DerivedFromCycle.B.class, DerivedFromCycle.C.class )
+						.setup()
+		)
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( DerivedFromCycle.Zero.class.getName() )
+						.pathContext( ".derivedZero<no value extractors>" )
+						.failure( "Unable to resolve dependencies of a derived property:"
+										+ " there is a cyclic dependency involving path '.derivedA<no value extractors>'"
+										+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
+								"A derived property cannot be marked as derived from itself",
+								"you should consider disabling automatic reindexing"
+						)
+				);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4423")
 	public void derivedFrom_cycleFalsePositive() {
 		final String indexName = "myindex";
