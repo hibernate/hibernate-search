@@ -358,7 +358,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		@Override
 		public String inspect(String sql) {
 			for ( String key : SQL_KEYS ) {
-				if ( Arrays.stream( sql.split( "[. ]" ) ).anyMatch( token -> key.equals( token ) ) ) {
+				if ( Arrays.stream( sql.split( "[^A-Za-z0-9_-]" ) ).anyMatch( token -> key.equals( token ) ) ) {
 					sqlByKey.get( key ).add( sql );
 				}
 			}
