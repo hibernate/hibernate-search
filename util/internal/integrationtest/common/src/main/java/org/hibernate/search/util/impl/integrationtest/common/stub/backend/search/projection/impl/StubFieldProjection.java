@@ -29,7 +29,6 @@ public class StubFieldProjection<F, V, A, P> implements StubSearchProjection<P> 
 	private final ProjectionAccumulator<F, V, A, P> accumulator;
 	private final boolean singleValued;
 
-
 	public StubFieldProjection(Class<F> fieldType, ProjectionConverter<F,? extends V> converter,
 			ProjectionAccumulator<F, V, A, P> accumulator, boolean singleValued) {
 		this.fieldType = fieldType;

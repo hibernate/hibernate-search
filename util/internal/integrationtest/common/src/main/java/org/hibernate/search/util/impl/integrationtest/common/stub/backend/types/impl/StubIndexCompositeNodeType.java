@@ -10,12 +10,14 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.spi.AbstractIndexCompositeNodeType;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexCompositeNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexCompositeNodeTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubCompositeProjection;
 
 public class StubIndexCompositeNodeType
 		extends AbstractIndexCompositeNodeType<
@@ -50,6 +52,7 @@ public class StubIndexCompositeNodeType
 					PredicateTypeKeys.NESTED,
 					PredicateTypeKeys.EXISTS
 			);
+			queryElementFactory( ProjectionTypeKeys.OBJECT, new StubCompositeProjection.Factory() );
 		}
 
 		@SafeVarargs
