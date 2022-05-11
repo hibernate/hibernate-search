@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -89,8 +89,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	public void wrongOutboxEventMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", "<ciao></ciao>" )
-				.setup( IndexedEntity.class )
-		)
+				.setup( IndexedEntity.class ) )
 				.isInstanceOf( MappingException.class )
 				.hasMessageContainingAll( "Unable to perform unmarshalling", "unexpected element" );
 	}
@@ -99,8 +98,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	public void wrongAgentMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.agent.entity.mapping", "<ciao></ciao>" )
-				.setup( IndexedEntity.class )
-		)
+				.setup( IndexedEntity.class ) )
 				.isInstanceOf( MappingException.class )
 				.hasMessageContainingAll( "Unable to perform unmarshalling", "unexpected element" );
 	}
@@ -116,15 +114,15 @@ public class OutboxPollingCustomEntityMappingIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		backendMock.expectWorks( IndexedEntity.INDEX )
-				.add( "1", f -> f.field( "indexedField", "value for the field" ) );
-
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", f -> f.field( "indexedField", "value for the field" ) );
 		} );
 
 		backendMock.verifyExpectationsMet();
@@ -156,15 +154,15 @@ public class OutboxPollingCustomEntityMappingIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		backendMock.expectWorks( IndexedEntity.INDEX )
-				.add( "1", f -> f.field( "indexedField", "value for the field" ) );
-
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", f -> f.field( "indexedField", "value for the field" ) );
 		} );
 
 		backendMock.verifyExpectationsMet();
@@ -190,8 +188,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.agent.entity.mapping", VALID_AGENT_EVENT_MAPPING )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", "break_it_all" )
-				.setup( IndexedEntity.class )
-		)
+				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Outbox polling agent configuration property conflict." );
 	}
@@ -201,8 +198,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", VALID_OUTBOX_EVENT_MAPPING )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", "break_it_all" )
-				.setup( IndexedEntity.class )
-		)
+				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Outbox event configuration property conflict." );
 	}
@@ -221,17 +217,16 @@ public class OutboxPollingCustomEntityMappingIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		backendMock.expectWorks( IndexedEntity.INDEX )
-				.add( "1", f -> f.field( "indexedField", "value for the field" ) );
-
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
-		} );
 
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", f -> f.field( "indexedField", "value for the field" ) );
+		} );
 		backendMock.verifyExpectationsMet();
 
 		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_TABLE_NAME ) ).isZero();
@@ -273,17 +268,16 @@ public class OutboxPollingCustomEntityMappingIT {
 		assumeTrue( "This test only makes sense if the dialect supports creating schemas",
 				getDialect().canCreateSchema() );
 
-		backendMock.expectWorks( IndexedEntity.INDEX )
-				.add( "1", f -> f.field( "indexedField", "value for the field" ) );
-
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
-		} );
 
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", f -> f.field( "indexedField", "value for the field" ) );
+		} );
 		backendMock.verifyExpectationsMet();
 
 		assertThat( statementInspector.countByKey( ORIGINAL_OUTBOX_EVENT_TABLE_NAME ) ).isZero();
