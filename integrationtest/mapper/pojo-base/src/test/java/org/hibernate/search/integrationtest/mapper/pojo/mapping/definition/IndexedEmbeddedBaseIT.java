@@ -1548,6 +1548,69 @@ public class IndexedEmbeddedBaseIT {
 								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." ) );
 	}
 
+	@Test
+	public void cycle() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@IndexedEmbedded
+				EntityB b;
+			}
+			class EntityB {
+				Integer id;
+				@IndexedEmbedded
+				EntityA a;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.EntityA.class.getName() )
+						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
+						.failure( "Infinite @IndexedEmbedded recursion involving path 'b.a.b.' on type '"
+								+ Model.EntityA.class.getName() + "'" )
+				);
+	}
+
+	@Test
+	public void cycle_nonRoot() {
+		class Model {
+			@Indexed(index = INDEX_NAME)
+			class EntityA {
+				@DocumentId
+				Integer id;
+				@IndexedEmbedded
+				EntityB b;
+			}
+			class EntityB {
+				Integer id;
+				@IndexedEmbedded
+				EntityC c;
+			}
+			class EntityC {
+				Integer id;
+				@IndexedEmbedded
+				EntityB b;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withAnnotatedEntityTypes( Model.EntityA.class )
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.satisfies( FailureReportUtils.hasFailureReport()
+						.typeContext( Model.EntityA.class.getName() )
+						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
+						.failure( "Infinite @IndexedEmbedded recursion involving path 'c.b.c.' on type '"
+								+ Model.EntityB.class.getName() + "'" )
+				);
+	}
+
 	private <E> void doTestEmbeddedRuntime(SearchMapping mapping,
 			Function<Integer, E> newEntityFunction,
 			Consumer<StubDocumentNode.Builder> expectedDocumentContributor) {
