@@ -17,8 +17,11 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
-class StubCompositeProjection<E, V, A, P> implements StubSearchProjection<P> {
+public class StubCompositeProjection<E, V, A, P> implements StubSearchProjection<P> {
 
 	private final StubSearchProjection<?>[] inners;
 	private final ProjectionCompositor<E, V> compositor;
@@ -82,6 +85,14 @@ class StubCompositeProjection<E, V, A, P> implements StubSearchProjection<P> {
 			accumulated = accumulator.transform( accumulated, i, compositor.finish( transformedData ) );
 		}
 		return accumulator.finish( accumulated );
+	}
+
+	public static class Factory extends AbstractStubSearchQueryElementFactory<CompositeProjectionBuilder> {
+		@Override
+		public CompositeProjectionBuilder create(StubSearchIndexScope scope,
+				StubSearchIndexNodeContext node) {
+			return new Builder();
+		}
 	}
 
 	static class Builder implements CompositeProjectionBuilder {
