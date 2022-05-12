@@ -101,11 +101,10 @@ public class TypeBindingBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.annotationContextAnyParameters( TypeBinding.class )
 						.failure( "Empty binder reference." )
-						.build()
 				);
 	}
 
@@ -142,10 +141,9 @@ public class TypeBindingBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedNoParamEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( AnnotatedNoParamEntity.class.getName() )
 						.failure( "Param with name 'stringBase' has not been defined for the binder." )
-						.build()
 				);
 	}
 
@@ -155,12 +153,11 @@ public class TypeBindingBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedSameParamTwiceEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( AnnotatedSameParamTwiceEntity.class.getName() )
 						.annotationContextAnyParameters( TypeBinding.class )
 						.failure( "Conflicting usage of @Param annotation for parameter name: 'stringBase'. " +
 								"Can't assign both value '7' and '7'" )
-						.build()
 				);
 	}
 

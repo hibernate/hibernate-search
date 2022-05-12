@@ -62,7 +62,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		String invalidDirectoryType = "someInvalidDirectoryType";
 		assertThatThrownBy( () -> setup( "someInvalidDirectoryType", c -> c.expectCustomBeans() ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.indexContext( index.name() )
 						.failure(
 								"Invalid value for configuration property 'hibernate.search.backend.directory.type': '"
@@ -71,9 +71,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 										+ "' and name '" + invalidDirectoryType
 										+ "' in Hibernate Search's internal registry",
 								"Unable to load class '" + invalidDirectoryType + "'"
-						)
-						.build()
-				);
+						) );
 	}
 
 	public static class CustomDirectoryProvider implements DirectoryProvider {

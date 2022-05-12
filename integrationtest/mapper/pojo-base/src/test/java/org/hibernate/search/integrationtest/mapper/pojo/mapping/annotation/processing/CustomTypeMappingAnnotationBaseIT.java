@@ -99,12 +99,10 @@ public class CustomTypeMappingAnnotationBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.annotationTypeContext( AnnotationWithEmptyProcessorRef.class )
 						.failure( "Empty annotation processor reference in meta-annotation '"
-								+ TypeMapping.class.getName() + "'" )
-						.build()
-				);
+								+ TypeMapping.class.getName() + "'" ) );
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -123,13 +121,11 @@ public class CustomTypeMappingAnnotationBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
 						.failure( "Invalid annotation processor: '" + DifferentAnnotationType.Processor.TO_STRING + "'",
 								"This processor expects annotations of a different type: '"
-										+ DifferentAnnotationType.class.getName() + "'" )
-						.build()
-				);
+										+ DifferentAnnotationType.class.getName() + "'" ) );
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)

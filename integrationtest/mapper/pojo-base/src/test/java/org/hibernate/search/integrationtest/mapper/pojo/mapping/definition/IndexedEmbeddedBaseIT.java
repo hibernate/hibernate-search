@@ -199,13 +199,11 @@ public class IndexedEmbeddedBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".level1" )
 						.annotationContextAnyParameters( IndexedEmbedded.class )
-						.failure( "Invalid index field name 'invalid.withdot': field names cannot contain a dot ('.')" )
-						.build()
-				);
+						.failure( "Invalid index field name 'invalid.withdot': field names cannot contain a dot ('.')" ) );
 	}
 
 	@Test
@@ -231,14 +229,13 @@ public class IndexedEmbeddedBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".level1" )
 						.annotationContextAnyParameters( IndexedEmbedded.class )
 						.failure( "Ambiguous @IndexedEmbedded name: both 'name' and 'prefix' are set.",
 								"Only one can be set.",
 								"Name is 'somename', prefix is 'someprefix.'" )
-						.build()
 				);
 	}
 
@@ -608,7 +605,7 @@ public class IndexedEmbeddedBaseIT {
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"An @IndexedEmbedded defines includePaths filters that do not match anything",
@@ -617,9 +614,7 @@ public class IndexedEmbeddedBaseIT {
 								"Encountered field paths:",
 								CollectionHelper.asLinkedHashSet( "ignoredProperty", "includedProperty" ).toString(),
 								"Check the filters for typos, or remove them if they are not useful"
-						)
-						.build()
-				);
+						) );
 	}
 
 	/**
@@ -1510,13 +1505,11 @@ public class IndexedEmbeddedBaseIT {
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".invalid" )
 						.failure( "Unable to index-embed type '" + String.class.getName() + "': no index mapping"
-								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." )
-						.build()
-				);
+								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." ) );
 	}
 
 	@Test
@@ -1548,13 +1541,11 @@ public class IndexedEmbeddedBaseIT {
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".invalid" )
 						.failure( "Unable to index-embed type '" + EmptyNested.class.getName() + "': no index mapping"
-								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." )
-						.build()
-				);
+								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." ) );
 	}
 
 	private <E> void doTestEmbeddedRuntime(SearchMapping mapping,

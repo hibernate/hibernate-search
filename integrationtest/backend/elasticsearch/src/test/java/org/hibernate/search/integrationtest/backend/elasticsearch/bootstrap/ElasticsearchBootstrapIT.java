@@ -104,13 +104,12 @@ public class ElasticsearchBootstrapIT {
 				"NO version check without explicit version number"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure( "Invalid value for configuration property 'hibernate.search.backend.version': ''",
 								"Missing or imprecise Elasticsearch version",
 								"when configuration property 'hibernate.search.backend.version_check.enabled' is set to 'false'",
 								"the version is mandatory and must be at least as precise as 'x.y', where 'x' and 'y' are integers" )
-						.build()
 				);
 	}
 
@@ -143,13 +142,12 @@ public class ElasticsearchBootstrapIT {
 				"NO version check with partial version number"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure( "Invalid value for configuration property 'hibernate.search.backend.version': '" + versionWithMajorOnly + "'",
 								"Missing or imprecise Elasticsearch version",
 								"when configuration property 'hibernate.search.backend.version_check.enabled' is set to 'false'",
 								"the version is mandatory and must be at least as precise as 'x.y', where 'x' and 'y' are integers" )
-						.build()
 				);
 	}
 
@@ -222,7 +220,7 @@ public class ElasticsearchBootstrapIT {
 		assertThatThrownBy(
 				() -> partialSetup.doSecondPhase( AllAwareConfigurationPropertySource.fromMap( runtimeProperties ) ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure(
 								"Invalid value for configuration property 'hibernate.search.backend.version': '"
@@ -233,7 +231,6 @@ public class ElasticsearchBootstrapIT {
 										+ " when the backend was created.",
 								"You can provide a more precise version on startup,"
 										+ " but you cannot override the version that was provided when the backend was created." )
-						.build()
 				);
 	}
 

@@ -38,7 +38,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( "foobar" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -47,7 +47,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 										+ ElasticsearchIndexSettings.ANALYSIS_CONFIGURER + "': 'foobar'",
 								"Unable to load class 'foobar'"
 						)
-						.build()
 				);
 	}
 
@@ -57,14 +56,13 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( FailingConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								FailingConfigurer.FAILURE_MESSAGE
 						)
-						.build()
 				);
 	}
 
@@ -88,7 +86,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( TokenizerNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -96,7 +94,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"Duplicate tokenizer definitions: 'tokenizerName'",
 								"Tokenizer names must be unique"
 						)
-						.build()
 				);
 	}
 
@@ -114,7 +111,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( TokenizerMissingTypeConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -122,7 +119,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"Invalid tokenizer definition for name 'tokenizerName'",
 								"Tokenizer definitions must at least define the tokenizer type"
 						)
-						.build()
 				);
 	}
 
@@ -139,7 +135,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( CharFilterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -147,7 +143,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"Duplicate char filter definitions: 'charFilterName'",
 								"Char filter names must be unique"
 						)
-						.build()
 				);
 	}
 
@@ -165,7 +160,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( CharFilterMissingTypeConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -173,7 +168,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"Invalid char filter definition for name 'charFilterName'",
 								"Char filter definitions must at least define the char filter type"
 						)
-						.build()
 				);
 	}
 
@@ -190,7 +184,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( TokenFilterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -198,7 +192,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"Duplicate token filter definitions: 'tokenFilterName'",
 								"Token filter names must be unique"
 						)
-						.build()
 				);
 	}
 
@@ -216,7 +209,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( TokenFilterMissingTypeConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -224,7 +217,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"Invalid token filter definition for name 'tokenFilterName'",
 								"Token filter definitions must at least define the token filter type"
 						)
-						.build()
 				);
 	}
 
@@ -241,7 +233,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure(
@@ -250,7 +242,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 								"'\"value1\"'",
 								"'\"value2\"'"
 						)
-						.build()
 				);
 	}
 

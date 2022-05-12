@@ -63,14 +63,12 @@ public class FieldBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure( "No default value bridge implementation for type '"
 										+ Object.class.getName() + "'",
-								"Use a custom bridge" )
-						.build()
-				);
+								"Use a custom bridge" ) );
 	}
 
 	@Test
@@ -87,13 +85,11 @@ public class FieldBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure( "No default value bridge implementation for type 'java.lang.Enum (java.lang.Enum<E>)'",
-								"Use a custom bridge" )
-						.build()
-				);
+								"Use a custom bridge" ) );
 	}
 
 	@Test
@@ -109,12 +105,11 @@ public class FieldBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure( "No default value bridge implementation for type 'java.lang.Enum<?>'",
 								"Use a custom bridge" )
-						.build()
 				);
 	}
 
@@ -131,14 +126,12 @@ public class FieldBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure( "No default value bridge implementation for type 'java.lang.Enum<"
 										+ EnumForEnumSuperClassTest.class.getName() + ">'",
-								"Use a custom bridge" )
-						.build()
-				);
+								"Use a custom bridge" ) );
 	}
 
 	enum EnumForEnumSuperClassTest {
@@ -158,14 +151,12 @@ public class FieldBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
 										+ "': '" + MyStringBridge.TOSTRING + "'",
-								"This bridge expects an input of type '" + String.class.getName() + "'" )
-						.build()
-				);
+								"This bridge expects an input of type '" + String.class.getName() + "'" ) );
 	}
 
 	@Test
@@ -181,14 +172,12 @@ public class FieldBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
 										+ "': '" + MyStringBridge.TOSTRING + "'",
-								"This bridge expects an input of type '" + String.class.getName() + "'" )
-						.build()
-				);
+								"This bridge expects an input of type '" + String.class.getName() + "'" ) );
 	}
 
 	public static class MyStringBridge implements ValueBridge<String, String> {
@@ -219,7 +208,7 @@ public class FieldBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( GenericField.class )
@@ -227,7 +216,6 @@ public class FieldBaseIT {
 								"Ambiguous value bridge reference: both 'valueBridge' and 'valueBinder' are set."
 										+ " Only one can be set."
 						)
-						.build()
 				);
 	}
 
@@ -242,7 +230,7 @@ public class FieldBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Unable to infer expected value type for value bridge '"
@@ -253,7 +241,6 @@ public class FieldBaseIT {
 								+ " when this type parameter is set to a raw class."
 								+ " Use a ValueBinder to set the expected value type explicitly,"
 								+ " or set the type parameter V to a definite, raw type." )
-						.build()
 				);
 	}
 

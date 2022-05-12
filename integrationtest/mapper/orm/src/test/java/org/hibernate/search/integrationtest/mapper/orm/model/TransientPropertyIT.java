@@ -52,16 +52,14 @@ public class TransientPropertyIT {
 		assertThatThrownBy(
 				() -> ormSetupHelper.start().setup( EntityWithoutDerivedFrom.class )
 		)
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( EntityWithoutDerivedFrom.class.getName() )
 						.failure(
 								"Unable to resolve path '.APlusB' to a persisted attribute in Hibernate ORM metadata.",
 								"If this path points to a transient attribute, use @IndexingDependency(derivedFrom = ...)"
 										+ " to specify which persisted attributes it is derived from.",
 								"See the reference documentation for more information"
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
