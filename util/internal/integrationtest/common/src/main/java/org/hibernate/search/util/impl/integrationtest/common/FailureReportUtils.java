@@ -26,7 +26,7 @@ public final class FailureReportUtils {
 	 * @param first The first part of the expected context.
 	 * @param others The other parts of the expected context, if any. To be concatenated to the first part.
 	 * @return A consumer representing an assertion to be passed as a parameter to
-	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
+	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer[])}.
 	 */
 	public static <T extends Throwable> Consumer<T> hasContext(EventContext first, EventContext... others) {
 		return hasContext(
@@ -37,7 +37,7 @@ public final class FailureReportUtils {
 	/**
 	 * @param contextElements The expect context elements, in order.
 	 * @return A consumer representing an assertion to be passed as a parameter to
-	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
+	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer[])}.
 	 */
 	public static <T extends Throwable> Consumer<T> hasContext(EventContextElement... contextElements) {
 		return throwable -> {
