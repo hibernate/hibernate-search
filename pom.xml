@@ -447,6 +447,12 @@
         <java-version.test.launcher>${java-version.test.launcher.java_home}/bin/java</java-version.test.launcher>
 
         <!-- Properties overridden in profiles to disable certain tests that only work with specific Java versions -->
+        <!-- These are only used in integration tests, hence the default to "none", which is overridden in integration tests -->
+        <java-version.test.java11.add-main-source-phase.default>none</java-version.test.java11.add-main-source-phase.default>
+        <java-version.test.java17.add-main-source-phase.default>none</java-version.test.java17.add-main-source-phase.default>
+        <java-version.test.java11.add-main-source-phase>${java-version.test.java11.add-main-source-phase.default}</java-version.test.java11.add-main-source-phase>
+        <java-version.test.java17.add-main-source-phase>${java-version.test.java17.add-main-source-phase.default}</java-version.test.java17.add-main-source-phase>
+        <!-- These are used in all modules -->
         <java-version.test.java11.add-test-source-phase>generate-test-sources</java-version.test.java11.add-test-source-phase>
         <java-version.test.java17.add-test-source-phase>generate-test-sources</java-version.test.java17.add-test-source-phase>
 
@@ -1561,6 +1567,30 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>add-main-source-java11</id>
+                        <phase>${java-version.test.java11.add-main-source-phase}</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java11</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-main-source-java17</id>
+                        <phase>${java-version.test.java17.add-main-source-phase}</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java17</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>add-test-source-java11</id>
                         <phase>${java-version.test.java11.add-test-source-phase}</phase>
                         <goals>
@@ -2419,6 +2449,8 @@
                      but it doesn't need them either, so we just omit them. -->
                 <test.weld.jvm.args></test.weld.jvm.args>
                 <!-- Tests specific to Java 11+ won't work with JDK 8, so we disable them. -->
+                <java-version.test.java11.add-source-phase>none</java-version.test.java11.add-source-phase>
+                <java-version.test.java17.add-source-phase>none</java-version.test.java17.add-source-phase>
                 <java-version.test.java11.add-test-source-phase>none</java-version.test.java11.add-test-source-phase>
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
             </properties>
@@ -2434,6 +2466,7 @@
             </activation>
             <properties>
                 <!-- Tests specific to Java 17+ won't work with JDK 11, so we disable them. -->
+                <java-version.test.java17.add-source-phase>none</java-version.test.java17.add-source-phase>
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
             </properties>
         </profile>
