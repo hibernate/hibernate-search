@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.javabean.schema.management.SearchSchemaManage
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 
 import org.junit.Test;
 

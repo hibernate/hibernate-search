@@ -10,7 +10,8 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.discriminatorMappingOmitDefaults;
 
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 
 class ElasticsearchIndexSchemaManagerTestUtils {
 
@@ -72,7 +73,7 @@ class ElasticsearchIndexSchemaManagerTestUtils {
 		return mapping.isEmpty() ? "" : mapping + ", ";
 	}
 
-	static FailureReportUtils.FailureReportChecker hasValidationFailureReport() {
+	static FailureReportChecker hasValidationFailureReport() {
 		return FailureReportUtils.hasFailureReport()
 				.contextLiteral( STUB_CONTEXT_LITERAL )
 				.failure( "Validation of the existing index in the Elasticsearch cluster failed. See below for details." );
