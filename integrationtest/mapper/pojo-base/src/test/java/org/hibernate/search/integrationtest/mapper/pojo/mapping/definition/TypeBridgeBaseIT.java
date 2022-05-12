@@ -207,12 +207,10 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "No readable property named 'doesNotExist' on type '"
-								+ IndexedEntity.class.getName() + "'" )
-						.build()
-				);
+								+ IndexedEntity.class.getName() + "'" ) );
 	}
 
 	/**
@@ -326,12 +324,10 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "No readable property named 'doesNotExist' on type '"
-								+ ContainedEntity.class.getName() + "'" )
-						.build()
-				);
+								+ ContainedEntity.class.getName() + "'" ) );
 	}
 
 	@Test
@@ -362,12 +358,10 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "No readable property named 'doesNotExist' on type '"
-								+ ContainedEntity.class.getName() + "'" )
-						.build()
-				);
+								+ ContainedEntity.class.getName() + "'" ) );
 	}
 
 	@Test
@@ -403,16 +397,14 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notEntity<no value extractors>" )
 						.failure(
 								"Invalid use of 'fromOtherEntity': this method can only be used when the bridged element has an entity type,"
 								+ " but the bridged element has type '" + NotEntity.class.getName() + "',"
 								+ " which is not an entity type."
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -442,14 +434,12 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"Invalid type passed to 'fromOtherEntity': the type must be an entity type",
 								"Type '" + NotEntity.class.getName() + "' is not an entity type."
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -483,14 +473,12 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"The inverse association targets type '" + DifferentEntity.class.getName() + "',"
 								+ " but a supertype or subtype of '" + IndexedEntity.class.getName() + "' was expected."
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -514,16 +502,14 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"Incorrect binder implementation",
 								"the binder did not declare any dependency to the entity model during binding."
 								+ " Declare dependencies using context.dependencies().use(...) or,"
 								+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()"
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -550,15 +536,13 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"Incorrect binder implementation",
 								"the binder called context.dependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -863,12 +847,10 @@ public class TypeBridgeBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "'.stringProperty<no value extractors>' cannot be assigned to '"
-								+ Integer.class.getName() + "'" )
-						.build()
-				);
+								+ Integer.class.getName() + "'" ) );
 	}
 
 	private static class UnusedTypeBridge implements TypeBridge<Object> {
@@ -889,13 +871,11 @@ public class TypeBridgeBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "Invalid bridge for input type '" + IndexedEntity.class.getName()
 										+ "': '" + MyTargetTypeBridge.TOSTRING + "'",
-								"This bridge expects an input of type '" + TargetType.class.getName() + "'" )
-						.build()
-				);
+								"This bridge expects an input of type '" + TargetType.class.getName() + "'" ) );
 	}
 
 	public static class MyTargetTypeBridge implements TypeBridge<TargetType> {

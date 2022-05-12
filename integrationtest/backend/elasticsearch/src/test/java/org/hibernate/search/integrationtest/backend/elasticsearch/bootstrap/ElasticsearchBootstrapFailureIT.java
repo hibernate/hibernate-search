@@ -45,14 +45,13 @@ public class ElasticsearchBootstrapFailureIT {
 				"Closed port"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure(
 								"Unable to detect the Elasticsearch version running on the cluster",
 								"Elasticsearch request failed",
 								"Connection refused"
 						)
-						.build()
 				);
 	}
 

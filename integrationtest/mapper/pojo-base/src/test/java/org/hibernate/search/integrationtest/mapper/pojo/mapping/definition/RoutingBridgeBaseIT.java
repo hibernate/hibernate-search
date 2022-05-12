@@ -64,13 +64,11 @@ public class RoutingBridgeBaseIT {
 				} )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "Invalid routing bridge for entity type '" + IndexedEntity.class.getName()
 										+ "': '" + UnusedRoutingBridge.TOSTRING + "'",
-								"This bridge expects an entity type extending '" + Integer.class.getName() )
-						.build()
-				);
+								"This bridge expects an entity type extending '" + Integer.class.getName() ) );
 	}
 
 	@Test
@@ -366,12 +364,10 @@ public class RoutingBridgeBaseIT {
 				} )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "'.stringProperty<no value extractors>' cannot be assigned to '"
-								+ Integer.class.getName() + "'" )
-						.build()
-				);
+								+ Integer.class.getName() + "'" ) );
 	}
 
 	/**
@@ -477,11 +473,10 @@ public class RoutingBridgeBaseIT {
 				} )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "No readable property named 'doesNotExist' on type '"
-								+ IndexedEntity.class.getName() + "'" )
-						.build() );
+								+ IndexedEntity.class.getName() + "'" ) );
 	}
 
 	@Test
@@ -503,13 +498,12 @@ public class RoutingBridgeBaseIT {
 				} )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "Incorrect binder implementation",
 								"the binder did not declare any dependency to the entity model during binding.",
 								" Declare dependencies using context.dependencies().use(...) or,"
-										+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()" )
-						.build() );
+										+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()" ) );
 	}
 
 	@Test
@@ -534,12 +528,11 @@ public class RoutingBridgeBaseIT {
 				} )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "Incorrect binder implementation",
 								"the binder called context.dependencies().useRootOnly() during binding,"
-										+ " but also declared extra dependencies to the entity model." )
-						.build() );
+										+ " but also declared extra dependencies to the entity model." ) );
 	}
 
 	@Test

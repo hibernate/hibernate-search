@@ -51,13 +51,11 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "No default identifier bridge implementation for type '" + Object.class.getName() + "'",
-								"Use a custom bridge" )
-						.build()
-				);
+								"Use a custom bridge" ) );
 	}
 
 	@Test
@@ -72,13 +70,11 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "No default identifier bridge implementation for type 'java.lang.Enum'",
-								"Use a custom bridge" )
-						.build()
-				);
+								"Use a custom bridge" ) );
 	}
 
 	@Test
@@ -92,12 +88,11 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "No default identifier bridge implementation for type 'java.lang.Enum<?>'",
 								"Use a custom bridge" )
-						.build()
 				);
 	}
 
@@ -112,14 +107,12 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "No default identifier bridge implementation for type 'java.lang.Enum<"
 										+ EnumForEnumSuperClassTest.class.getName() + ">'",
-								"Use a custom bridge" )
-						.build()
-				);
+								"Use a custom bridge" ) );
 	}
 
 	enum EnumForEnumSuperClassTest {
@@ -138,14 +131,12 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
 										+ "': '" + MyStringBridge.TOSTRING + "'",
-								"This bridge expects an input of type '" + String.class.getName() + "'." )
-						.build()
-				);
+								"This bridge expects an input of type '" + String.class.getName() + "'." ) );
 	}
 
 	public static class MyStringBridge implements IdentifierBridge<String> {
@@ -175,13 +166,12 @@ public class DocumentIdBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Object.class.getName()
 										+ "': '" + MyNumberBridge.TOSTRING + "'",
-								"This bridge expects an input of type '" + Number.class.getName() + "'" )
-						.build() );
+								"This bridge expects an input of type '" + Number.class.getName() + "'" ) );
 	}
 
 	@Test
@@ -194,13 +184,12 @@ public class DocumentIdBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Invalid bridge for input type '" + Integer.class.getName()
 										+ "': '" + MyNumberBridge.TOSTRING + "'",
-								"This bridge expects an input of type '" + Number.class.getName() + "'." )
-						.build() );
+								"This bridge expects an input of type '" + Number.class.getName() + "'." ) );
 	}
 
 	public static class MyNumberBridge implements IdentifierBridge<Number> {
@@ -234,7 +223,7 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( DocumentId.class )
@@ -242,7 +231,6 @@ public class DocumentIdBaseIT {
 								"Ambiguous identifier bridge reference: both 'identifierBridge' and 'identifierBinder' are set."
 										+ " Only one can be set."
 						)
-						.build()
 				);
 	}
 
@@ -256,7 +244,7 @@ public class DocumentIdBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure( "Unable to infer expected identifier type for identifier bridge '"
@@ -267,7 +255,6 @@ public class DocumentIdBaseIT {
 								+ " when this type parameter is set to a raw class."
 								+ " Use an IdentifierBinder to set the expected identifier type explicitly,"
 								+ " or set the type parameter I to a definite, raw type." )
-						.build()
 				);
 	}
 
@@ -301,7 +288,7 @@ public class DocumentIdBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"Unable to define a document identifier for indexed type '"
@@ -309,9 +296,7 @@ public class DocumentIdBaseIT {
 								"The property representing the entity identifier is unknown",
 								"Define the document identifier explicitly by annotating"
 										+ " a property whose values are unique with @DocumentId"
-						)
-						.build()
-				);
+						) );
 	}
 
 }

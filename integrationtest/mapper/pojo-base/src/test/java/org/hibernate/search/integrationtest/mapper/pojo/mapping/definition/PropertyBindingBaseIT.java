@@ -94,12 +94,11 @@ public class PropertyBindingBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".text" )
 						.annotationContextAnyParameters( PropertyBinding.class )
 						.failure( "Empty binder reference." )
-						.build()
 				);
 	}
 }

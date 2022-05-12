@@ -112,14 +112,13 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 				"some_invalid_name"
 		) ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.indexContext( index.name() )
 						.failure(
 								"Invalid filesystem access strategy name",
 								"'some_invalid_name'",
 								"Valid names are: [auto, simple, nio, mmap]"
 						)
-						.build()
 				);
 	}
 

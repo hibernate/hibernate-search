@@ -447,16 +447,14 @@ public class IndexedBaseIT {
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedWithoutEntityMetadata.class.getName() )
 						.failure( "Unable to index type '" + IndexedWithoutEntityMetadata.class.getName()
 								+ "': this type is not an entity type."
 								+ " If you only expect subtypes to be instantiated, make this type abstract."
 								+ " If you expect this exact type to be instantiated and want it to be indexed, make it an entity type."
 								+ " Otherwise, ensure this type and its subtypes are never indexed by removing the @Indexed annotation"
-								+ " or by annotating the type with @Indexed(enabled = false)." )
-						.build()
-				);
+								+ " or by annotating the type with @Indexed(enabled = false)." ) );
 	}
 
 	@Test
@@ -486,10 +484,9 @@ public class IndexedBaseIT {
 		}
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Simulated failure" )
-						.build() );
+						.failure( "Simulated failure" ) );
 	}
 
 	@Test
