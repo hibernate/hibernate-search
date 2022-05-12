@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.reporting;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * Notes on meta-characters used here:
@@ -20,7 +24,7 @@ import java.util.function.Consumer;
  * - "[\S\s]" matches any character, including newline characters
  */
 public class FailureReportChecker implements Consumer<Throwable> {
-	private final StringBuilder patternBuilder = new StringBuilder();
+	private final List<ElementToMatch> elementsToMatch = new ArrayList<>();
 	private boolean lastPatternWasFailure = false;
 
 	FailureReportChecker() {
@@ -116,49 +120,96 @@ public class FailureReportChecker implements Consumer<Throwable> {
 
 	public FailureReportChecker contextPattern(String contextPattern) {
 		lastPatternWasFailure = false;
-		patternBuilder.append( "\n\\h+" )
-				.append( contextPattern )
-				.append( ": " );
+		elementsToMatch.add( new ElementToMatch( "\\n\\h+" + contextPattern + ": " ) );
 		return this;
 	}
 
 	public FailureReportChecker failure(String... literalStringsContainedInFailureMessageInOrder) {
 		if ( !lastPatternWasFailure ) {
-			patternBuilder.append( "\n\\h+failures: " );
+			elementsToMatch.add( new ElementToMatch( "\\n\\h+failures: " ) );
 		}
 		lastPatternWasFailure = true;
-		patternBuilder.append( "\n\\h+-\\h" );
+		elementsToMatch.add( new ElementToMatch( "\\n\\h+-\\h" ) );
 		for ( String contained : literalStringsContainedInFailureMessageInOrder ) {
-			patternBuilder.append( ".*" )
-					.append( "\\Q" ).append( contained ).append( "\\E" );
+			elementsToMatch.add( new ElementToMatch( ".*" + "\\Q" + contained + "\\E" ) );
 		}
-		patternBuilder.append( ".*" );
+		// Consume the rest of the line
+		elementsToMatch.add( new ElementToMatch( ".*" ) );
 		return this;
 	}
 
 	public FailureReportChecker multilineFailure(String... literalStringsContainedInFailureMessageInOrder) {
 		if ( !lastPatternWasFailure ) {
-			patternBuilder.append( "\n\\h+failures: " );
+			elementsToMatch.add( new ElementToMatch( "\\n\\h+failures: " ) );
 		}
 		lastPatternWasFailure = true;
-		patternBuilder.append( "\n\\h+-\\h" );
+		elementsToMatch.add( new ElementToMatch( "\\n\\h+-\\h" ) );
 		for ( String contained : literalStringsContainedInFailureMessageInOrder ) {
-			patternBuilder.append( "[\\S\\s]*" )
-					.append( "\\Q" ).append( contained ).append( "\\E" );
+			elementsToMatch.add( new ElementToMatch( "[\\S\\s]*" + "\\Q" + contained + "\\E" ) );
 		}
-		patternBuilder.append( "[\\S\\s]*" );
+		// Match the rest of the line
+		// We can't match multiple lines here, or we would run the risk of
+		// matching text meant for the following elements to match
+		elementsToMatch.add( new ElementToMatch( ".*" ) );
 		return this;
+	}
+
+	private static class ElementToMatch {
+
+		private final Pattern pattern;
+
+		ElementToMatch(String patternString) {
+			this.pattern = Pattern.compile( patternString );
+		}
+
+		int consumeFirst(String fullMessage) {
+			Matcher matcher = pattern.matcher( fullMessage );
+			if ( matcher.find() ) {
+				return matcher.end();
+			}
+			else {
+				return fail(
+						"Expected to find substring matching the following pattern:"
+								+ "\n\t%s"
+								+ "\n\nbut did not."
+								+ "\n\nFull actual message:\n\t%s",
+						pattern.pattern(),
+						fullMessage
+				);
+			}
+		}
+
+		int consumeNext(String fullMessage, int currentIndex) {
+			Matcher matcher = pattern.matcher( fullMessage );
+			if ( matcher.find( currentIndex ) && matcher.start() == currentIndex ) {
+				return matcher.end();
+			}
+			else {
+				return fail(
+						"After:\n\t[...]%s"
+								+ "\n\nExpected to find substring matching the following pattern:"
+								+ "\n\t%s"
+								+ "\n\nbut found this instead:\n\t%s[..]"
+								+ "\n\nFull actual message:\n\t%s",
+						fullMessage.substring( Math.max( 0, currentIndex - 200 ), currentIndex ),
+						pattern.pattern(),
+						fullMessage.substring( currentIndex, Math.min( fullMessage.length(), currentIndex + 100 + pattern.pattern().length() ) ),
+						fullMessage
+				);
+			}
+		}
+
 	}
 
 	@Override
 	public void accept(Throwable throwable) {
-		/*
-		 * Prepend and append "[\S\s]*" because we have to match against the entire failure report,
-		 * so we must match any characters before and after what we're looking for.
-		 */
-		String pattern = "[\\S\\s]*"
-				+ patternBuilder
-				+ "[\\S\\s]*";
-		assertThat( throwable ).hasMessageMatching( pattern );
+		String message = throwable.getMessage();
+		if ( elementsToMatch.isEmpty() ) {
+			throw new IllegalStateException( "Must add at least one element to match" );
+		}
+		int currentIndex = elementsToMatch.get( 0 ).consumeFirst( message );
+		for ( int i = 1; i < elementsToMatch.size(); i++ ) {
+			currentIndex = elementsToMatch.get( i ).consumeNext( message, currentIndex );
+		}
 	}
 }
