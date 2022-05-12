@@ -48,12 +48,11 @@ public class IndexSchemaElementFieldIT {
 				"Null field name on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -64,12 +63,11 @@ public class IndexSchemaElementFieldIT {
 				"Null field name on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -79,12 +77,11 @@ public class IndexSchemaElementFieldIT {
 				"Null object field name on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -95,12 +92,11 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid index field name 'null': field names cannot be null or empty" )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" ) );
 	}
 
 	@Test
@@ -113,12 +109,11 @@ public class IndexSchemaElementFieldIT {
 				"empty field name on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Invalid index field name '': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name '': field names cannot be null or empty" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -128,12 +123,11 @@ public class IndexSchemaElementFieldIT {
 				"empty field name on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Invalid index field name '': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name '': field names cannot be null or empty" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -143,12 +137,11 @@ public class IndexSchemaElementFieldIT {
 				"empty object field name on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Invalid index field name '': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name '': field names cannot be null or empty" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -158,12 +151,11 @@ public class IndexSchemaElementFieldIT {
 				"empty object field name on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Invalid index field name '': field names cannot be null or empty" )
-						.build() );
+						.failure( "Invalid index field name '': field names cannot be null or empty" ) );
 	}
 
 	@Test
@@ -176,7 +168,7 @@ public class IndexSchemaElementFieldIT {
 				"field name containing a dot on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
@@ -185,8 +177,7 @@ public class IndexSchemaElementFieldIT {
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
-						)
-						.build() );
+						) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -196,7 +187,7 @@ public class IndexSchemaElementFieldIT {
 				"field name containing a dot on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
@@ -205,8 +196,7 @@ public class IndexSchemaElementFieldIT {
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
-						)
-						.build() );
+						) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -216,7 +206,7 @@ public class IndexSchemaElementFieldIT {
 				"object field name containing a dot on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
@@ -225,8 +215,7 @@ public class IndexSchemaElementFieldIT {
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
-						)
-						.build() );
+						) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -236,7 +225,7 @@ public class IndexSchemaElementFieldIT {
 				"object field name containing a dot on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
@@ -245,8 +234,7 @@ public class IndexSchemaElementFieldIT {
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
-						)
-						.build() );
+						) );
 	}
 
 	@Test
@@ -260,12 +248,11 @@ public class IndexSchemaElementFieldIT {
 				"Name collision between two fields on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Duplicate index field definition: 'field1'" )
-						.build() );
+						.failure( "Duplicate index field definition: 'field1'" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -278,12 +265,11 @@ public class IndexSchemaElementFieldIT {
 				"Name collision between two fields on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "Duplicate index field definition: 'field1'" )
-						.build() );
+						.failure( "Duplicate index field definition: 'field1'" ) );
 	}
 
 	@Test
@@ -297,12 +283,11 @@ public class IndexSchemaElementFieldIT {
 				"Name collision between two object fields on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Duplicate index field definition: 'field1'" )
-						.build() );
+						.failure( "Duplicate index field definition: 'field1'" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -315,12 +300,11 @@ public class IndexSchemaElementFieldIT {
 				"Name collision between two object fields on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "Duplicate index field definition: 'field1'" )
-						.build() );
+						.failure( "Duplicate index field definition: 'field1'" ) );
 	}
 
 	@Test
@@ -334,12 +318,11 @@ public class IndexSchemaElementFieldIT {
 				"Name collision between two fields on root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Duplicate index field definition: 'field1'" )
-						.build() );
+						.failure( "Duplicate index field definition: 'field1'" ) );
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
@@ -352,12 +335,11 @@ public class IndexSchemaElementFieldIT {
 				"Name collision between two fields (object and non-object) on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "Duplicate index field definition: 'field1'" )
-						.build() );
+						.failure( "Duplicate index field definition: 'field1'" ) );
 	}
 
 	@Test
@@ -370,12 +352,11 @@ public class IndexSchemaElementFieldIT {
 				"Missing toReference() call after field()"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
-						.failure( "Incomplete field definition" )
-						.build() );
+						.failure( "Incomplete field definition" ) );
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -384,12 +365,11 @@ public class IndexSchemaElementFieldIT {
 				"Missing toReference() call after objectField()"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
-						.failure( "Incomplete field definition" )
-						.build() );
+						.failure( "Incomplete field definition" ) );
 	}
 
 	@Test
@@ -407,12 +387,11 @@ public class IndexSchemaElementFieldIT {
 				"Multiple toReference() calls after field()"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
-						.failure( "Multiple calls to toReference() for the same field definition" )
-						.build() );
+						.failure( "Multiple calls to toReference() for the same field definition" ) );
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -423,12 +402,11 @@ public class IndexSchemaElementFieldIT {
 				"Multiple toReference() calls after objectField()"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
-						.failure( "Multiple calls to toReference() for the same field definition" )
-						.build() );
+						.failure( "Multiple calls to toReference() for the same field definition" ) );
 	}
 
 	private IndexFieldTypeFinalStep<String> irrelevantTypeContributor(IndexFieldTypeFactory factoryContext) {

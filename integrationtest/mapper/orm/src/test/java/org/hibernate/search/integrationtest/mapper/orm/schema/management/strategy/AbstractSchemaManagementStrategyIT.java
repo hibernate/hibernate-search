@@ -75,10 +75,9 @@ public abstract class AbstractSchemaManagementStrategyIT {
 
 		assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity2.class.getName() )
-						.failure( "My exception" )
-						.build() );
+						.failure( "My exception" ) );
 	}
 
 	@Test
@@ -90,12 +89,11 @@ public abstract class AbstractSchemaManagementStrategyIT {
 
 		assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity1.class.getName() )
 						.failure( "My exception 1" )
 						.typeContext( IndexedEntity2.class.getName() )
-						.failure( "My exception 2" )
-						.build() );
+						.failure( "My exception 2" ) );
 	}
 
 	protected abstract SchemaManagementStrategyName getStrategyName();

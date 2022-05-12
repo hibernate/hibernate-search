@@ -133,12 +133,11 @@ public class FieldDefaultBridgeAdditionIT {
 				.withConfiguration( builder -> bridgesConfigurer.accept( builder.bridges() ) )
 				.setup( indexedType ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( indexedType.getName() )
 						.pathContext( ".property" )
 						.failure( "No default value bridge implementation for type",
-								"Use a custom bridge" )
-						.build() );
+								"Use a custom bridge" ) );
 	}
 
 	@Indexed(index = INDEX_NAME)

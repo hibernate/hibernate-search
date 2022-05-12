@@ -53,7 +53,7 @@ public class IndexSchemaElementTypeIT {
 				"Setting an analyzer on sortable field"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
@@ -66,8 +66,7 @@ public class IndexSchemaElementTypeIT {
 								"If you need an actual analyzer (with tokenization), define two separate fields:"
 										+ " one with an analyzer that is not sortable,"
 										+ " and one with a normalizer that is sortable"
-						)
-						.build() );
+						) );
 	}
 
 	@Test
@@ -86,7 +85,7 @@ public class IndexSchemaElementTypeIT {
 				"Setting an analyzer on aggregable field"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
@@ -100,8 +99,7 @@ public class IndexSchemaElementTypeIT {
 								"If you need an actual analyzer (with tokenization), define two separate fields:"
 										+ " one with an analyzer that is not aggregable,"
 										+ " and one with a normalizer that is aggregable."
-						)
-						.build() );
+						) );
 	}
 
 	@Test
@@ -120,7 +118,7 @@ public class IndexSchemaElementTypeIT {
 				"Setting an analyzer and a normalizer on the same field"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
@@ -128,8 +126,7 @@ public class IndexSchemaElementTypeIT {
 								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'",
 								"'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'",
 								"Either an analyzer or a normalizer can be assigned, but not both"
-						)
-						.build() );
+						) );
 	}
 
 	@Test
@@ -147,7 +144,7 @@ public class IndexSchemaElementTypeIT {
 				"Setting a search analyzer, without setting an analyzer on the same field"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
@@ -155,8 +152,7 @@ public class IndexSchemaElementTypeIT {
 										+ DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
 										+ " is assigned to this type, but the indexing analyzer is missing.",
 								"Assign an indexing analyzer and a search analyzer, or remove the search analyzer"
-						)
-						.build() );
+						) );
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {

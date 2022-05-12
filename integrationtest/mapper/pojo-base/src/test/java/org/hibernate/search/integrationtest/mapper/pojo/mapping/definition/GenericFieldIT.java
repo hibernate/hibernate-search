@@ -99,13 +99,11 @@ public class GenericFieldIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".value" )
 						.annotationContextAnyParameters( GenericField.class )
-						.failure( "Invalid index field name 'invalid.withdot': field names cannot contain a dot ('.')" )
-						.build()
-				);
+						.failure( "Invalid index field name 'invalid.withdot': field names cannot contain a dot ('.')" ) );
 	}
 
 	@Test
@@ -248,11 +246,10 @@ public class GenericFieldIT {
 				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".value" )
 						.failure( "Param with name 'stringBase' has not been defined for the binder." )
-						.build()
 				);
 	}
 
@@ -276,13 +273,12 @@ public class GenericFieldIT {
 				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".value" )
 						.annotationContextAnyParameters( GenericField.class )
 						.failure( "Conflicting usage of @Param annotation for parameter name: 'stringBase'. " +
 								"Can't assign both value '4' and '4'" )
-						.build()
 				);
 	}
 
@@ -340,7 +336,7 @@ public class GenericFieldIT {
 
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
@@ -351,9 +347,7 @@ public class GenericFieldIT {
 								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
 								"encountered type DSL step '",
 								"expected interface '" + StandardIndexFieldTypeOptionsStep.class.getName() + "'"
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -369,7 +363,7 @@ public class GenericFieldIT {
 
 		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".property" )
 						.failure( "Unable to infer index field type for value bridge '"
@@ -379,8 +373,7 @@ public class GenericFieldIT {
 								+ " The index field type can only be inferred automatically"
 								+ " when this type parameter is set to a raw class."
 								+ " Use a ValueBinder to set the index field type explicitly,"
-								+ " or set the type parameter F to a definite, raw type." )
-						.build() );
+								+ " or set the type parameter F to a definite, raw type." ) );
 	}
 
 	public static class ValidTypeBridge implements ValueBridge<WrappedValue, String> {

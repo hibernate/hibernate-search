@@ -144,10 +144,9 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 			// But once the bean manager is ready...
 			assertThatThrownBy( () -> extendedBeanManager.simulateBoot( DependentBean.class ) )
 					// Hibernate Search should have attempted to boot, but failed.
-					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+					.satisfies( FailureReportUtils.hasFailureReport()
 							.defaultBackendContext()
-							.failure( bootFailedException.getMessage() )
-							.build() );
+							.failure( bootFailedException.getMessage() ) );
 
 			// Hibernate Search should have started to boot, then shut down.
 			backendMock.verifyExpectationsMet();

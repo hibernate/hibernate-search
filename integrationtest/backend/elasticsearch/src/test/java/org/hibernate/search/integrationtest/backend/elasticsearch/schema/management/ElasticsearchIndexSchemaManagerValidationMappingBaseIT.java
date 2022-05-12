@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 import static org.junit.Assume.assumeTrue;
@@ -23,6 +23,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -156,9 +157,8 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 		setupAndValidateExpectingFailure(
 				index,
-				buildValidationFailureReportPattern()
+				hasValidationFailureReport()
 						.failure( "Missing type mapping" )
-						.build()
 		);
 	}
 
@@ -180,10 +180,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 		setupAndValidateExpectingFailure(
 				index,
-				buildValidationFailureReportPattern()
+				hasValidationFailureReport()
 						.indexFieldContext( "myField" )
 						.failure( "Missing property mapping" )
-						.build()
 		);
 	}
 
@@ -264,14 +263,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidateExpectingFailure( index,
-				buildValidationFailureReportPattern()
+				hasValidationFailureReport()
 						.indexFieldContext( "double" )
 								.mappingAttributeContext( "null_value" )
 										.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
 						.indexFieldContext( "float" )
 								.mappingAttributeContext( "null_value" )
 										.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
-						.build()
 		);
 	}
 
@@ -303,14 +301,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidateExpectingFailure( index,
-				buildValidationFailureReportPattern()
+				hasValidationFailureReport()
 						.indexFieldContext( "double" )
 								.mappingAttributeContext( "null_value" )
 										.failure( "Invalid value. Expected '\"BBB\"', actual is '1.9'" )
 						.indexFieldContext( "float" )
 								.mappingAttributeContext( "null_value" )
 										.failure( "Invalid value. Expected '\"AAA\"', actual is '1.9'" )
-						.build()
 		);
 	}
 
@@ -346,11 +343,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 		setupAndValidateExpectingFailure(
 				index,
-				buildValidationFailureReportPattern()
+				hasValidationFailureReport()
 						.indexFieldContext( "myObjectField.myField" )
 						.mappingAttributeContext( "index" )
 						.failure( "Invalid value. Expected 'true', actual is 'false'" )
-						.build()
 		);
 	}
 
@@ -376,7 +372,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 		setupAndValidateExpectingFailure(
 				index,
-				buildValidationFailureReportPattern()
+				hasValidationFailureReport()
 						.mappingAttributeContext( "dynamic" )
 						.failure(
 								"Invalid value. Expected 'STRICT', actual is 'FALSE'"
@@ -386,14 +382,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 						.failure(
 								"Invalid value. Expected 'keyword', actual is 'integer'"
 						)
-						.build()
 		);
 	}
 
-	private void setupAndValidateExpectingFailure(StubMappedIndex index, String failureReportRegex) {
+	private void setupAndValidateExpectingFailure(StubMappedIndex index, FailureReportUtils.FailureReportChecker failureReportChecker) {
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( failureReportRegex );
+				.satisfies( failureReportChecker );
 	}
 
 	private void setupAndValidate(StubMappedIndex index) {

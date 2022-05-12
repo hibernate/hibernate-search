@@ -117,14 +117,12 @@ public class AlternativeBinderIT {
 				.expectCustomBeans()
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "No property annotated with @Alternative(id = null).",
 								"There must be exactly one such property in order to map property 'text' to multi-alternative fields." )
 						.failure( "No property annotated with @Alternative(id = null).",
-								"There must be exactly one such property in order to map property 'title' to multi-alternative fields." )
-						.build()
-				);
+								"There must be exactly one such property in order to map property 'title' to multi-alternative fields." ) );
 	}
 
 	@Test
@@ -147,13 +145,11 @@ public class AlternativeBinderIT {
 				.expectCustomBeans()
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure( "Multiple properties annotated with @Alternative(id = null).",
 								"There must be exactly one such property in order to map property 'text' to multi-alternative fields." )
 						.failure( "Multiple properties annotated with @Alternative(id = null).",
-								"There must be exactly one such property in order to map property 'title' to multi-alternative fields." )
-						.build()
-				);
+								"There must be exactly one such property in order to map property 'title' to multi-alternative fields." ) );
 	}
 }

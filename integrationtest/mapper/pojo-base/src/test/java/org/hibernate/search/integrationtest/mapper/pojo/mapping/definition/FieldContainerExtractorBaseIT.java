@@ -124,7 +124,7 @@ public class FieldContainerExtractorBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
@@ -132,9 +132,7 @@ public class FieldContainerExtractorBaseIT {
 								+ " Check that this name matches a container extractor,"
 								+ " either a builtin one whose name is a constant in '" + BuiltinContainerExtractors.class.getName() + "'"
 								+ " or a custom one that was properly registered."
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -153,16 +151,14 @@ public class FieldContainerExtractorBaseIT {
 						.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
 								"Unable to interpret the type arguments to the ContainerExtractor interface in "
 										+ " implementation '" + RawContainerExtractor.class.getName()
 										+ "'. Only the following implementations of ContainerExtractor are valid"
-						)
-						.build()
-				);
+						) );
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -188,15 +184,13 @@ public class FieldContainerExtractorBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure( "Invalid container extractor for type '"
 								+ List.class.getName() + "<" + Integer.class.getName() + ">': '"
 								+ BuiltinContainerExtractors.MAP_VALUE
-								+ "' (implementation class: '" + MapValueExtractor.class.getName() + "')" )
-						.build()
-				);
+								+ "' (implementation class: '" + MapValueExtractor.class.getName() + "')" ) );
 	}
 
 	@Test
@@ -215,7 +209,7 @@ public class FieldContainerExtractorBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.annotationContextAnyParameters( GenericField.class )
@@ -225,7 +219,6 @@ public class FieldContainerExtractorBaseIT {
 								"Either leave 'extract' to its default value to define extractors explicitly",
 								"or leave the 'extractor' list to its default, empty value to disable extraction"
 						)
-						.build()
 				);
 	}
 }

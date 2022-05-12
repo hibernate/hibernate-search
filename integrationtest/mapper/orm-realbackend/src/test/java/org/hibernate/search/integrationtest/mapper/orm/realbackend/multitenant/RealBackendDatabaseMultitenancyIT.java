@@ -71,11 +71,10 @@ public class RealBackendDatabaseMultitenancyIT {
 				// This is necessary to correctly rethrow assumption failures (when not using H2)
 				.satisfies( AssertionAndAssumptionViolationFallThrough.get() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure( "Invalid backend configuration: " +
 								"mapping requires multi-tenancy but no multi-tenancy strategy is set" )
-						.build()
 				);
 	}
 

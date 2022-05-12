@@ -54,8 +54,8 @@ public final class FailureReportUtils {
 		};
 	}
 
-	public static FailureReportPatternBuilder buildFailureReportPattern() {
-		return new FailureReportPatternBuilder();
+	public static FailureReportChecker hasFailureReport() {
+		return new FailureReportChecker();
 	}
 
 	/*
@@ -66,102 +66,102 @@ public final class FailureReportUtils {
 	 * - "." does not match newline characters
 	 * - "[\S\s]" matches any character, including newline characters
 	 */
-	public static class FailureReportPatternBuilder {
+	public static class FailureReportChecker implements Consumer<Throwable> {
 		private final StringBuilder patternBuilder = new StringBuilder();
 		private boolean lastPatternWasFailure = false;
 
-		private FailureReportPatternBuilder() {
+		private FailureReportChecker() {
 		}
 
-		public FailureReportPatternBuilder typeContext(String exactTypeName) {
+		public FailureReportChecker typeContext(String exactTypeName) {
 			return contextLiteral( "type '" + exactTypeName + "'" );
 		}
 
-		public FailureReportPatternBuilder indexContext(String exactIndexName) {
+		public FailureReportChecker indexContext(String exactIndexName) {
 			return contextLiteral( "index '" + exactIndexName + "'" );
 		}
 
-		public FailureReportPatternBuilder indexSchemaRootContext() {
+		public FailureReportChecker indexSchemaRootContext() {
 			return contextLiteral( "index schema root" );
 		}
 
-		public FailureReportPatternBuilder defaultBackendContext() {
+		public FailureReportChecker defaultBackendContext() {
 			return contextLiteral( "default backend" );
 		}
 
-		public FailureReportPatternBuilder backendContext(String exactBackendName) {
+		public FailureReportChecker backendContext(String exactBackendName) {
 			return contextLiteral( "backend '" + exactBackendName + "'" );
 		}
 
-		public FailureReportPatternBuilder pathContext(String pathPattern) {
+		public FailureReportChecker pathContext(String pathPattern) {
 			return contextLiteral( "path '" + pathPattern + "'" );
 		}
 
-		public FailureReportPatternBuilder indexFieldContext(String exactPath) {
+		public FailureReportChecker indexFieldContext(String exactPath) {
 			return contextLiteral( "field '" + exactPath + "'" );
 		}
 
-		public FailureReportPatternBuilder mappingAttributeContext(String exactName) {
+		public FailureReportChecker mappingAttributeContext(String exactName) {
 			return contextLiteral( "attribute '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder indexFieldTemplateContext(String exactPath) {
+		public FailureReportChecker indexFieldTemplateContext(String exactPath) {
 			return contextLiteral( "field template '" + exactPath + "'" );
 		}
 
-		public FailureReportPatternBuilder fieldTemplateAttributeContext(String exactPath) {
+		public FailureReportChecker fieldTemplateAttributeContext(String exactPath) {
 			return contextLiteral( "attribute '" + exactPath + "'" );
 		}
 
-		public FailureReportPatternBuilder analyzerContext(String exactName) {
+		public FailureReportChecker analyzerContext(String exactName) {
 			return contextLiteral( "analyzer '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder normalizerContext(String exactName) {
+		public FailureReportChecker normalizerContext(String exactName) {
 			return contextLiteral( "normalizer '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder charFilterContext(String exactName) {
+		public FailureReportChecker charFilterContext(String exactName) {
 			return contextLiteral( "char filter '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder tokenizerContext(String exactName) {
+		public FailureReportChecker tokenizerContext(String exactName) {
 			return contextLiteral( "tokenizer '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder tokenFilterContext(String exactName) {
+		public FailureReportChecker tokenFilterContext(String exactName) {
 			return contextLiteral( "token filter '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder analysisDefinitionParameterContext(String exactName) {
+		public FailureReportChecker analysisDefinitionParameterContext(String exactName) {
 			return contextLiteral( "parameter '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder aliasContext(String exactName) {
+		public FailureReportChecker aliasContext(String exactName) {
 			return contextLiteral( "alias '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder aliasAttributeContext(String exactName) {
+		public FailureReportChecker aliasAttributeContext(String exactName) {
 			return contextLiteral( "attribute '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder indexSettingsCustomAttributeContext(String exactName) {
+		public FailureReportChecker indexSettingsCustomAttributeContext(String exactName) {
 			return contextLiteral( "attribute '" + exactName + "'" );
 		}
 
-		public FailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
+		public FailureReportChecker annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
 			return contextPattern( "annotation '@\\Q" + annotationType.getName() + "\\E\\(.*'" );
 		}
 
-		public FailureReportPatternBuilder annotationTypeContext(Class<? extends Annotation> annotationType) {
+		public FailureReportChecker annotationTypeContext(Class<? extends Annotation> annotationType) {
 			return contextLiteral( "annotation type '@" + annotationType.getName() + "'" );
 		}
 
-		public FailureReportPatternBuilder contextLiteral(String contextLiteral) {
+		public FailureReportChecker contextLiteral(String contextLiteral) {
 			return contextPattern( "\\Q" + contextLiteral + "\\E" );
 		}
 
-		public FailureReportPatternBuilder contextPattern(String contextPattern) {
+		public FailureReportChecker contextPattern(String contextPattern) {
 			lastPatternWasFailure = false;
 			patternBuilder.append( "\n\\h+" )
 					.append( contextPattern )
@@ -169,7 +169,7 @@ public final class FailureReportUtils {
 			return this;
 		}
 
-		public FailureReportPatternBuilder failure(String ... literalStringsContainedInFailureMessageInOrder) {
+		public FailureReportChecker failure(String ... literalStringsContainedInFailureMessageInOrder) {
 			if ( !lastPatternWasFailure ) {
 				patternBuilder.append( "\n\\h+failures: " );
 			}
@@ -183,7 +183,7 @@ public final class FailureReportUtils {
 			return this;
 		}
 
-		public FailureReportPatternBuilder multilineFailure(String ... literalStringsContainedInFailureMessageInOrder) {
+		public FailureReportChecker multilineFailure(String ... literalStringsContainedInFailureMessageInOrder) {
 			if ( !lastPatternWasFailure ) {
 				patternBuilder.append( "\n\\h+failures: " );
 			}
@@ -197,14 +197,16 @@ public final class FailureReportUtils {
 			return this;
 		}
 
-		public String build() {
+		@Override
+		public void accept(Throwable throwable) {
 			/*
 			 * Prepend and append "[\S\s]*" because we have to match against the entire failure report,
 			 * so we must match any characters before and after what we're looking for.
 			 */
-			return "[\\S\\s]*"
-					+ patternBuilder.toString()
+			String pattern = "[\\S\\s]*"
+					+ patternBuilder
 					+ "[\\S\\s]*";
+			assertThat( throwable ).hasMessageMatching( pattern );
 		}
 	}
 
