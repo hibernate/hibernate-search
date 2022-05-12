@@ -94,11 +94,10 @@ public class TypeBindingBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.annotationContextAnyParameters( TypeBinding.class )
 						.failure( "Empty binder reference." )
-						.build()
 				);
 	}
 }

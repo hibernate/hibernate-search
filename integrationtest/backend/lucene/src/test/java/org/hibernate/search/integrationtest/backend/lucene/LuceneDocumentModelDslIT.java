@@ -37,11 +37,10 @@ public class LuceneDocumentModelDslIT {
 				"Referencing an unknown analyzer"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
-						.failure( "Unknown analyzer" )
-						.build() );
+						.failure( "Unknown analyzer" ) );
 	}
 
 	@Test
@@ -54,11 +53,10 @@ public class LuceneDocumentModelDslIT {
 				"Referencing an unknown analyzer"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
-						.failure( "Unknown normalizer" )
-						.build() );
+						.failure( "Unknown normalizer" ) );
 	}
 
 	@Test
@@ -72,11 +70,10 @@ public class LuceneDocumentModelDslIT {
 				"Referencing an unknown search analyzer"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
-						.failure( "Unknown analyzer" )
-						.build() );
+						.failure( "Unknown analyzer" ) );
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {

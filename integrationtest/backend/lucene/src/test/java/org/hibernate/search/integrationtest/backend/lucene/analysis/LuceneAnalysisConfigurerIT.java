@@ -37,7 +37,7 @@ public class LuceneAnalysisConfigurerIT {
 				() -> setup( "foobar" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -45,7 +45,6 @@ public class LuceneAnalysisConfigurerIT {
 										+ LuceneBackendSettings.ANALYSIS_CONFIGURER + "': 'foobar'",
 								"Unable to load class 'foobar'"
 						)
-						.build()
 				);
 	}
 
@@ -55,13 +54,12 @@ public class LuceneAnalysisConfigurerIT {
 				() -> setup( FailingConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								FailingConfigurer.FAILURE_MESSAGE
 						)
-						.build()
 				);
 	}
 
@@ -85,7 +83,7 @@ public class LuceneAnalysisConfigurerIT {
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
@@ -93,7 +91,6 @@ public class LuceneAnalysisConfigurerIT {
 								"'value1'",
 								"'value2'"
 						)
-						.build()
 				);
 	}
 

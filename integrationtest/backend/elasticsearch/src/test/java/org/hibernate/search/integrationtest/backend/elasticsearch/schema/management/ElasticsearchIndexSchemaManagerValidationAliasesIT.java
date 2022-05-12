@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleAliasDefinition;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
@@ -99,11 +99,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						buildValidationFailureReportPattern()
+				.satisfies(
+						hasValidationFailureReport()
 								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.failure( "Missing alias" )
-								.build()
 				);
 	}
 
@@ -122,12 +121,11 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						buildValidationFailureReportPattern()
+				.satisfies(
+						hasValidationFailureReport()
 								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.aliasAttributeContext( "filter" )
 								.failure( "Invalid value. Expected 'null', actual is '{\"term\":{\"user_id\":12}}'" )
-								.build()
 				);
 	}
 
@@ -144,12 +142,11 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						buildValidationFailureReportPattern()
+				.satisfies(
+						hasValidationFailureReport()
 								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.aliasAttributeContext( "is_write_index" )
 								.failure( "Invalid value. Expected 'true', actual is 'false'" )
-								.build()
 				);
 	}
 
@@ -163,11 +160,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						buildValidationFailureReportPattern()
+				.satisfies(
+						hasValidationFailureReport()
 								.aliasContext( defaultReadAlias( index.name() ).original )
 								.failure( "Missing alias" )
-								.build()
 				);
 	}
 
@@ -183,12 +179,11 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						buildValidationFailureReportPattern()
+				.satisfies(
+						hasValidationFailureReport()
 								.aliasContext( defaultReadAlias( index.name() ).original )
 								.aliasAttributeContext( "filter" )
 								.failure( "Invalid value. Expected 'null', actual is '{\"term\":{\"user_id\":12}}'" )
-								.build()
 				);
 	}
 
