@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 
 import org.junit.Test;
 
