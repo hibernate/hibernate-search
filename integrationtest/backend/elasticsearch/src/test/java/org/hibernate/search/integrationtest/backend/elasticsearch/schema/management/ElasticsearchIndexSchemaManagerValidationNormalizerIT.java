@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -118,7 +118,7 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 		);
 	}
 
-	private void setupAndValidateExpectingFailure(FailureReportUtils.FailureReportChecker failureReportChecker) {
+	private void setupAndValidateExpectingFailure(FailureReportChecker failureReportChecker) {
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.satisfies( failureReportChecker );
