@@ -278,10 +278,9 @@ public abstract class AbstractMassIndexingFailureIT {
 						.dropAndCreateSchemaOnStart( true ),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.satisfies( FailureReportUtils.hasFailureReport()
 								.typeContext( Book.class.getName() )
-								.failure( exceptionMessage )
-								.build() ),
+								.failure( exceptionMessage ) ),
 				expectSchemaManagementWorkException( StubSchemaManagementWork.Type.DROP_AND_CREATE )
 		);
 

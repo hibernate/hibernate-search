@@ -109,10 +109,9 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 			assertThatThrownBy( () -> execute( manager ) )
 					.isInstanceOf( SearchException.class )
-					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+					.satisfies( FailureReportUtils.hasFailureReport()
 							.typeContext( IndexedEntity2.class.getName() )
-							.failure( "My exception" )
-							.build() );
+							.failure( "My exception" ) );
 		}
 	}
 
@@ -130,12 +129,11 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 
 			assertThatThrownBy( () -> execute( manager ) )
 					.isInstanceOf( SearchException.class )
-					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+					.satisfies( FailureReportUtils.hasFailureReport()
 							.typeContext( IndexedEntity1.class.getName() )
 							.failure( "My exception 1" )
 							.typeContext( IndexedEntity2.class.getName() )
-							.failure( "My exception 2" )
-							.build() );
+							.failure( "My exception 2" ) );
 		}
 	}
 

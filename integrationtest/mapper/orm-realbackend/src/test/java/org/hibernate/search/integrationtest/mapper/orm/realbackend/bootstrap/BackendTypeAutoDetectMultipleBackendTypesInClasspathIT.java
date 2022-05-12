@@ -60,14 +60,13 @@ public class BackendTypeAutoDetectMultipleBackendTypesInClasspathIT {
 				.withBackendProperty( "type", null )
 				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.defaultBackendContext()
 						.failure( "Ambiguous backend type",
 								"configuration property 'hibernate.search.backend.type' is not set,"
 										+ " and multiple backend types are present in the classpath",
 								"Set property 'hibernate.search.backend.type' to one of the following"
-										+ " to select the backend type: [elasticsearch, lucene]" )
-						.build() );
+										+ " to select the backend type: [elasticsearch, lucene]" ) );
 	}
 
 	@Test

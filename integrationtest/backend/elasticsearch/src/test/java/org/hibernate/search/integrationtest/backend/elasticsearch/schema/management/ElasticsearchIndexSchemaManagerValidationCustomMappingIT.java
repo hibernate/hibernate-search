@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 
 import java.util.EnumSet;
 
@@ -111,11 +111,10 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( buildValidationFailureReportPattern()
+				.satisfies( hasValidationFailureReport()
 						.mappingAttributeContext( "_source" )
 						// "_source" enabled is the default, so it is not presented by ES
-						.failure( "Custom index mapping attribute missing" )
-						.build() );
+						.failure( "Custom index mapping attribute missing" ) );
 	}
 
 	@Test
@@ -144,10 +143,9 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( buildValidationFailureReportPattern()
+				.satisfies( hasValidationFailureReport()
 						.mappingAttributeContext( "_source" )
-						.failure( "Custom index mapping attribute missing" )
-						.build() );
+						.failure( "Custom index mapping attribute missing" ) );
 	}
 
 	@Test
@@ -178,7 +176,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( buildValidationFailureReportPattern()
+				.satisfies( hasValidationFailureReport()
 						.indexFieldContext( "userField" )
 						.mappingAttributeContext( "type" )
 						.failure( "Invalid value. Expected 'keyword', actual is 'integer'" )
@@ -187,8 +185,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						.mappingAttributeContext( "norms" )
 						.failure( "Invalid value. Expected 'true', actual is 'null'" )
 						.mappingAttributeContext( "doc_values" )
-						.failure( "Invalid value. Expected 'true', actual is 'false'" )
-						.build() );
+						.failure( "Invalid value. Expected 'true', actual is 'false'" ) );
 	}
 
 	@Test
@@ -214,10 +211,9 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 
 		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( buildValidationFailureReportPattern()
+				.satisfies( hasValidationFailureReport()
 						.indexFieldContext( "userField" )
-						.failure( "Missing property mapping" )
-						.build() );
+						.failure( "Missing property mapping" ) );
 	}
 
 	private void setupAndValidate(String customMappingFile) {
