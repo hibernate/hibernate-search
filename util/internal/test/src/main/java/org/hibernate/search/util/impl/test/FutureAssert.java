@@ -133,7 +133,7 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			failWithCauseAndMessage( e, "future <%s> should have failed, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
-			return new ThrowableAssert( e.getCause() )
+			return new ThrowableAssert<>( e.getCause() )
 					.as( "failure reported by future <%s>", actual );
 		}
 		throw new IllegalStateException( "We should never reach this line" );
