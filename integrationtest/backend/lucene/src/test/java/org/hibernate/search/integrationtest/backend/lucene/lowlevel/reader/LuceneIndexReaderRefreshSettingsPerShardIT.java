@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.lucene.sharding.AbstractSettingsPerShardIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -53,7 +52,6 @@ public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettings
 		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);

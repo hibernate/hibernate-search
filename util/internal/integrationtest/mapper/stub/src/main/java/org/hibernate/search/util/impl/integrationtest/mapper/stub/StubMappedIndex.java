@@ -52,10 +52,15 @@ public abstract class StubMappedIndex {
 	private String typeName;
 	private String backendName;
 	private MappedIndexManager manager;
+	private StubMapping mapping;
 
 	public StubMappedIndex() {
 		this.indexName = "indexName";
 		this.typeName = null;
+	}
+
+	public StubMapping mapping() {
+		return mapping;
 	}
 
 	public final String name() {
@@ -107,22 +112,26 @@ public abstract class StubMappedIndex {
 	}
 
 	public BulkIndexer bulkIndexer() {
-		return bulkIndexer( new StubBackendSessionContext(), true );
+		return bulkIndexer( mapping.session(), true );
 	}
 
 	public BulkIndexer bulkIndexer(boolean refresh) {
-		return bulkIndexer( new StubBackendSessionContext(), refresh );
+		return bulkIndexer( mapping.session(), refresh );
 	}
 
-	public BulkIndexer bulkIndexer(StubBackendSessionContext sessionContext, boolean refresh) {
+	public BulkIndexer bulkIndexer(StubSession sessionContext, boolean refresh) {
 		return new BulkIndexer( delegate(), sessionContext, refresh );
 	}
 
 	public IndexIndexingPlan createIndexingPlan() {
-		return createIndexingPlan( new StubBackendSessionContext() );
+		return createIndexingPlan( mapping.session() );
 	}
 
-	public IndexIndexingPlan createIndexingPlan(StubBackendSessionContext sessionContext) {
+	public IndexIndexingPlan createIndexingPlan(String tenantId) {
+		return createIndexingPlan( mapping.session( tenantId ) );
+	}
+
+	public IndexIndexingPlan createIndexingPlan(StubSession sessionContext) {
 		/*
 		 * Use the same defaults as in the ORM mapper for the commit strategy,
 		 * but force refreshes because it's more convenient for tests.
@@ -131,26 +140,35 @@ public abstract class StubMappedIndex {
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
-	public IndexIndexingPlan createIndexingPlan(StubBackendSessionContext sessionContext,
+	public IndexIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return delegate().createIndexingPlan( mapping.session(),
+				commitStrategy, refreshStrategy );
+	}
+
+	public IndexIndexingPlan createIndexingPlan(StubSession sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return delegate().createIndexingPlan( sessionContext,
 				commitStrategy, refreshStrategy );
 	}
 
 	public IndexIndexer createIndexer() {
-		return createIndexer( new StubBackendSessionContext() );
+		return createIndexer( mapping.session() );
 	}
 
-	public IndexIndexer createIndexer(StubBackendSessionContext sessionContext) {
+	public IndexIndexer createIndexer(StubSession sessionContext) {
 		return delegate().createIndexer( sessionContext );
 	}
 
 	public IndexWorkspace createWorkspace() {
-		return createWorkspace( new StubBackendSessionContext() );
+		return createWorkspace( mapping.session() );
 	}
 
-	public IndexWorkspace createWorkspace(StubBackendSessionContext sessionContext) {
+	public IndexWorkspace createWorkspace(StubSession sessionContext) {
 		return createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
+	}
+
+	public IndexWorkspace createWorkspace(String tenantId) {
+		return createWorkspace( DetachedBackendSessionContext.of( mapping.session( tenantId ) ) );
 	}
 
 	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
@@ -169,8 +187,8 @@ public abstract class StubMappedIndex {
 	 */
 	public StubMappingScope createScope() {
 		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
-				delegate().createScopeBuilder( new StubBackendMappingContext() );
-		return new StubMappingScope( builder.build() );
+				delegate().createScopeBuilder( mapping );
+		return new StubMappingScope( mapping, builder.build() );
 	}
 
 	/**
@@ -178,29 +196,32 @@ public abstract class StubMappedIndex {
 	 */
 	public StubMappingScope createScope(StubMappedIndex... others) {
 		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
-				delegate().createScopeBuilder( new StubBackendMappingContext() );
+				delegate().createScopeBuilder( mapping );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
 		}
-		return new StubMappingScope( builder.build() );
+		return new StubMappingScope( mapping, builder.build() );
 	}
 
 	/**
 	 * @return A scope containing this index and the given other indexes.
 	 */
 	public <R, E> GenericStubMappingScope<R, E> createGenericScope(StubMappedIndex... others) {
-		MappedIndexScopeBuilder<R, E> builder =
-				delegate().createScopeBuilder( new StubBackendMappingContext() );
+		MappedIndexScopeBuilder<R, E> builder = delegate().createScopeBuilder( mapping );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
 		}
-		return new GenericStubMappingScope<>( builder.build() );
+		return new GenericStubMappingScope<>( mapping, builder.build() );
 	}
 
 	protected abstract void bind(IndexedEntityBindingContext context);
 
 	protected void onIndexManagerCreated(MappedIndexManager manager) {
 		this.manager = manager;
+	}
+
+	protected void onMappingCreated(StubMapping mapping) {
+		this.mapping = mapping;
 	}
 
 	protected MappedIndexManager delegate() {

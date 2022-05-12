@@ -43,7 +43,7 @@ public class BulkIndexer {
 	private final List<IndexingQueue> indexingQueues;
 	private int currentQueueIndex;
 
-	BulkIndexer(MappedIndexManager indexManager, StubBackendSessionContext sessionContext, boolean refresh) {
+	BulkIndexer(MappedIndexManager indexManager, StubSession sessionContext, boolean refresh) {
 		this.indexManager = indexManager;
 		this.sessionContext = DetachedBackendSessionContext.of( sessionContext );
 		this.indexer = indexManager.createIndexer( sessionContext );

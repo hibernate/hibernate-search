@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -84,8 +83,8 @@ public class LuceneSimilarityIT {
 				.hasTotalHitCount( 1L );
 	}
 
-	private SearchIntegration setup(Similarity similarity) {
-		return setupHelper.start()
+	private void setup(Similarity similarity) {
+		setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty(
 						LuceneBackendSettings.ANALYSIS_CONFIGURER,

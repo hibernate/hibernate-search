@@ -38,6 +38,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImpl;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -57,7 +59,7 @@ public class SearchSetupHelper implements TestRule {
 
 	private final List<SearchIntegrationEnvironment> environments = new ArrayList<>();
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
-	private final List<SearchIntegration> integrations = new ArrayList<>();
+	private final List<StubMappingImpl> mappings = new ArrayList<>();
 	private TckBackendAccessor backendAccessor;
 
 	public SearchSetupHelper() {
@@ -137,8 +139,8 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	private void cleanUp(Closer<IOException> closer) {
-		closer.pushAll( SearchIntegration::close, integrations );
-		integrations.clear();
+		closer.pushAll( StubMappingImpl::close, mappings );
+		mappings.clear();
 		closer.pushAll( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
 		integrationPartialBuildStates.clear();
 		closer.pushAll( SearchIntegrationEnvironment::close, environments );
@@ -232,15 +234,15 @@ public class SearchSetupHelper implements TestRule {
 			return setupFirstPhaseOnly( Optional.empty() );
 		}
 
-		public PartialSetup setupFirstPhaseOnly(Optional<SearchIntegration> previousIntegration) {
+		public PartialSetup setupFirstPhaseOnly(Optional<StubMapping> previousMapping) {
 			SearchIntegrationEnvironment environment =
 					SearchIntegrationEnvironment.builder( propertySource, unusedPropertyChecker )
 							.beanProvider( beanProvider )
 							.build();
 			environments.add( environment );
 
-			SearchIntegration.Builder integrationBuilder = (previousIntegration.isPresent()) ?
-					previousIntegration.get().restartBuilder( environment ) :
+			SearchIntegration.Builder integrationBuilder = (previousMapping.isPresent()) ?
+					previousMapping.get().integration().restartBuilder( environment ) :
 					SearchIntegration.builder( environment );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
@@ -254,36 +256,37 @@ public class SearchSetupHelper implements TestRule {
 			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
 						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ), unusedPropertyChecker );
-				finalizer.finalizeMapping(
+				StubMappingImpl mapping = finalizer.finalizeMapping(
 						mappingKey,
 						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
 				);
+				mappings.add( mapping );
 
 				SearchIntegration integration = finalizer.finalizeIntegration();
-				integrations.add( integration );
+				mapping.setIntegration( integration );
 				integrationPartialBuildStates.remove( integrationPartialBuildState );
 
-				return integration;
+				return mapping;
 			};
 		}
 
-		public SearchIntegration setup() {
+		public StubMapping setup() {
 			return setupFirstPhaseOnly().doSecondPhase();
 		}
 
-		public SearchIntegration setup(SearchIntegration previousIntegration) {
-			return setupFirstPhaseOnly( Optional.of( previousIntegration ) ).doSecondPhase();
+		public StubMapping setup(StubMapping previousMapping) {
+			return setupFirstPhaseOnly( Optional.of( previousMapping ) ).doSecondPhase();
 		}
 
 	}
 
 	public interface PartialSetup {
 
-		default SearchIntegration doSecondPhase() {
+		default StubMapping doSecondPhase() {
 			return doSecondPhase( ConfigurationPropertySource.empty() );
 		}
 
-		SearchIntegration doSecondPhase(ConfigurationPropertySource overrides);
+		StubMapping doSecondPhase(ConfigurationPropertySource overrides);
 
 	}
 }

@@ -15,11 +15,11 @@ import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Rule;
@@ -39,7 +39,7 @@ public abstract class AbstractDirectoryIT {
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	protected SearchIntegration searchIntegration;
+	protected StubMapping mapping;
 
 	protected final void checkIndexingAndQuerying() {
 		IndexIndexingPlan plan = index.createIndexingPlan();
@@ -67,7 +67,7 @@ public abstract class AbstractDirectoryIT {
 
 	protected final void setup(Object directoryType,
 			Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
-		searchIntegration = additionalConfiguration.apply(
+		mapping = additionalConfiguration.apply(
 				setupHelper.start()
 						.withIndex( index )
 						.withBackendProperty(

@@ -37,7 +37,7 @@ public class LuceneBackendIT {
 	public static void setup() {
 		SearchIntegration integration = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
-				.setup();
+				.setup().integration();
 		backend = integration.backend().unwrap( LuceneBackend.class );
 	}
 

@@ -21,7 +21,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -29,6 +28,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -88,7 +88,7 @@ public class FieldTemplateIT {
 				step.multiValued();
 			}
 		};
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -109,7 +109,7 @@ public class FieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		assertThatQuery( query(
@@ -134,7 +134,7 @@ public class FieldTemplateIT {
 			}
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -159,7 +159,7 @@ public class FieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		assertThatQuery( query(
@@ -193,7 +193,7 @@ public class FieldTemplateIT {
 			}
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -220,7 +220,7 @@ public class FieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		assertThatQuery( query(
@@ -279,7 +279,7 @@ public class FieldTemplateIT {
 		}
 	}
 
-	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
+	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> templatesBinder) {
 		this.index = SimpleMappedIndex.of( root -> new IndexBinding( root, templatesBinder ) );
 

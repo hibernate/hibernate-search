@@ -22,23 +22,30 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
  */
 public class GenericStubMappingScope<R, E> {
 
+	private final StubMapping mapping;
 	private final MappedIndexScope<R, E> delegate;
 
-	GenericStubMappingScope(MappedIndexScope<R, E> delegate) {
+	GenericStubMappingScope(StubMapping mapping, MappedIndexScope<R, E> delegate) {
+		this.mapping = mapping;
 		this.delegate = delegate;
 	}
 
 	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(
 			SearchLoadingContext<R, E> loadingContext) {
-		return query( new StubBackendSessionContext(), loadingContext );
+		return query( mapping.session(), loadingContext );
 	}
 
-	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubBackendSessionContext sessionContext,
+	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubSession sessionContext,
 			SearchLoadingContext<R, E> loadingContext) {
 		return query( sessionContext, loadingContext, new StubLoadingOptionsStep() );
 	}
 
-	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubBackendSessionContext sessionContext,
+	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(
+			SearchLoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
+		return query( mapping.session(), loadingContext, loadingOptionsStep );
+	}
+
+	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubSession sessionContext,
 			SearchLoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
 		SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder = new SearchLoadingContextBuilder<R, E, LOS>() {
 			@Override

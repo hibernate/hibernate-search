@@ -19,8 +19,9 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -42,15 +43,16 @@ public class IndexWorkspaceIT {
 	@Rule
 	public SearchSetupHelper multiTenancySetupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
-	private final StubBackendSessionContext noTenantSessionContext = new StubBackendSessionContext();
-	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
-	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
-
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+
+	@Before
+	public void initSessionContexts() {
+	}
 
 	@Test
 	public void runMergeSegmentsPurgeAndFlushAndRefreshInSequence() {
 		setupHelper.start().withIndex( index ).setup();
+		StubSession noTenantSessionContext = index.mapping().session();
 
 		// Do not provide a tenant
 		IndexWorkspace workspace = index.createWorkspace();
@@ -73,6 +75,8 @@ public class IndexWorkspaceIT {
 	@Test
 	public void runMergeSegmentsPurgeAndFlushAndRefreshWithMultiTenancy() {
 		multiTenancySetupHelper.start().withIndex( index ).withMultiTenancy().setup();
+		StubSession tenant1SessionContext = index.mapping().session( TENANT_1 );
+		StubSession tenant2SessionContext = index.mapping().session( TENANT_2 );
 
 		// Do provide a tenant ID
 		IndexWorkspace workspace = index.createWorkspace( tenant1SessionContext );
@@ -97,7 +101,7 @@ public class IndexWorkspaceIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 	}
 
-	private void createBookIndexes(StubBackendSessionContext sessionContext) {
+	private void createBookIndexes(StubSession sessionContext) {
 		index.bulkIndexer( sessionContext, false ) // No refresh
 				.add( NUMBER_OF_BOOKS, i -> documentProvider(
 						String.valueOf( i ),
@@ -106,7 +110,7 @@ public class IndexWorkspaceIT {
 				.join();
 	}
 
-	private void assertBookNumberIsEqualsTo(long bookNumber, StubBackendSessionContext sessionContext) {
+	private void assertBookNumberIsEqualsTo(long bookNumber, StubSession sessionContext) {
 		SearchQuery<DocumentReference> query = index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();

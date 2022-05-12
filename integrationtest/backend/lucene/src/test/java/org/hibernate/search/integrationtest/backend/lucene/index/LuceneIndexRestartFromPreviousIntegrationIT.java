@@ -14,10 +14,10 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class LuceneIndexRestartFromPreviousIntegrationIT {
 
 	@Test
 	public void addNewFieldOnExistingIndex() {
-		SearchIntegration integrationV1 = setupHelper.start()
+		StubMapping mappingV1 = setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY )
 				.withIndex( indexV1 )
 				.withBackendProperty( LuceneIndexSettings.DIRECTORY_TYPE, directoryType )
@@ -63,7 +63,7 @@ public class LuceneIndexRestartFromPreviousIntegrationIT {
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndex( indexV2 )
 				.withBackendProperty( LuceneIndexSettings.DIRECTORY_TYPE, directoryType )
-				.setup( integrationV1 );
+				.setup( mappingV1 );
 
 		BulkIndexer indexer2 = indexV2.bulkIndexer();
 		indexer2.add( "2", doc -> {

@@ -6,91 +6,18 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 
-import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.impl.Futures;
-
-public class StubMapping implements MappingImplementor<StubMapping> {
-
-	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
-
-	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
-
-	StubMapping(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
-			StubMappingSchemaManagementStrategy schemaManagementStrategy) {
-		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
-		this.schemaManagementStrategy = schemaManagementStrategy;
-	}
+public interface StubMapping extends AutoCloseable, BackendMappingContext {
 
 	@Override
-	public StubMapping toConcreteType() {
-		return this;
-	}
+	void close();
 
-	@Override
-	public CompletableFuture<?> start(MappingStartContext context) {
-		switch ( schemaManagementStrategy ) {
-			case DROP_AND_CREATE_AND_DROP:
-			case DROP_AND_CREATE_ON_STARTUP_ONLY:
-				return doSchemaManagementOperation(
-						IndexSchemaManager::dropAndCreate,
-						context.failureCollector()
-				);
-			case DROP_ON_SHUTDOWN_ONLY:
-			case NONE:
-			default:
-				// Nothing to do
-				return CompletableFuture.completedFuture( null );
-		}
-	}
+	SearchIntegration integration();
 
-	@Override
-	public CompletableFuture<?> preStop(MappingPreStopContext context) {
-		switch ( schemaManagementStrategy ) {
-			case DROP_AND_CREATE_AND_DROP:
-			case DROP_ON_SHUTDOWN_ONLY:
-				return doSchemaManagementOperation(
-						IndexSchemaManager::dropIfExisting,
-						context.failureCollector()
-				);
-			case DROP_AND_CREATE_ON_STARTUP_ONLY:
-			case NONE:
-			default:
-				// Nothing to do
-				return CompletableFuture.completedFuture( null );
-		}
-	}
+	StubSession session();
 
-	@Override
-	public void stop() {
-		// Nothing to do
-	}
+	StubSession session(String tenantId);
 
-	private CompletableFuture<?> doSchemaManagementOperation(
-			Function<IndexSchemaManager, CompletableFuture<?>> operation,
-			ContextualFailureCollector failureCollector) {
-		CompletableFuture<?>[] futures = new CompletableFuture<?>[mappedIndexesByTypeIdentifier.size()];
-		int typeCounter = 0;
-
-		for ( Map.Entry<String, StubMappedIndex> entry : mappedIndexesByTypeIdentifier.entrySet() ) {
-			IndexSchemaManager delegate = entry.getValue().schemaManager();
-			ContextualFailureCollector typeFailureCollector =
-					failureCollector.withContext( EventContexts.fromType( entry.getKey() ) );
-			futures[typeCounter++] = operation.apply( delegate )
-					.exceptionally( Futures.handler( e -> {
-						typeFailureCollector.add( e );
-						return null;
-					} ) );
-		}
-
-		return CompletableFuture.allOf( futures );
-	}
 }

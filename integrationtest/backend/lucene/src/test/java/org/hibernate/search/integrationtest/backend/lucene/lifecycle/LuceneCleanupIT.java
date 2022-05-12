@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
@@ -31,7 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.directory.OpenResourceTracker;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.directory.TrackingDirectoryProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,7 +70,7 @@ public class LuceneCleanupIT {
 	@Test
 	public void test() {
 		OpenResourceTracker tracker = new OpenResourceTracker();
-		SearchIntegration integration = setup( tracker );
+		StubMapping mapping = setup( tracker );
 
 		// Execute a few operations to be sure that we open files
 		doQuery();
@@ -82,7 +81,7 @@ public class LuceneCleanupIT {
 
 		assertThat( tracker.openResources() ).isNotEmpty();
 
-		integration.close();
+		mapping.close();
 
 		assertThat( tracker.openResources() ).isEmpty();
 	}
@@ -108,7 +107,6 @@ public class LuceneCleanupIT {
 
 	private void doStore(int ... ids) {
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				// Let the commit/refresh intervals do their job
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		);
@@ -125,7 +123,7 @@ public class LuceneCleanupIT {
 		plan.execute().join();
 	}
 
-	private SearchIntegration setup(OpenResourceTracker tracker) {
+	private StubMapping setup(OpenResourceTracker tracker) {
 		return setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )

@@ -48,7 +48,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		checkIndexingAndQuerying();
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_GET_COUNTER_KEY ) ).isGreaterThan( 1 );
 
-		searchIntegration.close();
+		mapping.close();
 
 		assertThat( staticCounters.get( CustomDirectoryProvider.CONSTRUCTOR_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CREATE_DIRECTORY_COUNTER_KEY ) ).isEqualTo( 1 );
