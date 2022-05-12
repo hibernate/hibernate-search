@@ -23,7 +23,6 @@ import org.hibernate.search.integrationtest.performance.backend.base.testsupport
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.MappedIndex;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.PerThreadIndexPartition;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -116,11 +115,10 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 	@Benchmark
 	@Threads(10 * AbstractBackendHolder.INDEX_COUNT)
 	public void indexingPlan(WriteCounters counters) {
-		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 		PerThreadIndexPartition partition = getIndexPartition();
 		MappedIndex index = partition.getIndex();
 		IndexIndexingPlan indexingPlan =
-				index.createIndexingPlan( sessionContext, getCommitStrategyParam(), refreshStrategy );
+				index.createIndexingPlan( getCommitStrategyParam(), refreshStrategy );
 
 		for ( Long documentIdInThread : idsToAdd ) {
 			long documentId = partition.toDocumentId( documentIdInThread );

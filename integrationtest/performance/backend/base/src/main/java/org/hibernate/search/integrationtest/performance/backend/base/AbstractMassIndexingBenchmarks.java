@@ -16,7 +16,6 @@ import org.hibernate.search.integrationtest.performance.backend.base.testsupport
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.MappedIndex;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -57,8 +56,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 	@Setup(Level.Iteration)
 	public void prepareIteration(DatasetHolder datasetHolder) {
 		index = getIndexPartition().getIndex();
-		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
-		indexer = index.createIndexer( sessionContext );
+		indexer = index.createIndexer();
 		dataset = datasetHolder.getDataset();
 	}
 

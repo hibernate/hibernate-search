@@ -9,27 +9,19 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
-public class StubBackendSessionContext implements BackendSessionContext {
+public class StubSession implements BackendSessionContext {
 
-	private final StubBackendMappingContext mappingContext;
+	private final StubMapping mapping;
 	private final String tenantIdentifier;
 
-	public StubBackendSessionContext() {
-		this( new StubBackendMappingContext(), null );
-	}
-
-	public StubBackendSessionContext(String tenantIdentifier) {
-		this( new StubBackendMappingContext(), tenantIdentifier );
-	}
-
-	public StubBackendSessionContext(StubBackendMappingContext mappingContext, String tenantIdentifier) {
-		this.mappingContext = mappingContext;
+	StubSession(StubMapping mapping, String tenantIdentifier) {
+		this.mapping = mapping;
 		this.tenantIdentifier = tenantIdentifier;
 	}
 
 	@Override
 	public BackendMappingContext mappingContext() {
-		return mappingContext;
+		return mapping;
 	}
 
 	@Override

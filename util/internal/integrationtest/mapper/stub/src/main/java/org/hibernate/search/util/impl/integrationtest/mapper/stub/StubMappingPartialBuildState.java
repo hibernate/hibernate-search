@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 
 public class StubMappingPartialBuildState implements MappingPartialBuildState {
@@ -24,8 +23,12 @@ public class StubMappingPartialBuildState implements MappingPartialBuildState {
 		// Nothing to do
 	}
 
-	public MappingImplementor<StubMapping> finalizeMapping(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
-		return new StubMapping( mappedIndexesByTypeIdentifier, schemaManagementStrategy );
+	public StubMappingImpl finalizeMapping(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+		StubMappingImpl mapping = new StubMappingImpl( mappedIndexesByTypeIdentifier, schemaManagementStrategy );
+		for ( StubMappedIndex index : mappedIndexesByTypeIdentifier.values() ) {
+			index.onMappingCreated( mapping );
+		}
+		return mapping;
 	}
 
 }

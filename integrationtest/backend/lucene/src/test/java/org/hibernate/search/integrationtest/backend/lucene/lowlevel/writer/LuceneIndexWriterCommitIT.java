@@ -17,10 +17,9 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
@@ -77,7 +76,6 @@ public class LuceneIndexWriterCommitIT {
 
 		// Add the document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit will happen at some point, but the indexing plan will be considered completed before that
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
@@ -105,7 +103,6 @@ public class LuceneIndexWriterCommitIT {
 
 		// Add the document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				DocumentCommitStrategy.FORCE, // The commit will happen before the indexing plan is considered completed
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
@@ -121,14 +118,13 @@ public class LuceneIndexWriterCommitIT {
 	 */
 	@Test
 	public void integrationClose() throws IOException {
-		SearchIntegration integration = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY );
+		StubMapping mapping = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter
 		);
@@ -136,7 +132,7 @@ public class LuceneIndexWriterCommitIT {
 		plan.execute().join();
 
 		// Stop Hibernate Search
-		integration.close();
+		mapping.close();
 
 		// Commit may have happened at any time, but it must be done by the time integration.close() returns
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
@@ -155,7 +151,7 @@ public class LuceneIndexWriterCommitIT {
 		);
 	}
 
-	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		return setupHelper.start()
 				.withSchemaManagement( schemaManagementStrategy )
 				.withIndex( index )

@@ -232,6 +232,7 @@ public class LuceneAnalysisConfigurerIT {
 				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
 				.withIndex( StubMappedIndex.withoutFields() )
 				.setup()
+				.integration()
 				.backend()
 				.unwrap( LuceneBackend.class );
 	}

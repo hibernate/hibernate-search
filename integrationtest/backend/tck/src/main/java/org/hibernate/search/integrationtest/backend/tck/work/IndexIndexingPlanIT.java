@@ -29,8 +29,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityReference;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -55,12 +56,12 @@ public class IndexIndexingPlanIT {
 				{
 						NO_MULTI_TENANCY_LABEL,
 						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createDefaultBackendSetupStrategy,
-						new StubBackendSessionContext()
+						null
 				},
 				{
 						MULTI_TENANCY_LABEL,
 						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createMultiTenancyBackendSetupStrategy,
-						new StubBackendSessionContext( "tenant_1" )
+						"tenant_1"
 				}
 		};
 	}
@@ -68,16 +69,18 @@ public class IndexIndexingPlanIT {
 	@Rule
 	public final SearchSetupHelper setupHelper;
 
-	private final StubBackendSessionContext sessionContext;
+	private final String tenantId;
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private final String label;
 
+	private StubSession sessionContext;
+
 	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
-			StubBackendSessionContext sessionContext) {
+			String tenantId) {
 		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
-		this.sessionContext = sessionContext;
+		this.tenantId = tenantId;
 		this.label = label;
 	}
 
@@ -88,7 +91,9 @@ public class IndexIndexingPlanIT {
 			setupContext.withMultiTenancy();
 		}
 
-		setupContext.setup();
+		StubMapping mapping = setupContext.setup();
+
+		sessionContext = mapping.session( tenantId );
 	}
 
 	@Test

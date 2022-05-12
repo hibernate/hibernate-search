@@ -24,7 +24,8 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -42,7 +43,7 @@ public class LuceneIndexingNestedIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	private StubBackendSessionContext sessionContext;
+	private StubSession sessionContext;
 
 	@Test
 	public void add() throws IOException {
@@ -132,15 +133,15 @@ public class LuceneIndexingNestedIT {
 			setupContext.withMultiTenancy();
 		}
 
-		setupContext.setup();
+		StubMapping mapping = setupContext.setup();
 
 		assertThat( countWithField( "field1" ) ).isEqualTo( 0 );
 
 		if ( MultiTenancyStrategyName.NONE.equals( multiTenancyStrategyName ) ) {
-			sessionContext = new StubBackendSessionContext();
+			sessionContext = mapping.session();
 		}
 		else {
-			sessionContext = new StubBackendSessionContext( "someTenantId" );
+			sessionContext = mapping.session( "someTenantId" );
 		}
 
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );

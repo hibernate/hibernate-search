@@ -26,7 +26,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -57,14 +58,17 @@ public class MultiTenancyBaseIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
-	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
-	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
-
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+
+	private StubSession tenant1SessionContext;
+	private StubSession tenant2SessionContext;
 
 	@Before
 	public void setup() {
-		setupHelper.start().withIndex( index ).withMultiTenancy().setup();
+		StubMapping mapping = setupHelper.start().withIndex( index ).withMultiTenancy().setup();
+
+		tenant1SessionContext = mapping.session( TENANT_1 );
+		tenant2SessionContext = mapping.session( TENANT_2 );
 
 		initData();
 	}
@@ -315,7 +319,7 @@ public class MultiTenancyBaseIT {
 	public void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
 		StubMappingScope scope = index.createScope();
 
-		assertThatThrownBy( () -> scope.query( new StubBackendSessionContext() )
+		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
@@ -327,7 +331,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan plan = index.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan plan = index.createIndexingPlan();
 
 			plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 				document.addValue( index.binding().string, STRING_VALUE_3 );
@@ -348,7 +352,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan plan = index.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan plan = index.createIndexingPlan();
 
 			plan.addOrUpdate( referenceProvider( DOCUMENT_ID_2 ), document -> {
 				document.addValue( index.binding().string, UPDATED_STRING );
@@ -369,7 +373,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan plan = index.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan plan = index.createIndexingPlan();
 			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 			plan.execute().join();
 		} )

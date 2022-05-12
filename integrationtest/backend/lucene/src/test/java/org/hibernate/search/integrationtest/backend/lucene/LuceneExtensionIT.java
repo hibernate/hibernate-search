@@ -107,7 +107,7 @@ public class LuceneExtensionIT {
 
 	@Before
 	public void setup() {
-		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
+		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup().integration();
 
 		initData();
 	}

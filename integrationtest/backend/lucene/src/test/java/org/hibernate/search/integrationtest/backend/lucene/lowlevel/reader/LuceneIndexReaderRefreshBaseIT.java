@@ -19,7 +19,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,7 +78,6 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
@@ -101,7 +99,6 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
@@ -123,7 +120,6 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // This means no refresh will take place until after the refresh interval
 		);
@@ -148,7 +144,6 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.FORCE // This will force a refresh before the end of the refresh interval
 		);
@@ -170,7 +165,6 @@ public class LuceneIndexReaderRefreshBaseIT {
 		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan plan = index.createIndexingPlan(
-				new StubBackendSessionContext(),
 				DocumentCommitStrategy.FORCE, // With the debug IO strategy, commit is necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);

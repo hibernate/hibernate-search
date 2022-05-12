@@ -16,7 +16,8 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Rule;
@@ -29,10 +30,10 @@ import org.junit.Test;
  */
 public class MultiTenancyMismatchIT {
 
+	public static final String TENANT_1 = "tenant_1";
+
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( "tenant_1" );
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
@@ -71,65 +72,72 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_query_while_disabled_throws_exception() {
-		setupHelper.start().withIndex( index ).setup();
+		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
 
 		StubMappingScope scope = index.createScope();
+		StubSession tenant1Session = mapping.session( TENANT_1 );
 
-		assertThatThrownBy( () -> scope.query( tenant1SessionContext )
+		assertThatThrownBy( () -> scope.query( tenant1Session )
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
 						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 
 	@Test
 	public void using_multi_tenancy_for_add_while_disabled_throws_exception() {
-		setupHelper.start().withIndex( index ).setup();
+		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
+
+		StubSession tenant1Session = mapping.session( TENANT_1 );
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan plan = index.createIndexingPlan( tenant1Session );
 			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
 						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 
 	@Test
 	public void using_multi_tenancy_for_update_while_disabled_throws_exception() {
-		setupHelper.start().withIndex( index ).setup();
+		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
+
+		StubSession tenant1Session = mapping.session( TENANT_1 );
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan plan = index.createIndexingPlan( tenant1Session );
 			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
 						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 
 	@Test
 	public void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
-		setupHelper.start().withIndex( index ).setup();
+		StubMapping mapping = setupHelper.start().withIndex( index ).setup();
+
+		StubSession tenant1Session = mapping.session( TENANT_1 );
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan plan = index.createIndexingPlan( tenant1Session );
 			plan.delete( referenceProvider( "1" ) );
 			plan.execute().join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"Invalid tenant identifier: '" + tenant1Session.tenantIdentifier() + "'",
 						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}

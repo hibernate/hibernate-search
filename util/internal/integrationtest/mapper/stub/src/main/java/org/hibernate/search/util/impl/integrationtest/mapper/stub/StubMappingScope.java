@@ -18,8 +18,8 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
  */
 public class StubMappingScope extends GenericStubMappingScope<DocumentReference, DocumentReference> {
 
-	StubMappingScope(MappedIndexScope<DocumentReference, DocumentReference> delegate) {
-		super( delegate );
+	StubMappingScope(StubMapping mapping, MappedIndexScope<DocumentReference, DocumentReference> delegate) {
+		super( mapping, delegate );
 	}
 
 	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
@@ -27,7 +27,7 @@ public class StubMappingScope extends GenericStubMappingScope<DocumentReference,
 	}
 
 	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query(
-			StubBackendSessionContext sessionContext) {
+			StubSession sessionContext) {
 		return query( sessionContext, new StubSearchLoadingContext() );
 	}
 }

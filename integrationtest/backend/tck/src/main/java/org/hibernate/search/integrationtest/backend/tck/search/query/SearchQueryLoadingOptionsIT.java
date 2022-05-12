@@ -20,7 +20,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class SearchQueryLoadingOptionsIT {
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
-		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
+		scope.query( loadingContextMock, loadingOptionsStepMock )
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
@@ -72,7 +71,7 @@ public class SearchQueryLoadingOptionsIT {
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
-		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
+		scope.query( loadingContextMock, loadingOptionsStepMock )
 				.selectEntity()
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
@@ -87,7 +86,7 @@ public class SearchQueryLoadingOptionsIT {
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
-		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
+		scope.query( loadingContextMock, loadingOptionsStepMock )
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
@@ -103,7 +102,7 @@ public class SearchQueryLoadingOptionsIT {
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
-		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
+		scope.query( loadingContextMock, loadingOptionsStepMock )
 				.select( f -> f.composite( f.entity(), f.field( "string" ) ) )
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )

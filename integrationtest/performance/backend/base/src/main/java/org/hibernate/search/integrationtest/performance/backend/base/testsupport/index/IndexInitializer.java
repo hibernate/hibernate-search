@@ -14,14 +14,12 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.LongStream;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.DatasetHolder;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
 import org.jboss.logging.Logger;
@@ -66,13 +64,10 @@ public class IndexInitializer {
 	}
 
 	public void addToIndex(MappedIndex index, LongStream idStream) {
-		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
-
 		log( index, "Adding documents to index..." );
 
-		IndexWorkspace workspace = index.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
-
-		IndexIndexer indexer = index.createIndexer( new StubBackendSessionContext() );
+		IndexWorkspace workspace = index.createWorkspace();
+		IndexIndexer indexer = index.createIndexer();
 		List<CompletableFuture<?>> futures = new ArrayList<>();
 		idStream.forEach( id -> {
 			CompletableFuture<?> future = indexer.add(
@@ -90,10 +85,8 @@ public class IndexInitializer {
 
 	private void initializeIndex(MappedIndex index, LongStream idStream) {
 		log( index, "Starting index initialization..." );
-		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
-
 		log( index, "Purging..." );
-		IndexWorkspace workspace = index.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
+		IndexWorkspace workspace = index.createWorkspace();
 		workspace.purge( Collections.emptySet() ).join();
 		log( index, "Finished purge." );
 

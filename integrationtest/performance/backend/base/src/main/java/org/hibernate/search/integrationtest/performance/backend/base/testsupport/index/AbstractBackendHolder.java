@@ -23,6 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingImpl;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -38,7 +39,7 @@ public abstract class AbstractBackendHolder {
 
 	public static final int INDEX_COUNT = 3;
 
-	private SearchIntegration integration;
+	private StubMappingImpl mapping;
 	private List<MappedIndex> indexes;
 
 	@Setup(Level.Trial)
@@ -82,12 +83,14 @@ public abstract class AbstractBackendHolder {
 		try {
 			SearchIntegrationFinalizer finalizer =
 					integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
-			finalizer.finalizeMapping(
+			mapping = finalizer.finalizeMapping(
 					mappingKey,
 					(context, partialMapping) ->
-							partialMapping.finalizeMapping( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
+							partialMapping.finalizeMapping(
+									StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
 			);
-			integration = finalizer.finalizeIntegration();
+			SearchIntegration integration = finalizer.finalizeIntegration();
+			mapping.setIntegration( integration );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -103,8 +106,8 @@ public abstract class AbstractBackendHolder {
 
 	@TearDown(Level.Trial)
 	public void stopHibernateSearch() {
-		if ( integration != null ) {
-			integration.close();
+		if ( mapping != null ) {
+			mapping.close();
 		}
 	}
 

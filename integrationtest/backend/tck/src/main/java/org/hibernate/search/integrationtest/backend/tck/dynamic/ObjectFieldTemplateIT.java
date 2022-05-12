@@ -18,12 +18,12 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -65,7 +65,7 @@ public class ObjectFieldTemplateIT {
 					.multiValued();
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -93,7 +93,7 @@ public class ObjectFieldTemplateIT {
 		checkNested( "foo" );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		checkNested( "foo" );
@@ -113,7 +113,7 @@ public class ObjectFieldTemplateIT {
 					.multiValued();
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -145,7 +145,7 @@ public class ObjectFieldTemplateIT {
 		checkNested( "staticObject.foo" );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		checkNested( "staticObject.foo" );
@@ -166,7 +166,7 @@ public class ObjectFieldTemplateIT {
 					.multiValued();
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -209,7 +209,7 @@ public class ObjectFieldTemplateIT {
 		checkFlattened( "bar_flattened" );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		checkNested( "foo_nested" );
@@ -235,7 +235,7 @@ public class ObjectFieldTemplateIT {
 					.matchingPathGlob( "*_object" );
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
@@ -278,7 +278,7 @@ public class ObjectFieldTemplateIT {
 		checkFlattened( "flattened_object" );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		checkNested( "foo_nested_object" );
@@ -302,7 +302,7 @@ public class ObjectFieldTemplateIT {
 					.multiValued();
 		};
 
-		SearchIntegration integration = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY,
+		StubMapping mapping = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY,
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
 		// Index a few documents
@@ -349,7 +349,7 @@ public class ObjectFieldTemplateIT {
 		checkFlattened( "staticObject.flattened_object" );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY,
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
@@ -376,7 +376,7 @@ public class ObjectFieldTemplateIT {
 					.multiValued();
 		};
 
-		SearchIntegration integration = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY,
+		StubMapping mapping = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY,
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
 		String documentWhereObjectFieldExistsId = "existing";
@@ -412,7 +412,7 @@ public class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY,
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
@@ -438,7 +438,7 @@ public class ObjectFieldTemplateIT {
 					.multiValued();
 		};
 
-		SearchIntegration integration =
+		StubMapping mapping =
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		String documentWhereObjectFieldExistsId = "existing";
@@ -472,7 +472,7 @@ public class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
-		integration.close();
+		mapping.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		assertThatQuery( query( f -> f.exists().field( "foo_nested" ) ) )
@@ -520,12 +520,12 @@ public class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED, DOCUMENT_MATCHING_FOR_ALL );
 	}
 
-	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
+	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> rootTemplatesBinder) {
 		return setup( schemaManagementStrategy, rootTemplatesBinder, ignored -> { } );
 	}
 
-	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
+	private StubMapping setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> rootTemplatesBinder,
 			Consumer<IndexSchemaElement> staticObjectTemplatesBinder) {
 		this.index = SimpleMappedIndex.of(
