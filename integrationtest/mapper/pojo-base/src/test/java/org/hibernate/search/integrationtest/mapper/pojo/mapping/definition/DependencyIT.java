@@ -54,14 +54,13 @@ public class DependencyIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".other" )
 						.annotationContextAnyParameters( AssociationInverseSide.class )
 						.failure(
 								"@AssociationInverseSide.inversePath is empty"
 						)
-						.build()
 				);
 	}
 
@@ -601,14 +600,13 @@ public class DependencyIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".derived" )
 						.annotationContextAnyParameters( IndexingDependency.class )
 						.failure(
 								"@IndexingDependency.derivedFrom contains an empty path"
 						)
-						.build()
 				);
 	}
 
@@ -628,13 +626,11 @@ public class DependencyIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".derived<no value extractors>" )
 						.failure( "No readable property named 'invalidPath' on type '"
-								+ IndexedEntity.class.getName() + "'" )
-						.build()
-				);
+								+ IndexedEntity.class.getName() + "'" ) );
 	}
 
 	@Test
@@ -684,7 +680,7 @@ public class DependencyIT {
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( DerivedFromCycle.A.class.getName() )
 						.pathContext( ".derivedA<no value extractors>" )
 						.failure( "Unable to resolve dependencies of a derived property:"
@@ -692,9 +688,7 @@ public class DependencyIT {
 								+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
 								"A derived property cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test
@@ -768,7 +762,7 @@ public class DependencyIT {
 				)
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( CannotInvertAssociation.A.class.getName() )
 						.pathContext( ".embedded<no value extractors>.b<no value extractors>.text<no value extractors>" )
 						.failure(
@@ -784,9 +778,7 @@ public class DependencyIT {
 										+ CannotInvertAssociation.A.class.getName() + "' when '"
 										+ CannotInvertAssociation.B.class.getName() + "' is modified",
 								"@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)"
-						)
-						.build()
-				);
+						) );
 	}
 
 	@Test

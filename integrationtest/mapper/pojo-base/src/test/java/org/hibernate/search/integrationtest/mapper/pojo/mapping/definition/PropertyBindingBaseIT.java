@@ -100,12 +100,11 @@ public class PropertyBindingBaseIT {
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".text" )
 						.annotationContextAnyParameters( PropertyBinding.class )
 						.failure( "Empty binder reference." )
-						.build()
 				);
 	}
 
@@ -142,11 +141,10 @@ public class PropertyBindingBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedNoParamEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( AnnotatedNoParamEntity.class.getName() )
 						.pathContext( ".value" )
 						.failure( "Param with name 'stringBase' has not been defined for the binder." )
-						.build()
 				);
 	}
 
@@ -156,13 +154,12 @@ public class PropertyBindingBaseIT {
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedSameParamTwiceEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( AnnotatedSameParamTwiceEntity.class.getName() )
 						.pathContext( ".value" )
 						.annotationContextAnyParameters( PropertyBinding.class )
 						.failure( "Conflicting usage of @Param annotation for parameter name: 'stringBase'. " +
 								"Can't assign both value '7' and '7'" )
-						.build()
 				);
 	}
 

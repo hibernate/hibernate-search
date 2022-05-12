@@ -26,7 +26,7 @@ public class ReindexOnUpdateShallowIncorrectIT {
 	public void missingReindexOnUpdateShallow() {
 		assertThatThrownBy( () -> setupHelper.start().setup( Book.class, BookCategory.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Book.class.getName() )
 						.pathContext( ".category<no value extractors>.name<no value extractors>" )
 						.failure(
@@ -35,8 +35,7 @@ public class ReindexOnUpdateShallowIncorrectIT {
 								"Hibernate Search needs this information",
 								"you can disable automatic reindexing with"
 										+ " @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)"
-						)
-						.build() );
+						) );
 	}
 
 }

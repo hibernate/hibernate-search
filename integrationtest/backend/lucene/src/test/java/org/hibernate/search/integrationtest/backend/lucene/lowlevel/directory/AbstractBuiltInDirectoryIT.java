@@ -86,14 +86,13 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 				"some_invalid_name"
 		) ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.indexContext( index.name() )
 						.failure(
 								"Invalid locking strategy name",
 								"'some_invalid_name'",
 								"Valid names are: [simple-filesystem, native-filesystem, single-instance, none]"
 						)
-						.build()
 				);
 		testValidLockingStrategy( "none", NO_LOCK_FQN );
 	}
@@ -144,13 +143,12 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 				strategyName
 		) ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.indexContext( index.name() )
 						.failure(
 								"Unable to initialize index directory",
 								"can only be used with FSDirectory subclasses"
 						)
-						.build()
 				);
 	}
 

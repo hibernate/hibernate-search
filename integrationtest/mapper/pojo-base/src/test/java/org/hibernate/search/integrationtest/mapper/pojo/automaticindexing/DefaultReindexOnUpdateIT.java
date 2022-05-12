@@ -160,7 +160,7 @@ public class DefaultReindexOnUpdateIT {
 				.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( ParentEntity.class.getName() )
 						.pathContext( ".child<no value extractors>.value<no value extractors>" )
 						.failure(
@@ -169,9 +169,7 @@ public class DefaultReindexOnUpdateIT {
 								"Hibernate Search needs this information in order to reindex '"
 										+ ParentEntity.class.getName() + "' when '"
 										+ ChildEntity.class.getName() + "' is modified."
-						)
-						.build()
-				);
+						) );
 	}
 	/**
 	 * If ReindexOnUpdate.NO is the default,
