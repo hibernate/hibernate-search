@@ -46,7 +46,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
