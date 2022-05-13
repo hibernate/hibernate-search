@@ -62,6 +62,7 @@ public class RoutingTypeJsonAdapter extends TypeAdapter<RoutingType> {
 					throw new AssertionFailure( "Unexpected property for attribute of type " + RoutingType.class + ": " + name );
 			}
 		}
+		in.endObject();
 
 		return value;
 	}
