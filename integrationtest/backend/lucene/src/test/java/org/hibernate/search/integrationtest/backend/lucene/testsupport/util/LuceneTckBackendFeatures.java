@@ -22,6 +22,11 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean fieldsProjectableByDefault() {
+		return false;
+	}
+
+	@Override
 	public boolean reliesOnNestedDocumentsForObjectProjection() {
 		return true;
 	}

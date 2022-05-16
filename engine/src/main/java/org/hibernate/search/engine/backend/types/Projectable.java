@@ -15,6 +15,10 @@ package org.hibernate.search.engine.backend.types;
 public enum Projectable {
 	/**
 	 * Use the backend-specific default.
+	 * <ul>
+	 *     <li>Lucene's default value is {@code YES} </li>
+	 *     <li>Elasticsearch's default value is {@code NO} </li>
+	 * </ul>
 	 */
 	DEFAULT,
 	/**

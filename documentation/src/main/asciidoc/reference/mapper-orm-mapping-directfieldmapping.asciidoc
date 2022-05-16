@@ -159,6 +159,9 @@ Whether the field can be <<search-dsl-projection, projected on>>,
 i.e. whether the field value is stored in the index to allow retrieval later when querying.
 +
 Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
++
+The defaults are different for the <<backend-lucene,Lucene>> and <<backend-elasticsearch,Elasticsearch>> backends:
+with Lucene, the default is `Projectable.NO`, while with Elasticsearch it's `Projectable.YES`.
 
 [[mapper-orm-directfieldmapping-aggregable]] `aggregable`::
 Whether the field can be <<search-dsl-aggregation, aggregated>>,

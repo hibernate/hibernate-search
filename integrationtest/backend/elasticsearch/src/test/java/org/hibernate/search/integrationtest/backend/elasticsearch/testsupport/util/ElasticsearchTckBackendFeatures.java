@@ -114,6 +114,11 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean fieldsProjectableByDefault() {
+		return true;
+	}
+
+	@Override
 	public boolean supportsTotalHitsThresholdForSearch() {
 		return dialect.supportsSkipOrLimitingTotalHitCount();
 	}
