@@ -736,6 +736,37 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="hsearch:NestedTestTypesShouldBeAnnotatedWithNested">
+        <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <description>
+            Nested test types should be annotated with @Nested in order to be actually executed
+            when their surrounding type (hopefully annotated with @RunWith(NestedInner.class))
+            is executed.
+            Exceptions are only allowed for:
+            - Abstract test classes.
+        </description>
+        <cypher><![CDATA[
+            // Hibernate Search nested classes named "<prefix>IT" or "<prefix>Test"
+            MATCH (nestedTestType:Class:Test:HibernateSearch)
+            WHERE
+                (nestedTestType.nameWithoutContainingTypeName =~ ".*IT$"
+                        OR nestedTestType.nameWithoutContainingTypeName =~ ".*Test$")
+                AND nestedTestType.nameWithoutContainingTypeName <> nestedTestType.name
+                // Exceptions
+                AND (NOT nestedTestType.abstract OR nestedTestType.abstract IS NULL)
+            // The Nested annotation
+            OPTIONAL MATCH (nestedTestType:Type)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(nestedAnnotation:Type)
+            WHERE
+                nestedAnnotation.fqn = "org.hibernate.search.util.impl.test.runner.nested.Nested"
+            WITH nestedTestType, nestedAnnotation
+            WHERE
+                nestedAnnotation IS NULL
+            RETURN nestedTestType.fqn AS Test
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="hsearch:PublicTypesMayNotExposeInternalTypes" />
         <includeConstraint refId="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
@@ -749,6 +780,7 @@
         <includeConstraint refId="hsearch:UnitTestsMustHaveProperSuffix" />
         <includeConstraint refId="hsearch:IntegrationTestsMustHaveProperSuffix" />
         <includeConstraint refId="hsearch:ImplPackagesMustNotHaveSubPackages" />
+        <includeConstraint refId="hsearch:NestedTestTypesShouldBeAnnotatedWithNested" />
     </group>
 
     <group id="cycles">
