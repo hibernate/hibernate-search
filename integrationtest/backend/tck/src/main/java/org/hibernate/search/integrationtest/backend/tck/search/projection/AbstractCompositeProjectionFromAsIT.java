@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromAsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom1AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
@@ -42,8 +44,14 @@ import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * Abstract base for tests of the from/as syntax of composite or object projections,
@@ -54,6 +62,12 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	public static ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
 	private final SimpleMappedIndex<B> index;
 	private final AbstractDataSet<B> dataSet;
 
@@ -153,6 +167,51 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		}
 
 		@Test
+		@TestForIssue(jiraKey = "HSEARCH-3927")
+		public void as_class() {
+			// We simulate a projection definition on the mapper side;
+			// normally this would involve annotation mapping.
+			when( projectionRegistryMock.composite( ValueWrapper.class ) )
+					.thenReturn( (f, initialStep) ->
+							// Critically, in a real-world scenario the inner projections
+							// will be defined relative to the composite node
+							// (which may not be the root in the case of object projections).
+							// We need to do the same here, to check that the engine/backend compensates
+							// by passing a projection factory whose root is the composite node.
+							doFrom( f, index.binding().composite(), CompositeBinding::relativePath, initialStep )
+									.asArray( ValueWrapper<Object[]>::new ) );
+			assertThatQuery( index.createScope().query()
+					.select( f -> startProjection( f ).as( ValueWrapper.class ) )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedArrays().stream()
+							.<ValueWrapper<Object[]>>map( ValueWrapper::new )
+							.collect( Collectors.toList() ) );
+		}
+
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-3927")
+		@SuppressWarnings("rawtypes")
+		public void as_class_multi() {
+			// We simulate a projection definition on the mapper side;
+			// normally this would involve annotation mapping.
+			when( projectionRegistryMock.composite( ValueWrapper.class ) )
+					.thenReturn( (f, initialStep) ->
+							// Inner projections need to be defined relative to the composite node;
+							// see as_class.
+							doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
+									.asArray( ValueWrapper<Object[]>::new ) );
+			assertThatQuery( index.createScope().query()
+					.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class ).multi() )
+					.where( f -> f.matchAll() ) )
+					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
+					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti().stream()
+							.map( perDocList -> perDocList.stream()
+									.<ValueWrapper>map( ValueWrapper::new )
+									.collect( Collectors.toList() ) )
+							.collect( Collectors.toList() ) );
+		}
+
+		@Test
 		public void inComposite() {
 			assertThatQuery( index.query()
 					.select( f -> f.composite().from(
@@ -168,15 +227,16 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 
 		protected CompositeProjectionFromAsStep doFrom(SearchProjectionFactory<?, ?> f,
 				CompositeProjectionInnerStep step) {
-			return doFrom( f, index.binding().composite(), step );
+			return doFrom( f, index.binding().composite(), CompositeBinding::absolutePath, step );
 		}
 
 		protected CompositeProjectionFromAsStep doFromForMulti(SearchProjectionFactory<?, ?> f,
 				CompositeProjectionInnerStep step) {
-			return doFrom( f, index.binding().compositeForMulti(), step );
+			return doFrom( f, index.binding().compositeForMulti(), CompositeBinding::absolutePath, step );
 		}
 
 		protected abstract CompositeProjectionFromAsStep doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding,
+				BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
 				CompositeProjectionInnerStep step);
 
 		protected final Collection<List<?>> expectedLists() {
@@ -224,16 +284,18 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 
 		@Override
 		protected final S doFrom(SearchProjectionFactory<?, ?> f, CompositeProjectionInnerStep step) {
-			return doFrom( f, index.binding().composite(), step );
+			return doFrom( f, index.binding().composite(), CompositeBinding::absolutePath, step );
 		}
 
 		@Override
 		protected final S doFromForMulti(SearchProjectionFactory<?, ?> f, CompositeProjectionInnerStep step) {
-			return doFrom( f, index.binding().compositeForMulti(), step );
+			return doFrom( f, index.binding().compositeForMulti(), CompositeBinding::absolutePath, step );
 		}
 
 		@Override
-		protected abstract S doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding, CompositeProjectionInnerStep step);
+		protected abstract S doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding,
+				BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
+				CompositeProjectionInnerStep step);
 
 		protected abstract CompositeProjectionValueStep<?, T> doAs(S step);
 
@@ -254,8 +316,9 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom1AsStep<String>, ValueWrapper<String>> {
 		@Override
 		protected CompositeProjectionFrom1AsStep<String> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionInnerStep step) {
-			return step.from( f.field( binding.field1Path(), String.class ) );
+				CompositeBinding binding, BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
+				CompositeProjectionInnerStep step) {
+			return step.from( f.field( pathGetter.apply( binding, binding.field1 ), String.class ) );
 		}
 
 		@Override
@@ -279,9 +342,10 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom2AsStep<String, String>, Pair<String, String>> {
 		@Override
 		protected CompositeProjectionFrom2AsStep<String, String> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionInnerStep step) {
-			return step.from( f.field( binding.field1Path(), String.class ),
-					f.field( binding.field2Path(), String.class ) );
+				CompositeBinding binding, BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
+				CompositeProjectionInnerStep step) {
+			return step.from( f.field( pathGetter.apply( binding, binding.field1 ), String.class ),
+					f.field( pathGetter.apply( binding, binding.field2 ), String.class ) );
 		}
 
 		@Override
@@ -305,10 +369,11 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom3AsStep<String, String, LocalDate>, Triplet<String, String, LocalDate>> {
 		@Override
 		protected CompositeProjectionFrom3AsStep<String, String, LocalDate> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionInnerStep step) {
-			return step.from( f.field( binding.field1Path(), String.class ),
-					f.field( binding.field2Path(), String.class ),
-					f.field( binding.field3Path(), LocalDate.class ) );
+				CompositeBinding binding, BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
+				CompositeProjectionInnerStep step) {
+			return step.from( f.field( pathGetter.apply( binding, binding.field1 ), String.class ),
+					f.field( pathGetter.apply( binding, binding.field2 ), String.class ),
+					f.field( pathGetter.apply( binding, binding.field3 ), LocalDate.class ) );
 		}
 
 		@Override
@@ -337,11 +402,12 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromAnyNumberIT {
 		@Override
 		protected CompositeProjectionFromAsStep doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeBinding binding, CompositeProjectionInnerStep step) {
-			return step.from( f.field( binding.field1Path(), String.class ),
-					f.field( binding.field2Path(), String.class ),
-					f.field( binding.field3Path(), LocalDate.class ),
-					f.field( binding.field4Path(), String.class ) );
+				CompositeBinding binding, BiFunction<CompositeBinding, SimpleFieldModel<?>, String> pathGetter,
+				CompositeProjectionInnerStep step) {
+			return step.from( f.field( pathGetter.apply( binding, binding.field1 ), String.class ),
+					f.field( pathGetter.apply( binding, binding.field2 ), String.class ),
+					f.field( pathGetter.apply( binding, binding.field3 ), LocalDate.class ),
+					f.field( pathGetter.apply( binding, binding.field4 ), String.class ) );
 		}
 
 		@Override
@@ -384,20 +450,12 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 					.map( parent, "field4" );
 		}
 
-		public String field1Path() {
-			return FieldPaths.compose( absolutePath, field1.relativeFieldName );
+		public final String relativePath(SimpleFieldModel<?> fieldModel) {
+			return fieldModel.relativeFieldName;
 		}
 
-		public String field2Path() {
-			return FieldPaths.compose( absolutePath, field2.relativeFieldName );
-		}
-
-		public String field3Path() {
-			return FieldPaths.compose( absolutePath, field3.relativeFieldName );
-		}
-
-		public String field4Path() {
-			return FieldPaths.compose( absolutePath, field4.relativeFieldName );
+		public final String absolutePath(SimpleFieldModel<?> fieldModel) {
+			return FieldPaths.compose( absolutePath, fieldModel.relativeFieldName );
 		}
 
 	}

@@ -33,7 +33,9 @@ public class CompositeProjectionBaseIT {
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start().withIndex( FromAsIT.index ).setup();
+		setupHelper.start().withIndex( FromAsIT.index )
+				.withProjectionRegistry( AbstractCompositeProjectionFromAsIT.projectionRegistryMock )
+				.setup();
 
 		BulkIndexer fromAsIndexer = FromAsIT.index.bulkIndexer();
 		FromAsIT.dataSet.contribute( FromAsIT.index, fromAsIndexer );
