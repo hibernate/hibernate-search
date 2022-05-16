@@ -34,7 +34,7 @@ import org.junit.Test;
  * e.g. {@code f.composite( MyPair::new, otherProjection1, otherProjection2 ) },
  * as opposed to the multi-step DSL,
  * e.g. {@code f.composite().from( otherProjection1, otherProjection2 ).as( MyPair::new ) },
- * which is tested in {@link CompositeProjectionMultiStepIT}.
+ * which is tested in {@link AbstractCompositeProjectionFromAsIT}.
  */
 @SuppressWarnings("deprecation")
 public class CompositeProjectionSingleStepIT {
