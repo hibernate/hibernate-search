@@ -17,14 +17,15 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class CompositeProjectionBaseIT {
 
 	@ClassRule
@@ -52,6 +53,7 @@ public class CompositeProjectionBaseIT {
 	 * e.g. {@code f.composite( MyPair::new, otherProjection1, otherProjection2 ) },
 	 * which is tested in {@link CompositeProjectionSingleStepIT}.
 	 */
+	@Nested
 	public static class FromAsIT extends AbstractCompositeProjectionFromAsIT<FromAsIT.IndexBinding> {
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )

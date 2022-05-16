@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
 /**
@@ -18,7 +19,7 @@ import org.junit.runner.RunWith;
  * with a total shard count of 4,
  * self being static.
  */
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 
 	abstract static class AbstractBaseTest extends AbstractEventProcessorClusterLinkBaseTest {
@@ -63,6 +64,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 
 	}
 
+	@Nested
 	// It's very important that an agent that wasn't registered
 	// must not start running immediately on the first pulse,
 	// but should go through the waiting state first.
@@ -84,6 +86,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 	}
 
+	@Nested
 	public static class SuspendedTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
@@ -101,6 +104,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 	}
 
+	@Nested
 	public static class WaitingIn4NodeClusterTest extends AbstractBaseTest {
 
 		@Override
@@ -120,6 +124,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfDynamicBaseTest {
 		}
 	}
 
+	@Nested
 	public static class RunningIn4NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {

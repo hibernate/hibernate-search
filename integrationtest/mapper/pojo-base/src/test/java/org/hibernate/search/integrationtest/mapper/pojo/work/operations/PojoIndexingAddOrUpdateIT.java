@@ -12,11 +12,12 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class PojoIndexingAddOrUpdateIT {
 
 	private static final PojoIndexingOperationScenario SCENARIO = new PojoIndexingOperationScenario( BackendIndexingOperation.ADD_OR_UPDATE ) {
@@ -59,6 +60,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	};
 
+	@Nested
 	public static class IndexerBaseIT extends AbstractPojoIndexerOperationBaseIT {
 		@Override
 		protected PojoIndexingOperationScenario scenario() {
@@ -66,6 +68,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexerNullEntityIT extends AbstractPojoIndexerAddOrUpdateNullEntityIT {
 		@Override
 		protected PojoIndexingOperationScenario scenario() {
@@ -73,6 +76,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexerIndexingProcessorFailureIT extends AbstractPojoIndexingProcessorFailureIT {
 		@Override
 		protected void process(SearchSession session, Object entity) {
@@ -80,6 +84,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexingPlanBaseIT extends AbstractPojoIndexingPlanOperationBaseIT {
 		@Override
 		protected PojoIndexingOperationScenario scenario() {
@@ -87,6 +92,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexingPlanNullEntityIT extends AbstractPojoIndexingPlanOperationNullEntityIT {
 		@Override
 		protected PojoIndexingOperationScenario scenario() {
@@ -94,6 +100,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexingPlanContainedNullEntityIT extends AbstractPojoIndexingPlanOperationContainedNullEntityIT {
 		@Override
 		protected PojoIndexingOperationScenario scenario() {
@@ -101,6 +108,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexingPlanIndexingProcessorFailureIT extends AbstractPojoIndexingProcessorFailureIT {
 		@Override
 		protected void process(SearchSession session, Object entity) {
@@ -109,6 +117,7 @@ public class PojoIndexingAddOrUpdateIT {
 		}
 	}
 
+	@Nested
 	public static class IndexingPlanReindexingResolutionFailureIT extends AbstractPojoReindexingResolutionFailureIT {
 		@Override
 		protected void process(SearchSession session, Object entity) {

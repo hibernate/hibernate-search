@@ -18,16 +18,17 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class PhrasePredicateBaseIT {
 
 	private static final List<FieldTypeDescriptor<String>> supportedFieldTypes = new ArrayList<>();
@@ -113,6 +114,7 @@ public class PhrasePredicateBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class SingleFieldIT extends AbstractPredicateSingleFieldIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<String, PhrasePredicateTestValues>> dataSets = new ArrayList<>();
@@ -144,6 +146,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class MultiFieldIT extends AbstractPredicateMultiFieldIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<String, PhrasePredicateTestValues>> dataSets = new ArrayList<>();
@@ -189,6 +192,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class InObjectFieldIT extends AbstractPredicateFieldInObjectFieldIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -224,6 +228,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class AnalysisIT extends AbstractPredicateConfigurableAnalysisIT {
 		private static final DataSet dataSet = new DataSet();
 
@@ -268,6 +273,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ScoreIT extends AbstractPredicateFieldScoreIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<String, PhrasePredicateTestValues>> dataSets = new ArrayList<>();
@@ -341,6 +347,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
@@ -360,6 +367,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -393,6 +401,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class SearchableIT extends AbstractPredicateSearchableIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -430,6 +439,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -475,6 +485,7 @@ public class PhrasePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class TypeCheckingNoConversionIT extends AbstractPredicateTypeCheckingNoConversionIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<String, PhrasePredicateTestValues>> dataSets = new ArrayList<>();

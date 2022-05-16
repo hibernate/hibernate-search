@@ -11,14 +11,15 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class BoolPredicateBaseIT {
 
 	@ClassRule
@@ -43,6 +44,7 @@ public class BoolPredicateBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	public static class ScoreIT extends AbstractPredicateScoreIT {
 		private static final DataSet dataSet = new DataSet();
 

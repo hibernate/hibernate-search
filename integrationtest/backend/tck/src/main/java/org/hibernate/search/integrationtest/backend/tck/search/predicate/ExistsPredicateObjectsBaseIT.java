@@ -30,15 +30,16 @@ import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class ExistsPredicateObjectsBaseIT {
 
 	private static final FieldTypeDescriptor<String> innerFieldType = AnalyzedStringFieldTypeDescriptor.INSTANCE;
@@ -70,6 +71,7 @@ public class ExistsPredicateObjectsBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
 		private static final List<DataSet> dataSets = new ArrayList<>();
@@ -162,6 +164,7 @@ public class ExistsPredicateObjectsBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ScoreIT extends AbstractPredicateScoreIT {
 		private static final List<DataSet> dataSets = new ArrayList<>();

@@ -20,15 +20,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class TermsPredicateBaseIT {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
@@ -121,6 +122,7 @@ public class TermsPredicateBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class SingleFieldIT<F> extends AbstractPredicateSingleFieldIT<TermsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -153,6 +155,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class MultipleArgumentIT<F> extends AbstractPredicateSingleFieldIT<TermsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -192,6 +195,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class MultiFieldIT<F> extends AbstractPredicateMultiFieldIT<TermsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -239,6 +243,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<TermsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -275,6 +280,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ScoreIT<F> extends AbstractPredicateFieldScoreIT<TermsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -349,6 +355,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
@@ -368,6 +375,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -402,6 +410,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class SearchableIT extends AbstractPredicateSearchableIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -440,6 +449,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -469,6 +479,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class TypeCheckingAndConversionIT<F>
 			extends AbstractPredicateTypeCheckingAndConversionIT<TermsPredicateTestValues<F>, Object> {
@@ -547,6 +558,7 @@ public class TermsPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
 		private static final DataSet dataSet = new DataSet();
 
