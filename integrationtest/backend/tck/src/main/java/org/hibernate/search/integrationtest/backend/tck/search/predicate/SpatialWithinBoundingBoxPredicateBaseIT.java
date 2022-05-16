@@ -17,15 +17,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPoi
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class SpatialWithinBoundingBoxPredicateBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor supportedFieldType;
@@ -100,6 +101,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	public static class SingleFieldIT extends AbstractPredicateSingleFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
@@ -118,6 +120,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class MultiFieldIT extends AbstractPredicateMultiFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
@@ -150,6 +153,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class InObjectFieldIT
 			extends AbstractPredicateFieldInObjectFieldIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
@@ -173,6 +177,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class ScoreIT extends AbstractPredicateFieldScoreIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet = new DataSet<>( testValues() );
 
@@ -233,6 +238,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
@@ -254,6 +260,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -289,6 +296,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class SearchableIT extends AbstractPredicateSearchableIT {
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
@@ -315,6 +323,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
@@ -330,6 +339,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class TypeCheckingNoConversionIT extends AbstractPredicateTypeCheckingNoConversionIT<SpatialWithinBoundingBoxPredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet = new DataSet<>( testValues() );
 

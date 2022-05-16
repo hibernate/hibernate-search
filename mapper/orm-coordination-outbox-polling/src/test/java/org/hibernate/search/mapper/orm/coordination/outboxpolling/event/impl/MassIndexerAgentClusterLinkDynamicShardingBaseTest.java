@@ -8,15 +8,16 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
 /**
  * Base tests of {@link OutboxPollingMassIndexerAgentClusterLink}
  * with event processors using dynamic sharding.
  */
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 
 	abstract static class AbstractBaseTest extends AbstractMassIndexerAgentClusterLinkBaseTest {
@@ -50,6 +51,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 	// must not start running immediately on the first pulse,
 	// but should go through the waiting state first.
 	// See comments in OutboxPollingMassIndexerAgentClusterLink.
+	@Nested
 	public static class NotRegisteredTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
@@ -67,6 +69,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 		}
 	}
 
+	@Nested
 	public static class SuspendedTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
@@ -84,6 +87,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 		}
 	}
 
+	@Nested
 	public static class WaitingTest extends AbstractBaseTest {
 
 		@Override
@@ -104,6 +108,7 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 		}
 	}
 
+	@Nested
 	public static class RunningTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {

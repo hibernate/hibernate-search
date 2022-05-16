@@ -23,15 +23,16 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class RangePredicateBaseIT {
 
 	static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
@@ -122,6 +123,7 @@ public class RangePredicateBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class SingleFieldIT<F> extends AbstractPredicateSingleFieldIT<RangePredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -153,6 +155,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class MultiFieldIT<F> extends AbstractPredicateMultiFieldIT<RangePredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -198,6 +201,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<RangePredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -233,6 +237,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class AnalysisIT extends AbstractPredicateSimpleAnalysisIT {
 		private static final DataSet dataSet = new DataSet();
 
@@ -253,6 +258,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ScoreIT<F> extends AbstractPredicateFieldScoreIT<RangePredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
@@ -325,6 +331,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
@@ -344,6 +351,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -377,6 +385,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class SearchableIT extends AbstractPredicateSearchableIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -414,6 +423,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
@@ -456,6 +466,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class TypeCheckingAndConversionIT<F>
 			extends AbstractPredicateTypeCheckingAndConversionIT<RangePredicateTestValues<F>, Range<?>> {
@@ -532,6 +543,7 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	@Nested
 	public static class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
 		private static final DataSet dataSet = new DataSet();
 

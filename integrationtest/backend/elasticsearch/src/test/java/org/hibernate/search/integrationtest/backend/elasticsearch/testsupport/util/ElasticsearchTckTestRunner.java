@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
-		"!.*\\$.*", // Exclude nested tests, typically used with the Enclosed runner
+		"!.*\\$.*", // Exclude nested tests, typically used with NestedRunner
 		".*\\.tck\\..*"
 })
 public class ElasticsearchTckTestRunner {

@@ -19,17 +19,18 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.runner.nested.Nested;
+import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
-@RunWith(Enclosed.class)
+@RunWith(NestedRunner.class)
 public class FieldProjectionBaseIT {
 
 	@ClassRule
@@ -68,6 +69,7 @@ public class FieldProjectionBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
+	@Nested
 	@RunWith(Parameterized.class)
 	public static class InObjectProjectionIT<F>
 			extends AbstractProjectionInObjectProjectionIT<F, F, FieldProjectionTestValues<F>> {
