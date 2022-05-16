@@ -15,10 +15,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedElement;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.ConstructorMapping;
@@ -30,6 +33,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -53,6 +57,70 @@ public class CustomConstructorMappingAnnotationBaseIT {
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();
+
+	/**
+	 * Basic test checking that a simple constructor mapping will be applied as expected.
+	 */
+	@Test
+	public void simple() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField
+			String text;
+		}
+		class MyProjection {
+			public final String text;
+			@WorkingAnnotation
+			public MyProjection(String text) {
+				this.text = text;
+			}
+		}
+
+		backendMock.expectAnySchema( INDEX_NAME );
+
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans()
+				.withAnnotatedTypes( MyProjection.class )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			backendMock.expectSearchProjection(
+					INDEX_NAME,
+					StubSearchWorkBehavior.of(
+							2,
+							Collections.singletonList( "hit1Text" ),
+							Collections.singletonList( "hit2Text" )
+					)
+			);
+
+			assertThat( session.search( IndexedEntity.class )
+					.select( MyProjection.class )
+					.where( f -> f.matchAll() )
+					.fetchAllHits() )
+					.usingRecursiveFieldByFieldElementComparator()
+					.containsExactly(
+							new MyProjection( "hit1Text" ),
+							new MyProjection( "hit2Text" )
+					);
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.CONSTRUCTOR)
+	@ConstructorMapping(processor = @ConstructorMappingAnnotationProcessorRef(type = WorkingAnnotation.Processor.class))
+	private @interface WorkingAnnotation {
+		class Processor implements ConstructorMappingAnnotationProcessor<CustomConstructorMappingAnnotationBaseIT.WorkingAnnotation> {
+			@Override
+			public void process(ConstructorMappingStep mapping, CustomConstructorMappingAnnotationBaseIT.WorkingAnnotation annotation,
+					ConstructorMappingAnnotationProcessorContext context) {
+				mapping.projectionConstructor();
+			}
+		}
+	}
 
 	@Test
 	public void missingProcessorReference() {
