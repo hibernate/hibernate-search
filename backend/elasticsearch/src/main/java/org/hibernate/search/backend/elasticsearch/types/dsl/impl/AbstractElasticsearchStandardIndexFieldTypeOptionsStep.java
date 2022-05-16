@@ -27,10 +27,10 @@ abstract class AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S extends 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {
 			case DEFAULT:
-			case NO:
-				return false;
 			case YES:
 				return true;
+			case NO:
+				return false;
 			default:
 				throw new AssertionFailure( "Unexpected value for Projectable: " + projectable );
 		}

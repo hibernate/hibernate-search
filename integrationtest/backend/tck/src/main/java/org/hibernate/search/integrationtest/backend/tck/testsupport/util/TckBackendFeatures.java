@@ -59,6 +59,8 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
+	public abstract boolean fieldsProjectableByDefault();
+
 	public boolean supportsTotalHitsThresholdForSearch() {
 		return true;
 	}

@@ -25,6 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.T
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -91,8 +92,9 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 
 	@Test
 	public void isProjectable() {
+		boolean projectable = TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault();
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::projectable );
+				.returns( projectable, IndexValueFieldTypeDescriptor::projectable );
 		assertThat( getTypeDescriptor( "projectable" ) )
 				.returns( true, IndexValueFieldTypeDescriptor::projectable );
 		assertThat( getTypeDescriptor( "nonProjectable" ) )

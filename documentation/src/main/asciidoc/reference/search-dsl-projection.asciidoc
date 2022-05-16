@@ -36,7 +36,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [NOTE]
 ====
 There are a few constraints regarding `field` projections.
-In particular, in order for a field to be "projectable", it must be <<mapper-orm-directfieldmapping-projectable,marked as such in the mapping>>,
+In particular, in order for a field to be "projectable", it must either be <<mapper-orm-directfieldmapping-projectable,explicitly marked as such in the mapping>>,
+or be implicitly projectable based on the underlying backend (Elasticsearch),
 so that it is correctly stored in the index.
 ====
 

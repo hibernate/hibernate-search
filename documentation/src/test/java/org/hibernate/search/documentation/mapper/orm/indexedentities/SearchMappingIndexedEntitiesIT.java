@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescript
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -97,7 +98,7 @@ public class SearchMappingIndexedEntitiesIT {
 				Optional<String> normalizerName = type.normalizerName();
 				// Etc.
 				//end::indexMetamodel[]
-				assertThat( projectable ).isFalse();
+				assertThat( projectable ).isEqualTo( BackendConfiguration.isElasticsearch() ? true : false );
 				assertThat( dslArgumentClass ).isEqualTo( Date.class );
 				assertThat( projectedValueClass ).isEqualTo( Date.class );
 				assertThat( analyzerName ).isEmpty();
