@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom2AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFrom3AsStep;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
-import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.LocalDateFieldTypeDescriptor;
@@ -68,6 +69,8 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 
 	protected abstract CompositeProjectionFromStep startProjection(SearchProjectionFactory<?, ?> f);
 
+	protected abstract CompositeProjectionFromStep startProjectionForMulti(SearchProjectionFactory<?, ?> f);
+
 	private abstract class AbstractFromAnyNumberIT {
 
 		@Test
@@ -97,6 +100,14 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 					.where( f -> f.matchAll() ) )
 					.hasHitsAnyOrder( expectedLists().stream().<ValueWrapper<List<?>>>map( ValueWrapper::new )
 							.collect( Collectors.toList() ) );
+		}
+
+		@Test
+		public void asList_multi() {
+			assertThatQuery( index.query()
+					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asList().multi() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedListsForMulti() );
 		}
 
 		@Test
@@ -133,6 +144,15 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		}
 
 		@Test
+		public void asArray_multi() {
+			assertThatQuery( index.query()
+					.select( f -> doFromForMulti( f, startProjectionForMulti( f ) ).asArray().multi() )
+					.where( f -> f.matchAll() ) )
+					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
+					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti() );
+		}
+
+		@Test
 		public void inComposite() {
 			assertThatQuery( index.query()
 					.select( f -> f.composite().from(
@@ -146,21 +166,39 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 							.collect( Collectors.toList() ) );
 		}
 
-		protected abstract CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f,
+		protected CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f,
+				CompositeProjectionFromStep step) {
+			return doFrom( f, index.binding().composite(), step );
+		}
+
+		protected CompositeProjectionAsStep doFromForMulti(SearchProjectionFactory<?, ?> f,
+				CompositeProjectionFromStep step) {
+			return doFrom( f, index.binding().compositeForMulti(), step );
+		}
+
+		protected abstract CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding,
 				CompositeProjectionFromStep step);
 
 		protected final Collection<List<?>> expectedLists() {
-			return dataSet.forEachDocument( this::expectedList );
+			return dataSet.forEachDocument( docOrdinal -> expectedList( docOrdinal, 0 ) );
 		}
 
-		protected abstract List<?> expectedList(int docOrdinal);
+		protected abstract List<?> expectedList(int docOrdinal, int inDocOrdinal);
+
+		protected final Collection<List<List<?>>> expectedListsForMulti() {
+			return dataSet.forEachDocumentAndObject( this::expectedList );
+		}
 
 		protected final Collection<Object[]> expectedArrays() {
-			return dataSet.forEachDocument( this::expectedArray );
+			return dataSet.forEachDocument( docOrdinal -> expectedArray( docOrdinal, 0 ) );
 		}
 
-		protected final Object[] expectedArray(int docOrdinal) {
-			return expectedList( docOrdinal ).toArray();
+		protected final Collection<List<Object[]>> expectedArraysForMulti() {
+			return dataSet.forEachDocumentAndObject( this::expectedArray );
+		}
+
+		protected final Object[] expectedArray(int docOrdinal, int inDocOrdinal) {
+			return expectedList( docOrdinal, inDocOrdinal ).toArray();
 		}
 
 	}
@@ -176,16 +214,38 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 					.hasHitsAnyOrder( expectedTransformed() );
 		}
 
-		@Override
-		protected abstract S doFrom(SearchProjectionFactory<?, ?> f, CompositeProjectionFromStep step);
-
-		protected abstract ProjectionFinalStep<T> doAs(S step);
-
-		protected final Collection<T> expectedTransformed() {
-			return dataSet.forEachDocument( this::expectedTransformed );
+		@Test
+		public void as_transformer_multi() {
+			assertThatQuery( index.query()
+					.select( f -> doAs( doFromForMulti( f, startProjectionForMulti( f ) ) ).multi() )
+					.where( f -> f.matchAll() ) )
+					.hasHitsAnyOrder( expectedTransformedForMulti() );
 		}
 
-		protected abstract T expectedTransformed(int docOrdinal);
+		@Override
+		protected final S doFrom(SearchProjectionFactory<?, ?> f, CompositeProjectionFromStep step) {
+			return doFrom( f, index.binding().composite(), step );
+		}
+
+		@Override
+		protected final S doFromForMulti(SearchProjectionFactory<?, ?> f, CompositeProjectionFromStep step) {
+			return doFrom( f, index.binding().compositeForMulti(), step );
+		}
+
+		@Override
+		protected abstract S doFrom(SearchProjectionFactory<?, ?> f, CompositeBinding binding, CompositeProjectionFromStep step);
+
+		protected abstract CompositeProjectionValueStep<?, T> doAs(S step);
+
+		protected final Collection<T> expectedTransformed() {
+			return dataSet.forEachDocument( docOrdinal -> expectedTransformed( docOrdinal, 0 ) );
+		}
+
+		protected final Collection<List<T>> expectedTransformedForMulti() {
+			return dataSet.forEachDocumentAndObject( this::expectedTransformed );
+		}
+
+		protected abstract T expectedTransformed(int docOrdinal, int inDocOrdinal);
 
 	}
 
@@ -194,23 +254,23 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom1AsStep<String>, ValueWrapper<String>> {
 		@Override
 		protected CompositeProjectionFrom1AsStep<String> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeProjectionFromStep step) {
-			return step.from( f.field( index.binding().composite().field1Path(), String.class ) );
+				CompositeBinding binding, CompositeProjectionFromStep step) {
+			return step.from( f.field( binding.field1Path(), String.class ) );
 		}
 
 		@Override
-		protected ProjectionFinalStep<ValueWrapper<String>> doAs(CompositeProjectionFrom1AsStep<String> step) {
+		protected CompositeProjectionValueStep<?, ValueWrapper<String>> doAs(CompositeProjectionFrom1AsStep<String> step) {
 			return step.as( ValueWrapper<String>::new );
 		}
 
 		@Override
-		protected List<?> expectedList(int docOrdinal) {
-			return Arrays.asList( dataSet.field1Value( docOrdinal ) );
+		protected List<?> expectedList(int docOrdinal, int inDocOrdinal) {
+			return Arrays.asList( dataSet.field1Value( docOrdinal, inDocOrdinal ) );
 		}
 
 		@Override
-		protected ValueWrapper<String> expectedTransformed(int docOrdinal) {
-			return new ValueWrapper<>( dataSet.field1Value( docOrdinal ) );
+		protected ValueWrapper<String> expectedTransformed(int docOrdinal, int inDocOrdinal) {
+			return new ValueWrapper<>( dataSet.field1Value( docOrdinal, inDocOrdinal ) );
 		}
 	}
 
@@ -219,24 +279,24 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom2AsStep<String, String>, Pair<String, String>> {
 		@Override
 		protected CompositeProjectionFrom2AsStep<String, String> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeProjectionFromStep step) {
-			return step.from( f.field( index.binding().composite().field1Path(), String.class ),
-					f.field( index.binding().composite().field2Path(), String.class ) );
+				CompositeBinding binding, CompositeProjectionFromStep step) {
+			return step.from( f.field( binding.field1Path(), String.class ),
+					f.field( binding.field2Path(), String.class ) );
 		}
 
 		@Override
-		protected ProjectionFinalStep<Pair<String, String>> doAs(CompositeProjectionFrom2AsStep<String, String> step) {
+		protected CompositeProjectionValueStep<?, Pair<String, String>> doAs(CompositeProjectionFrom2AsStep<String, String> step) {
 			return step.as( Pair::new );
 		}
 
 		@Override
-		protected List<?> expectedList(int docOrdinal) {
-			return Arrays.asList( dataSet.field1Value( docOrdinal ), dataSet.field2Value( docOrdinal ) );
+		protected List<?> expectedList(int docOrdinal, int inDocOrdinal) {
+			return Arrays.asList( dataSet.field1Value( docOrdinal, inDocOrdinal ), dataSet.field2Value( docOrdinal, inDocOrdinal ) );
 		}
 
 		@Override
-		protected Pair<String, String> expectedTransformed(int docOrdinal) {
-			return new Pair<>( dataSet.field1Value( docOrdinal ), dataSet.field2Value( docOrdinal ) );
+		protected Pair<String, String> expectedTransformed(int docOrdinal, int inDocOrdinal) {
+			return new Pair<>( dataSet.field1Value( docOrdinal, inDocOrdinal ), dataSet.field2Value( docOrdinal, inDocOrdinal ) );
 		}
 	}
 
@@ -245,28 +305,30 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			extends AbstractFromSpecificNumberIT<CompositeProjectionFrom3AsStep<String, String, LocalDate>, Triplet<String, String, LocalDate>> {
 		@Override
 		protected CompositeProjectionFrom3AsStep<String, String, LocalDate> doFrom(SearchProjectionFactory<?, ?> f,
-				CompositeProjectionFromStep step) {
-			return step.from( f.field( index.binding().composite().field1Path(), String.class ),
-					f.field( index.binding().composite().field2Path(), String.class ),
-					f.field( index.binding().composite().field3Path(), LocalDate.class ) );
+				CompositeBinding binding, CompositeProjectionFromStep step) {
+			return step.from( f.field( binding.field1Path(), String.class ),
+					f.field( binding.field2Path(), String.class ),
+					f.field( binding.field3Path(), LocalDate.class ) );
 		}
 
 		@Override
-		protected ProjectionFinalStep<Triplet<String, String, LocalDate>> doAs(
+		protected CompositeProjectionValueStep<?, Triplet<String, String, LocalDate>> doAs(
 				CompositeProjectionFrom3AsStep<String, String, LocalDate> step) {
 			return step.as( Triplet::new );
 		}
 
 		@Override
-		protected List<?> expectedList(int docOrdinal) {
-			return Arrays.asList( dataSet.field1Value( docOrdinal ), dataSet.field2Value( docOrdinal ),
-					dataSet.field3Value( docOrdinal ) );
+		protected List<?> expectedList(int docOrdinal, int inDocOrdinal) {
+			return Arrays.asList( dataSet.field1Value( docOrdinal, inDocOrdinal ),
+					dataSet.field2Value( docOrdinal, inDocOrdinal ),
+					dataSet.field3Value( docOrdinal, inDocOrdinal ) );
 		}
 
 		@Override
-		protected Triplet<String, String, LocalDate> expectedTransformed(int docOrdinal) {
-			return new Triplet<>( dataSet.field1Value( docOrdinal ), dataSet.field2Value( docOrdinal ),
-					dataSet.field3Value( docOrdinal ) );
+		protected Triplet<String, String, LocalDate> expectedTransformed(int docOrdinal, int inDocOrdinal) {
+			return new Triplet<>( dataSet.field1Value( docOrdinal, inDocOrdinal ),
+					dataSet.field2Value( docOrdinal, inDocOrdinal ),
+					dataSet.field3Value( docOrdinal, inDocOrdinal ) );
 		}
 	}
 
@@ -274,23 +336,28 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 	public class From4IT
 			extends AbstractFromAnyNumberIT {
 		@Override
-		protected CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f, CompositeProjectionFromStep step) {
-			return step.from( f.field( index.binding().composite().field1Path(), String.class ),
-					f.field( index.binding().composite().field2Path(), String.class ),
-					f.field( index.binding().composite().field3Path(), LocalDate.class ),
-					f.field( index.binding().composite().field4Path(), String.class ) );
+		protected CompositeProjectionAsStep doFrom(SearchProjectionFactory<?, ?> f,
+				CompositeBinding binding, CompositeProjectionFromStep step) {
+			return step.from( f.field( binding.field1Path(), String.class ),
+					f.field( binding.field2Path(), String.class ),
+					f.field( binding.field3Path(), LocalDate.class ),
+					f.field( binding.field4Path(), String.class ) );
 		}
 
 		@Override
-		protected List<?> expectedList(int docOrdinal) {
-			return Arrays.asList( dataSet.field1Value( docOrdinal ), dataSet.field2Value( docOrdinal ),
-							dataSet.field3Value( docOrdinal ), dataSet.field4Value( docOrdinal ) );
+		protected List<?> expectedList(int docOrdinal, int inDocOrdinal) {
+			return Arrays.asList( dataSet.field1Value( docOrdinal, inDocOrdinal ),
+					dataSet.field2Value( docOrdinal, inDocOrdinal ),
+					dataSet.field3Value( docOrdinal, inDocOrdinal ),
+					dataSet.field4Value( docOrdinal, inDocOrdinal ) );
 		}
 	}
 
 	protected abstract static class AbstractIndexBinding {
 
 		abstract CompositeBinding composite();
+
+		abstract CompositeBinding compositeForMulti();
 
 	}
 
@@ -352,20 +419,43 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 			return Arrays.asList( function.apply( 0 ), function.apply( 1 ), function.apply( 2 ) );
 		}
 
+		public <T> List<List<T>> forEachDocumentAndObject(BiFunction<Integer, Integer, T> function) {
+			return forEachDocument( docOrdinal -> forEachObjectInDocument( inDocOrdinal ->
+					function.apply( docOrdinal, inDocOrdinal ) ) );
+		}
+
+		abstract <T> List<T> forEachObjectInDocument(IntFunction<T> function);
+
 		public String field1Value(int docOrdinal) {
-			return stringValues.fieldValue( 10 * docOrdinal + 1 );
+			return field1Value( docOrdinal, 0 );
 		}
 
 		public String field2Value(int docOrdinal) {
-			return stringValues.fieldValue( 10 * docOrdinal + 2 );
+			return field2Value( docOrdinal, 0 );
 		}
 
 		public LocalDate field3Value(int docOrdinal) {
-			return localDateValues.fieldValue( 10 * docOrdinal + 3 );
+			return field3Value( docOrdinal, 0 );
 		}
 
 		public String field4Value(int docOrdinal) {
-			return stringValues.fieldValue( 10 * docOrdinal + 4 );
+			return field4Value( docOrdinal, 0 );
+		}
+
+		public String field1Value(int docOrdinal, int inDocOrdinal) {
+			return stringValues.fieldValue( 100 * docOrdinal + 10 * inDocOrdinal + 1 );
+		}
+
+		public String field2Value(int docOrdinal, int inDocOrdinal) {
+			return stringValues.fieldValue( 100 * docOrdinal + 10 * inDocOrdinal + 2 );
+		}
+
+		public LocalDate field3Value(int docOrdinal, int inDocOrdinal) {
+			return localDateValues.fieldValue( 100 * docOrdinal + 10 * inDocOrdinal + 3 );
+		}
+
+		public String field4Value(int docOrdinal, int inDocOrdinal) {
+			return stringValues.fieldValue( 100 * docOrdinal + 10 * inDocOrdinal + 4 );
 		}
 	}
 

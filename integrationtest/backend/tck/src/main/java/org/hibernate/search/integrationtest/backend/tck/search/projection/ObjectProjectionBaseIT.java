@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.IntFunction;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -66,12 +70,19 @@ public class ObjectProjectionBaseIT {
 			return f.object( index.binding().objectField.relativeName );
 		}
 
+		@Override
+		protected CompositeProjectionFromStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
+			return f.object( index.binding().objectField_multi.relativeName );
+		}
+
 		// Just use fields at the root of the index
 		public static class IndexBinding extends AbstractCompositeProjectionFromAsIT.AbstractIndexBinding {
 			private final ObjectBinding objectField;
+			private final ObjectBinding objectField_multi;
 
 			IndexBinding(IndexSchemaElement parent) {
-				objectField = ObjectBinding.create( parent, "objectField" );
+				objectField = ObjectBinding.create( parent, "objectField", false );
+				objectField_multi = ObjectBinding.create( parent, "objectField_multi", true );
 			}
 
 			@Override
@@ -79,9 +90,19 @@ public class ObjectProjectionBaseIT {
 				return objectField;
 			}
 
+			@Override
+			CompositeBinding compositeForMulti() {
+				return objectField_multi;
+			}
+
 			private static class ObjectBinding extends AbstractCompositeProjectionFromAsIT.CompositeBinding {
-				public static ObjectBinding create(IndexSchemaElement parent, String relativeName) {
-					return new ObjectBinding( parent.objectField( relativeName, requiredObjectStructure() ), relativeName );
+				public static ObjectBinding create(IndexSchemaElement parent, String relativeName,
+						boolean multiValued) {
+					IndexSchemaObjectField objectField = parent.objectField( relativeName, requiredObjectStructure() );
+					if ( multiValued ) {
+						objectField.multiValued();
+					}
+					return new ObjectBinding( objectField, relativeName );
 				}
 
 				private final String relativeName;
@@ -99,10 +120,26 @@ public class ObjectProjectionBaseIT {
 			@Override
 			void initDocument(IndexBinding binding, int docOrdinal, DocumentElement document) {
 				DocumentElement object = document.addObject( binding.objectField.reference );
-				object.addValue( binding.objectField.field1.reference, field1Value( docOrdinal ) );
-				object.addValue( binding.objectField.field2.reference, field2Value( docOrdinal ) );
-				object.addValue( binding.objectField.field3.reference, field3Value( docOrdinal ) );
-				object.addValue( binding.objectField.field4.reference, field4Value( docOrdinal ) );
+				object.addValue( binding.objectField.field1.reference, field1Value( docOrdinal, 0 ) );
+				object.addValue( binding.objectField.field2.reference, field2Value( docOrdinal, 0 ) );
+				object.addValue( binding.objectField.field3.reference, field3Value( docOrdinal, 0 ) );
+				object.addValue( binding.objectField.field4.reference, field4Value( docOrdinal, 0 ) );
+
+				object = document.addObject( binding.objectField_multi.reference );
+				object.addValue( binding.objectField_multi.field1.reference, field1Value( docOrdinal, 0 ) );
+				object.addValue( binding.objectField_multi.field2.reference, field2Value( docOrdinal, 0 ) );
+				object.addValue( binding.objectField_multi.field3.reference, field3Value( docOrdinal, 0 ) );
+				object.addValue( binding.objectField_multi.field4.reference, field4Value( docOrdinal, 0 ) );
+				object = document.addObject( binding.objectField_multi.reference );
+				object.addValue( binding.objectField_multi.field1.reference, field1Value( docOrdinal, 1 ) );
+				object.addValue( binding.objectField_multi.field2.reference, field2Value( docOrdinal, 1 ) );
+				object.addValue( binding.objectField_multi.field3.reference, field3Value( docOrdinal, 1 ) );
+				object.addValue( binding.objectField_multi.field4.reference, field4Value( docOrdinal, 1 ) );
+			}
+
+			@Override
+			<T> List<T> forEachObjectInDocument(IntFunction<T> function) {
+				return Arrays.asList( function.apply( 0 ), function.apply( 1 ) );
 			}
 		}
 	}

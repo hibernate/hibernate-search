@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.function.IntFunction;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionFromStep;
@@ -64,6 +68,11 @@ public class CompositeProjectionBaseIT {
 			return f.composite();
 		}
 
+		@Override
+		protected CompositeProjectionFromStep startProjectionForMulti(SearchProjectionFactory<?, ?> f) {
+			return f.composite();
+		}
+
 		// Just use fields at the root of the index
 		public static class IndexBinding extends AbstractCompositeProjectionFromAsIT.AbstractIndexBinding {
 			private final CompositeBinding delegate;
@@ -77,6 +86,10 @@ public class CompositeProjectionBaseIT {
 				return delegate;
 			}
 
+			@Override
+			CompositeBinding compositeForMulti() {
+				return delegate;
+			}
 		}
 
 		public static class DataSet extends AbstractCompositeProjectionFromAsIT.AbstractDataSet<IndexBinding> {
@@ -86,6 +99,11 @@ public class CompositeProjectionBaseIT {
 				document.addValue( binding.delegate.field2.reference, field2Value( docOrdinal ) );
 				document.addValue( binding.delegate.field3.reference, field3Value( docOrdinal ) );
 				document.addValue( binding.delegate.field4.reference, field4Value( docOrdinal ) );
+			}
+
+			@Override
+			<T> List<T> forEachObjectInDocument(IntFunction<T> function) {
+				return Collections.singletonList( function.apply( 0 ) );
 			}
 		}
 	}
