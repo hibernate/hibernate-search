@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-package org.hibernate.search.integrationtest.backend.lucene.nested;
+package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,12 +23,14 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProjectionAndOrderByNestedIT {
+@TestForIssue(jiraKey = "HSEARCH-4584")
+public class FieldProjectionAndSortNestedIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
