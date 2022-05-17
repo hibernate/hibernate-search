@@ -101,7 +101,7 @@ public class DistanceProjectionMultiValuedBaseIT {
 									root,
 									supportedFieldTypes,
 									TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
-											c -> c.sortable( Sortable.YES ) :
+											NO_ADDITIONAL_CONFIGURATION :
 											c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
 							)
 					)

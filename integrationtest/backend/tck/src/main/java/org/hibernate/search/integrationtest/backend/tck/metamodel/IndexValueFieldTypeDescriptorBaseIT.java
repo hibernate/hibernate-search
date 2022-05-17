@@ -24,6 +24,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -80,14 +81,16 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 
 	@Test
 	public void isSortable() {
+		boolean projectable = TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault();
+
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::sortable );
+				.returns( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ? projectable : false, IndexValueFieldTypeDescriptor::sortable );
 		if ( isSortSupported() ) {
 			assertThat( getTypeDescriptor( "sortable" ) )
 					.returns( true, IndexValueFieldTypeDescriptor::sortable );
 		}
 		assertThat( getTypeDescriptor( "nonSortable" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::sortable );
+				.returns( GeoPointFieldTypeDescriptor.INSTANCE.equals( fieldType ) ? projectable : false, IndexValueFieldTypeDescriptor::sortable );
 	}
 
 	@Test

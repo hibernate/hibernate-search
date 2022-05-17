@@ -33,8 +33,13 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		ElasticsearchGeoPointFieldCodec codec = ElasticsearchGeoPointFieldCodec.INSTANCE;
 		builder.codec( codec );
 
+		// Since docs values are going to be available as soon as the filed is either sortable or projectable
+		// it would open the other capability automatically. Hence:
+		resolvedSortable = resolvedSortable || resolvedProjectable;
+		resolvedProjectable = resolvedSortable;
+
 		// We need doc values for the projection script when not sorting on the same field
-		builder.mapping().setDocValues( resolvedSortable || resolvedProjectable );
+		builder.mapping().setDocValues( resolvedProjectable );
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );

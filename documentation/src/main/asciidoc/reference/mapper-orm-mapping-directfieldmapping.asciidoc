@@ -162,6 +162,12 @@ Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
 +
 The defaults are different for the <<backend-lucene,Lucene>> and <<backend-elasticsearch,Elasticsearch>> backends:
 with Lucene, the default is `Projectable.NO`, while with Elasticsearch it's `Projectable.YES`.
++
+[NOTE]
+====
+For <<backend-elasticsearch,Elasticsearch>> if any of `projectable` or `sortable` properties are resolved to `YES`
+on a `GeoPoint` field then this field automatically becomes both `projectable` and `sortable` even if one of them was explicitly set to `NO`.
+====
 
 [[mapper-orm-directfieldmapping-aggregable]] `aggregable`::
 Whether the field can be <<search-dsl-aggregation, aggregated>>,
