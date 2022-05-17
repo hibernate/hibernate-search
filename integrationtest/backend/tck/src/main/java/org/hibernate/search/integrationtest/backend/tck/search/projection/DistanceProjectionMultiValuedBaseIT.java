@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding.NO_ADDITIONAL_CONFIGURATION;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_2;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
@@ -28,6 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
@@ -83,16 +85,26 @@ public class DistanceProjectionMultiValuedBaseIT {
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
-			SimpleMappedIndex.of( root -> SingleFieldIndexBinding.create(
-					root, supportedFieldTypes,
-					c -> c.projectable( Projectable.YES )
-			) )
+			SimpleMappedIndex.of(
+							root -> SingleFieldIndexBinding.create(
+									root,
+									supportedFieldTypes,
+									TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
+											NO_ADDITIONAL_CONFIGURATION :
+											c -> c.projectable( Projectable.YES )
+							)
+					)
 					.name( "main" );
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> sortableIndex =
-			SimpleMappedIndex.of( root -> SingleFieldIndexBinding.create(
-					root, supportedFieldTypes,
-					c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
-			) )
+			SimpleMappedIndex.of(
+							root -> SingleFieldIndexBinding.create(
+									root,
+									supportedFieldTypes,
+									TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
+											c -> c.sortable( Sortable.YES ) :
+											c -> c.projectable( Projectable.YES ).sortable( Sortable.YES )
+							)
+					)
 					.name( "sortable" );
 
 	@BeforeClass
