@@ -25,7 +25,7 @@ following the migration guide of link:https://hibernate.org/search/documentation
 [[requirements]]
 == Requirements
 
-Hibernate Search {hibernateSearchVersion} now requires using Hibernate ORM versions from the 5.5.x family.
+Hibernate Search's requirements did not change in version {hibernateSearchVersion}.
 
 [[data-format]]
 == Data format and schema changes
@@ -38,84 +38,17 @@ can be read from and written to with Hibernate Search {hibernateSearchVersion}.
 
 The configuration properties are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
-Some configuration properties API have been deprecated, and will be removed in the next major version:
-
-* `hibernate.search.automatic_indexing.strategy`:
-  use `hibernate.search.automatic_indexing.enabled` instead,
-  passing either `true` or `false`.
-
 [[api]]
 == API changes
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
-Parts of the API have been deprecated, and will be removed in the next major version:
-
-* `FromDocumentFieldValueConverter`: implement `FromDocumentValueConverter` instead.
-* `ToDocumentFieldValueConverter`: implement `ToDocumentValueConverter` instead.
-* `org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler`:
-implement `org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler` instead.
-* `org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor`:
-implement `org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor` instead.
-* `AutomaticIndexingStrategyName`, `HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY`,
-`HibernateOrmMapperSettings.Radicals#AUTOMATIC_INDEXING_STRATEGY`,
-`HibernateOrmMapperSettings.AutomaticIndexingRadicals#STRATEGY`,
- `HibernateOrmMapperSettings.Defaults#AUTOMATIC_INDEXING_STRATEGY`:
-use the new configuration property that accepts `true`/`false` instead.
-See `HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED`.
-* `ElasticsearchBackendSettings.Defaults#MULTITENANCY_STRATEGY`, `LuceneBackendSettings.Defaults#MULTITENANCY_STRATEGY`:
-the default for these properties is now dynamic.
-If the multi-tenancy is enabled in the mapper, the default is `MultiTenancyStrategyName#DISCRIMINATOR`;
-Otherwise, the default is still `MultiTenancyStrategyName#NONE`.
-
 [[spi]]
 == SPI changes
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
-is mostly backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
-
-Below are the most notable SPI changes:
-
-* `org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource`
-moved to `org.hibernate.search.engine.cfg.ConfigurationPropertySource`
-* `org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer`
-moved to `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer`
-and is now API.
-* `org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurationContext`
-moved to `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext`
-and is now API.
-* `org.hibernate.search.engine.common.timing.spi.Deadline`
-moved to `org.hibernate.search.engine.common.timing.Deadline`
-and is now API.
-* `org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport`
-is now `org.hibernate.search.engine.backend.work.execution.spi.MultiEntityOperationExecutionReport`.
-* `URLEncodedString#fromJsonString` was removed.
-* `FieldPaths#absolutize(String, String, String)` was removed.
-* `IndexManagerImplementor#createIndexingPlan` no longer expects an `EntityReferenceFactory` parameter,
-but `IndexIndexingPlan#executeAndReport` does.
-* API changes around `ToDocumentFieldValueConverter`/`FromDocumentFieldValueConverter`
-led to more SPI changes.
-See https://github.com/hibernate/hibernate-search/pull/2611.
-* The document model SPI for backend implementations changed significantly:
-** `org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder`
-is now `org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder`.
-** `org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder`
-is now `org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder`.
-** `org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder`
-is now `org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder`.
-** Implementations should rely on abstract classes provided as part of the SPI,
-for example `org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel`.
-** Etc. See https://github.com/hibernate/hibernate-search/pull/2591
-for an example of how to migrate backend implementations.
-* The entry points of the search DSL SPI for backend implementations changed significantly.
-See https://github.com/hibernate/hibernate-search/pull/2591
-and https://github.com/hibernate/hibernate-search/pull/2592
-for an example of how to migrate backend implementations.
-
-Parts of the SPI have been deprecated, and will be removed in the next major version:
-
-* `ElasticsearcAwsCredentialsProvider`: implement `ElasticsearchAwsCredentialsProvider` instead.
+is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
 [[behavior]]
 == Behavior changes
