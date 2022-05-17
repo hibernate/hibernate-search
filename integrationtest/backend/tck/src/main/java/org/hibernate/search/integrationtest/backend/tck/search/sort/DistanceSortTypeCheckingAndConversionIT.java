@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Consumer;
@@ -96,6 +97,10 @@ public class DistanceSortTypeCheckingAndConversionIT {
 
 	@Test
 	public void unsortable() {
+		assumeFalse(
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+		);
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath();
 
