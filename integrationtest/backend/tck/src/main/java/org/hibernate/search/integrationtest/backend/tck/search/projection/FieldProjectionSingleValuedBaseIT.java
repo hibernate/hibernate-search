@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding.NO_ADDITIONAL_CONFIGURATION;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assume.assumeTrue;
@@ -67,8 +68,13 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields( root, supportedFieldTypes,
-					c -> c.projectable( Projectable.YES ) );
+			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
+					root,
+					supportedFieldTypes,
+					TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault() ?
+							NO_ADDITIONAL_CONFIGURATION :
+							c -> c.projectable( Projectable.YES )
+			);
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
 

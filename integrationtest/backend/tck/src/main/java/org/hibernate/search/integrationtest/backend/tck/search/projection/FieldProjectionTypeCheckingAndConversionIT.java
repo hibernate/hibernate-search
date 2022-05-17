@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeFalse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -158,6 +160,25 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 
 	@Test
 	public void nonProjectable() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = getNonProjectableFieldPath();
+
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot use 'projection:field' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
+	}
+
+	@Test
+	public void projectableDefault() {
+		assumeFalse(
+				"Skipping this test as the backend makes fields projectable by default.",
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+		);
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getNonProjectableFieldPath();
@@ -459,6 +480,10 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 		return mainIndex.binding().fieldWithProjectionDisabledModels.get( fieldType ).relativeFieldName;
 	}
 
+	private String getProjectableDefaultFieldPath() {
+		return mainIndex.binding().fieldWithProjectionDisabledModels.get( fieldType ).relativeFieldName;
+	}
+
 	private F getFieldValue(int documentNumber) {
 		return getFieldValue( fieldType, documentNumber );
 	}
@@ -511,6 +536,7 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithConverterModels;
 		final SimpleFieldModelsByType fieldWithProjectionDisabledModels;
+		final SimpleFieldModelsByType fieldWithDefaultProjectionModels;
 		final SimpleFieldModelsByType fieldWithMultipleValuesModels;
 
 		final ObjectBinding flattenedObject;
@@ -528,6 +554,8 @@ public class FieldProjectionTypeCheckingAndConversionIT<F> {
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
 			fieldWithProjectionDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonProjectable_", c -> c.projectable( Projectable.NO ) );
+			fieldWithDefaultProjectionModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"projectableDefault_", c -> c.projectable( Projectable.DEFAULT ) );
 			fieldWithMultipleValuesModels = SimpleFieldModelsByType.mapAllMultiValued( supportedFieldTypes, root,
 					"multiValued_", c -> c.projectable( Projectable.YES ) );
 
