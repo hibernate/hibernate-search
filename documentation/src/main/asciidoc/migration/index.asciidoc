@@ -25,7 +25,7 @@ following the migration guide of link:https://hibernate.org/search/documentation
 [[requirements]]
 == Requirements
 
-Hibernate Search {hibernateSearchVersion} now requires using Hibernate ORM versions from the 5.5.x family.
+Hibernate Search {hibernateSearchVersion} now requires using Hibernate ORM versions from the 5.6.x family.
 
 [[data-format]]
 == Data format and schema changes
