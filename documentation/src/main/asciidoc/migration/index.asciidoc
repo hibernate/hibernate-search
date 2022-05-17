@@ -44,6 +44,27 @@ The configuration properties are backward-compatible with Hibernate Search {hibe
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
+Parts of the API have been deprecated, and may be removed in the next major version:
+
+* `SearchPredicateFactory#bool(Consumer)`, which enables the syntax `f.bool(b -> { b.must(...); b.must(...); }`:
+use the syntax `f.bool().with(b -> { b.must(...); b.must(...); })` instead,
+or (if possible) take advantage of the new `.where(BiConsumer)` method in the Search Query DSL:
+`.where((f, b) -> { b.must(...); b.must(...); })`.
+* `SearchPredicateFactory#nested()`, which enables the syntax `f.nested().objectFieldPath("someField").nest(f.bool().must(...).must(...))`:
+use the syntax `f.nested("someField").must(...).must(...)` instead.
+* `SearchProjectionFactory#composite((Function, SearchProjection ...)`/`SearchProjectionFactory#composite((Function, ProjectionFinalStep ...)`
+which enable the syntax `f.composite(list -> ..., <some projection>, <some projection>, ...)`:
+use the (more flexible) syntax `f.composite().from(<some projection>, <some projection>, ...).asList(list -> ...)` instead.
+* `SearchProjectionFactory#composite((Function, SearchProjection)`/`SearchProjectionFactory#composite((Function, ProjectionFinalStep)`
+which enable the syntax `f.composite(p1 -> ..., <some projection>)`:
+use the (more flexible) syntax `f.composite().from(<some projection>).as(p1 -> ...)` instead.
+* `SearchProjectionFactory#composite((BiFunction, SearchProjection, SearchProjection)`/`SearchProjectionFactory#composite((BiFunction, ProjectionFinalStep, ProjectionFinalStep)`
+which enable the syntax `f.composite((p1, p2) -> ..., <some projection>, <some projection>)`:
+use the (more flexible) syntax `f.composite().from(<some projection>, <some projection>).as((p1, p2) -> ...)` instead.
+* `SearchProjectionFactory#composite((TriFunction, SearchProjection, SearchProjection, SearchProjection)`/`SearchProjectionFactory#composite((TriFunction, ProjectionFinalStep, ProjectionFinalStep, ProjectionFinalStep)`
+which enable the syntax `f.composite((p1, p2, p3) -> ..., <some projection>, <some projection>, <some projection>)`:
+use the (more flexible) syntax `f.composite().from(<some projection>, <some projection>, <some projection>).as((p1, p2, p3) -> ...)` instead.
+
 [[spi]]
 == SPI changes
 
