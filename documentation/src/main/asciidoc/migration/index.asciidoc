@@ -69,7 +69,11 @@ use the (more flexible) syntax `f.composite().from(<some projection>, <some proj
 == SPI changes
 
 The https://hibernate.org/community/compatibility-policy/#code-categorization[SPI]
-is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+is mostly backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+Below are the most notable SPI changes:
+
+* `PojoGenericTypeModel` no longer exists; its methods moved to `PojoTypeModel`.
 
 [[behavior]]
 == Behavior changes
