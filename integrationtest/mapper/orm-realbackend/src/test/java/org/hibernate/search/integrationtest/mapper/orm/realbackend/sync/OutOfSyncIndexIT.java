@@ -7,17 +7,17 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.sync;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils.prepareBooks;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
-import java.time.Duration;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Book;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -39,18 +39,11 @@ public class OutOfSyncIndexIT {
 	@Before
 	public void before() {
 		entityManagerFactory = setupHelper.start()
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						AutomaticIndexingSynchronizationStrategyNames.READ_SYNC )
 				.setup( Book.class );
 
 		prepareBooks( entityManagerFactory );
-
-		await( "Waiting for docs to appear" )
-				.pollDelay( Duration.ZERO )
-				.pollInterval( Duration.ofMillis( 5 ) )
-				.atMost( Duration.ofSeconds( 5 ) )
-				.untilAsserted( () -> {
-					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) )
-							.isPositive();
-				} );
 	}
 
 	@Test
