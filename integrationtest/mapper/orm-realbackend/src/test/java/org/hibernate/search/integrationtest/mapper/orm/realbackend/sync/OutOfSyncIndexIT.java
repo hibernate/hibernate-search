@@ -31,6 +31,8 @@ import org.junit.Test;
  */
 public class OutOfSyncIndexIT {
 
+	private static final int NUMBER_OF_BOOKS = 8;
+
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
@@ -43,7 +45,7 @@ public class OutOfSyncIndexIT {
 						AutomaticIndexingSynchronizationStrategyNames.READ_SYNC )
 				.setup( Book.class );
 
-		prepareBooks( entityManagerFactory );
+		prepareBooks( entityManagerFactory, NUMBER_OF_BOOKS );
 	}
 
 	@Test

@@ -18,10 +18,6 @@ public final class BookCreatorUtils {
 	private BookCreatorUtils() {
 	}
 
-	public static void prepareBooks(EntityManagerFactory entityManagerFactory) {
-		prepareBooks( entityManagerFactory, 8 );
-	}
-
 	public static void prepareBooks(EntityManagerFactory entityManagerFactory, int numberOfBooks) {
 		withinJPATransaction( entityManagerFactory, entityManager -> {
 			for ( int i = 0; i < numberOfBooks; i++ ) {
