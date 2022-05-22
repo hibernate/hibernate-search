@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
+import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 class NativePersistenceRunner implements PersistenceRunner<Session, Transaction> {
 	private final SessionFactory sessionFactory;
@@ -23,7 +22,7 @@ class NativePersistenceRunner implements PersistenceRunner<Session, Transaction>
 	}
 
 	@Override
-	public <R> R applyNoTransaction(Function<? super Session, R> action) {
+	public <R, E extends Throwable> R applyNoTransaction(ThrowingFunction<? super Session, R, E> action) throws E {
 		if ( tenantId != null ) {
 			try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
 				return action.apply( session );
@@ -37,9 +36,11 @@ class NativePersistenceRunner implements PersistenceRunner<Session, Transaction>
 	}
 
 	@Override
-	public <R> R applyInTransaction(BiFunction<? super Session, ? super Transaction, R> action) {
-		return applyNoTransaction( session -> {
-			return OrmUtils.withinTransaction( session, tx -> { return action.apply( session, tx ); } );
-		} );
+	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action) throws E {
+		return applyNoTransaction( session ->
+				OrmUtils.withinTransaction( session, tx -> {
+					return action.apply( session, tx );
+				} )
+		);
 	}
 }

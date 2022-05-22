@@ -21,9 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -46,6 +44,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
+import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
+import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 import org.hibernate.testing.junit4.CustomParameterized;
 import org.junit.rules.MethodRule;
@@ -237,20 +238,20 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	}
 
 	@Override
-	public <R> R applyNoTransaction(Function<? super Session, R> action) {
+	public <R, E extends Throwable> R applyNoTransaction(ThrowingFunction<? super Session, R, E> action) throws E {
 		return with().applyNoTransaction( action );
 	}
 
 	@Override
-	public <R> R applyInTransaction(BiFunction<? super Session, ? super Transaction, R> action) {
+	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action) throws E {
 		return with().applyInTransaction( action );
 	}
 
-	public void runInTransaction(Consumer<? super Session> action) {
+	public <E extends Throwable> void runInTransaction(ThrowingConsumer<? super Session, E> action) throws E {
 		with().runInTransaction( action );
 	}
 
-	public void runNoTransaction(Consumer<? super Session> action) {
+	public <E extends Throwable> void runNoTransaction(ThrowingConsumer<? super Session, E> action) throws E {
 		with().runNoTransaction( action );
 	}
 
@@ -427,7 +428,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 
 	private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, String tenantId) {
-		for ( Consumer<Session> preClear : config.preClear ) {
+		for ( ThrowingConsumer<Session, RuntimeException> preClear : config.preClear ) {
 			if ( mapping != null ) {
 				mapping.listenerEnabled( false );
 			}
@@ -619,7 +620,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 		private final List<Class<?>> entityClearOrder = new ArrayList<>();
 
-		private final List<Consumer<Session>> preClear = new ArrayList<>();
+		private final List<ThrowingConsumer<Session, RuntimeException>> preClear = new ArrayList<>();
 
 		@Override
 		public DataClearConfig tenants(String ... tenantIds) {
@@ -629,7 +630,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 		@Override
 		public DataClearConfig preClear(Consumer<Session> preClear) {
-			this.preClear.add( preClear );
+			this.preClear.add( c -> preClear.accept( c ) );
 			return this;
 		}
 
