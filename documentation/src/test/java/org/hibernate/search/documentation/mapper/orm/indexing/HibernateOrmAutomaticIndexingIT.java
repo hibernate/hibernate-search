@@ -45,7 +45,7 @@ public class HibernateOrmAutomaticIndexingIT {
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			// tag::automatic-indexing-synchronization-strategy-override[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 			searchSession.automaticIndexingSynchronizationStrategy(

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -23,7 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -46,19 +46,19 @@ public class FlushClearEvictAllIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	private SessionFactory sessionFactory;
+	private EntityManagerFactory entityManagerFactory;
 
 	@Before
 	public void before() {
 		backendMock.expectAnySchema( Post.NAME );
 		backendMock.expectAnySchema( Comment.NAME );
-		sessionFactory = ormSetupHelper.start().setup( Post.class, Comment.class );
+		entityManagerFactory = ormSetupHelper.start().setup( Post.class, Comment.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	public void test() {
-		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			Post post = new Post();
 			post.setName( "This is a post" );
 
@@ -79,7 +79,7 @@ public class FlushClearEvictAllIT {
 			}
 
 			entityManager.clear();
-			sessionFactory.getCache().evictAll();
+			entityManagerFactory.getCache().evictAll();
 
 			backendMock.expectWorks( Post.NAME )
 					.executeFollowingWorks()
@@ -107,7 +107,7 @@ public class FlushClearEvictAllIT {
 			}
 
 			entityManager.clear();
-			sessionFactory.getCache().evictAll();
+			entityManagerFactory.getCache().evictAll();
 
 			backendMock.expectWorks( Comment.NAME )
 					.executeFollowingWorks()

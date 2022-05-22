@@ -64,7 +64,7 @@ public class HibernateOrmBatchJsr352IT {
 		jobExecution = waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			Search.session( entityManager ).workspace().refresh();
 
 			assertBookCount( entityManager, NUMBER_OF_BOOKS );
@@ -88,7 +88,7 @@ public class HibernateOrmBatchJsr352IT {
 		jobExecution = waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			Search.session( entityManager ).workspace().refresh();
 			assertAuthorCount( entityManager, NUMBER_OF_BOOKS / 2 );
 		} );
