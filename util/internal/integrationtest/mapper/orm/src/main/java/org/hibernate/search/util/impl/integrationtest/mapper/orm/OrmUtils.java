@@ -35,10 +35,6 @@ public final class OrmUtils {
 		return new NativePersistenceRunner( sessionFactory, tenantId );
 	}
 
-	public static void withinSession(SessionFactory sessionFactory, Consumer<? super Session> action) {
-		with( sessionFactory ).runNoTransaction( action );
-	}
-
 	public static void withinTransaction(SessionFactory sessionFactory, Consumer<Session> action) {
 		with( sessionFactory ).runInTransaction( action );
 	}

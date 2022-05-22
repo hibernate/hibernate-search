@@ -44,7 +44,7 @@ public class ScopeExtensionIT {
 
 	@Test
 	public void test() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			IndexScope indexScope = Search.session( session ).scope( Author.class )
 					.extension( original -> original );
 			assertThat( indexScope ).isInstanceOf( StubIndexScope.class );

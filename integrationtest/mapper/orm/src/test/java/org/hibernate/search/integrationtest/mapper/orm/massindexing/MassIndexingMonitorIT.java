@@ -56,7 +56,7 @@ public class MassIndexingMonitorIT {
 	public void simple() {
 		SessionFactory sessionFactory = setup( null );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 

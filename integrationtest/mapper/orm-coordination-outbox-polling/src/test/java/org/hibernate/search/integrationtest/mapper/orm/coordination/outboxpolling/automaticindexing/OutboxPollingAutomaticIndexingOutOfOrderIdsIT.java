@@ -87,7 +87,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			session.remove( entity );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 3 );
 			// Correct order when ordered by id (you'll have to trust me on that)
@@ -106,7 +106,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 3 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
@@ -198,7 +198,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			session.persist( entity );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id (you'll have to trust me on that)
@@ -215,7 +215,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
@@ -311,7 +311,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			entity.setText( "third" );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id
@@ -331,7 +331,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id

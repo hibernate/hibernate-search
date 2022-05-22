@@ -67,7 +67,7 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
 	public void defaultMassIndexerStartAndWait() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
