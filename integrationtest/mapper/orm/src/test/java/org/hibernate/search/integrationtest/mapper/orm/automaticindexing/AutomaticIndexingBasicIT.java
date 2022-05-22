@@ -106,7 +106,7 @@ public class AutomaticIndexingBasicIT {
 		assumeTrue( "This test only makes sense if entities are processed in-session",
 				setupHolder.areEntitiesProcessedInSession() );
 
-		setupHolder.with().runNoTransaction( session -> {
+		setupHolder.runNoTransaction( session -> {
 			Transaction trx = session.beginTransaction();
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );

@@ -21,7 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -98,7 +100,7 @@ import org.jboss.logging.Logger;
  * 	}
  * }</pre>
  */
-public class ReusableOrmSetupHolder implements TestRule {
+public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Session, Transaction> {
 	private static final Logger log = Logger.getLogger( ReusableOrmSetupHolder.class.getName() );
 
 	/**
@@ -226,12 +228,22 @@ public class ReusableOrmSetupHolder implements TestRule {
 		return sessionFactory;
 	}
 
-	public PersistenceRunner<Session, Transaction> with() {
+	private PersistenceRunner<Session, Transaction> with() {
 		return OrmUtils.with( sessionFactory() );
 	}
 
 	public PersistenceRunner<Session, Transaction> with(String tenantId) {
 		return OrmUtils.with( sessionFactory(), tenantId );
+	}
+
+	@Override
+	public <R> R applyNoTransaction(Function<? super Session, R> action) {
+		return with().applyNoTransaction( action );
+	}
+
+	@Override
+	public <R> R applyInTransaction(BiFunction<? super Session, ? super Transaction, R> action) {
+		return with().applyInTransaction( action );
 	}
 
 	public void runInTransaction(Consumer<? super Session> action) {
