@@ -159,7 +159,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		} );
 
 		// Make events visible one by one, so that they are processed in separate batches.
-		List<Long> eventIds = setupHolder.with().applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
+		List<Long> eventIds = setupHolder.applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
 		assertThat( eventIds ).hasSize( 2 );
 		for ( Long eventId : eventIds ) {
 			outboxEventFinder.showOnlyEvents( Collections.singletonList( eventId ) );
