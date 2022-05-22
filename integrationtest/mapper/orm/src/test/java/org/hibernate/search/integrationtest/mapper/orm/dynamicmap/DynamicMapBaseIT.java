@@ -105,7 +105,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Map> query = searchSession.search(
@@ -165,7 +165,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search(
@@ -222,7 +222,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Map> scope = searchSession.scope( Map.class, entityTypeName );
@@ -284,7 +284,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search(
@@ -370,7 +370,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Map> query = searchSession.search(

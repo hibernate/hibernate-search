@@ -138,7 +138,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		 * Update one contained entity.
 		 * The bridge will not load any entity and will just retrieve data from the database.
 		 */
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			OrmUtils.withinTransaction( session, tx -> {
 				ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 				containedEntity.setIncludedInTypeBridge( "value2" );
@@ -156,7 +156,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		} );
 
 		// Remove one contained entity.
-		OrmUtils.withinSession( sessionFactory, session -> {
+		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
 			ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 			containedEntity.setParent( null );
 			session.remove( containedEntity );

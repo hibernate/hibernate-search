@@ -57,9 +57,9 @@ public class DifferentSessionFactoriesIT {
 						.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
 
 		// try to use an entityManager owned by the original session factory instead
-		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory, session -> {
-			HibernateOrmSearchSession.get( contextProvider.get(), (SessionImplementor) session );
-		} ) )
+		assertThatThrownBy( () -> OrmUtils.with( sessionFactory ).runNoTransaction( session ->
+				HibernateOrmSearchSession.get( contextProvider.get(), (SessionImplementor) session )
+		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Unable to create a SearchSession for sessions created using a different session factory."
