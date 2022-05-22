@@ -7,8 +7,6 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -17,6 +15,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
+import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 public final class OrmUtils {
 
@@ -35,26 +35,26 @@ public final class OrmUtils {
 		return new NativePersistenceRunner( sessionFactory, tenantId );
 	}
 
-	public static void withinTransaction(SessionFactory sessionFactory, Consumer<Session> action) {
+	public static <E extends Throwable> void withinTransaction(SessionFactory sessionFactory, ThrowingConsumer<Session, E> action) throws E {
 		with( sessionFactory ).runInTransaction( action );
 	}
 
-	public static void withinTransaction(SessionFactory sessionFactory, String tenantId, Consumer<Session> action) {
+	public static <E extends Throwable> void withinTransaction(SessionFactory sessionFactory, String tenantId, ThrowingConsumer<Session, E> action) throws E {
 		with( sessionFactory, tenantId ).runInTransaction( action );
 	}
 
-	public static void withinJPATransaction(EntityManagerFactory entityManagerFactory, Consumer<EntityManager> action) {
+	public static <E extends Throwable> void withinJPATransaction(EntityManagerFactory entityManagerFactory, ThrowingConsumer<EntityManager, E> action) throws E {
 		with( entityManagerFactory ).runInTransaction( action );
 	}
 
-	public static void withinTransaction(Session session, Consumer<Transaction> action) {
+	public static <E extends Throwable> void withinTransaction(Session session, ThrowingConsumer<Transaction, E> action) throws E {
 		withinTransaction( session, tx -> {
 			action.accept( tx );
 			return null;
 		} );
 	}
 
-	public static <R> R withinTransaction(Session session, Function<Transaction, R> action) {
+	public static <R, E extends Throwable> R withinTransaction(Session session, ThrowingFunction<Transaction, R, E> action) throws E {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
@@ -89,7 +89,7 @@ public final class OrmUtils {
 		}
 	}
 
-	public static <R> R withinJPATransaction(EntityManager entityManager, Function<EntityTransaction, R> action) {
+	public static <R, E extends Throwable> R withinJPATransaction(EntityManager entityManager, ThrowingFunction<EntityTransaction, R, E> action) throws E {
 		EntityTransaction tx = null;
 		try {
 			tx = entityManager.getTransaction();

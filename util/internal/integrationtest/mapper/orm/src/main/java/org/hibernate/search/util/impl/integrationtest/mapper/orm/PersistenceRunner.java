@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+
+import org.hibernate.search.util.impl.test.function.ThrowingBiConsumer;
+import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
+import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
+import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 /**
  * An easy way to run code in the context of an {@link EntityManager}/{@link org.hibernate.Session}
@@ -22,29 +23,29 @@ import javax.persistence.EntityTransaction;
  */
 public interface PersistenceRunner<C, T> {
 
-	<R> R applyNoTransaction(Function<? super C, R> action);
+	<R, E extends Throwable> R applyNoTransaction(ThrowingFunction<? super C, R, E> action) throws E;
 
-	default void runNoTransaction(Consumer<? super C> action) {
+	default <E extends Throwable> void runNoTransaction(ThrowingConsumer<? super C, E> action) throws E {
 		applyNoTransaction( c -> {
 			action.accept( c );
 			return null;
 		} );
 	}
 
-	default <R> R applyInTransaction(Function<? super C, R> action) {
+	default <R, E extends Throwable> R applyInTransaction(ThrowingFunction<? super C, R, E> action) throws E {
 		return applyInTransaction( (c, t) -> action.apply( c ) );
 	}
 
-	<R> R applyInTransaction(BiFunction<? super C, ? super T, R> action);
+	<R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super C, ? super T, R, E> action) throws E;
 
-	default void runInTransaction(Consumer<? super C> action) {
+	default <E extends Throwable> void runInTransaction(ThrowingConsumer<? super C, E> action) throws E {
 		applyInTransaction( c -> {
 			action.accept( c );
 			return null;
 		} );
 	}
 
-	default void runInTransaction(BiConsumer<? super C, T> action) {
+	default <E extends Throwable> void runInTransaction(ThrowingBiConsumer<? super C, T, E> action) throws E {
 		applyInTransaction( (c, t) -> {
 			action.accept( c, t );
 			return null;

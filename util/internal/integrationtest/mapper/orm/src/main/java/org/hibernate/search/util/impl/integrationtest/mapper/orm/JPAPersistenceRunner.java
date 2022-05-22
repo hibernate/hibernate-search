@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
+import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 class JPAPersistenceRunner implements PersistenceRunner<EntityManager, EntityTransaction> {
 	private final EntityManagerFactory entityManagerFactory;
@@ -22,7 +22,7 @@ class JPAPersistenceRunner implements PersistenceRunner<EntityManager, EntityTra
 	}
 
 	@Override
-	public <R> R applyNoTransaction(Function<? super EntityManager, R> action) {
+	public <R, E extends Throwable> R applyNoTransaction(ThrowingFunction<? super EntityManager, R, E> action) throws E {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			EntityManager entityManager = entityManagerFactory.createEntityManager();
 			try {
@@ -35,9 +35,9 @@ class JPAPersistenceRunner implements PersistenceRunner<EntityManager, EntityTra
 	}
 
 	@Override
-	public <R> R applyInTransaction(BiFunction<? super EntityManager, ? super EntityTransaction, R> action) {
-		return applyNoTransaction( entityManager -> {
-			return OrmUtils.withinJPATransaction( entityManager, tx -> { return action.apply( entityManager, tx ); } );
-		} );
+	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super EntityManager, ? super EntityTransaction, R, E> action) throws E {
+		return applyNoTransaction( entityManager ->
+				OrmUtils.withinJPATransaction( entityManager, tx -> action.apply( entityManager, tx ) )
+		);
 	}
 }
