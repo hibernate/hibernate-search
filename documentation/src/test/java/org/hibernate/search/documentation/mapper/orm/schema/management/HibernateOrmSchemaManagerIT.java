@@ -46,7 +46,7 @@ public class HibernateOrmSchemaManagerIT {
 
 	@Test
 	public void simple() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -65,7 +65,7 @@ public class HibernateOrmSchemaManagerIT {
 
 	@Test
 	public void selectType() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );
 				// tag::select-type[]
@@ -117,7 +117,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				int i = 0;
 				while ( i < NUMBER_OF_BOOKS ) {

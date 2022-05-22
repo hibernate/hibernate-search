@@ -39,10 +39,6 @@ public final class OrmUtils {
 		with( sessionFactory ).runNoTransaction( action );
 	}
 
-	public static void withinEntityManager(EntityManagerFactory entityManagerFactory, Consumer<EntityManager> action) {
-		with( entityManagerFactory ).runNoTransaction( action );
-	}
-
 	public static void withinTransaction(SessionFactory sessionFactory, Consumer<Session> action) {
 		with( sessionFactory ).runInTransaction( action );
 	}

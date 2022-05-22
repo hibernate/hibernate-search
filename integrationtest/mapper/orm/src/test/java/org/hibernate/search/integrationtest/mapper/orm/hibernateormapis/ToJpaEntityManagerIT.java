@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinEntityManager;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -60,7 +59,7 @@ public class ToJpaEntityManagerIT {
 
 	@Test
 	public void toJpaEntityManager() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );

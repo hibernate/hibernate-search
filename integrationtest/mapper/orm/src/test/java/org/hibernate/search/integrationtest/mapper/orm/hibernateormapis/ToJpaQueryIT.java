@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinEntityManager;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.ArrayList;
@@ -140,7 +139,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void toJpaQuery() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -149,7 +148,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void getResultList() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -174,7 +173,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void getSingleResult() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -231,7 +230,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void pagination() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -258,7 +257,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_dsl() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -284,7 +283,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_jpaHint() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -307,7 +306,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_override() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -336,7 +335,7 @@ public class ToJpaQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_fetch() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -352,7 +351,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -373,7 +372,7 @@ public class ToJpaQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_load() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -389,7 +388,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -409,7 +408,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void graph_override_jpaHint() {
-		withinEntityManager( setupHolder.entityManagerFactory(), entityManager -> {
+		setupHolder.runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
