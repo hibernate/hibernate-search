@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.reindexing.derivedfrom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -17,7 +18,6 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,7 +56,7 @@ public class DerivedFromIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
 			book.setTitle( "Leviathan Wakes" );
 
@@ -66,7 +66,7 @@ public class DerivedFromIT {
 			entityManager.persist( book );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

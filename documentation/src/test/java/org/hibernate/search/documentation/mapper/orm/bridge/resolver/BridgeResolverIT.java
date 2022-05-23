@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.bridge.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -18,7 +19,6 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,7 +48,7 @@ public class BridgeResolverIT {
 		MyProductId book2Id = new MyProductId( "largevue", "84784-484-44" );
 		ISBN book2Isbn = ISBN.parse( "978-0-58-600824-5" );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
 			book1.setId( book1Id );
 			book1.setIsbn( book1Isbn );
@@ -67,7 +67,7 @@ public class BridgeResolverIT {
 			entityManager.persist( book2 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			List<ISBN> result = Search.session( entityManager ).search( Book.class )
 					.select( f -> f.field( "isbn", ISBN.class ) )
 					.where( f -> f.match().field( "genre" ).matching( "science", ValueConvert.NO ) )
@@ -76,7 +76,7 @@ public class BridgeResolverIT {
 					.containsExactly( book1Isbn );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			List<Genre> result = Search.session( entityManager ).search( Book.class )
 					.select( f -> f.field( "genre", Genre.class ) )
 					.where( f -> f.match().field( "title" ).matching( "steel" ) )
@@ -85,7 +85,7 @@ public class BridgeResolverIT {
 					.containsExactly( Genre.SCIFI );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			List<Book> result = Search.session( entityManager ).search( Book.class )
 					.where( f -> f.spatial().within().field( "location" )
 							.circle( 42.0, 41.0, 100, DistanceUnit.KILOMETERS ) )

@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.dependencies.contai
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -15,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,7 +34,7 @@ public class DependenciesFromOtherEntityIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			ScientificPaper paper1 = new ScientificPaper( 1 );
 			paper1.setTitle( "Fundamental Ideas of the General Theory of Relativity and the Application of this Theory in Astronomy" );
 			ScientificPaper paper2 = new ScientificPaper( 2 );
@@ -50,7 +50,7 @@ public class DependenciesFromOtherEntityIT {
 			entityManager.persist( paper3 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat( searchSession.search( ScientificPaper.class )
@@ -72,7 +72,7 @@ public class DependenciesFromOtherEntityIT {
 			)
 					.hasSize( 0 );
 		} );
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			ScientificPaper paper1 = entityManager.find( ScientificPaper.class, 1 );
 			ScientificPaper paper2 = entityManager.find( ScientificPaper.class, 2 );
 			ScientificPaper paper3 = entityManager.find( ScientificPaper.class, 3 );
@@ -85,7 +85,7 @@ public class DependenciesFromOtherEntityIT {
 			entityManager.persist( paper4 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat( searchSession.search( ScientificPaper.class )

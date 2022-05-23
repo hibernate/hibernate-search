@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.alternative.alternativebin
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -19,7 +20,6 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.AlternativeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -59,7 +59,7 @@ public class AlternativeBinderIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			BlogEntry entry1 = new BlogEntry();
 			entry1.setId( 1 );
 			entry1.setLanguage( Language.GERMAN );
@@ -73,7 +73,7 @@ public class AlternativeBinderIT {
 			entityManager.persist( entry2 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// Only matches the german text, because the word is decomposed

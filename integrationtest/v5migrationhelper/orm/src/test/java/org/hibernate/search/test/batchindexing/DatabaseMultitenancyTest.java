@@ -7,12 +7,12 @@
 package org.hibernate.search.test.batchindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -20,12 +20,13 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.hibernate.testing.RequiresDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.apache.lucene.search.Query;
 
 /**
  * This is a test class to check that search can be used with ORM in multi-tenancy.
@@ -234,7 +235,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 
 	private void deleteClocks(Session session) {
 		session.beginTransaction();
-		List<Clock> clocks = OrmUtils.listAll( session, Clock.class );
+		List<Clock> clocks = listAll( session, Clock.class );
 		for ( Clock clock : clocks ) {
 			session.delete( clock );
 		}

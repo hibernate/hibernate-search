@@ -230,11 +230,15 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	}
 
 	private PersistenceRunner<Session, Transaction> with() {
+		//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
 		return OrmUtils.with( sessionFactory() );
+		////CHECKSTYLE:ON
 	}
 
 	public PersistenceRunner<Session, Transaction> with(String tenantId) {
+		//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
 		return OrmUtils.with( sessionFactory(), tenantId );
+		//CHECKSTYLE:ON
 	}
 
 	@Override
@@ -432,7 +436,9 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 			if ( mapping != null ) {
 				mapping.listenerEnabled( false );
 			}
+			//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
 			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( preClear );
+			//CHECKSTYLE:ON
 			if ( mapping != null ) {
 				mapping.listenerEnabled( true );
 			}
@@ -486,7 +492,9 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 				mapping.listenerEnabled( false );
 			}
 			try {
+				//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
 				OrmUtils.with( sessionFactory, tenantId ).runInTransaction( s -> {
+					//CHECKSTYLE:ON
 					Query<?> query = selectAllOfSpecificType( entityType, s );
 					try {
 						query.list().forEach( s::remove );
@@ -504,7 +512,9 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 			}
 		}
 		else {
+			//CHECKSTYLE:OFF: RegexpSinglelineJava - cannot use static import as that would clash with method of this class
 			OrmUtils.with( sessionFactory, tenantId ).runInTransaction( s -> {
+				//CHECKSTYLE:ON
 				Query<?> query = deleteAllOfSpecificType( entityType, s );
 				try {
 					query.executeUpdate();

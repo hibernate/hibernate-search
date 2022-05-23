@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.search.converter;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.Basic;
@@ -26,7 +27,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,7 +46,7 @@ public class DslConverterIT {
 
 	@Test
 	public void dslConverterEnabled() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::dsl-converter-enabled[]
@@ -64,7 +64,7 @@ public class DslConverterIT {
 
 	@Test
 	public void dslConverterDisabled() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::dsl-converter-disabled[]
@@ -81,7 +81,7 @@ public class DslConverterIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			AuthenticationEvent event1 = new AuthenticationEvent( 1 );
 			event1.setOutcome( AuthenticationOutcome.USER_NOT_FOUND );
 			AuthenticationEvent event2 = new AuthenticationEvent( 2 );

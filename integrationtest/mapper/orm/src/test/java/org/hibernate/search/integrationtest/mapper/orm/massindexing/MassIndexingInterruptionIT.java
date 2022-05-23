@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +30,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -239,7 +239,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 		} );
 	}

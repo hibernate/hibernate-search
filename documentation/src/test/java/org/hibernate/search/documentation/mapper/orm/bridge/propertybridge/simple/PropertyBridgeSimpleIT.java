@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.propertybridge.simp
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +36,7 @@ public class PropertyBridgeSimpleIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Invoice invoice = new Invoice();
 			invoice.getLineItems()
 					.add( new InvoiceLineItem( InvoiceLineItemCategory.BOOK, new BigDecimal( "5.99" ) ) );
@@ -49,7 +49,7 @@ public class PropertyBridgeSimpleIT {
 			entityManager.persist( invoice );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Invoice> result = searchSession.search( Invoice.class )

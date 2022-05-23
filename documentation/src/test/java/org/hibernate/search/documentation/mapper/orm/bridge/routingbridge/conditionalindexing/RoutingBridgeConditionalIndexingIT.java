@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.conditionalindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -17,7 +18,6 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,7 +61,7 @@ public class RoutingBridgeConditionalIndexingIT {
 
 	@Test
 	public void test() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
@@ -70,7 +70,7 @@ public class RoutingBridgeConditionalIndexingIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book2 = entityManager.find( Book.class, BOOK2_ID );
 			Book book3 = entityManager.find( Book.class, BOOK3_ID );
 
@@ -78,7 +78,7 @@ public class RoutingBridgeConditionalIndexingIT {
 			book3.setStatus( Status.ARCHIVED );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
@@ -89,7 +89,7 @@ public class RoutingBridgeConditionalIndexingIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

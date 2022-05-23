@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.identifierbridge.co
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +36,7 @@ public class IdentifierBridgeCompatibleIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
 			book.getId().setPublisherId( 1L );
 			book.getId().setPublisherSpecificBookId( 42L );
@@ -48,7 +48,7 @@ public class IdentifierBridgeCompatibleIT {
 			entityManager.persist( magazine );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book.class, Magazine.class ) )

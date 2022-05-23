@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import javax.persistence.EntityManager;
@@ -20,7 +21,6 @@ import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class HibernateOrmManualIndexingIT {
 	public void persist_automaticIndexing_periodicFlushClear() {
 		EntityManagerFactory entityManagerFactory = setup( true );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, 0 );
 
 			// tag::persist-automatic-indexing-periodic-flush-clear[]
@@ -69,7 +69,7 @@ public class HibernateOrmManualIndexingIT {
 	public void persist_automaticIndexing_periodicFlushExecuteClear() {
 		EntityManagerFactory entityManagerFactory = setup( true );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, 0 );
 
 			// tag::persist-automatic-indexing-periodic-flush-execute-clear[]
@@ -104,7 +104,7 @@ public class HibernateOrmManualIndexingIT {
 	public void persist_automaticIndexing_multipleTransactions() {
 		EntityManagerFactory entityManagerFactory = setup( true );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, 0 );
 
 			// tag::persist-automatic-indexing-multiple-transactions[]
@@ -136,7 +136,7 @@ public class HibernateOrmManualIndexingIT {
 		EntityManagerFactory entityManagerFactory = setup( false );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, 0 );
 
 			// tag::indexing-plan-addOrUpdate[]
@@ -167,7 +167,7 @@ public class HibernateOrmManualIndexingIT {
 		EntityManagerFactory entityManagerFactory = setup( true );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, numberOfBooks );
 
 			// tag::indexing-plan-delete[]
@@ -208,7 +208,7 @@ public class HibernateOrmManualIndexingIT {
 			// end::workspace-retrieval-mapping[]
 		}
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			// tag::workspace-retrieval-session[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 			SearchWorkspace allEntitiesWorkspace = searchSession.workspace(); // <2>
@@ -217,7 +217,7 @@ public class HibernateOrmManualIndexingIT {
 			// end::workspace-retrieval-session[]
 		} );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, numberOfBooks );
 			assertAuthorCount( entityManager, numberOfBooks );
 
@@ -233,7 +233,7 @@ public class HibernateOrmManualIndexingIT {
 	}
 
 	private void initBooksAndAuthors(EntityManagerFactory entityManagerFactory, int numberOfBooks) {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				int i = 0;
 				while ( i < numberOfBooks ) {

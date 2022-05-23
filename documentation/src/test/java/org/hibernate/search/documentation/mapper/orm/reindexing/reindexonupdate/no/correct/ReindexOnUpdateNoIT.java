@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate.no.correct;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -17,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,7 +60,7 @@ public class ReindexOnUpdateNoIT {
 
 	@Test
 	public void reindexOnUpdateNo() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			for ( int i = 0 ; i < 2000 ; ++i ) {
 				Sensor sensor = new Sensor();
 				sensor.setId( i );
@@ -72,39 +72,39 @@ public class ReindexOnUpdateNoIT {
 			}
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )
 					.isEqualTo( 2000L );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Sensor sensor = entityManager.getReference( Sensor.class, 50 );
 			sensor.setStatus( SensorStatus.OFFLINE );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// The sensor was reindexed, as expected.
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )
 					.isEqualTo( 1999L );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Sensor sensor = entityManager.getReference( Sensor.class, 70 );
 			sensor.setRollingAverage( 0.5 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// The sensor was *not* been reindexed, as expected.
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )
 					.isEqualTo( 1999L );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Sensor sensor = entityManager.getReference( Sensor.class, 70 );
 			Search.session( entityManager ).indexingPlan().addOrUpdate( sensor );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// The sensor was reindexed, as expected.
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )
 					.isEqualTo( 1998L );

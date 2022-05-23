@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
@@ -29,7 +30,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -87,7 +87,7 @@ public class AnnotationMappingAccessTypeIT {
 
 	@Test
 	public void index() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;
 			entity1.fieldWithNonDefaultFieldAccess = "nonDefaultFieldAccess";

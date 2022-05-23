@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
@@ -18,7 +20,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -57,7 +58,7 @@ public class MappedSuperclassIT {
 
 	@Test
 	public void index() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
 

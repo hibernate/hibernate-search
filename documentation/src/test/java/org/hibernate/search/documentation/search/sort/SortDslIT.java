@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +50,7 @@ public class SortDslIT {
 
 	@Test
 	public void entryPoint() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -65,7 +65,7 @@ public class SortDslIT {
 					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-objects[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -343,14 +343,14 @@ public class SortDslIT {
 	}
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Author isaacAsimov = new Author();
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );

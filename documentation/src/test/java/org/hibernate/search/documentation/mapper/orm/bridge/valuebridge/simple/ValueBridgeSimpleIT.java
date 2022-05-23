@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.valuebridge.simple;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -18,7 +19,6 @@ import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,13 +55,13 @@ public class ValueBridgeSimpleIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
 			book.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );
 			entityManager.persist( book );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

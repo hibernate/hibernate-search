@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -20,7 +21,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -62,7 +62,7 @@ public class IdClassIT {
 				.setup( NonIdClassIndexed.class, IdClassNonIndexed.class );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			NonIdClassIndexed entity = new NonIdClassIndexed();
 			entity.setId( 1 );
 
@@ -85,7 +85,7 @@ public class IdClassIT {
 				.setup( IdClassIndexedWithDocumentId.class );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IdClassIndexedWithDocumentId entity = new IdClassIndexedWithDocumentId();
 			entity.setId1( 10 );
 			entity.setId2( 7 );

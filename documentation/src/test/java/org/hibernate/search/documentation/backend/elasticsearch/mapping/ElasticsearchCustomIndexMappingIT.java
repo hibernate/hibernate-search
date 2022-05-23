@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.backend.elasticsearch.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.io.InputStream;
@@ -22,7 +23,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,13 +50,13 @@ public class ElasticsearchCustomIndexMappingIT {
 		String mapping = elasticsearchClient.index( Book.NAME ).type().getMapping();
 		assertJsonEquals( expectedMergedMapping(), mapping );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
 			book.setTitle( "The Robots Of Dawn" );
 			entityManager.persist( book );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

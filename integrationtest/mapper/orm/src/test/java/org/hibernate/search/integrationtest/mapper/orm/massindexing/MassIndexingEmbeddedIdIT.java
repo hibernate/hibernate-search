@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -31,7 +33,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -75,7 +76,7 @@ public class MassIndexingEmbeddedIdIT {
 
 	@Test
 	public void defaultMassIndexerStartAndWait() {
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
@@ -118,7 +119,7 @@ public class MassIndexingEmbeddedIdIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			book1 = new Book( 1, TITLE_1, AUTHOR_1 );
 			session.persist( book1 );
 			book2 = new Book( 2, TITLE_2, AUTHOR_2 );

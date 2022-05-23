@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate.shallow.correct;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -17,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -59,7 +59,7 @@ public class ReindexOnUpdateShallowIT {
 
 	@Test
 	public void reindexOnUpdateShallow() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			BookCategory category = new BookCategory();
 			category.setId( 1 );
 			category.setName( "Science-fiction" );
@@ -74,18 +74,18 @@ public class ReindexOnUpdateShallowIT {
 			}
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			assertThat( countBooksByCategory( entityManager, "science" ) )
 					.isEqualTo( 100L );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			BookCategory category = entityManager.getReference( BookCategory.class, 1 );
 			category.setName( "Anticipation" );
 			entityManager.persist( category );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// The books weren't reindexed, as expected.
 			assertThat( countBooksByCategory( entityManager, "science" ) )
 					.isEqualTo( 100L );
@@ -93,12 +93,12 @@ public class ReindexOnUpdateShallowIT {
 					.isEqualTo( 0L );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			assertThat( countBooksByCategory( entityManager, "crime" ) )
 					.isEqualTo( 0L );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			BookCategory category = new BookCategory();
 			category.setId( 2 );
 			category.setName( "Crime fiction" );
@@ -108,7 +108,7 @@ public class ReindexOnUpdateShallowIT {
 			book.setCategory( category );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// The book was reindexed, as expected.
 			assertThat( countBooksByCategory( entityManager, "crime" ) )
 					.isEqualTo( 1L );

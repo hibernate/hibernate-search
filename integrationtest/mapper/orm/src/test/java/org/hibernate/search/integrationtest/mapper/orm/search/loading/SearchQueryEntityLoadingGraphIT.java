@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -159,7 +159,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_null() {
-		assertThatThrownBy( () -> OrmUtils.with( sessionFactory() ).runNoTransaction( session ->
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( (String) null, GraphSemantic.FETCH ) )
@@ -172,7 +172,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_invalid() {
-		assertThatThrownBy( () -> OrmUtils.with( sessionFactory() ).runNoTransaction( session ->
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( "invalidGraphName", GraphSemantic.FETCH ) )
@@ -185,7 +185,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_graphSemantic_null() {
-		assertThatThrownBy( () -> OrmUtils.with( sessionFactory() ).runNoTransaction( session ->
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( model.getEagerGraphName(), null ) )
@@ -198,7 +198,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_null() {
-		assertThatThrownBy( () -> OrmUtils.with( sessionFactory() ).runNoTransaction( session ->
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( (RootGraph<?>) null, GraphSemantic.FETCH ) )
@@ -211,7 +211,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_graphSemantic_null() {
-		assertThatThrownBy( () -> OrmUtils.with( sessionFactory() ).runNoTransaction( session ->
+		assertThatThrownBy( () -> with( sessionFactory() ).runNoTransaction( session ->
 				Search.session( session ).search( model.getIndexedClass() )
 						.where( f -> f.matchAll() )
 						.loading( o -> o.graph( session.getEntityGraph( model.getEagerGraphName() ), null ) )

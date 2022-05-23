@@ -7,12 +7,11 @@
 package org.hibernate.search.test.query.initandlookup;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
 
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
@@ -23,12 +22,15 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
 import org.hibernate.stat.Statistics;
+
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 
 /**
  * Test second level cache and persistence context lookup methods
@@ -187,7 +189,7 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 
 		indexingSwitch.enable( false ); // disable processing of index updates
 		Transaction tx = session.beginTransaction();
-		List list = OrmUtils.listAll( session, Kernel.class );
+		List list = listAll( session, Kernel.class );
 		assertThat( list ).hasSize( 2 );
 		session.delete( list.get( 0 ) );
 		tx.commit();

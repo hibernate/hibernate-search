@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.indexedembedded.none;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -15,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,7 +35,7 @@ public class IndexedEmbeddedNoneIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
 			book.setId( 1 );
 			book.setTitle( "Robots Of Dawn" );
@@ -50,7 +50,7 @@ public class IndexedEmbeddedNoneIT {
 			entityManager.persist( book );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.gettingstarted.withhsearch.defaultana
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -22,7 +23,6 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +55,7 @@ public class GettingStartedDefaultAnalysisIT {
 	public void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::indexing[]
 			// Not shown: get the entity manager and open a transaction
 			Author author = new Author();
@@ -76,7 +76,7 @@ public class GettingStartedDefaultAnalysisIT {
 			bookIdHolder.set( book.getId() );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			try {
 			// tag::manual-index[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -92,7 +92,7 @@ public class GettingStartedDefaultAnalysisIT {
 			}
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-objects[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -129,7 +129,7 @@ public class GettingStartedDefaultAnalysisIT {
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-lambdas[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -162,7 +162,7 @@ public class GettingStartedDefaultAnalysisIT {
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::counting[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager );

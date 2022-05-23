@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -17,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,7 +49,7 @@ public class LuceneQueryDslIT {
 
 	@Test
 	public void explain() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::explain-lucene[]
 			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
@@ -75,7 +75,7 @@ public class LuceneQueryDslIT {
 
 	@Test
 	public void lowLevel() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::lucene-lowLevel[]
 			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
@@ -107,7 +107,7 @@ public class LuceneQueryDslIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

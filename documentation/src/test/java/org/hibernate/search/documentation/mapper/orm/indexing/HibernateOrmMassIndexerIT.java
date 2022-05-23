@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
@@ -25,7 +26,6 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,7 +49,7 @@ public class HibernateOrmMassIndexerIT {
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory, HibernateOrmMassIndexerIT::newAuthor );
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			assertBookCount( entityManager, 0 );
 			assertAuthorCount( entityManager, 0 );
 		} );
@@ -57,7 +57,7 @@ public class HibernateOrmMassIndexerIT {
 
 	@Test
 	public void simple() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -75,7 +75,7 @@ public class HibernateOrmMassIndexerIT {
 
 	@Test
 	public void reindexOnly() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::reindexOnly[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -96,7 +96,7 @@ public class HibernateOrmMassIndexerIT {
 
 	@Test
 	public void selectType() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );
 				// tag::select-type[]
@@ -114,7 +114,7 @@ public class HibernateOrmMassIndexerIT {
 
 	@Test
 	public void async_reactive() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::async[]
 			searchSession.massIndexer() // <1>
@@ -136,7 +136,7 @@ public class HibernateOrmMassIndexerIT {
 
 	@Test
 	public void async_future() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::async[]
 
@@ -154,7 +154,7 @@ public class HibernateOrmMassIndexerIT {
 
 	@Test
 	public void parameters() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );
 				// tag::parameters[]
@@ -194,7 +194,7 @@ public class HibernateOrmMassIndexerIT {
 	}
 
 	static void initData( EntityManagerFactory entityManagerFactory, Function<Integer, Author> authorInit ) {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				int i = 0;
 				while ( i < NUMBER_OF_BOOKS ) {

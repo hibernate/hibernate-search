@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +50,7 @@ public class ElasticsearchQueryDslIT {
 
 	@Test
 	public void explain() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::explain-elasticsearch[]
 			ElasticsearchSearchQuery<Book> query = searchSession.search( Book.class )
@@ -74,7 +74,7 @@ public class ElasticsearchQueryDslIT {
 
 	@Test
 	public void json() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::elasticsearch-requestTransformer[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -96,7 +96,7 @@ public class ElasticsearchQueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::elasticsearch-responseBody[]
 			ElasticsearchSearchResult<Book> result = searchSession.search( Book.class )
@@ -143,7 +143,7 @@ public class ElasticsearchQueryDslIT {
 	// end::elasticsearch-responseBody-helper[]
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

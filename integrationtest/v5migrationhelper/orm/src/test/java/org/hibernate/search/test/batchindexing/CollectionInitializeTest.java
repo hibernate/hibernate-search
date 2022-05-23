@@ -7,6 +7,7 @@
 
 package org.hibernate.search.test.batchindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -15,7 +16,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class CollectionInitializeTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		initializeData( fullTextSession );
 		try {
-			List list = OrmUtils.listAll( fullTextSession, LegacyCarPlant.class );
+			List list = listAll( fullTextSession, LegacyCarPlant.class );
 			assertEquals( 1, list.size() );
 			fullTextSession.createIndexer( LegacyCarPlant.class ).startAndWait();
 			int resultSize = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCarPlant.class ).getResultSize();

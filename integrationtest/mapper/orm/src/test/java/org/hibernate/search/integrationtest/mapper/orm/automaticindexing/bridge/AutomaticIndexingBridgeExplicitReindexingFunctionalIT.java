@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -30,7 +32,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -84,7 +85,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	@Test
 	public void test() {
 		// Init
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			session.persist( entity1 );
@@ -96,7 +97,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		backendMock.verifyExpectationsMet();
 
 		// Add a contained entity
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 2 );
@@ -117,7 +118,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		 * Unfortunately the indexed entity will still be reindexed,
 		 * because Search doesn't know which contained entities are relevant.
 		 */
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			for ( int i = 3 ; i < 100 ; ++i ) {
 				ContainedEntity containedEntity = new ContainedEntity();
@@ -138,8 +139,8 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		 * Update one contained entity.
 		 * The bridge will not load any entity and will just retrieve data from the database.
 		 */
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
-			OrmUtils.withinTransaction( session, tx -> {
+		with( sessionFactory ).runNoTransaction( session -> {
+			withinTransaction( session, tx -> {
 				ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 				containedEntity.setIncludedInTypeBridge( "value2" );
 				backendMock.expectWorks( IndexedEntity.INDEX )
@@ -156,7 +157,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		} );
 
 		// Remove one contained entity.
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 			containedEntity.setParent( null );
 			session.remove( containedEntity );

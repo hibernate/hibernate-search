@@ -6,16 +6,15 @@
  */
 package org.hibernate.search.test.session;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
@@ -23,11 +22,13 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * @author Emmanuel Bernard
@@ -87,7 +88,7 @@ public class MassIndexTest extends SearchTestBase {
 		parser = new QueryParser( "noDefaultField", TestConstants.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
-		result = OrmUtils.listAll( s, Email.class );
+		result = listAll( s, Email.class );
 		for ( int i = 0; i < loop / 2; i++ ) {
 			s.index( result.get( i ) );
 		}

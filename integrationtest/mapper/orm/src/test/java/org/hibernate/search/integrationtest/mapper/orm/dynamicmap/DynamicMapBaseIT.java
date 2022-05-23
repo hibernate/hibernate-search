@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.dynamicmap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -38,7 +40,6 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -87,7 +88,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> entity1 = new HashMap<>();
 			entity1.put( "id", 1 );
 			entity1.put( "title", "Hyperion" );
@@ -105,7 +106,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Map> query = searchSession.search(
@@ -151,7 +152,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> entity1 = new HashMap<>();
 			entity1.put( "id", 1 );
 			entity1.put( "title", "Hyperion" );
@@ -165,7 +166,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search(
@@ -211,7 +212,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			for ( int i = 0; i < 100; i++ ) {
 				Map<String, Object> entity = new HashMap<>();
 				entity.put( "id", i );
@@ -222,7 +223,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Map> scope = searchSession.scope( Map.class, entityTypeName );
@@ -270,7 +271,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> entity1 = new HashMap<>();
 			entity1.put( "id", 1 );
 			entity1.put( "title", "Hyperion" );
@@ -284,7 +285,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search(
@@ -343,7 +344,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> entity1 = new HashMap<>();
 			entity1.put( "id", 1 );
 			entity1.put( "propertyOfA", "Hyperion" );
@@ -370,7 +371,7 @@ public class DynamicMapBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Map> query = searchSession.search(
@@ -427,7 +428,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -482,7 +483,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -538,7 +539,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -597,7 +598,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -652,7 +653,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -715,7 +716,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -792,7 +793,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -869,7 +870,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new SafeHashCodeDynamicEntity();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -948,7 +949,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new SafeHashCodeDynamicEntity();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );
@@ -1025,7 +1026,7 @@ public class DynamicMapBaseIT {
 				.setup();
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Map<String, Object> book = new HashMap<>();
 			book.put( "id", 1 );
 			book.put( "title", "Hyperion" );

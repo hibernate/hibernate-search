@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.documentation.search.aggregation;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.sql.Date;
@@ -19,7 +20,6 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -130,14 +130,14 @@ public class ElasticsearchAggregationDslIT {
 	}
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

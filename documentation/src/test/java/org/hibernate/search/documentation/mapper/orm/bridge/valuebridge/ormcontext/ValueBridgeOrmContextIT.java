@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.valuebridge.ormcont
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -17,7 +18,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,12 +38,12 @@ public class ValueBridgeOrmContextIT {
 	public void smoke() {
 		// See MyDataValueBridge
 		entityManagerFactory.getProperties().put( "test.data.indexed", MyData.INDEXED );
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			MyEntity myEntity = new MyEntity();
 			entityManager.persist( myEntity );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// See MyDataValueBridge
 			entityManager.setProperty( "test.data.projected", MyData.PROJECTED );
 

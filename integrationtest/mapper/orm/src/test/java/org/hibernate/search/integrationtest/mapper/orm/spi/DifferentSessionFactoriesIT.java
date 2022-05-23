@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.spi;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -21,7 +22,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,7 +57,7 @@ public class DifferentSessionFactoriesIT {
 						.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
 
 		// try to use an entityManager owned by the original session factory instead
-		assertThatThrownBy( () -> OrmUtils.with( sessionFactory ).runNoTransaction( session ->
+		assertThatThrownBy( () -> with( sessionFactory ).runNoTransaction( session ->
 				HibernateOrmSearchSession.get( contextProvider.get(), (SessionImplementor) session )
 		) )
 				.isInstanceOf( SearchException.class )
