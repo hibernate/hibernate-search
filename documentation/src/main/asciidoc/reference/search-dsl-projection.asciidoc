@@ -553,7 +553,7 @@ a list containing one list per author, which in turns contains the result of the
 Thus, the list of hits will be an instance of `List<List<List<?>>>`.
 ====
 
-Similarly, to get the result of inner projections as a `List<?>`,
+Similarly, to get the result of inner projections as an array (`Object[]`),
 you can do without the transformer by calling `asArray()`:
 
 .Returning an array of projected values with `.object(...).add(...).asArray()`
@@ -572,7 +572,7 @@ and at index `1` the value of the `lastName` field of `authors`.
 meaning it will yield values of type `List<Object[]>`:
 one `Object[]` per object in the `authors` object field.
 <6> Each hit will be an instance of `List<Object[]>`:
-a list containing one list per author, which in turns contains the result of the inner projections, in the given order.
+a list containing one array per author, which in turns contains the result of the inner projections, in the given order.
 Thus, the list of hits will be an instance of `List<List<Object[]>>`.
 ====
 
