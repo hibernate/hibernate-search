@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,7 +21,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +45,7 @@ public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 
 	@Test
 	public void nonUniqueDocumentId() {
-		backendMock.inLenientMode( () -> OrmUtils.withinTransaction( sessionFactory, session -> {
+		backendMock.inLenientMode( () -> withinTransaction( sessionFactory, session -> {
 			for ( long i = 0; i < 2; i++ ) {
 				IndexedEntity entity = new IndexedEntity();
 				entity.setId( i );
@@ -54,7 +54,7 @@ public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 			}
 		} ) );
 
-		assertThatThrownBy( () -> OrmUtils.withinTransaction( sessionFactory, session -> {
+		assertThatThrownBy( () -> withinTransaction( sessionFactory, session -> {
 			backendMock.expectSearchObjects( IndexedEntity.NAME,
 					StubSearchWorkBehavior.of( 1, StubBackendUtils.reference( IndexedEntity.NAME, "0" ) ) );
 			Search.session( session ).search( IndexedEntity.class )

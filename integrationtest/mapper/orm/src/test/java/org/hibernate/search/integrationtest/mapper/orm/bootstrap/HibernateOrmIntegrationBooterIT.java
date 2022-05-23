@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
 import org.junit.After;
@@ -133,7 +133,7 @@ public class HibernateOrmIntegrationBooterIT {
 			 */
 			backendMock.verifyExpectationsMet();
 
-			OrmUtils.withinTransaction( sessionFactory, session -> {
+			withinTransaction( sessionFactory, session -> {
 				IndexedEntity entity = new IndexedEntity();
 				entity.id = 1;
 				entity.text = "someText";

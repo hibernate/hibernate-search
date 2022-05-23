@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.test.engine;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.Assert.assertEquals;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * Verify index changes queued during a transaction are canceled
@@ -75,7 +76,7 @@ public class RollbackTransactionTest extends SearchTestBase {
 	public int countBusLineByDatabaseCount() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		int count = OrmUtils.listAll( fullTextSession, BusLine.class ).size();
+		int count = listAll( fullTextSession, BusLine.class ).size();
 		tx.commit();
 		fullTextSession.close();
 		return count;

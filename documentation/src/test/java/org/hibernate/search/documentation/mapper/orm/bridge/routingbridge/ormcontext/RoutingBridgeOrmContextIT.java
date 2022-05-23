@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.ormco
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -16,7 +17,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +39,7 @@ public class RoutingBridgeOrmContextIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// See MyDataPropertyBinder
 			entityManager.setProperty( "test.data.indexed", MyData.INDEXED );
 
@@ -48,7 +48,7 @@ public class RoutingBridgeOrmContextIT {
 			entityManager.persist( myEntity );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )
@@ -58,7 +58,7 @@ public class RoutingBridgeOrmContextIT {
 			assertThat( result ).hasSize( 1 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// See MyDataPropertyBinder
 			entityManager.setProperty( "test.data.indexed", MyData.NOT_INDEXED );
 
@@ -67,7 +67,7 @@ public class RoutingBridgeOrmContextIT {
 			Search.session( entityManager ).indexingPlan().addOrUpdate( myEntity );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )

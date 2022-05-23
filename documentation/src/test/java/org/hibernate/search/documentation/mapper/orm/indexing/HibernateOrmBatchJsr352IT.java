@@ -11,6 +11,7 @@ import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOr
 import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.assertAuthorCount;
 import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.assertBookCount;
 import static org.hibernate.search.documentation.mapper.orm.indexing.HibernateOrmMassIndexerIT.initData;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Properties;
 import javax.batch.operations.JobOperator;
@@ -24,7 +25,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +64,7 @@ public class HibernateOrmBatchJsr352IT {
 		jobExecution = waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			Search.session( entityManager ).workspace().refresh();
 
 			assertBookCount( entityManager, NUMBER_OF_BOOKS );
@@ -88,7 +88,7 @@ public class HibernateOrmBatchJsr352IT {
 		jobExecution = waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			Search.session( entityManager ).workspace().refresh();
 			assertAuthorCount( entityManager, NUMBER_OF_BOOKS / 2 );
 		} );

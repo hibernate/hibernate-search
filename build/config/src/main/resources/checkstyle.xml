@@ -88,6 +88,12 @@
             <property name="ignoreComments" value="true" />
         </module>
 
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?&lt;!^import static)\s[\w\.]*\bOrmUtils\.[a-z]\w*\(" />
+            <property name="message" value="Always use static imports for OrmUtils" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
        <!-- Checks for imports -->
         <module name="AvoidStarImport" />
         <module name="RedundantImport" />

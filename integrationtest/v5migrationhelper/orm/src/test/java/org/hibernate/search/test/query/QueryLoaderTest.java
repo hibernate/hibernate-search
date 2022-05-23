@@ -6,24 +6,23 @@
  */
 package org.hibernate.search.test.query;
 
-import java.util.List;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.Assert.assertEquals;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
@@ -92,7 +91,7 @@ public class QueryLoaderTest extends SearchTestBase {
 		music.getAuthors().clear();
 		music2.getAuthors().clear();
 
-		for ( Object o : OrmUtils.listAll( s, Object.class ) ) {
+		for ( Object o : listAll( s, Object.class ) ) {
 			s.delete( o );
 		}
 

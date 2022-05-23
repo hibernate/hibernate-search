@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -31,7 +32,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -105,7 +105,7 @@ public class ToSearchSessionFromSessionProxyIT {
 	public void testThreadBoundSessionWrappingInTransaction() {
 		final Session sessionFromFirstThread = setupHolder.sessionFactory().getCurrentSession();
 		try {
-			OrmUtils.withinTransaction( sessionFromFirstThread, ignored -> {
+			withinTransaction( sessionFromFirstThread, ignored -> {
 				SearchSession searchSessionFromFirstThread = Search.session( sessionFromFirstThread );
 				assertNotNull( searchSessionFromFirstThread );
 				assertThat( searchSessionFromFirstThread.toEntityManager() ).isSameAs( sessionFromFirstThread );

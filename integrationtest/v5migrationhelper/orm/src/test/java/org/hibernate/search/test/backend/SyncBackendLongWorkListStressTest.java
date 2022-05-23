@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.backend;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.countAll;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
 		Transaction tx = s.beginTransaction();
 		// count of entities in database needs to be checked before SF is closed (HSQLDB will forget the entities)
-		Number count = OrmUtils.countAll( s, Clock.class );
+		Number count = countAll( s, Clock.class );
 		assertEquals( NUM_SAVED_ENTITIES, count.intValue() );
 		tx.commit();
 		s.close();

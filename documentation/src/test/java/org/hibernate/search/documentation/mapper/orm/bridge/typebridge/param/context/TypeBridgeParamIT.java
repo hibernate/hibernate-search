@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.typebridge.param.co
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,7 +54,7 @@ public class TypeBridgeParamIT {
 
 	@Test
 	public void smoke() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Author author1 = new Author();
 			author1.setFirstName( "Ty" );
 			author1.setLastName( "Frank" );
@@ -66,7 +66,7 @@ public class TypeBridgeParamIT {
 			entityManager.persist( author2 );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> result = searchSession.search( Author.class )

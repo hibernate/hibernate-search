@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.sync;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils.prepareBooks;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.countAll;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import javax.persistence.EntityManagerFactory;
@@ -19,7 +20,6 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -83,7 +83,7 @@ public class OutOfSyncIndexIT {
 	}
 
 	private int entityCount() {
-		return OrmUtils.countAll( entityManagerFactory.createEntityManager(), Book.class ).intValue();
+		return countAll( entityManagerFactory.createEntityManager(), Book.class ).intValue();
 	}
 
 }

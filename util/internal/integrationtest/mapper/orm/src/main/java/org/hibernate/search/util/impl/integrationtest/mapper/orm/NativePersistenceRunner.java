@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -38,7 +40,7 @@ class NativePersistenceRunner implements PersistenceRunner<Session, Transaction>
 	@Override
 	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super Session, ? super Transaction, R, E> action) throws E {
 		return applyNoTransaction( session ->
-				OrmUtils.withinTransaction( session, tx -> {
+				withinTransaction( session, tx -> {
 					return action.apply( session, tx );
 				} )
 		);

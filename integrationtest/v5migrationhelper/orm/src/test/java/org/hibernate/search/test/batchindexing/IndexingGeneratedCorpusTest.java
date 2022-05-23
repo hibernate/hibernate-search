@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.countAll;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +27,6 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -232,7 +232,7 @@ public class IndexingGeneratedCorpusTest {
 		try {
 			Transaction tx = session.beginTransaction();
 			try {
-				Number countAsNumber = OrmUtils.countAll( session, type );
+				Number countAsNumber = countAll( session, type );
 				return countAsNumber.longValue();
 			}
 			finally {

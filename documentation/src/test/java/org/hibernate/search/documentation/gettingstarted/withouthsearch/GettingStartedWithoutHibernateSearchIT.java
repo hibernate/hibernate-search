@@ -7,14 +7,13 @@
 package org.hibernate.search.documentation.gettingstarted.withouthsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +39,7 @@ public class GettingStartedWithoutHibernateSearchIT {
 	public void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Author author = new Author();
 			author.setName( "John Doe" );
 
@@ -57,7 +56,7 @@ public class GettingStartedWithoutHibernateSearchIT {
 			bookIdHolder.set( book.getId() );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			TypedQuery<Book> query = entityManager.createQuery( "select b from Book b where title = ?1", Book.class );
 			query.setParameter( 1, "Refactoring: Improving the Design of Existing Code" );
 

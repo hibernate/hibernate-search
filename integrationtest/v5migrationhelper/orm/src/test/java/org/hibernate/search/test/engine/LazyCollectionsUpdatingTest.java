@@ -6,23 +6,24 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
@@ -39,7 +40,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
-			List list = OrmUtils.listAll( fullTextSession, BusStop.class );
+			List list = listAll( fullTextSession, BusStop.class );
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
 			BusStop busStop = (BusStop) list.get( 1 );
@@ -57,7 +58,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
-			List list = OrmUtils.listAll( fullTextSession, BusStop.class );
+			List list = listAll( fullTextSession, BusStop.class );
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
 			BusStop busStop = (BusStop) list.get( 1 );

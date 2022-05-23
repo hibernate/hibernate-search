@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.scope;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -19,7 +20,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class ScopeExtensionIT {
 
 	@Test
 	public void test() {
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			IndexScope indexScope = Search.session( session ).scope( Author.class )
 					.extension( original -> original );
 			assertThat( indexScope ).isInstanceOf( StubIndexScope.class );

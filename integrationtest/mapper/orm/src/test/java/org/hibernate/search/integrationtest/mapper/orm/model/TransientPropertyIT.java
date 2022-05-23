@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -30,7 +31,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class TransientPropertyIT {
 
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( EntityWithDerivedFrom.class );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			EntityWithDerivedFrom entity1 = new EntityWithDerivedFrom();
 			entity1.setId( 1 );
 			entity1.setA( 2 );
@@ -84,7 +84,7 @@ public class TransientPropertyIT {
 
 		// A is used to derive the transient property, so it should trigger reindexing.
 		// More related tests in the AutomaticIndexing*IT tests.
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			EntityWithDerivedFrom entity1 = session.getReference( EntityWithDerivedFrom.class, 1 );
 			entity1.setA( 4 );
 
@@ -98,7 +98,7 @@ public class TransientPropertyIT {
 		backendMock.verifyExpectationsMet();
 
 		// C is not used to derive the transient property, so it should not trigger reindexing.
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			EntityWithDerivedFrom entity1 = session.getReference( EntityWithDerivedFrom.class, 1 );
 			entity1.setC( 42 );
 
@@ -115,7 +115,7 @@ public class TransientPropertyIT {
 
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( EntityWithDerivedFromAndBridge.class );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			EntityWithDerivedFromAndBridge entity1 = new EntityWithDerivedFromAndBridge();
 			entity1.setId( 1 );
 			entity1.setA( 2 );
@@ -133,7 +133,7 @@ public class TransientPropertyIT {
 
 		// A is used to derive the transient property, so it should trigger reindexing.
 		// More related tests in the AutomaticIndexing*IT tests.
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			EntityWithDerivedFromAndBridge entity1 = session.getReference( EntityWithDerivedFromAndBridge.class, 1 );
 			entity1.setA( 4 );
 
@@ -147,7 +147,7 @@ public class TransientPropertyIT {
 		backendMock.verifyExpectationsMet();
 
 		// C is not used to derive the transient property, so it should not trigger reindexing.
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			EntityWithDerivedFromAndBridge entity1 = session.getReference( EntityWithDerivedFromAndBridge.class, 1 );
 			entity1.setC( 42 );
 

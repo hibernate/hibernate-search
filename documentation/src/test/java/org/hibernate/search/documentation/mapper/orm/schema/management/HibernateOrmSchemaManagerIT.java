@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -18,7 +19,6 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,7 +46,7 @@ public class HibernateOrmSchemaManagerIT {
 
 	@Test
 	public void simple() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -65,7 +65,7 @@ public class HibernateOrmSchemaManagerIT {
 
 	@Test
 	public void selectType() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );
 				// tag::select-type[]
@@ -117,7 +117,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	private void initData() {
-		OrmUtils.with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				int i = 0;
 				while ( i < NUMBER_OF_BOOKS ) {

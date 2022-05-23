@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
@@ -32,7 +33,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,25 +69,25 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
 
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			entity.setIndexedField( "another value for the field" );
 			session.merge( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 3 );
 			// Correct order when ordered by id (you'll have to trust me on that)
@@ -99,14 +99,14 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			// Swap the IDs of event 1 (add) and 3 (delete)
 			updateOutboxTableRow( session, 1, 4 );
 			updateOutboxTableRow( session, 3, 1 );
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 3 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
@@ -139,7 +139,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// An entity is deleted, then re-created in separate transactions.
 
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -151,11 +151,11 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -174,7 +174,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// but the add event has ID 1, the and the delete event has ID 2.
 
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -186,19 +186,19 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
 		} );
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id (you'll have to trust me on that)
@@ -208,14 +208,14 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", null );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			// Swap the IDs of event 2 (delete) and 3 (add)
 			updateOutboxTableRow( session, 2, 4 );
 			updateOutboxTableRow( session, 3, 2 );
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
@@ -311,7 +311,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			entity.setText( "third" );
 		} );
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id
@@ -323,7 +323,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			);
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			// Swap the IDs of event 2 (update routing key from "FIRST" to "SECOND") and
 			// 3 (update routing key from "SECOND" to "THIRD")
 			updateOutboxTableRow( session, 2, 4 );
@@ -331,7 +331,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			updateOutboxTableRow( session, 4, 3 );
 		} );
 
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id

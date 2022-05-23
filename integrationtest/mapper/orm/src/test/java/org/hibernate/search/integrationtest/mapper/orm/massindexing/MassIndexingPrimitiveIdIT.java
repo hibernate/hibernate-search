@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,7 +24,6 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -55,7 +56,7 @@ public class MassIndexingPrimitiveIdIT {
 
 	@Test
 	public void entityWithPrimitiveId() {
-		OrmUtils.with( sessionFactory ).runNoTransaction( session -> {
+		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
 
@@ -89,7 +90,7 @@ public class MassIndexingPrimitiveIdIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			session.persist( new EntityWithPrimitiveId( 1 ) );
 			session.persist( new EntityWithPrimitiveId( 2 ) );
 			session.persist( new EntityWithPrimitiveId( 3 ) );

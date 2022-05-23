@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.List;
 import javax.persistence.Basic;
@@ -22,7 +23,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +51,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		backendMock.verifyExpectationsMet();
 		int size = 1000;
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			for ( int i = 1; i <= size; i++ ) {
 				IndexedEntity entity = new IndexedEntity();
 				entity.setId( i );
@@ -69,7 +69,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		SessionFactory finalSessionFactory = sessionFactory;
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
-			OrmUtils.withinTransaction( finalSessionFactory, session -> {
+			withinTransaction( finalSessionFactory, session -> {
 				assertThat( outboxEventFinder.findOutboxEventIdsNoFilter( session ) ).hasSizeLessThan( size );
 			} );
 		} );
@@ -80,7 +80,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		// verify some entities have not been processed
 		outboxEventFinder.hideAllEvents();
 		sessionFactory = setup();
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			List<OutboxEvent> outboxEventsNoFilter = outboxEventFinder.findOutboxEventsNoFilter( session );
 			// partial processing, meaning that the events size is *strictly* between 0 and the full size:
 			assertThat( outboxEventsNoFilter ).isNotEmpty();
@@ -101,20 +101,20 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		backendMock.verifyExpectationsMet();
 
 		int id = 1;
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			entity.setIndexedField( "another value for the field" );
 			session.merge( entity );
 		} );
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
@@ -122,7 +122,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 		sessionFactory.close();
 		sessionFactory = setup();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// add

@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.test.session;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.queryAll;
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
@@ -20,11 +22,10 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 /**
  * @author Emmanuel Bernard
@@ -55,7 +56,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestBase {
 		//check non created object does get found!!1
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
-		ScrollableResults results = OrmUtils.queryAll( s, Email.class ).scroll( ScrollMode.FORWARD_ONLY );
+		ScrollableResults results = queryAll( s, Email.class ).scroll( ScrollMode.FORWARD_ONLY );
 		int index = 0;
 		while ( results.next() ) {
 			index++;

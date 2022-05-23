@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
@@ -33,7 +35,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBindin
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,7 +75,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	@Test
 	public void indirectValueUpdate_embeddedBridge() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -112,7 +113,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value used in an included bridge
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInFirstBridge( "updatedValue" );
 
@@ -131,7 +132,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		 * Test updating a value used in an excluded bridge
 		 * (every index field filtered out by the IndexedEmbedded filter)
 		 */
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInSecondBridge( "updatedValue" );
 

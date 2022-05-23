@@ -7,23 +7,24 @@
 
 package org.hibernate.search.test.embedded.nested.containedIn;
 
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.listAll;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * @author Emmanuel Bernard
@@ -69,10 +70,10 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		tx.commit();
 
 		tx = fts.beginTransaction();
-		for ( Entity2ForDoc0 e : OrmUtils.listAll( fts, Entity2ForDoc0.class ) ) {
+		for ( Entity2ForDoc0 e : listAll( fts, Entity2ForDoc0.class ) ) {
 			fts.delete( e );
 		}
-		for ( Entity1ForDoc0 e : OrmUtils.listAll( fts, Entity1ForDoc0.class ) ) {
+		for ( Entity1ForDoc0 e : listAll( fts, Entity1ForDoc0.class ) ) {
 			fts.delete( e );
 		}
 		tx.commit();
@@ -134,10 +135,10 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 				fts.createFullTextQuery( new TermQuery( new Term( "entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
 
 		tx = fts.beginTransaction();
-		for ( Entity2ForUnindexed e : OrmUtils.listAll( fts, Entity2ForUnindexed.class ) ) {
+		for ( Entity2ForUnindexed e : listAll( fts, Entity2ForUnindexed.class ) ) {
 			fts.delete( e );
 		}
-		for ( Entity1ForUnindexed e : OrmUtils.listAll( fts, Entity1ForUnindexed.class ) ) {
+		for ( Entity1ForUnindexed e : listAll( fts, Entity1ForUnindexed.class ) ) {
 			fts.delete( e );
 		}
 		tx.commit();

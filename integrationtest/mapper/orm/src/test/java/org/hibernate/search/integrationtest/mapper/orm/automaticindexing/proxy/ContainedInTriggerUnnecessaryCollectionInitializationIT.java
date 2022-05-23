@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assert.assertFalse;
 
 import java.util.HashSet;
@@ -27,7 +28,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -60,7 +60,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 
 	@Test
 	public void test() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Group group = new Group();
 			group.setId( 1 );
 			group.setSomeField( "initialValue" );
@@ -90,7 +90,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		backendMock.verifyExpectationsMet();
 
 		AtomicReference<Group> groupFromModifyingTransaction = new AtomicReference<>();
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			Group group = session.getReference( Group.class, 1 );
 			groupFromModifyingTransaction.set( group );
 

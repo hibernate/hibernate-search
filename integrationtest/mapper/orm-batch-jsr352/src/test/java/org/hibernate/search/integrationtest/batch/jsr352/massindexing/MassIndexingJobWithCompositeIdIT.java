@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.JOB_TIMEOUT_MS;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -36,7 +37,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -79,7 +79,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	public void initData() throws Exception {
 		emf = setupHolder.entityManagerFactory();
 
-		OrmUtils.withinJPATransaction( emf, ( entityManager ) -> {
+		withinJPATransaction( emf, ( entityManager ) -> {
 			for ( LocalDate d = START; d.isBefore( END ); d = d.plusDays( 1 ) ) {
 				entityManager.persist( new EntityWithIdClass( d ) );
 				entityManager.persist( new EntityWithEmbeddedId( d ) );

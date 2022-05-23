@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.gettingstarted.withhsearch.customanal
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
@@ -18,7 +19,6 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class GettingStartedCustomAnalysisIT {
 	public void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Author author = new Author();
 			author.setName( "John Doe" );
 
@@ -68,7 +68,7 @@ public class GettingStartedCustomAnalysisIT {
 			bookIdHolder.set( book.getId() );
 		} );
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager );
@@ -86,7 +86,7 @@ public class GettingStartedCustomAnalysisIT {
 		} );
 
 		// Also test the other terms mentioned in the getting started guide
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactor", "refactoring" } ) {

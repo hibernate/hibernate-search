@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.entityindexmapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -85,7 +85,7 @@ public class HibernateOrmIndexedIT {
 
 	@Test
 	public void search_separateQueries() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> authorResult = searchSession.search( Author.class )
@@ -103,7 +103,7 @@ public class HibernateOrmIndexedIT {
 	@Test
 	public void search_singleQuery() {
 		assertThatThrownBy(
-				() -> OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+				() -> withinJPATransaction( entityManagerFactory, entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );
 
 					// tag::cross-backend-search[]
@@ -120,7 +120,7 @@ public class HibernateOrmIndexedIT {
 	}
 
 	private void initData() {
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book1 = new Book();
 			book1.setTitle( "Some title" );
 			Author author1 = new Author();
