@@ -345,7 +345,7 @@ Thus, the list of hits will be an instance of `List<MyTuple4>`.
 ====
 
 [[search-dsl-projection-composite-as-list]]
-=== Projecting to a `List<?>`
+=== Projecting to a `List<?>` or `Object[]`
 
 If you don't mind receiving the result of inner projections as a `List<?>`,
 you can do without the transformer by calling `asList()`:
@@ -365,6 +365,26 @@ and the value of the `genre` field of the matched document at index `1`.
 <5> Each hit will be an instance of `List<?>`:
 a list containing the result of the inner projections, in the given order.
 Thus, the list of hits will be an instance of `List<List<?>>`.
+====
+
+Similarly, to get the result of inner projections as an array (`Object[]`),
+you can do without the transformer by calling `asArray()`:
+
+.Returning an array of projected values with `.composite(...).add(...).asArray()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-array]
+----
+<1> Call `.composite()`.
+<2> Define the first inner projection as a projection on the `title` field.
+<3> Define the second inner projection as a projection on the `genre` field.
+<4> Define the result of the projection as an array,
+meaning the hits will be `Object[]` instances with the value of the `title` field of the matched document at index `0`,
+and the value of the `genre` field of the matched document at index `1`.
+<5> Each hit will be an instance of `Object[]`:
+a array of objects containing the result of the inner projections, in the given order.
+Thus, the list of hits will be an instance of `List<Object[]>`.
 ====
 
 Alternatively, to get the result as a `List<?>`,

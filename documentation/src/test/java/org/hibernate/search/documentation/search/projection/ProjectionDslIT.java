@@ -440,6 +440,37 @@ public class ProjectionDslIT {
 					)
 			);
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::composite-array[]
+			List<Object[]> hits = searchSession.search( Book.class )
+					.select( f -> f.composite() // <1>
+							.from( f.field( "title", String.class ), // <2>
+									f.field( "genre", Genre.class ) ) // <3>
+							.asArray() ) // <4>
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 ); // <5>
+			// end::composite-array[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					new Object[] {
+							session.getReference( Book.class, BOOK1_ID ).getTitle(),
+							session.getReference( Book.class, BOOK1_ID ).getGenre()
+					},
+					new Object[] {
+							session.getReference( Book.class, BOOK2_ID ).getTitle(),
+							session.getReference( Book.class, BOOK2_ID ).getGenre()
+					},
+					new Object[] {
+							session.getReference( Book.class, BOOK3_ID ).getTitle(),
+							session.getReference( Book.class, BOOK3_ID ).getGenre()
+					},
+					new Object[] {
+							session.getReference( Book.class, BOOK4_ID ).getTitle(),
+							session.getReference( Book.class, BOOK4_ID ).getGenre()
+					}
+			);
+		} );
 	}
 
 	@Test
