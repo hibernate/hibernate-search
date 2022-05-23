@@ -45,9 +45,9 @@ While `field` projections are certainly the most common,
 they are not the only type of projection.
 Other projections allow
 <<search-dsl-projection-composite,composing custom beans containing extracted data>>,
-get references to the <<search-dsl-projection-documentReference,extracted documents>>
+getting references to the <<search-dsl-projection-documentReference,extracted documents>>
 or the <<search-dsl-projection-reference,corresponding entities>>,
-or get information related to the search query itself
+or getting information related to the search query itself
 (<<search-dsl-projection-score,score>>, ...).
 
 To learn more about the field projection, and all the other types of projection,
