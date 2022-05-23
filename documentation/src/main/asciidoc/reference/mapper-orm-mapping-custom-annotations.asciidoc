@@ -34,6 +34,6 @@ You can find examples in these sections in particular:
 ====
 It is completely possible to use custom annotations for parameter-less bridges,
 or even for more complex features such as indexed-embedded:
-every feature available in the programmatic API
+every feature available in the <<mapper-orm-programmatic-mapping,programmatic mapping API>>
 can be triggered by a custom annotation.
 ====
