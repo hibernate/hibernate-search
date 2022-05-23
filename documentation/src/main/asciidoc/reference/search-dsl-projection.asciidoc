@@ -576,32 +576,6 @@ a list containing one list per author, which in turns contains the result of the
 Thus, the list of hits will be an instance of `List<List<Object[]>>`.
 ====
 
-[[search-dsl-projection-object-as-object-array]]
-=== Projecting to an `Object[]`
-
-If you don't mind receiving the result of inner projections as a `List<?>`,
-you can do without the transformer by calling `asList()`:
-
-.Returning a `List` of projected values with `.object(...).add(...).asList()`
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=object-list]
-----
-<1> Call `.object( "authors" )`.
-<2> Define the first inner projection as a projection on the `firstName` field of `authors`.
-<3> Define the second inner projection as a projection on the `lastName` field of `authors`.
-<4> Define the result of the projection as a list,
-meaning the hits will be `List` instances with at index `0` the value of the `firstName` field of `authors` ,
-and at index `1` the value of the `lastName` field of `authors`.
-<5> Define the projection as multivalued,
-meaning it will yield values of type `List<List<?>`:
-one `List<?>` per object in the `authors` object field.
-<6> Each hit will be an instance of `List<List<?>>`:
-a list containing one list per author, which in turns contains the result of the inner projections, in the given order.
-Thus, the list of hits will be an instance of `List<List<List<?>>>`.
-====
-
 [[search-dsl-projection-constant]]
 == `constant`: return a provided constant
 
