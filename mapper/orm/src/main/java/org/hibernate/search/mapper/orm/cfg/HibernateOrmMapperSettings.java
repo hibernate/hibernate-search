@@ -126,12 +126,12 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The mapping configurer to use.
 	 * <p>
-	 * Expects a reference to a bean of type {@link HibernateOrmSearchMappingConfigurer}.
+	 * Expects a single-valued or multi-valued reference to beans of type {@link HibernateOrmSearchMappingConfigurer}.
 	 * <p>
 	 * Defaults to no value.
 	 *
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
-	 * which includes a description of the "bean reference" properties and accepted values.
+	 * which includes a description of the "multi-valued bean reference" properties and accepted values.
 	 */
 	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
 

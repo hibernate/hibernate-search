@@ -579,6 +579,8 @@ To configure analysis in a Lucene backend, you will need to:
 to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
 for example `class:com.mycompany.MyAnalysisConfigurer`.
 
+TIP: You can pass multiple bean references separated by commas. See <<configuration-property-types>>.
+
 Hibernate Search will call the `configure` method of this implementation on startup,
 and the configurer will be able to take advantage of a DSL to define
 <<backend-lucene-analysis-analyzers,analyzers and normalizers>> or even (for more advanced use) the <<backend-lucene-analysis-similarity,similarity>>.
@@ -1173,6 +1175,8 @@ To configure caching in a Lucene backend, you will need to:
 `hibernate.search.backend.query.caching.configurer`
 to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
 for example `class:com.mycompany.MyQueryCachingConfigurer`.
+
+TIP: You can pass multiple bean references separated by commas. See <<configuration-property-types>>.
 
 Hibernate Search will call the `configure` method of this implementation on startup,
 and the configurer will be able to take advantage of a DSL to define

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.util.List;
+
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
@@ -47,9 +49,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.withDefault( HibernateOrmMapperSettings.Defaults.MAPPING_PROCESS_ANNOTATIONS )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends HibernateOrmSearchMappingConfigurer>> MAPPING_CONFIGURER =
+	private static final OptionalConfigurationProperty<List<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_CONFIGURER )
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
+					.multivalued()
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
@@ -142,8 +145,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		// Apply the user-provided mapping configurer if necessary
 		MAPPING_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 				.ifPresent( holder -> {
-					try ( BeanHolder<? extends HibernateOrmSearchMappingConfigurer> configurerHolder = holder ) {
-						configurerHolder.get().configure( this );
+					try ( BeanHolder<List<HibernateOrmSearchMappingConfigurer>> configurerHolder = holder ) {
+						for ( HibernateOrmSearchMappingConfigurer configurer : configurerHolder.get() ) {
+							configurer.configure( this );
+						}
 					}
 				} );
 
