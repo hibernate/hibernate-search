@@ -35,12 +35,13 @@
  *
  * <h2 id="bean-reference-multi">Multi-valued bean reference</h2>
  *
- * A multi-valued reference to a bean of type {@code T} can be passed as either:
+ * A multivalued reference to a bean of type {@code T} can be passed as either:
  * <ul>
  * <li>A {@link java.util.Collection Collection} containing any
  * <a href="bean-reference">value that is accepted as a bean reference</a></li>
  * <li>or a comma-separated {@link java.lang.String String} containing any
  * <a href="bean-reference">String value that is accepted as a bean reference</a></li>
+ * <li>or any value accepted for a <a href="#bean-reference">single-valued bean reference</a></li>
  * </ul>
  */
 package org.hibernate.search.engine.cfg;

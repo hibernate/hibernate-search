@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -306,7 +307,19 @@ public final class ConvertUtils {
 					.collect( Collectors.toList() );
 		}
 		else {
-			throw log.invalidMultiPropertyValue();
+			T singleElement;
+			try {
+				singleElement = elementConverter.apply( value );
+			}
+			catch (RuntimeException e) {
+				throw log.invalidMultiPropertyValue( e.getMessage(), e );
+			}
+			if ( singleElement == null ) {
+				return Collections.emptyList();
+			}
+			else {
+				return Collections.singletonList( singleElement );
+			}
 		}
 	}
 

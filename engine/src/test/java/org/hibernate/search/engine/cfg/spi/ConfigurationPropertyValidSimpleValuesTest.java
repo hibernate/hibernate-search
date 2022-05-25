@@ -192,7 +192,14 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
 
-		// Typed value - one
+		// Typed value - one (not wrapped in a collection)
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue );
+
+		// Typed value - one (wrapped in a collection)
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue ) ) );
 		result = property.get( sourceMock );
 		verifyNoOtherSourceInteractionsAndReset();
