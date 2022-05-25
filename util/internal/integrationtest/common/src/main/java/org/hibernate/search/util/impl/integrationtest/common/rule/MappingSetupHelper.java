@@ -42,6 +42,11 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 				.orElse( configurationProvider );
 	}
 
+	@Override
+	public String toString() {
+		return backendSetupStrategy.toString();
+	}
+
 	public C start() {
 		C setupContext = createSetupContext();
 		return backendSetupStrategy.start( setupContext, configurationProvider, setupContext.backendMappingHandlePromise );
