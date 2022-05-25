@@ -58,14 +58,16 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends LuceneAnalysisConfigurer>> ANALYSIS_CONFIGURER =
+	private static final OptionalConfigurationProperty<List<BeanReference<? extends LuceneAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( LuceneBackendSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( LuceneAnalysisConfigurer.class )
+					.multivalued()
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends QueryCachingConfigurer>> QUERY_CACHING_CONFIGURER
-			= ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHING_CONFIGURER )
+	private static final OptionalConfigurationProperty<List<BeanReference<? extends QueryCachingConfigurer>>> QUERY_CACHING_CONFIGURER =
+			ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHING_CONFIGURER )
 					.asBeanReference( QueryCachingConfigurer.class )
+					.multivalued()
 					.build();
 
 	@Override
@@ -174,12 +176,14 @@ public class LuceneBackendFactory implements BackendFactory {
 					new LuceneAnalysisConfigurationContextImpl( analysisComponentFactory );
 			// Add default definitions first, so that they can be overridden
 			LuceneDefaultAnalysisConfigurer.INSTANCE.configure( collector );
-			// Apply the user-provided analysis configurer if necessary
+			// Apply the user-provided analysis configurers if necessary
 			final BeanResolver beanResolver = buildContext.beanResolver();
 			ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.ifPresent( holder -> {
-						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
-							configurerHolder.get().configure( collector );
+						try ( BeanHolder<List<LuceneAnalysisConfigurer>> configurerHolder = holder ) {
+							for ( LuceneAnalysisConfigurer configurer : configurerHolder.get() ) {
+								configurer.configure( collector );
+							}
 						}
 					} );
 			return new LuceneAnalysisDefinitionRegistry( collector );
@@ -201,11 +205,13 @@ public class LuceneBackendFactory implements BackendFactory {
 				}
 			}
 
-			// Apply the user-provided query cache configurer if necessary
+			// Apply the user-provided query cache configurers if necessary
 			QUERY_CACHING_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.ifPresent( holder -> {
-						try ( BeanHolder<? extends QueryCachingConfigurer> configurerHolder = holder ) {
-							configurerHolder.get().configure( context );
+						try ( BeanHolder<List<QueryCachingConfigurer>> configurerHolder = holder ) {
+							for ( QueryCachingConfigurer configurer : configurerHolder.get() ) {
+								configurer.configure( context );
+							}
 						}
 					} );
 		}

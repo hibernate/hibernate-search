@@ -57,24 +57,24 @@ public final class LuceneBackendSettings {
 	/**
 	 * The analysis configurer to use.
 	 * <p>
-	 * Expects a reference to a bean of type {@link LuceneAnalysisConfigurer}.
+	 * Expects a single-valued or multi-valued reference to beans of type {@link LuceneAnalysisConfigurer}.
 	 * <p>
 	 * Defaults to no value.
 	 *
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
-	 * which includes a description of the "bean reference" properties and accepted values.
+	 * which includes a description of the "multi-valued bean reference" properties and accepted values.
 	 */
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
 	 * The query caching configurer to use.
 	 * <p>
-	 * Expects a reference to a bean of type {@link QueryCachingConfigurer}.
+	 * Expects a single-valued or multi-valued reference to beans of type {@link QueryCachingConfigurer}.
 	 * <p>
 	 * Defaults to no value.
 	 *
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
-	 * which includes a description of the "bean reference" properties and accepted values.
+	 * which includes a description of the "multi-valued bean reference" properties and accepted values.
 	 */
 	public static final String QUERY_CACHING_CONFIGURER = "query.caching.configurer";
 

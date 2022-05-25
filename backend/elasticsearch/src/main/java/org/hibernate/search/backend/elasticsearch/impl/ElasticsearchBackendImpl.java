@@ -65,9 +65,10 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
+	private static final OptionalConfigurationProperty<List<BeanReference<? extends ElasticsearchAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
+					.multivalued()
 					.build();
 
 	private static final ConfigurationProperty<DynamicMapping> DYNAMIC_MAPPING =
@@ -265,13 +266,15 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			EventContext indexEventContext, ConfigurationPropertySource propertySource) {
 		try {
 			BeanResolver beanResolver = buildContext.beanResolver();
-			// Apply the user-provided analysis configurer if necessary
+			// Apply the user-provided analysis configurers if necessary
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.map( holder -> {
-						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
+						try ( BeanHolder<List<ElasticsearchAnalysisConfigurer>> configurerHolder = holder ) {
 							ElasticsearchAnalysisConfigurationContextImpl collector =
 									new ElasticsearchAnalysisConfigurationContextImpl();
-							configurerHolder.get().configure( collector );
+							for ( ElasticsearchAnalysisConfigurer configurer : configurerHolder.get() ) {
+								configurer.configure( collector );
+							}
 							return new ElasticsearchAnalysisDefinitionRegistry( collector );
 						}
 					} )
