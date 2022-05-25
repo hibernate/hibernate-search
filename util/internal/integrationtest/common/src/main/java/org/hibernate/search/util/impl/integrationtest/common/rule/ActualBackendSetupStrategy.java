@@ -36,6 +36,12 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
+	public String toString() {
+		return namedBackendConfigurations.isEmpty() ? defaultBackendConfiguration.toString()
+				: allConfigurations.toString();
+	}
+
+	@Override
 	public Optional<TestRule> getTestRule() {
 		RuleChain ruleChain = null;
 		for ( BackendConfiguration configuration : allConfigurations ) {

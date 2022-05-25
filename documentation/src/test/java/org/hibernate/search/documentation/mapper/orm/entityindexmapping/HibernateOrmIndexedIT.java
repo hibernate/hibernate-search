@@ -20,10 +20,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
@@ -51,23 +48,18 @@ public class HibernateOrmIndexedIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return Arrays.asList(
-				DocumentationSetupHelper.withMultipleBackends( DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS, null ),
-				DocumentationSetupHelper.withMultipleBackends( DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS,
-						new HibernateOrmSearchMappingConfigurer() {
-							@Override
-							public void configure(HibernateOrmMappingConfigurationContext context) {
-								ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
-								//tag::programmatic[]
-								TypeMappingStep bookMapping = mapping.type( Book.class );
-								bookMapping.indexed();
-								TypeMappingStep authorMapping = mapping.type( Author.class );
-								authorMapping.indexed().index( "AuthorIndex" );
-								TypeMappingStep userMapping = mapping.type( User.class );
-								userMapping.indexed().backend( "backend2" );
-								//end::programmatic[]
-							}
-						} )
+		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
+				DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS,
+				mapping -> {
+					//tag::programmatic[]
+					TypeMappingStep bookMapping = mapping.type( Book.class );
+					bookMapping.indexed();
+					TypeMappingStep authorMapping = mapping.type( Author.class );
+					authorMapping.indexed().index( "AuthorIndex" );
+					TypeMappingStep userMapping = mapping.type( User.class );
+					userMapping.indexed().backend( "backend2" );
+					//end::programmatic[]
+				}
 		);
 	}
 

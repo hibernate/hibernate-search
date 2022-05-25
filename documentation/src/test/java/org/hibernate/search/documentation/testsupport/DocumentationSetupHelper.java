@@ -8,9 +8,11 @@ package org.hibernate.search.documentation.testsupport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
@@ -21,8 +23,8 @@ import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrateg
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
@@ -32,64 +34,94 @@ public final class DocumentationSetupHelper
 	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
 			BackendConfiguration backendConfiguration,
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
-		HibernateOrmSearchMappingConfigurer mappingConfigurer =
-				context -> programmaticMappingContributor.accept( context.programmaticMapping() );
+		return testParamsForBothAnnotationsAndProgrammatic( backendConfiguration,
+				Collections.emptySet(), programmaticMappingContributor );
+	}
+
+	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
+			BackendConfiguration backendConfiguration,
+			Set<Class<?>> additionalAnnotatedClasses,
+			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
+		return testParamsForBothAnnotationsAndProgrammatic(
+				BackendSetupStrategy.withSingleBackend( backendConfiguration ), backendConfiguration,
+				additionalAnnotatedClasses, programmaticMappingContributor );
+	}
+
+	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
+			BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations,
+			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
+		return testParamsForBothAnnotationsAndProgrammatic( defaultBackendConfiguration, namedBackendConfigurations,
+				Collections.emptySet(), programmaticMappingContributor );
+	}
+
+	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
+			BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations,
+			Set<Class<?>> additionalAnnotatedClasses,
+			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
+		return testParamsForBothAnnotationsAndProgrammatic(
+				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
+				defaultBackendConfiguration,
+				additionalAnnotatedClasses, programmaticMappingContributor );
+	}
+
+	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
+			BackendSetupStrategy backendSetupStrategy,
+			BackendConfiguration defaultBackendConfiguration,
+			Set<Class<?>> additionalAnnotatedClasses,
+			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
 		List<DocumentationSetupHelper> result = new ArrayList<>();
 		// Annotation-based mapping
-		result.add( withSingleBackend( backendConfiguration, null ) );
+		HibernateOrmSearchMappingConfigurer annotationMappingConfigurer =
+				additionalAnnotatedClasses.isEmpty() ? null
+						: context -> context.annotationMapping().add( additionalAnnotatedClasses );
+		result.add( new DocumentationSetupHelper( backendSetupStrategy,
+				null, annotationMappingConfigurer ) );
 		// Programmatic mapping
-		result.add( withSingleBackend( backendConfiguration, mappingConfigurer ) );
+		HibernateOrmSearchMappingConfigurer programmaticMappingConfigurer =
+				context -> programmaticMappingContributor.accept( context.programmaticMapping() );
+		result.add( new DocumentationSetupHelper( backendSetupStrategy,
+				false, programmaticMappingConfigurer ) );
 		return result;
 	}
 
 	public static DocumentationSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
 		return new DocumentationSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
-				backendConfiguration,
-				null
+				null, null
 		);
 	}
 
 	public static DocumentationSetupHelper withSingleBackend(BackendConfiguration backendConfiguration,
-			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
+			Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
 		return new DocumentationSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
-				backendConfiguration,
-				mappingConfigurerOrNull
+				annotationProcessingEnabled, defaultMappingConfigurer
 		);
 	}
 
-	public static DocumentationSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
-			Map<String, BackendConfiguration> namedBackendConfigurations,
-			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
-		return new DocumentationSetupHelper(
-				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
-				defaultBackendConfiguration,
-				mappingConfigurerOrNull
-		);
-	}
+	private final Boolean annotationProcessingEnabled;
 
-	private final BackendConfiguration defaultBackendConfiguration;
-
-	private final HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull;
+	private final HibernateOrmSearchMappingConfigurer defaultMappingConfigurer;
 
 	private DocumentationSetupHelper(BackendSetupStrategy backendSetupStrategy,
-			BackendConfiguration defaultBackendConfiguration,
-			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
+			Boolean annotationProcessingEnabled,
+			HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
 		super( backendSetupStrategy );
-		this.defaultBackendConfiguration = defaultBackendConfiguration;
-		this.mappingConfigurerOrNull = mappingConfigurerOrNull;
+		this.annotationProcessingEnabled = annotationProcessingEnabled;
+		this.defaultMappingConfigurer = defaultMappingConfigurer;
 	}
 
 	@Override
 	public String toString() {
-		return defaultBackendConfiguration.toString()
-				+ (mappingConfigurerOrNull != null ? " - programmatic mapping" : "");
+		return super.toString()
+				+ ( annotationProcessingEnabled == Boolean.FALSE ? " - programmatic mapping" : "");
 	}
 
 	@Override
 	protected SetupContext createSetupContext() {
-		return new SetupContext( mappingConfigurerOrNull );
+		return new SetupContext( annotationProcessingEnabled, defaultMappingConfigurer );
 	}
 
 	@Override
@@ -103,17 +135,19 @@ public final class DocumentationSetupHelper
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
-		SetupContext(HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
+		SetupContext(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer defaultMappingConfigurer) {
 			// Real backend => ensure we clean up everything before and after the tests
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 					SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP );
 			// Override the automatic indexing synchronization strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 					AutomaticIndexingSynchronizationStrategyNames.SYNC );
-			// Set up programmatic mapping if necessary
-			if ( mappingConfigurerOrNull != null ) {
-				withProperty( HibernateOrmMapperSettings.MAPPING_PROCESS_ANNOTATIONS, false );
-				withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, mappingConfigurerOrNull );
+			// Set up default mapping if necessary
+			if ( annotationProcessingEnabled != null ) {
+				withProperty( HibernateOrmMapperSettings.MAPPING_PROCESS_ANNOTATIONS, annotationProcessingEnabled );
+			}
+			if ( defaultMappingConfigurer != null ) {
+				withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, defaultMappingConfigurer );
 			}
 			// Ensure we don't build Jandex indexes needlessly:
 			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
