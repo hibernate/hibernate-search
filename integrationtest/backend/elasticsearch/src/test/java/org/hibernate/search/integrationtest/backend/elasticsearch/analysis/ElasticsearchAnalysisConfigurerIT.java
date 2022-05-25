@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.analysis;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.function.Consumer;
 
@@ -16,8 +17,10 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +34,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	@Rule
+	public final TestElasticsearchClient client = new TestElasticsearchClient();
 
 	@Test
 	public void error_invalidReference() {
@@ -255,16 +261,56 @@ public class ElasticsearchAnalysisConfigurerIT {
 		}
 	}
 
-	private void setup(String analysisConfigurer) {
-		setup( analysisConfigurer, c -> { } );
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4594")
+	public void multipleConfigurers() {
+		StubMappedIndex index = setup( MultipleConfigurers1.class.getName() + "," + MultipleConfigurers2.class.getName() );
+
+		assertJsonEquals(
+				"{"
+					+ "'analyzer': {"
+							+ "'analyzer1': {"
+									+ "'type': 'custom',"
+									+ "'tokenizer': 'whitespace'"
+							+ "},"
+							+ "'analyzer2': {"
+									+ "'type': 'custom',"
+									+ "'tokenizer': 'whitespace'"
+							+ "}"
+					+ "}"
+				+ "}",
+				client.index( index.name() ).settings( "index.analysis" ).get()
+		);
 	}
 
-	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
+	public static class MultipleConfigurers1 implements ElasticsearchAnalysisConfigurer {
+		@Override
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
+			context.analyzer( "analyzer1" ).custom()
+					.tokenizer( "whitespace" );
+		}
+	}
+
+	public static class MultipleConfigurers2 implements ElasticsearchAnalysisConfigurer {
+		@Override
+		public void configure(ElasticsearchAnalysisConfigurationContext context) {
+			context.analyzer( "analyzer2" ).custom()
+					.tokenizer( "whitespace" );
+		}
+	}
+
+	private StubMappedIndex setup(String analysisConfigurer) {
+		return setup( analysisConfigurer, c -> { } );
+	}
+
+	private StubMappedIndex setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
+		StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor )
+				.name( INDEX_NAME ).typeName( TYPE_NAME );
 		setupHelper.start()
 				.expectCustomBeans()
 				.withBackendProperty( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
-				.withIndex( StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor )
-						.name( INDEX_NAME ).typeName( TYPE_NAME ) )
+				.withIndex( index )
 				.setup();
+		return index;
 	}
 }
