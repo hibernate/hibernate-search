@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -42,5 +43,10 @@ public interface MappingStartContext {
 	 * @return A provided of thread pools, to use when spawning background processes.
 	 */
 	ThreadPoolProvider threadPoolProvider();
+
+	/**
+	 * @return A {@link SearchIntegration.Handle} to access the {@link SearchIntegration}.
+	 */
+	SearchIntegration.Handle integrationHandle();
 
 }

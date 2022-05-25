@@ -14,7 +14,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -72,15 +71,14 @@ final class HibernateOrmIntegrationPartialBuildState {
 				mappingKey,
 				(context, partialMapping) -> partialMapping.bindToSessionFactory( context, sessionFactoryImplementor )
 		);
-		SearchIntegration integration = finalizer.finalizeIntegration();
+		finalizer.finalizeIntegration();
 
 		/*
-		 * Make the booted integration available to the user (through Search.getFullTextEntityManager(em))
-		 * and to the index event listener.
+		 * Make the mapping available to the user through Search.mapping(emf)/Search.session(em).
 		 */
 		HibernateSearchContextProviderService contextService =
 				HibernateSearchContextProviderService.get( sessionFactoryImplementor );
-		contextService.initialize( integration, mapping );
+		contextService.initialize( mapping );
 
 		return contextService;
 	}

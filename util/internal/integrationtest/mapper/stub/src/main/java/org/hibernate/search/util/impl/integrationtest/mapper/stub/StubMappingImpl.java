@@ -20,6 +20,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 
 public class StubMappingImpl implements StubMapping, MappingImplementor<StubMappingImpl> {
@@ -30,7 +31,7 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 
 	private final ToDocumentValueConvertContext toDocumentFieldValueConvertContext;
 
-	private SearchIntegration integration;
+	private SearchIntegration.Handle integrationHandle;
 
 	StubMappingImpl(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
 			ProjectionRegistry projectionRegistry, StubMappingSchemaManagementStrategy schemaManagementStrategy) {
@@ -40,21 +41,17 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 		this.toDocumentFieldValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 	}
 
-	public void setIntegration(SearchIntegration integration) {
-		this.integration = integration;
-	}
-
 	@Override
 	public void close() {
-		if ( integration != null ) {
-			integration.close();
-			integration = null;
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( SearchIntegration::close, integrationHandle, SearchIntegration.Handle::getOrNull );
+			integrationHandle = null;
 		}
 	}
 
 	@Override
 	public SearchIntegration integration() {
-		return integration;
+		return integrationHandle.getOrFail();
 	}
 
 	@Override
@@ -84,6 +81,7 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 
 	@Override
 	public CompletableFuture<?> start(MappingStartContext context) {
+		integrationHandle = context.integrationHandle();
 		switch ( schemaManagementStrategy ) {
 			case DROP_AND_CREATE_AND_DROP:
 			case DROP_AND_CREATE_ON_STARTUP_ONLY:

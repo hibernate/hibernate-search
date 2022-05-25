@@ -276,8 +276,7 @@ public class SearchSetupHelper implements TestRule {
 				);
 				mappings.add( mapping );
 
-				SearchIntegration integration = finalizer.finalizeIntegration();
-				mapping.setIntegration( integration );
+				finalizer.finalizeIntegration();
 				integrationPartialBuildStates.remove( integrationPartialBuildState );
 
 				return mapping;

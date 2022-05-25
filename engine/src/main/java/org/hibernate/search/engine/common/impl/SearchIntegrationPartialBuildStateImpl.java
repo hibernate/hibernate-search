@@ -201,12 +201,13 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			failureCollector.checkNoFailure();
 
 			// Start mappings
+			SearchIntegrationHandle integrationHandle = new SearchIntegrationHandle();
 			CompletableFuture<?>[] mappingFutures = new CompletableFuture<?>[fullyBuiltNonStartedMappings.size()];
 			int mappingIndex = 0;
 			// Start
 			for ( MappingNonStartedState state : fullyBuiltNonStartedMappings.values() ) {
 				mappingFutures[mappingIndex] = state.start( failureCollector, beanResolver, propertySource,
-						threadPoolProvider );
+						threadPoolProvider, integrationHandle );
 				++mappingIndex;
 			}
 			// Wait for the starting operation to finish
@@ -219,7 +220,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 			propertyChecker.afterBoot( partialConfigurationPropertyChecker );
 
-			return new SearchIntegrationImpl(
+			SearchIntegrationImpl integration = new SearchIntegrationImpl(
 					beanProvider,
 					failureHandlerHolder,
 					threadPoolProvider,
@@ -228,6 +229,10 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					startedIndexManagers,
 					engineThreads, timingSource
 			);
+			integrationHandle.initialize( integration );
+
+			return integration;
 		}
 	}
+
 }

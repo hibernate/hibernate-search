@@ -40,4 +40,19 @@ public interface SearchIntegration extends AutoCloseable {
 		SearchIntegrationPartialBuildState prepareBuild();
 
 	}
+
+	interface Handle {
+
+		/**
+		 * @return The {@link SearchIntegration}, if available.
+		 * @throws org.hibernate.search.util.common.SearchException If the {@link SearchIntegration} hasn't been completely started yet.
+		 */
+		SearchIntegration getOrFail();
+
+		/**
+		 * @return The {@link SearchIntegration}, if available, or {@code null}.
+		 */
+		SearchIntegration getOrNull();
+
+	}
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
@@ -17,15 +18,17 @@ class MappingStartContextImpl implements MappingStartContext {
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource configurationPropertySource;
 	private final ThreadPoolProvider threadPoolProvider;
+	private final SearchIntegration.Handle integrationHandle;
 
 	MappingStartContextImpl(ContextualFailureCollector failureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource configurationPropertySource,
-			ThreadPoolProvider threadPoolProvider) {
+			ThreadPoolProvider threadPoolProvider, SearchIntegration.Handle integrationHandle) {
 		this.failureCollector = failureCollector;
 		this.beanResolver = beanResolver;
 		this.configurationPropertySource = configurationPropertySource;
 		this.threadPoolProvider = threadPoolProvider;
+		this.integrationHandle = integrationHandle;
 	}
 
 	@Override
@@ -46,5 +49,10 @@ class MappingStartContextImpl implements MappingStartContext {
 	@Override
 	public ThreadPoolProvider threadPoolProvider() {
 		return threadPoolProvider;
+	}
+
+	@Override
+	public SearchIntegration.Handle integrationHandle() {
+		return integrationHandle;
 	}
 }

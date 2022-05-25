@@ -199,8 +199,7 @@ public final class SearchMappingBuilder {
 	public CloseableSearchMapping build() {
 		SearchIntegrationEnvironment environment = null;
 		SearchIntegrationPartialBuildState integrationPartialBuildState = null;
-		SearchIntegration integration;
-		SearchMapping mapping;
+		JavaBeanMapping mapping = null;
 		try {
 			SearchIntegrationEnvironment.Builder environmentBuilder =
 					SearchIntegrationEnvironment.builder( propertySource, propertyChecker );
@@ -218,26 +217,14 @@ public final class SearchMappingBuilder {
 					mappingKey,
 					(context, partialMapping) -> partialMapping.finalizeMapping()
 			);
-			integration = finalizer.finalizeIntegration();
+			finalizer.finalizeIntegration();
+			return mapping;
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
+					.push( JavaBeanMapping::close, mapping )
 					.push( environment )
 					.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState );
-			throw e;
-		}
-
-		try {
-			/*
-			 * Since the user doesn't have access to the integration, but only to the (closeable) mapping,
-			 * make sure to close the integration whenever the mapping is closed by the user.
-			 */
-			JavaBeanMapping mappingImpl = (JavaBeanMapping) mapping;
-			mappingImpl.setIntegration( integration );
-			return mappingImpl;
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( integration );
 			throw e;
 		}
 	}

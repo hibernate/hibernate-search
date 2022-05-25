@@ -75,7 +75,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
-		implements SearchMapping, HibernateOrmMappingContext, EntityReferenceFactory<EntityReference>,
+		implements SearchMapping, AutoCloseable, HibernateOrmMappingContext, EntityReferenceFactory<EntityReference>,
 				HibernateOrmListenerContextProvider, BatchMappingContext,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext,
 				AutomaticIndexingMappingContext, CoordinationStrategyContext {
@@ -131,6 +131,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private final SchemaManagementListener schemaManagementListener;
 
+	private SearchIntegration.Handle integrationHandle;
+
 	private volatile boolean listenerEnabled = true;
 
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
@@ -152,7 +154,16 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( SearchIntegration::close, integrationHandle, SearchIntegration.Handle::getOrNull );
+			integrationHandle = null;
+		}
+	}
+
+	@Override
 	public CompletableFuture<?> start(MappingStartContext context) {
+		integrationHandle = context.integrationHandle();
 		// This may fail and normally doesn't involve I/O, so do it first
 		configuredAutomaticIndexingStrategy.start( this,
 				new AutomaticIndexingStrategyStartContextImpl( context ), this );
@@ -404,7 +415,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private SearchIntegration searchIntegration() {
-		return HibernateSearchContextProviderService.get( sessionFactory() ).getIntegration();
+		return integrationHandle.getOrFail();
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> entityTypeIdentifier(Class<T> expectedSuperType,
