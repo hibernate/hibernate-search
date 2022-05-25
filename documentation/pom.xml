@@ -27,6 +27,7 @@
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
+        <asciidoctor.examples-source-dir.java17>${basedir}/src/test/java17</asciidoctor.examples-source-dir.java17>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
 
         <html.meta.description>Hibernate Search, full text search for your entities - Reference Documentation</html.meta.description>
@@ -287,6 +288,7 @@
                     <relativeBaseDir>true</relativeBaseDir>
                     <attributes>
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
+                        <sourcedirJava17>${asciidoctor.examples-source-dir.java17}</sourcedirJava17>
                         <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
                         <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
                         <icons>font</icons>
