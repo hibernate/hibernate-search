@@ -201,6 +201,31 @@ public class LuceneAnalysisConfigurerIT {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4594")
+	public void multipleConfigurers() {
+		LuceneBackend backend = setup( MultipleConfigurers1.class.getName() + "," + MultipleConfigurers2.class.getName() );
+
+		assertThat( backend.analyzer( "analyzer1" ) ).isPresent();
+		assertThat( backend.analyzer( "analyzer2" ) ).isPresent();
+	}
+
+	public static class MultipleConfigurers1 implements LuceneAnalysisConfigurer {
+		@Override
+		public void configure(LuceneAnalysisConfigurationContext context) {
+			context.analyzer( "analyzer1" ).custom()
+					.tokenizer( "whitespace" );
+		}
+	}
+
+	public static class MultipleConfigurers2 implements LuceneAnalysisConfigurer {
+		@Override
+		public void configure(LuceneAnalysisConfigurationContext context) {
+			context.analyzer( "analyzer2" ).custom()
+					.tokenizer( "whitespace" );
+		}
+	}
+
 	private LuceneBackend setup(String analysisConfigurer) {
 		return setupHelper.start()
 				.expectCustomBeans()
