@@ -89,8 +89,7 @@ public abstract class AbstractBackendHolder {
 							partialMapping.finalizeMapping(
 									StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
 			);
-			SearchIntegration integration = finalizer.finalizeIntegration();
-			mapping.setIntegration( integration );
+			finalizer.finalizeIntegration();
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )

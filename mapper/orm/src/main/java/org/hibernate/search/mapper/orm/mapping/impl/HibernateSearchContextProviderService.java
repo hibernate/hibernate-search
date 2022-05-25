@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,18 +26,16 @@ public final class HibernateSearchContextProviderService
 		return HibernateOrmUtils.getServiceOrFail( sessionFactory.getServiceRegistry(), HibernateSearchContextProviderService.class );
 	}
 
-	private volatile SearchIntegration integration;
 	private volatile HibernateOrmMapping mapping;
 
 	@Override
 	public void close() {
-		if ( integration != null ) {
-			integration.close();
+		if ( mapping != null ) {
+			mapping.close();
 		}
 	}
 
-	public void initialize(SearchIntegration integration, HibernateOrmMapping mapping) {
-		this.integration = integration;
+	public void initialize(HibernateOrmMapping mapping) {
 		this.mapping = mapping;
 	}
 
@@ -52,7 +49,4 @@ public final class HibernateSearchContextProviderService
 		}
 	}
 
-	SearchIntegration getIntegration() {
-		return integration;
-	}
 }

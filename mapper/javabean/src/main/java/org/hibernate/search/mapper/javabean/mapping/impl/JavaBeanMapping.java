@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;
 import org.hibernate.search.mapper.javabean.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
@@ -46,16 +45,17 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMapping>
+public class JavaBeanMapping extends AbstractPojoMappingImplementor<JavaBeanMapping>
 		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext, EntityReferenceFactory<EntityReference> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanTypeContextContainer typeContextContainer;
 
-	private SearchIntegration integration;
+	private SearchIntegration.Handle integrationHandle;
 
 	private boolean active;
 
@@ -71,6 +71,7 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 
 	@Override
 	public CompletableFuture<?> start(MappingStartContext context) {
+		integrationHandle = context.integrationHandle();
 		Optional<SearchScopeImpl<Object>> scopeOptional = createAllScope();
 		if ( !scopeOptional.isPresent() ) {
 			// No indexed type
@@ -100,12 +101,9 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 		if ( !active ) {
 			return;
 		}
-		try {
-			if ( integration != null ) {
-				integration.close();
-			}
-		}
-		finally {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( SearchIntegration::close, integrationHandle, SearchIntegration.Handle::getOrNull );
+			integrationHandle = null;
 			active = false;
 		}
 	}
@@ -138,7 +136,7 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	@Override
-	public SearchMapping toConcreteType() {
+	public JavaBeanMapping toConcreteType() {
 		return this;
 	}
 
@@ -217,10 +215,6 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	@Override
 	public DetachedBackendSessionContext detachedBackendSessionContext(String tenantId) {
 		return DetachedBackendSessionContext.of( this, tenantId );
-	}
-
-	public void setIntegration(SearchIntegration integration) {
-		this.integration = integration;
 	}
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {

@@ -337,7 +337,7 @@
             Exceptions are allowed when:
             - the method is deprecated;
             - or the method overrides another method;
-            - or the method name starts with 'getOrCreate';
+            - or the method name matches 'getOr[A-Z].*';
             - or the name of the declaring type ends with 'Provider';
             - or the name of the declaring type ends with 'ConfigurationProperty';
             - or the name of the declaring type ends with 'ConfigurationPropertySource'.
@@ -352,7 +352,7 @@
                 // Exceptions
                 AND NOT (method:Deprecated)
                 AND NOT (method)-[:OVERRIDES]->()
-                AND NOT method.name STARTS WITH "getOrCreate"
+                AND NOT method.name =~ "getOr[A-Z].*"
                 AND NOT type.name ENDS WITH "Provider"
                 AND NOT type.name ENDS WITH "ConfigurationProperty"
                 AND NOT type.name ENDS WITH "ConfigurationPropertySource"

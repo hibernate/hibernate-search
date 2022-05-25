@@ -496,4 +496,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 112,
 			value = "Unable to close saved value for key %1$s: %2$s")
 	SearchException unableToCloseSavedValue(String keyName, String message, @Cause Exception e);
+
+	@Message(id = ID_OFFSET + 113,
+			value = "Unable to access the Search integration: initialization hasn't completed yet.")
+	SearchException noIntegrationBecauseInitializationNotComplete();
+
 }
