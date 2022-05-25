@@ -20,6 +20,59 @@ If you want to ignore these annotations, set `hibernate.search.mapping.process_a
 
 To configure the mapping programmatically, see <<mapper-orm-programmatic-mapping>>.
 
+[[mapper-orm-mapping-configuration-scanning]]
+== Configuring classpath scanning
+
+[[mapper-orm-mapping-configuration-scanning-basics]]
+=== Basics
+
+Hibernate Search will automatically scan the JARs of entity types on startup,
+looking for types annotated with "root mapping annotations"
+so that it can automatically add those types to the list of types whose annotations should be processed.
+
+Root mapping annotations are mapping annotations that serve as the entrypoint to a mapping,
+for example <<mapper-orm-mapping-projection,`@ProjectionConstructor`>>
+or <<mapper-orm-custom-annotations-root,custom root mapping annotations>>.
+Without this scanning, Hibernate Search would learn about e.g. projection constructors too late
+(when the projection is actually executed) and would fail due to a lack of metadata.
+
+The scanning is backed by https://github.com/wildfly/jandex[Jandex], a library that indexes the content of JARs.
+
+[[mapper-orm-mapping-configuration-scanning-dependencies]]
+=== Scanning dependencies of the application
+
+By default, Hibernate Search will only scan the JARs containing your Hibernate ORM entities.
+If you want Hibernate Search to detect types annotated
+with <<mapper-orm-mapping-configuration-scanning-basics,root mapping annotations>> in other JARs,
+you will need to implement a `HibernateOrmSearchMappingConfigurer`
+(similarly to <<mapper-orm-programmatic-mapping,programmatic mapping>>),
+then either:
+
+* call `context.annotationMapping().add( MyType.class )` to explicitly tell Hibernate Search
+  to process annotation on `MyType`, and to discover other types annotated with
+  <<mapper-orm-mapping-configuration-scanning-basics,root mapping annotations>> in the JAR containing `MyType`.
+* OR (advanced usage) call `context.annotationMapping().add( <an IndexView instance> )` to explicitly tell Hibernate Search
+  to look for types annotated with
+  <<mapper-orm-mapping-configuration-scanning-basics,root mapping annotations>> in the given Jandex index.
+
+[[mapper-orm-mapping-configuration-scanning-faster]]
+=== Faster scanning
+
+Hibernate Search's scanning may trigger the indexing of JARs through Jandex on application startup.
+This indexing should be reasonably short, but if it causes performance issues, you can:
+
+* Switch to the <<gettingstarted-framework-quarkus,Quarkus>> framework,
+  which among other things executes this part of Hibernate Search's startup at build time.
+* OR execute the https://github.com/wildfly/jandex-maven-plugin[Jandex Maven Plugin]
+  during the build of your application, so that indexes are already built when the application starts.
+* OR instruct Hibernate Search to never build Jandex indexes on startup,
+  by setting the configuration property
+  `hibernate.search.mapping.build_missing_discovered_jandex_indexes` to `false`.
+  **This is not recommended as it may lead to bootstrap failures or ignored mapping annotations**
+  because Hibernate Search will no longer be able to automatically discover types annotated with
+  <<mapper-orm-mapping-configuration-scanning-basics,root annotations>>
+  in JARs that do not have an embedded Jandex index.
+
 [[mapper-orm-mapping-configuration-other]]
 == Other configuration properties
 

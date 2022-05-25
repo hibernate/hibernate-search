@@ -25,6 +25,8 @@ include::configuration.asciidoc[]
 
 include::mapper-orm-mapping.asciidoc[]
 
+include::mapper-orm-mapping-projection.asciidoc[]
+
 include::mapper-orm-bridge.asciidoc[]
 
 include::mapper-orm-schema.asciidoc[]

@@ -50,8 +50,48 @@ or the <<search-dsl-projection-reference,corresponding entities>>,
 or getting information related to the search query itself
 (<<search-dsl-projection-score,score>>, ...).
 
-To learn more about the field projection, and all the other types of projection,
-refer to the following sections.
+[[search-dsl-projection-mapped]]
+== Projecting to a custom (annotated) type
+
+For more complex projections, it is possible to <<mapper-orm-mapping-projection,define a custom (annotated) record or class>>
+and have Hibernate Search infer the corresponding projections from the custom type's constructor parameters.
+
+include::components/custom-projection-type-important.asciidoc[]
+
+.Using a custom record type to project data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
+----
+<1> Annotate the record type with `@ProjectionConstructor`,
+either at the type level (if there's only one constructor)
+or at the constructor level (if there are multiple constructors).
+<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+See <<mapper-orm-mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
+<3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
+Multivalued projections <<mapper-orm-mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
+<4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=entryPoint-mapped-record]
+----
+<1> Pass the custom projection type to `.select(...)`.
+Hibernate Search will <<mapper-orm-mapping-projection-inner-inference,infer the inner projections>>
+from the custom type's constructor parameters.
+<2> Each hit will be an instance of the custom projection type,
+populated with data retrieved from the index.
+====
+
+include::components/custom-projection-type-nonrecord-tip.asciidoc[]
+
+NOTE: For more information about mapping custom projection types, see <<mapper-orm-mapping-projection>>.
+
+Beside `.select(Class<?>)`, some projections also allow using custom projection types;
+see <<search-dsl-projection-composite-as-mapped,the `composite` projection>>
+and <<search-dsl-projection-object-as-mapped,the `object` projection>>.
+For more information about  mapping projection types, see <<mapper-orm-mapping-projection>>.
 
 [[search-dsl-projection-documentReference]]
 == `documentReference`: return references to matched documents
@@ -322,6 +362,11 @@ Thus, the list of hits will be an instance of `List<MyPair>`.
 [[search-dsl-projection-composite-more-inners]]
 === Composing more than 3 inner projections
 
+[TIP]
+====
+For complex projections, consider <<search-dsl-projection-composite-as-mapped,projecting to a custom (annotated) type>>.
+====
+
 If you pass more than 3 projections as arguments to `from(...)`,
 then the transform function will have to take a `List<?>` as an argument,
 and will be set using `asList(...)` instead of `as(..,)`:
@@ -403,6 +448,46 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 a list containing the result of the inner projections, in the given order.
 Thus, the list of hits will be an instance of `List<List<?>>`.
 ====
+
+[[search-dsl-projection-composite-as-mapped]]
+=== Projecting to a custom (annotated) type
+
+For more complex composite projections, it is possible to define a custom (annotated) record or class
+and have Hibernate Search infer the corresponding inner projections from the custom type's constructor parameters.
+This is similar to the <<search-dsl-projection-mapped,projection to a custom (annotated) type through `.select(...)`>>.
+
+include::components/custom-projection-type-important.asciidoc[]
+
+.Using a custom record type to project data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyBookProjection.java[tags=include]
+----
+<1> Annotate the record type with `@ProjectionConstructor`,
+either at the type level (if there's only one constructor)
+or at the constructor level (if there are multiple constructors).
+<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+See <<mapper-orm-mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
+<3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
+Multivalued projections <<mapper-orm-mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
+<4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=composite-mapped-record]
+----
+<1> Call `.composite()`.
+<2> Define the result of the projection as a custom (annotated) type.
+Hibernate Search will <<mapper-orm-mapping-projection-inner-inference,infer the inner projections>>
+from the custom type's constructor parameters.
+<3> Each hit will be an instance of the custom projection type,
+populated with data retrieved from the index.
+====
+
+include::components/custom-projection-type-nonrecord-tip.asciidoc[]
+
+NOTE: For more information about mapping custom projection types, see <<mapper-orm-mapping-projection>>.
 
 [[search-dsl-projection-composite-deprecated-variants]]
 === Deprecated variants
@@ -494,6 +579,11 @@ Thus, the list of hits will be an instance of `List<List<MyAuthorName>>`.
 
 [[search-dsl-projection-object-more-inners]]
 === Composing more than 3 inner projections
+
+[TIP]
+====
+For complex projections, consider <<search-dsl-projection-object-as-mapped,projecting to a custom (annotated) type>>.
+====
 
 If you pass more than 3 projections as arguments,
 then the transform function will have to take a `List<?>` as an argument,
@@ -595,6 +685,43 @@ one `Object[]` per object in the `authors` object field.
 a list containing one array per author, which in turns contains the result of the inner projections, in the given order.
 Thus, the list of hits will be an instance of `List<List<Object[]>>`.
 ====
+
+[[search-dsl-projection-object-as-mapped]]
+=== Projecting to a custom (annotated) type
+
+For more complex object projections, it is possible to define a custom (annotated) record or class
+and have Hibernate Search infer the corresponding inner projections from the custom type's constructor parameters.
+This is similar to the <<search-dsl-projection-mapped,projection to a custom (annotated) type through `.select(...)`>>.
+
+include::components/custom-projection-type-important.asciidoc[]
+
+.Using a custom record type to project data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/MyAuthorProjection.java[tags=include]
+----
+<1> Annotate the record type with `@ProjectionConstructor`,
+either at the type level (if there's only one constructor)
+or at the constructor level (if there are multiple constructors).
+<2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
+See <<mapper-orm-mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=object-mapped-record]
+----
+<1> Call `.object( "authors" )`.
+<2> Define the result of the projection as a custom (annotated) type.
+Hibernate Search will <<mapper-orm-mapping-projection-inner-inference,infer the inner projections>>
+from the custom type's constructor parameters.
+<3> Each hit will be an instance of the custom projection type,
+populated with data retrieved from the index.
+====
+
+include::components/custom-projection-type-nonrecord-tip.asciidoc[]
+
+NOTE: For more information about mapping custom projection types, see <<mapper-orm-mapping-projection>>.
 
 [[search-dsl-projection-constant]]
 == `constant`: return a provided constant

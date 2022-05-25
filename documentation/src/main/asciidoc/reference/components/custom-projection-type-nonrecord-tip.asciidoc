@@ -1,0 +1,6 @@
+[TIP]
+====
+Custom, non-record classes can also be annotated with `@ProjectionConstructor`,
+which can be useful if you cannot use records for some reason
+(for example because you're still using Java 13 or below).
+====
