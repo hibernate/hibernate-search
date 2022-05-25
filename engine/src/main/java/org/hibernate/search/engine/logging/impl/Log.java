@@ -98,8 +98,9 @@ public interface Log extends BasicLogger {
 	SearchException invalidLongPropertyValue(String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 6,
-			value = "Invalid multi value: expected either a Collection or a String.")
-	SearchException invalidMultiPropertyValue();
+			value = "Invalid multi value: expected either a single value of the correct type, a Collection, or a String,"
+					+ " and interpreting as a single value failed with the following exception. %1$s")
+	SearchException invalidMultiPropertyValue(String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 14,
 			value = "Invalid index field name '%1$s': field names cannot be null or empty.")

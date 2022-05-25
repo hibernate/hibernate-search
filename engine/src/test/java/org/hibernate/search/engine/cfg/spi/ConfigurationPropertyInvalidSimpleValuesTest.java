@@ -258,11 +258,12 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( invalidTypeValue ) );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
-				.hasMessageContaining(
+				.hasMessageContainingAll(
 						"Invalid value for configuration property '" + resolvedKey
-								+ "': '" + invalidTypeValue + "'."
-				)
-				.hasMessageContaining( "Invalid multi value: expected either a Collection or a String" )
+								+ "': '" + invalidTypeValue + "'.",
+						"Invalid multi value: expected either a single value of the correct type, a Collection, or a String",
+						"interpreting as a single value failed with the following exception",
+						expectedInvalidValueTypeMessagePrefix )
 				.hasCauseInstanceOf( SearchException.class );
 		verifyNoOtherSourceInteractionsAndReset();
 	}

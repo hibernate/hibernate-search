@@ -118,10 +118,14 @@ Here are the definitions of all property types.
 or a reference by type as a `java.lang.Class`
 (see <<configuration-bean-reference>>)
 |See <<configuration-bean-reference-parsing>>
-|Multivalued bean reference of type T
-|A `java.util.Collection` containing bean references (see above)
-|Comma-separated string containing bean references (see above)
 |===============
+
+When a configuration property of any type above is documented as multivalued,
+that property accepts either:
+
+* A `java.util.Collection` containing any Java object that would be accepted for a single-valued property of the same type (see above);
+* or a comma-separated string containing strings that would be accepted for a single-valued property of the same type (see above);
+* or a single Java object that would be accepted for a single-valued property of the same type (see above).
 
 [[configuration-builder]]
 === Configuration Builders

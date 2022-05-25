@@ -246,7 +246,16 @@ public class ConfigurationPropertyBeanReferenceTest {
 		assertThat( result.get().get() ).containsExactly( expected1AsStubBean.get(), expected2AsStubBean.get(),
 				expected3AsStubBean.get(), expected4AsStubBean.get(), expected5AsStubBean.get() );
 
-		// Class value - one
+		// Class value - one (not wrapped in a collection)
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( StubBeanImpl1.class ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
+				.thenReturn( expected1 );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get().get() ).containsExactly( expected1.get() );
+
+		// Class value - one (wrapped in a collection)
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
 				createCollection( StubBeanImpl1.class )
 		) );
@@ -270,7 +279,18 @@ public class ConfigurationPropertyBeanReferenceTest {
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get().get() ).containsExactly( expected1.get(), expected2.get() );
 
-		// BeanReference value - one
+		// BeanReference value - one (not wrapped in a collection)
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
+				BeanReference.of( StubBeanImpl1.class, "name" )
+		) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expected1 );
+		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get().get() ).containsExactly( expected1.get() );
+
+		// BeanReference value - one (wrapped in a collection)
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
 				createCollection( BeanReference.of( StubBeanImpl1.class, "name" ) )
 		) );
@@ -330,7 +350,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 						.build();
 
 		String propertyValue = "name";
-		SimulatedFailure simulatedFailure = new SimulatedFailure();
+		SimulatedFailure simulatedFailure = new SimulatedFailure( "some message" );
 
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( propertyValue ) );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
@@ -342,9 +362,10 @@ public class ConfigurationPropertyBeanReferenceTest {
 				}
 		)
 				.hasCause( simulatedFailure )
-				.hasMessageContaining(
+				.hasMessageContainingAll(
 						"Invalid value for configuration property '" + resolvedKey
-								+ "': '" + propertyValue + "'."
+								+ "': '" + propertyValue + "'.",
+						simulatedFailure.getMessage()
 				);
 		verifyNoOtherSourceInteractionsAndReset();
 	}
@@ -361,7 +382,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 		BeanHolder<StubBean> bean1Mock = mock( BeanHolder.class );
 
 		String propertyValue = "name1,name2";
-		SimulatedFailure simulatedFailure = new SimulatedFailure();
+		SimulatedFailure simulatedFailure = new SimulatedFailure( "some message" );
 
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( propertyValue ) );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
@@ -377,7 +398,10 @@ public class ConfigurationPropertyBeanReferenceTest {
 				.hasCause( simulatedFailure )
 				.hasMessageContaining(
 						"Invalid value for configuration property '" + resolvedKey
-								+ "': '" + propertyValue + "'."
+								+ "': '" + propertyValue + "'.",
+						"Invalid multi value: expected either a single value of the correct type, a Collection, or a String",
+						"interpreting as a single value failed with the following exception",
+						simulatedFailure.getMessage()
 				);
 		verify( bean1Mock ).close(); // Expect the first bean holder to be closed
 		verifyNoMoreInteractions( bean1Mock );
@@ -623,6 +647,9 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	private class SimulatedFailure extends RuntimeException {
+		public SimulatedFailure(String message) {
+			super( message );
+		}
 	}
 
 	enum MyEnum {
