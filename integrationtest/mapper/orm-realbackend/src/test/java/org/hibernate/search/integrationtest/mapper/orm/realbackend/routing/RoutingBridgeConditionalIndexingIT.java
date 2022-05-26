@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.routing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class RoutingBridgeConditionalIndexingIT {
 	public void testLifecycle() {
 		assertThat( searchAllIds() ).isEmpty();
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( 1 );
 			book1.setTitle( "I, Robot" );
@@ -67,14 +67,14 @@ public class RoutingBridgeConditionalIndexingIT {
 
 		assertThat( searchAllIds() ).isEmpty();
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = entityManager.getReference( Book.class, 1 );
 			book1.setStatus( Status.PUBLISHED );
 		} );
 
 		assertThat( searchAllIds() ).containsExactly( 1 );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = entityManager.getReference( Book.class, 1 );
 			// Try to fool the routing bridge into not deleting - it shouldn't matter.
 			book1.setStatus( Status.ARCHIVED );
@@ -86,7 +86,7 @@ public class RoutingBridgeConditionalIndexingIT {
 
 	private List<Integer> searchAllIds() {
 		List<Integer> results = new ArrayList<>();
-		withinJPATransaction( entityManagerFactory, entityManager -> Search.session( entityManager )
+		with( entityManagerFactory ).runInTransaction( entityManager -> Search.session( entityManager )
 				.search( Book.class )
 				.select( f -> f.id( Integer.class ) )
 				.where( f -> f.matchAll() )

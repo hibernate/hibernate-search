@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.valuebridge.param.c
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.Year;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ValueBridgeParamIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setTitle( "The Government Is Evil" );
 			book1.setPublished( true );
@@ -52,7 +52,7 @@ public class ValueBridgeParamIT {
 			entityManager.persist( book2 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
@@ -63,7 +63,7 @@ public class ValueBridgeParamIT {
 			assertThat( result ).hasSize( 1 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

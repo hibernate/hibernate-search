@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.search.paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -127,14 +127,14 @@ public class FieldPathsIT {
 	// end::withRoot_method[]
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author isaacAsimov = new Author();
 			isaacAsimov.setId( 1 );
 			isaacAsimov.setFirstName( "Isaac" );

@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.sync;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils.prepareBooks;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.countAll;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -58,7 +58,7 @@ public class OutOfSyncIndexIT {
 		assertThat( indexedEntityCount ).isEqualTo( entityCount );
 
 		// Simulate an external delete that Hibernate Search will not be able to detect
-		withinJPATransaction( entityManagerFactory, entityManager ->
+		with( entityManagerFactory ).runInTransaction( entityManager ->
 				entityManager.createQuery( "DELETE FROM book WHERE MOD(id, 2) = 0" )
 						.executeUpdate()
 		);
@@ -71,7 +71,7 @@ public class OutOfSyncIndexIT {
 
 		// Check that running a search query still returns the correct number of hits,
 		// because hits that cannot be loaded are ignored
-		withinJPATransaction( entityManagerFactory, entityManager ->
+		with( entityManagerFactory ).runInTransaction( entityManager ->
 				assertThat(
 						Search.session( entityManager )
 								.search( Book.class )

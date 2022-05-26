@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.gettingstarted.withhsearch.defaultana
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class GettingStartedDefaultAnalysisIT {
 	public void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::indexing[]
 			// Not shown: get the entity manager and open a transaction
 			Author author = new Author();
@@ -76,7 +76,7 @@ public class GettingStartedDefaultAnalysisIT {
 			bookIdHolder.set( book.getId() );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			try {
 			// tag::manual-index[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -92,7 +92,7 @@ public class GettingStartedDefaultAnalysisIT {
 			}
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::searching-objects[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -129,7 +129,7 @@ public class GettingStartedDefaultAnalysisIT {
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::searching-lambdas[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -162,7 +162,7 @@ public class GettingStartedDefaultAnalysisIT {
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::counting[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager );

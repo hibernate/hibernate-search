@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexedembedded.includepat
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -38,7 +38,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Human human1 = new Human();
 			human1.setId( 1 );
 			human1.setName( "George Bush Senior" );
@@ -71,7 +71,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 			entityManager.persist( human4 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Human> result = searchSession.search( Human.class )

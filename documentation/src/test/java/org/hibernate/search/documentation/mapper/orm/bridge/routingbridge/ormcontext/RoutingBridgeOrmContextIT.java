@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.ormco
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -39,7 +39,7 @@ public class RoutingBridgeOrmContextIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// See MyDataPropertyBinder
 			entityManager.setProperty( "test.data.indexed", MyData.INDEXED );
 
@@ -48,7 +48,7 @@ public class RoutingBridgeOrmContextIT {
 			entityManager.persist( myEntity );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )
@@ -58,7 +58,7 @@ public class RoutingBridgeOrmContextIT {
 			assertThat( result ).hasSize( 1 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// See MyDataPropertyBinder
 			entityManager.setProperty( "test.data.indexed", MyData.NOT_INDEXED );
 
@@ -67,7 +67,7 @@ public class RoutingBridgeOrmContextIT {
 			Search.session( entityManager ).indexingPlan().addOrUpdate( myEntity );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )

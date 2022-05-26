@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +50,7 @@ public class SortDslIT {
 
 	@Test
 	public void entryPoint() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -65,7 +65,7 @@ public class SortDslIT {
 					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-objects[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -343,14 +343,14 @@ public class SortDslIT {
 	}
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author isaacAsimov = new Author();
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );

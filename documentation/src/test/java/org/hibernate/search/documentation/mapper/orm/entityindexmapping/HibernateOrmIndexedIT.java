@@ -9,7 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.entityindexmapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public class HibernateOrmIndexedIT {
 
 	@Test
 	public void search_separateQueries() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> authorResult = searchSession.search( Author.class )
@@ -103,7 +103,7 @@ public class HibernateOrmIndexedIT {
 	@Test
 	public void search_singleQuery() {
 		assertThatThrownBy(
-				() -> withinJPATransaction( entityManagerFactory, entityManager -> {
+				() -> with( entityManagerFactory ).runInTransaction( entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );
 
 					// tag::cross-backend-search[]
@@ -120,7 +120,7 @@ public class HibernateOrmIndexedIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setTitle( "Some title" );
 			Author author1 = new Author();

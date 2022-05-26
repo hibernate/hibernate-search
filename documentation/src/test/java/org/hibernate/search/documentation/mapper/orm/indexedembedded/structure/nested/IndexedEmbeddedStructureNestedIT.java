@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.indexedembedded.structure.nested;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -60,7 +60,7 @@ public class IndexedEmbeddedStructureNestedIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setId( 1 );
 			book.setTitle( "Leviathan Wakes" );
@@ -84,7 +84,7 @@ public class IndexedEmbeddedStructureNestedIT {
 			entityManager.persist( book );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::include[]

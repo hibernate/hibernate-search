@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.valuebridge.compati
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ValueBridgeCompatibleIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book1 book1 = new Book1();
 			book1.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );
 			entityManager.persist( book1 );
@@ -47,7 +47,7 @@ public class ValueBridgeCompatibleIT {
 			entityManager.persist( book2 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book1.class, Book2.class ) )

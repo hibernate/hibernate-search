@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.util;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.Locale;
 import javax.persistence.EntityManagerFactory;
@@ -19,7 +18,7 @@ public final class BookCreatorUtils {
 	}
 
 	public static void prepareBooks(EntityManagerFactory entityManagerFactory, int numberOfBooks) {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			for ( int i = 0; i < numberOfBooks; i++ ) {
 				Book book = new Book();
 				book.setId( i + 1 );

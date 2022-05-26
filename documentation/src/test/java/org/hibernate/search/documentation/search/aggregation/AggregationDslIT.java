@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -55,7 +55,7 @@ public class AggregationDslIT {
 
 	@Test
 	public void entryPoint() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -76,7 +76,7 @@ public class AggregationDslIT {
 					);
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-objects[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -402,14 +402,14 @@ public class AggregationDslIT {
 	}
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

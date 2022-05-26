@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.dependencies.contai
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -34,7 +34,7 @@ public class DependenciesFromOtherEntityIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			ScientificPaper paper1 = new ScientificPaper( 1 );
 			paper1.setTitle( "Fundamental Ideas of the General Theory of Relativity and the Application of this Theory in Astronomy" );
 			ScientificPaper paper2 = new ScientificPaper( 2 );
@@ -50,7 +50,7 @@ public class DependenciesFromOtherEntityIT {
 			entityManager.persist( paper3 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat( searchSession.search( ScientificPaper.class )
@@ -72,7 +72,7 @@ public class DependenciesFromOtherEntityIT {
 			)
 					.hasSize( 0 );
 		} );
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			ScientificPaper paper1 = entityManager.find( ScientificPaper.class, 1 );
 			ScientificPaper paper2 = entityManager.find( ScientificPaper.class, 2 );
 			ScientificPaper paper3 = entityManager.find( ScientificPaper.class, 3 );
@@ -85,7 +85,7 @@ public class DependenciesFromOtherEntityIT {
 			entityManager.persist( paper4 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat( searchSession.search( ScientificPaper.class )

@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.isLucene;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
@@ -50,14 +50,14 @@ public class AnalysisIT {
 				)
 				.setup( IndexedEntity.class );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			IndexedEntity entity = new IndexedEntity();
 			// Mix French and English to test multiple analyzers with different stemmers
 			entity.setText( "THE <strong>châtié</strong> wording" );
 			entityManager.persist( entity );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat(

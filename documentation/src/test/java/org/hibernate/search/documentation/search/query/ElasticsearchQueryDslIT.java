@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class ElasticsearchQueryDslIT {
 
 	@Test
 	public void explain() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::explain-elasticsearch[]
 			ElasticsearchSearchQuery<Book> query = searchSession.search( Book.class )
@@ -74,7 +74,7 @@ public class ElasticsearchQueryDslIT {
 
 	@Test
 	public void json() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::elasticsearch-requestTransformer[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -96,7 +96,7 @@ public class ElasticsearchQueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::elasticsearch-responseBody[]
 			ElasticsearchSearchResult<Book> result = searchSession.search( Book.class )
@@ -143,7 +143,7 @@ public class ElasticsearchQueryDslIT {
 	// end::elasticsearch-responseBody-helper[]
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

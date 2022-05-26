@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate.no.incorrect;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -35,7 +35,7 @@ public class ReindexOnUpdateNoIncorrectIT {
 
 	@Test
 	public void missingReindexOnUpdateNo() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			for ( int i = 0 ; i < 2000 ; ++i ) {
 				Sensor sensor = new Sensor();
 				sensor.setId( i );
@@ -47,28 +47,28 @@ public class ReindexOnUpdateNoIncorrectIT {
 			}
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )
 					.isEqualTo( 2000L );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Sensor sensor = entityManager.getReference( Sensor.class, 50 );
 			sensor.setStatus( SensorStatus.OFFLINE );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// The sensor was reindexed, as expected.
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )
 					.isEqualTo( 1999L );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Sensor sensor = entityManager.getReference( Sensor.class, 70 );
 			sensor.setRollingAverage( 0.5 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// The sensor was reindexed! That won't perform well
 			// if we update the rolling average every few milliseconds on all sensors...
 			assertThat( countSensorsWithinOperatingParameters( entityManager ) )

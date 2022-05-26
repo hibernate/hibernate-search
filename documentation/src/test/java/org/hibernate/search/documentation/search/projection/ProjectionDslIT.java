@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -66,7 +66,7 @@ public class ProjectionDslIT {
 
 	@Test
 	public void entryPoint() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -83,7 +83,7 @@ public class ProjectionDslIT {
 			);
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-objects[]
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -816,14 +816,14 @@ public class ProjectionDslIT {
 	}
 
 	private void withinSearchSession(Consumer<SearchSession> action) {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			action.accept( searchSession );
 		} );
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author isaacAsimov = new Author();
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );

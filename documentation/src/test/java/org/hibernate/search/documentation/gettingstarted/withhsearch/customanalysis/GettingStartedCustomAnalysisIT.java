@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.gettingstarted.withhsearch.customanal
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
@@ -51,7 +51,7 @@ public class GettingStartedCustomAnalysisIT {
 	public void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author author = new Author();
 			author.setName( "John Doe" );
 
@@ -68,7 +68,7 @@ public class GettingStartedCustomAnalysisIT {
 			bookIdHolder.set( book.getId() );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::searching[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager );
@@ -86,7 +86,7 @@ public class GettingStartedCustomAnalysisIT {
 		} );
 
 		// Also test the other terms mentioned in the getting started guide
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactor", "refactoring" } ) {

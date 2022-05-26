@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.reindexing.associationinverseside;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -63,7 +63,7 @@ public class AssociationInverseSideIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setTitle( "The Caves Of Steel" );
 
@@ -82,7 +82,7 @@ public class AssociationInverseSideIT {
 			entityManager.persist( book );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
