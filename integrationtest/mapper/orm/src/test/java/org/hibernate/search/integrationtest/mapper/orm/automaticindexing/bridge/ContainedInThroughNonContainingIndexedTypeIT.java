@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -63,7 +63,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 	@Test
 	public void test() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Containing containing = new Containing();
 			containing.setId( 1 );
 
@@ -88,7 +88,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating the value
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Contained contained = session.get( Contained.class, 2 );
 			contained.setIndexedInContaining( 42 );
 

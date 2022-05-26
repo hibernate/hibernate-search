@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
@@ -87,7 +87,7 @@ public class AnnotationMappingAccessTypeIT {
 
 	@Test
 	public void index() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;
 			entity1.fieldWithNonDefaultFieldAccess = "nonDefaultFieldAccess";

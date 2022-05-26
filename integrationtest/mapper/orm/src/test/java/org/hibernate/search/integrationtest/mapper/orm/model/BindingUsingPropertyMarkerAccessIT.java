@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -89,7 +89,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 	 */
 	@Test
 	public void indexing() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = modelPrimitives.create( 1, 42.0, 42.0 );
 
 			session.persist( entity1 );

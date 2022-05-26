@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.searchmapping;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,10 +34,10 @@ public class AbortedEventsGenerator {
 
 	void generateThreeAbortedEvents() {
 		if ( tenantId == null ) {
-			withinTransaction( sessionFactory, this::generateThreeAbortedEvents );
+			with( sessionFactory ).runInTransaction( this::generateThreeAbortedEvents );
 		}
 		else {
-			withinTransaction( sessionFactory, tenantId, this::generateThreeAbortedEvents );
+			with( sessionFactory, tenantId ).runInTransaction( this::generateThreeAbortedEvents );
 		}
 
 		backendMock.verifyExpectationsMet();

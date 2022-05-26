@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -106,7 +106,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		int entityCount = 1000;
 
 		// A single big insert transaction
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
 				session.persist( entity );
@@ -139,7 +139,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingUnevenShardsIT {
 		for ( int i = 0; i < entityCount; i += batchSize ) {
 			int idStart = i;
 			int idEnd = Math.min( i + batchSize, entityCount );
-			withinTransaction( sessionFactory, session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				for ( int j = idStart; j < idEnd ; j++ ) {
 					IndexedEntity entity = session.getReference( IndexedEntity.class, j );
 					entity.setText( "updated" );

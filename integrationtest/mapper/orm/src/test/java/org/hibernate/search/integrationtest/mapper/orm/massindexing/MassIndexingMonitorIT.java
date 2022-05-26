@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.concurrent.CompletableFuture;
 import javax.persistence.Entity;
@@ -122,7 +121,7 @@ public class MassIndexingMonitorIT {
 
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
 			session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );

@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -90,7 +89,7 @@ public class MassIndexingPrimitiveIdIT {
 	}
 
 	private void initData() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityWithPrimitiveId( 1 ) );
 			session.persist( new EntityWithPrimitiveId( 2 ) );
 			session.persist( new EntityWithPrimitiveId( 3 ) );

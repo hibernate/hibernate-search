@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +90,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 		for ( int i = 0; i < ENTITY_COUNT; i += ENTITY_UPDATE_BATCH_SIZE ) {
 			int idStart = i;
 			int idEnd = Math.min( i + ENTITY_UPDATE_BATCH_SIZE, ENTITY_COUNT );
-			withinTransaction( sessionFactory, session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				for ( int j = idStart; j < idEnd ; j++ ) {
 					IndexedEntity entity = new IndexedEntity( j, "initial" );
 					session.persist( entity );

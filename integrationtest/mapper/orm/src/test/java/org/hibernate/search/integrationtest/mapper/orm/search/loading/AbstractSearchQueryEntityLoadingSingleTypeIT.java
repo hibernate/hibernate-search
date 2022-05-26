@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +42,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 	protected final void persistThatManyEntities(int entityCount) {
 		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock().inLenientMode( () -> withinTransaction( sessionFactory(), session -> {
+		backendMock().inLenientMode( () -> with( sessionFactory() ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				session.persist( model.newIndexed( i, mapping ) );
 			}

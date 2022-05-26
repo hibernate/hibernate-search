@@ -85,7 +85,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	@Test
 	public void test() {
 		// Init
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			session.persist( entity1 );
@@ -97,7 +97,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		backendMock.verifyExpectationsMet();
 
 		// Add a contained entity
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			ContainedEntity containedEntity = new ContainedEntity();
 			containedEntity.setId( 2 );
@@ -118,7 +118,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		 * Unfortunately the indexed entity will still be reindexed,
 		 * because Search doesn't know which contained entities are relevant.
 		 */
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.getReference( IndexedEntity.class, 1 );
 			for ( int i = 3 ; i < 100 ; ++i ) {
 				ContainedEntity containedEntity = new ContainedEntity();

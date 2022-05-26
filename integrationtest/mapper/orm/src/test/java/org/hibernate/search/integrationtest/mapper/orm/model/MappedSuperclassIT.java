@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -58,7 +58,7 @@ public class MappedSuperclassIT {
 
 	@Test
 	public void index() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );
 

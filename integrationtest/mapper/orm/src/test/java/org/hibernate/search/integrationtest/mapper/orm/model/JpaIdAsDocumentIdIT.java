@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class JpaIdAsDocumentIdIT {
 				.setup( IndexedEntity.class, ContainedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 0 );
 			ContainedEntity contained1 = new ContainedEntity();

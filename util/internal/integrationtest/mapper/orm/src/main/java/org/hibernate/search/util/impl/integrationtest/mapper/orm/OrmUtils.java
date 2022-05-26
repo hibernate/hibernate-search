@@ -35,14 +35,6 @@ public final class OrmUtils {
 		return new NativePersistenceRunner( sessionFactory, tenantId );
 	}
 
-	public static <E extends Throwable> void withinTransaction(SessionFactory sessionFactory, ThrowingConsumer<Session, E> action) throws E {
-		with( sessionFactory ).runInTransaction( action );
-	}
-
-	public static <E extends Throwable> void withinTransaction(SessionFactory sessionFactory, String tenantId, ThrowingConsumer<Session, E> action) throws E {
-		with( sessionFactory, tenantId ).runInTransaction( action );
-	}
-
 	public static <E extends Throwable> void withinTransaction(Session session, ThrowingConsumer<Transaction, E> action) throws E {
 		withinTransaction( session, tx -> {
 			action.accept( tx );

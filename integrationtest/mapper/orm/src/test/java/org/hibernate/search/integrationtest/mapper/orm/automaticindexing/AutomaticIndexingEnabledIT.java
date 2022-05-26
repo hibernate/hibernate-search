@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -61,7 +61,7 @@ public class AutomaticIndexingEnabledIT {
 
 		SessionFactory sessionFactory = setup( null, null );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
 			session.persist( entity1 );
@@ -80,7 +80,7 @@ public class AutomaticIndexingEnabledIT {
 
 		SessionFactory sessionFactory = setup( true, null );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
 			session.persist( entity1 );
@@ -99,7 +99,7 @@ public class AutomaticIndexingEnabledIT {
 
 		SessionFactory sessionFactory = setup( false, null );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
 			session.persist( entity1 );
@@ -115,7 +115,7 @@ public class AutomaticIndexingEnabledIT {
 
 		SessionFactory sessionFactory = setup( null, "none" );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
 			session.persist( entity1 );
@@ -131,7 +131,7 @@ public class AutomaticIndexingEnabledIT {
 
 		SessionFactory sessionFactory = setup( null, "session" );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
 
 			session.persist( entity1 );

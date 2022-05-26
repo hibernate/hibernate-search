@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -119,7 +118,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 	public void uniqueWorkAcrossSessionFactories_insertUpdateDelete_indexed() {
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity( 1, "initial" );
 			session.persist( entity );
 
@@ -128,7 +127,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			entity.setText( "updated" );
 
@@ -137,7 +136,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			session.remove( entity );
 
@@ -153,7 +152,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 	public void uniqueWorkAcrossSessionFactories_insertUpdateDelete_contained() {
 		SessionFactory sessionFactory = indexingCountHelper.sessionFactory( 0 );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
 			ContainedEntity contained = new ContainedEntity( 2, "initial" );
 			containing.setContained( contained );
@@ -168,7 +167,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity contained = session.getReference( ContainedEntity.class, 2 );
 			contained.setText( "updated" );
 
@@ -179,7 +178,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		} );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedAndContainingEntity containing = session.getReference( IndexedAndContainingEntity.class, 1 );
 			ContainedEntity contained = containing.getContained();
 			containing.setContained( null );
@@ -200,7 +199,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		int entityCount = 1000;
 
 		// A single big insert transaction
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
 				session.persist( entity );
@@ -224,7 +223,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 		for ( int i = 0; i < entityCount; i += batchSize ) {
 			int idStart = i;
 			int idEnd = Math.min( i + batchSize, entityCount );
-			withinTransaction( sessionFactory, session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				for ( int j = idStart; j < idEnd ; j++ ) {
 					IndexedEntity entity = session.getReference( IndexedEntity.class, j );
 					entity.setText( "updated" );

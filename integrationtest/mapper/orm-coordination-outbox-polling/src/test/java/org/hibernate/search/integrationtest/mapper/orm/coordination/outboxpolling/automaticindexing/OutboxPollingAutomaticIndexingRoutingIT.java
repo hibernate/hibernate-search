@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4186")
 	public void processingEventsWithOutdatedRoutingKey() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = new RoutedIndexedEntity( 1, "first", RoutedIndexedEntity.Status.FIRST );
 			session.persist( entity );
 		} );
@@ -62,7 +62,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 		backendMock.verifyExpectationsMet();
 
 		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
 			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 			entity.setText( "second" );
@@ -70,12 +70,12 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 
 		// Remember the events at this point
 		List<Long> eventIdsAtSecondStatus = new ArrayList<>();
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			eventIdsAtSecondStatus.addAll( outboxEventFinder.findOutboxEventIdsNoFilter( session ) );
 		} );
 
 		// Update the current routing key again (but don't trigger indexing yet: events are being filtered)
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
 			entity.setStatus( RoutedIndexedEntity.Status.THIRD );
 			entity.setText( "third" );
