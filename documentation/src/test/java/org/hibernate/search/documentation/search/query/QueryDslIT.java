@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class QueryDslIT {
 
 	@Test
 	public void entryPoint() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint[]
 			// Not shown: get the entity manager and open a transaction
 			SearchSession searchSession = Search.session( entityManager ); // <1>
@@ -92,7 +92,7 @@ public class QueryDslIT {
 
 	@Test
 	public void targetingMultipleEntityTypes() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::targeting-multiple[]
 			SearchResult<Person> result = searchSession.search( Arrays.asList( // <1>
@@ -114,7 +114,7 @@ public class QueryDslIT {
 
 	@Test
 	public void targetingByEntityName() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::targeting-entityName[]
 			SearchResult<Person> result = searchSession.search( // <1>
@@ -139,7 +139,7 @@ public class QueryDslIT {
 
 	@Test
 	public void fetchingBasics() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
@@ -156,7 +156,7 @@ public class QueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-totalHitCount[]
 			long totalHitCount = searchSession.search( Book.class )
@@ -167,7 +167,7 @@ public class QueryDslIT {
 			assertThat( totalHitCount ).isEqualTo( 4 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-hits[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -179,7 +179,7 @@ public class QueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-singleHit[]
 			Optional<Book> hit = searchSession.search( Book.class )
@@ -194,7 +194,7 @@ public class QueryDslIT {
 
 	@Test
 	public void fetchingAllHits() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-all-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class )
@@ -210,7 +210,7 @@ public class QueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-all-hits[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -225,7 +225,7 @@ public class QueryDslIT {
 
 	@Test
 	public void pagination() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-pagination-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class )
@@ -239,7 +239,7 @@ public class QueryDslIT {
 			assertThat( hits ).isEmpty();
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-pagination-hits[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -253,7 +253,7 @@ public class QueryDslIT {
 
 	@Test
 	public void scrolling() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			List<Integer> collectedIds = new ArrayList<>();
 			long totalHitCount = 0;
@@ -286,7 +286,7 @@ public class QueryDslIT {
 
 	@Test
 	public void searchQuery() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::searchQuery[]
 			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
@@ -299,7 +299,7 @@ public class QueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::searchQuery-toORM[]
 			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
@@ -319,7 +319,7 @@ public class QueryDslIT {
 
 	@Test
 	public void tookAndTimedOut() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::took-timedOut[]
 			SearchQuery<Book> query = searchSession.search( Book.class )
@@ -341,7 +341,7 @@ public class QueryDslIT {
 
 	@Test
 	public void truncateAfter() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::truncateAfter[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
@@ -362,7 +362,7 @@ public class QueryDslIT {
 
 	@Test
 	public void failAfter() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::failAfter[]
 			try {
@@ -382,7 +382,7 @@ public class QueryDslIT {
 
 	@Test
 	public void cacheLookupStrategy() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Statistics statistics = entityManagerFactory.unwrap( SessionFactory.class ).getStatistics();
 			statistics.setStatisticsEnabled( true );
 			statistics.clear();
@@ -408,7 +408,7 @@ public class QueryDslIT {
 
 	@Test
 	public void fetchSize() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::fetchSize[]
@@ -427,7 +427,7 @@ public class QueryDslIT {
 
 	@Test
 	public void resultTotal() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-resultTotal[]
 			SearchResult<Book> result = searchSession.search( Book.class )
@@ -450,7 +450,7 @@ public class QueryDslIT {
 
 	@Test
 	public void resultTotal_totalHitCountThreshold() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-totalHitCountThreshold[]
 			SearchResult<Book> result = searchSession.search( Book.class )
@@ -471,7 +471,7 @@ public class QueryDslIT {
 	@Test
 	public void graph() {
 		// By default associates are not loaded
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			SearchResult<Manager> result = searchSession.search( Manager.class ) // <1>
@@ -485,7 +485,7 @@ public class QueryDslIT {
 					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isNotInitialized() );
 		} );
 
-		withinJPATransaction( entityManagerFactory, theEntityManager -> {
+		with( entityManagerFactory ).runInTransaction( theEntityManager -> {
 			// tag::graph-byReference[]
 			EntityManager entityManager = /* ... */
 					// end::graph-byReference[]
@@ -508,7 +508,7 @@ public class QueryDslIT {
 					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isInitialized() );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::graph-byName[]
 			SearchResult<Manager> result = Search.session( entityManager ).search( Manager.class ) // <1>
 					.where( f -> f.match()
@@ -525,7 +525,7 @@ public class QueryDslIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );
@@ -548,7 +548,7 @@ public class QueryDslIT {
 			entityManager.persist( book4 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Manager manager1 = new Manager();
 			manager1.setId( MANAGER1_ID );
 			manager1.setName( "James Green" );

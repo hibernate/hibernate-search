@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.containerextractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -64,7 +64,7 @@ public class ContainerExtractorIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author author = new Author();
 			author.setId( 1 );
 			author.setName( "Isaac Asimov" );
@@ -81,7 +81,7 @@ public class ContainerExtractorIT {
 			entityManager.persist( book );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

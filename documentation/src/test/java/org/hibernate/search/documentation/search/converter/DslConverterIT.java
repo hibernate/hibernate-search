@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.search.converter;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.Basic;
@@ -46,7 +46,7 @@ public class DslConverterIT {
 
 	@Test
 	public void dslConverterEnabled() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::dsl-converter-enabled[]
@@ -64,7 +64,7 @@ public class DslConverterIT {
 
 	@Test
 	public void dslConverterDisabled() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::dsl-converter-disabled[]
@@ -81,7 +81,7 @@ public class DslConverterIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			AuthenticationEvent event1 = new AuthenticationEvent( 1 );
 			event1.setOutcome( AuthenticationOutcome.USER_NOT_FOUND );
 			AuthenticationEvent event2 = new AuthenticationEvent( 2 );

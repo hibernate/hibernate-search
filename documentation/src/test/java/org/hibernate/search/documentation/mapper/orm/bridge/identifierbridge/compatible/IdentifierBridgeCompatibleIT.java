@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.identifierbridge.co
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +36,7 @@ public class IdentifierBridgeCompatibleIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.getId().setPublisherId( 1L );
 			book.getId().setPublisherSpecificBookId( 42L );
@@ -48,7 +48,7 @@ public class IdentifierBridgeCompatibleIT {
 			entityManager.persist( magazine );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book.class, Magazine.class ) )

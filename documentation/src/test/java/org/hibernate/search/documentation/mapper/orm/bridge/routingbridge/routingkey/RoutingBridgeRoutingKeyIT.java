@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.routingkey;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -63,7 +63,7 @@ public class RoutingBridgeRoutingKeyIT {
 
 	@Test
 	public void routing_single() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::routing-single[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
@@ -81,7 +81,7 @@ public class RoutingBridgeRoutingKeyIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );

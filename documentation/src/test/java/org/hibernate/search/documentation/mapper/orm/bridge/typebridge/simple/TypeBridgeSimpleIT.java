@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.typebridge.simple;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -35,14 +35,14 @@ public class TypeBridgeSimpleIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Author author = new Author();
 			author.setFirstName( "Isaac" );
 			author.setLastName( "Asimov" );
 			entityManager.persist( author );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> result = searchSession.search( Author.class )

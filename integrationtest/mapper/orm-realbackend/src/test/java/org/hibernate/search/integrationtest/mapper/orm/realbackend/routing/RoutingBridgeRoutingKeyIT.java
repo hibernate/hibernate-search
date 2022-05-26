@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.routing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class RoutingBridgeRoutingKeyIT {
 		assertThat( searchIdsByRoutingKey( Genre.SCIENCE_FICTION ) ).isEmpty();
 		assertThat( searchIdsByRoutingKey( Genre.CRIME_FICTION ) ).isEmpty();
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( 1 );
 			book1.setTitle( "I, Robot" );
@@ -75,7 +75,7 @@ public class RoutingBridgeRoutingKeyIT {
 		assertThat( searchIdsByRoutingKey( Genre.SCIENCE_FICTION ) ).containsExactly( 1 );
 		assertThat( searchIdsByRoutingKey( Genre.CRIME_FICTION ) ).isEmpty();
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = entityManager.getReference( Book.class, 1 );
 			book1.setGenre( Genre.CRIME_FICTION );
 		} );
@@ -83,7 +83,7 @@ public class RoutingBridgeRoutingKeyIT {
 		assertThat( searchIdsByRoutingKey( Genre.SCIENCE_FICTION ) ).isEmpty();
 		assertThat( searchIdsByRoutingKey( Genre.CRIME_FICTION ) ).containsExactly( 1 );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = entityManager.getReference( Book.class, 1 );
 			// Try to fool the routing bridge into deleting from the wrong shard - it shouldn't matter.
 			book1.setGenre( Genre.SCIENCE_FICTION );
@@ -97,7 +97,7 @@ public class RoutingBridgeRoutingKeyIT {
 	private List<Integer> searchIdsByRoutingKey(Genre genre) {
 		String routingKey = genre.name();
 		List<Integer> results = new ArrayList<>();
-		withinJPATransaction( entityManagerFactory, entityManager -> Search.session( entityManager )
+		with( entityManagerFactory ).runInTransaction( entityManager -> Search.session( entityManager )
 				.search( Book.class )
 				.select( f -> f.id( Integer.class ) )
 				.where( f -> f.matchAll() )

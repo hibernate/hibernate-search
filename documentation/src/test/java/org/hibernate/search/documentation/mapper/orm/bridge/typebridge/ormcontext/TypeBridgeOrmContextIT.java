@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.typebridge.ormconte
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -36,7 +36,7 @@ public class TypeBridgeOrmContextIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// See MyDataPropertyBinder
 			entityManager.setProperty( "test.data.indexed", MyData.INDEXED );
 
@@ -44,7 +44,7 @@ public class TypeBridgeOrmContextIT {
 			entityManager.persist( myEntity );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )

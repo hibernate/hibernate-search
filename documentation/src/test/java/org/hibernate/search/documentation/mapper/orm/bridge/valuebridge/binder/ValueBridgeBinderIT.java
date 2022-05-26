@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.valuebridge.binder;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -58,13 +58,13 @@ public class ValueBridgeBinderIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );
 			entityManager.persist( book );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )

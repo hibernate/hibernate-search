@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.search.converter;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -46,7 +46,7 @@ public class ProjectionConverterIT {
 
 	@Test
 	public void projectionConverterEnabled() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::projection-converter-enabled[]
@@ -63,7 +63,7 @@ public class ProjectionConverterIT {
 
 	@Test
 	public void projectionConverterDisabled() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::projection-converter-disabled[]
@@ -81,7 +81,7 @@ public class ProjectionConverterIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Order order1 = new Order( 1 );
 			order1.setStatus( OrderStatus.ACKNOWLEDGED );
 			Order order2 = new Order( 2 );

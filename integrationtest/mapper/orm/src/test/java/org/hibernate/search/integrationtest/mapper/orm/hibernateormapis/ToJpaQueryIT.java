@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +78,7 @@ public class ToJpaQueryIT {
 
 	@Before
 	public void initData() {
-		withinJPATransaction( setupHolder.entityManagerFactory(), entityManager -> {
+		with( setupHolder.entityManagerFactory() ).runInTransaction( entityManager -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );

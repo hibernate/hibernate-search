@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
@@ -47,13 +47,13 @@ public class ElasticsearchAnalysisIT {
 				)
 				.setup( IndexedEntity.class );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setText( "the Wording" );
 			entityManager.persist( entity );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat(

@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.directfieldmapping;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -74,7 +74,7 @@ public class HibernateOrmSimpleMappingIT {
 
 	@Test
 	public void sort() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
@@ -92,7 +92,7 @@ public class HibernateOrmSimpleMappingIT {
 
 	@Test
 	public void projection_simple() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<String> result = searchSession.search( Book.class ) // <1>
@@ -106,7 +106,7 @@ public class HibernateOrmSimpleMappingIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setTitle( BOOK1_TITLE );
 			book1.setPageCount( BOOK1_PAGECOUNT );

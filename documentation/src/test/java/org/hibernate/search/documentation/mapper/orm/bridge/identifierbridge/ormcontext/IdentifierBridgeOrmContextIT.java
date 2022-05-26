@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.identifierbridge.or
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -38,13 +38,13 @@ public class IdentifierBridgeOrmContextIT {
 	public void smoke() {
 		// See MyDataValueBridge
 		entityManagerFactory.getProperties().put( "test.data.indexed", MyData.VALUE1 );
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			MyEntity myEntity = new MyEntity();
 			myEntity.setId( MyData.VALUE3 );
 			entityManager.persist( myEntity );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// See MyDataValueBridge
 			entityManager.setProperty( "test.data.projected", MyData.VALUE2 );
 

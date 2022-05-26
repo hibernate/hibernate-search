@@ -43,10 +43,6 @@ public final class OrmUtils {
 		with( sessionFactory, tenantId ).runInTransaction( action );
 	}
 
-	public static <E extends Throwable> void withinJPATransaction(EntityManagerFactory entityManagerFactory, ThrowingConsumer<EntityManager, E> action) throws E {
-		with( entityManagerFactory ).runInTransaction( action );
-	}
-
 	public static <E extends Throwable> void withinTransaction(Session session, ThrowingConsumer<Transaction, E> action) throws E {
 		withinTransaction( session, tx -> {
 			action.accept( tx );

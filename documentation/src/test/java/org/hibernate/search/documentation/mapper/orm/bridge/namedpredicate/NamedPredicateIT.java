@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.namedpredicate;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -35,7 +35,7 @@ public class NamedPredicateIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			ItemStock unit1 = new ItemStock();
 			unit1.setSkuId( "SHOES.WI2012.4242" );
 			unit1.setAmountInStock( 23 );
@@ -50,7 +50,7 @@ public class NamedPredicateIT {
 			entityManager.persist( unit3 );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			// tag::named-predicate[]

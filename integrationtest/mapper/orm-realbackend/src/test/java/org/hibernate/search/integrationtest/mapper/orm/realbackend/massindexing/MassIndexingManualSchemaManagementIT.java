@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.massindexing
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils.prepareBooks;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -64,18 +64,15 @@ public class MassIndexingManualSchemaManagementIT {
 	public void cleanup() {
 		// Necessary to keep the server (ES) or filesystem (Lucene) clean after the tests,
 		// because the schema management strategy is "none"
-		withinJPATransaction(
-				entityManagerFactory,
-				entityManager -> Search.session( entityManager ).schemaManager().dropIfExisting()
+		with( entityManagerFactory ).runInTransaction( entityManager ->
+				Search.session( entityManager ).schemaManager().dropIfExisting()
 		);
 	}
 
 	@Test
 	public void testMassIndexingWithAutomaticDropAndCreate() {
 		// The index doesn't exist initially, since we delete it in "cleanup()" the schema management strategy is "none"
-		withinJPATransaction(
-				entityManagerFactory,
-				entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 					MassIndexer indexer = Search.session( entityManager ).massIndexer()
 							.dropAndCreateSchemaOnStart( true );
 					try {
@@ -91,9 +88,7 @@ public class MassIndexingManualSchemaManagementIT {
 
 	@Test
 	public void testMassIndexingWithManualDropAndCreate() {
-		withinJPATransaction(
-				entityManagerFactory,
-				entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 					// The index doesn't exist initially, since the schema management strategy is "none"
 					Search.session( entityManager ).schemaManager().dropAndCreate();
 

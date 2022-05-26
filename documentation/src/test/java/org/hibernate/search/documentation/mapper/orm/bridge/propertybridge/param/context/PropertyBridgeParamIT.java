@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.propertybridge.para
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -58,7 +58,7 @@ public class PropertyBridgeParamIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Invoice invoice = new Invoice();
 			invoice.getLineItems()
 					.add( new InvoiceLineItem( InvoiceLineItemCategory.BOOK, new BigDecimal( "5.99" ) ) );
@@ -71,7 +71,7 @@ public class PropertyBridgeParamIT {
 			entityManager.persist( invoice );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Invoice> result = searchSession.search( Invoice.class )

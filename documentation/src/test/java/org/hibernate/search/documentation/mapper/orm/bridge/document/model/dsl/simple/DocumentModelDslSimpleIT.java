@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.document.model.dsl.
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +37,7 @@ public class DocumentModelDslSimpleIT {
 
 	@Test
 	public void smoke() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );
 			entityManager.persist( book );
@@ -48,7 +48,7 @@ public class DocumentModelDslSimpleIT {
 			entityManager.persist( author );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book.class, Author.class ) )

@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.massindexing
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils.prepareBooks;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -65,9 +65,7 @@ public class MassIndexingMonitorIT {
 
 	@Test
 	public void testMassIndexingMonitor() {
-		withinJPATransaction(
-				entityManagerFactory,
-				entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 					assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
 
 					MassIndexer indexer = Search.session( entityManager ).massIndexer()

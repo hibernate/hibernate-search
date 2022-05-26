@@ -7,7 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.conditionalindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -61,7 +61,7 @@ public class RoutingBridgeConditionalIndexingIT {
 
 	@Test
 	public void test() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
@@ -70,7 +70,7 @@ public class RoutingBridgeConditionalIndexingIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book2 = entityManager.find( Book.class, BOOK2_ID );
 			Book book3 = entityManager.find( Book.class, BOOK3_ID );
 
@@ -78,7 +78,7 @@ public class RoutingBridgeConditionalIndexingIT {
 			book3.setStatus( Status.ARCHIVED );
 		} );
 
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
@@ -89,7 +89,7 @@ public class RoutingBridgeConditionalIndexingIT {
 	}
 
 	private void initData() {
-		withinJPATransaction( entityManagerFactory, entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );
 			book1.setTitle( "I, Robot" );
