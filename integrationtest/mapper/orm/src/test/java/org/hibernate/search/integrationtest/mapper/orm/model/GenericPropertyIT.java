@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class GenericPropertyIT {
 
 	@Test
 	public void index() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			GenericEntity<String> genericEntity = new StringGenericEntity();

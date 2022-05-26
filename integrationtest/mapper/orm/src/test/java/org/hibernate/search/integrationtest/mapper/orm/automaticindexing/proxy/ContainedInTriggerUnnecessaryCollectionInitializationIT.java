@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assert.assertFalse;
 
 import java.util.HashSet;
@@ -60,7 +60,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 
 	@Test
 	public void test() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Group group = new Group();
 			group.setId( 1 );
 			group.setSomeField( "initialValue" );
@@ -90,7 +90,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		backendMock.verifyExpectationsMet();
 
 		AtomicReference<Group> groupFromModifyingTransaction = new AtomicReference<>();
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			Group group = session.getReference( Group.class, 1 );
 			groupFromModifyingTransaction.set( group );
 

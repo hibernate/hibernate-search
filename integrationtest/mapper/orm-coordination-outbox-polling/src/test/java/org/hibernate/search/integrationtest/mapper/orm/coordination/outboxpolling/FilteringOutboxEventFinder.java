@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +81,7 @@ public class FilteringOutboxEventFinder {
 
 	public synchronized void showAllEventsUpToNow(SessionFactory sessionFactory) {
 		checkFiltering();
-		withinTransaction( sessionFactory, session -> showOnlyEvents( findOutboxEventIdsNoFilter( session ) ) );
+		with( sessionFactory ).runInTransaction( session -> showOnlyEvents( findOutboxEventIdsNoFilter( session ) ) );
 	}
 
 	public synchronized void showOnlyEvents(List<Long> eventIds) {
@@ -147,7 +147,7 @@ public class FilteringOutboxEventFinder {
 	}
 
 	public void awaitUntilNoMoreVisibleEvents(SessionFactory sessionFactory) {
-		await().untilAsserted( () -> withinTransaction( sessionFactory, session -> {
+		await().untilAsserted( () -> with( sessionFactory ).runInTransaction( session -> {
 			List<OutboxEvent> outboxEntries = findOutboxEventsNotForProcessing( session, 1, Optional.empty() );
 			assertThat( outboxEntries ).isEmpty();
 		} ) );

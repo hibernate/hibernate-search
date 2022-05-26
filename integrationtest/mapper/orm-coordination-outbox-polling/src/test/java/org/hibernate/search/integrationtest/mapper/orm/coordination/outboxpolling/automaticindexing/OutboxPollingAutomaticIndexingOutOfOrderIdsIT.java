@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
 import java.sql.PreparedStatement;
@@ -69,20 +68,20 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
 			session.persist( entity );
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			entity.setIndexedField( "another value for the field" );
 			session.merge( entity );
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
@@ -99,7 +98,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", null );
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 1 (add) and 3 (delete)
 			updateOutboxTableRow( session, 1, 4 );
 			updateOutboxTableRow( session, 3, 1 );
@@ -139,7 +138,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// An entity is deleted, then re-created in separate transactions.
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -151,11 +150,11 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -174,7 +173,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// but the add event has ID 1, the and the delete event has ID 2.
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -186,12 +185,12 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, id );
 			session.remove( entity );
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -208,7 +207,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", null );
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 2 (delete) and 3 (add)
 			updateOutboxTableRow( session, 2, 4 );
 			updateOutboxTableRow( session, 3, 2 );
@@ -236,7 +235,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// An entity is updated twice in two separate transactions,
 		// resulting in two events with different routing keys
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = new RoutedIndexedEntity( 1, "first", RoutedIndexedEntity.Status.FIRST );
 			session.persist( entity );
 		} );
@@ -250,14 +249,14 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 
 		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
 			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 			entity.setText( "second" );
 		} );
 
 		// Update the current routing key again (but don't trigger indexing yet: events are being filtered)
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
 			entity.setStatus( RoutedIndexedEntity.Status.THIRD );
 			entity.setText( "third" );
@@ -284,7 +283,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		// resulting in two events with different routing keys,
 		// but the second update event has ID 1, and the first update has ID 2.
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = new RoutedIndexedEntity( 1, "first", RoutedIndexedEntity.Status.FIRST );
 			session.persist( entity );
 		} );
@@ -298,14 +297,14 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 
 		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
 			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 			entity.setText( "second" );
 		} );
 
 		// Update the current routing key again (but don't trigger indexing yet: events are being filtered)
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
 			entity.setStatus( RoutedIndexedEntity.Status.THIRD );
 			entity.setText( "third" );
@@ -323,7 +322,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			);
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 2 (update routing key from "FIRST" to "SECOND") and
 			// 3 (update routing key from "SECOND" to "THIRD")
 			updateOutboxTableRow( session, 2, 4 );

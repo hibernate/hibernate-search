@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,7 +100,7 @@ public class BytecodeEnhancementIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3581")
 	public void test() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006
 			( (IndexedEntitySuperClass) entity1 ).id = 1;
@@ -165,7 +165,7 @@ public class BytecodeEnhancementIT {
 
 			AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
 
-			withinTransaction( sessionFactory, session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 				entityFromTransaction.set( entity );
 

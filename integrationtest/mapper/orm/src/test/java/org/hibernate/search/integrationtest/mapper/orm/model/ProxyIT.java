@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -60,7 +60,7 @@ public class ProxyIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-383")
 	public void proxyAccess() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			EntityWithPropertyAccessTypeForId entity1 = new EntityWithPropertyAccessTypeForId();
 			entity1.id = 1;
 			entity1.text = "initialValue";
@@ -73,7 +73,7 @@ public class ProxyIT {
 					);
 		} );
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ParentEntity proxy = session.getReference( ParentEntity.class, 1 );
 
 			// 'proxy' is a Hibernate proxy and accessing its fields will not work, even after the proxy is initialized

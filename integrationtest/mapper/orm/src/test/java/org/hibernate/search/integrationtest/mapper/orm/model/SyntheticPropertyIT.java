@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class SyntheticPropertyIT {
 
 		// If we get here the bug was solved, but let's at least check that indexing works
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity containing1 = new IndexedEntity();
 			containing1.setId( 0 );
 			IndexedEntity containing2 = new IndexedEntity();

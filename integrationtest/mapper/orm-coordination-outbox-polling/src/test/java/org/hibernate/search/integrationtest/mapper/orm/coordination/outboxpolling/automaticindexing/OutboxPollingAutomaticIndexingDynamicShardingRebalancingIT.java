@@ -12,7 +12,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingTestUtils.awaitAllAgentsRunningInOneCluster;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.HibernateOrmMapperOutboxPollingImplSettings.CoordinationRadicals.AGENT_REPOSITORY_PROVIDER;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +105,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
 				session.persist( entity );
@@ -155,7 +154,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
 				session.persist( entity );
@@ -198,7 +197,7 @@ public class OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT {
 		int entityCount = 3000;
 		int initialShardCount = 3;
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < entityCount; i++ ) {
 				IndexedEntity entity = new IndexedEntity( i, "initial" );
 				session.persist( entity );

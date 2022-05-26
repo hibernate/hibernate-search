@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -115,7 +115,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		backendMock.verifyExpectationsMet();
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -155,7 +155,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		backendMock.verifyExpectationsMet();
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -218,7 +218,7 @@ public class OutboxPollingCustomEntityMappingIT {
 		backendMock.verifyExpectationsMet();
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );
@@ -269,7 +269,7 @@ public class OutboxPollingCustomEntityMappingIT {
 				getDialect().canCreateSchema() );
 
 		int id = 1;
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity = new IndexedEntity();
 			entity.setId( id );
 			entity.setIndexedField( "value for the field" );

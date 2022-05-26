@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +57,7 @@ public class SearchQueryEntityChangingScrollingIT {
 
 	@Test
 	public void test() {
-		backendMock.inLenientMode( () -> withinTransaction( sessionFactory, session -> {
+		backendMock.inLenientMode( () -> with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 0; i < 12; i++ ) {
 				session.persist( new SimpleEntity( i ) );
 			}

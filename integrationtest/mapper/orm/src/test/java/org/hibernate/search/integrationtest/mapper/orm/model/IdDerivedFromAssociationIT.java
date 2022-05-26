@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.io.Serializable;
 import javax.persistence.Entity;
@@ -66,7 +66,7 @@ public class IdDerivedFromAssociationIT {
 				.setup( IndexedBaseForNonIndexedDerived.class, NonIndexedDerived.class );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedBaseForNonIndexedDerived base = new IndexedBaseForNonIndexedDerived();
 			session.persist( base );
 
@@ -88,7 +88,7 @@ public class IdDerivedFromAssociationIT {
 				.setup( NonIndexedBaseForIndexedDerivedWithDocumentId.class, IndexedDerivedWithDocumentId.class );
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			NonIndexedBaseForIndexedDerivedWithDocumentId base = new NonIndexedBaseForIndexedDerivedWithDocumentId();
 			session.persist( base );
 

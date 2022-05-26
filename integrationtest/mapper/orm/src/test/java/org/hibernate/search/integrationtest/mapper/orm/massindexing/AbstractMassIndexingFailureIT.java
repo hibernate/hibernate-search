@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -113,7 +113,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		// We need more than 1000 batches in order to reproduce HSEARCH-4236.
 		// That's because of the size of the queue:
 		// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			for ( int i = 4; i < 1500; i++ ) {
 				session.persist( new Book( i, "title " + i, "author " + i ) );
 			}
@@ -750,7 +750,7 @@ public abstract class AbstractMassIndexingFailureIT {
 
 		backendMock.verifyExpectationsMet();
 
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
 			session.persist( new Book( 2, TITLE_2, AUTHOR_2 ) );
 			session.persist( new Book( 3, TITLE_3, AUTHOR_3 ) );

@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
@@ -513,7 +513,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 			throws InterruptedException, ExecutionException, TimeoutException {
 		CompletableFuture<?> justBeforeTransactionCommitFuture = new CompletableFuture<>();
 		CompletableFuture<?> transactionThreadFuture = CompletableFuture.runAsync( () -> {
-			withinTransaction( sessionFactory, session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				if ( overriddenStrategy != null ) {
 					Search.session( session ).automaticIndexingSynchronizationStrategy( overriddenStrategy );
 				}

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	@Test
 	public void indirectValueUpdate_embeddedBridge() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 
@@ -113,7 +113,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Test updating a value used in an included bridge
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInFirstBridge( "updatedValue" );
 
@@ -132,7 +132,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		 * Test updating a value used in an excluded bridge
 		 * (every index field filtered out by the IndexedEmbedded filter)
 		 */
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 4 );
 			containedEntity.setIncludedInSecondBridge( "updatedValue" );
 

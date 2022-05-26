@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import javax.persistence.ElementCollection;
@@ -63,7 +63,7 @@ public class IndexedEmbeddedRecordIT {
 
 	@Test
 	public void index() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.id = 1;
 			MyRecord myRecord = new MyRecord( "someText", 42, List.of( "someText2", "someText3" ) );

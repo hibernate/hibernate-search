@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +89,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@Before
 	public void initData() {
 		// We don't care about what is indexed exactly, so use the lenient mode
-		backendMock.inLenientMode( () -> withinTransaction( sessionFactory(), session -> {
+		backendMock.inLenientMode( () -> with( sessionFactory() ).runInTransaction( session -> {
 			session.persist( model.newIndexedWithContained( 0, mapping ) );
 			session.persist( model.newIndexedWithContained( 1, mapping ) );
 			session.persist( model.newIndexedWithContained( 2, mapping ) );

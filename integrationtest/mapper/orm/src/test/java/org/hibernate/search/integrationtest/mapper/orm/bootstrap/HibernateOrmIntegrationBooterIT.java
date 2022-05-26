@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -133,7 +133,7 @@ public class HibernateOrmIntegrationBooterIT {
 			 */
 			backendMock.verifyExpectationsMet();
 
-			withinTransaction( sessionFactory, session -> {
+			with( sessionFactory ).runInTransaction( session -> {
 				IndexedEntity entity = new IndexedEntity();
 				entity.id = 1;
 				entity.text = "someText";

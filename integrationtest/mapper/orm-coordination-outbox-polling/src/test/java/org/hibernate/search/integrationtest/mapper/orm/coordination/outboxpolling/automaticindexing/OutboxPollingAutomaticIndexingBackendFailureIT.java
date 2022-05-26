@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolli
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -56,7 +56,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	@Test
 	public void backendFailure() {
 		setup( 0 );
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
@@ -109,7 +109,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	public void backendFailure_retryAfter() {
 		setup( 3 );
 		AtomicLong timeOfTheException = new AtomicLong();
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
@@ -164,7 +164,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	@Test
 	public void backendFailure_twoFailuresOfTheSameIndexingWork() {
 		setup( 0 );
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
@@ -223,7 +223,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	@Test
 	public void backendFailure_numberOfTrialsExhausted() {
 		setup( 0 );
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );

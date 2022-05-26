@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -119,7 +118,7 @@ public class MassIndexingEmbeddedIdIT {
 	}
 
 	private void initData() {
-		withinTransaction( sessionFactory, session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			book1 = new Book( 1, TITLE_1, AUTHOR_1 );
 			session.persist( book1 );
 			book2 = new Book( 2, TITLE_2, AUTHOR_2 );
