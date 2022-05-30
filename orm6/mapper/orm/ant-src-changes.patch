@@ -287,12 +287,12 @@ index 0318ea858d..b2bf030782 100644
  						new ErrorCollectingPojoTypeMetadataContributor()
  								// Ensure Hibernate ORM metadata about properties is translated into Hibernate Search metadata
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
-index de45790392..99b67466db 100644
+index 9228a9bd7c..77fdfa0616 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingInitiator.java
-@@ -6,10 +6,9 @@
-  */
- package org.hibernate.search.mapper.orm.mapping.impl;
+@@ -8,10 +8,9 @@
+ 
+ import java.util.List;
  
 -import org.hibernate.MultiTenancyStrategy;
  import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -302,39 +302,40 @@ index de45790392..99b67466db 100644
  import org.hibernate.mapping.PersistentClass;
  import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
  import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-@@ -58,13 +57,14 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionM
+@@ -70,13 +69,14 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView j
  				HibernateOrmBasicTypeMetadataProvider.create( metadata );
  		HibernateOrmBootstrapIntrospector introspector = HibernateOrmBootstrapIntrospector.create(
- 				basicTypeMetadataProvider, reflectionManager, valueReadHandleFactory );
+ 				basicTypeMetadataProvider, reflectionManager, valueHandleFactory );
 -		ConfigurationService ormConfigurationService =
 -				HibernateOrmUtils.getServiceOrFail( serviceRegistry, ConfigurationService.class );
  		HibernateSearchPreIntegrationService preIntegrationService =
  				HibernateOrmUtils.getServiceOrFail( serviceRegistry, HibernateSearchPreIntegrationService.class );
  
--		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector, ormConfigurationService,
--				preIntegrationService );
 +		boolean multiTenancyEnabled = ( (MetadataImplementor) metadata ).getMetadataBuildingOptions()
 +				.isMultiTenancyEnabled();
 +
-+		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector,
+ 		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, jandexIndex, introspector,
+-				ormConfigurationService, preIntegrationService );
 +				preIntegrationService, multiTenancyEnabled );
  	}
  
  	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
-@@ -74,26 +74,16 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionM
+@@ -86,10 +86,10 @@ public static HibernateOrmMappingInitiator create(Metadata metadata, IndexView j
  	private BeanHolder<? extends CoordinationStrategy> coordinationStrategyHolder;
  	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
  
 -	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
--			HibernateOrmBootstrapIntrospector introspector, ConfigurationService ormConfigurationService,
--			HibernateSearchPreIntegrationService preIntegrationService) {
 +	private HibernateOrmMappingInitiator(
 +			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-+			HibernateOrmBootstrapIntrospector introspector,
+ 			IndexView jandexIndex, HibernateOrmBootstrapIntrospector introspector,
+-			ConfigurationService ormConfigurationService,
+-			HibernateSearchPreIntegrationService preIntegrationService) {
 +			HibernateSearchPreIntegrationService preIntegrationService, boolean multiTenancyEnabled) {
  		super( introspector );
  
  		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
+@@ -98,18 +98,7 @@ private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basic
+ 		}
  		this.introspector = introspector;
  
 -		/*
@@ -354,7 +355,7 @@ index de45790392..99b67466db 100644
  		this.preIntegrationService = preIntegrationService;
  	}
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
-index c4fd693171..c2f2d35e35 100644
+index 44069a5558..9cd86db6e5 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingPropertiesMetadataContributor.java
 @@ -10,12 +10,14 @@
@@ -373,7 +374,7 @@ index c4fd693171..c2f2d35e35 100644
  import org.hibernate.mapping.SimpleValue;
  import org.hibernate.mapping.ToOne;
  import org.hibernate.mapping.Value;
-@@ -100,13 +102,18 @@ else if ( value instanceof SimpleValue ) {
+@@ -94,13 +96,18 @@ else if ( value instanceof SimpleValue ) {
  	}
  
  	private void collectScale(PojoAdditionalMetadataCollectorPropertyNode collector, Value value) {
