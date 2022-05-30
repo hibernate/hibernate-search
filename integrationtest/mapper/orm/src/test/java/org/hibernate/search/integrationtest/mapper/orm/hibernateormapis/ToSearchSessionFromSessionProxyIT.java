@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.runInTransaction;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -105,7 +105,7 @@ public class ToSearchSessionFromSessionProxyIT {
 	public void testThreadBoundSessionWrappingInTransaction() {
 		final Session sessionFromFirstThread = setupHolder.sessionFactory().getCurrentSession();
 		try {
-			withinTransaction( sessionFromFirstThread, ignored -> {
+			runInTransaction( sessionFromFirstThread, ignored -> {
 				SearchSession searchSessionFromFirstThread = Search.session( sessionFromFirstThread );
 				assertNotNull( searchSessionFromFirstThread );
 				assertThat( searchSessionFromFirstThread.toEntityManager() ).isSameAs( sessionFromFirstThread );

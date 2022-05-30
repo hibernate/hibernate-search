@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.applyInJPATransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -39,7 +39,7 @@ class JPAPersistenceRunner implements PersistenceRunner<EntityManager, EntityTra
 	@Override
 	public <R, E extends Throwable> R applyInTransaction(ThrowingBiFunction<? super EntityManager, ? super EntityTransaction, R, E> action) throws E {
 		return applyNoTransaction( entityManager ->
-				withinJPATransaction( entityManager, tx -> action.apply( entityManager, tx ) )
+				applyInJPATransaction( entityManager, tx -> action.apply( entityManager, tx ) )
 		);
 	}
 }

@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.runInTransaction;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -140,7 +140,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		 * The bridge will not load any entity and will just retrieve data from the database.
 		 */
 		with( sessionFactory ).runNoTransaction( session -> {
-			withinTransaction( session, tx -> {
+			runInTransaction( session, tx -> {
 				ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 				containedEntity.setIncludedInTypeBridge( "value2" );
 				backendMock.expectWorks( IndexedEntity.INDEX )
