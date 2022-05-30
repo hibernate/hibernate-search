@@ -254,7 +254,7 @@
          -->
         <version.com.fasterxml.jackson.databind>2.13.3</version.com.fasterxml.jackson.databind>
         <!-- Reactive-streams: used by the AWS SDK -->
-        <version.org.reactivestreams.reactive-streams>1.0.3</version.org.reactivestreams.reactive-streams>
+        <version.org.reactivestreams.reactive-streams>1.0.4</version.org.reactivestreams.reactive-streams>
         <!-- slf4j: used by the AWS SDK -->
         <version.org.slf4j>1.7.36</version.org.slf4j>
 
