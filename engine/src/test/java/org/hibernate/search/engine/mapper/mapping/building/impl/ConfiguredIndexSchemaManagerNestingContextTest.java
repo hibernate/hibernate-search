@@ -49,16 +49,16 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	@Mock(lenient = true)
+	@Mock(strictness = Strictness.LENIENT)
 	private MappableTypeModel typeModel1Mock;
 
-	@Mock(lenient = true)
+	@Mock(strictness = Strictness.LENIENT)
 	private MappableTypeModel typeModel2Mock;
 
-	@Mock(lenient = true)
+	@Mock(strictness = Strictness.LENIENT)
 	private MappableTypeModel typeModel3Mock;
 
-	@Mock(lenient = true)
+	@Mock(strictness = Strictness.LENIENT)
 	private MappableTypeModel typeModel4Mock;
 
 	@Mock
