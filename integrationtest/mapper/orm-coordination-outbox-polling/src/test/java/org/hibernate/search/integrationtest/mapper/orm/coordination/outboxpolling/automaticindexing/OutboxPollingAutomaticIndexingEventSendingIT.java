@@ -309,11 +309,11 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 			entity.setText( "updated" );
 		} );
 
-		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.addOrUpdate( "2", b -> b
 						.field( "text", "updated" )
 						.field( "nonIndexedEmbeddedText", "initial" ) );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.verifyExpectationsMet();
 		// Processing the update event should yield more events for containing entities
 		backendMock.indexingWorkExpectations().awaitIndexingAssertions( () -> {
@@ -406,11 +406,11 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 			entity.setNonIndexedEmbeddedText( "updated" );
 		} );
 
-		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.addOrUpdate( "2", b -> b
 						.field( "text", "initial" )
 						.field( "nonIndexedEmbeddedText", "updated" ) );
+		outboxEventFinder.showAllEventsUpToNow( setupHolder.sessionFactory() );
 		backendMock.verifyExpectationsMet();
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.
