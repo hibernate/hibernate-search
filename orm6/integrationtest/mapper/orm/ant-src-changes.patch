@@ -1,5 +1,5 @@
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
-index 52694f380c..adbce15922 100644
+index 01ef5825f9..60cb71a476 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
 @@ -124,7 +124,7 @@ public void simple() {
@@ -879,10 +879,10 @@ index c032664bb9..4d205fdccf 100644
  				.withProperty( AvailableSettings.USE_SECOND_LEVEL_CACHE, "true" )
  				.withAnnotatedTypes( IndexedEntity.class );
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
-index 798418f3a9..bbfc99e232 100644
+index 6af91cdb9f..34c4c1b092 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BackRefPropertyIT.java
-@@ -19,7 +19,7 @@
+@@ -20,7 +20,7 @@
  
  import org.hibernate.SessionFactory;
  import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -903,18 +903,18 @@ index 798418f3a9..bbfc99e232 100644
  				.contains( "_containingIndexBackref" );
  
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
-index aa24c725e1..66c2063aea 100644
+index f3c50122f5..74e1a3d37c 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
-@@ -6,6 +6,7 @@
-  */
- package org.hibernate.search.integrationtest.mapper.orm.model;
+@@ -8,6 +8,7 @@
+ 
+ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
  
 +import java.io.Serializable;
  import java.util.ArrayList;
  import java.util.List;
  import jakarta.persistence.Basic;
-@@ -117,25 +118,17 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
+@@ -118,25 +119,17 @@ public void setGenericProperty(GenericEntity<String> genericProperty) {
  	}
  
  	@Entity(name = "generic")
@@ -942,10 +942,10 @@ index aa24c725e1..66c2063aea 100644
  
  		@OneToMany(mappedBy = "genericProperty")
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
-index 43bed0bfd6..16115098af 100644
+index e4943eba1f..79d8d96c29 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/SyntheticPropertyIT.java
-@@ -19,7 +19,7 @@
+@@ -20,7 +20,7 @@
  
  import org.hibernate.SessionFactory;
  import org.hibernate.engine.spi.SessionFactoryImplementor;

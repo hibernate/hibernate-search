@@ -189,10 +189,10 @@ index 5f67f7d4e7..cb9495f675 100644
  			assertEquals( position, objs[1] );
  			assertTrue( objs[2] instanceof Employee );
 diff --git a/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java b/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java
-index 8960e20e4f..76896f767d 100644
+index 3e45d55cd1..e9ba5a3272 100644
 --- a/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java
 +++ b/test/java/org/hibernate/search/test/session/MassIndexUsingManualFlushTest.java
-@@ -59,7 +59,7 @@ public void execute(Connection connection) throws SQLException {
+@@ -60,7 +60,7 @@ public void execute(Connection connection) throws SQLException {
  		int index = 0;
  		while ( results.next() ) {
  			index++;
