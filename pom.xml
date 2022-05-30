@@ -262,7 +262,7 @@
         <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
-        <version.org.hibernate.orm>6.0.1.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>6.0.2.Final</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -272,7 +272,7 @@
              and to our own explicit dependencies in the relevant artifacts.
           -->
         <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
-        <version.org.hibernate.commons.annotations.orm6>6.0.1.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.org.hibernate.commons.annotations.orm6>6.0.2.Final</version.org.hibernate.commons.annotations.orm6>
         <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
         <version.jakarta.transaction-api>2.0.0</version.jakarta.transaction-api>
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
