@@ -62,7 +62,7 @@ public class IndexManagerBuildingStateHolderTest {
 	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private ConfigurationPropertySource configurationSourceMock;
 
-	@Mock(lenient = true, answer = Answers.CALLS_REAL_METHODS)
+	@Mock(strictness = Strictness.LENIENT, answer = Answers.CALLS_REAL_METHODS)
 	private BeanResolver beanResolverMock;
 
 	@Mock

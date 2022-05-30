@@ -48,7 +48,7 @@ public class BulkWorkTest {
 
 	@Mock
 	private ElasticsearchClient clientMock;
-	@Mock(lenient = true)
+	@Mock(strictness = Strictness.LENIENT)
 	private ElasticsearchWorkExecutionContext contextMock;
 
 	@Before

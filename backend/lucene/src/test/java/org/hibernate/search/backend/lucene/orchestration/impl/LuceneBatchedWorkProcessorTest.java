@@ -222,7 +222,8 @@ public class LuceneBatchedWorkProcessorTest {
 	private <T> IndexingWork<T> workMock() {
 		int id = nextWorkId++;
 		String workName = workInfo( id );
-		IndexingWork<T> workMock = mock( IndexingWork.class, withSettings().name( workName ).lenient() );
+		IndexingWork<T> workMock = mock( IndexingWork.class,
+				withSettings().name( workName ).strictness( Strictness.LENIENT ) );
 		when( workMock.getInfo() ).thenReturn( workInfo( id ) );
 		return workMock;
 	}

@@ -50,7 +50,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 	@Mock
 	private ElasticsearchSerialWorkOrchestrator orchestratorMock;
 
-	@Mock(lenient = true)
+	@Mock(strictness = Strictness.LENIENT)
 	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock;
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
@@ -291,7 +291,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 		int id = workMocks.size();
 		String workName = workInfo( id );
 		SingleDocumentIndexingWork workMock = mock( SingleDocumentIndexingWork.class,
-				withSettings().name( workName ).lenient() );
+				withSettings().name( workName ).strictness( Strictness.LENIENT ) );
 		when( workMock.getEntityTypeName() ).thenReturn( TYPE_NAME );
 		when( workMock.getEntityIdentifier() ).thenReturn( id );
 		workMocks.add( workMock );
