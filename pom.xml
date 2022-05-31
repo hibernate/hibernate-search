@@ -2463,8 +2463,8 @@
                      but it doesn't need them either, so we just omit them. -->
                 <test.weld.jvm.args></test.weld.jvm.args>
                 <!-- Tests specific to Java 11+ won't work with JDK 8, so we disable them. -->
-                <java-version.test.java11.add-source-phase>none</java-version.test.java11.add-source-phase>
-                <java-version.test.java17.add-source-phase>none</java-version.test.java17.add-source-phase>
+                <java-version.test.java11.add-main-source-phase>none</java-version.test.java11.add-main-source-phase>
+                <java-version.test.java17.add-main-source-phase>none</java-version.test.java17.add-main-source-phase>
                 <java-version.test.java11.add-test-source-phase>none</java-version.test.java11.add-test-source-phase>
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
             </properties>
@@ -2480,7 +2480,7 @@
             </activation>
             <properties>
                 <!-- Tests specific to Java 17+ won't work with JDK 11, so we disable them. -->
-                <java-version.test.java17.add-source-phase>none</java-version.test.java17.add-source-phase>
+                <java-version.test.java17.add-main-source-phase>none</java-version.test.java17.add-main-source-phase>
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
             </properties>
         </profile>
