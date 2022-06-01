@@ -107,6 +107,7 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		HttpCoreContext coreContext = HttpCoreContext.adapt( context );
 		HttpHost targetHost = coreContext.getTargetHost();
 		awsRequestBuilder.host( targetHost.getHostName() );
+		awsRequestBuilder.port( targetHost.getPort() );
 		awsRequestBuilder.protocol( targetHost.getSchemeName() );
 
 		RequestLine requestLine = request.getRequestLine();
