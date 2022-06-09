@@ -44,7 +44,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 	@Mock
 	private ConfigurationPropertySource sourceMock;
-	@Mock(strictness = Strictness.LENIENT, answer = Answers.CALLS_REAL_METHODS)
+	@Mock(strictness = Mock.Strictness.LENIENT, answer = Answers.CALLS_REAL_METHODS)
 	private BeanResolver beanResolverMock;
 
 	@Test
