@@ -152,7 +152,6 @@
 
     <modules>
         <module>build/config</module>
-        <module>build/surefire-extension</module>
         <module>parents/internal</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>
