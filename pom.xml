@@ -534,8 +534,10 @@
         <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
         <!-- Database profile jdbc java arguments -->
         <failsafe.jvm.args.jdbc></failsafe.jvm.args.jdbc>
-        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc}</failsafe.jvm.args>
+        <!-- Argument passed from the command line -->
+        <test.launcher.args></test.launcher.args>
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco} ${test.launcher.args}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} ${failsafe.jvm.args.jdbc} ${test.launcher.args}</failsafe.jvm.args>
 
         <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
         <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
