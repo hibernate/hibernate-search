@@ -181,7 +181,11 @@ stage('Configure') {
 							isDefault: true),
 					new JdkBuildEnvironment(version: '18', testCompilerTool: 'OpenJDK 18 Latest',
 							condition: TestCondition.AFTER_MERGE),
+					// We want to enable preview features when testing early-access builds of OpenJDK:
+					// even if we don't use these features, just enabling them can cause side effects
+					// and it's useful to test that.
 					new JdkBuildEnvironment(version: '19', testCompilerTool: 'OpenJDK 19 Latest',
+							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			compiler: [
@@ -736,6 +740,7 @@ class JdkBuildEnvironment extends BuildEnvironment {
 	String version
 	String testCompilerTool
 	String testLauncherTool
+	String testLauncherArgs
 	@Override
 	String getTag() { "jdk-$version" }
 }
@@ -968,6 +973,10 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 	String version = buildEnv.version
 	if ( defaultVersion != version ) {
 		args += " -Djava-version.test.release=$version"
+	}
+
+	if ( buildEnv.testLauncherArgs ) {
+		args += " -Dtest.launcher.args=${buildEnv.testLauncherArgs}"
 	}
 
 	return args
