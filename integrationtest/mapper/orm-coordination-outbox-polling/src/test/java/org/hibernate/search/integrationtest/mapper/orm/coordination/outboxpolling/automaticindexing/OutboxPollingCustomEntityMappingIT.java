@@ -81,7 +81,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	@Test
 	public void wrongOutboxEventMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", "<ciao></ciao>" )
+				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", "<entity-mappings><ciao></ciao></entity-mappings>" )
 				.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( MappingException.class )
@@ -91,7 +91,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	@Test
 	public void wrongAgentMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.agent.entity.mapping", "<ciao></ciao>" )
+				.withProperty( "hibernate.search.coordination.agent.entity.mapping", "<entity-mappings><ciao></ciao></entity-mappings>" )
 				.setup( IndexedEntity.class )
 		)
 				.isInstanceOf( MappingException.class )
