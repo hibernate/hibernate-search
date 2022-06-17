@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.util.common.data.impl.LinkedNode;
 
 /**
  * A node representing a value in a dependency collector,
@@ -93,9 +94,9 @@ public class PojoIndexingDependencyCollectorPolymorphicDirectValueNode<P, V>
 
 	@Override
 	void doCollectDependency(
-			PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency) {
+			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath) {
 		for ( PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> node : monomorphicValueNodes ) {
-			node.doCollectDependency( initialNodeCollectingDependency );
+			node.doCollectDependency( derivedDependencyPath );
 		}
 	}
 
