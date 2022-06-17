@@ -1530,7 +1530,7 @@ or it doesn't match and it won't benefit from the score of this predicate.
 
 Predicates with a variable score have a more subtle impact on the score.
 For example the <<search-dsl-predicate-match,`match` predicate>>, on a text field,
-will yield a higher score for documents
+will yield a higher score for documents that contain the term to match multiple times.
 
 When this "variable score" behavior is not desired,
 you can suppress it by calling `.constantScore()`.

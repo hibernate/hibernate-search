@@ -190,7 +190,7 @@ but omits the field names.
 A field template is always declared in a binder: either in a <<mapper-orm-bridge-typebridge,type binder>>
 or in a <<mapper-orm-bridge-propertybridge,property binder>>.
 As for static fields, the entry point to declaring a template is the `IndexNode`
-passed to the binder's `bind(...)` method
+passed to the binder's `bind(...)` method.
 A call to the `fieldTemplate` method on the schema element will declare a field template.
 
 Assuming a field template was declared during binding,
