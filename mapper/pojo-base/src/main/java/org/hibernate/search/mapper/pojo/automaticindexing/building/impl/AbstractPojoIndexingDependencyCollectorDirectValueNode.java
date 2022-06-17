@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.impl.LinkedNode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -93,7 +94,7 @@ public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, 
 	public abstract void collectDependency();
 
 	abstract void doCollectDependency(
-			PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency);
+			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath);
 
 	@Override
 	final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
