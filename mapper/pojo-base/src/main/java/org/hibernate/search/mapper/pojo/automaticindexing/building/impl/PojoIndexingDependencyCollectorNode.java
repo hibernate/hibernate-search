@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
+import org.hibernate.search.util.common.data.impl.LinkedNode;
 
 public abstract class PojoIndexingDependencyCollectorNode {
 
@@ -16,8 +17,9 @@ public abstract class PojoIndexingDependencyCollectorNode {
 		return new Walker( null );
 	}
 
-	static Walker walker(PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency) {
-		return new Walker( initialNodeCollectingDependency );
+	static Walker walker(
+			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath) {
+		return new Walker( derivedDependencyPath );
 	}
 
 	final PojoImplicitReindexingResolverBuildingHelper buildingHelper;
@@ -63,10 +65,10 @@ public abstract class PojoIndexingDependencyCollectorNode {
 			PojoIndexingDependencyCollectorPropertyNode<?, ?>,
 			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?>
 			> {
-		private final PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency;
+		private final LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath;
 
-		Walker(PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency) {
-			this.initialNodeCollectingDependency = initialNodeCollectingDependency;
+		Walker(LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath) {
+			this.derivedDependencyPath = derivedDependencyPath;
 		}
 
 		@Override
@@ -80,7 +82,7 @@ public abstract class PojoIndexingDependencyCollectorNode {
 				PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyNode,
 				ContainerExtractorPath extractorPath) {
 			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> node = propertyNode.value( extractorPath );
-			node.doCollectDependency( initialNodeCollectingDependency );
+			node.doCollectDependency( derivedDependencyPath );
 			return node;
 		}
 
