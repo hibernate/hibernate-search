@@ -35,11 +35,7 @@ public class PojoIndexingProcessorMultiNode<T> extends PojoIndexingProcessor<T> 
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.startList();
-		for ( PojoIndexingProcessor<? super T> element : elements ) {
-			builder.value( element );
-		}
-		builder.endList();
+		builder.attribute( null, elements );
 	}
 
 	@Override

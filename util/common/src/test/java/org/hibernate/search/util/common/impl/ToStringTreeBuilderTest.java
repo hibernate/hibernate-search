@@ -8,6 +8,8 @@ package org.hibernate.search.util.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 public class ToStringTreeBuilderTest {
@@ -17,11 +19,11 @@ public class ToStringTreeBuilderTest {
 		assertThat( toString( ToStringStyle.inlineDelimiterStructure() ) )
 				.isEqualTo(
 						"foo=value, children={"
-						+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ] }, emptyChild={ },"
+						+ " childrenFoo=23, child1={ child1Foo=customToString, [ foo, 42 ], [ foo2, 43 ] }, emptyChild={ },"
 						+ " appendable={ attr=val, nested={ attr=val2 } },"
 						+ " appendableAsObject={ attr=val, nested={ attr=val2 } },"
 						+ " nullAppendable=null,"
-						+ " list=[ { name=foo }, object={ name=foo, attr=bar }, { nestedList=[ first, second ], name=bar } ]"
+						+ " list=[ { name=foo }, object={ name=foo, attr=bar }, { nestedList=[ first, second ], name=bar, nestedList2=[ first, second ] } ]"
 						+ " }, bar=value"
 				);
 		assertThat( new ToStringTreeBuilder().toString() ).isEqualTo( "" );
@@ -41,6 +43,10 @@ public class ToStringTreeBuilderTest {
 						+ "\t\t[\n"
 						+ "\t\t\tfoo\n"
 						+ "\t\t\t42\n"
+						+ "\t\t]\n"
+						+ "\t\t[\n"
+						+ "\t\t\tfoo2\n"
+						+ "\t\t\t43\n"
 						+ "\t\t]\n"
 						+ "\t}\n"
 						+ "\temptyChild={\n"
@@ -72,6 +78,10 @@ public class ToStringTreeBuilderTest {
 						+ "\t\t\t\tsecond\n"
 						+ "\t\t\t]\n"
 						+ "\t\t\tname=bar\n"
+						+ "\t\t\tnestedList2=[\n"
+						+ "\t\t\t\tfirst\n"
+						+ "\t\t\t\tsecond\n"
+						+ "\t\t\t]\n"
 						+ "\t\t}\n"
 						+ "\t]\n"
 						+ "}\n"
@@ -94,6 +104,8 @@ public class ToStringTreeBuilderTest {
 						+ "    child1Foo: customToString\n"
 						+ "      - foo\n"
 						+ "      - 42\n"
+						+ "      - foo2\n"
+						+ "      - 43\n"
 						+ "  emptyChild: \n"
 						+ "  appendable: \n"
 						+ "    attr: val\n"
@@ -113,6 +125,9 @@ public class ToStringTreeBuilderTest {
 						+ "        - first\n"
 						+ "        - second\n"
 						+ "      name: bar\n"
+						+ "      nestedList2: \n"
+						+ "        - first\n"
+						+ "        - second\n"
 						+ "bar: value"
 				);
 		assertThat( new ToStringTreeBuilder( style ).toString() ).isEqualTo( "" );
@@ -136,6 +151,7 @@ public class ToStringTreeBuilderTest {
 							.value( "foo" )
 							.value( 42 )
 							.endList()
+						.attribute( null, Arrays.asList( "foo2", 43 ) )
 						.endObject()
 					.startObject( "emptyChild" )
 						.endObject()
@@ -156,6 +172,7 @@ public class ToStringTreeBuilderTest {
 								.value( "second" )
 								.endList()
 							.attribute( "name", "bar" )
+							.attribute( "nestedList2", Arrays.asList( "first", "second" ) )
 							.endObject()
 						.endList()
 					.endObject()

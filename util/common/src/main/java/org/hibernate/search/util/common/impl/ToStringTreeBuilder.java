@@ -42,6 +42,13 @@ public class ToStringTreeBuilder {
 			endStructure( StructureType.OBJECT, style.endObject );
 			endEntry();
 		}
+		else if ( value instanceof Iterable ) {
+			startList( name );
+			for ( Object element : (Iterable<?>) value ) {
+				value( element );
+			}
+			endList();
+		}
 		else {
 			startEntry( name, null );
 			if ( value == null ) {
