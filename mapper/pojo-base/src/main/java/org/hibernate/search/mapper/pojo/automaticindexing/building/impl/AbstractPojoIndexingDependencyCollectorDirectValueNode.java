@@ -93,8 +93,7 @@ public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, 
 
 	public abstract void collectDependency();
 
-	abstract void doCollectDependency(
-			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath);
+	abstract void doCollectDependency(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath);
 
 	@Override
 	final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {

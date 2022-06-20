@@ -683,9 +683,12 @@ public class DependencyIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( DerivedFromCycle.A.class.getName() )
 						.pathContext( ".derivedA<no value extractors>" )
-						.failure( "Unable to resolve dependencies of a derived property:"
-								+ " there is a cyclic dependency involving path '.derivedA<no value extractors>'"
-								+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
+						.multilineFailure( "Unable to resolve dependencies of a derived property:"
+										+ " there is a cyclic dependency starting from type '" + DerivedFromCycle.A.class.getName() + "'",
+								"Derivation chain starting from that type and ending with a cycle:\n"
+										+ "- " + DerivedFromCycle.A.class.getName() + "#.b<default value extractors>.derivedB<default value extractors>\n"
+										+ "- " + DerivedFromCycle.B.class.getName() + "#.c<default value extractors>.derivedC<default value extractors>\n"
+										+ "- " + DerivedFromCycle.C.class.getName() + "#.a<default value extractors>.derivedA<default value extractors>\n",
 								"A derived property cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
 						) );
@@ -753,9 +756,12 @@ public class DependencyIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( DerivedFromCycle.Zero.class.getName() )
 						.pathContext( ".derivedZero<no value extractors>" )
-						.failure( "Unable to resolve dependencies of a derived property:"
-										+ " there is a cyclic dependency involving path '.derivedA<no value extractors>'"
-										+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
+						.multilineFailure( "Unable to resolve dependencies of a derived property:"
+										+ " there is a cyclic dependency starting from type '" + DerivedFromCycle.A.class.getName() + "'",
+								"Derivation chain starting from that type and ending with a cycle:\n"
+										+ "- " + DerivedFromCycle.A.class.getName() + "#.b<default value extractors>.derivedB<default value extractors>\n"
+										+ "- " + DerivedFromCycle.B.class.getName() + "#.c<default value extractors>.derivedC<default value extractors>\n"
+										+ "- " + DerivedFromCycle.C.class.getName() + "#.a<default value extractors>.derivedA<default value extractors>\n",
 								"A derived property cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
 						)

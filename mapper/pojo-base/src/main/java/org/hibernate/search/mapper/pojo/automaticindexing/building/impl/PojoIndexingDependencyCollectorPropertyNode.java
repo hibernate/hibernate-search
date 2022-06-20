@@ -41,7 +41,6 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 			BoundContainerExtractorPath<? super P, V> boundExtractorPath) {
 		return PojoIndexingDependencyCollectorPolymorphicDirectValueNode.create(
 				this,
-				modelPathFromParentNode.value( boundExtractorPath ),
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
 				buildingHelper
 		);
@@ -61,7 +60,6 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 			BoundContainerExtractorPath<? super P, V> boundExtractorPath) {
 		return PojoIndexingDependencyCollectorMonomorphicDirectValueNode.create(
 				this,
-				modelPathFromParentNode.value( boundExtractorPath ),
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
 				buildingHelper
 		);
