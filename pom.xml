@@ -193,7 +193,7 @@
         <!-- Nothing beyond common dependencies -->
 
         <!-- >>> Lucene -->
-        <version.org.apache.lucene>8.11.1</version.org.apache.lucene>
+        <version.org.apache.lucene>8.11.2</version.org.apache.lucene>
         <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>
         <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
         <javadoc.org.apache.lucene.analyzers-common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
