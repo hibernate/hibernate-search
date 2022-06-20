@@ -475,7 +475,7 @@
                 is outdated and leads to compilation errors.
          -->
         <version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>2.12.0</version.org.codehaus.plexus.plexus-compiler.compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.29.0</version.org.eclipse.jdt.ecj>
+        <version.org.eclipse.jdt.ecj>3.30.0</version.org.eclipse.jdt.ecj>
 
         <!--
             The absolute path to the root project directory.
