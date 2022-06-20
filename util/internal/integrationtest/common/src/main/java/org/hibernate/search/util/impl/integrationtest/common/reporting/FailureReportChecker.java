@@ -155,7 +155,15 @@ public class FailureReportChecker implements Consumer<Throwable> {
 		lastPatternWasFailure = true;
 		elementsToMatch.add( new ElementToMatch( "\\n\\h+-\\h" ) );
 		for ( String contained : literalStringsContainedInFailureMessageInOrder ) {
-			elementsToMatch.add( new ElementToMatch( "[\\S\\s]*" + "\\Q" + contained + "\\E" ) );
+			String[] lines = contained.split( "\n" );
+			for ( int i = 0; i < lines.length; i++ ) {
+				if ( i == 0 ) {
+					elementsToMatch.add( new ElementToMatch( ".*(\\n\\h+.*)?" + "\\Q" + lines[i] + "\\E" ) );
+				}
+				else {
+					elementsToMatch.add( new ElementToMatch( "\\n\\h+" + "\\Q" + lines[i] + "\\E" ) );
+				}
+			}
 		}
 		// Match the rest of the line
 		// We can't match multiple lines here, or we would run the risk of
