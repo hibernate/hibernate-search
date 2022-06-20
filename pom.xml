@@ -287,7 +287,7 @@
         <version.javax.enterprise>2.0</version.javax.enterprise>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
         <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
-        <version.jakarta.annotation-api>2.1.0</version.jakarta.annotation-api>
+        <version.jakarta.annotation-api>2.1.1</version.jakarta.annotation-api>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
         <!-- We need dependency management on these ones to avoid dependency divergence created by our own dependencies
