@@ -7,13 +7,13 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -35,33 +35,21 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 
 	static <P, V> PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V> create(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
-			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		return new PojoIndexingDependencyCollectorMonomorphicDirectValueNode<>( parentNode,
-				modelPathFromLastTypeNode, modelPathFromLastEntityNode,
-				Metadata.create( buildingHelper, parentNode, modelPathFromLastTypeNode.getExtractorPath() ),
+				modelPathFromLastEntityNode,
+				Metadata.create( buildingHelper, parentNode, modelPathFromLastEntityNode.getExtractorPath() ),
 				buildingHelper
 		);
 	}
 
-	/**
-	 * The path to this node from the last type node, i.e. from the node
-	 * representing the type holding the property from which this value is extracted.
-	 */
-	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode;
-	private final PojoModelPathValueNode unboundModelPathFromLastTypeNode;
-
 	PojoIndexingDependencyCollectorMonomorphicDirectValueNode(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
-			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
 			Metadata metadata,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( parentNode, modelPathFromLastEntityNode, metadata, buildingHelper );
-		this.modelPathFromLastTypeNode = modelPathFromLastTypeNode;
-		// The path is used for comparisons (equals), so we need it unbound
-		this.unboundModelPathFromLastTypeNode = modelPathFromLastTypeNode.toUnboundPath();
 	}
 
 	@Override
@@ -92,50 +80,18 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 	}
 
 	@Override
-	void doCollectDependency(
-			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath) {
+	void doCollectDependency(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath) {
 		ReindexOnUpdate composedReindexOnUpdate = derivedDependencyPath == null ? metadata.reindexOnUpdate
-				: derivedDependencyPath.last.value.composeReindexOnUpdate( lastEntityNode(), metadata.reindexOnUpdate );
+				: derivedDependencyPath.last.value.node.composeReindexOnUpdate( lastEntityNode(), metadata.reindexOnUpdate );
 		if ( ReindexOnUpdate.NO.equals( composedReindexOnUpdate ) ) {
 			// Updates are ignored
 			return;
-		}
-
-		if ( derivedDependencyPath != null ) {
-			for ( PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> derivedPathNode : derivedDependencyPath ) {
-				PojoRawTypeModel<?> initialType = derivedPathNode.modelPathFromLastTypeNode
-						.getRootType().rawType();
-				PojoModelPathValueNode initialValuePath = derivedPathNode.unboundModelPathFromLastTypeNode;
-				PojoRawTypeModel<?> latestType = modelPathFromLastTypeNode.getRootType().rawType();
-				PojoModelPathValueNode latestValuePath = unboundModelPathFromLastTypeNode;
-				if ( initialType.equals( latestType ) && initialValuePath.equals( latestValuePath ) ) {
-					/*
-					 * We found a cycle in the derived dependency path.
-					 * This can happen for example if:
-					 * - property "foo" on type A is marked as derived from itself
-					 * - property "foo" on type A is marked as derived from property "bar" on type B,
-					 *   which is marked as derived from property "foo" on type "A".
-					 * - property "foo" on type A is marked as derived from property "bar" on type B,
-					 *   which is marked as derived from property "foobar" on type "C".
-					 *   which is marked as derived from property "bar" on type "B".
-					 * Even if such a dependency might work in practice at runtime,
-					 * for example because the link A => B never leads to a B that refers to the same A,
-					 * even indirectly,
-					 * we cannot support it here because we need to model dependencies as a static tree,
-					 * which in such case would have an infinite depth.
-					 */
-					throw log.infiniteRecursionForDerivedFrom( latestType, latestValuePath );
-				}
-			}
 		}
 
 		if ( metadata.derivedFrom.isEmpty() ) {
 			parentNode.parentNode().collectDependency( this.modelPathFromLastEntityNode );
 		}
 		else {
-			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> updatedDerivedDependencyPath =
-					derivedDependencyPath == null ? LinkedNode.of( this )
-							: derivedDependencyPath.withHead( this );
 			/*
 			 * The value represented by this node is derived from other, base values.
 			 * If we rely on the value represented by this node when indexing,
@@ -149,11 +105,44 @@ public class PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V>
 			 */
 			PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.parentNode();
 			for ( PojoModelPathValueNode path : metadata.derivedFrom ) {
+				DerivedDependencyWalkingInfo newDerivedDependencyInfo = new DerivedDependencyWalkingInfo( this, path );
+				if ( derivedDependencyPath != null ) {
+					checkForDerivedDependencyCycle( derivedDependencyPath, newDerivedDependencyInfo );
+				}
+				LinkedNode<DerivedDependencyWalkingInfo> updatedDerivedDependencyPath =
+						derivedDependencyPath == null ? LinkedNode.of( newDerivedDependencyInfo )
+								: derivedDependencyPath.withHead( newDerivedDependencyInfo );
 				PojoModelPathBinder.bind(
 						lastTypeNode, path,
 						PojoIndexingDependencyCollectorNode.walker( updatedDerivedDependencyPath )
 				);
 			}
+		}
+	}
+
+	private void checkForDerivedDependencyCycle(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath,
+			DerivedDependencyWalkingInfo newDerivedDependencyInfo) {
+		Optional<LinkedNode<DerivedDependencyWalkingInfo>> cycle = derivedDependencyPath.findAndReverse(
+				other -> newDerivedDependencyInfo.definingTypeModel.equals( other.definingTypeModel )
+						&& newDerivedDependencyInfo.derivedFromPath.equals( other.derivedFromPath ) );
+		if ( cycle.isPresent() ) {
+			/*
+			 * We found a cycle in the derived dependency path.
+			 * This can happen for example if:
+			 * - property "foo" on type A is marked as derived from itself
+			 * - property "foo" on type A is marked as derived from property "bar" on type B,
+			 *   which is marked as derived from property "foo" on type "A".
+			 * - property "foo" on type A is marked as derived from property "bar" on type B,
+			 *   which is marked as derived from property "foobar" on type "C".
+			 *   which is marked as derived from property "bar" on type "B".
+			 * Even if such a dependency might work in practice at runtime,
+			 * for example because the link A => B never leads to a B that refers to the same A,
+			 * even indirectly,
+			 * we cannot support it here because we need to model dependencies as a static tree,
+			 * which in such case would have an infinite depth.
+			 */
+			throw log.infiniteRecursionForDerivedFrom( newDerivedDependencyInfo.definingTypeModel,
+					cycle.get() );
 		}
 	}
 

@@ -42,4 +42,44 @@ public class LinkedNodeTest {
 				.isNotEqualTo( LinkedNode.of( 42, 1, 32, 3 ) );
 	}
 
+	@Test
+	public void findAndReverse() {
+		Predicate<Integer> is42 = Predicate.isEqual( 42 );
+
+		// First matching is first element
+		assertThat( LinkedNode.of( 42, 1, 2, 3 )
+				.findAndReverse( is42 ) )
+				.hasValue( LinkedNode.of( 42 ) );
+
+		// First matching is somewhere in the middle
+		assertThat( LinkedNode.of( 1, 42, 2, 3 )
+				.findAndReverse( is42 ) )
+				.hasValue( LinkedNode.of( 42, 1 ) );
+
+		// First matching is last element
+		assertThat( LinkedNode.of( 1, 2, 3, 42 )
+				.findAndReverse( is42 ) )
+				.hasValue( LinkedNode.of( 42, 3, 2, 1 ) );
+
+		// No match
+		assertThat( LinkedNode.of( 1, 2, 3 )
+				.findAndReverse( is42 ) )
+				.isEmpty();
+
+		// Multiple matches
+		assertThat( LinkedNode.of( 1, 42, 42, 2, 3, 42 )
+				.findAndReverse( is42 ) )
+				.hasValue( LinkedNode.of( 42, 1 ) );
+
+		// Matching singleton
+		assertThat( LinkedNode.of( 42 )
+				.findAndReverse( is42 ) )
+				.hasValue( LinkedNode.of( 42 ) );
+
+		// Non-matching singleton
+		assertThat( LinkedNode.of( 1 )
+				.findAndReverse( is42 ) )
+				.isEmpty();
+	}
+
 }
