@@ -342,7 +342,7 @@
         <!-- >>> JSR 352: JBatch runtime -->
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
         <version.com.ibm.jbatch.jakarta>2.1.1</version.com.ibm.jbatch.jakarta>
-        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
+        <version.org.apache.derby>10.16.1.1</version.org.apache.derby>
 
         <!-- >>> JSR 352: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.0.12.Final</version.org.jboss.marshalling>
