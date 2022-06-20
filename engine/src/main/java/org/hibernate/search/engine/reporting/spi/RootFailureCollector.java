@@ -219,11 +219,7 @@ public final class RootFailureCollector implements FailureCollector {
 		synchronized void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
 			if ( !failureMessages.isEmpty() ) {
-				builder.startList( EngineEventContextMessages.INSTANCE.failureReportFailures() );
-				for ( String failureMessage : failureMessages ) {
-					builder.value( failureMessage );
-				}
-				builder.endList();
+				builder.attribute( EngineEventContextMessages.INSTANCE.failureReportFailures(), failureMessages );
 			}
 			appendChildrenFailuresTo( builder );
 			builder.endObject();
