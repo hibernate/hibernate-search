@@ -646,7 +646,7 @@
                 <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
                 <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
-                <jdbc.driver.version>${version.com.h2database}</jdbc.driver.version>
+                <jdbc.driver.version>2.1.214</jdbc.driver.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
