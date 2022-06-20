@@ -202,7 +202,7 @@
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently of the version of the remote cluster -->
         <!-- Use the latest open-source version here. Currently, low-level clients are open-source even in 8.2+ -->
-        <version.org.elasticsearch.client>8.2.2</version.org.elasticsearch.client>
+        <version.org.elasticsearch.client>8.2.3</version.org.elasticsearch.client>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
              to make sure the corresponding profile (e.g. elasticsearch-8.3) becomes the default. -->
