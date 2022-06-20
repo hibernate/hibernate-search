@@ -7,25 +7,24 @@
 package org.hibernate.search.util.common.logging.impl;
 
 import org.hibernate.search.util.common.impl.ToStringStyle;
-import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
- * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith} to display
- * {@link ToStringTreeAppendable} objects in log messages.
+ * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith} to format
+ * objects using a {@link ToStringTreeBuilder}.
  */
-public final class ToStringTreeAppendableMultilineFormatter {
+public final class ToStringTreeMultilineFormatter {
 
-	private final ToStringTreeAppendable appendable;
+	private final Object object;
 
-	public ToStringTreeAppendableMultilineFormatter(ToStringTreeAppendable appendable) {
-		this.appendable = appendable;
+	public ToStringTreeMultilineFormatter(Object object) {
+		this.object = object;
 	}
 
 	@Override
 	public String toString() {
 		return new ToStringTreeBuilder( ToStringStyle.multilineIndentStructure() )
-				.value( appendable )
+				.value( object )
 				.toString();
 	}
 }
