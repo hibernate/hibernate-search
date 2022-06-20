@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.jakarta.batch.massindexing.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -30,6 +31,7 @@ public class WhoAmI {
 	private String id;
 
 	@GenericField
+	@Column(name = "`uid`")
 	private String uid;
 
 	public WhoAmI() {
