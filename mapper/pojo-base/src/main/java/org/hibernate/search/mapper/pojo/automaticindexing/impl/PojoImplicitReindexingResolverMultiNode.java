@@ -34,11 +34,7 @@ public class PojoImplicitReindexingResolverMultiNode<T> extends PojoImplicitRein
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.startList();
-		for ( PojoImplicitReindexingResolverNode<?> element : elements ) {
-			builder.value( element );
-		}
-		builder.endList();
+		builder.attribute( null, elements );
 	}
 
 	@Override

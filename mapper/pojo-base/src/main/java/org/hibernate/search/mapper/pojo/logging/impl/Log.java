@@ -36,7 +36,7 @@ import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormat
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
-import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
+import org.hibernate.search.util.common.logging.impl.ToStringTreeMultilineFormatter;
 import org.hibernate.search.util.common.logging.impl.TypeFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -228,7 +228,7 @@ public interface Log extends BasicLogger {
 			value = "Type manager for indexed type '%1$s': %2$s")
 	void indexedTypeManager(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoIndexedTypeManager<?, ?> typeManager);
+			@FormatWith(ToStringTreeMultilineFormatter.class) PojoIndexedTypeManager<?, ?> typeManager);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET + 18,
@@ -241,7 +241,7 @@ public interface Log extends BasicLogger {
 			value = "Type manager for contained type '%1$s': %2$s")
 	void containedTypeManager(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoContainedTypeManager<?, ?> typeManager);
+			@FormatWith(ToStringTreeMultilineFormatter.class) PojoContainedTypeManager<?, ?> typeManager);
 
 	@Message(id = ID_OFFSET + 20,
 			value = "Unable to find the inverse side of the association on type '%2$s' at path '%3$s'."
@@ -709,7 +709,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 117,
 			value = "Constructor projection for type '%1$s': %2$s")
 	void constructorProjection(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoConstructorProjectionDefinition<?> projectionDefinition);
+			@FormatWith(ToStringTreeMultilineFormatter.class) PojoConstructorProjectionDefinition<?> projectionDefinition);
 
 	@Message(id = ID_OFFSET + 118,
 			value = "Infinite object projection recursion starting from projection constructor %1$s and involving field path '%2$s'.")
