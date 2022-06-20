@@ -139,10 +139,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				);
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Infinite @IndexedEmbedded recursion",
-						"path 'level1.prefix1_level1.prefix1_'",
-						"type '" + typeModel1Mock.toString() + "'"
+				.hasMessageContainingAll( "Cyclic @IndexedEmbedded recursion starting from type '" + typeModel1Mock.toString() + "'",
+						"Path starting from that type and ending with a cycle: 'level1.prefix1_level1.prefix1_'"
 				);
 		verifyNoOtherInteractionsAndReset();
 	}
@@ -172,10 +170,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 			);
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Infinite @IndexedEmbedded recursion",
-						"path 'level1.prefix1_level2.prefix2_level1.prefix1_'",
-						"type '" + typeModel1Mock.toString() + "'"
+				.hasMessageContainingAll( "Cyclic @IndexedEmbedded recursion starting from type '" + typeModel1Mock.toString() + "'",
+						"Path starting from that type and ending with a cycle: 'level1.prefix1_level2.prefix2_level1.prefix1_'"
 				);
 		verifyNoOtherInteractionsAndReset();
 	}
