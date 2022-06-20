@@ -1572,8 +1572,10 @@ public class IndexedEmbeddedBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.a<no value extractors>.b" )
-						.failure( "Infinite @IndexedEmbedded recursion involving path 'b.a.b.' on type '"
-								+ Model.EntityA.class.getName() + "'" )
+						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityA.class.getName() + "'",
+								"Path starting from that type and ending with a cycle: 'b.a.b.'",
+								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, ..." )
 				);
 	}
 
@@ -1606,8 +1608,10 @@ public class IndexedEmbeddedBaseIT {
 				.satisfies( FailureReportUtils.hasFailureReport()
 						.typeContext( Model.EntityA.class.getName() )
 						.pathContext( ".b<no value extractors>.c<no value extractors>.b<no value extractors>.c" )
-						.failure( "Infinite @IndexedEmbedded recursion involving path 'c.b.c.' on type '"
-								+ Model.EntityB.class.getName() + "'" )
+						.failure( "Cyclic @IndexedEmbedded recursion starting from type '" + Model.EntityB.class.getName() + "'",
+								"Path starting from that type and ending with a cycle: 'c.b.c.'",
+								"A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly",
+								"To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, ..." )
 				);
 	}
 
