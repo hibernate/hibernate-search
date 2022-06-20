@@ -17,8 +17,7 @@ public abstract class PojoIndexingDependencyCollectorNode {
 		return new Walker( null );
 	}
 
-	static Walker walker(
-			LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath) {
+	static Walker walker(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath) {
 		return new Walker( derivedDependencyPath );
 	}
 
@@ -65,9 +64,9 @@ public abstract class PojoIndexingDependencyCollectorNode {
 			PojoIndexingDependencyCollectorPropertyNode<?, ?>,
 			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?>
 			> {
-		private final LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath;
+		private final LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath;
 
-		Walker(LinkedNode<PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?>> derivedDependencyPath) {
+		Walker(LinkedNode<DerivedDependencyWalkingInfo> derivedDependencyPath) {
 			this.derivedDependencyPath = derivedDependencyPath;
 		}
 
