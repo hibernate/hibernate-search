@@ -188,7 +188,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 44, value = "Invalid type '%1$s': missing constructor. The type must expose a public constructor with a single parameter of type Map.")
 	SearchException noPublicMapArgConstructor(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
 
-	@Message(id = ID_OFFSET + 46, value = "Infinite @IndexedEmbedded recursion involving path '%1$s' on type '%2$s'.")
+	@Message(id = ID_OFFSET + 46, value = "Cyclic @IndexedEmbedded recursion starting from type '%2$s'."
+			+ " Path starting from that type and ending with a cycle: '%1$s'."
+			+ " A type cannot declare an unrestricted @IndexedEmbedded to itself, even indirectly."
+			+ " To break the cycle, you should consider adding filters to your @IndexedEmbedded: includePaths, includeDepth, ...")
 	SearchException indexedEmbeddedCyclicRecursion(String cyclicRecursionPath,
 			@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel parentTypeModel);
 
