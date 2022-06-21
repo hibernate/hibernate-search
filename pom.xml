@@ -162,7 +162,7 @@
         <module>backend/elasticsearch</module>
         <module>backend/elasticsearch-aws</module>
         <module>mapper/pojo-base</module>
-        <module>mapper/javabean</module>
+        <module>mapper/pojo-standalone</module>
         <module>mapper/orm</module>
         <module>mapper/orm-coordination-outbox-polling</module>
         <module>mapper/orm-batch-jsr352/core</module>
@@ -749,7 +749,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-javabean</artifactId>
+                <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -24,11 +24,11 @@ import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -54,7 +54,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final TestModelProvider testModelProvider;
 
@@ -384,7 +384,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@SafeVarargs
-	final <E, P, F> void doTest(Supplier<JavaBeanMappingSetupHelper.SetupContext> startSetup,
+	final <E, P, F> void doTest(Supplier<StandalonePojoMappingSetupHelper.SetupContext> startSetup,
 				TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue, F firstIndexedFieldValues, F... otherIndexedFieldValues) {
 		// Schema

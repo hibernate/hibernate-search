@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.singletype.BasicIndexedEntity;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubSelectionLoadingStrategy;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 
 import org.junit.Before;
 

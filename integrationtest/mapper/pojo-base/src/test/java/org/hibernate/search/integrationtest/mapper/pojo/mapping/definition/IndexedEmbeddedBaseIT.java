@@ -25,9 +25,9 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
@@ -78,7 +78,7 @@ public class IndexedEmbeddedBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public StaticCounters counters = new StaticCounters();

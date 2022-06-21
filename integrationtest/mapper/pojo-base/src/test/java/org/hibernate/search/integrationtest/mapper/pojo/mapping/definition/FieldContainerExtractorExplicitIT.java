@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;

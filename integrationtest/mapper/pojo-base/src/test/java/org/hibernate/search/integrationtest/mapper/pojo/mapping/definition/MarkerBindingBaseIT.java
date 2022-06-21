@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
@@ -42,7 +42,7 @@ public class MarkerBindingBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock(
+	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(), backendMock );
 
 	@Test

@@ -13,8 +13,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
@@ -47,11 +47,11 @@ public class IndexedBaseIT {
 	public BackendMock backend3Mock = new BackendMock();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper =
-			JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), defaultBackendMock );
+	public StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), defaultBackendMock );
 
 	@Rule
-	public JavaBeanMappingSetupHelper multiBackendSetupHelper;
+	public StandalonePojoMappingSetupHelper multiBackendSetupHelper;
 
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();
@@ -60,7 +60,7 @@ public class IndexedBaseIT {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
 		namedBackendMocks.put( "backend2", backend2Mock );
 		namedBackendMocks.put( "backend3", backend3Mock );
-		multiBackendSetupHelper = JavaBeanMappingSetupHelper.withBackendMocks(
+		multiBackendSetupHelper = StandalonePojoMappingSetupHelper.withBackendMocks(
 				MethodHandles.lookup(), defaultBackendMock, namedBackendMocks
 		);
 	}

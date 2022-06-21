@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.schema.management.strategy;
 
-import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 
 public class SchemaManagementStrategyDefaultIT extends SchemaManagementStrategyCreateOrValidateIT {
 

@@ -7,10 +7,10 @@
 package org.hibernate.search.integrationtest.mapper.pojo.schema.management.strategy;
 
 import java.lang.invoke.MethodHandles;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.cfg.JavaBeanMapperSettings;
-import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
-import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
+import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -24,8 +24,8 @@ public class SchemaManagementStrategyNoneIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final JavaBeanMappingSetupHelper setupHelper
-			= JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper
+			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void none() {
@@ -42,7 +42,7 @@ public class SchemaManagementStrategyNoneIT {
 		backendMock.expectAnySchema( IndexedEntity1.NAME );
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 		return (CloseableSearchMapping) setupHelper.start()
-				.withProperty( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+				.withProperty( StandalonePojoMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						getStrategyName()
 				)
 				.setup( IndexedEntity1.class, IndexedEntity2.class );

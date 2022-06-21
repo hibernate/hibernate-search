@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.SearchException;

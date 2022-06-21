@@ -1,0 +1,28 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
+
+import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+
+class StandalonePojoContainedTypeContext<E> extends AbstractStandalonePojoTypeContext<E> {
+
+	private StandalonePojoContainedTypeContext(Builder<E> builder) {
+		super( builder );
+	}
+
+	static class Builder<E> extends AbstractBuilder<E> implements PojoContainedTypeExtendedMappingCollector {
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, StandalonePojoEntityTypeMetadata<E> metadata) {
+			super( typeIdentifier, entityName, metadata );
+		}
+
+		StandalonePojoContainedTypeContext<E> build() {
+			return new StandalonePojoContainedTypeContext<>( this );
+		}
+	}
+}

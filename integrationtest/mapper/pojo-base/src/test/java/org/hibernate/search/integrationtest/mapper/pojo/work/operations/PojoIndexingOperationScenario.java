@@ -8,8 +8,8 @@ package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
 import java.util.concurrent.CompletionStage;
 
-import org.hibernate.search.mapper.javabean.work.SearchIndexer;
-import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 
 public abstract class PojoIndexingOperationScenario {

@@ -64,8 +64,8 @@ public final class MessageConstants {
 	public static final int MAPPER_POJO_ID_RANGE_MIN = 700000;
 	public static final int MAPPER_POJO_ID_RANGE_MAX = 709999;
 
-	public static final int MAPPER_JAVABEAN_ID_RANGE_MIN = 750000;
-	public static final int MAPPER_JAVABEAN_ID_RANGE_MAX = 759999;
+	public static final int MAPPER_POJO_STANDALONE_ID_RANGE_MIN = 750000;
+	public static final int MAPPER_POJO_STANDALONE_ID_RANGE_MAX = 759999;
 
 	public static final int MAPPER_ORM_ID_RANGE_MIN = 800000;
 	public static final int MAPPER_ORM_ID_RANGE_MAX = 809999;

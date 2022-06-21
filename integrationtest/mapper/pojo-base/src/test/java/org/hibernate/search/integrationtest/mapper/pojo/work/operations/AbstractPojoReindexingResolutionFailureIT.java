@@ -12,9 +12,9 @@ import static org.mockito.Mockito.when;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -40,8 +40,8 @@ abstract class AbstractPojoReindexingResolutionFailureIT {
 	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final JavaBeanMappingSetupHelper setupHelper =
-			JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper =
+			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
