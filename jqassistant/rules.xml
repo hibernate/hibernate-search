@@ -767,6 +767,37 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="hsearch:StandalonePojoAPIAndSPIShouldBeAnnotatedWithIncubating">
+        <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <description>
+            All API/SPI types of the mapper-pojo-standalone module should be annotated with @Incubating,
+            because the whole module is incubating.
+            Exceptions are only allowed for:
+            - Nested/inner classes.
+        </description>
+        <cypher><![CDATA[
+            // Hibernate Search nested classes named "<prefix>IT" or "<prefix>Test"
+            MATCH
+                (standalonePojoModule:Maven:Artifact:HibernateSearch)-[:CONTAINS]->(type:Type:HibernateSearch)
+            WHERE
+                (type:Api OR type:Spi)
+                AND standalonePojoModule.name = 'hibernate-search-mapper-pojo-standalone'
+                // Exceptions
+                AND NOT (type.nameWithoutContainingTypeName <> type.name) // Not nested
+            // The Incubating annotation
+            OPTIONAL MATCH (type)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(incubatingAnnotation:Type)
+            WHERE
+                incubatingAnnotation.fqn = "org.hibernate.search.util.common.annotation.Incubating"
+            WITH type, incubatingAnnotation
+            WHERE
+                incubatingAnnotation IS NULL
+            RETURN type.fqn AS NonAnnotatedType
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="hsearch:PublicTypesMayNotExposeInternalTypes" />
         <includeConstraint refId="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
@@ -781,6 +812,7 @@
         <includeConstraint refId="hsearch:IntegrationTestsMustHaveProperSuffix" />
         <includeConstraint refId="hsearch:ImplPackagesMustNotHaveSubPackages" />
         <includeConstraint refId="hsearch:NestedTestTypesShouldBeAnnotatedWithNested" />
+        <includeConstraint refId="hsearch:StandalonePojoAPIAndSPIShouldBeAnnotatedWithIncubating" />
     </group>
 
     <group id="cycles">
