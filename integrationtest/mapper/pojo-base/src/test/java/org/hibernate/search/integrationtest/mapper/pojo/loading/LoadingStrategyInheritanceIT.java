@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategies;
+import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -74,7 +74,7 @@ public class LoadingStrategyInheritanceIT {
 							} );
 							// Pass generic type arguments explicitly here, even if it's not necessary:
 							// it can trigger compiler problems with generics.
-							c.massLoadingStrategy( MassLoadingStrategies.<RootEntity, Integer>from( entityMap ) );
+							c.massLoadingStrategy( MassLoadingStrategy.<RootEntity, Integer>fromMap( entityMap ) );
 						} )
 						.addEntityType( DerivedEntity.class )
 				)
@@ -128,7 +128,7 @@ public class LoadingStrategyInheritanceIT {
 							} );
 							// Pass generic type arguments explicitly here, even if it's not necessary:
 							// it can trigger compiler problems with generics.
-							c.massLoadingStrategy( MassLoadingStrategies.<RootEntity, Integer>from( entityMap ) );
+							c.massLoadingStrategy( MassLoadingStrategy.<RootEntity, Integer>fromMap( entityMap ) );
 						} )
 						.addEntityType( DerivedEntity.class, derivedEntityName )
 				)

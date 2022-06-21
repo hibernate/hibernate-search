@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.loading;
 
+import java.util.Map;
+
+import org.hibernate.search.mapper.pojo.standalone.loading.impl.MapSelectionLoadingStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -15,6 +18,20 @@ import org.hibernate.search.util.common.annotation.Incubating;
  */
 @Incubating
 public interface SelectionLoadingStrategy<E> {
+
+	/**
+	 * Creates a simple map-based loading strategy.
+	 * <p>
+	 * Generally only useful for tests.
+	 *
+	 * @param map A map from containing all entity identifiers as keys, and the corresponding entity as value.
+	 * @return A loading strategy that loads entities from the given map.
+	 * @param <E> The type of loaded entities.
+	 * @param <I> The type of entity identifiers.
+	 */
+	static <E, I> SelectionLoadingStrategy<E> fromMap(Map<I, E> map) {
+		return new MapSelectionLoadingStrategy<>( map );
+	}
 
 	/**
 	 * @param obj Another strategy

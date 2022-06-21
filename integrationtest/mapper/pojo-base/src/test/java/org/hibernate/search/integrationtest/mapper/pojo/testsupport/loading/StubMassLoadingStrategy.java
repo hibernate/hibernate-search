@@ -14,7 +14,6 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassIdentifierSink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
-import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategies;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 
 public class StubMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {
@@ -47,7 +46,7 @@ public class StubMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> 
 		StubLoadingContext context = options.context( StubLoadingContext.class );
 		// Important: get the map from the context, not from this strategy's constructor,
 		// because in real-world scenarios that's where the information (connection, ...) will come from.
-		MassLoadingStrategy<E, I> delegate = MassLoadingStrategies.from( context.persistenceMap( key ) );
+		MassLoadingStrategy<E, I> delegate = MassLoadingStrategy.fromMap( context.persistenceMap( key ) );
 		return delegate.createIdentifierLoader( includedTypes, sink, options );
 	}
 
@@ -57,7 +56,7 @@ public class StubMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> 
 		StubLoadingContext context = options.context( StubLoadingContext.class );
 		// Important: get the map from the context, not from this strategy's constructor,
 		// because in real-world scenarios that's where the information (connection, ...) will come from.
-		MassLoadingStrategy<E, I> delegateStrategy = MassLoadingStrategies.from( context.persistenceMap( key ) );
+		MassLoadingStrategy<E, I> delegateStrategy = MassLoadingStrategy.fromMap( context.persistenceMap( key ) );
 		MassEntityLoader<I> delegateLoader = delegateStrategy.createEntityLoader( includedTypes, sink, options );
 		return new MassEntityLoader<I>() {
 			@Override
