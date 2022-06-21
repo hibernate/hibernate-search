@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.javabean.work.SearchIndexer;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;

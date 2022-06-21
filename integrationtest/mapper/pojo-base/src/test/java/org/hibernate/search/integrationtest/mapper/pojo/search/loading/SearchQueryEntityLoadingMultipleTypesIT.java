@@ -31,7 +31,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.mul
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.multipletypes.Interface1;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubSelectionLoadingStrategy;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;

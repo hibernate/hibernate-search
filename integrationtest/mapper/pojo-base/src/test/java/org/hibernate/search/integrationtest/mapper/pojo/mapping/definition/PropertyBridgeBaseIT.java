@@ -18,9 +18,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomPropertyMappingAnnotationBaseIT;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
@@ -63,7 +63,7 @@ public class PropertyBridgeBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 	/**
 	 * Basic test checking that a "normal" custom property bridge will work as expected
 	 * when relying on accessors.
@@ -209,7 +209,7 @@ public class PropertyBridgeBaseIT {
 	 * Before HSEARCH-4114 was fixed, this test used to fail with the following report:
 	 *
 	 * <pre>{@literal
-	 *     JavaBean mapping:
+	 *     Standalone POJO mapping:
 	 *         type 'org.hibernate.search.integrationtest.mapper.pojo.mapping.definition.
 	 *         PropertyBridgeBaseIT$PropertyBridgeExplicitDependenciesInaccessibleObjectClasses$IndexedEntity':
 	 *             path '.myEnum':

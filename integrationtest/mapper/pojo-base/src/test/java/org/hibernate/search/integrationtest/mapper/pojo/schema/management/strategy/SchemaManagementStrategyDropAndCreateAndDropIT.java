@@ -8,11 +8,11 @@ package org.hibernate.search.integrationtest.mapper.pojo.schema.management.strat
 
 import java.util.concurrent.CompletableFuture;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 
 import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
-import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.SearchException;
 import org.junit.Test;
 

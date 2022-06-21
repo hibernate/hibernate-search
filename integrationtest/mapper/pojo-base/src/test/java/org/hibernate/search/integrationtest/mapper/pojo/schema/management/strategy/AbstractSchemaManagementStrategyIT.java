@@ -10,10 +10,10 @@ import java.lang.invoke.MethodHandles;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.concurrent.CompletableFuture;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.cfg.JavaBeanMapperSettings;
-import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
-import org.hibernate.search.mapper.javabean.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
+import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -30,14 +30,14 @@ public abstract class AbstractSchemaManagementStrategyIT {
 	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final JavaBeanMappingSetupHelper setupHelper
-			= JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper
+			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
 	public void noIndexedType() {
 		SchemaManagementStrategyName strategyName = getStrategyName();
 		CloseableSearchMapping mapper = setupHelper.start()
-				.withProperty( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+				.withProperty( StandalonePojoMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						strategyName == null ? null : strategyName.externalRepresentation()
 				)
 				.setup();
@@ -116,7 +116,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 		backendMock.expectAnySchema( IndexedEntity2.NAME );
 		SchemaManagementStrategyName strategyName = getStrategyName();
 		return (CloseableSearchMapping) setupHelper.start()
-				.withProperty( JavaBeanMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
+				.withProperty( StandalonePojoMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						strategyName == null ? null : strategyName.externalRepresentation()
 				)
 				.setup( IndexedEntity1.class, IndexedEntity2.class );

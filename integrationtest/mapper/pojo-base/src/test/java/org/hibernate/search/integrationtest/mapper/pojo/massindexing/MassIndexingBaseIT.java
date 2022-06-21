@@ -16,10 +16,10 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -47,8 +47,8 @@ public class MassIndexingBaseIT {
 	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public final JavaBeanMappingSetupHelper setupHelper
-			= JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public final StandalonePojoMappingSetupHelper setupHelper
+			= StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
@@ -255,7 +255,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void reuseSearchSessionAfterJavaBeanSessionIsClosed_createMassIndexer() {
+	public void reuseSearchSessionAfterSearchSessionIsClosed_createMassIndexer() {
 		SearchSession searchSession = mapping.createSession();
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -270,7 +270,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void lazyCreateSearchSessionAfterJavaBeanSessionIsClosed_createMassIndexer() {
+	public void lazyCreateSearchSessionAfterSearchSessionIsClosed_createMassIndexer() {
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = mapping.createSession();
 		searchSession.close();

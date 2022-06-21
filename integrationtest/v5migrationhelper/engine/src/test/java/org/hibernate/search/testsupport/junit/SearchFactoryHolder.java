@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.testsupport.migration.V5MigrationJavaBeanSearchIntegratorAdapter;
+import org.hibernate.search.testsupport.migration.V5MigrationStandalonePojoSearchIntegratorAdapter;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -59,7 +59,7 @@ public class SearchFactoryHolder implements TestRule {
 					mapping = setupHelper.start()
 							.withProperties( configuration )
 							.setup( entities );
-					searchIntegrator = new V5MigrationJavaBeanSearchIntegratorAdapter( mapping );
+					searchIntegrator = new V5MigrationStandalonePojoSearchIntegratorAdapter( mapping );
 					base.evaluate();
 				}
 				finally {

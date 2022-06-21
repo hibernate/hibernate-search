@@ -190,12 +190,12 @@ Also, the SPIs implemented by backends allow mappers to inject a "loading contex
 that will essentially transform document references into the entity that was initially indexed.
 
 [[pojo-base]]
-== [[_pojo_mapper]] POJO mapper
+== [[_pojo_mapper]] POJO mapper base
 
-What we call the POJO mapper is in fact an abstract basis for implementing mappers from Java objects to a full-text index.
+What we call the POJO mapper base (or POJO mapper for short) is an abstract base for implementing mappers from Java objects to a full-text index.
 This module implements most of the necessary logic, and defines SPIs to implement the bits that are specific to each mapper.
 
-There are currently only two implementations: the Hibernate ORM mapper, and the JavaBean mapper.
+There are currently only two implementations: the Hibernate ORM mapper, and the Stanadlone POJO mapper.
 The second one is mostly here to demonstrate that implementing a mapper that doesn't rely on Hibernate ORM is possible:
 we do not expect much real-life usage.
 

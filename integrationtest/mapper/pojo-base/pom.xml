@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-javabean</artifactId>
+            <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -23,13 +23,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.javabean.work.SearchIndexer;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.testsupport.migration.V5MigrationJavaBeanSearchSessionAdapter;
+import org.hibernate.search.testsupport.migration.V5MigrationStandalonePojoSearchSessionAdapter;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -113,7 +113,7 @@ public class SearchITHelper {
 	}
 
 	public V5MigrationSearchSession<?> session() {
-		return new V5MigrationJavaBeanSearchSessionAdapter( sfHolder.getMapping().createSession() );
+		return new V5MigrationStandalonePojoSearchSessionAdapter( sfHolder.getMapping().createSession() );
 	}
 
 	public HSQuery hsQuery(Class<?> ... classes) {
