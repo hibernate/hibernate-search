@@ -187,8 +187,8 @@ and do the work of converting between user entities and documents to be indexed.
   * `orm`: A mapper for [Hibernate ORM](http://hibernate.org/orm/) entities.
   * `orm-coordination-outbox-polling`: An implementation of coordination of automatic indexing between nodes
   in the orm mapper (see above) using an outbox, i.e. an event table in the database. 
-  * `pojo-standalone`: An experimental (not published) mapper for POJOs in standalone mode, i.e. without Hibernate ORM.
-    Mostly useful for tests of the `pojo-base` module.
+  * `pojo-standalone`: A mapper for POJOs in standalone mode, i.e. without Hibernate ORM.
+    Currently incubating, i.e. backwards-incompatible changes in APIs may happen.
 * `orm6`: Modules that take the source code of other modules (e.g. mapper/orm)
 and transform it to use Hibernate ORM 6 instead of Hibernate ORM 5.x.
 * `reports`: Module built last, producing reports related to test coverage in particular.

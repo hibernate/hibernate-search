@@ -137,6 +137,64 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
+                <!--
+                     We cannot just merge the -mapper-orm moduleSet with the -mapper-pojo-base moduleSet,
+                     for the same reason as above with the -engine and utils moduleSets.
+                 -->
+                <include>org.hibernate.search:hibernate-search-mapper-pojo-base</include>
+            </includes>
+            <binaries>
+                <outputDirectory>dist/mapper/pojo-standalone</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>dist/mapper/pojo-standalone/lib/required</outputDirectory>
+                        <scope>runtime</scope>
+                        <useTransitiveDependencies>true</useTransitiveDependencies>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <excludes>
+                            <!-- Do not repeat dependencies that are already included by the engine -->
+                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
+                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
+                            <exclude>org.jboss.logging:jboss-logging</exclude>
+                        </excludes>
+                        <useStrictFiltering>true</useStrictFiltering>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>org.hibernate.search:hibernate-search-mapper-pojo-standalone</include>
+            </includes>
+            <binaries>
+                <outputDirectory>dist/mapper/pojo-standalone</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>dist/mapper/pojo-standalone/lib/required</outputDirectory>
+                        <scope>runtime</scope>
+                        <useTransitiveDependencies>true</useTransitiveDependencies>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <excludes>
+                            <!-- Do not repeat dependencies that are already included by the engine -->
+                            <exclude>org.hibernate.search:hibernate-search-engine</exclude>
+                            <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
+                            <exclude>org.jboss.logging:jboss-logging</exclude>
+                            <!-- Do not include the mapper-pojo-base JAR, nor its dependencies that are already included above -->
+                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
+                        </excludes>
+                        <useStrictFiltering>true</useStrictFiltering>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
                 <include>org.hibernate.search:hibernate-search-backend-lucene</include>
             </includes>
             <binaries>
