@@ -17,7 +17,9 @@ import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public interface SearchSession extends AutoCloseable {
 
 	/**

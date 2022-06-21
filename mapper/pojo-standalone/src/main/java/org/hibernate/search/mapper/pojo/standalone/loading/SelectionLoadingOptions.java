@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.pojo.standalone.loading;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingOptionsStep;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public interface SelectionLoadingOptions {
 
 	/**

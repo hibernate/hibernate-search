@@ -8,12 +8,14 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.metadata;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A context allowing the definition of entity configuration.
  *
  * @see EntityConfigurer
  */
+@Incubating
 public interface EntityConfigurationContext<E> {
 
 	/**

@@ -9,7 +9,9 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.MapSelectionLoadingStrategy;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public final class SelectionLoadingStrategies {
 
 	private SelectionLoadingStrategies() {

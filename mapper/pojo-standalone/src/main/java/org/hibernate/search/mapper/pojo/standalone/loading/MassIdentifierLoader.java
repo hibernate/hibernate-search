@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.loading;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A loader for mass loading of entity identifiers, used in particular during mass indexing.
  */
+@Incubating
 public interface MassIdentifierLoader extends AutoCloseable {
 
 	/**

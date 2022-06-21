@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 import java.util.List;
 
 import org.hibernate.search.engine.common.timing.Deadline;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A loader for loading a small selection of entities, used in particular during search.
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.common.timing.Deadline;
  *
  * @param <E> The type of loaded entities.
  */
+@Incubating
 public interface SelectionEntityLoader<E> {
 
 	/**

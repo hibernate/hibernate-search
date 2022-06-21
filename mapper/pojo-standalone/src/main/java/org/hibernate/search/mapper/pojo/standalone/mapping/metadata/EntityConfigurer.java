@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.metadata;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A provider of configuration for a specific entity type,
  * for example loading.
@@ -14,6 +16,7 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.metadata;
  * it will also apply to its subtypes,
  * but its configuration can be overridden in a subtype by assigning another configurer to that subtype.
  */
+@Incubating
 public interface EntityConfigurer<E> {
 
 	/**

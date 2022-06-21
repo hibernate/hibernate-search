@@ -9,7 +9,9 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public interface MassLoadingOptions {
 
 	/**

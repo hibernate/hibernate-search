@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.standalone.entity;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A descriptor of an indexed entity type,
@@ -14,6 +15,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
  *
  * @param <E> The entity type.
  */
+@Incubating
 public interface SearchIndexedEntity<E> {
 
 	/**

@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 
 import java.util.List;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A loader for mass loading of entities, used in particular during mass indexing.
  * <p>
@@ -22,6 +24,7 @@ import java.util.List;
  *
  * @param <I> The type of entity identifiers.
  */
+@Incubating
 public interface MassEntityLoader<I> extends AutoCloseable {
 
 	/**
