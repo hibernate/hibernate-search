@@ -46,3 +46,7 @@ updates:
       # TODO HSEARCH-4556 / HSEARCH-4555 Remove this when making JDK 11 our baseline
       - dependency-name: "org.jboss.logging:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # Sticking to Derby 10.14 for now since later versions require JDK 9+, and we need to test with JDK 8.
+      # See https://db.apache.org/derby/derby_downloads.html
+      - dependency-name: "org.apache.derby:*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
