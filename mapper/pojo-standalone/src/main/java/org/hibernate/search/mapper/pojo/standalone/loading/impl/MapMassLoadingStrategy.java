@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 
-public class MapMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {
+public final class MapMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {
 
 	private final Map<I, E> source;
 

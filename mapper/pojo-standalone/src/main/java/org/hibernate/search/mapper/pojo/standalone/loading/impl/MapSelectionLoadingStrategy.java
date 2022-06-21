@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.SelectionEntityLoader
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.SelectionLoadingStrategy;
 
-public class MapSelectionLoadingStrategy<E, I> implements SelectionLoadingStrategy<E> {
+public final class MapSelectionLoadingStrategy<E, I> implements SelectionLoadingStrategy<E> {
 
 	private final Map<I, E> source;
 
