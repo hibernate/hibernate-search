@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.schema.management;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * The entry point for explicit schema management operations: creating indexes, dropping them, validating them, ...
  * <p>
  * A {@link SearchSchemaManager} targets a pre-defined set of indexed types (and their indexes).
  */
+@Incubating
 public interface SearchSchemaManager {
 
 	/**

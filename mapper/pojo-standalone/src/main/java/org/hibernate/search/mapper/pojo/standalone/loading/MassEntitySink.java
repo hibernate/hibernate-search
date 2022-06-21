@@ -8,11 +8,14 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 
 import java.util.List;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A sink for use by a {@link MassIdentifierLoader}.
  *
  * @param <E> The type of loaded entities.
  */
+@Incubating
 public interface MassEntitySink<E> {
 
 	/**

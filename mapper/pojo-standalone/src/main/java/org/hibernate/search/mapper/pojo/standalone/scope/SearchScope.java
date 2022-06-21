@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Represents a set of types and the corresponding indexes,
@@ -33,6 +34,7 @@ import org.hibernate.search.util.common.SearchException;
  *
  * @param <E> A supertype of all types in this scope.
  */
+@Incubating
 public interface SearchScope<E> {
 
 	/**

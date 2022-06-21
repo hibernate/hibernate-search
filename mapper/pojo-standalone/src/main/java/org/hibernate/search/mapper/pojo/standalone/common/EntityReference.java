@@ -7,10 +7,12 @@
 package org.hibernate.search.mapper.pojo.standalone.common;
 
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A reference to an indexed entity.
  */
+@Incubating
 public interface EntityReference {
 
 	/**

@@ -8,11 +8,14 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 
 import java.util.Map;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A group of entity types for entity loading.
  *
  * @param <E> The type of loaded entities.
  */
+@Incubating
 public interface LoadingTypeGroup<E> {
 
 	/**

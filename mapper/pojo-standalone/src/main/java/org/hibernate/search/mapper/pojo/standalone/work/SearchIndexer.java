@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.standalone.work;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * An interface for indexing entities in the context of a session.
@@ -17,6 +18,7 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
  * <p>
  * This contract is thread-safe.
  */
+@Incubating
 public interface SearchIndexer {
 
 	/**

@@ -9,7 +9,9 @@ package org.hibernate.search.mapper.pojo.standalone.loading;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.MapMassLoadingStrategy;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public final class MassLoadingStrategies {
 
 	private MassLoadingStrategies() {

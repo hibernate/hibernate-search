@@ -12,6 +12,7 @@ import java.util.concurrent.CompletionStage;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 
 /**
@@ -22,6 +23,7 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
  *
  * @author Sanne Grinovero
  */
+@Incubating
 public interface MassIndexer {
 
 	/**

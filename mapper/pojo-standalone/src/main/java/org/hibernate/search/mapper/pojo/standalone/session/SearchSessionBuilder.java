@@ -11,7 +11,9 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingOptionsStep;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public interface SearchSessionBuilder {
 
 	/**

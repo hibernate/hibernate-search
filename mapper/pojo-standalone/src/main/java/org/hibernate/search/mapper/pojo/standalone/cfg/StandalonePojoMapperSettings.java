@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.pojo.standalone.cfg;
 
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public final class StandalonePojoMapperSettings {
 
 	private StandalonePojoMapperSettings() {

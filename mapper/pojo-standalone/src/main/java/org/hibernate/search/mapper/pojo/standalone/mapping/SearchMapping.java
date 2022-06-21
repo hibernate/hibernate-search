@@ -14,7 +14,9 @@ import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
+import org.hibernate.search.util.common.annotation.Incubating;
 
+@Incubating
 public interface SearchMapping {
 
 	/**

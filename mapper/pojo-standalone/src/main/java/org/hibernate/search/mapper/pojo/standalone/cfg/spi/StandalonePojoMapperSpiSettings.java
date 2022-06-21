@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.cfg.spi;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
+@Incubating
 public final class StandalonePojoMapperSpiSettings {
 
 	private StandalonePojoMapperSpiSettings() {

@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.loading;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A strategy for selection loading, used in particular during search.
  *
  * @param <E> The type of loaded entities.
  */
+@Incubating
 public interface SelectionLoadingStrategy<E> {
 
 	/**

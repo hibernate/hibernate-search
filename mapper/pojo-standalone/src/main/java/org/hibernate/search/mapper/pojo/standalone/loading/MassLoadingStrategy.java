@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.loading;
 
+import org.hibernate.search.util.common.annotation.Incubating;
+
 /**
  * A strategy for mass loading, used in particular during mass indexing.
  *
  * @param <E> The type of loaded entities.
  * @param <I> The type of entity identifiers.
  */
+@Incubating
 public interface MassLoadingStrategy<E, I> {
 
 	/**
