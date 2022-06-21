@@ -142,12 +142,12 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public SearchSession createSession() {
-		return createSearchManagerBuilder().build();
+		return createSessionBuilder().build();
 	}
 
 	@Override
 	public SearchSessionBuilder createSessionWithOptions() {
-		return createSearchManagerBuilder();
+		return createSessionBuilder();
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 
 	@Override
 	public StandalonePojoMassIndexingSessionContext createSession(DetachedBackendSessionContext sessionContext) {
-		return createSearchManagerBuilder().tenantId( sessionContext.tenantIdentifier() ).build();
+		return createSessionBuilder().tenantId( sessionContext.tenantIdentifier() ).build();
 	}
 
 	@Override
@@ -226,7 +226,7 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
 	}
 
-	private StandalonePojoSearchSession.Builder createSearchManagerBuilder() {
+	private StandalonePojoSearchSession.Builder createSessionBuilder() {
 		return new StandalonePojoSearchSession.Builder(
 				this, typeContextContainer
 		);
