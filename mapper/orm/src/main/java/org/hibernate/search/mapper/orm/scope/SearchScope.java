@@ -27,9 +27,14 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.common.SearchException;
 
 /**
- * Represents a set of types and the corresponding indexes,
- * allowing to build search-related objects (query, predicate, ...)
- * taking into account the relevant indexes and their metadata (underlying technology, field types, ...).
+ * Represents a set of types and the corresponding indexes.
+ * <p>
+ * The scope can be used for search, to build search-related objects (predicate, sort, projection, aggregation, ...),
+ * or to define the targeted entities/indexes
+ * when {@link org.hibernate.search.mapper.orm.session.SearchSession#search(SearchScope) passing it to the session}.
+ * <p>
+ * It can also be used to start large-scale operations, e.g. using a {@link #schemaManager()}, a {@link #workspace()}
+ * or a {@link #massIndexer()}.
  *
  * @param <E> A supertype of all types in this scope.
  */

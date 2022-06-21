@@ -24,6 +24,12 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
+/**
+ * A Hibernate Search session, bound to a Hibernate ORM {@link Session}/{@link EntityManager}.
+ * <p>
+ * Provides entry points to Hibernate Search operations that involve indexing and searching,
+ * and that make use of the ORM session.
+ */
 public interface SearchSession {
 
 	/**

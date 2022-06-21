@@ -19,6 +19,12 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.util.common.annotation.Incubating;
 
+/**
+ * A Hibernate Search session, bound to a particular tenant identifier (if any),
+ * and with its own overridden settings regarding commits, refresh, etc.
+ * <p>
+ * Provides entry points to Hibernate Search operations that involve indexing and searching.
+ */
 @Incubating
 public interface SearchSession extends AutoCloseable {
 
