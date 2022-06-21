@@ -21,15 +21,20 @@
 
     <properties>
         <java.module.name>org.hibernate.search.mapper.pojo.standalone</java.module.name>
-
-        <!-- This artifact is not officially published yet. See HSEARCH-1800. -->
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-pojo-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
