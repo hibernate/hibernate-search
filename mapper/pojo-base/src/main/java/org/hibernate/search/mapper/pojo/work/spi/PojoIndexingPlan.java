@@ -75,7 +75,7 @@ public interface PojoIndexingPlan {
 	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
 	 * @param entity The entity to update in the index.
 	 * @param forceSelfDirty If {@code true}, forces reindexing of this entity regardless of the dirty paths.
-	 * @param forceContainingDirty If {@code true}, forces the resolution of containing entities as dirty
+	 * @param forceContainingDirty If {@code true}, forces the resolution of containing entities as dirty regardless of the dirty paths.
 	 * @param dirtyPaths The paths to consider dirty, as a {@link BitSet}.
 	 * You can build such a {@link BitSet} by obtaining the
 	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}

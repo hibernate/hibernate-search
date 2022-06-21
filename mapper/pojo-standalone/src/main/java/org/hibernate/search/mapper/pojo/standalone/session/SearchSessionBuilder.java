@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface SearchSessionBuilder {
 
 	/**
-	 * @param tenantId The tenant ID to use when performing index-related operatiosn (indexing, searching, ...)
+	 * @param tenantId The tenant ID to use when performing index-related operations (indexing, searching, ...)
 	 * in the resulting session.
 	 * @return {@code this} for method chaining.
 	 */

@@ -23,6 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.impl.StandalonePojoMappingInitiator;
 import org.hibernate.search.mapper.pojo.standalone.log.impl.Log;
@@ -78,18 +79,34 @@ public final class SearchMappingBuilder {
 				.discoverAnnotationsFromReferencedTypes( true );
 	}
 
+	/**
+	 * Starts the definition of the programmatic mapping.
+	 * @return A context to define the programmatic mapping.
+	 */
 	public ProgrammaticMappingConfigurationContext programmaticMapping() {
 		return mappingInitiator.programmaticMapping();
 	}
 
+	/**
+	 * Starts the definition of the annotation mapping.
+	 * @return A context to define the annotation mapping.
+	 */
 	public AnnotationMappingConfigurationContext annotationMapping() {
 		return mappingInitiator.annotationMapping();
 	}
 
+	/**
+	 * Starts the definition of container extractors available for use in mappings.
+	 * @return A context to define container extractors.
+	 */
 	public ContainerExtractorConfigurationContext containerExtractors() {
 		return mappingInitiator.containerExtractors();
 	}
 
+	/**
+	 * Starts the definition of bridges to apply by default in mappings.
+	 * @return A context to define default bridges.
+	 */
 	public BridgesConfigurationContext bridges() {
 		return mappingInitiator.bridges();
 	}
@@ -155,15 +172,54 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
+	/**
+	 * Enables or disables multi-tenancy.
+	 * <p>
+	 * If multi-tenancy is enabled, every {@link SearchMapping#createSession() session} will need to be assigned a tenant identifier.
+	 *
+	 * @param multiTenancyEnabled {@code true} to enable multi-tenancy, {@code false} to disable it (the default).
+	 * @return {@code this}, for call chaining.
+	 */
 	public SearchMappingBuilder multiTenancyEnabled(boolean multiTenancyEnabled) {
 		mappingInitiator.tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
 		return this;
 	}
 
+	/**
+	 * Defines the default depth of automatic reindexing.
+	 * <p>
+	 * Keep the default value ({@link ReindexOnUpdate#DEFAULT} if your entity model is a graph (normalized model, e.g. in ORMs);
+	 * pass {@link ReindexOnUpdate#SHALLOW} if your entity model is a collection of trees (denormalized model, e.g. in a document datastore).
+	 * <p>
+	 * The exact behavior is as follows:
+	 * <ul>
+	 *     <li>If set to {@link ReindexOnUpdate#DEFAULT}, when entity A is {@link IndexedEmbedded indexed-embedded} in entity B,
+	 *     and a relevant property of entity A changes, then Hibernate Search will trigger reindexing of
+	 *     entity A (if appropriate) <em>and</em> entity B (if appropriate).</li>
+	 *     <li>If set to {@link ReindexOnUpdate#SHALLOW}, when entity A is {@link IndexedEmbedded indexed-embedded} in entity B,
+	 *     and a relevant property of entity A changes, then Hibernate Search will trigger reindexing of
+	 *     entity A (if appropriate) <em>only</em>, and not entity B.</li>
+	 *     <li>If set to {@link ReindexOnUpdate#NO}, when entity A is {@link IndexedEmbedded indexed-embedded} in entity B,
+	 *     and a relevant property of entity A changes, then Hibernate Search will trigger reindexing of
+	 *     neither entity A nor entity B. The only way to trigger reindexing will be to force it,
+	 *     e.g. with {@link org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan#addOrUpdate(Object)}
+	 *     (without passing a list of dirty paths)
+	 *     or {@link org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan#addOrUpdate(Object, DocumentRoutesDescriptor, Object, boolean, boolean, String...)}
+	 *     (with {@code forceSelfDirty = true} or {@code forceContainedDirty = true}) </li>
+	 * </ul>
+	 *
+	 * @param defaultReindexOnUpdate The default behavior
+	 */
 	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
 		mappingInitiator.defaultReindexOnUpdate( defaultReindexOnUpdate );
 	}
 
+	/**
+	 * @param providedIdentifierBridge An identifier bridge to use by default for entities that don't have a property annotated
+	 * with {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId}.
+	 * Caution: the bridge will be applied to the whole entity, with the expectation that the identifier never changes for a given entity.
+	 * @return {@code this}, for call chaining.
+	 */
 	public SearchMappingBuilder providedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
 		mappingInitiator.providedIdentifierBridge( providedIdentifierBridge );
 		return this;
@@ -188,16 +244,39 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
+	/**
+	 * Sets a configuration property.
+	 * <p>
+	 * Configuration properties are mentioned in {@link org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings},
+	 * or in the reference documentation for backend-related properties.
+	 *
+	 * @param name The name (key) of the configuration property.
+	 * @param value The value of the configuration property.
+	 * @return {@code this}, for call chaining.
+	 */
 	public SearchMappingBuilder property(String name, Object value) {
 		properties.put( name, value );
 		return this;
 	}
 
+	/**
+	 * Sets multiple configuration properties.
+	 * <p>
+	 * Configuration properties are mentioned in {@link org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings},
+	 * or in the reference documentation for backend-related properties.
+	 *
+	 * @param map A map containing property names (property keys) as map keys and property values as map values.
+	 * @return {@code this}, for call chaining.
+	 */
 	public SearchMappingBuilder properties(Map<String, Object> map) {
 		properties.putAll( map );
 		return this;
 	}
 
+	/**
+	 * Builds the search mapping.
+	 * @return The {@link SearchMapping}.
+	 */
 	public CloseableSearchMapping build() {
 		SearchIntegrationEnvironment environment = null;
 		SearchIntegrationPartialBuildState integrationPartialBuildState = null;

@@ -16,6 +16,12 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.util.common.annotation.Incubating;
 
+
+/**
+ * The Hibernate Search mapping between the POJO model and the backend(s).
+ * <p>
+ * Provides entry points to Hibernate Search operations that are not tied to a specific {@link SearchSession session}.
+ */
 @Incubating
 public interface SearchMapping {
 
@@ -75,10 +81,17 @@ public interface SearchMapping {
 	 */
 	Collection<? extends SearchIndexedEntity<?>> allIndexedEntities();
 
+	/**
+	 * @return A {@link SearchMapping} builder.
+	 */
 	static SearchMappingBuilder builder() {
 		return builder( MethodHandles.publicLookup() );
 	}
 
+	/**
+	 * @param lookup A {@link java.lang.invoke.MethodHandles.Lookup} to perform reflection on entities.
+	 * @return A {@link SearchMapping} builder.
+	 */
 	static SearchMappingBuilder builder(MethodHandles.Lookup lookup) {
 		return new SearchMappingBuilder( lookup );
 	}

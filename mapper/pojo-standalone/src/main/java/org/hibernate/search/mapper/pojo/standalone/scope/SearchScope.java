@@ -28,9 +28,14 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * Represents a set of types and the corresponding indexes,
- * allowing to build search-related objects (query, predicate, ...)
- * taking into account the relevant indexes and their metadata (underlying technology, field types, ...).
+ * Represents a set of types and the corresponding indexes.
+ * <p>
+ * The scope can be used for search, to build search-related objects (predicate, sort, projection, aggregation, ...),
+ * or to define the targeted entities/indexes
+ * when {@link org.hibernate.search.mapper.pojo.standalone.session.SearchSession#search(SearchScope) passing it to the session}.
+ * <p>
+ * It can also be used to start large-scale operations, e.g. using a {@link #schemaManager()}
+ * or a {@link #massIndexer()}.
  *
  * @param <E> A supertype of all types in this scope.
  */

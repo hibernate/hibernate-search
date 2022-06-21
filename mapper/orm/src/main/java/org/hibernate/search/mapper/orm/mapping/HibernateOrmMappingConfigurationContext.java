@@ -15,26 +15,26 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface HibernateOrmMappingConfigurationContext {
 
 	/**
-	 * Start the definition of a programmatic mapping.
+	 * Starts the definition of the programmatic mapping.
 	 * @return A context to define the programmatic mapping.
 	 */
 	ProgrammaticMappingConfigurationContext programmaticMapping();
 
 	/**
-	 * Start the definition of the annotation mapping.
+	 * Starts the definition of the annotation mapping.
 	 * @return A context to define the annotation mapping.
 	 */
 	AnnotationMappingConfigurationContext annotationMapping();
 
 	/**
-	 * Start the definition of container extractors available for use in mappings.
+	 * Starts the definition of container extractors available for use in mappings.
 	 * @return A context to define container extractors.
 	 */
 	@Incubating
 	ContainerExtractorConfigurationContext containerExtractors();
 
 	/**
-	 * Start the definition of bridges to apply by default in mappings.
+	 * Starts the definition of bridges to apply by default in mappings.
 	 * @return A context to define default bridges.
 	 */
 	BridgesConfigurationContext bridges();
