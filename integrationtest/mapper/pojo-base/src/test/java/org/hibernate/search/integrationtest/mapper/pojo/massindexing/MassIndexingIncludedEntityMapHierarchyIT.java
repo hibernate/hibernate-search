@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.loading.LoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntityLoader;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassEntitySink;

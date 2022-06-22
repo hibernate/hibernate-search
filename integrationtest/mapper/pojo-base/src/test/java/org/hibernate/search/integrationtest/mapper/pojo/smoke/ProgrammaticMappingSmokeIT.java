@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;

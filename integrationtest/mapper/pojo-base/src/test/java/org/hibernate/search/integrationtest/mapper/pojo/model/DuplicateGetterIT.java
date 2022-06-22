@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.model;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.StandalonePojoMappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
