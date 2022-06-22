@@ -209,9 +209,11 @@ public final class SearchMappingBuilder {
 	 * </ul>
 	 *
 	 * @param defaultReindexOnUpdate The default behavior
+	 * @return {@code this}, for call chaining.
 	 */
-	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
+	public SearchMappingBuilder defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
 		mappingInitiator.defaultReindexOnUpdate( defaultReindexOnUpdate );
+		return this;
 	}
 
 	/**
