@@ -74,6 +74,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-integrationtest-mapper-pojo-standalone</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>

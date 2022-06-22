@@ -17,6 +17,7 @@
         <module>common</module>
         <module>backend/lucene</module>
         <module>backend/elasticsearch</module>
+        <module>mapper/pojo-standalone</module>
         <module>mapper/orm</module>
         <module>mapper/stub</module>
         <module>v5migrationhelper</module>

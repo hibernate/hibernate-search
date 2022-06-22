@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-pojo-standalone</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
