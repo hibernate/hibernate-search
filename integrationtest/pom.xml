@@ -18,6 +18,7 @@
         <module>backend/lucene</module>
         <module>backend/elasticsearch</module>
         <module>mapper/pojo-base</module>
+        <module>mapper/pojo-standalone-realbackend</module>
         <module>mapper/orm</module>
         <module>mapper/orm-cdi</module>
         <module>mapper/orm-spring</module>

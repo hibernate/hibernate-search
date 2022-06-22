@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
@@ -35,27 +36,44 @@ public final class StandalonePojoMappingSetupHelper
 	 * @param backendMock A backend mock.
 	 */
 	public static StandalonePojoMappingSetupHelper withBackendMock(MethodHandles.Lookup lookup, BackendMock backendMock) {
-		return new StandalonePojoMappingSetupHelper( lookup, BackendSetupStrategy.withSingleBackendMock( backendMock ) );
+		return new StandalonePojoMappingSetupHelper( lookup, BackendSetupStrategy.withSingleBackendMock( backendMock ),
+				// Mock backend => avoid schema management unless we want to test it
+				SchemaManagementStrategyName.NONE );
 	}
 
 	public static StandalonePojoMappingSetupHelper withBackendMocks(MethodHandles.Lookup lookup,
 			BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
 		return new StandalonePojoMappingSetupHelper(
 				lookup,
-				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks )
+				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks ),
+				// Mock backend => avoid schema management unless we want to test it
+				SchemaManagementStrategyName.NONE
+		);
+	}
+
+	public static StandalonePojoMappingSetupHelper withSingleBackend(MethodHandles.Lookup lookup,
+			BackendConfiguration backendConfiguration) {
+		return new StandalonePojoMappingSetupHelper(
+				lookup,
+				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
+				// Real backend => ensure we clean up everything before and after the tests
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
 		);
 	}
 
 	private final MethodHandles.Lookup lookup;
+	private final SchemaManagementStrategyName schemaManagementStrategyName;
 
-	private StandalonePojoMappingSetupHelper(MethodHandles.Lookup lookup, BackendSetupStrategy backendSetupStrategy) {
+	private StandalonePojoMappingSetupHelper(MethodHandles.Lookup lookup, BackendSetupStrategy backendSetupStrategy,
+			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
 		this.lookup = lookup;
+		this.schemaManagementStrategyName = schemaManagementStrategyName;
 	}
 
 	@Override
 	protected SetupContext createSetupContext() {
-		return new SetupContext();
+		return new SetupContext( schemaManagementStrategyName );
 	}
 
 	@Override
@@ -74,9 +92,8 @@ public final class StandalonePojoMappingSetupHelper
 		// whereas it should rely on reflection or built-in beans.
 		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
 
-		SetupContext() {
-			properties.put( StandalonePojoMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-					SchemaManagementStrategyName.NONE );
+		SetupContext(SchemaManagementStrategyName schemaManagementStrategyName) {
+			properties.put( StandalonePojoMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, schemaManagementStrategyName );
 			// Ensure we don't build Jandex indexes needlessly:
 			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
 			withConfiguration( builder -> builder.annotationMapping().buildMissingDiscoveredJandexIndexes( false ) );
