@@ -233,20 +233,6 @@ public final class SearchMappingBuilder {
 	}
 
 	/**
-	 *
-	 * @param enabled {@code true} if Hibernate Search should automatically process mapping annotations
-	 * on types referenced in the mapping of other types (e.g. the target of an {@link IndexedEmbedded}, ...).
-	 * {@code false} if that discovery should be disabled.
-	 * @deprecated Use {@link AnnotationMappingConfigurationContext#discoverAnnotationsFromReferencedTypes(boolean)}
-	 * on the object returned by {@link #annotationMapping()} instead.
-	 */
-	@Deprecated
-	public SearchMappingBuilder annotatedTypeDiscoveryEnabled(boolean enabled) {
-		annotationMapping().discoverAnnotationsFromReferencedTypes( enabled );
-		return this;
-	}
-
-	/**
 	 * Sets a configuration property.
 	 * <p>
 	 * Configuration properties are mentioned in {@link org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings},
