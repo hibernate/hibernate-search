@@ -24,9 +24,9 @@ the keys mentioned in this documentation.
 
 For example `hibernate.search.backend.hosts` will become
 `quarkus.hibernate-search-orm.elasticsearch.hosts` in Quarkus
-or `spring.jpa.properties.hibernate.search.backend.hosts` in Spring.
+or `spring.jpa.properties.hibernate.search.backend.hosts` in Spring Boot.
 
-See <<gettingstarted-framework>> for more information.
+See <<compatibility-framework>> for more information.
 ====
 
 [[configuration-structure]]

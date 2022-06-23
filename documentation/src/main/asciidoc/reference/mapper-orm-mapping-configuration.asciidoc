@@ -61,7 +61,7 @@ then either:
 Hibernate Search's scanning may trigger the indexing of JARs through Jandex on application startup.
 This indexing should be reasonably short, but if it causes performance issues, you can:
 
-* Switch to the <<gettingstarted-framework-quarkus,Quarkus>> framework,
+* Switch to the <<compatibility-framework-quarkus,Quarkus>> framework,
   which among other things executes this part of Hibernate Search's startup at build time.
 * OR execute the https://github.com/wildfly/jandex-maven-plugin[Jandex Maven Plugin]
   during the build of your application, so that indexes are already built when the application starts.
