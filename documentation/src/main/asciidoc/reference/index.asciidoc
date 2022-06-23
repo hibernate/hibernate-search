@@ -15,7 +15,11 @@ include::preface.asciidoc[]
 
 :numbered:
 
+include::compatibility.asciidoc[]
+
 include::getting-started.asciidoc[]
+
+include::migrating.asciidoc[]
 
 include::concepts.asciidoc[]
 
