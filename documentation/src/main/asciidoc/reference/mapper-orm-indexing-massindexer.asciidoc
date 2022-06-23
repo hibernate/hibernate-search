@@ -188,7 +188,7 @@ so this should only be used when failures of concurrent operations on the indexe
 are acceptable.
 
 This should be used when the existing schema is known to be obsolete,
-for example when <<mapper-orm-mapping-changes,the Hibernate Search mapping changed>>
+for example when <<mapping-changes,the Hibernate Search mapping changed>>
 and some fields now have a different type, a different analyzer, new capabilities (projectable, ...), etc.
 
 This may also be used when the schema is up-to-date,
@@ -197,7 +197,7 @@ especially with the Elasticsearch backend.
 
 As an alternative to this parameter,
 you can also use a schema manager to manage schemas manually at the time of your choosing:
-<<mapper-orm-schema-management-manager>>.
+<<schema-management-manager>>.
 
 |`purgeAllOnStart(boolean)`
 |`true`

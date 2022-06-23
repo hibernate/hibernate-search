@@ -45,7 +45,9 @@ They are generally located just under the `hibernate.search` root.
 +
 Global properties are explained in the relevant parts of this documentation:
 
-* <<mapper-orm-mapping-configuration,Hibernate ORM mapping>>
+* <<mapper-orm,Hibernate ORM integration>>
+* <<mapping-configuration,Mapping configuration>>
+* And many more.
 
 Backend properties::
 These properties affect a single backend.

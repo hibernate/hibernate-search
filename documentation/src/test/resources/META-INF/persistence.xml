@@ -9,16 +9,16 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.2"
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
     <persistence-unit name="GettingStartedWithoutHibernateSearchIT">
-        <class>org.hibernate.search.documentation.gettingstarted.withouthsearch.Author</class>
-        <class>org.hibernate.search.documentation.gettingstarted.withouthsearch.Book</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withouthsearch.Author</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withouthsearch.Book</class>
         <exclude-unlisted-classes />
         <properties>
         </properties>
     </persistence-unit>
 
     <persistence-unit name="GettingStartedDefaultAnalysisIT_lucene">
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.defaultanalysis.Author</class>
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.defaultanalysis.Book</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.defaultanalysis.Author</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.defaultanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_lucene[] -->
@@ -29,8 +29,8 @@
     </persistence-unit>
 
     <persistence-unit name="GettingStartedDefaultAnalysisIT_elasticsearch">
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.defaultanalysis.Author</class>
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.defaultanalysis.Book</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.defaultanalysis.Author</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.defaultanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_elasticsearch[] -->
@@ -47,25 +47,25 @@
     </persistence-unit>
 
     <persistence-unit name="GettingStartedCustomAnalysisIT_lucene">
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.Author</class>
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.Book</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.customanalysis.Author</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.customanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
             <property name="hibernate.search.backend.analysis.configurer"
-                      value="class:org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
+                      value="class:org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.customanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
             <!-- end::gettingstarted-configuration-orm_lucene-analysis[] -->
         </properties>
     </persistence-unit>
 
     <persistence-unit name="GettingStartedCustomAnalysisIT_elasticsearch">
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.Author</class>
-        <class>org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.Book</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.customanalysis.Author</class>
+        <class>org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.customanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
             <property name="hibernate.search.backend.analysis.configurer"
-                      value="class:org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
+                      value="class:org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.customanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
         </properties>
     </persistence-unit>

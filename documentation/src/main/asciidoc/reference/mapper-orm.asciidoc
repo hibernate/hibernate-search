@@ -1,0 +1,43 @@
+[[mapper-orm]]
+= [[mapper-orm-mapping-configuration]] Hibernate ORM integration
+
+[[mapper-orm-basics]]
+== Basics
+
+The Hibernate ORM "mapper" is an integration of Hibernate Search into Hibernate ORM.
+
+Its key features include:
+
+* <<mapper-orm-indexing-automatic,Automatic indexing>> of Hibernate ORM entities
+as they are modified in the Hibernate ORM `EntityManager`/`Session`.
+* <<search-dsl-query-entity-loading-options,Loading of managed entities>>
+as hits in the result of a <<search-dsl-query,search query>>.
+
+[[mapper-orm-enabling-disabling]]
+== [[mapper-orm-mapping-configuration-enabling-disabling]] [[search-configuration-event]] Enabling/disabling Hibernate Search
+
+The Hibernate Search integration into Hibernate ORM is enabled by default as soon as it is present in the classpath.
+If for some reason you need to disable it,
+set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
+
+[[mapper-orm-mapping-dynamicmap]]
+== [[mapper-orm-programmatic-mapping-dynamicmap]] Mapping `Map`-based models
+
+link:{hibernateDocUrl}#dynamic-model["dynamic-map" entity models],
+i.e. models based on `java.util.Map` instead of custom classes,
+cannot be mapped using annotations.
+However, they can be mapped using the programmatic mapping API.
+You just need to refer to the types by their name using `context.programmaticMapping().type("thename")`:
+
+* Pass the entity name for dynamic entity types.
+* Pass the "role" for dynamic embedded/component types,
+i.e. the name of the owning entity, followed by a dot ("."),
+followed by the dot-separated path to the component in that entity.
+For example `MyEntity.myEmbedded` or `MyEntity.myEmbedded.myNestedEmbedded`.
+
+[[mapper-orm-configuration-other]]
+== [[mapper-orm-mapping-configuration-other]] Other configuration
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/orm/cfg/HibernateOrmMapperSettings.html[org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings].

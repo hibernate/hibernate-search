@@ -1,0 +1,54 @@
+[[mapping-custom-annotations]]
+= [[mapper-orm-custom-annotations]] Custom mapping annotations
+
+[[mapping-custom-annotations-basics]]
+== [[mapper-orm-custom-annotations-basics]] Basics
+
+By default, Hibernate Search only recognizes built-in mapping annotations
+such as `@Indexed`, `@GenericField` or `@IndexedEmbedded`.
+
+To use custom annotations in a Hibernate Search mapping,
+two steps are required:
+
+. Implementing a processor for that annotation:
+`TypeMappingAnnotationProcessor` for type annotations,
+`PropertyMappingAnnotationProcessor` for method/field annotations,
+or `ConstructorMappingAnnotationProcessor` for constructor annotations.
+. Annotating the custom annotation with either `@TypeMapping`, `@PropertyMapping` or `@ConstructorMapping`,
+passing as an argument the reference to the annotation processor.
+
+Once this is done, Hibernate Search will be able to detect custom annotations in **indexed classes**
+(though not necessarily in custom projection types, see <<mapping-custom-annotations-root>>).
+Whenever a custom annotation is encountered,
+Hibernate Search will instantiate the annotation processor
+and call its `process` method, passing the following as arguments:
+
+* A `mapping` parameter allowing to define the mapping for the type or property
+using the <<mapping-programmatic,programmatic mapping API>>.
+* An `annotation` parameter representing the annotation instance.
+* A `context` object with various helpers.
+
+Custom annotations are most frequently used to apply custom, parameterized bridges.
+You can find examples in these sections in particular:
+
+* <<bridge-valuebridge-parameters,Passing parameters to a value bridge>>
+* <<bridge-propertybridge-parameters,Passing parameters to a property bridge>>
+* <<bridge-typebridge-parameters,Passing parameters to a type bridge>>
+
+[TIP]
+====
+It is completely possible to use custom annotations for parameter-less bridges,
+or even for more complex features such as indexed-embedded:
+every feature available in the <<mapping-programmatic,programmatic mapping API>>
+can be triggered by a custom annotation.
+====
+
+[[mapping-custom-annotations-root]]
+== [[mapper-orm-custom-annotations-root]] Custom root mapping annotations
+
+To have Hibernate Search consider a custom annotation as a <<mapping-classpath-scanning-basics,root mapping annotation>>,
+add the `@RootMapping` meta-annotation to the custom annotation.
+
+This will ensure Hibernate Search processes annotations on types annotated with the custom annotation
+even if those types are not referenced in the index mapping,
+which is mainly useful for custom annotations related to <<mapping-projection,projection mapping>>.

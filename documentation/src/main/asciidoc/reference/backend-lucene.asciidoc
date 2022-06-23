@@ -91,7 +91,7 @@ For example, with the configuration above,
 an entity type named `Order` will be indexed in directory
 `/path/to/my/root/Order/`.
 If that entity is explicitly assigned the index name `orders`
-(see `@Indexed(index = ...)` in <<mapper-orm-entityindexmapping>>),
+(see `@Indexed(index = ...)` in <<mapping-entityindexmapping>>),
 it will instead be indexed in directory
 `/path/to/my/root/orders/`.
 
@@ -249,7 +249,7 @@ When routing, the routing key will be hashed to assign it to a shard.
 If the routing key is null, the document ID will be used instead.
 +
 This strategy is suitable when there is no explicit routing key
-<<mapper-orm-bridge-routingbridge-routingkey,configured in the mapping>>,
+<<bridge-routingbridge-routingkey,configured in the mapping>>,
 or when the routing key has a large number of possible values that need
 to be brought down to a smaller number (e.g. "all integers").
 
@@ -278,7 +278,7 @@ If it does not, an exception will be thrown.
 The routing key cannot be null, and the document ID will be ignored.
 +
 This strategy is suitable when there is an explicit routing key
-<<mapper-orm-bridge-routingbridge-routingkey,configured in the mapping>>,
+<<bridge-routingbridge-routingkey,configured in the mapping>>,
 and that routing key has a limited number of possible values that are known before starting the application.
 
 
@@ -378,7 +378,7 @@ but Hibernate Search maintains such a schema in memory,
 in order to remember which predicates/projections/sorts can be applied to each field.
 
 For the most part, the schema is inferred from
-<<mapper-orm-mapping,the mapping configured through Hibernate Search's mapping APIs>>,
+<<mappingthe mapping configured through Hibernate Search's mapping APIs>>,
 which are generic and independent of Lucene.
 
 Aspects that are specific to the Lucene backend are explained in this section.
@@ -395,7 +395,7 @@ Some types are not supported directly by the Lucene backend,
 but will work anyway because they are "bridged" by the mapper.
 For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
 which is supported by the Lucene backend.
-See <<mapper-orm-directfieldmapping-supported-types>> for more information.
+See <<mapping-directfieldmapping-supported-types>> for more information.
 ====
 
 [NOTE]
@@ -404,7 +404,7 @@ Field types that are not in this list can still be used with a bit more work:
 
 * If a property in the entity model has an unsupported type,
 but can be converted to a supported type, you will need a bridge.
-See <<mapper-orm-bridge>>.
+See <<bridge>>.
 * If you need an index field with a specific type that is not supported by Hibernate Search,
 you will need a bridge that defines a native field type.
 See <<backend-lucene-field-types-extension>>.
@@ -487,12 +487,12 @@ Below is an example of how to use the Lucene "native" type.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/PageRankValueBinder.java[tags=include]
 ----
-<1> Define a <<mapper-orm-bridge,custom binder>> and its bridge.
+<1> Define a <<bridge,custom binder>> and its bridge.
 The "native" type can only be used from a binder,
 it cannot be used directly with annotation mapping.
-Here we're defining a <<mapper-orm-bridge-valuebridge,value binder>>,
-but a <<mapper-orm-bridge-typebridge,type binder>>,
-or a <<mapper-orm-bridge-propertybridge,property binder>>
+Here we're defining a <<bridge-valuebridge,value binder>>,
+but a <<bridge-typebridge,type binder>>,
+or a <<bridge-propertybridge,property binder>>
 would work as well.
 <2> Get the context's type factory.
 <3> Apply the Lucene extension to the type factory.
@@ -595,7 +595,7 @@ If necessary, they can be overridden by defining your own analyzer with the same
 The Lucene backend comes with a series of built-in analyzer:
 
 `default`::
-The analyzer used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
+The analyzer used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
 +
 Default implementation: `org.apache.lucene.analysis.standard.StandardAnalyzer`.
 +
@@ -632,7 +632,7 @@ Default behavior: do not change the text in any way.
 With this analyzer a full text field would behave similarly to a keyword field,
 but with fewer features: no terms aggregations, for example.
 +
-Consider using a <<mapper-orm-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
+Consider using a <<mapping-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
 
 [[backend-lucene-analysis-builtin-normalizer]]
 === Built-in normalizers
@@ -1222,10 +1222,10 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/
 <3> Narrow down the index manager to the `LuceneIndexManager` type.
 <4> Get the indexing analyzer.
 This is the analyzer used when indexing documents.
-It ignores the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>> in particular.
+It ignores the <<mapping-directfieldmapping-search-analyzer,search analyzer>> in particular.
 <5> Get the search analyzer.
 This is the analyzer used when building search queries through the <<search-dsl,Search DSL>>.
-On contrary to the indexing analyzer, it takes into account the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>.
+On contrary to the indexing analyzer, it takes into account the <<mapping-directfieldmapping-search-analyzer,search analyzer>>.
 ====
 
 

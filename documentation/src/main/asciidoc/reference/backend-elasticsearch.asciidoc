@@ -67,7 +67,7 @@ You can find a full reference of available properties in the Hibernate Search ja
 Most of the time, Hibernate Search does not require any specific configuration
 to be applied by hand to the Elasticsearch cluster,
 beyond the index mapping (schema)
-which <<mapper-orm-schema-management,can be automatically generated>>.
+which <<schema-management,can be automatically generated>>.
 
 The only exception is <<backend-elasticsearch-configuration-sharding>>,
 which needs to be enabled explicitly.
@@ -396,7 +396,7 @@ link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the pro
 == [[elasticsearch-schema-management-strategy]] Schema management
 
 Elasticsearch indexes need to be created before they can be used for indexing and searching;
-see <<mapper-orm-schema-management>> for more information about how to create indexes and their schema
+see <<schema-management>> for more information about how to create indexes and their schema
 in Hibernate Search.
 
 // Search 6 anchors backward compatibility
@@ -457,7 +457,7 @@ The `simple` layout is a bit more complex than it could be, but it follows the b
 Using aliases has a significant advantage over directly targeting the index:
 it makes full reindexing on a live application possible without downtime,
 which is useful in particular when <<mapper-orm-indexing-automatic,automatic indexing>> is disabled
-(<<mapper-orm-indexing-automatic-configuration,completely>> or <<mapper-orm-reindexing-reindexonupdate,partially>>)
+(<<mapper-orm-indexing-automatic-configuration,completely>> or <<mapping-reindexing-reindexonupdate,partially>>)
 and you need to fully reindex periodically (for example on a daily basis).
 
 With aliases, you just need to direct the read alias (used by search queries) to an old copy of the index,
@@ -526,7 +526,7 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/la
 [[backend-elasticsearch-indexlayout-metamodel]]
 === Retrieving index or alias names
 
-Index or alias names used to read and write can be retrieved from the <<mapper-orm-mapping-inspect,metamodel>>.
+Index or alias names used to read and write can be retrieved from the <<mapping-inspect,metamodel>>.
 
 .Retrieving the index names from an Elasticsearch index manager
 ====
@@ -549,7 +549,7 @@ is the schema assigned to each index,
 specifying the data type and capabilities of each "property" (called an "index field" in Hibernate Search).
 
 For the most part, the Elasticsearch mapping is inferred from
-<<mapper-orm-mapping,the mapping configured through Hibernate Search's mapping APIs>>,
+<<mappingthe mapping configured through Hibernate Search's mapping APIs>>,
 which are generic and independent of Elasticsearch.
 
 Aspects that are specific to the Elasticsearch backend are explained in this section.
@@ -572,7 +572,7 @@ Some types are not supported directly by the Elasticsearch backend,
 but will work anyway because they are "bridged" by the mapper.
 For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
 which is supported by the Elasticsearch backend.
-See <<mapper-orm-directfieldmapping-supported-types>> for more information.
+See <<mapping-directfieldmapping-supported-types>> for more information.
 ====
 
 [NOTE]
@@ -581,7 +581,7 @@ Field types that are not in this list can still be used with a little bit more w
 
 * If a property in the entity model has an unsupported type,
 but can be converted to a supported type, you will need a bridge.
-See <<mapper-orm-bridge>>.
+See <<bridge>>.
 * If you need an index field with a specific type that is not supported by Hibernate Search,
 you will need a bridge that defines a native field type.
 See <<backend-elasticsearch-field-types-extension>>.
@@ -646,7 +646,7 @@ See <<backend-elasticsearch-field-types-extension>>.
  or `yyyy-MM-dd` (ES6 and below).
  **The year is always set to 0**.
  |-
-|<<mapper-orm-geopoint-basics,GeoPoint>>
+|<<mapping-geopoint-basics,GeoPoint>>
  |`geo_point`
  |-
 |====
@@ -687,12 +687,12 @@ Below is an example of how to use the Elasticearch "native" type.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
 ----
-<1> Define a <<mapper-orm-bridge,custom binder>> and its bridge.
+<1> Define a <<bridge,custom binder>> and its bridge.
 The "native" type can only be used from a binder,
 it cannot be used directly with annotation mapping.
-Here we're defining a <<mapper-orm-bridge-valuebridge,value binder>>,
-but a <<mapper-orm-bridge-typebridge,type binder>>,
-or a <<mapper-orm-bridge-propertybridge,property binder>>
+Here we're defining a <<bridge-valuebridge,value binder>>,
+but a <<bridge-typebridge,type binder>>,
+or a <<bridge-propertybridge,property binder>>
 would work as well.
 <2> Get the context's type factory.
 <3> Apply the Elasticsearch extension to the type factory.
@@ -796,7 +796,7 @@ hibernate.search.backend.indexes.<index name>.dynamic_mapping = strict
 The default for this property is `strict`.
 
 We said that Hibernate Search **usually** works on declared schema fields. More precisely, it always does
-if no <<mapper-orm-bridge-index-field-dsl-dynamic>> are defined.
+if no <<bridge-index-field-dsl-dynamic>> are defined.
 When field templates are defined, `dynamic` will be forced to `true`, in order to allow for dynamic fields. In that case, the value of the `dynamic_mapping` property is ignored.
 
 [[backend-elasticsearch-multi-tenancy]]
@@ -851,7 +851,7 @@ The ID field is used to retrieve the original document IDs.
 [[backend-elasticsearch-mapping-custom-basics]]
 ==== Basics
 
-Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>,
+Hibernate Search can <<schema-management,create and validate indexes>>,
 but by default created indexes will only include the bare minimum required to index and search:
 the mapping, and the analysis settings.
 Should you need to customize some link:{elasticsearchDocUrl}/mapping-params.html[mapping parameters],
@@ -892,7 +892,7 @@ Properties that are only defined in the custom mappings file but not mapped by H
 will not be visible to Hibernate Search.
 
 This means Hibernate Search will throw exceptions if you try to reference these properties in the <<search-dsl,Search DSL>>,
-or when <<mapper-orm-bridge-index-field-dsl-dynamic,writing to a document from a bridge>>
+or when <<bridge-index-field-dsl-dynamic,writing to a document from a bridge>>
 ====
 
 The file does not need to contain the full mapping: Hibernate Search will automatically inject
@@ -967,7 +967,7 @@ Elasticsearch analysis configuration is not applied immediately on startup:
 it needs to be pushed to the Elasticsearch cluster.
 
 Hibernate Search will only push the configuration to the cluster if instructed to do so
-through <<mapper-orm-schema-management,schema management>>.
+through <<schema-management,schema management>>.
 ====
 
 To configure analysis in an Elasticsearch backend, you will need to:
@@ -1012,7 +1012,7 @@ The exact list depends on the version of Elasticsearch and can be found
 link:{elasticsearchDocUrl}/analysis-analyzers.html[here].
 
 One important built-in analyzer is the one named `default`:
-it is used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
+it is used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
 Unless overridden explicitly, this analyzer uses a `standard` tokenizer and a `lowercase` filter.
 
 [[backend-elasticsearch-analysis-builtin-normalizer]]
@@ -1073,7 +1073,7 @@ refer to the documentation:
 [[backend-elasticsearch-configuration-index-settings]]
 == [[_custom_index_settings]] Custom index settings
 
-Hibernate Search can <<mapper-orm-schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
+Hibernate Search can <<schema-management,create and validate indexes>>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
 Should you need to set some link:{elasticsearchDocUrl}/index-modules.html#index-modules-settings[custom index settings], it is possible to provide these settings to Hibernate Search: it will include them when creating an index and take them into account when validating an index.
 
 [source]

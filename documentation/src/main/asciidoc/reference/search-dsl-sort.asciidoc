@@ -34,7 +34,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [NOTE]
 ====
 There are a few constraints regarding sorts by field.
-In particular, in order for a field to be "sortable", it must be <<mapper-orm-directfieldmapping-sortable,marked as such in the mapping>>,
+In particular, in order for a field to be "sortable", it must be <<mapping-directfieldmapping-sortable,marked as such in the mapping>>,
 so that the correct data structures are available in the index.
 ====
 
@@ -119,15 +119,15 @@ For text fields, "lower" means "lower in the alphabetical order".
 === Prerequisites
 
 In order for the `field` sort to be available on a given field,
-you need to mark the field as <<mapper-orm-directfieldmapping-sortable,sortable>> in the mapping.
+you need to mark the field as <<mapping-directfieldmapping-sortable,sortable>> in the mapping.
 
-<<mapper-orm-geopoint,GeoPoint>> fields cannot be marked as sortable;
+<<mapping-geopoint,GeoPoint>> fields cannot be marked as sortable;
 refer to the <<search-dsl-sort-distance,distance sort>> for these fields.
 
-<<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text fields>> (multi-word text fields)
+<<mapping-directfieldmapping-annotations-fulltextfield,full-text fields>> (multi-word text fields)
 cannot be marked as sortable;
-you need to use <<mapper-orm-directfieldmapping-annotations-keywordfield,keyword fields>> for text sorts.
-Remember you can <<mapper-orm-directfieldmapping-basics,map a single property to multiple fields with different names>>,
+you need to use <<mapping-directfieldmapping-annotations-keywordfield,keyword fields>> for text sorts.
+Remember you can <<mapping-directfieldmapping-basics,map a single property to multiple fields with different names>>,
 so you can have a full-text field for predicates along with a keyword field for sorts,
 all for the same property.
 
@@ -166,7 +166,7 @@ but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.fil
 === Prerequisites
 
 In order for the `distance` sort to be available on a given field,
-you need to mark the field as <<mapper-orm-directfieldmapping-sortable,sortable>> in the mapping.
+you need to mark the field as <<mapping-directfieldmapping-sortable,sortable>> in the mapping.
 
 [[search-dsl-sort-distance-syntax]]
 === Syntax
@@ -255,7 +255,7 @@ you may want to append an arbitrary sort just to stabilize your sort:
 to make sure the search hits will always be in the same order if you execute the same query.
 
 In most cases, a quick and easy solution for stabilizing a sort is
-to change your mapping to add a <<mapper-orm-directfieldmapping-sortable,sortable field>> on your entity ID,
+to change your mapping to add a <<mapping-directfieldmapping-sortable,sortable field>> on your entity ID,
 and to append a `field` sort by id to your unstable sort:
 
 .Stabilizing a sort
@@ -431,7 +431,7 @@ By default, `.use(...)` expects its argument to have the same type as
 the entity property corresponding to the target field.
 
 For example, if an entity property is of type `java.util.Date`,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>.
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>.
 `.use(...)` will expect its argument to be of type `java.util.Date` regardless.
 
 This should generally be what you want,
@@ -491,7 +491,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [[search-dsl-sort-common-filter]]
 === Filter for fields in nested objects
 
-When the sort field is located in a <<mapper-orm-indexedembedded-structure-nested,nested object>>,
+When the sort field is located in a <<mapping-indexedembedded-structure-nested,nested object>>,
 by default all nested objects will be considered for the sort
 and their values will be combined using the configured <<search-dsl-sort-common-multi-value-mode,sort mode>>.
 

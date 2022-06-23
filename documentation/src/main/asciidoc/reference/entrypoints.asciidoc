@@ -26,7 +26,7 @@ allow you to simply https://quarkus.io/guides/hibernate-search-orm-elasticsearch
 into your CDI beans.
 ====
 
-To retrieve the `SearchMapping` with the Hibernate ORM integration,
+To retrieve the `SearchMapping` with the <<mapper-orm,Hibernate ORM integration>>,
 call `Search.mapping(...)` and pass the `EntityManagerFactory`/`SessionFactory`:
 
 .Retrieving the `SearchMapping` from a Hibernate ORM `SessionFactory`
@@ -42,7 +42,7 @@ e.g. by annotating a field of that type with `@Inject` or `@PersistenceUnit`.
 This will return the `SearchMapping`.
 ====
 
-Still with the Hibernate ORM integration, the same can be done from a JPA `EntityManagerFactory`:
+Still with the <<mapper-orm,Hibernate ORM integration>>, the same can be done from a JPA `EntityManagerFactory`:
 
 .Retrieving the `SearchMapping` from a JPA `EntityManagerFactory`
 ====
@@ -78,7 +78,7 @@ allow you to simply https://quarkus.io/guides/hibernate-search-orm-elasticsearch
 into your CDI beans.
 ====
 
-To retrieve the `SearchSession` with the Hibernate ORM integration,
+To retrieve the `SearchSession` with the <<mapper-orm,Hibernate ORM integration>>,
 call `Search.session(...)` and pass the `EntityManager`/`Session`:
 
 .Retrieving the `SearchSession` from a Hibernate ORM `Session`
@@ -94,7 +94,7 @@ e.g. by annotating a field of that type with `@Inject` or `@PersistenceContext`.
 This will return the `SearchSession`.
 ====
 
-Still with the Hibernate ORM integration, the same can be done from a JPA `EntityManager`:
+Still with the <<mapper-orm,Hibernate ORM integration>>, the same can be done from a JPA `EntityManager`:
 
 .Retrieving the `SearchSession` from a JPA `EntityManager`
 ====

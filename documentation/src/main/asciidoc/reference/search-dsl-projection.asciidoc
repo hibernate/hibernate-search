@@ -37,7 +37,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [NOTE]
 ====
 There are a few constraints regarding `field` projections.
-In particular, in order for a field to be "projectable", it must either be <<mapper-orm-directfieldmapping-projectable,explicitly marked as such in the mapping>>,
+In particular, in order for a field to be "projectable", it must either be <<mapping-directfieldmapping-projectable,explicitly marked as such in the mapping>>,
 or be implicitly projectable based on the underlying backend (Elasticsearch),
 so that it is correctly stored in the index.
 ====
@@ -54,7 +54,7 @@ or getting information related to the search query itself
 [[search-dsl-projection-mapped]]
 == Projecting to a custom (annotated) type
 
-For more complex projections, it is possible to <<mapper-orm-mapping-projection,define a custom (annotated) record or class>>
+For more complex projections, it is possible to <<mapping-projection,define a custom (annotated) record or class>>
 and have Hibernate Search infer the corresponding projections from the custom type's constructor parameters.
 
 include::components/custom-projection-type-important.asciidoc[]
@@ -69,9 +69,9 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
 <2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
-See <<mapper-orm-mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
+See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
 <3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
-Multivalued projections <<mapper-orm-mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
 <4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -79,7 +79,7 @@ Multivalued projections <<mapper-orm-mapping-projection-inner-inference-type,mus
 include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/ProjectionDslJava17IT.java[tags=entryPoint-mapped-record]
 ----
 <1> Pass the custom projection type to `.select(...)`.
-Hibernate Search will <<mapper-orm-mapping-projection-inner-inference,infer the inner projections>>
+Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
 from the custom type's constructor parameters.
 <2> Each hit will be an instance of the custom projection type,
 populated with data retrieved from the index.
@@ -87,12 +87,12 @@ populated with data retrieved from the index.
 
 include::components/custom-projection-type-nonrecord-tip.asciidoc[]
 
-NOTE: For more information about mapping custom projection types, see <<mapper-orm-mapping-projection>>.
+NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
 
 Beside `.select(Class<?>)`, some projections also allow using custom projection types;
 see <<search-dsl-projection-composite-as-mapped,the `composite` projection>>
 and <<search-dsl-projection-object-as-mapped,the `object` projection>>.
-For more information about  mapping projection types, see <<mapper-orm-mapping-projection>>.
+For more information about  mapping projection types, see <<mapping-projection>>.
 
 [[search-dsl-projection-documentReference]]
 == `documentReference`: return references to matched documents
@@ -181,7 +181,7 @@ The `field` projection returns the value of a given field for the matched docume
 === Prerequisites
 
 In order for the `field` projection to be available on a given field,
-you need to mark the field as <<mapper-orm-directfieldmapping-projectable,projectable>> in the mapping.
+you need to mark the field as <<mapping-directfieldmapping-projectable,projectable>> in the mapping.
 
 [[search-dsl-projection-field-syntax]]
 === Syntax
@@ -232,7 +232,7 @@ By default, the values returned by the `field` projection have the same type as
 the entity property corresponding to the target field.
 
 For example, if an entity property if of an enum type,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
 the values returned by the `field` projection will be of the enum type regardless.
 
 This should generally be what you want,
@@ -285,7 +285,7 @@ and the geo-point value of a given field for the matched document.
 === Prerequisites
 
 In order for the `distance` projection to be available on a given field,
-you need to mark the field as <<mapper-orm-directfieldmapping-projectable,projectable>> in the mapping.
+you need to mark the field as <<mapping-directfieldmapping-projectable,projectable>> in the mapping.
 
 [[search-dsl-projection-distance-syntax]]
 === Syntax
@@ -469,9 +469,9 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
 <2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
-See <<mapper-orm-mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
+See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
 <3> To project on an object field, add a constructor parameter named after that field and with its own custom projection type.
-Multivalued projections <<mapper-orm-mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
+Multivalued projections <<mapping-projection-inner-inference-type,must be modeled as a `List<...>`>> or supertype.
 <4> Annotate any custom projection type used for object fields with `@ProjectionConstructor` as well.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -480,7 +480,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 ----
 <1> Call `.composite()`.
 <2> Define the result of the projection as a custom (annotated) type.
-Hibernate Search will <<mapper-orm-mapping-projection-inner-inference,infer the inner projections>>
+Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
 from the custom type's constructor parameters.
 <3> Each hit will be an instance of the custom projection type,
 populated with data retrieved from the index.
@@ -488,7 +488,7 @@ populated with data retrieved from the index.
 
 include::components/custom-projection-type-nonrecord-tip.asciidoc[]
 
-NOTE: For more information about mapping custom projection types, see <<mapper-orm-mapping-projection>>.
+NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
 
 [[search-dsl-projection-composite-deprecated-variants]]
 === Deprecated variants
@@ -541,7 +541,7 @@ However, there are two key differences:
 With the <<backend-lucene,Lucene backend>>, the object projection has a few limitations:
 
 1. It is only available for object fields with a
-<<mapper-orm-indexedembedded-structure-nested,`NESTED` structure>>.
+<<mapping-indexedembedded-structure-nested,`NESTED` structure>>.
 2. It will never yield `null` objects for multi-valued object fields.
 The Lucene backend does not index `null` objects,
 and thus cannot find them when searching.
@@ -706,7 +706,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 either at the type level (if there's only one constructor)
 or at the constructor level (if there are multiple constructors).
 <2> To project on a value field, add a constructor parameter named after that field and with the same type as that field.
-See <<mapper-orm-mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
+See <<mapping-projection-inner-inference>> for more information on how constructor parameters should be defined.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -714,7 +714,7 @@ include::{sourcedirJava17}/org/hibernate/search/documentation/search/projection/
 ----
 <1> Call `.object( "authors" )`.
 <2> Define the result of the projection as a custom (annotated) type.
-Hibernate Search will <<mapper-orm-mapping-projection-inner-inference,infer the inner projections>>
+Hibernate Search will <<mapping-projection-inner-inference,infer the inner projections>>
 from the custom type's constructor parameters.
 <3> Each hit will be an instance of the custom projection type,
 populated with data retrieved from the index.
@@ -722,7 +722,7 @@ populated with data retrieved from the index.
 
 include::components/custom-projection-type-nonrecord-tip.asciidoc[]
 
-NOTE: For more information about mapping custom projection types, see <<mapper-orm-mapping-projection>>.
+NOTE: For more information about mapping custom projection types, see <<mapping-projection>>.
 
 [[search-dsl-projection-constant]]
 == `constant`: return a provided constant
@@ -774,7 +774,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Lucene
 The returned document is similar to the one that was indexed.
 
 For example, if a value was transformed by the `toIndexedValue` method
-of a <<mapper-orm-bridge-valuebridge,value bridge>> upon indexing,
+of a <<bridge-valuebridge,value bridge>> upon indexing,
 this transformed value (after encoding) will be the value included in the document:
 Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
 
@@ -783,9 +783,9 @@ However, there are some differences between the returned document and the one th
 * Only stored fields are present.
 * Even stored fields may not have the same `FieldType` as they originally had.
 * The document structure flattened,
-i.e. even fields from <<mapper-orm-indexedembedded-structure-nested,nested documents>>
+i.e. even fields from <<mapping-indexedembedded-structure-nested,nested documents>>
 are all added to same returned document.
-* <<mapper-orm-bridge-index-field-dsl-dynamic,Dynamic fields>> may be missing.
+* <<bridge-index-field-dsl-dynamic,Dynamic fields>> may be missing.
 
 If you want a projection that retrieves the value as it was in your entity upon indexing,
 use a <<search-dsl-projection-field,`field` projection>>.
@@ -837,7 +837,7 @@ In particular, Hibernate Search will not apply any kind of the conversions
 described in <<search-dsl-projected-value-type>>.
 
 For example, if a value was transformed by the `toIndexedValue` method
-of a <<mapper-orm-bridge-valuebridge,value bridge>> upon indexing,
+of a <<bridge-valuebridge,value bridge>> upon indexing,
 this transformed value will be the value included in the source:
 Hibernate Search will not convert it back using `ValueBridge#fromIndexedValue`.
 
