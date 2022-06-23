@@ -227,11 +227,6 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
-	public SearchMappingBuilder containedEntityIdentityMappingRequired(boolean required) {
-		mappingInitiator.containedEntityIdentityMappingRequired( required );
-		return this;
-	}
-
 	/**
 	 * Sets a configuration property.
 	 * <p>
