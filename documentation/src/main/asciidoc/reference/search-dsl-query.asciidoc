@@ -369,7 +369,7 @@ potentially increasing search performance.
 [IMPORTANT]
 ====
 A pre-requisite to using routing in search queries is to map your entity in such a way that
-<<mapper-orm-bridge-routingbridge-routingkey,it is assigned a routing key>> at indexing time.
+<<bridge-routingbridge-routingkey,it is assigned a routing key>> at indexing time.
 ====
 
 Specifying routing keys is done by calling the `.routing(String)` or `.routing(Collection<String>)` methods

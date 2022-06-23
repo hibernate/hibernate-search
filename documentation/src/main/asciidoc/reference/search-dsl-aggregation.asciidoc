@@ -58,7 +58,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 [NOTE]
 ====
 There are a few constraints regarding aggregations.
-In particular, in order for a field to be "aggregable", it must be <<mapper-orm-directfieldmapping-aggregable,marked as such in the mapping>>,
+In particular, in order for a field to be "aggregable", it must be <<mapping-directfieldmapping-aggregable,marked as such in the mapping>>,
 so that it is correctly stored in the index.
 ====
 
@@ -106,7 +106,7 @@ By default, the values returned by the `terms` aggregation have the same type as
 the entity property corresponding to the target field.
 
 For example, if an entity property if of an enum type,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
 the values returned by the `terms` aggregation will be of the enum type regardless.
 
 This should generally be what you want,
@@ -299,7 +299,7 @@ By default, the bounds of ranges accepted by the `range` aggregation must have t
 the entity property corresponding to the target field.
 
 For example, if an entity property if of type `java.util.Date`,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>;
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>;
 the values returned by the `terms` aggregation will have to be of type `java.util.Date` regardless.
 
 This should generally be what you want,
@@ -365,7 +365,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Elast
 [[search-dsl-aggregation-common-filter]]
 === Filter for fields in nested objects
 
-When the aggregation field is located in a <<mapper-orm-indexedembedded-structure-nested,nested object>>,
+When the aggregation field is located in a <<mapping-indexedembedded-structure-nested,nested object>>,
 by default all nested objects will be considered for the aggregation,
 and the document will be counted once for each value found in any nested object.
 

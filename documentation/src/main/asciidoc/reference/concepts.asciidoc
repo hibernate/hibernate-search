@@ -70,7 +70,7 @@ the basis for everything else from automatic indexing to the various search DSLs
 
 Mapping is usually configured using annotations in the entity model,
 but this can also be achieved using a programmatic API.
-To learn more about how to configure mapping, see <<mapper-orm-mapping>>.
+To learn more about how to configure mapping, see <<mapping>>.
 
 To learn how to index the resulting documents, see <<mapper-orm-indexing>>
 (hint: it's automatic).
@@ -142,7 +142,7 @@ Normalizers are simply analyzers that are guaranteed not to use a tokenizer:
 they can only use character filters and token filters.
 
 In Hibernate Search, analyzers and normalizers are referenced by their name,
-for example <<mapper-orm-directfieldmapping-analyzer,when defining a full-text field>>.
+for example <<mapping-directfieldmapping-analyzer,when defining a full-text field>>.
 Analyzers and normalizers have two separate namespaces.
 
 Some names are already assigned to built-in analyzers (in Elasticsearch in particular),
@@ -255,7 +255,7 @@ which can be located on different disks (Lucene)
 or different servers (Elasticsearch).
 * When searching: if one property, let's call it `category`,
 is often used to select a subset of documents,
-this property can be <<mapper-orm-bridge-routingbridge-routingkey,defined as a routing key in the mapping>>,
+this property can be <<bridge-routingbridge-routingkey,defined as a routing key in the mapping>>,
 so that it's used to route documents instead of the document ID.
 As a result, documents with the same value for `category` will be indexed in the same shard.
 Then when searching, if a query already filters documents so that it is known that the hits
@@ -273,7 +273,7 @@ This does not allow taking advantage of routing when searching,
 which requires multiple documents to share the same routing key.
 Applying routing to a search query in that case will return at most one result.
 To explicitly define the routing key to assign to each document,
-assign <<mapper-orm-bridge-routingbridge-routingkey,routing bridges>> to your entities.
+assign <<bridge-routingbridge-routingkey,routing bridges>> to your entities.
 
 [WARNING]
 ====

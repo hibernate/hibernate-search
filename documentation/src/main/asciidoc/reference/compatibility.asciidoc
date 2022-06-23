@@ -11,23 +11,23 @@
 |Java Runtime
 |8, 11 or 17
 |
-|Hibernate ORM (for the Hibernate ORM mapper)
+|Hibernate ORM (for the <<mapper-orm,Hibernate ORM mapper>>
 |{hibernateVersion}
 |
-|JPA (Java EE) (for the Hibernate ORM mapper)
+|JPA (Java EE) (for the <<mapper-orm,Hibernate ORM mapper>>
 |{jpaVersion}
 |
-|Jakarta Persistence (for the Hibernate ORM mapper)
+|Jakarta Persistence (for the <<mapper-orm,Hibernate ORM mapper>>
 |{jakartaPersistenceVersion}
 |Need to use <<other-integrations-jakarta,different Maven artifacts>>.
-|Apache Lucene (for the Lucene backend)
+|Apache Lucene (for the <<backend-lucene,Lucene backend>>)
 |{luceneVersion}
 |
-|Elasticsearch server (for the Elasticsearch backend)
+|Elasticsearch server (for the <<backend-elasticsearch,Elasticsearch backend>>)
 |{elasticsearchCompatibleVersions}
 |Other minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) may work
 but are not given priority for bugfixes and new features.
-|OpenSearch server (for the Elasticsearch backend)
+|OpenSearch server (for the <<backend-elasticsearch,Elasticsearch backend>>)
 |{openSearchCompatibleVersions}
 |Other minor versions may work
 but are not given priority for bugfixes and new features.
@@ -79,7 +79,7 @@ _and_ it covers the specifics of Quarkus.
 === [[gettingstarted-framework-spring-boot]] [[_spring_boot]] Spring Boot
 
 Hibernate Search can easily be integrated into a link:{springBootUrl}[Spring Boot] application.
-Just read about Spring Boot's specifics below, then follow the <<getting-started,getting started guide>>.
+Just read about Spring Boot's specifics below, then follow the <<mapper-orm-getting-started,getting started guide>>.
 
 [[compatibility-framework-spring-boot-configuration-properties]]
 ==== [[gettingstarted-framework-spring-boot-configuration-properties]] [[_configuration_properties]] Configuration properties
@@ -155,4 +155,4 @@ See <<configuration-bean-reference-parsing,this section>> for more information.
 If your framework of choice is not mentioned in the previous sections, don't worry:
 Hibernate Search works just fine with plenty of other frameworks.
 
-Just follow the <<getting-started,getting started guide>> to try it out.
+Just follow the <<mapper-orm-getting-started,getting started guide>> to try it out.

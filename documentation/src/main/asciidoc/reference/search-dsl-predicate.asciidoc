@@ -144,7 +144,7 @@ By default, the `match` predicate expects arguments to the `matching(...)` metho
 to have the same type as the entity property corresponding to the target field.
 
 For example, if an entity property is of an enum type,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `String`>>.
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `String`>>.
 `.matching(...)` will expect its argument to have the enum type regardless.
 
 This should generally be what you want,
@@ -164,8 +164,8 @@ See <<search-dsl-predicate-common-multiple-fields>>.
 === Analysis
 
 For most field types (number, date, ...), the match is exact.
-However, for <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text>> fields
-or <<mapper-orm-directfieldmapping-annotations-keywordfield,normalized keyword>> fields,
+However, for <<mapping-directfieldmapping-annotations-fulltextfield,full-text>> fields
+or <<mapping-directfieldmapping-annotations-keywordfield,normalized keyword>> fields,
 the value passed to the `matching(...)` method is analyzed or normalized before being compared to the values in the index.
 This means the match is more subtle in two ways.
 
@@ -185,7 +185,7 @@ In this case, the result of analysis is a lowercase string: `asimov`.
 In this case, `Asimov` was normalized to `asimov` too, so it matched.
 ====
 
-Second, for <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text>> fields,
+Second, for <<mapping-directfieldmapping-annotations-fulltextfield,full-text>> fields,
 the value passed to the `matching(...)` method is tokenized.
 This means multiple terms may be extracted from the input value,
 and the predicate will match all documents for which the given field has a value that _contains any of those terms_,
@@ -276,7 +276,7 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 * The score of a `match` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
 either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
 or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
-* The `match` predicate uses the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+* The `match` predicate uses the <<mapping-directfieldmapping-search-analyzer,search analyzer>>
 of targeted fields to analyze searched text by default,
 but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
@@ -356,7 +356,7 @@ By default, the `range` predicate expects arguments to the `between(...)`/`atLea
 to have the same type as the entity property corresponding to the target field.
 
 For example, if an entity property is of type `java.util.Date`,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>;
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>;
 `between(...)`/`atLeast(...)`/etc. will expect its arguments to have type `java.util.Date` regardless.
 Similarly, `range(...)` will expect an argument of type `Range<java.util.Date>`.
 
@@ -386,7 +386,7 @@ or for the whole predicate with a call to `.boost(...)` after `.between(...)`/`a
 
 The `phrase` predicate matches documents for which a given field contains a given sequence of words, in the given order.
 
-NOTE: This predicate is only available on <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text fields>>.
+NOTE: This predicate is only available on <<mapping-directfieldmapping-annotations-fulltextfield,full-text fields>>.
 
 .Matching a sequence of words
 ====
@@ -434,7 +434,7 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 * The score of a `phrase` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
 either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
 or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
-* The `phrase` predicate uses the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+* The `phrase` predicate uses the <<mapping-directfieldmapping-search-analyzer,search analyzer>>
 of targeted fields  to analyze searched text by default,
 but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
@@ -760,7 +760,7 @@ By default, the `terms` predicate expects arguments to the `matchingAny(...)` or
 to have the same type as the entity property corresponding to the target field.
 
 For example, if an entity property is of an enum type,
-<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `String`>>.
+<<mapping-directfieldmapping-supported-types,the corresponding field may be of type `String`>>.
 `.matchingAny(...)` will expect its argument to have the enum type regardless.
 
 This should generally be what you want,
@@ -1188,14 +1188,14 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 * The score of a `simpleQueryString` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
 either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
 or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
-* The `simpleQueryString` predicate uses the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+* The `simpleQueryString` predicate uses the <<mapping-directfieldmapping-search-analyzer,search analyzer>>
 of targeted fields to analyze searched text by default,
 but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
 [[search-dsl-predicate-nested]]
 == `nested`: match nested documents
 
-The `nested` predicate can be used on object fields <<mapper-orm-indexedembedded-structure,indexed as nested documents>>
+The `nested` predicate can be used on object fields <<mapping-indexedembedded-structure,indexed as nested documents>>
 to require two or more inner predicates to match _the same object_.
 This is how you ensure that `authors.firstname:isaac AND authors.lastname:asimov`
 will not match a book whose authors are "Jane Asimov" and "Isaac Deutscher".
@@ -1274,7 +1274,7 @@ will *not* match.
 The `within` predicate matches documents for which a given field is a geo-point
 contained within a given circle, bounding-box or polygon.
 
-NOTE: This predicate is only available on <<mapper-orm-geopoint,geo-point fields>>.
+NOTE: This predicate is only available on <<mapping-geopoint,geo-point fields>>.
 
 [[search-dsl-predicate-spatial-within-circle]]
 === Matching points within a circle (within a distance to a point)
@@ -1365,7 +1365,7 @@ A `named` predicate, i.e. a predicate defined in the mapping,
 can be called and included in a query.
 
 Below is an example that calls the named predicate
-from the example of section <<mapper-orm-bridge-named-predicate>>.
+from the example of section <<bridge-named-predicate>>.
 
 .Calling a named predicate
 ====
@@ -1380,7 +1380,7 @@ Here, the predicate is named `skuIdMatch` and was defined on an object field nam
 For named predicates defined at the root of the index,
 you can pass the predicate name directly, without any prefix.
 <2> Named predicates can accept parameters,
-which will be handled as explained in <<mapper-orm-bridge-named-predicate>>.
+which will be handled as explained in <<bridge-named-predicate>>.
 ====
 
 [[search-dsl-predicate-extensions]]
@@ -1563,7 +1563,7 @@ This can be achieved by calling `.analyzer(...)` and passing the name of the ana
 Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
 
 TIP: If you always apply the same analyzer when searching,
-you might want to configure a <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+you might want to configure a <<mapping-directfieldmapping-search-analyzer,search analyzer>>
 on your field instead. Then you won't need to use `.analyzer(...)` when searching.
 
 .Matching a value, analyzing it with a different analyzer

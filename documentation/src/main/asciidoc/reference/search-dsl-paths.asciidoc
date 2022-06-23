@@ -28,7 +28,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsI
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsIT.java[tags=nested_implicit]
 ----
-<1> Fields declared in object fields (created by <<mapper-orm-indexedembedded,`@IndexedEmbedded`>>, for example)
+<1> Fields declared in object fields (created by <<mapping-indexedembedded,`@IndexedEmbedded`>>, for example)
 must be referenced by their absolute path: the absolute path of the object field, followed by a dot,
 followed by the name of the targeted field.
 
@@ -39,7 +39,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/paths/FieldPathsI
 <1> Even within a `nested` predicate, fields referenced in inner predicates must be referenced by their absolute path.
 ====
 
-The only exception is <<mapper-orm-bridge-named-predicate,named predicates>> registered on object fields:
+The only exception is <<bridge-named-predicate,named predicates>> registered on object fields:
 the factory used to build those predicates interprets field paths as relative to that object field **by default**.
 
 [[search-dsl-paths-relative]]

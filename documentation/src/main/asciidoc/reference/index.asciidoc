@@ -17,7 +17,7 @@ include::preface.asciidoc[]
 
 include::compatibility.asciidoc[]
 
-include::getting-started.asciidoc[]
+include::mapper-orm-getting-started.asciidoc[]
 
 include::migrating.asciidoc[]
 
@@ -25,17 +25,19 @@ include::concepts.asciidoc[]
 
 include::architecture.asciidoc[]
 
+include::mapper-orm.asciidoc[]
+
 include::configuration.asciidoc[]
 
 include::entrypoints.asciidoc[]
 
-include::mapper-orm-mapping.asciidoc[]
+include::mapping.asciidoc[]
 
-include::mapper-orm-mapping-projection.asciidoc[]
+include::mapping-projection.asciidoc[]
 
-include::mapper-orm-bridge.asciidoc[]
+include::bridge.asciidoc[]
 
-include::mapper-orm-schema.asciidoc[]
+include::schema.asciidoc[]
 
 include::mapper-orm-indexing.asciidoc[]
 

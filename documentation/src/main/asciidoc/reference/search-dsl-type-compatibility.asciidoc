@@ -52,7 +52,7 @@ But what if we want users to type in some words instead, i.e. what if we want fu
 Then we will not have an `AuthenticationOutcome` instance to pass to the DSL, only a `String`...
 
 In that case, we will first need to assign some text to each enum.
-This can be achieved by defining a custom <<mapper-orm-bridge-valuebridge,`ValueBridge<AuthenticationOutcome, String>`>>
+This can be achieved by defining a custom <<bridge-valuebridge,`ValueBridge<AuthenticationOutcome, String>`>>
 and applying it to the `outcome` property to index a textual description of the outcome,
 instead of the default `Enum#name()`.
 
@@ -77,7 +77,7 @@ All methods that apply DSL converters offer a variant that accepts a `ValueConve
 A DSL converter is always automatically generated for value bridges.
 However, more complex bridges will require explicit configuration.
 
-See <<mapper-orm-bridge-typebridge>> or <<mapper-orm-bridge-propertybridge>> for more information.
+See <<bridge-typebridge>> or <<bridge-propertybridge>> for more information.
 ====
 
 [[search-dsl-projected-value-type]]
@@ -138,8 +138,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/converter/Project
 ====
 Projection converters must be configured explicitly in custom bridges.
 
-See <<mapper-orm-bridge-valuebridge>>,
-<<mapper-orm-bridge-propertybridge>> or <<mapper-orm-bridge-typebridge>> for more information.
+See <<bridge-valuebridge>>,
+<<bridge-propertybridge>> or <<bridge-typebridge>> for more information.
 ====
 
 [[search-dsl-multiple-fields]]
@@ -184,7 +184,7 @@ you cannot apply predicates, sorts or projections on that field.
 NOTE: Encoding is not only about the field type, such as `LocalDate` or `BigDecimal`.
 Some codecs are parameterized and two codecs with different parameters will often be considered incompatible.
 Examples of parameters include the format for temporal types
-or the <<mapper-orm-directfieldmapping-annotations-scalednumberfield, decimal scale>>
+or the <<mapping-directfieldmapping-annotations-scalednumberfield, decimal scale>>
 for `BigDecimal` and `BigInteger`.
 
 In that case, your only option is to change your mapping to avoid the conflict:

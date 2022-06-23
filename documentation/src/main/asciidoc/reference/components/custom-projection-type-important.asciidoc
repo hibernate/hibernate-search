@@ -3,13 +3,13 @@
 There are a few constraints to keep in mind when annotating a custom projection type:
 
 * The custom projection type must be in the same JAR as entity types,
-or Hibernate Search will <<mapper-orm-mapping-projection-type-detection,require additional configuration>>.
+or Hibernate Search will <<mapping-projection-type-detection,require additional configuration>>.
 * The custom projection type must be compiled in such a way that
-<<mapper-orm-mapping-projection-inner-inference-basics,constructor parameter names are included in the Java bytecode>>.
+<<mapping-projection-inner-inference-basics,constructor parameter names are included in the Java bytecode>>.
 * When projecting on value fields, the constraints of the <<search-dsl-projection-field,`field`>> projection still apply.
 In particular, with the <<backend-lucene,Lucene backend>>, value fields involved in the projection
-must be configured as <<mapper-orm-directfieldmapping-projectable,projectable>>.
+must be configured as <<mapping-directfieldmapping-projectable,projectable>>.
 * When projecting on object fields, the constraints of the <<search-dsl-projection-object,`object`>> projection still apply.
 In particular, with the <<backend-lucene,Lucene backend>>, object fields involved in the projection
-must be configured as <<mapper-orm-indexedembedded-structure-nested,nested>>.
+must be configured as <<mapping-indexedembedded-structure-nested,nested>>.
 ====
