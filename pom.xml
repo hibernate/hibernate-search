@@ -347,7 +347,7 @@
         <version.org.apache.derby>10.14.2.0</version.org.apache.derby>
 
         <!-- >>> JSR 352: JBeret SE dependencies -->
-        <version.org.jboss.marshalling>2.0.12.Final</version.org.jboss.marshalling>
+        <version.org.jboss.marshalling>2.1.0.Final</version.org.jboss.marshalling>
         <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
         <version.org.google.guava>31.1-jre</version.org.google.guava>
 
