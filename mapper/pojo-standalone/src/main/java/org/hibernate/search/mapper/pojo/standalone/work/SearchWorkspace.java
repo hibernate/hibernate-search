@@ -4,10 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.work;
+package org.hibernate.search.mapper.pojo.standalone.work;
 
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
+
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The entry point for explicit, large-scale index operations.
@@ -15,12 +17,12 @@ import java.util.concurrent.CompletionStage;
  * A {@link SearchWorkspace} targets a pre-defined set of indexed types (and their indexes),
  * filtered to only affect a single tenant, if relevant.
  * <p>
- * While {@link org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings#AUTOMATIC_INDEXING_ENABLED automatic indexing}
- * generally takes care of indexing entities as they are persisted/deleted in the database,
+ * While {@link SearchIndexingPlan indexing plans} take care of indexing individual entities,
  * there are cases where massive operations must be applied to the index,
  * such as completely purging the index.
  * This is where the {@link SearchWorkspace} comes in.
  */
+@Incubating
 public interface SearchWorkspace {
 
 	/**

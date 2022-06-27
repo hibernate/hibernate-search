@@ -29,6 +29,8 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
+import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
@@ -64,6 +66,20 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	@Override
 	public SearchSchemaManager schemaManager() {
 		return new SearchSchemaManagerImpl( schemaManagerDelegate() );
+	}
+
+	@Override
+	public SearchWorkspace workspace() {
+		return workspace( (String) null );
+	}
+
+	@Override
+	public SearchWorkspace workspace(String tenantId) {
+		return workspace( mappingContext.detachedBackendSessionContext( tenantId ) );
+	}
+
+	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
+		return new SearchWorkspaceImpl( delegate.workspace( detachedSessionContext ) );
 	}
 
 	@Override
