@@ -70,6 +70,13 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
+	public void noClause() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool() ) )
+				.hasNoHits();
+	}
+
+	@Test
 	public void must() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
