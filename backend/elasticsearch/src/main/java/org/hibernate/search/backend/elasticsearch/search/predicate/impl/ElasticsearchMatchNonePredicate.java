@@ -20,7 +20,7 @@ class ElasticsearchMatchNonePredicate extends AbstractElasticsearchPredicate {
 	private static final JsonObjectAccessor MATCH_NONE_ACCESSOR = JsonAccessor.root().property( "match_none" )
 			.asObject();
 
-	private ElasticsearchMatchNonePredicate(Builder builder) {
+	ElasticsearchMatchNonePredicate(AbstractBuilder builder) {
 		super( builder );
 	}
 

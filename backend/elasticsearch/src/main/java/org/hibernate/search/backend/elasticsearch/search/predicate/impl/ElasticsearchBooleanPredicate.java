@@ -210,6 +210,11 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		@Override
 		public SearchPredicate build() {
+			if ( mustClauses == null && shouldClauses == null && mustNotClauses == null && filterClauses == null ) {
+				// HSEARCH-4619: a boolean predicate without any clause must not match anything.
+				return new ElasticsearchMatchNonePredicate( this );
+			}
+
 			// Forcing to Lucene's defaults. See HSEARCH-3534
 			if ( minimumShouldMatchConstraints == null && hasAtLeastOneMustOrFilterPredicate() ) {
 				minimumShouldMatchNumber( 0, 0 );
