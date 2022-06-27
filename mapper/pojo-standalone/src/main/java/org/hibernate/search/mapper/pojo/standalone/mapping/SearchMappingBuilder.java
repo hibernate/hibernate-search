@@ -251,7 +251,7 @@ public final class SearchMappingBuilder {
 	 * @param map A map containing property names (property keys) as map keys and property values as map values.
 	 * @return {@code this}, for call chaining.
 	 */
-	public SearchMappingBuilder properties(Map<String, Object> map) {
+	public SearchMappingBuilder properties(Map<String, ?> map) {
 		properties.putAll( map );
 		return this;
 	}
