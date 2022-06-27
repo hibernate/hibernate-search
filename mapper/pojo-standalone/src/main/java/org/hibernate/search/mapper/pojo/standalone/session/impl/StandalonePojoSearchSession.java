@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceImpl;
@@ -129,6 +130,11 @@ public class StandalonePojoSearchSession extends AbstractPojoSearchSession
 	@Override
 	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
 		return scope( types ).schemaManager();
+	}
+
+	@Override
+	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
+		return scope( types ).workspace( DetachedBackendSessionContext.of( this ) );
 	}
 
 	@Override

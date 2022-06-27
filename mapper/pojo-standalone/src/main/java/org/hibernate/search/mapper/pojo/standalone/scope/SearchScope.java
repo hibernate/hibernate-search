@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -112,6 +113,27 @@ public interface SearchScope<E> {
 	 * @return A {@link SearchSchemaManager}.
 	 */
 	SearchSchemaManager schemaManager();
+
+	/**
+	 * Create a {@link SearchWorkspace} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for single-tenant applications.
+	 * If multi-tenancy is enabled, use {@link #workspace(String)} instead.
+	 *
+	 * @return A {@link SearchWorkspace}.
+	 */
+	SearchWorkspace workspace();
+
+	/**
+	 * Create a {@link SearchWorkspace} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for multi-tenant applications.
+	 * If multi-tenancy is disabled, use {@link #workspace()} instead.
+	 *
+	 * @param tenantId The identifier of the tenant whose index content should be targeted.
+	 * @return A {@link SearchWorkspace}.
+	 */
+	SearchWorkspace workspace(String tenantId);
 
 	/**
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.

@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -136,6 +137,33 @@ public interface SearchSession extends AutoCloseable {
 	 * @return A {@link SearchSchemaManager}.
 	 */
 	SearchSchemaManager schemaManager(Collection<? extends Class<?>> types);
+
+	/**
+	 * Create a {@link SearchWorkspace} for the indexes mapped to all indexed types.
+	 *
+	 * @return A {@link SearchWorkspace}.
+	 */
+	default SearchWorkspace workspace() {
+		return workspace( Collections.singleton( Object.class ) );
+	}
+
+	/**
+	 * Create a {@link SearchWorkspace} for the indexes mapped to the given type, or to any of its sub-types.
+	 *
+	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return A {@link SearchWorkspace}.
+	 */
+	default SearchWorkspace workspace(Class<?> ... types) {
+		return workspace( Arrays.asList( types ) );
+	}
+
+	/**
+	 * Create a {@link SearchWorkspace} for the indexes mapped to the given types, or to any of their sub-types.
+	 *
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return A {@link SearchWorkspace}.
+	 */
+	SearchWorkspace workspace(Collection<? extends Class<?>> types);
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.
