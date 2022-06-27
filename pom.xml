@@ -289,7 +289,7 @@
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0.1</version.javax.batch>
-        <version.jakarta.batch>2.1.0</version.jakarta.batch>
+        <version.jakarta.batch>2.1.1</version.jakarta.batch>
         <version.org.jberet>1.4.7.Final</version.org.jberet>
         <version.org.jberet.jakarta>2.0.4.Final</version.org.jberet.jakarta>
 
