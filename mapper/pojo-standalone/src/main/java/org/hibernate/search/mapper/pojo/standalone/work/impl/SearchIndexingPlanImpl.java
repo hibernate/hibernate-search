@@ -100,7 +100,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+	public void purge(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes, null );
 	}
 
