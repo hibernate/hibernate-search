@@ -57,18 +57,21 @@ public class AggregationDslIT {
 	public void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
-			SearchSession searchSession = Search.session( entityManager );
+			SearchSession searchSession = /* ... */ // <1>
+					// end::entryPoint-lambdas[]
+					Search.session( entityManager );
+			// tag::entryPoint-lambdas[]
 
-			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" ); // <1>
+			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" ); // <2>
 
-			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
-					.where( f -> f.match().field( "title" ) // <3>
+			SearchResult<Book> result = searchSession.search( Book.class ) // <3>
+					.where( f -> f.match().field( "title" ) // <4>
 							.matching( "robot" ) )
-					.aggregation( countsByGenreKey, f -> f.terms() // <4>
+					.aggregation( countsByGenreKey, f -> f.terms() // <5>
 							.field( "genre", Genre.class ) )
-					.fetch( 20 ); // <5>
+					.fetch( 20 ); // <6>
 
-			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey ); // <6>
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey ); // <7>
 			// end::entryPoint-lambdas[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -78,7 +81,10 @@ public class AggregationDslIT {
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchSession searchSession = Search.session( entityManager );
+			SearchSession searchSession = /* ... */
+					// end::entryPoint-objects[]
+					Search.session( entityManager );
+			// tag::entryPoint-objects[]
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 

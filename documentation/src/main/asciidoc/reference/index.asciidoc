@@ -27,6 +27,8 @@ include::architecture.asciidoc[]
 
 include::configuration.asciidoc[]
 
+include::entrypoints.asciidoc[]
+
 include::mapper-orm-mapping.asciidoc[]
 
 include::mapper-orm-mapping-projection.asciidoc[]

@@ -13,11 +13,12 @@ Other sorts, including the sort by field value, can be configured when building 
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-lambdas]
 ----
-<1> Start building the query as usual.
-<2> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Start building the query as usual.
+<3> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
 then (for those with the same page count) on field "title_sort" in ascending order.
 If the field does not exist or cannot be sorted on, an exception will be thrown.
-<3> Fetch the results, which will be sorted according to instructions.
+<4> Fetch the results, which will be sorted according to instructions.
 ====
 
 Alternatively, if you don't want to use lambdas:

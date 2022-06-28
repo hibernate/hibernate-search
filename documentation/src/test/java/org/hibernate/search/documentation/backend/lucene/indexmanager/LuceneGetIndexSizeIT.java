@@ -38,7 +38,10 @@ public class LuceneGetIndexSizeIT {
 	@Test
 	public void computeIndexSize() {
 		//tag::computeIndexSize[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::computeIndexSize[]
+				Search.mapping( entityManagerFactory );
+		//tag::computeIndexSize[]
 		IndexManager indexManager = mapping.indexManager( "Book" ); // <2>
 		LuceneIndexManager luceneIndexManager = indexManager.unwrap( LuceneIndexManager.class ); // <3>
 		long size = luceneIndexManager.computeSizeInBytes(); // <4>

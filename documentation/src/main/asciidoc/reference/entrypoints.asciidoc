@@ -1,0 +1,156 @@
+[[entrypoints]]
+= Main API Entry Points
+
+This section details the main entry points to Hibernate Search APIs at runtime,
+i.e. APIs to index, search, look up metadata, ...
+
+[[entrypoints-search-mapping]]
+== `SearchMapping`
+
+The `SearchMapping` is the top-most entrypoint to Hibernate Search APIs:
+it represents the whole mapping from entities to indexes.
+
+The `SearchMapping` is thread-safe: it can safely be used concurrently from multiple threads.
+However, that does not mean the objects it returns (`SearchWorkspace`, ...) are themselves thread-safe.
+
+[TIP]
+====
+The `SearchMapping` in Hibernate Search is the equivalent of
+the `EntityManagerFactory`/`SessionFactory` in JPA/Hibernate ORM.
+====
+
+[TIP]
+====
+Some frameworks, such as link:{quarkusUrl}[Quarkus],
+allow you to simply https://quarkus.io/guides/hibernate-search-orm-elasticsearch#multiple-persistence-units-attaching-cdi[`@Inject` the `SearchMapping`]
+into your CDI beans.
+====
+
+To retrieve the `SearchMapping` with the Hibernate ORM integration,
+call `Search.mapping(...)` and pass the `EntityManagerFactory`/`SessionFactory`:
+
+.Retrieving the `SearchMapping` from a Hibernate ORM `SessionFactory`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchMapping-fromSessionFactory]
+----
+<1> Retrieve the `SessionFactory`.
+Details depend on <<compatibility-framework,your framework>>, but this is generally achieved by injecting it into your own class,
+e.g. by annotating a field of that type with `@Inject` or `@PersistenceUnit`.
+<2> Call `Search.mapping(...)`, passing the `SessionFactory` as an argument.
+This will return the `SearchMapping`.
+====
+
+Still with the Hibernate ORM integration, the same can be done from a JPA `EntityManagerFactory`:
+
+.Retrieving the `SearchMapping` from a JPA `EntityManagerFactory`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchMapping-fromEntityManagerFactory]
+----
+<1> Retrieve the `EntityManagerFactory`.
+Details depend on <<compatibility-framework,your framework>>, but this is generally achieved by injecting it into your own class,
+e.g. by annotating a field of that type with `@Inject` or `@PersistenceUnit`.
+<2> Call `Search.mapping(...)`, passing the `EntityManagerFactory` as an argument.
+This will return the `SearchMapping`.
+====
+
+[[entrypoints-search-session]]
+== `SearchSession`
+
+The `SearchSession` represents the context in which a sequence of related operations are executed.
+It should generally be used for a very short time, for example to process a single web request.
+
+The `SearchSession` is **not** thread-safe: it must not be used concurrently from multiple threads.
+
+[TIP]
+====
+The `SearchSession` in Hibernate Search is the equivalent of
+the `EntityManager`/`Session` in JPA/Hibernate ORM.
+====
+
+[TIP]
+====
+Some frameworks, such as link:{quarkusUrl}[Quarkus],
+allow you to simply https://quarkus.io/guides/hibernate-search-orm-elasticsearch#multiple-persistence-units-attaching-cdi[`@Inject` the `SearchSession`]
+into your CDI beans.
+====
+
+To retrieve the `SearchSession` with the Hibernate ORM integration,
+call `Search.session(...)` and pass the `EntityManager`/`Session`:
+
+.Retrieving the `SearchSession` from a Hibernate ORM `Session`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchSession-fromSession]
+----
+<1> Retrieve the `Session`.
+Details depend on <<compatibility-framework,your framework>>, but this is generally achieved by injecting it into your own class,
+e.g. by annotating a field of that type with `@Inject` or `@PersistenceContext`.
+<2> Call `Search.session(...)`, passing the `Session` as an argument.
+This will return the `SearchSession`.
+====
+
+Still with the Hibernate ORM integration, the same can be done from a JPA `EntityManager`:
+
+.Retrieving the `SearchSession` from a JPA `EntityManager`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchSession-fromEntityManager]
+----
+<1> Retrieve the `EntityManager`.
+Details depend on <<compatibility-framework,your framework>>, but this is generally achieved by injecting it into your own class,
+e.g. by annotating a field of that type with `@Inject` or `@PersistenceContext`.
+<2> Call `Search.mapping(...)`, passing the `EntityManager` as an argument.
+This will return the `SearchSession`.
+====
+
+[[entrypoints-search-scope]]
+== `SearchScope`
+
+The `SearchScope` represents a set of indexed entities and their indexes.
+
+The `SearchScope` is thread-safe: it can safely be used concurrently from multiple threads.
+However, that does not mean the objects it returns (`SearchWorkspace`, ...) are themselves thread-safe.
+
+A `SearchScope` can be retrieved from a <<entrypoints-search-mapping,`SearchMapping`>> as well as from a <<entrypoints-search-session,`SearchSession`>>.
+
+.Retrieving a `SearchScope` from a `SearchMapping`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchScope-fromSearchMapping]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Create a `SearchScope` targeting the `Book` entity type only.
+<3> Create a `SearchScope` targeting both the `Associate` entity type and the `Manager` entity type.
+The scope's generic type parameter can be any common supertype of those entity types.
+<4> A scope will always target all subtypes of the given classes, and the given classes do not need to be indexed entity types themselves.
+This creates a `SearchScope` targeting all (indexed entity) subtypes of the `Person` interface;
+in our case this will target both the `Associate` entity type and the `Manager` entity type.
+<5> For advanced use cases, it is possible to target (indexed entity) types by their name,
+e.g. the JPA entity name.
+<6> Passing `Object.class` will create a scope targeting every single indexed entity types.
+====
+
+.Retrieving a `SearchScope` from a `SearchSession`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entrypoints/HibernateOrmEntryPointsIT.java[tags=searchScope-fromSearchSession]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Create a `SearchScope` targeting the `Book` entity type only.
+<3> Create a `SearchScope` targeting both the `Associate` entity type and the `Manager` entity type.
+The scope's generic type parameter can be any common supertype of those entity types.
+<4> A scope will always target all subtypes of the given classes, and the given classes do not need to be indexed entity types themselves.
+This creates a `SearchScope` targeting all (indexed entity) subtypes of the `Person` interface;
+in our case this will target both the `Associate` entity type and the `Manager` entity type.
+<5> For advanced use cases, it is possible to target (indexed entity) types by their name,
+e.g. the JPA entity name.
+<6> Passing `Object.class` will create a scope targeting every single indexed entity types.
+====

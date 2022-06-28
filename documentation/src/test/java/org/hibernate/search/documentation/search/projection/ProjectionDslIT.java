@@ -68,12 +68,15 @@ public class ProjectionDslIT {
 	public void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
-			SearchSession searchSession = Search.session( entityManager );
+			SearchSession searchSession = /* ... */ // <1>
+					// end::entryPoint-lambdas[]
+					Search.session( entityManager );
+			// tag::entryPoint-lambdas[]
 
-			List<String> result = searchSession.search( Book.class ) // <1>
-					.select( f -> f.field( "title", String.class ) ) // <2>
+			List<String> result = searchSession.search( Book.class ) // <2>
+					.select( f -> f.field( "title", String.class ) ) // <3>
 					.where( f -> f.matchAll() )
-					.fetchHits( 20 ); // <3>
+					.fetchHits( 20 ); // <4>
 			// end::entryPoint-lambdas[]
 			assertThat( result ).containsExactlyInAnyOrder(
 					entityManager.getReference( Book.class, BOOK1_ID ).getTitle(),
@@ -85,7 +88,10 @@ public class ProjectionDslIT {
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchSession searchSession = Search.session( entityManager );
+			SearchSession searchSession = /* ... */
+					// end::entryPoint-objects[]
+					Search.session( entityManager );
+			// tag::entryPoint-objects[]
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 

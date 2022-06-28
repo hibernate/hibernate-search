@@ -1194,7 +1194,7 @@ can be retrieved from the Lucene backend.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromBackend]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `Backend`.
 <3> Narrow down the backend to the `LuceneBackend` type.
 <4> Get an analyzer by name.
@@ -1217,7 +1217,7 @@ delegating to the analyzer configured in the mapping for each field.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromIndexManager]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `IndexManager`.
 <3> Narrow down the index manager to the `LuceneIndexManager` type.
 <4> Get the indexing analyzer.
@@ -1240,7 +1240,7 @@ The size of a Lucene index can be retrieved from the `LuceneIndexManager`.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmanager/LuceneGetIndexSizeIT.java[tags=computeIndexSize]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `IndexManager`.
 <3> Narrow down the index manager to the `LuceneIndexManager` type.
 <4> Compute the index size and get the result.
@@ -1258,7 +1258,7 @@ The low-level `IndexReader` can be retrieved from the `LuceneIndexScope`.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/lowlevel/LuceneLowLevelIndexReaderIT.java[tags=indexReader]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `LuceneIndexScope` extending the search scope with the `LuceneExtension`.
 <3> Open an instance of `IndexReader`. Optionally it is possible to provide the routing keys
 to target only some shards of the indexes using the method `openIndexReader(Set<String>)`.

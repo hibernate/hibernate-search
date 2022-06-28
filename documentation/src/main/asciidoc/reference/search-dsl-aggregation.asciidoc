@@ -31,14 +31,15 @@ Aggregations can be configured when building the search query:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=entryPoint-lambdas]
 ----
-<1> Define a key that will uniquely identify the aggregation. Make sure to give it the correct type (see <6>).
-<2> Start building the query as usual.
-<3> Define a predicate: the aggregation will only take into account documents matching this predicate.
-<4> Request an aggregation on the `genre` field,
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Define a key that will uniquely identify the aggregation. Make sure to give it the correct type (see <6>).
+<3> Start building the query as usual.
+<4> Define a predicate: the aggregation will only take into account documents matching this predicate.
+<5> Request an aggregation on the `genre` field,
 with a separate count for each genre: science-fiction, crime fiction, ...
 If the field does not exist or cannot be aggregated, an exception will be thrown.
-<5> Fetch the results.
-<6> Retrieve the aggregation from the results as a `Map`,
+<6> Fetch the results.
+<7> Retrieve the aggregation from the results as a `Map`,
 with the genre as key and the hit count as value of type `Long`.
 ====
 

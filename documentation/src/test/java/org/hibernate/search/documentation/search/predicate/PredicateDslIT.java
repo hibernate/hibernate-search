@@ -58,12 +58,15 @@ public class PredicateDslIT {
 	public void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
-			SearchSession searchSession = Search.session( entityManager );
+			SearchSession searchSession = /* ... */ // <1>
+					// end::entryPoint-lambdas[]
+					Search.session( entityManager );
+			// tag::entryPoint-lambdas[]
 
-			List<Book> result = searchSession.search( Book.class ) // <1>
-					.where( f -> f.match().field( "title" ) // <2>
+			List<Book> result = searchSession.search( Book.class ) // <2>
+					.where( f -> f.match().field( "title" ) // <3>
 							.matching( "robot" ) )
-					.fetchHits( 20 ); // <3>
+					.fetchHits( 20 ); // <4>
 			// end::entryPoint-lambdas[]
 			assertThat( result )
 					.extracting( Book::getId )
@@ -72,7 +75,10 @@ public class PredicateDslIT {
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchSession searchSession = Search.session( entityManager );
+			SearchSession searchSession = /* ... */
+					// end::entryPoint-objects[]
+					Search.session( entityManager );
+			// tag::entryPoint-objects[]
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 

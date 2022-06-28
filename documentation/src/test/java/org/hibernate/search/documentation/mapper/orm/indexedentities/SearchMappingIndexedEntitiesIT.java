@@ -45,7 +45,10 @@ public class SearchMappingIndexedEntitiesIT {
 	@Test
 	public void indexedEntities() {
 		//tag::indexedEntities[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::indexedEntities[]
+				Search.mapping( entityManagerFactory );
+		//tag::indexedEntities[]
 		SearchIndexedEntity<Book> bookEntity = mapping.indexedEntity( Book.class ); // <2>
 		String jpaName = bookEntity.jpaName(); // <3>
 		IndexManager indexManager = bookEntity.indexManager(); // <4>
