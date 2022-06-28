@@ -39,7 +39,7 @@ include::bridge.asciidoc[]
 
 include::schema.asciidoc[]
 
-include::mapper-orm-indexing.asciidoc[]
+include::indexing.asciidoc[]
 
 include::search-dsl.asciidoc[]
 

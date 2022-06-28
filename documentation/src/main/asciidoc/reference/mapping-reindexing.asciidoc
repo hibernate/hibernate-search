@@ -173,7 +173,7 @@ saying it needs an inverse side to the `Book` -> `BookCategory` association.
 
 However, in this case, we don't expect the name of a `BookCategory` to change.
 That's really "reference" data, which changes so rarely that we can conceivably plan ahead such change
-and <<mapper-orm-indexing-massindexer,reindex all books>> whenever that happens.
+and <<indexing-massindexer,reindex all books>> whenever that happens.
 So we would really not mind if Hibernate Search just ignored changes to `BookCategory`...
 
 That's what `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)` is for:
@@ -203,7 +203,7 @@ Thus, Hibernate Search will reindex the book automatically.
 Hibernate Search will consider it a "deep" change, since it occurs beyond the boundaries of the `Book` entity.
 Thus, Hibernate Search will *not* reindex books of that category automatically.
 The index will become slightly out-of-sync,
-but this can be solved by <<mapper-orm-indexing-massindexer,reindexing>> `Book` entities,
+but this can be solved by <<indexing-massindexer,reindexing>> `Book` entities,
 for example every night.
 
 [[mapping-reindexing-reindexonupdate-no]]
@@ -236,7 +236,7 @@ reindexing thousands of sensors every few milliseconds probably won't perform we
 In this scenario, however, search on sensor value is not considered critical and indexes don't need to be as fresh.
 We can accept indexes to lag behind a few minutes when it comes to sensor value.
 We can consider setting up a batch process that runs every few seconds
-to reindex all sensors, either through a <<mapper-orm-indexing-massindexer,mass indexer>>
+to reindex all sensors, either through a <<indexing-massindexer,mass indexer>>
 or <<mapper-orm-indexing-manual,other means>>.
 So we would really not mind if Hibernate Search just ignored changes to sensor values...
 

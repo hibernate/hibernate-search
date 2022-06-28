@@ -1,8 +1,8 @@
-[[mapper-orm-indexing-massindexer]]
-= [[search-batchindex-massindexer]] Reindexing large volumes of data with the `MassIndexer`
+[[indexing-massindexer]]
+= [[mapper-orm-indexing-massindexer]] [[search-batchindex-massindexer]] Reindexing large volumes of data with the `MassIndexer`
 
-[[mapper-orm-indexing-massindexer-basics]]
-== Basics
+[[indexing-massindexer-basics]]
+== [[mapper-orm-indexing-massindexer-basics]] Basics
 
 There are cases where automatic indexing is not enough,
 because a pre-existing database has to be indexed:
@@ -10,7 +10,7 @@ because a pre-existing database has to be indexed:
 * when restoring a database backup;
 * when indexes had to be wiped,
 for example because the Hibernate Search mapping or some core settings changed;
-* when entities cannot be indexed as they change (e.g. with <<mapper-orm-indexing-automatic,automatic indexing>>) for performance reasons,
+* when entities cannot be indexed as they change (e.g. with <<indexing-automatic,automatic indexing>>) for performance reasons,
 and periodic reindexing (every night, ...) is preferred.
 
 To address these situations, Hibernate Search provides the `MassIndexer`:
@@ -59,7 +59,7 @@ A note to MySQL users: the `MassIndexer` uses forward only scrollable results
 to iterate on the primary keys to be loaded,
 but MySQL's JDBC driver will preload all values in memory.
 
-To avoid this "optimization" set the <<mapper-orm-indexing-massindexer-parameters-idfetchsize,`idFetchSize` parameter>>
+To avoid this "optimization" set the <<indexing-massindexer-parameters-idfetchsize,`idFetchSize` parameter>>
 to `Integer.MIN_VALUE`.
 ====
 
@@ -97,8 +97,8 @@ A `CompletionStage` is returned.
 Although the `MassIndexer` is simple to use, some tweaking is recommended to speed up the process.
 Several optional parameters are available, and can be set as shown below,
 before the mass indexer starts.
-See <<mapper-orm-indexing-massindexer-parameters>> for a reference of all available parameters,
-and <<mapper-orm-indexing-massindexer-tuning>> for details about key topics.
+See <<indexing-massindexer-parameters>> for a reference of all available parameters,
+and <<indexing-massindexer-tuning>> for details about key topics.
 
 .Using a tuned MassIndexer
 ====
@@ -119,11 +119,11 @@ Running the `MassIndexer` with many threads will require many connections to the
 If you don't have a sufficiently large connection pool, the `MassIndexer` itself and/or your other
 applications could starve and be unable to serve other requests:
 make sure you size your connection pool according to the mass indexing parameters,
-as explained in <<mapper-orm-indexing-massindexer-tuning-threads>>.
+as explained in <<indexing-massindexer-tuning-threads>>.
 ====
 
-[[mapper-orm-indexing-massindexer-conditional]]
-== Conditional reindexing
+[[indexing-massindexer-conditional]]
+== [[mapper-orm-indexing-massindexer-conditional]] Conditional reindexing
 You can also select a subset of target entities to be reindexed.
 
 .Use of Conditional reindexing
@@ -143,14 +143,14 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 [WARNING]
 ====
 Even if the reindexing is applied on a subset of entities, by default *all entities* will be purged at the start.
-The purge <<mapper-orm-indexing-massindexer-parameters,can be disabled completely>>,
+The purge <<indexing-massindexer-parameters,can be disabled completely>>,
 but when enabled there is no way to filter the entities that will be purged.
 
 See https://hibernate.atlassian.net/browse/HSEARCH-3304[HSEARCH-3304] for more information.
 ====
 
-[[mapper-orm-indexing-massindexer-parameters]]
-== [[_useful_parameters_for_batch_indexing]] `MassIndexer` parameters
+[[indexing-massindexer-parameters]]
+== [[mapper-orm-indexing-massindexer-parameters]] [[_useful_parameters_for_batch_indexing]] `MassIndexer` parameters
 
 .`MassIndexer` parameters
 |===
@@ -167,9 +167,9 @@ That is to say, the number of threads spawned for entity loading
 will be `typesToIndexInParallel * threadsToLoadObjects`
 (+ 1 thread per type to retrieve the IDs of entities to load).
 
-|[[mapper-orm-indexing-massindexer-parameters-idfetchsize]]`idFetchSize(int)`
+|[[indexing-massindexer-parameters-idfetchsize]]`idFetchSize(int)`
 |`100`
-|The fetch size to be used when loading primary keys. Some databases
+|[[mapper-orm-indexing-massindexer-parameters-idfetchsize]]The fetch size to be used when loading primary keys. Some databases
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
 will attempt to preload everything in memory.
 
@@ -179,9 +179,9 @@ will attempt to preload everything in memory.
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
 will attempt to preload everything in memory.
 
-|[[mapper-orm-indexing-massindexer-parameters-drop-and-create-schema]]`dropAndCreateSchemaOnStart(boolean)`
+|[[indexing-massindexer-parameters-drop-and-create-schema]]`dropAndCreateSchemaOnStart(boolean)`
 |`false`
-|Drops the indexes and their schema (if they exist) and re-creates them before indexing.
+|[[mapper-orm-indexing-massindexer-parameters-drop-and-create-schema]]Drops the indexes and their schema (if they exist) and re-creates them before indexing.
 
 Indexes will be unavailable for a short time during the dropping and re-creation,
 so this should only be used when failures of concurrent operations on the indexes (automatic indexing, ...)
@@ -214,7 +214,7 @@ This setting has no effect if `purgeAllOnStart` is set to false.
 |`mergeSegmentsOnFinish(boolean)`
 |`false`
 |Force merging of each index into a single segment after indexing.
-This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
+This operation does not always improve performance: see <<indexing-workspace-merge-segments>>.
 
 |`cacheMode(CacheMode)`
 |`CacheMode.IGNORE`
@@ -273,11 +273,11 @@ Implementations of `MassIndexingFailureHandler` must be thread-safe.
 
 |===
 
-[[mapper-orm-indexing-massindexer-tuning]]
-== Tuning the `MassIndexer` for best performance
+[[indexing-massindexer-tuning]]
+== [[mapper-orm-indexing-massindexer-tuning]] Tuning the `MassIndexer` for best performance
 
-[[mapper-orm-indexing-massindexer-tuning-basics]]
-=== Basics
+[[indexing-massindexer-tuning-basics]]
+=== [[mapper-orm-indexing-massindexer-tuning-basics]] Basics
 
 The `MassIndexer` was designed to finish the re-indexing task as quickly as possible,
 but there is no one-size-fits-all solution,
@@ -299,8 +299,8 @@ to assess performance more quickly.
 * Tune your entity types individually *before*
 you try to tune a mass indexing operation that indexes multiple entity types in parallel.
 
-[[mapper-orm-indexing-massindexer-tuning-threads]]
-=== [[search-batchindexing-threadsandconnections]] Threads and JDBC connections
+[[indexing-massindexer-tuning-threads]]
+=== [[mapper-orm-indexing-massindexer-tuning-threads]] [[search-batchindexing-threadsandconnections]] Threads and JDBC connections
 
 Increasing parallelism usually helps as the bottleneck
 usually is the latency to the database connection:

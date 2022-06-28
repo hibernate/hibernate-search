@@ -1,0 +1,123 @@
+[[indexing-workspace]]
+== [[mapper-orm-indexing-manual-largescale]] Explicitly altering a whole index
+
+Some index operations are not about a specific entity/document,
+but rather about a large number of documents, possibly all of them.
+This includes, for example, purging the index to remove all of its content.
+
+The operations are accessed through the `SearchWorkspace` interface,
+and executed immediately (*outside* the context of a `SearchSession`, ORM session or transaction).
+
+The `SearchWorkspace` can be retrieved from the <<entrypoints-search-mapping,`SearchMapping`>>,
+and can target one, several or all indexes:
+
+.Retrieving a `SearchWorkspace` from the `SearchMapping`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
+----
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
+<2> Get a workspace targeting all indexes.
+<3> Get a workspace targeting the index mapped to the `Book` entity type.
+<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
+====
+
+Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the <<entrypoints-search-session,`SearchSession`>>:
+
+.Retrieving a `SearchWorkspace` from the `SearchSession`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Get a workspace targeting all indexes.
+<3> Get a workspace targeting the index mapped to the `Book` entity type.
+<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
+====
+
+The `SearchWorkspace` exposes various large-scale operations
+that can be applied to an index or a set of indexes.
+These operations are triggered as soon as they are requested,
+without waiting for the transaction commit.
+
+This interface offers the following methods:
+
+`purge()`::
+Delete all documents from indexes targeted by this workspace.
++
+With multi-tenancy enabled, only documents of the current tenant will be removed:
+the tenant of the session from which this workspace originated.
+`purgeAsync()`::
+Asynchronous version of `purge()` returning a `CompletionStage`.
+`purge(Set<String> routingKeys)`::
+Delete documents from indexes targeted by this workspace
+that were indexed with any of the given routing keys.
++
+With multi-tenancy enabled, only documents of the current tenant will be removed:
+the tenant of the session from which this workspace originated.
+`purgeAsync(Set<String> routingKeys)`::
+Asynchronous version of `purge(Set<String>)` returning a `CompletionStage`.
+[[indexing-workspace-flush]]`flush()`::
+[[mapper-orm-indexing-manual-flush]]Flush to disk the changes to indexes that have not been committed yet.
+In the case of backends with a transaction log (Elasticsearch),
+also apply operations from the transaction log that were not applied yet.
++
+This is generally not useful as Hibernate Search commits changes automatically.
+See <<concepts-commit-refresh>> for more information.
+`flushAsync()`::
+Asynchronous version of `flush()` returning a `CompletionStage`.
+[[indexing-workspace-refresh]]`refresh()`::
+[[mapper-orm-indexing-manual-refresh]]Refresh the indexes so that all changes executed so far will be visible in search queries.
++
+This is generally not useful as indexes are refreshed automatically.
+See <<concepts-commit-refresh>> for more information.
+`refreshAsync()`::
+Asynchronous version of `refresh()` returning a `CompletionStage`.
+[[indexing-workspace-merge]]`mergeSegments()`::
+[[mapper-orm-indexing-manual-merge]]Merge each index targeted by this workspace into a single segment.
+This operation does not always improve performance: see <<indexing-workspace-merge-segments>>.
+`mergeSegmentsAsync()`::
+Asynchronous version of `mergeSegments()` returning a `CompletionStage`.
+This operation does not always improve performance: see <<indexing-workspace-merge-segments>>.
+
+[NOTE]
+[[indexing-workspace-merge-segments]]
+.Merging segments and performance
+====
+[[mapper-orm-indexing-merge-segments]]The merge-segments operation may affect performance positively as well as negatively.
+
+This operation will regroup all index data into a single, huge segment (a file).
+This may speed up search at first, but as documents are deleted,
+this huge segment will begin to fill with "holes" which have to be handled as special cases
+during search, degrading performance.
+
+Elasticsearch/Lucene do address this by rebuilding the segment at some point,
+but only once a certain ratio of deleted documents is reached.
+If all documents are in a single, huge segment, this ratio is less likely to be reached,
+and the index performance will continue to degrade for a long time.
+
+There are, however, two situations in which merging segments may help:
+
+1. No deletions or document updates are expected for an extended period of time.
+2. Most, or all documents have just been removed from the index,
+leading to segments consisting mostly of deleted documents.
+In that case, it makes sense to regroup the few remaining documents into a single segment,
+though Elasticsearch/Lucene will probably do it automatically.
+====
+
+Below is an example using a `SearchWorkspace` to purge several indexes.
+
+.Purging indexes using a `SearchWorkspace`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-purge]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
+<3> Trigger a purge.
+This method is synchronous and will only return after the purge is complete,
+but an asynchronous method, `purgeAsync`, is also available.
+====

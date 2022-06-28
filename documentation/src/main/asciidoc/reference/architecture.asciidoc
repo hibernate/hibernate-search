@@ -36,7 +36,7 @@ loading the entities then processing them to generate documents that are sent to
 The backend puts the document in an internal queue, and will index documents in batches, in background processes,
 notifying the mapper when it's done.
 +
-See <<mapper-orm-indexing-massindexer>> for details.
+See <<indexing-massindexer>> for details.
 Automatic indexing::
 This is how Hibernate Search keeps indexes in sync with a database.
 +
@@ -47,7 +47,7 @@ and documents are generated, then sent to the backend for indexing.
 The backend puts the documents in an internal queue, and will index documents in batches, in background processes,
 notifying the mapper when it's done.
 +
-See <<mapper-orm-indexing-automatic>> for details.
+See <<indexing-automatic>> for details.
 Searching::
 This is how Hibernate Search provides ways to query an index.
 +

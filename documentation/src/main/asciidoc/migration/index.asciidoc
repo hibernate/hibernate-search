@@ -39,7 +39,7 @@ will fail on startup because of missing docvalues on those fields.
 To address that, either:
 
 * Revert to the previous defaults by adding `projectable = Projectable.NO` to the mapping annotation of relevant `GeoPoint` fields.
-* Or recreate your Elasticsearch indexes and reindex your database. The easiest way to do so is to use link:{hibernateSearchDocUrl}#mapper-orm-indexing-massindexer[the the `MassIndexer`] with link:{hibernateSearchDocUrl}#mapper-orm-indexing-massindexer-parameters-drop-and-create-schema[`dropAndCreateSchemaOnStart(true)`].
+* Or recreate your Elasticsearch indexes and reindex your database. The easiest way to do so is to use link:{hibernateSearchDocUrl}#indexing-massindexer[the the `MassIndexer`] with link:{hibernateSearchDocUrl}#indexing-massindexer-parameters-drop-and-create-schema[`dropAndCreateSchemaOnStart(true)`].
 
 [[configuration]]
 == Configuration changes

@@ -1,99 +1,93 @@
-[[mapper-orm-indexing-automatic]]
-= [[_automatic_indexing]] Automatic indexing
+[[indexing-plan]]
+= [[mapper-orm-indexing-manual-indexingplan-writes]] [[_deleting_instances_from_the_index]] [[_adding_instances_to_the_index]] Explicitly indexing on entity change events
 
-By default, every time an entity is changed through a Hibernate ORM Session,
-if that entity is <<mapping-entityindexmapping,mapped to an index>>,
-Hibernate Search updates the relevant index.
+When <<indexing-automatic,automatic indexing>> is disabled,
+the indexes will start empty and stay that way
+until explicit indexing commands are sent to Hibernate Search.
 
-Exactly how and when the index update happens depends on the <<coordination,coordination strategy>>;
-see <<mapper-orm-indexing-automatic-concepts>> for more information.
+Explicitly indexing is done in the context of a <<entrypoints-search-session,`SearchSession`>>
+using the `SearchIndexingPlan` interface.
+This interface represents the (mutable) set of changes
+that are planned in the context of a session,
+and will be applied to indexes upon transaction commit.
 
-[[mapper-orm-indexing-automatic-concepts]]
-== Overview
+This interface offers the following methods:
 
-Below is a summary of how automatic indexing works depending
-on the configured <<coordination,coordination strategy>>.
+`addOrUpdate(Object entity)`::
+Add or update a document in the index if the entity type is mapped to an index (`@Indexed`),
+and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
+`delete(Object entity)`::
+Delete a document from the index if the entity type is mapped to an index (`@Indexed`),
+and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
+`purge(Class<?> entityType, Object id)`::
+Delete the entity from the index,
+but do not try to re-index documents that embed this entity.
++
+Compared to `delete`, this is mainly useful if the entity has already been deleted from the database
+and is not available, even in a detached state, in the session.
+In that case, reindexing associated entities will be the user's responsibility,
+since Hibernate Search cannot know which entities are associated to an entity that no longer exists.
+`purge(String entityName, Object id)`::
+Same as `purge(Class<?> entityType, Object id)`,
+but the entity type is referenced by its name (see `@javax.persistence.Entity#name`).
+`process()` and `execute()`::
+(Available with the <<mapper-orm,Hibernate ORM integration>> only.)
++
+Respectively, process the changes and apply them to indexes.
++
+These methods will be executed automatically on commit,
+so they are only useful when processing large number of items,
+as explained in <<mapper-orm-indexing-manual-indexingplan-process-execute>>.
 
-Follow the links for more details.
+Below are examples of using `addOrUpdate` and `delete`.
 
-[cols="h,2*^",options="header"]
-.Comparison of automatic indexing depending on the coordination strategy
-|===
-|Coordination strategy
-|<<coordination-none,No coordination>> (default)
-|<<coordination-outbox-polling,Outbox polling>>
+.Explicitly adding or updating an entity in the index using `SearchIndexingPlan`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-addOrUpdate]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Get the search session's indexing plan.
+<3> Fetch from the database the `Book` we want to index.
+<4> Submit the `Book` to the indexing plan for an add-or-update operation.
+The operation won't be executed immediately,
+but will be delayed until the transaction is committed.
+====
 
-|Detects changes occurring in ORM sessions (`session.persist(...)`, `session.delete(...)`, setters, ...)
-2+|<<mapper-orm-indexing-automatic-concepts-changes-in-session,Yes>>
+.Explicitly deleting an entity from the index using `SearchIndexingPlan`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-delete]
+----
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Get the search session's indexing plan.
+<3> Fetch from the database the `Book` we want to un-index.
+<4> Submit the `Book` to the indexing plan for a delete operation.
+The operation won't be executed immediately,
+but will be delayed until the transaction is committed.
+====
 
-|Detects changes caused by JPQL or SQL queries (`insert`/`update`/`delete`)
-2+|<<limitations-changes-in-session,No>>
+[TIP]
+====
+Multiple operations can be performed in a single indexing plan.
+The same entity can even be changed multiple times,
+for example added and then removed:
+Hibernate Search will simplify the operation as expected.
 
-|Associations must be updated on both sides
-2+|<<mapper-orm-indexing-automatic-concepts-session-consistency,Yes>>
+This will work fine for any reasonable number of entities,
+but changing or simply loading large numbers of entities in a single session
+requires special care with Hibernate ORM,
+and then some extra care with Hibernate Search.
+See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more information.
+====
 
-|Changes triggering reindexing
-2+|<<mapper-orm-indexing-automatic-concepts-dirty-checking,Only relevant changes>>
+[[indexing-plan-synchronization]]
+== [[mapper-orm-indexing-automatic-synchronization]] Synchronization with the indexes
 
-|Guarantee of indexes updates
-|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
-|<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
-
-|Visibility of index updates
-|<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
-|<<coordination-outbox-polling-indexing-visibility,Eventual>>
-
-|Overhead for application threads
-|<<coordination-none-indexing-on-flush,Low to medium>>
-|<<coordination-outbox-polling-indexing-background,Very low>>
-
-|Overhead for the database
-|<<coordination-none-indexing-lazy-loading,Low>>
-|<<coordination-outbox-polling-indexing-full-loading,Low to medium>>
-|===
-
-[[mapper-orm-indexing-automatic-configuration]]
-== Configuration
-
-Automatic indexing may be unnecessary if your index is read-only
-or if you update it regularly by reindexing,
-either using the  <<mapper-orm-indexing-massindexer,`MassIndexer`>>
-or <<mapper-orm-indexing-manual,manually>>.
-You can disable automatic indexing by setting the configuration property
-`hibernate.search.automatic_indexing.enabled` to `false`.
-
-[[mapper-orm-indexing-automatic-concepts-changes-in-session]]
-== In-session entity change detection and limitations
-
-Hibernate Search uses internal events of Hibernate ORM in order to detect changes.
-These events will be triggered if you actually manipulate managed entity objects in your code:
-calls o `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
-
-This works great for most applications, but you need to consider some limitations:
-
-* <<limitations-changes-in-session>>
-* <<limitations-changes-asymmetric-association-updates>>
-
-[[mapper-orm-indexing-automatic-concepts-dirty-checking]]
-== Dirty checking
-Hibernate Search is aware of the entity properties that are accessed when building indexed documents.
-Thanks to that knowledge, it is able to detect which entity changes are actually relevant to indexing,
-and to skip reindexing when a property is modified, but does not affect the indexed document.
-
-You can control this "dirty checking" by setting
-the <<configuration-property-types,boolean property>> `hibernate.search.automatic_indexing.enable_dirty_check`:
-
-* by default, or when set to `true`,
-Hibernate Search will consider whether modified properties are relevant
-before triggering reindexing.
-* when set to `false`, Hibernate Search will trigger reindexing upon any change,
-regardless of the entity properties that changed.
-
-[[mapper-orm-indexing-automatic-synchronization]]
-== Synchronization with the indexes
-
-[[mapper-orm-indexing-automatic-synchronization-basics]]
-=== Basics
+[[indexing-plan-synchronization-basics]]
+=== [[mapper-orm-indexing-automatic-synchronization-basics]] Basics
 
 include::components/writing-reading-intro-note.asciidoc[]
 
@@ -136,14 +130,14 @@ h|Changes safe from crash/power loss (<<concepts-commit-refresh,commit>>)
 h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
 |`async`|Best|No guarantee|No guarantee|No guarantee
 |`write-sync` (**default**)|Medium|Guaranteed|Guaranteed|No guarantee
-|`read-sync`|Medium to <<mapper-orm-indexing-automatic-synchronization-refresh-throughput,worst>>|Guaranteed|No guarantee|Guaranteed
-|`sync`|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>|Guaranteed|Guaranteed|Guaranteed
+|`read-sync`|Medium to <<indexing-plan-synchronization-refresh-throughput,worst>>|Guaranteed|No guarantee|Guaranteed
+|`sync`|<<indexing-plan-synchronization-refresh-throughput,Worst>>|Guaranteed|Guaranteed|Guaranteed
 |====
 
-[[mapper-orm-indexing-automatic-synchronization-refresh-throughput]]
+[[indexing-plan-synchronization-refresh-throughput]]
 [WARNING]
 ====
-Depending on the backend and its configuration,
+[[mapper-orm-indexing-automatic-synchronization-refresh-throughput]] Depending on the backend and its configuration,
 the `sync` and `read-sync` strategies may lead to poor indexing throughput,
 because the backend may not be designed for frequent, on-demand index refreshes.
 
@@ -152,9 +146,10 @@ In particular, the `sync` strategy will work fine with the default configuration
 but will perform poorly with the Elasticsearch backend.
 ====
 
-[[mapper-orm-indexing-automatic-synchronization-failures]]
+[[indexing-plan-synchronization-failures]]
 [NOTE]
 ====
+[[mapper-orm-indexing-automatic-synchronization-failures]]
 Indexing failures may be reported differently depending on the chosen strategy:
 
 * Failure to extract data from entities:
@@ -171,8 +166,8 @@ forwards the failure to the <<configuration-background-failure-handling,failure 
 which by default will simply log the failure.
 ====
 
-[[mapper-orm-indexing-automatic-synchronization-override-per-session]]
-=== [[_per_session_override]] Per-session override
+[[indexing-plan-synchronization-override-per-session]]
+=== [[mapper-orm-indexing-automatic-synchronization-override-per-session]] [[_per_session_override]] Per-session override
 
 While the configuration property mentioned above defines a default,
 it is possible to override this default on a particular session
@@ -199,8 +194,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 even though the query was executed _just after_ the transaction commit.
 ====
 
-[[mapper-orm-indexing-automatic-synchronization-custom]]
-=== [[_custom_strategy]] Custom strategy
+[[indexing-plan-synchronization-custom]]
+=== [[mapper-orm-indexing-automatic-synchronization-custom]] [[_custom_strategy]] Custom strategy
 
 You can also implement custom strategy.
 The custom strategy can then be set just like the built-in strategies:
