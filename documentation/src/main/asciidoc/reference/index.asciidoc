@@ -19,6 +19,8 @@ include::compatibility.asciidoc[]
 
 include::mapper-orm-getting-started.asciidoc[]
 
+include::mapper-pojo-standalone-getting-started.asciidoc[]
+
 include::migrating.asciidoc[]
 
 include::concepts.asciidoc[]
@@ -26,6 +28,8 @@ include::concepts.asciidoc[]
 include::architecture.asciidoc[]
 
 include::mapper-orm.asciidoc[]
+
+include::mapper-pojo-standalone.asciidoc[]
 
 include::configuration.asciidoc[]
 

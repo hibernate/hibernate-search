@@ -23,10 +23,17 @@ See <<search-dsl-query-fetching-results-total>> for ways to optimize computation
 <6> Retrieve matching entities.
 ====
 
-By default, the hits of a search query will be entities managed by Hibernate ORM,
+This will work fine with the <<mapper-orm,Hibernate ORM integration>>:
+by default, the hits of a search query will be entities managed by Hibernate ORM,
 bound to the entity manager used to create the search session.
 This provides all the benefits of Hibernate ORM,
 in particular the ability to navigate the entity graph to retrieve associated entities if necessary.
+
+For the <<mapper-pojo-standalone,Standalone POJO Mapper>>, however,
+loading entities <<mapper-pojo-standalone-search-query-loading,requires explicit configuration>>
+and thus the query above will fail by default;
+either configure entity loading to get the query above to work,
+or use explicit <<search-dsl-projection,projections>> to retrieve data from the index instead.
 
 The query DSL offers many features, detailed in the following sections.
 Some commonly used features include:
@@ -390,8 +397,9 @@ so we can specify the routing key to limit the query to relevant shards.
 ====
 
 [[search-dsl-query-entity-loading-options]]
-== Entity loading options
+== Entity loading options for Hibernate ORM
 
+When using the Hibernate ORM mapper,
 Hibernate Search executes database queries to load entities
 that are returned as part of the hits of a search query.
 
@@ -399,6 +407,8 @@ This section presents all available options related to entity loading in search 
 
 [[search-dsl-query-cache-lookup-strategy]]
 === [[_customizing_object_initialization_strategies]] Cache lookup strategy
+
+include::components/mapper-orm-only-note.asciidoc[]
 
 By default, Hibernate Search will load entities from the database directly,
 without looking at any cache.
@@ -454,6 +464,8 @@ the fewer entities will be loaded from the database.
 [[search-dsl-query-fetch-size]]
 === Fetch size
 
+include::components/mapper-orm-only-note.asciidoc[]
+
 By default, Hibernate Search will use a fetch size of `100`,
 meaning that for a single `fetch*()` call on a single query,
 it will run a first query to load the first 100 entities,
@@ -482,6 +494,8 @@ etc.
 
 [[search-dsl-query-entity-graph]]
 === [[_fetching_strategy]] Entity graph
+
+include::components/mapper-orm-only-note.asciidoc[]
 
 By default, Hibernate Search will load associations according to the defaults of your mappings:
 associations marked as lazy won't be loaded,

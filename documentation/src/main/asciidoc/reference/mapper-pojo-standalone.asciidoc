@@ -1,0 +1,333 @@
+[[mapper-pojo-standalone]]
+= Standalone POJO Mapper
+
+include::components/incubating-warning.asciidoc[]
+
+[[mapper-pojo-standalone-basics]]
+== Basics
+
+The Standalone POJO <<architecture-hsearch-components-mapper,Mapper>> enables mapping arbitrary POJOs to indexes.
+
+Its key feature compared to the <<mapper-orm,Hibernate ORM integration>>
+is its ability to run without Hibernate ORM or a relational database.
+
+It can be used to index entities coming from an arbitrary datastore
+or even (though that's not recommended in general)
+to use Lucene or Elasticsearch as a primary datastore.
+
+Because the Standalone POJO Mapper does not assume anything about the entities being mapped,
+beyond the fact they are represented as POJOs,
+it can be more complex to use than the <<mapper-orm,Hibernate ORM integration>>.
+In particular:
+
+* This mapper <<mapper-pojo-standalone-indexing-automatic,does not provide automatic indexing>>:
+all indexing <<mapper-pojo-standalone-indexing-plan,must be explicit>>.
+* Loading of entities as hits in the result of a <<search-dsl-query,search query>>
+must be <<mapper-pojo-standalone-search-query-loading,implemented on a case-by-case basis>>.
+* Loading of identifiers and entities for <<indexing-massindexer,mass indexing>>
+must be <<mapper-pojo-standalone-indexing-massindexer,implemented on a case-by-case basis>>.
+* This mapper <<mapper-pojo-standalone-coordination,does not provide coordination between nodes>>
+at the moment.
+
+[[mapper-pojo-standalone-startup]]
+== Startup
+
+Starting up Hibernate Search with the Standalone POJO Mapper is explicit and involves a builder:
+
+.Starting up Hibernate Search with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=setup]
+----
+<1> Create a builder.
+<2> Declare *all* entity types that Hibernate Search may need to work with.
+<3> Set configuration properties (see also <<configuration>>).
+<4> Build the `SearchMapping`.
+====
+
+[[mapper-pojo-standalone-shutdown]]
+== Shutdown
+
+You can shut down Hibernate Search with the Standalone POJO Mapper by calling the `close()` method on the mapping:
+
+.Shutting down Hibernate Search with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=shutdown]
+----
+<1> Retrieve the `SearchMapping` that was returned when <<mapper-pojo-standalone-startup,Hibernate Search started>>.
+<2> Call `close()` to shut down Hibernate Search.
+====
+
+On shutdown, Hibernate Search will stop accepting new indexing requests:
+new indexing attempts will throw exceptions.
+The `close()` method will only return once all ongoing indexing operations complete.
+
+[[mapper-pojo-standalone-beanprovider]]
+== Bean provider
+
+include::components/incubating-warning.asciidoc[]
+
+The Standalone POJO Mapper can <<configuration-bean,retrieve beans from CDI/Spring>>,
+but that support needs to be implemented explicitly through a bean provider.
+
+You can plug in your own bean provider in two steps:
+
+. Define a class that implements the `org.hibernate.search.engine.environment.bean.spi.BeanProvider` interface.
+. Configure Hibernate Search to use that implementation by setting the configuration property
+`hibernate.search.bean_provider`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyMappingConfigurer`.
+Obviously, the reference to the bean provider cannot be resolved using the bean provider.
+
+[[mapper-pojo-standalone-multi-tenancy]]
+== Multi-tenancy
+
+Multi-tenancy needs to be enabled explicitly when starting the Standalone POJO Mapper:
+
+.Enabling multi-tenancy with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/multitenancy/StandalonePojoMultiTenancyIT.java[tags=setup]
+----
+<1> Create a builder.
+<2> Enable multi-tenancy.
+<3> Build the `SearchMapping`.
+====
+
+Once multi-tenancy is enabled, a tenant ID will have to be provided when creating a `SearchSession` and in some other cases
+(creating a <<indexing-massindexer,mass indexer>>, a <<indexing-workspace,workspace>>, ...).
+
+.Creating the `SearchSession` with a tenant identifier
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/multitenancy/StandalonePojoMultiTenancyIT.java[tags=searchSession]
+----
+<1> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<2> Start creating a new session.
+<3> Set the tenant identifier for the new session.
+<4> Build the new session.
+====
+
+[[mapper-pojo-standalone-mapping]]
+== Mapping
+
+While the <<mapper-orm,Hibernate ORM integration>> can infer parts of the mapping from the Hibernate ORM mapping,
+the Standalone POJO Mapper cannot.
+As a result, the Standalone POJO Mapper needs more explicit configuration
+for its mapping:
+
+* Entity types must be listed explicitly on <<mapper-pojo-standalone-startup,startup>>.
+* Document identifiers must be <<mapping-identifiermapping-explicit,mapped explicitly>>.
+* The inverse side of associations must be <<mapping-reindexing-associationinverseside,mapped explicitly>>.
+
+[[mapper-pojo-standalone-indexing]]
+== Indexing
+
+[[mapper-pojo-standalone-indexing-automatic]]
+=== Automatic indexing
+
+The Standalone POJO Mapper does not provide "implicit" indexing
+similar to the <<indexing-automatic,automatic indexing>> in the <<mapper-orm,Hibernate ORM integration>>.
+
+Instead, you must index explicitly with an <<mapper-pojo-standalone-indexing-plan,indexing plan>>.
+
+[[mapper-pojo-standalone-indexing-plan]]
+=== Explicitly indexing on entity change events
+
+The Standalone POJO Mapper can process entity change events (add, update, delete)
+and perform indexing accordingly,
+though events must necessarily be passed to Hibernate Search explicitly.
+See <<indexing-plan>> for more information about the API.
+
+One major difference with the <<mapper-orm,Hibernate ORM integration>>
+is that transactions (JTA or otherwise are not supported),
+so indexing is executed on <<entrypoints-search-session-mapper-pojo-standalone,session closing>>
+rather than on transaction commit.
+
+[[mapper-pojo-standalone-indexing-massindexer]]
+=== Mass indexing
+
+Because by default, the Standalone POJO Mapper does not know anything about where the entity data comes from,
+<<indexing-massindexer,mass indexing>> requires plugging in a way to load entities from the other datastore.
+
+This is done on <<mapper-pojo-standalone-startup,startup>>
+by assigning a `MassLoadingStrategy` to each entity type that will require reindexing:
+
+.Assigning mass loading strategies with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/StandalonePojoMassLoadingIT.java[tags=setup]
+----
+<1> Retrieve a reference to an implementation-specific datastore.
+<2> Create a builder.
+<3> Declare an entity type, and assign it a `MassLoadingStrategy`
+(which must somehow have access to the datastore).
+<4> Build the `SearchMapping`.
+====
+
+Once all types to reindex have their mass loading strategy implemented and assigned,
+they can be reindexed using the <<indexing-massindexer,mass indexer>>:
+
+.Mass indexing with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/StandalonePojoMassLoadingIT.java[tags=massIndexer]
+----
+<1> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<2> Create a `MassIndexer` targeting every indexed entity type.
+<3> Start the mass indexing process and return when it is over.
+====
+
+Below is an example of `MassLoadingStrategy` implementation for an imaginary datastore.
+
+.Implementing `MassLoadingStrategy`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/MyMassLoadingStrategy.java[tags=include]
+----
+<1> The strategy must have access to the datastore to be able to open connections,
+but it should not generally have any open connection.
+<2> Implement an identifier loader to retrieve the identifiers of all entities that will have to be indexed.
+Hibernate Search will only call this method once per mass indexing.
+<3> Retrieve the <<indexing-massindexer-parameters-batchsizetoloadobjects,batch size>> configured on the `MassIndexer`.
+This defines how many IDs (at most) must be returned in each `List` passed to the sink.
+<4> Retrieve the list of entity types to be loaded:
+Hibernate Search may request loading of multiple types from a single loader
+if those types share similar mass loading strategies (see tips/warnings below).
+<5> The identifier loader owns a connection exclusively: it should create one when it's created, and close it when it's closed.
+Related: the identifier loader always executes in the same thread.
+<6> Count the number of entities to index.
+This is just an estimate: it can be off to some extent,
+but that will lead to incorrect reporting in the <<indexing-massindexer-parameters-monitor,monitor>> (by default, the logs).
+<7> Retrieve identifiers in successive batches, one per call to `loadNext()`, and pass them to the sink.
+<8> When there are no more identifiers to load, let the sink know by calling `complete()`.
+<9> Implement an entity loader to actually load entities from the identifiers retrieved above.
+Hibernate Search will call this method multiple times for a single mass indexing,
+to create <<indexing-massindexer-parameters-threadstoloadobjects,multiple loaders>> that execute in parallel.
+<10> Each entity loader owns a connection exclusively: it should create one when it's created, and close it when it's closed.
+Related: each entity loader always executes in the same thread.
+<11> Load the entities corresponding to the identifiers passed in argument and pass them to the sink.
+Entities passed to the sink do not need to be the same order as the identifiers passed in argument.
+====
+
+[NOTE]
+====
+Hibernate Search will optimize loading by grouping together
+types that have the same `MassLoadingStrategy`,
+or different strategies that are equal according to `equals()`/`hashCode()`.
+
+When grouping types together, only one of their strategies will be called,
+and will get passed a "type group" that includes all types that should be loaded.
+
+This happens in particular when configuring the strategy on a "parent" entity type
+but not on its subtypes:
+the subtypes will inherit the same strategy.
+====
+
+[WARNING]
+====
+Be careful of non-abstract (instantiable) parent classes in inheritance trees:
+when the "type group" passed to the `createIdentifierLoader` method
+contains a parent type (say, `Animal`) and none of the subtypes (neither `Lion` nor `Zebra`),
+then the loader really should only load identifiers of instances of the parent type,
+not of its subtypes
+(it should load identifiers of entities whose type is exactly `Animal`, not `Lion` nor `Zebra`).
+====
+
+[[mapper-pojo-standalone-search-query-loading]]
+=== Entity loading in search queries
+
+Because by default, the Standalone POJO Mapper does not know anything about where the entity data comes from,
+<<search-dsl-query-generality,entity loading in search queries>>
+requires plugging in a way to load entities from the other datastore.
+
+This is done on <<mapper-pojo-standalone-startup,startup>>
+by assigning a `SelectionLoadingStrategy` to each entity type that will require loading in search queries:
+
+.Assigning selection loading strategies with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/StandalonePojoSelectionLoadingIT.java[tags=setup]
+----
+<1> Create a builder.
+<2> Declare an entity type, and assign it a `SelectionLoadingStrategy`.
+<3> Build the `SearchMapping`.
+====
+
+Once all types to search for have their selection loading strategy implemented and assigned,
+they can be loaded as hits when <<search-dsl-query,querying>>:
+
+.Loading entities as search query hits with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/StandalonePojoSelectionLoadingIT.java[tags=search]
+----
+<1> Retrieve a reference to an implementation-specific datastore.
+<2> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<3> Open a connection to the datastore (this is just an imaginary API, for the purpose of this example).
+Note we're using a try-with-resources block,
+so that the connection will automatically be closed when we're done with it.
+<4> Start creating a new session.
+Note we're using a try-with-resources block,
+so that the session will automatically be closed when we're done with it.
+<5> Pass the connection to the new session.
+<6> Build the new session.
+<7> Create a <<search-dsl-query,search query>>: since we don't use `select()`,
+hits will have their default representations: entities loaded from the datastore.
+<8> Retrieve the search hits as entities loaded from the datastore.
+====
+
+Below is an example of `SelectionLoadingStrategy` implementation for an imaginary datastore.
+
+.Implementing `SelectionLoadingStrategy`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/loading/MySelectionLoadingStrategy.java[tags=include]
+----
+<1> Implement an entity loader to actually load entities from the identifiers returned by Lucene/Elasticsearch.
+Hibernate Search will call this method multiple times for a single mass indexing,
+<2> The entity loader does not own a connection, but retrieves it from the context passed to the `SearchSession`.
+<3> Load the entities corresponding to the identifiers passed in argument and return them.
+Returned entities **must** be in the same order as the identifiers passed in argument.
+====
+
+[NOTE]
+====
+Hibernate Search will optimize loading by grouping together
+types that have the same `SelectionLoadingStrategy`,
+or different strategies that are equal according to `equals()`/`hashCode()`.
+
+When grouping types together, only one of their strategies will be called,
+and will get passed a "type group" that includes all types that should be loaded.
+
+This happens in particular when configuring the strategy on a "parent" entity type
+but not on its subtypes:
+the subtypes will inherit the same strategy.
+====
+
+[[mapper-pojo-standalone-coordination]]
+== Coordination
+
+The Standalone POJO Mapper does not provide any way
+to coordinate between nodes at the moment,
+so its behavior is roughly similar to that described in <<coordination-none>>,
+except entity data extracting happens on session closing instead of happening on Hibernate ORM session flushes,
+and indexing happens immediately after that instead of happening on transaction commit.
+
+[[mapper-pojo-standalone-configuration-other]]
+== Other configuration
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/pojo/standalone/cfg/StandalonePojoMapperSettings.html[org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings].

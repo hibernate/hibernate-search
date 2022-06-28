@@ -281,7 +281,7 @@ Note that rounding does not affect projections, which will return the original v
 NOTE: A typical use case is monetary amounts, with a decimal scale of 2
 because only two digits are generally needed beyond the decimal point.
 +
-NOTE: Using Hibernate ORM mapping,
+NOTE: With the <<mapper-orm,Hibernate ORM integration>>,
 a default `decimalScale` is taken automatically from the underlying `scale` value of the relative SQL `@Column`,
 using the Hibernate ORM metadata. The value could be overridden explicitly using the `decimalScale` attribute.
 

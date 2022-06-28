@@ -395,6 +395,8 @@ Here, the bridge will be applied successively to each value in the map.
 [[bridge-valuebridge-access-orm]]
 == [[mapper-orm-bridge-valuebridge-access-orm]] Accessing the ORM session or session factory from the bridge
 
+include::components/mapper-orm-only-note.asciidoc[]
+
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.
 
 .Retrieving the ORM session or session factory from a `ValueBridge`

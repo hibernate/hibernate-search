@@ -7,20 +7,24 @@
 Index documents, much like entities, need to be assigned an identifier
 so that Hibernate Search can handle updates and deletion.
 
-When indexing Hibernate ORM entities,
+When <<mapper-orm,indexing Hibernate ORM entities>>,
 the entity identifier is used as a document identifier by default.
-
 Provided the entity identifier has a <<mapping-identifiermapping-supported-types,supported type>>,
 identifier mapping will work out of the box and no explicit mapping is necessary.
+
+When using the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+document identifiers need to be <<mapping-identifiermapping-explicit,mapped explicitly>>.
 
 [[mapping-identifiermapping-explicit]]
 == [[mapper-orm-identifiermapping-explicit]] [[_explicit_identifier_mapping]] Explicit identifier mapping
 
 Explicit identifier mapping is required in the following cases:
 
-* The document identifier is not the entity identifier.
+* Hibernate Search doesn't know about the entity identifier
+(e.g. when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>).
+* OR the document identifier is not the entity identifier.
 * OR the entity identifier has a type that is not supported by default.
-This is the case of composite identifiers, in particular.
+This is the case of composite identifiers (Hibernate ORM's `@EmbeddedId`, `@IdClass`), in particular.
 
 To select a property to map to the document identifier,
 just apply the `@DocumentId` annotation to that property:

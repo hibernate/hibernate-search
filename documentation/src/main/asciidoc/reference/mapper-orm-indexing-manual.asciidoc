@@ -1,6 +1,8 @@
 [[mapper-orm-indexing-manual]]
 = [[manual-index-changes]] Reindexing large amounts of data manually with Hibernate ORM
 
+include::components/mapper-orm-only-note.asciidoc[]
+
 [[mapper-orm-indexing-manual-basics]]
 == [[search-batchindex]] Basics
 

@@ -7,6 +7,9 @@ i.e. APIs to index, search, look up metadata, ...
 [[entrypoints-search-mapping]]
 == `SearchMapping`
 
+[[entrypoints-search-mapping-basics]]
+=== Basics
+
 The `SearchMapping` is the top-most entrypoint to Hibernate Search APIs:
 it represents the whole mapping from entities to indexes.
 
@@ -26,7 +29,13 @@ allow you to simply https://quarkus.io/guides/hibernate-search-orm-elasticsearch
 into your CDI beans.
 ====
 
-To retrieve the `SearchMapping` with the <<mapper-orm,Hibernate ORM integration>>,
+[[entrypoints-search-mapping-mapper-orm]]
+=== Retrieving the `SearchMapping` with the Hibernate ORM integration
+
+With the <<mapper-orm,Hibernate ORM integration>>,
+the `SearchMapping` is <<mapper-orm-startup,created automatically when Hibernate ORM starts>>.
+
+To retrieve the `SearchMapping`,
 call `Search.mapping(...)` and pass the `EntityManagerFactory`/`SessionFactory`:
 
 .Retrieving the `SearchMapping` from a Hibernate ORM `SessionFactory`
@@ -57,8 +66,20 @@ e.g. by annotating a field of that type with `@Inject` or `@PersistenceUnit`.
 This will return the `SearchMapping`.
 ====
 
+[[entrypoints-search-mapping-mapper-pojo-standalone]]
+=== Retrieving the `SearchMapping` with the Standalone POJO Mapper
+
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+the `SearchMapping` is the result of starting Hibernate Search.
+
+See <<mapper-pojo-standalone-startup,this section>> for more information
+about starting Hibernate Search with the Standalone POJO Mapper.
+
 [[entrypoints-search-session]]
 == `SearchSession`
+
+[[entrypoints-search-session-basics]]
+=== Basics
 
 The `SearchSession` represents the context in which a sequence of related operations are executed.
 It should generally be used for a very short time, for example to process a single web request.
@@ -77,6 +98,9 @@ Some frameworks, such as link:{quarkusUrl}[Quarkus],
 allow you to simply https://quarkus.io/guides/hibernate-search-orm-elasticsearch#multiple-persistence-units-attaching-cdi[`@Inject` the `SearchSession`]
 into your CDI beans.
 ====
+
+[[entrypoints-search-session-mapper-orm]]
+=== Retrieving the `SearchSession` with the Hibernate ORM integration
 
 To retrieve the `SearchSession` with the <<mapper-orm,Hibernate ORM integration>>,
 call `Search.session(...)` and pass the `EntityManager`/`Session`:
@@ -109,6 +133,48 @@ e.g. by annotating a field of that type with `@Inject` or `@PersistenceContext`.
 This will return the `SearchSession`.
 ====
 
+[[entrypoints-search-session-mapper-pojo-standalone]]
+=== Retrieving the `SearchSession` with the Standalone POJO Mapper
+
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+the `SearchSession` should be created and closed explicitly:
+
+.Creating the `SearchSession`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=searchSession-simple]
+----
+<1> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<2> Create a new session.
+Note we're using a try-with-resources block,
+so that the session will automatically be closed when we're done with it,
+which will in particular trigger the execution of the <<indexing-plan,indexing plan>>.
+====
+
+[WARNING]
+====
+Forgetting to close the `SearchSession` will lead to indexing not being executed,
+and may even cause memory leaks.
+====
+
+The `SearchSession` can also be configured with a few options:
+
+.Creating the `SearchSession` with options
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoEntryPointsIT.java[tags=searchSession-withOptions]
+----
+<1> <<entrypoints-search-mapping-mapper-pojo-standalone,Retrieve the `SearchMapping`>>.
+<2> Start creating a new session.
+Note we're using a try-with-resources block,
+so that the session will automatically be closed when we're done with it,
+which will in particular trigger the execution of the <<indexing-plan,indexing plan>>.
+<3> Pass options to the new session.
+<4> Build the new session.
+====
+
 [[entrypoints-search-scope]]
 == `SearchScope`
 
@@ -132,7 +198,8 @@ The scope's generic type parameter can be any common supertype of those entity t
 <4> A scope will always target all subtypes of the given classes, and the given classes do not need to be indexed entity types themselves.
 This creates a `SearchScope` targeting all (indexed entity) subtypes of the `Person` interface;
 in our case this will target both the `Associate` entity type and the `Manager` entity type.
-<5> For advanced use cases, it is possible to target (indexed entity) types by their name,
+<5> For advanced use cases and with the <<mapper-orm,Hibernate ORM integration>> only,
+it is possible to target (indexed entity) types by their name,
 e.g. the JPA entity name.
 <6> Passing `Object.class` will create a scope targeting every single indexed entity types.
 ====
@@ -150,7 +217,8 @@ The scope's generic type parameter can be any common supertype of those entity t
 <4> A scope will always target all subtypes of the given classes, and the given classes do not need to be indexed entity types themselves.
 This creates a `SearchScope` targeting all (indexed entity) subtypes of the `Person` interface;
 in our case this will target both the `Associate` entity type and the `Manager` entity type.
-<5> For advanced use cases, it is possible to target (indexed entity) types by their name,
+<5> For advanced use cases and with the <<mapper-orm,Hibernate ORM integration>> only,
+it is possible to target (indexed entity) types by their name,
 e.g. the JPA entity name.
 <6> Passing `Object.class` will create a scope targeting every single indexed entity types.
 ====

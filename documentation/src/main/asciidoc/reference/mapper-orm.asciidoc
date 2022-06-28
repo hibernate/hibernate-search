@@ -4,7 +4,7 @@
 [[mapper-orm-basics]]
 == Basics
 
-The Hibernate ORM "mapper" is an integration of Hibernate Search into Hibernate ORM.
+The Hibernate ORM <<architecture-hsearch-components-mapper,"mapper">> is an integration of Hibernate Search into Hibernate ORM.
 
 Its key features include:
 
@@ -13,12 +13,24 @@ as they are modified in the Hibernate ORM `EntityManager`/`Session`.
 * <<search-dsl-query-entity-loading-options,Loading of managed entities>>
 as hits in the result of a <<search-dsl-query,search query>>.
 
-[[mapper-orm-enabling-disabling]]
-== [[mapper-orm-mapping-configuration-enabling-disabling]] [[search-configuration-event]] Enabling/disabling Hibernate Search
+[[mapper-orm-startup]]
+== [[mapper-orm-mapping-configuration-enabling-disabling]] [[search-configuration-event]] Startup
 
-The Hibernate Search integration into Hibernate ORM is enabled by default as soon as it is present in the classpath.
-If for some reason you need to disable it,
-set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
+The Hibernate Search integration into Hibernate ORM will start automatically,
+at the same time as Hibernate ORM, as soon as it is present in the classpath.
+
+If for some reason you need to prevent Hibernate Search from starting,
+set the <<configuration-property-types,boolean property>> `hibernate.search.enabled` to `false`.
+
+[[mapper-orm-shutdown]]
+== Shutdown
+
+The Hibernate Search integration into Hibernate ORM will stop automatically,
+at the same time as Hibernate ORM.
+
+On shutdown, Hibernate Search will stop accepting new indexing requests:
+new indexing attempts will throw exceptions.
+The Hibernate ORM shutdown will block until all ongoing indexing operations complete.
 
 [[mapper-orm-mapping-dynamicmap]]
 == [[mapper-orm-programmatic-mapping-dynamicmap]] Mapping `Map`-based models

@@ -809,7 +809,8 @@ according to the tenant ID defined in the current session:
 * queries will filter results appropriately.
 
 The multi-tenancy is automatically enabled in the backend if it is enabled in the mapper,
-e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected in Hibernate ORM].
+e.g. if link:{hibernateDocUrl}#multitenacy[a multi-tenancy strategy is selected in Hibernate ORM],
+or if <<mapper-pojo-standalone-multi-tenancy,multi-tenancy is explicitly configured in the Standalone POJO mapper>>.
 
 However, it is possible to enable multi-tenancy manually.
 

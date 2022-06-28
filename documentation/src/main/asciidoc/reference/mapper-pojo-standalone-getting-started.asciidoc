@@ -1,0 +1,548 @@
+[[mapper-pojo-standalone-getting-started]]
+= Getting started with the Standalone POJO Mapper
+
+include::components/incubating-warning.asciidoc[]
+
+This section will guide you through the initial steps required
+to index and query your entities using Hibernate Search,
+when your entities are not defined in Hibernate ORM.
+
+If your entities **are** defined in Hibernate ORM, see <<mapper-orm-getting-started,this other guide>> instead.
+
+[[mapper-pojo-standalone-getting-started-assumptions]]
+== Assumptions
+
+This getting-started guide aims to be generic and does not tie itself to any framework in particular.
+If you use link:{springBootUrl}[Spring Boot] or link:{quarkusUrl}[Quarkus],
+make sure to first have a look at <<compatibility-framework,framework support>> for tips and to learn about quirks.
+
+For the sake of simplicity, this guide assumes you are building an application deployed as a single instance on a single node.
+For more advanced setups, you are encouraged to have a look at the <<architecture-examples>>.
+
+[[mapper-pojo-standalone-getting-started-dependencies]]
+== Dependencies
+
+The Hibernate Search artifacts can be found in Maven's http://central.sonatype.org/[Central Repository].
+
+If you do not want to, or cannot, fetch the JARs from a Maven repository,
+you can get them from the
+link:http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/[distribution bundle hosted at Sourceforge].
+
+In order to use Hibernate Search, you will need at least two direct dependencies:
+
+* a dependency to the "mapper", which extracts data from your domain model and maps it to indexable documents;
+* and a dependency to the "backend", which allows indexing and searching these documents.
+
+Below are the most common setups and matching dependencies for a quick start;
+read <<architecture>> for more information.
+
+Standalone POJO Mapper + Lucene::
+Allows indexing of entities that are not defined in Hibernate ORM,
+in a single application node,
+storing the index on the local filesystem.
++
+If you get Hibernate Search from Maven, use these dependencies:
++
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-lucene</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
++
+If you get Hibernate Search from the distribution bundle,
+copy the JARs from `dist/engine`, `dist/mapper/pojo-standalone`, `dist/backend/lucene`,
+and their respective `lib` subdirectories.
+Standalone POJO Mapper + link:{elasticsearchUrl}[Elasticsearch] (or link:{openSearchUrl}[OpenSearch])::
+Allows indexing of entities that are not defined in Hibernate ORM,
+on multiple application nodes,
+storing the index on a remote Elasticsearch or OpenSearch cluster (to be configured separately).
++
+If you get Hibernate Search from Maven, use these dependencies:
++
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
++
+If you get Hibernate Search from the distribution bundle,
+copy the JARs from `dist/engine`, `dist/mapper/pojo-standalone`, `dist/backend/elasticsearch`,
+and their respective `lib` subdirectories.
+
+[[mapper-pojo-standalone-getting-started-configuration]]
+== Configuration
+
+Once you have added all required dependencies to your application,
+it's time to have a look at the configuration.
+
+The configuration properties of Hibernate Search with the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+are set programmatically when building the mapping.
+
+.Hibernate Search properties for a "Standalone POJO Mapper + Lucene" setup
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-lucene]
+----
+<1> Create a builder.
+<2> Declare *all* entity types that Hibernate Search may need to work with.
+<3> Set the location of indexes in the filesystem.
+By default, the backend will store indexes in the current working directory.
+<4> Build the `SearchMapping`.
+====
+
+.Hibernate Search properties for a "Standalone POJO Mapper + Elasticsearch/OpenSearch" setup
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=setup-elasticsearch]
+----
+<1> Create a builder.
+<2> Declare *all* entity types that Hibernate Search may need to work with.
+<3> Set the Elasticsearch hosts to connect to.
+By default, the backend will attempt to connect to `localhost:9200`.
+<4> Set the protocol. The default is `http`, but you may need to use `https`.
+<5> Set the username and password for basic HTTP authentication.
+You may also be interested in <<backend-elasticsearch-configuration-aws,AWS IAM authentication>>.
+<6> Build the `SearchMapping`.
+====
+
+[TIP]
+====
+A few <<configuration-builder,util methods>> are available to simplify
+the dynamic building of property keys.
+====
+
+[[mapper-pojo-standalone-getting-started-mapping]]
+== Mapping
+
+Let's assume that your application contains the entity classes `Book` and `Author`
+and you want to index them in order to search for books.
+
+.Book and Author entities BEFORE adding Hibernate Search specific annotations
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withouthsearch/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withouthsearch/Author.java[tags=include;!getters-setters]
+----
+====
+
+To make these entities searchable, you will need to map them to an index structure.
+The mapping can be defined using annotations, or using a programmatic API;
+this getting started guide will show you a simple annotation mapping.
+For more details, refer to <<mapping>>.
+
+Below is an example of how the model above can be mapped.
+
+.Book and Author entities AFTER adding Hibernate Search specific annotations
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/Author.java[tags=include;!getters-setters]
+----
+<1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
+<2> `@DocumentId` marks the property used to generate a document identifier.
+<3> `@FullTextField` maps a property to a full-text index field with the same name and type.
+Full-text fields are broken down into tokens and normalized (lowercased, ...).
+Here we're relying on default analysis configuration,
+but most applications need to customize it;
+this will be addressed further down.
+<4> `@KeywordField` maps a property to a non-analyzed index field.
+Useful for identifiers, for example.
+<5> Hibernate Search is not just for full-text search: you can index non-`String` types with the `@GenericField` annotation,
+A <<mapping-directfieldmapping-supported-types,broad range of property types>> are supported out-of-the-box,
+such as primitive types (`int`, `double`, ...) and their boxed counterpart (`Integer`, `Double`, ...),
+enums, date/time types, `BigInteger`/`BigDecimal`, etc.
+<6> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
+into the indexed form of the embedding entity.
++
+Here, the `Author` class defines a single indexed field, `name`.
+Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
+will add a single field named `authors.name` to the `Book` index.
+This field will be populated automatically based on the content of the `authors` property,
+and the books will be re-indexed automatically whenever the `name` property of their author changes.
+See <<mapping-indexedembedded>> for more information.
+<7> Entities that are only `@IndexedEmbedded` in other entities,
+but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
+<8> Most of the time, you will need to put `@DocumentId` on contained, non-indexed entity types such as `Author`,
+to allow Hibernate Search to retrieve the identifier from entities of that type.
+<9> `Book` embeds data from the `Author` entity, so `Book` needs to be reindexed when `Author` changes,
+and thus Hibernate Search needs to be able to retrieve the books of a particular author when the author changes.
+For that reason, we need to provide information to Hibernate Search about the inverse side of associations.
+====
+
+This is a very simple example, but is enough to get started.
+Just remember that Hibernate Search allows more complex mappings:
+
+* Multiple `@*Field` annotations exist, some of them allowing full-text search,
+some of them allowing finer-grained configuration for field of a certain type.
+You can find out more about `@*Field` annotations in <<mapping-directfieldmapping>>.
+* Properties, or even types, can be mapped with finer-grained control using "bridges".
+This allows the mapping of types that are not supported out-of-the-box.
+See <<bridge>> for more information.
+
+[[mapper-pojo-standalone-getting-started-initialization]]
+== Initialization
+
+Before the application is started for the first time,
+some initialization may be required:
+
+* The indexes and their schema need to be created.
+* Data already present in another datastore (if any) needs to be indexed.
+
+[[mapper-pojo-standalone-getting-started-initialization-schema-management]]
+=== Schema management
+
+Before indexing can take place, indexes and their schema need to be created,
+either on disk (Lucene) or through REST API calls (Elasticsearch).
+
+Fortunately, by default, Hibernate Search will take care of creating indexes on the first startup:
+you don't have to do anything.
+
+The next time the application is started, existing indexes will be re-used.
+
+[NOTE]
+====
+Any change to your mapping (adding new fields, changing the type of existing fields, ...)
+between two restarts of the application
+will require an update to the index schema.
+
+This will require some special handling, though it can easily be solved by dropping and re-creating the index.
+See <<mapping-changes>> for more information.
+====
+
+[[mapper-pojo-standalone-getting-started-initialization-indexing]]
+=== Initial indexing
+
+As we'll see later, Hibernate Search makes it possible to explicitly index an entity
+every time it changes in the application.
+
+However, if you use Hibernate Search to index data from another datastore,
+this datastore may already contain data when you add the Hibernate Search integration.
+That data is unknown to Hibernate Search, and thus has to be indexed through a batch process.
+
+This is possible thanks to the mass indexer API,
+but a little more involved than
+with the <<mapper-orm-getting-started-initialization-indexing,Hibernate ORM mapper>>,
+because a way to load entities from the other datastore needs to be plugged in.
+
+Due to this (relative) complexity, we won't cover it in this guide,
+but if you want to know more,
+have a look at <<mapper-pojo-standalone-indexing-massindexer>>.
+
+[[mapper-pojo-standalone-getting-started-indexing]]
+== Indexing
+
+Indexing is performed explicitly through an `SearchIndexingPlan`, accessible from a `SearchSession`.
+
+[IMPORTANT]
+====
+By default, in particular when using the Elasticsearch backend,
+changes will not be visible right after the session is closed.
+A slight delay (by default one second) will be necessary for Elasticsearch to process the changes.
+
+For that reason, if you modify entities in a session,
+and then execute a search query right after that session is closed,
+the search results may not be consistent with the changes you just performed.
+
+See <<indexing-automatic-synchronization>> for more information about this behavior and how to tune it.
+====
+
+Use `add` when the entity is first added and you are absolutely certain it does not exist in the index yet:
+
+.Using the Standalone POJO Mapper to index data
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing]
+----
+====
+
+Use `addOrUpdate` to add/update the entity when the entity may already exist in the index:
+
+.Using the Standalone POJO Mapper to index data
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing-addOrUpdate]
+----
+====
+
+Add use `delete` to delete the entity from the index:
+
+.Using the Standalone POJO Mapper to index data
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing-delete]
+----
+====
+
+[[mapper-pojo-standalone-getting-started-searching]]
+== Searching
+
+Once the data is indexed, you can perform search queries.
+
+The following code will prepare a search query targeting the index for the `Book` entity,
+filtering the results so that at least one field among `title` and `authors.name`
+contains the string `refactoring`.
+The matches are implicitly on words ("tokens") instead of the full string,
+and are case-insensitive: that's because the targeted fields are *full-text* fields.
+
+.Using Hibernate Search to query the indexes
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-lambdas]
+----
+<1> Create a Hibernate Search session, called `SearchSession`.
+<2> Initiate a search query on the index mapped to the `Book` entity.
+<3> Define that we will only retrieve entity identifiers.
+Retrieving entities directly is possible, but requires <<mapper-pojo-standalone-search-query-loading,more configuration>>,
+so we won't discuss it in this guide.
+<4> Define that only documents matching the given predicate should be returned.
+The predicate is created using a factory `f` passed as an argument to the lambda expression.
+<5> Build the query and fetch the results, limiting to the top 20 hits.
+<6> Retrieve the total number of matching entities.
+<7> Retrieve the identifiers of matching entities.
+<8> In case you're not interested in the whole result, but only in the hits,
+you can also call `fetchHits()` directly.
+====
+
+If for some reason you don't want to use lambdas, you can use an alternative, object-based syntax,
+but it will be a bit more verbose:
+
+.Using Hibernate Search to query the indexes -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-objects]
+----
+<1> Create a Hibernate Search session, called `SearchSession`.
+<2> Create a "search scope", representing the indexed types that will be queried.
+<3> Initiate a search query targeting the search scope.
+<4> Define that we will only retrieve entity identifiers.
+Retrieving entities directly is possible, but requires <<mapper-pojo-standalone-search-query-loading,more configuration>>,
+so we won't discuss it in this guide.
+<5> Define that only documents matching the given predicate should be returned.
+The predicate is created using the same search scope as the query.
+<6> Build the query and fetch the results, limiting to the top 20 hits.
+<7> Retrieve the total number of matching entities.
+<8> Retrieve the identifiers of matching entities.
+<9> In case you're not interested in the whole result, but only in the hits,
+you can also call `fetchHits()` directly.
+====
+
+It is possible to get just the total hit count, using `fetchTotalHitCount()`.
+
+.Using Hibernate Search to count the matches
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=counting]
+----
+<1> Fetch the total hit count.
+====
+
+[NOTE]
+====
+While the examples above retrieved hits as entity identifiers,
+it is just one of the possible hit types.
+See <<search-dsl-projection>> for more information.
+====
+
+[[mapper-pojo-standalone-getting-started-analysis]]
+== Analysis
+
+Full-text search allows fast matches on words in a case-insensitive way,
+which is one step further than substring search in a relational database.
+But it can get much better: what if we want a search with the term "refactored"
+to match our book whose title contains "refactoring"?
+That's possible with custom analysis.
+
+Analysis is how text is supposed to be processed when indexing and searching.
+This involves _analyzers_,
+which are made up of three types of components, applied one after the other:
+
+* zero or (rarely) more character filters, to clean up the input text:
+`A <strong>GREAT</strong> résume` => `A GREAT résume`.
+* a tokenizer, to split the input text into words, called "tokens":
+`A GREAT résume` => `[A, GREAT, résume]`.
+* zero or more token filters, to normalize the tokens and remove meaningless tokens.
+`[A, GREAT, résume]` => `[great, resume]`.
+
+There are built-in analyzers,
+in particular the default one, which will:
+
+* tokenize (split) the input according to the Word Break rules
+of the http://unicode.org/reports/tr29/[Unicode Text Segmentation algorithm];
+* filter (normalize) tokens by turning uppercase letters to lowercase.
+
+The default analyzer is a good fit for most language, but is not very advanced.
+To get the most of analysis, you will need to define a custom analyzer
+by picking the tokenizer and filters most suited to your specific needs.
+
+The following paragraphs will explain how to configure and use
+a simple yet reasonably useful analyzer.
+For more information about analysis and how to configure it,
+refer to the <<concepts-analysis>> section.
+
+Each custom analyzer needs to be given a name in Hibernate Search.
+This is done through analysis configurers, which are defined per backend:
+
+. First, you need to implement an analysis configurer, a Java class that implements a backend-specific interface:
+`LuceneAnalysisConfigurer` or `ElasticsearchAnalysisConfigurer`.
+. Second, you need to alter the configuration of your backend to actually use your analysis configurer.
+
+As an example, let's assume that one of your indexed `Book` entities has the title
+"Refactoring: Improving the Design of Existing Code",
+and you want to get hits for any of the following search terms:
+"Refactor", "refactors", "refactored" and "refactoring".
+One way to achieve this is to use an analyzer with the following components:
+
+* A "standard" tokenizer, which splits words at whitespaces, punctuation characters and hyphens.
+It is a good general-purpose tokenizer.
+* A "lowercase" filter, which converts every character to lowercase.
+* A "snowball" filter, which applies language-specific https://en.wikipedia.org/wiki/Stemming[stemming].
+* Finally, an "ascii-folding" filter, which replaces characters with diacritics ("é", "à", ...)
+with their ASCII equivalent ("e", "a", ...).
+
+The examples below show how to define an analyzer with these components, depending on the backend you picked.
+
+.Analysis configurer implementation and configuration for a "Standalone POJO Mapper + Lucene" setup
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/MyLuceneAnalysisConfigurer.java[tags=include]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=setup-lucene]
+----
+<1> Define a custom analyzer named "english", to analyze English text such as book titles.
+<2> Set the tokenizer to a standard tokenizer.
+You need to pass Lucene-specific names to refer to tokenizers;
+see <<backend-lucene-analysis-analyzers>> for information about available tokenizers, their name and their parameters.
+<3> Set the token filters. Token filters are applied in the order they are given.
+Here too, Lucene-specific names are expected;
+see <<backend-lucene-analysis-analyzers>> for information about available token filters, their name and their parameters.
+<4> Set the value of a parameter for the last added char filter/tokenizer/token filter.
+<5> Define another custom analyzer, called "name", to analyze author names.
+On contrary to the first one, do not use enable stemming,
+as it is unlikely to lead to useful results on proper nouns.
+<6> Assign the configurer to the backend in the Hibernate Search configuration properties.
+For more information about the bean references, see <<configuration-bean-reference>>.
+====
+
+.Analysis configurer implementation and configuration for a "Standalone POJO Mapper + Elasticsearch/OpenSearch" setup
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=setup-elasticsearch]
+----
+<1> Define a custom analyzer named "english", to analyze English text such as book titles.
+<2> Set the tokenizer to a standard tokenizer.
+You need to pass Elasticsearch-specific names to refer to tokenizers;
+see <<backend-elasticsearch-analysis-analyzers>> for information about available tokenizers, their name and their parameters.
+<3> Set the token filters. Token filters are applied in the order they are given.
+Here too, Elasticsearch-specific names are expected;
+see <<backend-elasticsearch-analysis-analyzers>> for information about available token filters, their name and their parameters.
+<4> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
+must be defined separately and assigned a new name.
+<5> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
+<6> Define another custom analyzer, named "name", to analyze author names.
+On contrary to the first one, do not use enable stemming,
+as it is unlikely to lead to useful results on proper nouns.
+<7> Assign the configurer to the backend in the Hibernate Search configuration properties.
+For more information about the bean references, see <<configuration-bean-reference>>.
+====
+
+Once analysis is configured, the mapping must be adapted to assign the relevant analyzer to each field:
+
+.Book and Author entities after adding Hibernate Search specific annotations
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/Author.java[tags=include;!getters-setters]
+----
+<1> Replace the `@GenericField` annotation with `@FullTextField`,
+and set the `analyzer` parameter to the name of the custom analyzer configured earlier.
+====
+
+[IMPORTANT]
+====
+Mapping changes are not auto-magically applied to already-indexed data.
+Unless you know what you are doing, you should remember to
+<<mapper-pojo-standalone-getting-started-initialization-schema-management,update your schema>>
+and <<mapper-pojo-standalone-getting-started-initialization-indexing,reindex your data>>
+after you changed the Hibernate Search mapping of your entities.
+====
+
+That's it! Now, once the entities will be re-indexed, you will be able to search for the terms
+"Refactor", "refactors", "refactored" or "refactoring",
+and the book entitled "Refactoring: Improving the Design of Existing Code"
+will show up in the results.
+
+.Using Hibernate Search to query the indexes after analysis was configured
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=searching]
+----
+====
+
+[[mapper-pojo-standalone-getting-started-whats-next]]
+== What's next
+
+The above paragraphs gave you an overview of Hibernate Search.
+
+The next step after this tutorial is to get more familiar
+with the overall architecture of Hibernate Search (<<architecture>>)
+and review the <<architecture-examples>> to pick the most appropriate for your use case.
+
+You may also want to explore the basic features in more detail.
+Two topics which were only briefly touched in this tutorial
+were analysis configuration (<<concepts-analysis>>) and bridges (<<bridge>>).
+Both are important features required for more fine-grained indexing.
+
+When it comes to initializing your index, you will be interested
+in <<schema-management,schema management>>
+and <<mapper-pojo-standalone-indexing-massindexer,mass indexing>>.
+
+When querying, you will probably want to know more about
+<<search-dsl-predicate,predicates>>,
+<<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>,
+<<search-dsl-aggregation,aggregations>>.
+

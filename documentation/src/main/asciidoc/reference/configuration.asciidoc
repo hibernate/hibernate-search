@@ -4,6 +4,9 @@
 [[configuration-sources]]
 == [[_configuration_sources]] Configuration sources
 
+[[configuration-sources-mapper-orm]]
+=== Configuration sources when integrating into Hibernate ORM
+
 When using Hibernate Search within Hibernate ORM,
 configuration properties are retrieved from Hibernate ORM.
 
@@ -29,6 +32,14 @@ or `spring.jpa.properties.hibernate.search.backend.hosts` in Spring Boot.
 See <<compatibility-framework>> for more information.
 ====
 
+[[configuration-sources-mapper-pojo-standalone]]
+=== Configuration sources with the Standalone POJO mapper
+
+When using Hibernate Search in the <<mapper-pojo-standalone,Standalone POJO Mapper>> (without Hibernate ORM),
+configuration properties must be set programmatically as you build the mapping.
+
+See <<mapper-pojo-standalone-basics,this section>> for more information.
+
 [[configuration-structure]]
 == Structure of configuration properties
 
@@ -46,6 +57,7 @@ They are generally located just under the `hibernate.search` root.
 Global properties are explained in the relevant parts of this documentation:
 
 * <<mapper-orm,Hibernate ORM integration>>
+* <<mapper-pojo-standalone,Standalone POJO Mapper>>
 * <<mapping-configuration,Mapping configuration>>
 * And many more.
 
@@ -71,7 +83,7 @@ they set defaults for all indexes of the backend.
 With the root `hibernate.search.backend.indexes.<index name>`,
 they set the value for a specific index, overriding the defaults (if any).
 The backend and index names must match the names defined in the mapping.
-For ORM entities, the default index name is the name of the indexed class, without the package:
+For Hibernate ORM entities, the default index name is the name of the indexed class, without the package:
 `org.mycompany.Book` will have `Book` as its default index name.
 Index names can be customized in the mapping.
 +
@@ -190,16 +202,30 @@ and <<configuration-bean-injection,how the beans can get injected with other bea
 [[configuration-bean-frameworks]]
 === Supported frameworks
 
+[[configuration-bean-frameworks-mapper-orm]]
+==== Supported frameworks when integrating into Hibernate ORM
+
 When using the Hibernate Search integration into Hibernate ORM,
-all dependency injection frameworks supported by Hibernate ORM are supported.
+all dependency injection frameworks integrated into Hibernate ORM are automatically integrated into Hibernate Search.
 
 This includes, but may not be limited to:
 
 * all CDI-compliant frameworks, including link:{wildflyUrl}[WildFly] and link:{quarkusUrl}[Quarkus];
 * the link:{springUrl}[Spring] framework.
 
-When the framework is not supported, or when using Hibernate Search without Hibernate ORM,
-beans can only be retrieved using reflection by calling the public, no-arg constructor of the referenced type.
+When not using a dependency injection framework, or when it is not integrated into Hibernate ORM,
+beans can only be retrieved using reflection by calling the public, no-arg constructor of the referenced type;
+see <<configuration-bean-resolution>>.
+
+[[configuration-bean-frameworks-mapper-pojo-standalone]]
+==== Supported frameworks when using the Standalone POJO Mapper
+
+When using the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+dependency injection support must be <<mapper-pojo-standalone-beanprovider,plugged in manually>>.
+
+Failing that,
+beans can only be retrieved using reflection by calling the public, no-arg constructor of the referenced type;
+see <<configuration-bean-resolution>>.
 
 [[configuration-bean-reference]]
 == Bean references
@@ -264,8 +290,8 @@ Example: the name `simple`,
 when used as the value of the property `hibernate.search.backend.layout.strategy`
 to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
 resolves to the built-in `simple` strategy.
-* Otherwise, if a dependency injection framework is integrated into Hibernate ORM,
-the reference is resolved using the DI framework (see <<configuration-bean-frameworks>>).
+* Otherwise, if a <<configuration-bean-frameworks,supported Dependency Injection (DI) framework>> is available,
+the reference is resolved using the DI framework.
 ** If a managed bean with the given type (and if provided, name) exists, that bean is used.
 +
 Example: the name `myLayoutStrategy`,
@@ -409,6 +435,7 @@ It will not be propagated.
 == Multi-tenancy
 
 If your application uses Hibernate ORM's link:{hibernateDocUrl}#multitenacy[multi-tenancy support],
+or if you <<mapper-pojo-standalone-multi-tenancy,configured multi-tenancy explicitly in the Standalone POJO Mapper>>,
 Hibernate Search should detect that and configure your backends transparently.
 For details, see:
 

@@ -1,5 +1,7 @@
 [[indexing-automatic]]
-= [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Automatic indexing
+= [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Automatic indexing within Hibernate ORM
+
+include::components/mapper-orm-only-note.asciidoc[]
 
 By default, every time an entity is changed through a Hibernate ORM Session,
 if that entity is <<mapping-entityindexmapping,mapped to an index>>,
@@ -77,6 +79,7 @@ This works great for most applications, but you need to consider some limitation
 [[indexing-automatic-concepts-dirty-checking]]
 == [[mapper-orm-indexing-automatic-concepts-dirty-checking]] Dirty checking
 Hibernate Search is aware of the entity properties that are accessed when building indexed documents.
+When processing Hibernate ORM entity change events, it is also aware of which properties actually changed.
 Thanks to that knowledge, it is able to detect which entity changes are actually relevant to indexing,
 and to skip reindexing when a property is modified, but does not affect the indexed document.
 

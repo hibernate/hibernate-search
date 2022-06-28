@@ -66,7 +66,8 @@ Given an association from an entity type `A` to entity type `B`,
 `@AssociationInverseSide` defines the inverse side of an association,
 i.e. the path from `B` to `A`.
 
-This is mostly useful when a bidirectional association
+This is mostly useful when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>
+or when using the <<mapper-orm,Hibernate ORM integration>> and a bidirectional association
 is not mapped as such in Hibernate ORM (no `mappedBy`).
 
 .Mapping the inverse side of an association with `@AssociationInverseSide`

@@ -2,7 +2,9 @@
 = [[getting-started]] Getting started with the Hibernate ORM integration
 
 This section will guide you through the initial steps required
-to integrate Hibernate Search into your application.
+to index and query your Hibernate ORM entities using Hibernate Search.
+
+If your entities are **not** defined in Hibernate ORM, see <<mapper-pojo-standalone-getting-started,this other guide>> instead.
 
 [[mapper-orm-getting-started-assumptions]]
 == [[gettingstarted-architecture]] Assumptions
@@ -161,6 +163,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 ----
 <1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
 <2> By default, the JPA `@Id` is used to generate a document identifier.
+When there is no JPA `@Id` (e.g. when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>),
+the ID can be mapped explicitly with <<mapping-identifiermapping-explicit,`@DocumentId`>>.
 <3> `@FullTextField` maps a property to a full-text index field with the same name and type.
 Full-text fields are broken down into tokens and normalized (lowercased, ...).
 Here we're relying on default analysis configuration,
@@ -338,9 +342,12 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 <1> Fetch the total hit count.
 ====
 
-Note that, while the examples above retrieved hits as managed entities,
+[NOTE]
+====
+While the examples above retrieved hits as managed entities,
 it is just one of the possible hit types.
 See <<search-dsl-projection>> for more information.
+====
 
 [[mapper-orm-getting-started-analysis]]
 == [[getting-started-analysis]] Analysis
@@ -468,17 +475,19 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 and set the `analyzer` parameter to the name of the custom analyzer configured earlier.
 ====
 
+[IMPORTANT]
+====
+Mapping changes are not auto-magically applied to already-indexed data.
+Unless you know what you are doing, you should remember to
+<<mapper-orm-getting-started-initialization-schema-management,update your schema>>
+and <<mapper-orm-getting-started-initialization-indexing,reindex your data>>
+after you changed the Hibernate Search mapping of your entities.
+====
+
 That's it! Now, once the entities will be re-indexed, you will be able to search for the terms
 "Refactor", "refactors", "refactored" or "refactoring",
 and the book entitled "Refactoring: Improving the Design of Existing Code"
 will show up in the results.
-
-[IMPORTANT]
-====
-Mapping changes are not auto-magically applied to already-indexed data.
-Unless you know what you are doing, you should remember to reindex your data
-after you changed the Hibernate Search mapping of your entities.
-====
 
 .Using Hibernate Search to query the indexes after analysis was configured
 ====

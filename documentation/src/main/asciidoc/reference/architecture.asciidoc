@@ -6,11 +6,13 @@
 
 From the user's perspective, Hibernate Search consists of two components:
 
-Mapper:: The mapper "maps" the user model to an index model,
+[[architecture-hsearch-components-mapper]]Mapper:: The mapper "maps" the user model to an index model,
 and provide APIs consistent with the user model to perform indexing and searching.
 +
-Most applications rely on the ORM mapper,
-which offers the ability to index properties of Hibernate ORM entities.
+Most applications rely on the <<mapper-orm,Hibernate ORM mapper>>,
+which offers the ability to index properties of Hibernate ORM entities,
+but there is also a <<mapper-pojo-standalone,Standalone POJO mapper>>
+that can be used without Hibernate ORM.
 +
 The mapper is configured partly through annotations on the domain model,
 and partly through configuration properties.
@@ -38,7 +40,7 @@ notifying the mapper when it's done.
 +
 See <<indexing-massindexer>> for details.
 Automatic indexing::
-This is how Hibernate Search keeps indexes in sync with a database.
+This is how Hibernate Search keeps indexes in sync with a database with the <<mapper-orm,Hibernate ORM integration>>.
 +
 When an entity changes, the mapper detects the change and stores the information in an indexing plan.
 Upon transaction commit, these changes processed (either in the same thread or in a background process,
@@ -48,6 +50,8 @@ The backend puts the documents in an internal queue, and will index documents in
 notifying the mapper when it's done.
 +
 See <<indexing-automatic>> for details.
++
+NOTE: Automatic indexing is <<mapper-pojo-standalone-indexing-automatic,not available for the Standalone POJO Mapper>>.
 Searching::
 This is how Hibernate Search provides ways to query an index.
 +
@@ -75,6 +79,10 @@ See <<search-dsl>> for details.
 |<<architecture-examples-no-coordination-elasticsearch,No coordination with Elasticsearch>>
 |<<architecture-examples-outbox-polling-elasticsearch,Outbox polling with Elasticsearch>>
 
+|Compatible <<architecture-hsearch-components-mapper,mappers>>
+2+|Both <<mapper-orm,Hibernate ORM integration>> and <<mapper-pojo-standalone,Standalone POJO Mapper>>
+|<<mapper-orm,Hibernate ORM integration>> only
+
 |Application topology
 |Single-node
 2+|Single-node or multi-node
@@ -84,7 +92,7 @@ See <<search-dsl>> for details.
 2+|Elasticsearch cluster
 
 |Guarantee of index updates
-2+|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
+2+|<<coordination-none-indexing-guarantee,When the commit / `SearchSession.close()` returns (non-transactional)>>
 |<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
 
 |Visibility of index updates
@@ -159,11 +167,26 @@ and all indexes need to live on the same server.
 
 To implement this architecture, use the following Maven dependencies:
 
+When <<mapper-orm,integrating with Hibernate ORM>>::
 [source, XML, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
    <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-lucene</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>> (no Hibernate ORM)::
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
@@ -225,11 +248,26 @@ and won't perform very well if you need changes to be visible immediately after 
 
 To implement this architecture, use the following Maven dependencies:
 
+When <<mapper-orm,integrating with Hibernate ORM>>::
 [source, XML, subs="+attributes"]
 ----
 <dependency>
    <groupId>org.hibernate.search</groupId>
    <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>> (no Hibernate ORM)::
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-pojo-standalone</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
@@ -306,6 +344,7 @@ to hold the data necessary for coordination.
 The `outbox-polling` coordination strategy requires an extra dependency.
 To implement this architecture, use the following Maven dependencies:
 
+When <<mapper-orm,integrating with Hibernate ORM>>::
 [source, XML, subs="+attributes"]
 ----
 <dependency>
@@ -324,5 +363,8 @@ To implement this architecture, use the following Maven dependencies:
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>> (no Hibernate ORM)::
+This architecture cannot be implemented with the Standalone POJO Mapper at the moment,
+because this mapper <<mapper-pojo-standalone-coordination,does not support coordination>>.
 
 Also, configure coordination as explained in <<coordination-outbox-polling>>.

@@ -129,6 +129,9 @@ See <<mapping-custom-annotations>> for more information.
 [[mapping-configurer]]
 == Mapping configurer
 
+[[mapper-orm-mapping-configurer]]
+=== Hibernate ORM integration
+
 With the Hibernate ORM integration, a custom `HibernateOrmSearchMappingConfigurer` can be plugged into Hibernate Search in order to configure
 annotation mapping (`AnnotationMappingConfigurationContext`),
 programmatic mapping (`ProgrammaticMappingConfigurationContext`), and more.
@@ -158,4 +161,24 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/programmatic/
 <3> Define `Book` as <<mapping-entityindexmapping-programmatic,indexed>>.
 <4> Access the programmatic mapping of property `title` of type `Book`.
 <5> Define an <<mapping-directfieldmapping-programmatic,index field>> based on property `title` of type `Book`.
+====
+
+[[mapper-pojo-standalone-mapping-configurer]]
+=== Standalone POJO Mapper
+
+The Standalone POJO Mapper does not offer a "mapping configurer" at the moment
+(https://hibernate.atlassian.net/browse/HSEARCH-4615[HSEARCH-4615]).
+However, `AnnotationMappingConfigurationContext`
+and `ProgrammaticMappingConfigurationContext`
+can be accessed when building the `SearchMapping`:
+
+.Configuring the mapping with the Standalone POJO Mapper
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/mapping/config/MappingConfigurationIT.java[tags=setup]
+----
+<1> Start building the `SearchMapping` as usual.
+<2> Access the annotation mapping context to configure annotation mapping.
+<3> Access the programmatic mapping context to configure programmatic mapping.
 ====

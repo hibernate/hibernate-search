@@ -154,7 +154,7 @@ public class HibernateOrmManualIndexingIT {
 
 			indexingPlan.addOrUpdate( book ); // <4>
 
-			// Not shown: commit the transaction if relevant
+			// Not shown: commit the transaction or close the session if relevant
 			// end::indexing-plan-addOrUpdate[]
 		} );
 
@@ -187,7 +187,7 @@ public class HibernateOrmManualIndexingIT {
 
 			indexingPlan.delete( book ); // <4>
 
-			// Not shown: commit the transaction if relevant
+			// Not shown: commit the transaction or close the session if relevant
 			// end::indexing-plan-delete[]
 		} );
 

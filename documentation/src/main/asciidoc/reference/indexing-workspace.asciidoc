@@ -6,7 +6,7 @@ but rather about a large number of documents, possibly all of them.
 This includes, for example, purging the index to remove all of its content.
 
 The operations are accessed through the `SearchWorkspace` interface,
-and executed immediately (*outside* the context of a `SearchSession`, ORM session or transaction).
+and executed immediately (*outside* the context of a `SearchSession`, Hibernate ORM session or transaction).
 
 The `SearchWorkspace` can be retrieved from the <<entrypoints-search-mapping,`SearchMapping`>>,
 and can target one, several or all indexes:
@@ -40,7 +40,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 The `SearchWorkspace` exposes various large-scale operations
 that can be applied to an index or a set of indexes.
 These operations are triggered as soon as they are requested,
-without waiting for the transaction commit.
+without waiting for the `SearchSession` to be closed or the Hibernate ORM transaction to be committed.
 
 This interface offers the following methods:
 
