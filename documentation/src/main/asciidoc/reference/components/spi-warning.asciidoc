@@ -1,0 +1,12 @@
+[WARNING]
+====
+Features detailed in this section rely on at least one _SPI_ (Service Provider Interface):
+these are aimed at integration providers (typically frameworks).
+
+The https://hibernate.org/community/compatibility-policy/[compatibility policy] is slightly different for an SPI:
+SPI elements (e.g. types, methods, configuration properties, etc.)
+may be altered in a backward-incompatible way -- or even removed -- in **minor** versions of Hibernate Search.
+
+You are free to use/implement SPI if you really need it,
+but you should be prepared to update code which relies on SPI as needed.
+====

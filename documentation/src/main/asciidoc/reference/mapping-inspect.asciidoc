@@ -14,7 +14,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedentiti
 <1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `SearchIndexedEntity` by its entity class.
 `SearchIndexedEntity` gives access to information pertaining to that entity and its index.
-<3> Get the JPA name of that entity.
+<3> (With the <<mapper-orm,Hibernate ORM integration>> only) Get the JPA name of that entity.
 <4> Get the index manager for that entity.
 <5> Get the backend for that index manager.
 <6> Retrieve the `SearchIndexedEntity` by its entity name.

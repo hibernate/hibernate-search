@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.hibernate.search.documentation.testsupport.JpaConfiguration;
+import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -41,7 +41,7 @@ public class GettingStartedDefaultAnalysisIT {
 	@Before
 	public void setup() {
 		entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName,
-				JpaConfiguration.properties( configurationProvider ) );
+				TestConfiguration.ormMapperProperties( configurationProvider ) );
 	}
 
 	@After

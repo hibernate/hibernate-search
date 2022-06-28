@@ -1,6 +1,8 @@
 [[mapper-orm-indexing-jsr352]]
 = [[jsr352-integration]] Reindexing large volumes of data with the JSR-352 integration
 
+include::components/mapper-orm-only-note.asciidoc[]
+
 Hibernate Search provides a JSR-352 job to perform mass indexing. It covers not only the existing
 functionality of the mass indexer described above, but also benefits from some powerful standard
 features of the Java Batch Platform (JSR-352), such as failure recovery using checkpoints, chunk

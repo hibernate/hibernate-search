@@ -1,5 +1,5 @@
 [[indexing]]
-= [[mapper-orm-indexing]] Indexing Hibernate ORM entities
+= [[mapper-orm-indexing]] Indexing entities
 
 :leveloffset: +1
 

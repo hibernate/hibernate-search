@@ -73,7 +73,7 @@ but this can also be achieved using a programmatic API.
 To learn more about how to configure mapping, see <<mapping>>.
 
 To learn how to index the resulting documents, see <<indexing>>
-(hint: it's automatic).
+(hint: for the <<mapper-orm,Hibernate ORM integration>>, it's automatic).
 
 To learn how to search with an API
 that takes advantage of the mapping to be closer to the entity model,
@@ -185,7 +185,8 @@ Different factors influence when refreshes and commit happen:
 
 * <<indexing-automatic,Automatic indexing>> and <<indexing-plan,indexing plans>> will, by default,
 require that a commit of the index writer is performed after each set of changes,
-meaning the changes are safe after the Hibernate ORM transaction commit returns.
+meaning the changes are safe after the Hibernate ORM transaction commit returns (for the <<mapper-orm,Hibernate ORM integration>>)
+or the ``SearchSession``'s `close()` method returns (for the <<mapper-pojo-standalone,Standalone POJO Mapper>>).
 However, no refresh is requested by default, meaning the changes may only be visible at a later time,
 when the backend decides to refresh the index reader.
 This behavior can be customized by setting a different <<indexing-plan-synchronization,synchronization strategy>>.

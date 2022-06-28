@@ -1,7 +1,8 @@
 [[indexing-plan]]
 = [[mapper-orm-indexing-manual-indexingplan-writes]] [[_deleting_instances_from_the_index]] [[_adding_instances_to_the_index]] Explicitly indexing on entity change events
 
-When <<indexing-automatic,automatic indexing>> is disabled,
+When <<indexing-automatic,automatic indexing>> is <<mapping-annotations,disabled>>
+or simply not supported (e.g. <<mapper-pojo-standalone-indexing-automatic,with the Standalone POJO Mapper>>),
 the indexes will start empty and stay that way
 until explicit indexing commands are sent to Hibernate Search.
 
@@ -9,10 +10,25 @@ Explicitly indexing is done in the context of a <<entrypoints-search-session,`Se
 using the `SearchIndexingPlan` interface.
 This interface represents the (mutable) set of changes
 that are planned in the context of a session,
-and will be applied to indexes upon transaction commit.
+and will be applied to indexes upon transaction commit (for the <<mapper-orm,Hibernate ORM integration>>)
+or upon closing the `SearchSession` (for the <<mapper-pojo-standalone,Standalone POJO Mapper>>).
 
-This interface offers the following methods:
+When indexing explicitly,
+the indexing plan should be used whenever a change event (add, update, delete) occurs on an entity.
+The indexing plan will automatically determine whether the changed entity needs to be reindexed.
+It will even infer which other entities need to be <<mapping-reindexing,reindexed>>
+because their indexed document embeds the changed entity
+(e.g. through <<mapping-indexedembedded,`@IndexedEmbedded`>>).
 
+The `SearchIndexingPlan` interface offers the following methods:
+
+`add(Object entity)`::
+(Available with the <<mapper-pojo-standalone,Standalone POJO Mapper>> only.)
++
+Add a document to the index if the entity type is mapped to an index (`@Indexed`).
++
+WARNING: This may create duplicates in the index if the document already exists.
+Prefer `addOrUpdate` unless you are really sure of yourself and need a (slight) performance boost.
 `addOrUpdate(Object entity)`::
 Add or update a document in the index if the entity type is mapped to an index (`@Indexed`),
 and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
@@ -49,10 +65,12 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 ----
 <1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Get the search session's indexing plan.
-<3> Fetch from the database the `Book` we want to index.
+<3> Fetch from the database the `Book` we want to index;
+this could be replaced with any other way of loading an entity when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>.
 <4> Submit the `Book` to the indexing plan for an add-or-update operation.
 The operation won't be executed immediately,
-but will be delayed until the transaction is committed.
+but will be delayed until the transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
+or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>).
 ====
 
 .Explicitly deleting an entity from the index using `SearchIndexingPlan`
@@ -63,10 +81,12 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 ----
 <1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Get the search session's indexing plan.
-<3> Fetch from the database the `Book` we want to un-index.
+<3> Fetch from the database the `Book` we want to un-index;
+this could be replaced with any other way of loading an entity when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>.
 <4> Submit the `Book` to the indexing plan for a delete operation.
 The operation won't be executed immediately,
-but will be delayed until the transaction is committed.
+but will be delayed until the transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
+or until the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>).
 ====
 
 [TIP]
@@ -86,6 +106,8 @@ See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more informa
 [[indexing-plan-synchronization]]
 == [[mapper-orm-indexing-automatic-synchronization]] Synchronization with the indexes
 
+include::components/mapper-orm-only-note.asciidoc[]
+
 [[indexing-plan-synchronization-basics]]
 === [[mapper-orm-indexing-automatic-synchronization-basics]] Basics
 
@@ -99,8 +121,11 @@ With coordination strategies such as <<coordination-outbox-polling,`outbox-polli
 indexing happens in background threads and is always asynchronous.
 ====
 
-When a transaction is committed, <<coordination-none,with default coordination settings>>,
-automatic indexing can (and, by default, will) block the application thread
+When a transaction is committed (<<mapper-orm,Hibernate ORM integration>>)
+or the `SearchSession` is closed (<<mapper-pojo-standalone,Standalone POJO Mapper>>),
+<<coordination-none,with default coordination settings>>,
+the execution of the indexing plan (<<indexing-automatic,automatic>> or otherwise)
+can block the application thread
 until indexing reaches a certain level of completion.
 
 There are two main reasons for blocking the thread:
@@ -191,7 +216,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <3> Change an entity.
 <4> Commit the changes, triggering reindexing.
 <5> The overridden strategy guarantees that the modified book will be present in these results,
-even though the query was executed _just after_ the transaction commit.
+even though the query was executed _just after_ the transaction commit
+(here we're using the <<mapper-orm,Hibernate ORM integration>>).
 ====
 
 [[indexing-plan-synchronization-custom]]

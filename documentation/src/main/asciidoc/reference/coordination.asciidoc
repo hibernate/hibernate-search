@@ -25,6 +25,14 @@ hibernate.search.coordination.strategy = outbox-polling
 
 The default for this property is `none`.
 
+[NOTE]
+====
+Coordination strategies are only available for the integration to Hibernate ORM.
+
+See <<mapper-pojo-standalone-coordination,this section>> for information about
+coordination in the Standalone POJO mapper.
+====
+
 See the following subsections for details about available strategies.
 
 [[coordination-none]]
@@ -50,7 +58,7 @@ include::components/coordination-comparison-note.asciidoc[]
 === How indexing works without coordination
 
 [[coordination-none-indexing-detected-changes]]
-Changes have to occur in the ORM session in order to be detected::
+Changes have to occur in the ORM session in order to be detected for <<indexing-automatic,automatic indexing>>::
 See <<indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-none-indexing-association-consistency]]
 Associations must be updated on both sides::
@@ -59,17 +67,19 @@ See <<limitations-changes-asymmetric-association-updates>> for more details.
 Only relevant changes trigger indexing::
 See <<indexing-automatic-concepts-dirty-checking>> for more details.
 [[coordination-none-indexing-on-flush]]
-Entity data is extracted from entities upon session flushes::
+Entity data is extracted from entities upon session flushes or `SearchSession.close()`::
 [[mapper-orm-indexing-automatic-concepts-extraction-on-flush]] When a Hibernate ORM session is flushed,
+or (with the <<mapper-pojo-standalone,Standalone POJO Mapper>>) when `SearchSession.close()` is called,
 Hibernate Search will extract data from the entities
 to build documents to index,
 and will put these documents in an internal buffer for
-<<coordination-none-indexing-guarantee,indexing after the commit>>.
+<<coordination-none-indexing-guarantee,later indexing>>.
 This extraction <<coordination-none-indexing-lazy-loading,may involve loading extra data from the database>>.
 +
 [NOTE]
 ====
-The fact that this internal buffer is populated on session flush
+With the <<mapper-orm,Hibernate ORM integration>>,
+the fact that this internal buffer is populated on Hibernate ORM session flush
 means that you can safely `clear()` the session after a `flush()`:
 entity changes performed up to the flush will be indexed correctly.
 
@@ -79,7 +89,7 @@ there is no need to call `flushToIndexes()` and update indexes in the middle of 
 except for larger volumes of data (see <<mapper-orm-indexing-manual-indexingplan-process-execute>>).
 ====
 +
-However, if you perform a batch process inside a transaction,
+However, if you perform a batch process inside a transaction with the <<mapper-orm,Hibernate ORM integration>>,
 and call `session.flush()`/`session.clear()` regularly to save memory,
 be aware that Hibernate Search's internal buffer holding documents to index
 will grow on each flush, and will not be cleared until the transaction is committed or rolled back.
@@ -97,7 +107,7 @@ even if you didn't need them in your business code,
 which may represent an overhead for your application threads
 as well as your database.
 +
-This extra cost can be mitigated to some extent by:
+With the <<mapper-orm,Hibernate ORM integration>>, this extra cost can be mitigated to some extent by:
 +
 * leveraging Hibernate ORM's batch fetching:
 see link:{hibernateDocUrl}#configurations-database-fetch[the `batch_fetch_size` property]
@@ -106,18 +116,22 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 especially for immutable entities referenced from indexed entities
 (e.g. for reference data such as countries, cities, ...).
 [[coordination-none-indexing-guarantee]]
-Indexing is not guaranteed on commit, but only when the application thread returns::
+Indexing is not guaranteed on commit, but only after the application thread returns::
 [[mapper-orm-indexing-automatic-concepts-transaction-commit]] When entity changes happen inside a transaction,
 indexes are not updated immediately, but only after the transaction is successfully committed.
 That way, if a transaction is rolled back, the indexes will be left in a state consistent with the database,
 discarding all the index changes that were planned during the transaction.
++
+Similarly, when using the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+indexes are guaranteed to be updated after `SearchSession.close()` returns.
 +
 However, if an error occurs in the backend while indexing,
 this behavior means that <<limitations-backend-indexing-error,index changes may be lost, leading to out-of-sync indexes>>.
 If this is a problem for you, you should consider switching to <<coordination-outbox-polling,another coordination strategy>>.
 +
 [[mapper-orm-indexing-automatic-concepts-notransaction-flush]]
-NOTE: When entity changes happen outside any transaction (not recommended),
+NOTE: With the <<mapper-orm,Hibernate ORM integration>>,
+when entity changes happen outside any transaction (not recommended),
 indexes are updated immediately upon session `flush()`.
 Without that flush, indexes will not be updated automatically.
 [[coordination-none-indexing-visibility]]
@@ -181,7 +195,7 @@ include::components/coordination-comparison-note.asciidoc[]
 === [[coordination-database-polling-indexing]] How indexing works with `outbox-polling` coordination
 
 [[coordination-outbox-polling-indexing-detected-changes]]
-Changes have to occur in the ORM session in order to be detected::
+Changes have to occur in the ORM session in order to be detected for <<indexing-automatic,automatic indexing>>::
 See <<indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-outbox-polling-indexing-association-consistency]]
 Associations must be updated on both sides::

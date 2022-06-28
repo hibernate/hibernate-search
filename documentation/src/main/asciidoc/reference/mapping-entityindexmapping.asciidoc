@@ -30,9 +30,15 @@ By default:
 * The index name will be equal to the entity name,
 which in Hibernate ORM is set using the `@Entity` annotation
 and defaults to the simple class name.
-* The identifier of indexed documents will be generated from the entity identifier.
+* With the <<mapper-orm,Hibernate ORM integration>>, the identifier of indexed documents
+will be <<mapping-identifiermapping-basics,generated from the entity identifier>>.
 Most types commonly used for entity identifiers are supported out of the box,
 but for more exotic types you may need specific configuration.
++
+With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+the identifier of indexed documents needs to be
+<<mapping-identifiermapping-explicit,mapped explicitly>>.
++
 See <<mapping-identifiermapping>> for details.
 * The index won't have any field.
 Fields must be mapped to properties explicitly.

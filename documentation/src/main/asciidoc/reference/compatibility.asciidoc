@@ -88,16 +88,19 @@ Just read about Spring Boot's specifics below, then follow the <<mapper-orm-gett
 not JPA or Hibernate Search configuration files.
 Adding Hibernate Search properties starting with `hibernate.search.` directly in that file will not work.
 
-Instead, prefix your Hibernate Search properties with
+When <<mapper-orm,integrating Hibernate Search with Hibernate ORM>>::
+Prefix your Hibernate Search properties with
 https://docs.spring.io/spring-boot/docs/2.5.1/reference/html/application-properties.html#application-properties.data.spring.jpa.properties[`spring.jpa.properties.`],
 so that Spring Boot passes along the properties to Hibernate ORM, which will pass them along to Hibernate Search.
-
++
 For example:
-
++
 [source]
 ----
 spring.jpa.properties.hibernate.search.backend.hosts = elasticsearch.mycompany.com
 ----
+When using the <<mapper-pojo-standalone,Standalone POJO mapper>>::
+You can pass properties programmatically to `SearchMappingBuilder#property`.
 
 [[compatibility-framework-spring-boot-dependency-versions]]
 ==== [[gettingstarted-framework-spring-boot-dependency-versions]] [[_dependency_versions]] Dependency versions

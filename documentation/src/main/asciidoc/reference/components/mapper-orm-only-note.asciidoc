@@ -1,0 +1,6 @@
+[NOTE]
+====
+This feature is only available with the <<mapper-orm,Hibernate ORM integration>>.
+
+It **cannot** be used with the <<mapper-pojo-standalone,Standalone POJO Mapper>> in particular.
+====

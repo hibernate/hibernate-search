@@ -230,6 +230,8 @@ setting the parameter.
 [[bridge-identifierbridge-access-orm]]
 == [[mapper-orm-bridge-identifierbridge-access-orm]] Accessing the ORM session or session factory from the bridge
 
+include::components/mapper-orm-only-note.asciidoc[]
+
 Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session or session factory.
 
 .Retrieving the ORM session or session factory from an `IdentifierBridge`
