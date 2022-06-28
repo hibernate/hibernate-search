@@ -10,5 +10,5 @@ see <<architecture-examples>>.
 
 For a summary of the differences between coordination strategies
 specifically in the context of automatic indexing,
-see <<mapper-orm-indexing-automatic-concepts>>.
+see <<indexing-automatic-concepts>>.
 ====

@@ -136,27 +136,29 @@ public class HibernateOrmManualIndexingIT {
 		EntityManagerFactory entityManagerFactory = setup( false );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
-		with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			assertBookCount( entityManager, 0 );
+		} );
 
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::indexing-plan-addOrUpdate[]
-			SearchSession searchSession = Search.session( entityManager ); // <1>
+			// Not shown: open a transaction if relevant
+
+			SearchSession searchSession = /* ... */ // <1>
+					// end::indexing-plan-addOrUpdate[]
+					Search.session( entityManager );
+			// tag::indexing-plan-addOrUpdate[]
 			SearchIndexingPlan indexingPlan = searchSession.indexingPlan(); // <2>
 
-			entityManager.getTransaction().begin();
-			try {
-				Book book = entityManager.getReference( Book.class, 5 ); // <3>
+			Book book = entityManager.getReference( Book.class, 5 ); // <3>
 
-				indexingPlan.addOrUpdate( book ); // <4>
+			indexingPlan.addOrUpdate( book ); // <4>
 
-				entityManager.getTransaction().commit(); // <5>
-			}
-			catch (RuntimeException e) {
-				entityManager.getTransaction().rollback();
-				throw e;
-			}
+			// Not shown: commit the transaction if relevant
 			// end::indexing-plan-addOrUpdate[]
+		} );
 
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			assertBookCount( entityManager, 1 );
 		} );
 	}
@@ -167,27 +169,29 @@ public class HibernateOrmManualIndexingIT {
 		EntityManagerFactory entityManagerFactory = setup( true );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
-		with( entityManagerFactory ).runNoTransaction( entityManager -> {
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			assertBookCount( entityManager, numberOfBooks );
+		} );
 
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::indexing-plan-delete[]
-			SearchSession searchSession = Search.session( entityManager ); // <1>
+			// Not shown: open a transaction if relevant
+
+			SearchSession searchSession = /* ... */ // <1>
+					// end::indexing-plan-delete[]
+					Search.session( entityManager );
+			// tag::indexing-plan-delete[]
 			SearchIndexingPlan indexingPlan = searchSession.indexingPlan(); // <2>
 
-			entityManager.getTransaction().begin();
-			try {
-				Book book = entityManager.getReference( Book.class, 5 ); // <3>
+			Book book = entityManager.getReference( Book.class, 5 ); // <3>
 
-				indexingPlan.delete( book ); // <4>
+			indexingPlan.delete( book ); // <4>
 
-				entityManager.getTransaction().commit(); // <5>
-			}
-			catch (RuntimeException e) {
-				entityManager.getTransaction().rollback();
-				throw e;
-			}
+			// Not shown: commit the transaction if relevant
 			// end::indexing-plan-delete[]
+		} );
 
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			assertBookCount( entityManager, numberOfBooks - 1 );
 		} );
 	}

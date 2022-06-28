@@ -46,7 +46,7 @@ e.g. the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>.
 See in particular <<architecture-examples>>.
 2. OR avoid parallel updates to entities that are indexed-embedded in the same indexed entity.
 This is only possible in very specific setups.
-3. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
+3. OR schedule a <<indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
 [[limitations-parallel-embedded-update-roadmap]]
@@ -64,7 +64,7 @@ There are no other solutions currently on the roadmap.
 === Description
 
 With the default settings (<<coordination-none,no coordination>>),
-<<mapper-orm-indexing-automatic,automatic indexing>>
+<<indexing-automatic,automatic indexing>>
 will actually apply index changes in the backend *just after* the transaction commit,
 without any kind of transaction log for the index changes.
 
@@ -85,7 +85,7 @@ The following solutions can help circumvent this limitation:
 1. Use a safer <<coordination,coordination strategy>>,
 e.g. the <<coordination-outbox-polling,`outbox-polling` coordination strategy>>.
 See in particular <<architecture-examples>>.
-2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
+2. OR schedule a <<indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
 to get the index back in sync with the database.
 
 [[limitations-backend-indexing-error-roadmap]]
@@ -106,7 +106,7 @@ and they are not currently on the roadmap.
 [[limitations-changes-in-session-description]]
 === Description
 
-Due to <<mapper-orm-indexing-automatic-concepts-changes-in-session,how Hibernate Search uses internal events of Hibernate ORM>>
+Due to <<indexing-automatic-concepts-changes-in-session,how Hibernate Search uses internal events of Hibernate ORM>>
 in order to detect changes,
 it will not detect changes resulting from `insert`/`delete`/`update` queries,
 be it SQL or JPQL/HQL queries.
@@ -118,7 +118,7 @@ without Hibernate ORM or Search having any knowledge of which entities are actua
 === Solutions and workarounds
 
 One workaround is to reindex explicitly after you run JPQL/SQL queries,
-either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+either using the <<indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
 
 [[limitations-changes-in-session-roadmap]]
@@ -173,7 +173,7 @@ The following solutions can help circumvent this limitation:
 always update the other side consistently.
 2. When the above is not possible,
 reindex affected entities explicitly after the association update,
-either using the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+either using the <<indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
 
 [[limitations-changes-asymmetric-association-updates-roadmap]]
@@ -196,7 +196,7 @@ but is long-term goal.
 [[limitations-indexing-plan-serialization-description]]
 === Description
 
-When <<mapper-orm-indexing-automatic,automatic indexing>> is enabled,
+When <<indexing-automatic,automatic indexing>> is enabled,
 Hibernate Search collects entity change events
 to build an "indexing plan" inside the ORM `EntityManager`/`Session`.
 The indexing plan holds information relative to which entities need to be re-indexed,

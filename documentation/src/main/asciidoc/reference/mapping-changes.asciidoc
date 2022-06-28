@@ -14,7 +14,7 @@ The simplest solution when the index structure needs to change is to:
 either manually by deleting the filesystem directory for Lucene
 or using the REST API to delete the index for Elasticsearch,
 or using Hibernate Search's <<schema-management,schema management features>>.
-2. Re-populate the index, for example using the <<mapper-orm-indexing-massindexer,mass indexer>>.
+2. Re-populate the index, for example using the <<indexing-massindexer,mass indexer>>.
 
 [TIP]
 ====

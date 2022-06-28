@@ -45,7 +45,7 @@ with the one expected by Hibernate Search for Elasticsearch 7.
 
 In such cases, the easiest way to upgrade is to delete your indexes manually,
 make Hibernate Search re-create the indexes along with their schema,
-and <<mapper-orm-indexing-massindexer,reindex your data>>.
+and <<indexing-massindexer,reindex your data>>.
 
 [[backend-elasticsearch-configuration]]
 == [[elasticsearch-integration-configuration]] Basic configuration
@@ -456,8 +456,8 @@ The `simple` layout is a bit more complex than it could be, but it follows the b
 
 Using aliases has a significant advantage over directly targeting the index:
 it makes full reindexing on a live application possible without downtime,
-which is useful in particular when <<mapper-orm-indexing-automatic,automatic indexing>> is disabled
-(<<mapper-orm-indexing-automatic-configuration,completely>> or <<mapping-reindexing-reindexonupdate,partially>>)
+which is useful in particular when <<indexing-automatic,automatic indexing>> is disabled
+(<<indexing-automatic-configuration,completely>> or <<mapping-reindexing-reindexonupdate,partially>>)
 and you need to fully reindex periodically (for example on a daily basis).
 
 With aliases, you just need to direct the read alias (used by search queries) to an old copy of the index,
@@ -473,7 +473,7 @@ The basic sequence of actions is the following:
 
 1. Create a new index, `myindex-000002`.
 2. Switch the write alias, `myindex-write`, from `myindex-000001` to `myindex-000002`.
-3. Reindex, for example using the <<mapper-orm-indexing-massindexer,mass indexer>>.
+3. Reindex, for example using the <<indexing-massindexer,mass indexer>>.
 4. Switch the read alias, `myindex-read`, from `myindex-000001` to `myindex-000002`.
 5. Delete `myindex-000001`.
 

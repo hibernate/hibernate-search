@@ -36,9 +36,9 @@ See the following subsections for details about available strategies.
 The default strategy is the simplest and does not involve any additional infrastructure
 for communication between application nodes.
 
-All <<mapper-orm-indexing-automatic,automatic indexing>> operations
+All <<indexing-automatic,automatic indexing>> operations
 are executed directly in application threads,
-which gives this strategy the unique ability to provide <<mapper-orm-indexing-automatic-synchronization,synchronous indexing>>,
+which gives this strategy the unique ability to provide <<indexing-plan-synchronization,synchronous indexing>>,
 at the cost of a few limitations:
 
 * <<limitations-parallel-embedded-update>>
@@ -51,13 +51,13 @@ include::components/coordination-comparison-note.asciidoc[]
 
 [[coordination-none-indexing-detected-changes]]
 Changes have to occur in the ORM session in order to be detected::
-See <<mapper-orm-indexing-automatic-concepts-changes-in-session>> for more details.
+See <<indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-none-indexing-association-consistency]]
 Associations must be updated on both sides::
 See <<limitations-changes-asymmetric-association-updates>> for more details.
 [[coordination-none-indexing-change-filter]]
 Only relevant changes trigger indexing::
-See <<mapper-orm-indexing-automatic-concepts-dirty-checking>> for more details.
+See <<indexing-automatic-concepts-dirty-checking>> for more details.
 [[coordination-none-indexing-on-flush]]
 Entity data is extracted from entities upon session flushes::
 [[mapper-orm-indexing-automatic-concepts-extraction-on-flush]] When a Hibernate ORM session is flushed,
@@ -127,7 +127,7 @@ This means index changes are safely stored to disk,
 but this does not mean a search query ran immediately after indexing will take the changes into account:
 when using the Elasticsearch backend in particular, changes may take some time to be visible from search queries.
 +
-See <<mapper-orm-indexing-automatic-synchronization>> for details.
+See <<indexing-plan-synchronization>> for details.
 
 [[coordination-outbox-polling]]
 == [[coordination-database-polling]] `outbox-polling`: additional event tables and polling in background processors
@@ -140,7 +140,7 @@ include::components/incubating-warning.asciidoc[]
 The `outbox-polling` strategy implements coordination through
 <<coordination-outbox-polling-schema,additional tables>> in the application database.
 
-<<mapper-orm-indexing-automatic,Automatic indexing>> is implemented
+<<indexing-automatic,Automatic indexing>> is implemented
 by pushing events to an outbox table within the same transaction as the entity changes,
 and polling this outbox table from background processors which perform indexing.
 
@@ -182,13 +182,13 @@ include::components/coordination-comparison-note.asciidoc[]
 
 [[coordination-outbox-polling-indexing-detected-changes]]
 Changes have to occur in the ORM session in order to be detected::
-See <<mapper-orm-indexing-automatic-concepts-changes-in-session>> for more details.
+See <<indexing-automatic-concepts-changes-in-session>> for more details.
 [[coordination-outbox-polling-indexing-association-consistency]]
 Associations must be updated on both sides::
 See <<limitations-changes-asymmetric-association-updates>> for more details.
 [[coordination-outbox-polling-indexing-change-filter]]
 Only relevant changes trigger indexing::
-See <<mapper-orm-indexing-automatic-concepts-dirty-checking>> for more details.
+See <<indexing-automatic-concepts-dirty-checking>> for more details.
 [[coordination-outbox-polling-indexing-background]]
 Indexing happens in a background thread::
 When a Hibernate ORM session is flushed,
@@ -565,7 +565,7 @@ hibernate.search.coordination.event_processor.enabled = false
 [[coordination-outbox-polling-mass-indexer-basics]]
 ==== Basics
 
-During <<mapper-orm-indexing-massindexer,mass indexing>>,
+During <<indexing-massindexer,mass indexing>>,
 an application instance will exceptionally bypass <<coordination-outbox-polling-sharding,sharding>>
 and index entities from any shard.
 

@@ -876,16 +876,16 @@ are pushed to the index itself,
 so that a crash or power loss will no longer result in data loss.
 
 Some operations are critical and are always committed before they are considered complete.
-This is the case for changes triggered by <<mapper-orm-indexing-automatic,automatic indexing>>
-(unless <<mapper-orm-indexing-automatic-synchronization,configured otherwise>>),
-and also for large-scale operations such as a <<mapper-orm-indexing-manual-largescale,purge>>.
+This is the case for changes triggered by <<indexing-automatic,automatic indexing>>
+(unless <<indexing-plan-synchronization,configured otherwise>>),
+and also for large-scale operations such as a <<indexing-workspace,purge>>.
 When such an operation is encountered, a commit will be performed immediately,
 guaranteeing that the operation is only considered complete after all changes are safely stored on disk.
 
 Other operations, however, are not expected to be committed immediately.
-This is the case for changes contributed by the <<mapper-orm-indexing-massindexer,mass indexer>>,
+This is the case for changes contributed by the <<indexing-massindexer,mass indexer>>,
 or by automatic indexing when using the
-<<mapper-orm-indexing-automatic-synchronization,`async` synchronization strategy>>.
+<<indexing-plan-synchronization,`async` synchronization strategy>>.
 
 Performance-wise, committing may be an expensive operation,
 which is why Hibernate Search tries not to commit too often.
@@ -894,7 +894,7 @@ Hibernate Search will delay the commit by one second.
 If other changes are applied during that second,
 they will be included in the same commit.
 This dramatically reduces the amount of commits in write-intensive scenarios
-(e.g. <<mapper-orm-indexing-massindexer,mass indexing>>),
+(e.g. <<indexing-massindexer,mass indexing>>),
 leading to much better performance.
 
 It is possible to control exactly how often Hibernate Search will commit
@@ -913,8 +913,8 @@ The default for this property is `1000`.
 ====
 Setting the commit interval to 0 will force Hibernate Search to commit after every batch of changes,
 which may result in a much lower throughput,
-both for <<mapper-orm-indexing-automatic,automatic indexing>>
-and <<mapper-orm-indexing-massindexer,mass indexing>>.
+both for <<indexing-automatic,automatic indexing>>
+and <<indexing-massindexer,mass indexing>>.
 ====
 
 [NOTE]
@@ -923,10 +923,10 @@ Remember that individual write operations may force a commit,
 which may cancel out the potential performance gains from setting a higher commit interval.
 
 By default, the commit interval may only improve throughput
-of the <<mapper-orm-indexing-massindexer,mass indexer>>.
-If you want changes triggered by <<mapper-orm-indexing-automatic,automatic indexing>>
+of the <<indexing-massindexer,mass indexer>>.
+If you want changes triggered by <<indexing-automatic,automatic indexing>>
 to benefit from it too, you will need to select a non-default
-<<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>,
+<<indexing-plan-synchronization,synchronization strategy>>,
 so as not to require a commit after each change.
 ====
 
@@ -1070,8 +1070,8 @@ larger values provide better search performance if the index does not change oft
 
 With smaller values, merging happens more often and thus uses more resources,
 but the total number of segments will be lower on average, increasing read performance.
-Thus, larger values (`> 10`) are best for <<mapper-orm-indexing-massindexer,mass indexing>>,
-and smaller values (`< 10`) are best for <<mapper-orm-indexing-automatic,automatic indexing>>.
+Thus, larger values (`> 10`) are best for <<indexing-massindexer,mass indexing>>,
+and smaller values (`< 10`) are best for <<indexing-automatic,automatic indexing>>.
 
 The value must not be lower than `2`.
 
@@ -1090,14 +1090,14 @@ Segments larger than this size are never merged in the background.
 Settings this to a lower value helps reduce memory requirements and avoids some merging operations at the
 cost of optimal search speed.
 
-When <<mapper-orm-indexing-manual-merge,forcefully merging>> an index, this value is ignored and `max_forced_size` is used instead (see below).
+When <<indexing-workspace-merge,forcefully merging>> an index, this value is ignored and `max_forced_size` is used instead (see below).
 
 |`[...].io.merge.max_forced_size`
 |The maximum size of segments, in MB, for forced merges.
 
-This is the equivalent of `io.merge.max_size` for <<mapper-orm-indexing-manual-merge,forceful merges>>.
+This is the equivalent of `io.merge.max_size` for <<indexing-workspace-merge,forceful merges>>.
 You will generally want to set this to the same value as `max_size` or lower,
-but setting it too low will <<mapper-orm-indexing-merge-segments,degrade search performance as documents are deleted>>.
+but setting it too low will <<indexing-workspace-merge-segments,degrade search performance as documents are deleted>>.
 
 |`[...].io.merge.calibrate_by_deletes`
 |Whether the number of deleted documents in an index should be taken into account; `true` or `false`.

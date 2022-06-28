@@ -102,7 +102,7 @@ for example the Elasticsearch cluster has finished booting.
 
 After schema management operations are complete,
 you will often want to populate indexes.
-To that end, use the <<mapper-orm-indexing-massindexer,mass indexer>>.
+To that end, use the <<indexing-massindexer,mass indexer>>.
 ====
 
 The `SearchSchemaManager` interface exposes the following methods.
@@ -148,9 +148,9 @@ because <<schema-management-concepts-lucene-schema,local Lucene indexes don't ha
 |====
 
 Below is an example using a `SearchSchemaManager` to drop and create indexes,
-then using a <<mapper-orm-indexing-massindexer,mass indexer>> to re-populate the indexes.
+then using a <<indexing-massindexer,mass indexer>> to re-populate the indexes.
 The
-<<mapper-orm-indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart` setting of the mass indexer>>
+<<indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart` setting of the mass indexer>>
 would be an alternative solution to achieve the same results.
 
 .Reinitializing indexes using a `SearchSchemaManager`
@@ -163,7 +163,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/manage
 <2> Get a schema manager.
 <3> Drop and create the indexes.
 This method is synchronous and will only return after the operation is complete.
-<4> Optionally, trigger <<mapper-orm-indexing-massindexer,mass indexing>>.
+<4> Optionally, trigger <<indexing-massindexer,mass indexing>>.
 ====
 
 You can also select entity types when creating a schema manager,
@@ -194,7 +194,7 @@ i.e. new fields won't be added to documents just because they were added to the 
 
 This is by design: reindexing is a potentially long-running task that should be triggered explicitly.
 To populate indexes with pre-existing data from the database,
-use <<mapper-orm-indexing-massindexer,mass indexing>>.
+use <<indexing-massindexer,mass indexing>>.
 
 [[schema-management-concepts-drop-loses-data]]
  [[mapper-orm-schema-management-concepts-drop-loses-data]]Dropping the schema means losing indexed data::
@@ -202,7 +202,7 @@ use <<mapper-orm-indexing-massindexer,mass indexing>>.
 Dropping a schema will drop the whole index, including all indexed data.
 +
 A dropped index will need to be re-created through schema management,
-then populated with pre-existing data from the database through <<mapper-orm-indexing-massindexer,mass indexing>>.
+then populated with pre-existing data from the database through <<indexing-massindexer,mass indexing>>.
 [[schema-management-concepts-lucene-schema]]
  [[mapper-orm-schema-management-concepts-lucene-schema]]Schema validation and update are not effective with Lucene::
 The Lucene backend will only validate that the index actually exists and create missing indexes,
@@ -234,7 +234,7 @@ leaving your schema as a whole half-updated.
 For these reasons, **using schema updates in a production environment is not recommended**.
 Whenever the schema changes, you should either:
 
-* drop and create indexes, then <<mapper-orm-indexing-massindexer,reindex>>.
+* drop and create indexes, then <<indexing-massindexer,reindex>>.
 * OR update the schema manually through custom scripts.
 
 +

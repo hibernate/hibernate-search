@@ -244,7 +244,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/gettingstarte
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create an "indexer", passing the entity types you want to index.
 To index all entity types, call `massIndexer()` without any argument.
-<3> It is possible to set the number of threads to be used. For the complete list of options see <<mapper-orm-indexing-massindexer>>.
+<3> It is possible to set the number of threads to be used. For the complete list of options see <<indexing-massindexer>>.
 <4> Invoke the batch indexing process.
 ====
 
@@ -275,7 +275,7 @@ For that reason, if you modify entities in a transaction,
 and then execute a search query right after that transaction,
 the search results may not be consistent with the changes you just performed.
 
-See <<mapper-orm-indexing-automatic-synchronization>> for more information about this behavior and how to tune it.
+See <<indexing-plan-synchronization>> for more information about this behavior and how to tune it.
 ====
 
 [[mapper-orm-getting-started-searching]]
@@ -505,7 +505,7 @@ Both are important features required for more fine-grained indexing.
 
 When it comes to initializing your index, you will be interested
 in <<schema-management,schema management>>
-and <<mapper-orm-indexing-massindexer,mass indexing>>.
+and <<indexing-massindexer,mass indexing>>.
 
 When querying, you will probably want to know more about
 <<search-dsl-predicate,predicates>>,

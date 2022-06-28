@@ -1,11 +1,11 @@
 [[mapper-orm-indexing-manual]]
-= [[manual-index-changes]] Manual indexing
+= [[manual-index-changes]] Reindexing large amounts of data manually with Hibernate ORM
 
 [[mapper-orm-indexing-manual-basics]]
 == [[search-batchindex]] Basics
 
-While <<mapper-orm-indexing-automatic,automatic indexing>> and
-the <<mapper-orm-indexing-massindexer,`MassIndexer`>>
+While <<indexing-automatic,automatic indexing>> and
+the <<indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-jsr352,the mass indexing job>>
 should take care of most needs,
 it is sometimes necessary to control indexing manually,
@@ -90,7 +90,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-manual-indexingplan-writes>>.
+See <<indexing-plan>>.
 <5> Commit the transaction at the end of each iteration of the outer loop.
 The entities will be flushed and indexed automatically.
 ====
@@ -125,12 +125,12 @@ The index will thus be inconsistent with the database.
 To recover from that situation, you will have to either
 execute the exact same database changes that failed manually
 (to get the database back in sync with the index),
-or <<mapper-orm-indexing-manual-indexingplan-writes,reindex the entities>> affected by the transaction manually
+or <<indexing-plan,reindex the entities>> affected by the transaction manually
 (to get the index back in sync with the database).
 
 Of course, if you can afford to take the indexes offline for a longer period of time,
 a simpler solution would be to wipe the indexes clean
-and <<mapper-orm-indexing-massindexer,reindex everything>>.
+and <<indexing-massindexer,reindex everything>>.
 ====
 
 .A batch process with Hibernate Search using `execute()`
@@ -145,222 +145,11 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 Note we're relying on automatic indexing to index the entity,
 but this would work just as well if automatic indexing was disabled,
 only requiring an extra call to index the entity.
-See <<mapper-orm-indexing-manual-indexingplan-writes>>.
+See <<indexing-plan>>.
 <4> After a `flush()`/`clear()`, call `indexingPlan.execute()`.
 The entities will be processed and *the changes will be sent to the indexes immediately*.
 Hibernate Search will wait for index changes to be "completed"
-as required by the configured <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
+as required by the configured <<indexing-automatic-synchronization,synchronization strategy>>.
 <5> After the loop, commit the transaction.
 The remaining entities that were not flushed/cleared will be flushed and indexed automatically.
-====
-
-
-[[mapper-orm-indexing-manual-indexingplan-writes]]
-== [[_adding_instances_to_the_index]] Explicitly indexing and deleting specific documents
-//[[_deleting_instances_from_the_index]] // There can only be one anchor per paragraph, unfortunately...
-
-When <<mapper-orm-indexing-automatic,automatic indexing>> is disabled,
-the indexes will start empty and stay that way
-until explicit indexing commands are sent to Hibernate Search.
-
-Indexing is done in the context of an ORM session
-using the `SearchIndexingPlan` interface.
-This interface represents the (mutable) set of changes
-that are planned in the context of a session,
-and will be applied to indexes upon transaction commit.
-
-This interface offers the following methods:
-
-`addOrUpdate(Object entity)`::
-Add or update a document in the index if the entity type is mapped to an index (`@Indexed`),
-and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
-`delete(Object entity)`::
-Delete a document from the index if the entity type is mapped to an index (`@Indexed`),
-and re-index documents that embed this entity (through `@IndexedEmbedded` for example).
-`purge(Class<?> entityType, Object id)`::
-Delete the entity from the index,
-but do not try to re-index documents that embed this entity.
-+
-Compared to `delete`, this is mainly useful if the entity has already been deleted from the database
-and is not available, even in a detached state, in the session.
-In that case, reindexing associated entities will be the user's responsibility,
-since Hibernate Search cannot know which entities are associated to an entity that no longer exists.
-`purge(String entityName, Object id)`::
-Same as `purge(Class<?> entityType, Object id)`,
-but the entity type is referenced by its name (see `@javax.persistence.Entity#name`).
-`process()` and `execute()`::
-Respectively, process the changes and apply them to indexes.
-+
-These methods will be executed automatically on commit,
-so they are only useful when processing large number of items,
-as explained in <<mapper-orm-indexing-manual-indexingplan-process-execute>>.
-
-Below are examples of using `addOrUpdate` and `delete`.
-
-.Explicitly adding or updating an entity in the index using `SearchIndexingPlan`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-addOrUpdate]
-----
-<1> Get the `SearchSession`.
-<2> Get the search session's indexing plan.
-<3> Fetch from the database the `Book` we want to index.
-<4> Submit the `Book` to the indexing plan for an add-or-update operation.
-The operation won't be executed immediately,
-but will be delayed until the transaction is committed.
-<5> Commit the transaction, allowing Hibernate Search to actually write the document to the index.
-====
-
-.Explicitly deleting an entity from the index using `SearchIndexingPlan`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=indexing-plan-delete]
-----
-<1> Get the `SearchSession`.
-<2> Get the search session's indexing plan.
-<3> Fetch from the database the `Book` we want to un-index.
-<4> Submit the `Book` to the indexing plan for a delete operation.
-The operation won't be executed immediately,
-but will be delayed until the transaction is committed.
-<5> Commit the transaction, allowing Hibernate Search to actually delete the document from the index.
-====
-
-[TIP]
-====
-Multiple operations can be performed in a single indexing plan.
-The same entity can even be changed multiple times,
-for example added and then removed:
-Hibernate Search will simplify the operation as expected.
-
-This will work fine for any reasonable number of entities,
-but changing or simply loading large numbers of entities in a single session
-requires special care with Hibernate ORM,
-and then some extra care with Hibernate Search.
-See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more information.
-====
-
-[[mapper-orm-indexing-manual-largescale]]
-== Explicitly altering a whole index
-
-Some index operations are not about a specific entity/document,
-but rather about a large number of documents, possibly all of them.
-This includes, for example, purging the index to remove all of its content.
-
-The operations are performed *outside* the context of an ORM session,
-using the `SearchWorkspace` interface.
-
-The `SearchWorkspace` can be retrieved from the <<entrypoints-search-mapping,`SearchMapping`>>,
-and can target one, several or all indexes:
-
-.Retrieving a `SearchWorkspace` from the `SearchMapping`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
-----
-<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
-<2> Get a workspace targeting all indexes.
-<3> Get a workspace targeting the index mapped to the `Book` entity type.
-<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
-====
-
-Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the <<entrypoints-search-session,`SearchSession`>>:
-
-.Retrieving a `SearchWorkspace` from the `SearchSession`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
-----
-<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
-<2> Get a workspace targeting all indexes.
-<3> Get a workspace targeting the index mapped to the `Book` entity type.
-<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
-====
-
-The `SearchWorkspace` exposes various large-scale operations
-that can be applied to an index or a set of indexes.
-These operations are triggered as soon as they are requested,
-without waiting for the transaction commit.
-
-This interface offers the following methods:
-
-`purge()`::
-Delete all documents from indexes targeted by this workspace.
-+
-With multi-tenancy enabled, only documents of the current tenant will be removed:
-the tenant of the session from which this workspace originated.
-`purgeAsync()`::
-Asynchronous version of `purge()` returning a `CompletionStage`.
-`purge(Set<String> routingKeys)`::
-Delete documents from indexes targeted by this workspace
-that were indexed with any of the given routing keys.
-+
-With multi-tenancy enabled, only documents of the current tenant will be removed:
-the tenant of the session from which this workspace originated.
-`purgeAsync(Set<String> routingKeys)`::
-Asynchronous version of `purge(Set<String>)` returning a `CompletionStage`.
-[[mapper-orm-indexing-manual-flush]]`flush()`::
-Flush to disk the changes to indexes that have not been committed yet.
-In the case of backends with a transaction log (Elasticsearch),
-also apply operations from the transaction log that were not applied yet.
-+
-This is generally not useful as Hibernate Search commits changes automatically.
-See <<concepts-commit-refresh>> for more information.
-`flushAsync()`::
-Asynchronous version of `flush()` returning a `CompletionStage`.
-[[mapper-orm-indexing-manual-refresh]]`refresh()`::
-Refresh the indexes so that all changes executed so far will be visible in search queries.
-+
-This is generally not useful as indexes are refreshed automatically.
-See <<concepts-commit-refresh>> for more information.
-`refreshAsync()`::
-Asynchronous version of `refresh()` returning a `CompletionStage`.
-[[mapper-orm-indexing-manual-merge]]`mergeSegments()`::
-Merge each index targeted by this workspace into a single segment.
-This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
-`mergeSegmentsAsync()`::
-Asynchronous version of `mergeSegments()` returning a `CompletionStage`.
-This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
-
-[NOTE]
-[[mapper-orm-indexing-merge-segments]]
-.Merging segments and performance
-====
-The merge-segments operation may affect performance positively as well as negatively.
-
-This operation will regroup all index data into a single, huge segment (a file).
-This may speed up search at first, but as documents are deleted,
-this huge segment will begin to fill with "holes" which have to be handled as special cases
-during search, degrading performance.
-
-Elasticsearch/Lucene do address this by rebuilding the segment at some point,
-but only once a certain ratio of deleted documents is reached.
-If all documents are in a single, huge segment, this ratio is less likely to be reached,
-and the index performance will continue to degrade for a long time.
-
-There are, however, two situations in which merging segments may help:
-
-1. No deletions or document updates are expected for an extended period of time.
-2. Most, or all documents have just been removed from the index,
-leading to segments consisting mostly of deleted documents.
-In that case, it makes sense to regroup the few remaining documents into a single segment,
-though Elasticsearch/Lucene will probably do it automatically.
-====
-
-Below is an example using a `SearchWorkspace` to purge several indexes.
-
-.Purging indexes using a `SearchWorkspace`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-purge]
-----
-<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
-<2> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
-<3> Trigger a purge.
-This method is synchronous and will only return after the purge is complete,
-but an asynchronous method, `purgeAsync`, is also available.
 ====

@@ -72,7 +72,7 @@ Mapping is usually configured using annotations in the entity model,
 but this can also be achieved using a programmatic API.
 To learn more about how to configure mapping, see <<mapping>>.
 
-To learn how to index the resulting documents, see <<mapper-orm-indexing>>
+To learn how to index the resulting documents, see <<indexing>>
 (hint: it's automatic).
 
 To learn how to search with an API
@@ -183,21 +183,21 @@ but they are a trade-off that improves performance.
 
 Different factors influence when refreshes and commit happen:
 
-* <<mapper-orm-indexing-automatic,Automatic indexing>> will, by default,
+* <<indexing-automatic,Automatic indexing>> and <<indexing-plan,indexing plans>> will, by default,
 require that a commit of the index writer is performed after each set of changes,
 meaning the changes are safe after the Hibernate ORM transaction commit returns.
 However, no refresh is requested by default, meaning the changes may only be visible at a later time,
 when the backend decides to refresh the index reader.
-This behavior can be customized by setting a different <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
-* The <<mapper-orm-indexing-massindexer,mass indexer>>
+This behavior can be customized by setting a different <<indexing-plan-synchronization,synchronization strategy>>.
+* The <<indexing-massindexer,mass indexer>>
 will not require any commit or refresh until the very end of mass indexing,
 to maximize indexing throughput.
 * Whenever there are no particular commit or refresh requirements,
 backend defaults will apply:
 ** See <<backend-elasticsearch-io,here for Elasticsearch>>.
 ** See <<backend-lucene-io,here for Lucene>>.
-* A commit may be forced explicitly through the <<mapper-orm-indexing-manual-flush,`flush()` API>>.
-* A refresh may be forced explicitly though the <<mapper-orm-indexing-manual-flush,`refresh()` API>>.
+* A commit may be forced explicitly through the <<indexing-workspace-flush,`flush()` API>>.
+* A refresh may be forced explicitly though the <<indexing-workspace-flush,`refresh()` API>>.
 
 [NOTE]
 ====

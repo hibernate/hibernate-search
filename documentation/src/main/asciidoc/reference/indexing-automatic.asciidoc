@@ -1,0 +1,97 @@
+[[indexing-automatic]]
+= [[mapper-orm-indexing-automatic]] [[_automatic_indexing]] Automatic indexing
+
+By default, every time an entity is changed through a Hibernate ORM Session,
+if that entity is <<mapping-entityindexmapping,mapped to an index>>,
+Hibernate Search updates the relevant index.
+
+Exactly how and when the index update happens depends on the <<coordination,coordination strategy>>;
+see <<indexing-automatic-concepts>> for more information.
+
+[[indexing-automatic-concepts]]
+== [[mapper-orm-indexing-automatic-concepts]] Overview
+
+Below is a summary of how automatic indexing works depending
+on the configured <<coordination,coordination strategy>>.
+
+Follow the links for more details.
+
+[cols="h,2*^",options="header"]
+.Comparison of automatic indexing depending on the coordination strategy
+|===
+|Coordination strategy
+|<<coordination-none,No coordination>> (default)
+|<<coordination-outbox-polling,Outbox polling>>
+
+|Detects changes occurring in ORM sessions (`session.persist(...)`, `session.delete(...)`, setters, ...)
+2+|<<indexing-automatic-concepts-changes-in-session,Yes>>
+
+|Detects changes caused by JPQL or SQL queries (`insert`/`update`/`delete`)
+2+|<<limitations-changes-in-session,No>>
+
+|Associations must be updated on both sides
+2+|<<limitations-changes-asymmetric-association-updates,Yes>>
+
+|Changes triggering reindexing
+2+|<<indexing-automatic-concepts-dirty-checking,Only relevant changes>>
+
+|Guarantee of indexes updates
+|<<coordination-none-indexing-guarantee,When the commit returns (non-transactional)>>
+|<<coordination-outbox-polling-indexing-guarantee,On commit (transactional)>>
+
+|Visibility of index updates
+|<<coordination-none-indexing-visibility,Configurable: immediate (poor performance) or eventual>>
+|<<coordination-outbox-polling-indexing-visibility,Eventual>>
+
+|Overhead for application threads
+|<<coordination-none-indexing-on-flush,Low to medium>>
+|<<coordination-outbox-polling-indexing-background,Very low>>
+
+|Overhead for the database
+|<<coordination-none-indexing-lazy-loading,Low>>
+|<<coordination-outbox-polling-indexing-full-loading,Low to medium>>
+|===
+
+[[indexing-automatic-configuration]]
+== [[mapper-orm-indexing-automatic-configuration]] Configuration
+
+Automatic indexing may be unnecessary if your index is read-only
+or if you update it regularly by reindexing,
+either using the  <<indexing-massindexer,`MassIndexer`>>
+or <<mapper-orm-indexing-manual,manually>>.
+You can disable automatic indexing by setting the configuration property
+`hibernate.search.automatic_indexing.enabled` to `false`.
+
+[[indexing-automatic-concepts-changes-in-session]]
+== [[mapper-orm-indexing-automatic-concepts-changes-in-session]] In-session entity change detection and limitations
+
+Hibernate Search uses internal events of Hibernate ORM in order to detect changes.
+These events will be triggered if you actually manipulate managed entity objects in your code:
+calls o `session.persist(...)`, `session.delete(...)`, to entity setters, etc.
+
+This works great for most applications, but you need to consider some limitations:
+
+* <<limitations-changes-in-session>>
+* <<limitations-changes-asymmetric-association-updates>>
+
+[[indexing-automatic-concepts-dirty-checking]]
+== [[mapper-orm-indexing-automatic-concepts-dirty-checking]] Dirty checking
+Hibernate Search is aware of the entity properties that are accessed when building indexed documents.
+Thanks to that knowledge, it is able to detect which entity changes are actually relevant to indexing,
+and to skip reindexing when a property is modified, but does not affect the indexed document.
+
+You can control this "dirty checking" by setting
+the <<configuration-property-types,boolean property>> `hibernate.search.automatic_indexing.enable_dirty_check`:
+
+* by default, or when set to `true`,
+Hibernate Search will consider whether modified properties are relevant
+before triggering reindexing.
+* when set to `false`, Hibernate Search will trigger reindexing upon any change,
+regardless of the entity properties that changed.
+
+[[indexing-automatic-synchronization]]
+== Synchronization with the indexes
+
+Automatic indexing is affected by the synchronization strategy in use in the `SearchSession`.
+
+See <<indexing-plan-synchronization,this section>> for more information.
