@@ -45,7 +45,7 @@ public class PojoIndexingDeleteIT {
 		@Override
 		<T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
 				DocumentRoutesDescriptor providedRoutes) {
-			indexingPlan.delete( entityClass, providedId, providedRoutes );
+			indexingPlan.purge( entityClass, providedId, providedRoutes );
 		}
 
 		@Override

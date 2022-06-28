@@ -93,7 +93,7 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().add( entity1 );
 			session.indexingPlan().addOrUpdate( entity2 );
 			session.indexingPlan().delete( entity3 );
-			session.indexingPlan().delete( IndexedEntity.class, 4, null );
+			session.indexingPlan().purge( IndexedEntity.class, 4, null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b
@@ -293,8 +293,8 @@ public class PojoIndexingPlanBaseIT {
 
 			session.indexingPlan().add( IndexedEntity.class, 1, null );
 			session.indexingPlan().addOrUpdate( IndexedEntity.class, 2, null );
-			session.indexingPlan().delete( IndexedEntity.class, 3, null );
-			session.indexingPlan().delete( IndexedEntity.class, 4, null );
+			session.indexingPlan().purge( IndexedEntity.class, 3, null );
+			session.indexingPlan().purge( IndexedEntity.class, 4, null );
 
 			when( loaderMock.load( Arrays.asList( 1, 2 ), null ) )
 					.thenReturn( Arrays.asList( entity1, entity2 ) );
@@ -343,7 +343,7 @@ public class PojoIndexingPlanBaseIT {
 			// add then delete
 			entity = new IndexedEntity( 2 );
 			session.indexingPlan().add( IndexedEntity.class, entity.id, null );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			// No work expected
 
 			// add then update
@@ -358,7 +358,7 @@ public class PojoIndexingPlanBaseIT {
 			entity = new IndexedEntity( 4 );
 			session.indexingPlan().add( IndexedEntity.class, entity.id, null );
 			session.indexingPlan().addOrUpdate( IndexedEntity.class, entity.id, null );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			// No work expected
 
 			// update then update
@@ -372,13 +372,13 @@ public class PojoIndexingPlanBaseIT {
 			// update then delete
 			entity = new IndexedEntity( 6 );
 			session.indexingPlan().addOrUpdate( IndexedEntity.class, entity.id, null );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			expectations.delete( "6" );
 
 			// update then delete then add
 			entity = new IndexedEntity( 7 );
 			session.indexingPlan().addOrUpdate( IndexedEntity.class, entity.id, null );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			session.indexingPlan().add( IndexedEntity.class, entity.id, null );
 			idsToLoad.add( entity.id );
 			loadedEntities.add( entity );
@@ -386,13 +386,13 @@ public class PojoIndexingPlanBaseIT {
 
 			// delete then delete
 			entity = new IndexedEntity( 8 );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			expectations.delete( "8" );
 
 			// delete then add
 			entity = new IndexedEntity( 9 );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			session.indexingPlan().add( IndexedEntity.class, entity.id, null );
 			idsToLoad.add( entity.id );
 			loadedEntities.add( entity );
@@ -400,7 +400,7 @@ public class PojoIndexingPlanBaseIT {
 
 			// delete then add then update
 			entity = new IndexedEntity( 10 );
-			session.indexingPlan().delete( IndexedEntity.class, entity.id, null );
+			session.indexingPlan().purge( IndexedEntity.class, entity.id, null );
 			session.indexingPlan().add( IndexedEntity.class, entity.id, null );
 			session.indexingPlan().addOrUpdate( IndexedEntity.class, entity.id, null );
 			idsToLoad.add( entity.id );
