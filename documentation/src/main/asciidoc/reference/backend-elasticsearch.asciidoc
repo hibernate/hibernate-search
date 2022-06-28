@@ -534,7 +534,7 @@ Index or alias names used to read and write can be retrieved from the <<mapper-o
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/indexmanager/ElasticsearchIndexManagerIT.java[tags=readWriteName]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `IndexManager`.
 <3> Narrow down the index manager to the `ElasticsearchIndexManager` type.
 <4> Get the index descriptor.
@@ -1293,7 +1293,7 @@ See below for an example.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/ElasticsearchGetClientIT.java[tags=client]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `Backend`.
 <3> Narrow down the backend to the `ElasticsearchBackend` type.
 <4> Get the client, passing the expected type of the client as an argument.

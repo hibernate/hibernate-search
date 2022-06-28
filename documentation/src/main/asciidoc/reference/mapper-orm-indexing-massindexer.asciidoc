@@ -10,7 +10,7 @@ because a pre-existing database has to be indexed:
 * when restoring a database backup;
 * when indexes had to be wiped,
 for example because the Hibernate Search mapping or some core settings changed;
-* when automatic indexing had to be disabled for performance reasons,
+* when entities cannot be indexed as they change (e.g. with <<mapper-orm-indexing-automatic,automatic indexing>>) for performance reasons,
 and periodic reindexing (every night, ...) is preferred.
 
 To address these situations, Hibernate Search provides the `MassIndexer`:
@@ -41,7 +41,7 @@ deleting the index and then reloading all entities from the database.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=simple]
 ----
-<1> Get the `SearchSession`.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Create a `MassIndexer` targeting every indexed entity type.
 <3> Start the mass indexing process and return when it is over.
 ====
@@ -132,7 +132,7 @@ You can also select a subset of target entities to be reindexed.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=reindexOnly]
 ----
-<1> Get the `SearchSession`.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Create a `MassIndexer` targeting every indexed entity type.
 <3> Reindex only the books published before year 2100.
 <4> Reindex only the authors born prior to a given local date.

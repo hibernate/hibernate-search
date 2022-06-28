@@ -17,10 +17,11 @@ Projections can be configured when building the search query:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-lambdas]
 ----
-<1> Start building the query as usual.
-<2> Mention that the expected result of the query is a projection on field "title", of type String.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Start building the query as usual.
+<3> Mention that the expected result of the query is a projection on field "title", of type String.
 If that type is not appropriate or if the field does not exist, an exception will be thrown.
-<3> Fetch the results, which will have the expected type.
+<4> Fetch the results, which will have the expected type.
 ====
 
 Alternatively, if you don't want to use lambdas:

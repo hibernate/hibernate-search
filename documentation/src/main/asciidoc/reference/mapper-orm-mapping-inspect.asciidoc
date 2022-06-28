@@ -11,7 +11,7 @@ as shown in the example below.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedentities/SearchMappingIndexedEntitiesIT.java[tags=indexedEntities]
 ----
-<1> Retrieve the `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Retrieve the `SearchIndexedEntity` by its entity class.
 `SearchIndexedEntity` gives access to information pertaining to that entity and its index.
 <3> Get the JPA name of that entity.

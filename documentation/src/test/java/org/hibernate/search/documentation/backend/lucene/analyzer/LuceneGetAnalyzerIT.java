@@ -42,7 +42,10 @@ public class LuceneGetAnalyzerIT {
 	@Test
 	public void fromBackend() {
 		//tag::fromBackend[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::fromBackend[]
+				Search.mapping( entityManagerFactory );
+		//tag::fromBackend[]
 		Backend backend = mapping.backend(); // <2>
 		LuceneBackend luceneBackend = backend.unwrap( LuceneBackend.class ); // <3>
 		Optional<? extends Analyzer> analyzer = luceneBackend.analyzer( "english" ); // <4>
@@ -55,7 +58,10 @@ public class LuceneGetAnalyzerIT {
 	@Test
 	public void fromIndexManager() {
 		//tag::fromIndexManager[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::fromIndexManager[]
+				Search.mapping( entityManagerFactory );
+		//tag::fromIndexManager[]
 		IndexManager indexManager = mapping.indexManager( "Book" ); // <2>
 		LuceneIndexManager luceneIndexManager = indexManager.unwrap( LuceneIndexManager.class ); // <3>
 		Analyzer indexingAnalyzer = luceneIndexManager.indexingAnalyzer(); // <4>

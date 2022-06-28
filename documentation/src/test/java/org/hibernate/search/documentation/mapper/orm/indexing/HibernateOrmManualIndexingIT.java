@@ -200,7 +200,10 @@ public class HibernateOrmManualIndexingIT {
 
 		{
 			// tag::workspace-retrieval-mapping[]
-			SearchMapping searchMapping = Search.mapping( entityManagerFactory ); // <1>
+			SearchMapping searchMapping = /* ... */ // <1>
+					// end::workspace-retrieval-mapping[]
+					Search.mapping( entityManagerFactory );
+			// tag::workspace-retrieval-mapping[]
 			SearchWorkspace allEntitiesWorkspace = searchMapping.scope( Object.class ).workspace(); // <2>
 			SearchWorkspace bookWorkspace = searchMapping.scope( Book.class ).workspace(); // <3>
 			SearchWorkspace bookAndAuthorWorkspace = searchMapping.scope( Arrays.asList( Book.class, Author.class ) )
@@ -210,7 +213,10 @@ public class HibernateOrmManualIndexingIT {
 
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			// tag::workspace-retrieval-session[]
-			SearchSession searchSession = Search.session( entityManager ); // <1>
+			SearchSession searchSession = /* ... */ // <1>
+					// end::workspace-retrieval-session[]
+					Search.session( entityManager );
+			// tag::workspace-retrieval-session[]
 			SearchWorkspace allEntitiesWorkspace = searchSession.workspace(); // <2>
 			SearchWorkspace bookWorkspace = searchSession.workspace( Book.class ); // <3>
 			SearchWorkspace bookAndAuthorWorkspace = searchSession.workspace( Book.class, Author.class ); // <4>
@@ -222,7 +228,10 @@ public class HibernateOrmManualIndexingIT {
 			assertAuthorCount( entityManager, numberOfBooks );
 
 			// tag::workspace-purge[]
-			SearchSession searchSession = Search.session( entityManager ); // <1>
+			SearchSession searchSession = /* ... */ // <1>
+					// end::workspace-purge[]
+					Search.session( entityManager );
+			// tag::workspace-purge[]
 			SearchWorkspace workspace = searchSession.workspace( Book.class, Author.class ); // <2>
 			workspace.purge(); // <3>
 			// end::workspace-purge[]

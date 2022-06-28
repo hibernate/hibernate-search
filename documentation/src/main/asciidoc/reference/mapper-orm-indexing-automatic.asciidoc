@@ -191,7 +191,7 @@ The built-in strategies can be retrieved by calling:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmAutomaticIndexingIT.java[tags=automatic-indexing-synchronization-strategy-override]
 ----
-<1> Obtain the search session, which by default uses the synchronization strategy configured in properties.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>, which by default uses the synchronization strategy configured in properties.
 <2> Override the synchronization strategy.
 <3> Change an entity.
 <4> Commit the changes, triggering reindexing.

@@ -251,7 +251,7 @@ This includes, for example, purging the index to remove all of its content.
 The operations are performed *outside* the context of an ORM session,
 using the `SearchWorkspace` interface.
 
-The `SearchWorkspace` can be retrieved from the `SearchMapping`,
+The `SearchWorkspace` can be retrieved from the <<entrypoints-search-mapping,`SearchMapping`>>,
 and can target one, several or all indexes:
 
 .Retrieving a `SearchWorkspace` from the `SearchMapping`
@@ -260,13 +260,13 @@ and can target one, several or all indexes:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
 ----
-<1> Get a `SearchMapping`.
+<1> <<entrypoints-search-mapping,Retrieve the `SearchMapping`>>.
 <2> Get a workspace targeting all indexes.
 <3> Get a workspace targeting the index mapped to the `Book` entity type.
 <4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
 ====
 
-Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the `SearchSession`:
+Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the <<entrypoints-search-session,`SearchSession`>>:
 
 .Retrieving a `SearchWorkspace` from the `SearchSession`
 ====
@@ -274,7 +274,7 @@ Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the 
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
 ----
-<1> Get a `SearchSession`.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Get a workspace targeting all indexes.
 <3> Get a workspace targeting the index mapped to the `Book` entity type.
 <4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
@@ -358,7 +358,7 @@ Below is an example using a `SearchWorkspace` to purge several indexes.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-purge]
 ----
-<1> Get a `SearchSession`.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
 <3> Trigger a purge.
 This method is synchronous and will only return after the purge is complete,

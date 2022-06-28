@@ -70,8 +70,11 @@ public class QueryDslIT {
 	public void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint[]
-			// Not shown: get the entity manager and open a transaction
-			SearchSession searchSession = Search.session( entityManager ); // <1>
+			// Not shown: open a transaction if relevant
+			SearchSession searchSession = /* ... */ // <1>
+					// end::entryPoint[]
+					Search.session( entityManager );
+			// tag::entryPoint[]
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.where( f -> f.match() // <3>
@@ -81,7 +84,7 @@ public class QueryDslIT {
 
 			long totalHitCount = result.total().hitCount(); // <5>
 			List<Book> hits = result.hits(); // <6>
-			// Not shown: commit the transaction and close the entity manager
+			// Not shown: commit the transaction if relevant
 			// end::entryPoint[]
 
 			assertThat( totalHitCount ).isEqualTo( 2 );

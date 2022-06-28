@@ -49,7 +49,10 @@ public class HibernateOrmSchemaManagerIT {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
-				SearchSession searchSession = Search.session( entityManager ); // <1>
+				SearchSession searchSession = /* ... */ // <1>
+						// end::simple[]
+						Search.session( entityManager );
+				// tag::simple[]
 				SearchSchemaManager schemaManager = searchSession.schemaManager(); // <2>
 				schemaManager.dropAndCreate(); // <3>
 				searchSession.massIndexer().startAndWait(); // <4>

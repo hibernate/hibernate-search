@@ -42,7 +42,10 @@ public class ElasticsearchGetClientIT {
 	@Test
 	public void client() throws IOException {
 		//tag::client[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::client[]
+				Search.mapping( entityManagerFactory );
+		//tag::client[]
 		Backend backend = mapping.backend(); // <2>
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class ); // <3>
 		RestClient client = elasticsearchBackend.client( RestClient.class ); // <4>

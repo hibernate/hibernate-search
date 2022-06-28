@@ -15,10 +15,11 @@ The predicate is configured when building the search query:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=entryPoint-lambdas]
 ----
-<1> Start building the query.
-<2> Mention that the results of the query are expected to have a `title` field matching the value `robot`.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
+<2> Start building the query.
+<3> Mention that the results of the query are expected to have a `title` field matching the value `robot`.
 If the field does not exist or cannot be searched on, an exception will be thrown.
-<3> Fetch the results, which will match the given predicate.
+<4> Fetch the results, which will match the given predicate.
 ====
 
 Alternatively, if you don't want to use lambdas:

@@ -41,7 +41,10 @@ public class LuceneLowLevelIndexReaderIT {
 	public void indexReader() throws Exception {
 		int numDocs;
 		//tag::indexReader[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::indexReader[]
+				Search.mapping( entityManagerFactory );
+		//tag::indexReader[]
 		LuceneIndexScope indexScope = mapping
 				.scope( Book.class ).extension( LuceneExtension.get() ); // <2>
 		try ( IndexReader indexReader = indexScope.openIndexReader() ) { // <3>

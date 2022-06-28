@@ -38,7 +38,10 @@ public class ElasticsearchIndexManagerIT {
 	@Test
 	public void readWriteName() {
 		//tag::readWriteName[]
-		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
+		SearchMapping mapping = /* ... */ // <1>
+				//end::readWriteName[]
+				Search.mapping( entityManagerFactory );
+		//tag::readWriteName[]
 		IndexManager indexManager = mapping.indexManager( "Book" ); // <2>
 		ElasticsearchIndexManager esIndexManager = indexManager.unwrap( ElasticsearchIndexManager.class ); // <3>
 		ElasticsearchIndexDescriptor descriptor = esIndexManager.descriptor();// <4>

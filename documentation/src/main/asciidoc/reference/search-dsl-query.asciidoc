@@ -12,7 +12,7 @@ Preparing and executing a query requires just a few lines:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=entryPoint]
 ----
-<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
+<1> <<entrypoints-search-session,Retrieve the `SearchSession`>>.
 <2> Initiate a search query on the index mapped to the `Book` entity.
 <3> Define that only documents matching the given predicate should be returned.
 The predicate is created using a factory `f` passed as an argument to the lambda expression.

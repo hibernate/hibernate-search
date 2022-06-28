@@ -60,7 +60,10 @@ public class HibernateOrmMassIndexerIT {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
-				SearchSession searchSession = Search.session( entityManager ); // <1>
+				SearchSession searchSession = /* ... */ // <1>
+						// end::simple[]
+						Search.session( entityManager );
+						// tag::simple[]
 				searchSession.massIndexer() // <2>
 						.startAndWait(); // <3>
 				// end::simple[]
@@ -78,7 +81,10 @@ public class HibernateOrmMassIndexerIT {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::reindexOnly[]
-				SearchSession searchSession = Search.session( entityManager ); // <1>
+				SearchSession searchSession = /* ... */ // <1>
+						// end::reindexOnly[]
+						Search.session( entityManager );
+				// tag::reindexOnly[]
 				MassIndexer massIndexer = searchSession.massIndexer(); // <2>
 				massIndexer.type( Book.class ).reindexOnly( "e.publicationYear <= 2100" ); // <3>
 				massIndexer.type( Author.class ).reindexOnly( "e.birthDate < :birthDate" ) // <4>
