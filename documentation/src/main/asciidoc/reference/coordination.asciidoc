@@ -262,7 +262,7 @@ in a way that requires reindexing.
 
 This also includes an agent table, where Hibernate Search registers every background event processor
 in order to <<coordination-outbox-polling-sharding,dynamically assign shards>> to each application instance,
-or simply to check that <<coordination-outbox-polling-sharding-static,statically assigned shards>>
+or simply to check that <<coordination-outbox-polling-sharding,statically assigned shards>>
 are consistent.
 
 These tables are accessed through entities that are automatically added to the Hibernate ORM configuration,
@@ -341,7 +341,7 @@ Unspecified properties will use their defaults.
 ====
 
 [[coordination-outbox-polling-sharding]]
-=== [[coordination-database-polling-sharding]] [[coordination-outbox-polling-sharding-basics]] Sharding and pulse
+=== [[coordination-database-polling-sharding]] [[coordination-outbox-polling-sharding-static]] [[coordination-outbox-polling-sharding-basics]] Sharding and pulse
 
 In order to avoid unnecessarily indexing the same entity multiple times on different application nodes,
 Hibernate Search partitions the entities in what it calls "shards":
@@ -369,7 +369,7 @@ During a "pulse":
 ** forcibly remove entries from other agents if it detects that these agents expired
    (did not update their entry for a long time);
 ** detect and report configuration mistakes
-   if using <<coordination-outbox-polling-sharding-static,static sharding>>,
+   if using <<coordination-outbox-polling-sharding,static sharding>>,
    e.g. two agents assigned to the same shard;
 ** decide to suspend itself if a <<coordination-outbox-polling-mass-indexer,mass indexer>> is running;
 ** trigger rebalancing as necessary if using <<coordination-outbox-polling-event-processor-sharding,dynamic sharding>>;
@@ -429,7 +429,7 @@ before it must perform a "pulse",
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `2000`.
 +
-See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
+See <<coordination-outbox-polling-sharding,the sharding basics>> for information about "pulses".
 +
 The pulse interval must be set to a value between the polling interval (see above) and one third (1/3) of the expiration interval (see below).
 +
@@ -449,7 +449,7 @@ before considering the processor disconnected and forcibly removing it from the 
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `30000`.
 +
-See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
+See <<coordination-outbox-polling-sharding,the sharding basics>> for information about "pulses".
 +
 The expiration interval must be set to a value at least 3 times larger than the pulse interval (see above).
 +
@@ -566,7 +566,7 @@ hibernate.search.coordination.event_processor.enabled = false
 ==== Basics
 
 During <<mapper-orm-indexing-massindexer,mass indexing>>,
-an application instance will exceptionally bypass <<coordination-database-polling-sharding,sharding>>
+an application instance will exceptionally bypass <<coordination-outbox-polling-sharding,sharding>>
 and index entities from any shard.
 
 Bypassing sharding can be dangerous,
@@ -603,7 +603,7 @@ but will reduce the stress on the database while the mass indexer agent is activ
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `2000`.
 +
-See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
+See <<coordination-outbox-polling-sharding,the sharding basics>> for information about "pulses".
 +
 The pulse interval must be set to a value between the polling interval (see above) and one third (1/3) of the expiration interval (see below).
 +
@@ -621,7 +621,7 @@ before considering the processor disconnected and forcibly removing it from the 
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `30000`.
 +
-See <<coordination-outbox-polling-sharding-basics,the sharding basics>> for information about "pulses".
+See <<coordination-outbox-polling-sharding,the sharding basics>> for information about "pulses".
 +
 The expiration interval must be set to a value at least 3 times larger than the pulse interval (see above).
 +
