@@ -29,16 +29,19 @@ public class LogChecker {
 			description.appendText( "Expected at least " + expectation.getMinExpectedCount() + " time(s) " );
 			expectation.getMatcher().describeTo( description );
 			description.appendText( " but only got " + count + " such event(s)." );
-			description.appendText( " Matching events: " );
+			description.appendText( newline );
+			description.appendText( "Matching events: " );
 			appendEvents( description, newline, matchingEvents );
 		}
 		if ( expectation.getMaxExpectedCount() != null && expectation.getMaxExpectedCount() < count ) {
 			description.appendText( "Expected at most " + expectation.getMaxExpectedCount() + " time(s) " );
 			expectation.getMatcher().describeTo( description );
 			description.appendText( " but got " + count + " such event(s)." );
-			description.appendText( " Extra events: " );
+			description.appendText( newline );
+			description.appendText( "Extra events: " );
 			appendEvents( description, newline, extraEvents );
-			description.appendText( " Matching events: " );
+			description.appendText( newline );
+			description.appendText( "Matching events: " );
 			appendEvents( description, newline, matchingEvents );
 		}
 	}
