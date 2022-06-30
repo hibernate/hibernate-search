@@ -643,19 +643,37 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4559")
+	@TestForIssue(jiraKey = "HSEARCH-4623")
 	public void elastic_8_3() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.ELASTIC, "8.3", "8.3.0",
 				Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
 		);
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4559")
+	@TestForIssue(jiraKey = "HSEARCH-4623")
 	public void elastic_8_3_0() {
-		testSuccessWithWarning(
+		testSuccess(
 				ElasticsearchDistributionName.ELASTIC, "8.3.0", "8.3.0",
+				Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4623")
+	public void elastic_8_4() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.ELASTIC, "8.4", "8.4.0",
+				Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4623")
+	public void elastic_8_4_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.ELASTIC, "8.4.0", "8.4.0",
 				Elasticsearch8ModelDialect.class, Elasticsearch81ProtocolDialect.class
 		);
 	}
