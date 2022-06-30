@@ -603,7 +603,7 @@
             <properties>
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
-                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-8.2}</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-8.3}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
