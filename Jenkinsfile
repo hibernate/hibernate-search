@@ -267,13 +267,13 @@ stage('Configure') {
 					// --------------------------------------------
 					// OpenSearch
 					// Not testing 1.0 - 1.2 to make the build quicker.
-					new OpenSearchEsLocalBuildEnvironment(version: '1.0', mavenProfile: 'opensearch-1.0',
+					new OpenSearchLocalBuildEnvironment(version: '1.0', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.ON_DEMAND),
-					new OpenSearchEsLocalBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
+					new OpenSearchLocalBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.ON_DEMAND),
-					new OpenSearchEsLocalBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
+					new OpenSearchLocalBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE),
-					new OpenSearchEsLocalBuildEnvironment(version: '2.0', mavenProfile: 'opensearch-2.0',
+					new OpenSearchLocalBuildEnvironment(version: '2.0', mavenProfile: 'opensearch-2.0',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			esAws: [
@@ -312,12 +312,12 @@ stage('Configure') {
 
 					// --------------------------------------------
 					// AWS OpenSearch service
-					new OpenSearchEsAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
+					new OpenSearchAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.ON_DEMAND),
-					new OpenSearchEsAwsBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
+					new OpenSearchAwsBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
-					new OpenSearchEsAwsBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
+					new OpenSearchAwsBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
 							staticCredentials: true,
 							condition: TestCondition.AFTER_MERGE)
 			]
@@ -767,10 +767,10 @@ class EsLocalBuildEnvironment extends BuildEnvironment {
 	String getTag() { "elasticsearch-local-$versionRange" }
 }
 
-class OpenSearchEsLocalBuildEnvironment extends EsLocalBuildEnvironment {
+class OpenSearchLocalBuildEnvironment extends EsLocalBuildEnvironment {
 	String version
 	@Override
-	String getTag() { "opensearch-elasticsearch-local-$version" }
+	String getTag() { "opensearch-local-$version" }
 }
 
 class EsAwsBuildEnvironment extends BuildEnvironment {
@@ -787,7 +787,7 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 }
 
-class OpenSearchEsAwsBuildEnvironment extends EsAwsBuildEnvironment {
+class OpenSearchAwsBuildEnvironment extends EsAwsBuildEnvironment {
 	@Override
 	String getTag() { "opensearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
 	@Override
