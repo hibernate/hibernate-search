@@ -378,7 +378,7 @@ but Hibernate Search maintains such a schema in memory,
 in order to remember which predicates/projections/sorts can be applied to each field.
 
 For the most part, the schema is inferred from
-<<mappingthe mapping configured through Hibernate Search's mapping APIs>>,
+<<mapping,the mapping configured through Hibernate Search's mapping APIs>>,
 which are generic and independent of Lucene.
 
 Aspects that are specific to the Lucene backend are explained in this section.
