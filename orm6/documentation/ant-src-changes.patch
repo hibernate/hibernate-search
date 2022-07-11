@@ -1,5 +1,5 @@
 diff --git a/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java b/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
-index a5c0c91e51..2522ee732a 100644
+index 6185209396..b7736775f3 100644
 --- a/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
 +++ b/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
 @@ -61,7 +61,7 @@ public class QueryDslIT {
