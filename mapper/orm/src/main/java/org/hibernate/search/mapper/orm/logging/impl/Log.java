@@ -245,4 +245,19 @@ public interface Log extends BasicLogger {
 			+ " which should be set to a comma-separated string containing all possible tenant identifiers."
 			+ " Currently configured tenant identifiers: %2$s." )
 	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
+
+	// NOTE: This is used in -orm6 modules
+	@SuppressWarnings("unused")
+	@LogMessage(level = Logger.Level.INFO)
+	@Message(id = ID_OFFSET + 56, value = "Ignoring unrecognized query hint [%s]")
+	void ignoringUnrecognizedQueryHint(String hintName);
+
+	// NOTE: This is used in -orm6 modules
+	@SuppressWarnings("unused")
+	@Message(id = ID_OFFSET + 57, value = "Cannot set the fetch size of Hibernate Search ScrollableResults after having created them."
+			+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
+			+ " for example with .loading(o -> o.fetchSize(50))."
+			+ " See the reference documentation for more information.")
+	SearchException cannotSetFetchSize();
+
 }
