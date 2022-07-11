@@ -792,10 +792,15 @@ It can be used in particular to build `AND`/`OR` operators.
 
 Inner predicates are added as clauses of one of the following types:
 
-[[search-dsl-predicate-boolean-clauses-must]]`must`::
-`must` clauses are required to match: if they don't match, then the `bool` predicate will not match.
+[[search-dsl-predicate-boolean-clauses-must]]`must` / `and`::
+
+`must` / `and` clauses are required to match: if they don't match, then the `bool` predicate will not match.
 +
-Matching "must" clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
+Matching "must" / "and" clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
++
+NOTE: `must` and `and` clauses are equivalent and interchangeable. The `must` naming directly comes from
+Lucene while `and` was added as syntactic sugar for users who find such naming easier to grasp.
+
 [[search-dsl-predicate-boolean-clauses-mustNot]]`mustNot`::
 `mustNot` clauses are required to not match: if they match, then the `bool` predicate will not match.
 +
@@ -805,27 +810,30 @@ Matching "must" clauses are taken into account during <<search-dsl-predicate-com
 +
 `filter` clauses are ignored during <<search-dsl-predicate-common-score,score>> computation,
 and so are any clauses of boolean predicates contained in the filter clause (even `must` or `should` clauses).
-[[search-dsl-predicate-boolean-clauses-should]]`should`::
-`should` clauses may optionally match, and are required to match depending on the context.
+[[search-dsl-predicate-boolean-clauses-should]]`should` / `or`::
+`should` / `or` clauses may optionally match, and are required to match depending on the context.
 +
-Matching `should` clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
+Matching `should` / `or` clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
 +
-The exact behavior of `should` clauses is as follows:
+The exact behavior of `should` / `or` clauses is as follows:
 +
-* When there isn't any `must` clause nor any `filter` clause in the `bool` predicate
-then at least one "should" clause is required to match.
-Simply put, in this case, the "should" clauses
+* When there isn't any `must` / `and` clause nor any `filter` clause in the `bool` predicate
+then at least one "should" / "or" clause is required to match.
+Simply put, in this case, the "should" / "or" clauses
 behave as if there was an `OR` operator between each of them.
-* When there is at least one `must` clause or one `filter` clause in the `bool` predicate,
-then the "should" clauses are not required to match,
+* When there is at least one `must` / `and` clause or one `filter` clause in the `bool` predicate,
+then the "should" / "or" clauses are not required to match,
 and are simply used for scoring.
 * This behavior can be changed by specifying
 <<search-dsl-predicate-boolean-minimumshouldmatch,`minimumShouldMatch` constraints>>.
++
+NOTE: `should` and `or` clauses are equivalent and interchangeable. The `should` naming directly comes
+from Lucene while `or` was added as syntactic sugar for users who find such naming easier to grasp.
 
 [[search-dsl-predicate-boolean-or]]
 === Emulating an `OR` operator
 
-A `bool` predicate with only `should` clauses will behave as an `OR` operator.
+A `bool` predicate with only `should` / `or` clauses will behave as an `OR` operator.
 
 .Matching a document that matches any of multiple given predicates (~`OR` operator)
 ====
@@ -845,7 +853,7 @@ they will have a `title` field matching the text `robot`
 [[search-dsl-predicate-boolean-and]]
 === Emulating an `AND` operator
 
-A `bool` predicate with only `must` clauses will behave as an `AND` operator.
+A `bool` predicate with only `must` / `and` clauses will behave as an `AND` operator.
 
 .Matching a document that matches all the multiple given predicates (~`AND` operator)
 ====
@@ -889,7 +897,7 @@ performance may be disappointing because the full power of indexes cannot be lev
 [[search-dsl-predicate-boolean-filter]]
 === `filter`: matching documents that match a given predicate without affecting the score
 
-`filter` clauses are essentially `must` clauses with only one difference:
+`filter` clauses are essentially `must` / `and` clauses with only one difference:
 they are ignored when computing the total <<search-dsl-predicate-common-score,score>> of a document.
 
 .Matching a document that matches a given predicate without affecting the score
@@ -916,11 +924,11 @@ leading to fairer sorts if there are much more "crime fiction" documents than "s
 ====
 
 [[search-dsl-predicate-boolean-should-scoring]]
-=== `should` as a way to tune scoring
+=== `should` / `or` as a way to tune scoring
 
 Apart from being <<search-dsl-predicate-boolean-or,used alone to emulate an `OR` operator>>,
-`should` clauses can also be used in conjunction with `must` clauses.
-When doing so, the `should` clauses become completely optional,
+`should` / `or` clauses can also be used in conjunction with `must` / `and` clauses.
+When doing so, the `should` / `or` clauses become completely optional,
 and their only purpose is to increase the score of documents that match these clauses.
 
 .Using optional `should` clauses to boost the score of some documents
@@ -943,9 +951,9 @@ and the ones whose description matches either `crime` or `investigation` will ha
 ====
 
 [[search-dsl-predicate-boolean-minimumshouldmatch]]
-=== `minimumShouldMatch`: fine-tuning how many `should` clauses are required to match
+=== `minimumShouldMatch`: fine-tuning how many `should` / `or` clauses are required to match
 
-It is possible to require that an arbitrary number of `should` clauses match
+It is possible to require that an arbitrary number of `should` / `or` clauses match
 in order for the `bool` predicate to match.
 This is the purpose of the `minimumShouldMatch*` methods,
 as demonstrated below.
@@ -983,7 +991,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 The consumer, implemented by a lambda expression, will receive a predicate factory as well as clause collector as an argument,
 and will add clauses to that collector as necessary.
 <3> By default, a boolean predicate will match nothing if there is no clause.
-To match every document when there is no clause, add a `must` clause that matches everything.
+To match every document when there is no clause, add a `must` / `and` clause that matches everything.
 <4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
 to control the addition of clauses.
 In this case, we only add clauses if the relevant parameter was filled in by the user.

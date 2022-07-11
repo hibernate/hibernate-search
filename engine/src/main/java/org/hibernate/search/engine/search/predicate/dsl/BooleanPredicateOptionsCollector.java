@@ -16,11 +16,16 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * <p>
  * Different types of clauses have different effects, see below.
  *
- * <h2 id="must">"must" clauses</h2>
+ * <h2 id="must">"must" and ¨and" clauses</h2>
  * <p>
- * "must" clauses are required to match: if they don't match, then the boolean predicate will not match.
+ * "must" and "and" clauses are required to match: if they don't match, then the boolean predicate will not match.
  * <p>
- * Matching "must" clauses are taken into account during score computation.
+ * Matching "must" and "and" clauses are taken into account during score computation.
+ * <p>
+ * <i>
+ *   Note: "must" and "and" clauses are equivalent and interchangeable. The "must" naming directly comes
+ *   from Lucene while "and" was added as syntactic sugar for users who find such naming easier to grasp.
+ * </i>
  *
  * <h2 id="mustnot">"must not" clauses</h2>
  * <p>
@@ -35,23 +40,23 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * "filter" clauses are ignored during score computation,
  * and so are any clauses of boolean predicates contained in the filter clause (even "must" or "should" clauses).
  *
- * <h2 id="should">"should" clauses</h2>
+ * <h2 id="should">"should" and "or" clauses</h2>
  * <p>
- * "should" clauses may optionally match, and are required to match depending on the context.
+ * "should" and "or" clauses may optionally match, and are required to match depending on the context.
  * <p>
- * Matching "should" clauses are taken into account during score computation.
+ * Matching "should" and "or" clauses are taken into account during score computation.
  * <p>
- * The exact behavior of `should` clauses is as follows:
+ * The exact behavior of `should` and `or` clauses is as follows:
  * <ul>
  * <li>
- *     When there isn't any "must" clause nor any "filter" clause in the boolean predicate,
- *     then at least one "should" clause is required to match.
- *     Simply put, in this case, the "should" clauses
+ *     When there isn't any "must"/"and" clause nor any "filter" clause in the boolean predicate,
+ *     then at least one "should"/"or" clause is required to match.
+ *     Simply put, in this case, the "should"/"or" clauses
  *     <strong>behave as if there was an "OR" operator between each of them</strong>.
  * </li>
  * <li>
- *     When there is at least one "must" clause or one "filter" clause in the boolean predicate,
- *     then the "should" clauses are not required to match,
+ *     When there is at least one "must"/"and" clause or one "filter" clause in the boolean predicate,
+ *     then the "should"/"or" clauses are not required to match,
  *     and are simply used for scoring.
  * </li>
  * <li>
@@ -59,6 +64,11 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *     <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraints</a>.
  * </li>
  * </ul>
+ * <p>
+ * <i>
+ *   Note: "should" and "or" clauses are equivalent and interchangeable. The "should" naming directly comes
+ *   from Lucene while "or" was added as syntactic sugar for users who find such naming easier to grasp.
+ * </i>
  *
  * @param <S> The "self" type (the actual exposed type of this collector).
  */
@@ -84,6 +94,14 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	S must(SearchPredicate searchPredicate);
 
 	/**
+	 * Add an <a href="#must">"and" clause</a> based on a previously-built {@link SearchPredicate}.
+	 *
+	 * @param searchPredicate The predicate that must match.
+	 * @return {@code this}, for method chaining.
+	 */
+	S and(SearchPredicate searchPredicate);
+
+	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> based on a previously-built {@link SearchPredicate}.
 	 *
 	 * @param searchPredicate The predicate that must not match.
@@ -98,6 +116,14 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 * @return {@code this}, for method chaining.
 	 */
 	S should(SearchPredicate searchPredicate);
+
+	/**
+	 * Add an <a href="#should">"or" clause</a> based on a previously-built {@link SearchPredicate}.
+	 *
+	 * @param searchPredicate The predicate that should match.
+	 * @return {@code this}, for method chaining.
+	 */
+	S or(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -123,6 +149,16 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	}
 
 	/**
+	 * Add an <a href="#must">"and" clause</a> based on an almost-built {@link SearchPredicate}.
+	 *
+	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
+	 * @return {@code this}, for method chaining.
+	 */
+	default S and(PredicateFinalStep dslFinalStep) {
+		return must( dslFinalStep );
+	}
+
+	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> based on an almost-built {@link SearchPredicate}.
 	 *
 	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
@@ -140,6 +176,16 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 */
 	default S should(PredicateFinalStep dslFinalStep) {
 		return should( dslFinalStep.toPredicate() );
+	}
+
+	/**
+	 * Add an <a href="#should">"or" clause</a> based on an almost-built {@link SearchPredicate}.
+	 *
+	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
+	 * @return {@code this}, for method chaining.
+	 */
+	default S or(PredicateFinalStep dslFinalStep) {
+		return should( dslFinalStep );
 	}
 
 	/**
@@ -171,6 +217,18 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	S must(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
+	 * Add an <a href="#must">"and" clause</a> to be defined by the given function.
+	 * <p>
+	 * Best used with lambda expressions.
+	 *
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
+	 * returning the final step in the predicate DSL.
+	 * Should generally be a lambda expression.
+	 * @return {@code this}, for method chaining.
+	 */
+	S and(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+
+	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
@@ -193,6 +251,18 @@ public interface BooleanPredicateOptionsCollector<S extends BooleanPredicateOpti
 	 * @return {@code this}, for method chaining.
 	 */
 	S should(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+
+	/**
+	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
+	 * <p>
+	 * Best used with lambda expressions.
+	 *
+	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
+	 * returning the final step in the predicate DSL.
+	 * Should generally be a lambda expression.
+	 * @return {@code this}, for method chaining.
+	 */
+	S or(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.

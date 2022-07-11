@@ -109,6 +109,15 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
+	public void and_function() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.and( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+	}
+
+	@Test
 	public void must_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
@@ -116,6 +125,17 @@ public class BoolPredicateSpecificsIT {
 
 		assertThatQuery( scope.query()
 				.where(	f -> f.bool().must( predicate ) ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+	}
+
+	@Test
+	public void and_separatePredicateObject() {
+		StubMappingScope scope = index.createScope();
+
+		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
+
+		assertThatQuery( scope.query()
+				.where(	f -> f.bool().and( predicate ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
@@ -136,11 +156,37 @@ public class BoolPredicateSpecificsIT {
 	}
 
 	@Test
+	public void or() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.or( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.or( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.or( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
 	public void should_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.should( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	public void or_function() {
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.or( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.or( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
@@ -156,6 +202,21 @@ public class BoolPredicateSpecificsIT {
 				.where( f -> f.bool()
 						.should( predicate1 )
 						.should( predicate2 )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
+	public void or_separatePredicateObject() {
+		StubMappingScope scope = index.createScope();
+
+		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
+		SearchPredicate predicate2 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE3 ).toPredicate();
+
+		assertThatQuery( scope.query()
+				.where( f -> f.bool()
+						.or( predicate1 )
+						.or( predicate2 )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
@@ -309,6 +370,30 @@ public class BoolPredicateSpecificsIT {
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+	}
+
+	@Test
+	public void and_or() {
+		// A boolean predicate with and + or clauses:
+		// documents should match regardless of whether or clauses match.
+
+		// Non-matching "and" clauses
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.and( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
+						.or( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
+						.or( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
+				) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		// One matching and one non-matching "or" clause
+		assertThatQuery( index.query()
+				.where( f -> f.bool()
+						.and( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
+						.or( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
+						.or( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
 				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}

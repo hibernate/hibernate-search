@@ -35,10 +35,16 @@ public interface GenericBooleanPredicateClausesStep
 	S must(SearchPredicate searchPredicate);
 
 	@Override
+	S and(SearchPredicate searchPredicate);
+
+	@Override
 	S mustNot(SearchPredicate searchPredicate);
 
 	@Override
 	S should(SearchPredicate searchPredicate);
+
+	@Override
+	S or(SearchPredicate searchPredicate);
 
 	@Override
 	S filter(SearchPredicate searchPredicate);
@@ -46,6 +52,11 @@ public interface GenericBooleanPredicateClausesStep
 	@Override
 	default S must(PredicateFinalStep dslFinalStep) {
 		return must( dslFinalStep.toPredicate() );
+	}
+
+	@Override
+	default S and(PredicateFinalStep dslFinalStep) {
+		return must( dslFinalStep );
 	}
 
 	@Override
@@ -59,6 +70,11 @@ public interface GenericBooleanPredicateClausesStep
 	}
 
 	@Override
+	default S or(PredicateFinalStep dslFinalStep) {
+		return should( dslFinalStep );
+	}
+
+	@Override
 	default S filter(PredicateFinalStep dslFinalStep) {
 		return filter( dslFinalStep.toPredicate() );
 	}
@@ -67,10 +83,16 @@ public interface GenericBooleanPredicateClausesStep
 	S must(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
+	S and(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+
+	@Override
 	S mustNot(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
 	S should(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+
+	@Override
+	S or(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	@Override
 	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);

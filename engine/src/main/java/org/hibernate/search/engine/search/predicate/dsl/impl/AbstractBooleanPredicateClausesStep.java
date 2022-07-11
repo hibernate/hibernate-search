@@ -65,6 +65,11 @@ abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends Boolea
 	}
 
 	@Override
+	public S and(SearchPredicate searchPredicate) {
+		return must( searchPredicate );
+	}
+
+	@Override
 	public S mustNot(SearchPredicate searchPredicate) {
 		builder.mustNot( searchPredicate );
 		return self();
@@ -74,6 +79,11 @@ abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends Boolea
 	public S should(SearchPredicate searchPredicate) {
 		builder.should( searchPredicate );
 		return self();
+	}
+
+	@Override
+	public S or(SearchPredicate searchPredicate) {
+		return should( searchPredicate );
 	}
 
 	@Override
@@ -90,6 +100,12 @@ abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends Boolea
 	}
 
 	@Override
+	public S and(
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		return must( clauseContributor );
+	}
+
+	@Override
 	public S mustNot(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		mustNot( clauseContributor.apply( factory ) );
@@ -101,6 +117,12 @@ abstract class AbstractBooleanPredicateClausesStep<S extends C, C extends Boolea
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		should( clauseContributor.apply( factory ) );
 		return self();
+	}
+
+	@Override
+	public S or(
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		return should( clauseContributor );
 	}
 
 	@Override
