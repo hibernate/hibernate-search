@@ -50,3 +50,7 @@ updates:
       # See https://db.apache.org/derby/derby_downloads.html
       - dependency-name: "org.apache.derby:*"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # maven-assembly-plugin 3.3+ behaves in a significantly different way, which makes the upgrade quite complex
+      # TODO HSEARCH-4380 Remove this when upgrading
+      - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
