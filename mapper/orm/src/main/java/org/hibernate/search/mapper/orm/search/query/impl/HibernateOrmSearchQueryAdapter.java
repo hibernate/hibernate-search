@@ -47,7 +47,7 @@ import jakarta.persistence.Parameter;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
 
-@SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
+@SuppressForbiddenApis(reason = "We need to use the internal QueryOptionsImpl"
 		+ " in order to implement a org.hibernate.query.Query")
 @SuppressWarnings("unchecked") // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
 public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
