@@ -194,6 +194,11 @@ public class HibernateOrmSearchScrollableResultsAdapter<R, H>
 		return scroll( rowNumber - currentIndexInScroll );
 	}
 
+	// We cannot use @Override here because this method only exists in ORM 6.1.2+
+	public void setFetchSize(int i) {
+		throw log.cannotSetFetchSize();
+	}
+
 	@Override
 	public boolean isClosed() {
 		return closed;
