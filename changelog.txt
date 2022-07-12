@@ -1,6 +1,117 @@
 Hibernate Search Changelog
 ==========================
 
+6.2.0.Alpha1 (2022-07-12)
+-------------------------
+
+** Bug
+    * HSEARCH-4619 Inconsistent behavior of boolean predicate when not adding any clause
+    * HSEARCH-4604 AWS Request signing ignores the target port of service endpoint
+    * HSEARCH-4584 Projection and sort on the same nested field fails with the Lucene Backend
+    * HSEARCH-4580 "_routing" in custom Elasticsearch schema leads to "JsonIOException: JSON document was not fully consumed."
+    * HSEARCH-4565 Cyclic dependency detection for IndexingDependency(derivedFrom = ...) does not detect "buried" cycles
+    * HSEARCH-4544 OutOfMemoryError when defining aggregation on text field with .maxTermCount(<very large value>)
+    * HSEARCH-4538 Provided routes with null "currentRoute" may lead to a null previousRoutes, exposing the mapper to NPE
+    * HSEARCH-4537 NPE with outbox-polling coordination strategy when routing prevents indexing
+    * HSEARCH-4536 .flags(Collections.emptySet()) doesn't disable all flags as expected for simpleQueryString predicate
+    * HSEARCH-4531 Sort on dynamic field fails on Elasticsearch if field has never been indexed yet 
+    * HSEARCH-4513 Using a SearchSort instance in multiple queries with the Lucene backend has side effects and leads to unexpected results
+
+** Improvement
+    * HSEARCH-4635 Prepare -orm6 artifacts for changes coming in Hibernate ORM 6.1.2.Final
+    * HSEARCH-4631 Upgrade to Elasticsearch client 8.3.2 and test against Elasticsearch 8.3.2
+    * HSEARCH-4628 Upgrade to Hibernate ORM 5.6.10.Final
+    * HSEARCH-4627 Upgrade to Hibernate ORM 6.1.1.Final for -orm6 artifacts
+    * HSEARCH-4626 Run tests against OpenSearch 2.0.1
+    * HSEARCH-4625 Upgrade to Elasticsearch client 8.3.1 and test against Elasticsearch 8.3.1
+    * HSEARCH-4623 Upgrade to Elasticsearch client 8.3.0
+    * HSEARCH-4622 Add compatibility with Elasticsearch 8.3.0
+    * HSEARCH-4611 Improve exception and log messages involving multi-valued elements
+    * HSEARCH-4610 Upgrade to Elasticsearch client 8.2.3 and test against Elasticsearch 8.2.3
+    * HSEARCH-4609 Upgrade to Lucene 8.11.2
+    * HSEARCH-4608 Upgrade to the latest version of Jakarta dependencies in -orm6/-jakarta artifacts
+    * HSEARCH-4606 Upgrade to Hibernate ORM 6.1.0.Final for -orm6 artifacts
+    * HSEARCH-4599 Upgrade to Elasticsearch client 8.2.2 and test against Elasticsearch 8.2.2
+    * HSEARCH-4598 Upgrade to Reactive Streams 1.0.4
+    * HSEARCH-4596 Upgrade to Hibernate ORM 6.0.2.Final for -orm6 artifacts
+    * HSEARCH-4594 Allow multi-valued bean references for configurers defined in configuration properties
+    * HSEARCH-4593 Upgrade to Elasticsearch client 8.2.1 and test against Elasticsearch 8.2.1
+    * HSEARCH-4590 Upgrade to HCANN 6.0.2 for -orm6 artifacts
+    * HSEARCH-4585 Upgrade to Hibernate ORM 5.6.9.Final
+    * HSEARCH-4581 Upgrade to Jackson 2.13.3
+    * HSEARCH-4575 Allow projections on fields by default with the Elasticsearch backend
+    * HSEARCH-4570 Upgrade -orm6 artifacts to HCANN 6.0.1.Final
+    * HSEARCH-4569 Upgrade -orm6 artifacts to Hibernate ORM 6.0.1.Final
+    * HSEARCH-4562 Add compatibility with OpenSearch 2.0
+    * HSEARCH-4561 Add compatibility with OpenSearch 1.3
+    * HSEARCH-4560 Upgrade to Elasticsearch client 8.2.0
+    * HSEARCH-4559 Add compatibility with Elasticsearch 8.2.0
+    * HSEARCH-4547 Upgrade Elasticsearch client to 8.1.3 and test against Elasticsearch 8.1.3
+    * HSEARCH-4543 Upgrade to Hibernate ORM 5.6.8.Final
+    * HSEARCH-4540 Upgrade to the latest version of Jakarta dependencies in -orm6/-jakarta artifacts
+    * HSEARCH-4539 Upgrade to JBeret 1.4.7.Final
+    * HSEARCH-4533 Setting to customize Hibernate Search's outbox-polling table names, schema, catalog
+    * HSEARCH-4529 Upgrade to Hibernate Commons Annotations 6.0.0.Final for -orm6 artifacts
+    * HSEARCH-4528 Upgrade to latest version of Jakarta dependencies for -orm6/-jakarta artifacts
+    * HSEARCH-4524 Upgrade Elasticsearch client to 8.1.2 and test against Elasticsearch 8.1.2
+    * HSEARCH-4523 Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.Final
+    * HSEARCH-4520 Improved support of lambdas in boolean predicates
+    * HSEARCH-4516 Upgrade to Elasticsearch client 8.1.1
+    * HSEARCH-4512 Upgrade to Hibernate ORM 5.6.7.Final
+    * HSEARCH-4506 Upgrade to Elasticsearch client 8.1.0
+    * HSEARCH-4505 Add compatibility with Elasticsearch 8.1.0
+    * HSEARCH-4504 Upgrade to JBeret 1.4.6.Final
+    * HSEARCH-4502 Upgrade to Jackson 2.13.2
+    * HSEARCH-4496 Upgrade to Elasticsearch client 8.0.1
+    * HSEARCH-4486 Upgrade to slf4j 1.7.36
+    * HSEARCH-4485 Upgrade to GSON 2.9.0
+    * HSEARCH-4483 Display "instant speed" on top of overall speed in the mass indexer
+    * HSEARCH-4481 Upgrade to elasticsearch-rest-client 8.0.0
+    * HSEARCH-4475 Add compatibility with Elasticsearch 8.0.0
+    * HSEARCH-4474 Upgrade to Elasticsearch client 7.17.0
+    * HSEARCH-4318 Review mapper-pojo-standalone API, mark as @Incubating if necessary, remove loose ends
+
+** New Feature
+    * HSEARCH-4621 Add support for SearchWorkspace to the Standalone POJO Mapper
+    * HSEARCH-4567 "Constant" projection, returning a given constant
+    * HSEARCH-4553 Option to return composite/object projections as an object array
+    * HSEARCH-4499 Fluent definition of nested predicates
+    * HSEARCH-4498 Fluent definition of composite projections
+    * HSEARCH-4489 matchNone() predicate
+    * HSEARCH-3943 Projection on object fields: preserving the document structure in projections
+    * HSEARCH-3927 Projection to a DTO/JavaBean/record/etc.
+
+** Task
+    * HSEARCH-4632 Test against JDK 20 (early access)
+    * HSEARCH-4614 Test the standalone POJO mapper with real backends
+    * HSEARCH-4613 Revert to a version of Derby that works on JDK 8
+    * HSEARCH-4603 Upgrade to Surefire 3.0.0-M7
+    * HSEARCH-4600 Fix flaky assertion in OutboxPollingAutomaticIndexingEventSendingIT
+    * HSEARCH-4597 Fix unfinished sentences in the documentation
+    * HSEARCH-4592 Simplify passing the SearchIntegration to mappings
+    * HSEARCH-4587 Initialize migration guide with 6.2 changes so far
+    * HSEARCH-4586 Use clean, consistent utils for all in-session code execution in ORM sessions
+    * HSEARCH-4583 Use equivalent of @Nested instead of the Enclosed runner in JUnit 4 tests
+    * HSEARCH-4582 More extensive testing of from()/as()/multi() on object projections
+    * HSEARCH-4578 Improve error messages in tests when failure report assertions fail
+    * HSEARCH-4571 Move a few tests from integrationtest/showcase/library to integrationtest/mapper/orm-realbackend
+    * HSEARCH-4568 Simplify search projection SPI
+    * HSEARCH-4566 SPI for "hot" restart that allows compatible schema changes with Lucene without losing data in local-heap indexes
+    * HSEARCH-4564 Run tests against AWS OpenSearch Service 1.2 instead of 1.1
+    * HSEARCH-4534 Fix random failures for tests involving dynamic BigDecimal/BigInteger fields with Elasticsearch
+    * HSEARCH-4530 Remove LGTM integration from the Hibernate Search GitHub repository
+    * HSEARCH-4527 Upgrade to jackson-databind 2.13.2.2 (this is a test dependency only)
+    * HSEARCH-4526 Test mapping of Java Records
+    * HSEARCH-4525 Fix generation of Avro sources with Intellij IDEA
+    * HSEARCH-4522 Use JDK17 by default when building Hibernate Search
+    * HSEARCH-4521 Upgrade to forbidden-apis 3.3+
+    * HSEARCH-4519 Update links markup in Getting Started Guide 
+    * HSEARCH-4518 Upgrade to Jackson-databind 2.13.2.1 (this is a test dependency only)
+    * HSEARCH-4517 Run tests against Elasticsearch 8.1.1
+    * HSEARCH-4515 Simplify NestedDocsProvider and a few projections
+    * HSEARCH-4511 Use hppc collections where possible in low-level Lucene-related code
+    * HSEARCH-4509 Upgrade -orm6 artifacts to Hibernate ORM 6.0.0.CR2
+
 6.1.1.Final (2022-02-07)
 -------------------------
 
