@@ -549,7 +549,7 @@ is the schema assigned to each index,
 specifying the data type and capabilities of each "property" (called an "index field" in Hibernate Search).
 
 For the most part, the Elasticsearch mapping is inferred from
-<<mappingthe mapping configured through Hibernate Search's mapping APIs>>,
+<<mapping,the mapping configured through Hibernate Search's mapping APIs>>,
 which are generic and independent of Elasticsearch.
 
 Aspects that are specific to the Elasticsearch backend are explained in this section.
