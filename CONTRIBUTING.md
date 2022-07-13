@@ -225,12 +225,22 @@ which might be a problem for some of the Maven plugins used in the build.
 If you did run those commands and are facing strange errors,
 you'll have to close your IDE then use `./mvnw clean` to get back to a clean state.
 
-### Documentation
-The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
-output is enabled; to also generate the PDF output use:
+### Building without running tests
+
+To only build Hibernate Search, without running tests, use the following command:
 
 ```bash
-./mvnw clean install -Pdocumentation-pdf
+./mvnw clean install -DskipTests
+```
+
+### Documentation
+
+The documentation is based on [Asciidoctor](http://asciidoctor.org/).
+
+To generate the documentation only, without running tests, use:
+
+```bash
+./mvnw clean install -pl documentation -am -DskipTests
 ```
 
 You can then find the freshly built documentation at the following location:
@@ -239,12 +249,24 @@ You can then find the freshly built documentation at the following location:
 ./documentation/target/dist/
 ```
 
+By default only the HTML output is enabled; to also generate the PDF output, enable the `documentation-pdf` profile:
+
+```bash
+./mvnw clean install -pl documentation -am -DskipTests -Pdocumentation-pdf
+```
+
 ### Distribution
 
-To build the distribution bundle run:
+To build the distribution bundle, enable the `documentation-pdf` and `dist` profiles:
 
 ```bash
 ./mvnw clean install -Pdocumentation-pdf,dist
+```
+
+Or if you don't want to run tests:
+
+```bash
+./mvnw clean install -Pdocumentation-pdf,dist -DskipTests
 ```
 
 ### <a id="other-jdks"></a> Other JDKs
