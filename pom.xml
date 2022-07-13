@@ -2058,7 +2058,8 @@
                         <excludes>
                             **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
                             **/*_$logger.java,**/*_$bundle.java,
-                            **/module-info.java
+                            **/module-info.java,
+                            **/avro/generated/**/*.java
                         </excludes>
                     </configuration>
                     <executions>

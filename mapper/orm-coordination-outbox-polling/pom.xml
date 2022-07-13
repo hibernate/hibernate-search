@@ -57,8 +57,12 @@
                             <goal>schema</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
-                            <outputDirectory>${project.basedir}/target/generated-sources/avro/</outputDirectory>
+                            <sourceDirectory>${project.basedir}/src/main/avro/schema</sourceDirectory>
+                            <!-- These sources are checked into the source repository,
+                                 because otherwise the experience of importing the project into IDEA
+                                 is very bad.
+                                 See https://hibernate.atlassian.net/browse/HSEARCH-4638 -->
+                            <outputDirectory>${project.basedir}/src/main/avro/generated</outputDirectory>
                             <customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
                         </configuration>
                     </execution>
@@ -77,7 +81,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources/avro</source>
+                                <source>src/main/avro/generated</source>
                             </sources>
                         </configuration>
                     </execution>
