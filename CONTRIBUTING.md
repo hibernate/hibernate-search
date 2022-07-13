@@ -48,7 +48,7 @@ so you can use that and don't need to care about the required version of Maven
 and ideally avoid using Maven from the command line at all while IntelliJ IDEA is open.
 IntelliJ IDEA's own build might conflict with the Maven build, leaving your working directory in an undetermined state
 (some classes being generated twice, ...).
-If you already did that, close Intellij IDEA, run `./mvnw clean`, and open Intellij IDEA again.
+If you already did that, close IntelliJ IDEA, run `./mvnw clean`, and open IntelliJ IDEA again.
 
 You will need to change some settings:
 
@@ -61,10 +61,10 @@ Then a few steps will initialize your workspace:
 * In the "Maven" side panel, click "Reload all Maven projects".
 * To check your setup, click `Build > Rebuild Project`.
   You might get a few errors similar to `java: module not found: org.hibernate.search.mapper.orm`;
-  those are caused by limitations of Intellij IDEA and can be safely ignored.
+  those are caused by limitations of IntelliJ IDEA and can be safely ignored.
   If the build has no other error, your workspace is correctly set up.
 * If you encounter any problem, that might be caused by the project being half-built before you started.
-  Try again from a clean state: close Intellij IDEA, run `./mvnw clean`, open Intellij IDEA again,
+  Try again from a clean state: close IntelliJ IDEA, run `./mvnw clean`, open IntelliJ IDEA again,
   and go back to the first step.
 
 #### <a id="setup-ide-eclipse"></a> Eclipse
