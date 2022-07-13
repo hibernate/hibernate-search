@@ -44,25 +44,6 @@ so you can use that and don't need to care about the required version of Maven
 
 #### <a id="setup-ide-intellij-idea"></a> IntelliJ IDEA
 
-Make sure you use IntelliJ IDEA 2022.1 or later, as previous versions have some
-[trouble with generated sources](https://youtrack.jetbrains.com/issue/IDEA-286455).
-
-Before opening the IDE, you will need to install the Hibernate Search artifacts in your local Maven repository,
-because Intellij IDEA will fail silently if it doesn't find those artifacts:
-
-```bash
-./mvnw clean install -DskipTests
-```
-
-Don't forget to clean your working directory once that's done,
-otherwise Intellij IDEA might choke on files it didn't expect in `target` directories:
-
-```bash
-./mvnw clean
-```
-
-Only then, open Intellij IDEA.
-
 **WARNING**: Avoid running `./mvnw` while IntelliJ IDEA is importing/building,
 and ideally avoid using Maven from the command line at all while IntelliJ IDEA is open.
 IntelliJ IDEA's own build might conflict with the Maven build, leaving your working directory in an undetermined state
@@ -78,9 +59,6 @@ You will need to change some settings:
 Then a few steps will initialize your workspace:
 
 * In the "Maven" side panel, click "Reload all Maven projects".
-* On freshly cloned projects, the build might fail because of an error related to Avro-generated classes.
-  To solve that, in the "Maven" side panel, click "Generate Sources and Update Folders For All Projects".
-  This will take a while.
 * To check your setup, click `Build > Rebuild Project`.
   If this completes successfully, your workspace is correctly set up.
 * If you encounter any problem, that might be caused by the project being half-built before you started.
