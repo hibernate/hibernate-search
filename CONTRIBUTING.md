@@ -154,10 +154,6 @@ see [here](https://hibernate.org/community/#contribute) for more information.
 This is how JIRA will pick up the related commits and display them on the JIRA issue.
 * Avoid formatting changes to existing code as much as possible:
 they make the intent of your patch less clear.
-* Make sure you have added the necessary tests for your changes.
-* If relevant, make sure you have updated the documentation to match your changes.
-* Run the relevant tests once again to check that your changes work as expected.
-  No need to run the whole test suite, the Continuous Integration will take care of that.
 
 _Prior to committing, if you want to pull in the latest upstream changes (highly
 appreciated by the way), please use rebasing rather than merging (see instructions below).
@@ -172,6 +168,20 @@ If you want to rebase your branch on top of the main branch, you can use the fol
 ```bash
 git pull --rebase upstream main
 ```
+
+### Check and test your work
+
+Before submitting a pull requests, check your contribution:
+
+* Make sure you have added the necessary tests for your changes.
+* If relevant, make sure you have updated the documentation to match your changes.
+* Run the relevant tests once again to check that your changes work as expected.
+  No need to run the whole test suite, the Continuous Integration will take care of that.
+
+**Note**: If you want to run specific tests of the `integrationtests/backend/tck` module from the IDE,
+you will need to rely on runner classes to to run them in the appropriate context:
+see `org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckTestRunner` for Elasticsearch,
+or `org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneTckTestRunner` for Lucene.
 
 ### Submit
 
