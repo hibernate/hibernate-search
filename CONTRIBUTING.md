@@ -47,6 +47,12 @@ so you can use that and don't need to care about the required version of Maven
 Make sure you use IntelliJ IDEA 2022.1 or later, as previous versions have some
 [trouble with generated sources](https://youtrack.jetbrains.com/issue/IDEA-286455).
 
+**WARNING**: Avoid running `./mvnw` while IntelliJ IDEA is importing/building,
+and ideally avoid using Maven from the command line at all while IntelliJ IDEA is open.
+IntelliJ IDEA's own build might conflict with the Maven build, leaving your working directory in an undetermined state
+(some classes being generated twice, ...).
+If you already did that, close Intellij IDEA, run `./mvnw clean`, and open Intellij IDEA again.
+
 You will need to change some settings:
 
 * `Build, Execution, Deployment > Build Tools > Maven`: set `Maven home path` to `Use Maven wrapper`
@@ -56,10 +62,14 @@ You will need to change some settings:
 Then a few steps will initialize your workspace:
 
 * In the "Maven" side panel, click "Reload all Maven projects".
-* In the "Maven" side panel, click "Generate Sources and Update Folders For All Projects".
+* On freshly cloned projects, the build might fail because of an error related to Avro-generated classes.
+  To solve that, in the "Maven" side panel, click "Generate Sources and Update Folders For All Projects".
   This will take a while.
 * To check your setup, click `Build > Rebuild Project`.
   If this completes successfully, your workspace is correctly set up.
+* If you encounter any problem, that might be caused by the project being half-built before you started.
+  Try again from a clean state: close Intellij IDEA, run `./mvnw clean`, open Intellij IDEA again,
+  and go back to the first step.
 
 #### <a id="setup-ide-eclipse"></a> Eclipse
 
@@ -130,11 +140,8 @@ This is how JIRA will pick up the related commits and display them on the JIRA i
 they make the intent of your patch less clear.
 * Make sure you have added the necessary tests for your changes.
 * If relevant, make sure you have updated the documentation to match your changes.
-* Run _all_ the tests to assure nothing else was accidentally broken:
-
-    ```bash
-    ./mvnw clean install
-    ```
+* Run the relevant tests once again to check that your changes work as expected.
+  No need to run the whole test suite, the Continuous Integration will take care of that.
 
 _Prior to committing, if you want to pull in the latest upstream changes (highly
 appreciated by the way), please use rebasing rather than merging (see instructions below).
@@ -209,6 +216,14 @@ and run unit tests and integration tests.
 
 Note: the produced JARs are compatible with Java 8 and later,
 regardless of the JDK used to build Hibernate Search.
+
+**WARNING:** Avoid using other goals unless you know what you're doing, because they may leave your workspace
+in an undetermined state and lead to strange errors.
+In particular, `./mvnw compile` will not build tests and may skip some post-processing of classes,
+and `./mvnw package` will not install the JARs into your local Maven repository
+which might be a problem for some of the Maven plugins used in the build.
+If you did run those commands and are facing strange errors,
+you'll have to close your IDE then use `./mvnw clean` to get back to a clean state.
 
 ### Documentation
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
