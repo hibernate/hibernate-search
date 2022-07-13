@@ -60,7 +60,9 @@ Then a few steps will initialize your workspace:
 
 * In the "Maven" side panel, click "Reload all Maven projects".
 * To check your setup, click `Build > Rebuild Project`.
-  If this completes successfully, your workspace is correctly set up.
+  You might get a few errors similar to `java: module not found: org.hibernate.search.mapper.orm`;
+  those are caused by limitations of Intellij IDEA and can be safely ignored.
+  If the build has no other error, your workspace is correctly set up.
 * If you encounter any problem, that might be caused by the project being half-built before you started.
   Try again from a clean state: close Intellij IDEA, run `./mvnw clean`, open Intellij IDEA again,
   and go back to the first step.
