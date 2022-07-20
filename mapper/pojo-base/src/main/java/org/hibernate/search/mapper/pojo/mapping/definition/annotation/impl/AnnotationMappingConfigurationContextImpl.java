@@ -106,7 +106,7 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		BeanResolver beanResolver = buildContext.beanResolver();
 		FailureCollector failureCollector = buildContext.failureCollector();
-		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueReadHandleFactory() );
+		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
 				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, configurationContext,
 						annotationHelper );

@@ -26,7 +26,7 @@ public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 	@Test
 	public void singleAnnotation() {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithSingleFieldAnnotation.class );
-		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueReadHandleFactory() );
+		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
 
 		PojoRawTypeModel<EntityWithSingleFieldAnnotation> typeModel =
 				introspector.typeModel( EntityWithSingleFieldAnnotation.class );
@@ -47,7 +47,7 @@ public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 	@TestForIssue(jiraKey = "HSEARCH-3614")
 	public void repeatedAnnotation() {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithRepeatedFieldAnnotation.class );
-		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueReadHandleFactory() );
+		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
 
 		PojoRawTypeModel<EntityWithRepeatedFieldAnnotation> typeModel =
 				introspector.typeModel( EntityWithRepeatedFieldAnnotation.class );

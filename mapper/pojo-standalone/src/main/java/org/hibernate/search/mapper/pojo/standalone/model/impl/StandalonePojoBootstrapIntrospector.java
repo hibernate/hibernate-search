@@ -71,11 +71,6 @@ public class StandalonePojoBootstrapIntrospector extends AbstractPojoHCAnnBootst
 	}
 
 	@Override
-	public ValueHandleFactory annotationValueReadHandleFactory() {
-		return valueHandleFactory;
-	}
-
-	@Override
 	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor) throws IllegalAccessException {
 		setAccessible( constructor );
 		return valueHandleFactory.createForConstructor( constructor );

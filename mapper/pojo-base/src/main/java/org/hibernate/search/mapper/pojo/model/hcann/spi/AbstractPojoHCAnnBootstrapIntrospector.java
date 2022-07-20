@@ -22,6 +22,7 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
@@ -40,7 +41,7 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 	}
 
 	@Override
-	public ValueHandleFactory annotationValueReadHandleFactory() {
+	public ValueHandleFactory annotationValueHandleFactory() {
 		return valueHandleFactory;
 	}
 
@@ -70,8 +71,11 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 		return typeOrdering.descendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	protected abstract <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor)
-			throws IllegalAccessException;
+	protected <T> ValueCreateHandle<T> createValueCreateHandle(Constructor<T> constructor)
+			throws IllegalAccessException {
+		throw new AssertionFailure( this + " doesn't support constructor handles."
+				+ " '" + getClass().getName() + " should be updated to implement createValueCreateHandle(Constructor)." );
+	}
 
 	public Class<?> toClass(XClass xClass) {
 		return reflectionManager.toClass( xClass );

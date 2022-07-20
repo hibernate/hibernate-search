@@ -14,7 +14,8 @@ import org.hibernate.search.util.common.reflect.impl.ConstructorValueCreateHandl
 import org.hibernate.search.util.common.reflect.impl.FieldValueReadHandle;
 import org.hibernate.search.util.common.reflect.impl.MethodValueReadHandle;
 
-final class MemberValueHandleFactory implements ValueHandleFactory {
+@SuppressWarnings("deprecation")
+final class MemberValueHandleFactory implements ValueHandleFactory, ValueReadHandleFactory {
 	@Override
 	public <T> ValueCreateHandle<T> createForConstructor(Constructor<T> constructor) {
 		return new ConstructorValueCreateHandle<>( constructor );
