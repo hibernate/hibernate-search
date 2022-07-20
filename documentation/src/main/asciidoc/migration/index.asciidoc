@@ -86,4 +86,8 @@ Below are the most notable SPI changes:
 [[behavior]]
 == Behavior changes
 
-No behavior changes to report.
+Due to bugfixes, parts of Hibernate Search now behave differently:
+
+* The boolean predicate, `SearchPredicateFactory#bool()`, when used without any clause,
+used to match no documents with the Lucene backend, but all documents with the Elasticsearch backend.
+A boolean predicate with no clause will now consistently match no documents regardless of the backend.
