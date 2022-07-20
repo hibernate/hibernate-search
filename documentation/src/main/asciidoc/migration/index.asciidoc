@@ -44,7 +44,19 @@ To address that, either:
 [[configuration]]
 == Configuration changes
 
-The configuration properties are backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+The configuration properties are for the most part backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
+
+However, some changes may have an impact on exotic configuration:
+
+* Configuration properties expecting references to "configurer" beans now accept multiple references, separated by commas.
+If your bean reference contains a comma, it may no longer be interpreted correctly.
++
+The suggested workaround is to avoid using commas in bean names.
++
+This affects the following configuration properties:
+** `hibernate.search.backend.analysis.configurer`
+** `hibernate.search.backend.query.caching.configurer`
+** `hibernate.search.mapping.configurer`
 
 [[api]]
 == API changes
@@ -82,6 +94,10 @@ is mostly backward-compatible with Hibernate Search {hibernateSearchPreviousStab
 Below are the most notable SPI changes:
 
 * `PojoGenericTypeModel` no longer exists; its methods moved to `PojoTypeModel`.
+* `org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator#annotatedTypeDiscoveryEnabled` is deprecated.
+Use `.annotationMapping().discoverAnnotationsFromReferencedTypes(...)` instead.
+* `org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory` is deprecated.
+Use/implement `org.hibernate.search.util.common.reflect.spi.ValueHandleFactory` instead.
 
 [[behavior]]
 == Behavior changes
