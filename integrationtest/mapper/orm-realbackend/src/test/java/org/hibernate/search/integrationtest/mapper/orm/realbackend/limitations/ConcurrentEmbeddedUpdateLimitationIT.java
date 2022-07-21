@@ -25,6 +25,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.dialect.CockroachDB192Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
@@ -61,7 +62,11 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 				// This is absolutely necessary to avoid false positives in this test
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY, "sync" )
 				.skipTestForDialect( SQLServerDialect.class,
-						"The execution could provoke a deadlock on SQLServer, which will abort our requests upon detecting the deadlock, and will make the tests fail." )
+						"The execution could provoke a failure caused by a deadlock on SQLServer, "
+						+ "which will abort our requests and will make the tests fail." )
+				.skipTestForDialect( CockroachDB192Dialect.class,
+						"The execution could provoke a 'failed preemptive refresh due to a conflict' on CockroachDB,"
+						+ " which will abort our requests and will make the tests fail." )
 				.setup( Book.class, Author.class, BookEdition.class );
 
 		reproducer();
