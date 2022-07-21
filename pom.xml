@@ -647,6 +647,10 @@
         <test.database.run.mssql.skip>true</test.database.run.mssql.skip>
         <test.database.run.mssql.image.name>mcr.microsoft.com/mssql/server</test.database.run.mssql.image.name>
         <test.database.run.mssql.image.tag>2019-CU8-ubuntu-16.04</test.database.run.mssql.image.tag>
+        <!-- CockroachDB -->
+        <test.database.run.cockroachdb.skip>true</test.database.run.cockroachdb.skip>
+        <test.database.run.cockroachdb.image.name>cockroachdb/cockroach</test.database.run.cockroachdb.image.name>
+        <test.database.run.cockroachdb.image.tag>v22.1.4</test.database.run.cockroachdb.image.tag>
 
         <!-- Property whose sole purpose is to be referenced in the definition of surefire.jvm.args.module
              when Weld is used. -->
@@ -2333,6 +2337,9 @@
                                     }
                                     if ( isFalseString( '${test.database.run.mssql.skip}' ) ) {
                                         images += '${test.database.run.mssql.image.name}:${test.database.run.mssql.image.tag}'
+                                    }
+                                    if ( isFalseString( '${test.database.run.cockroachdb.skip}' ) ) {
+                                        images += '${test.database.run.cockroachdb.image.name}:${test.database.run.cockroachdb.image.tag}'
                                     }
                                     new File('${containerImagesListFile}').append( images.join('\n') + '\n' )
                                 ]]></script>
