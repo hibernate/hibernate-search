@@ -322,6 +322,42 @@
                                     </wait>
                                 </run>
                             </image>
+                            <image>
+                                <name>${test.database.run.cockroachdb.image.name}:${test.database.run.cockroachdb.image.tag}</name>
+                                <alias>cockroachdb</alias>
+                                <run>
+                                    <skip>${test.database.run.cockroachdb.skip}</skip>
+                                    <cmd>
+                                        <exec>
+                                            <arg>start-single-node</arg>
+                                            <arg>--insecure</arg>
+                                        </exec>
+                                    </cmd>
+                                    <ulimits>
+                                        <ulimit>
+                                            <name>nofile</name>
+                                            <hard>1956</hard>
+                                            <soft>1956</soft>
+                                        </ulimit>
+                                    </ulimits>
+                                    <env>
+                                        <POSTGRES_USER>hibernate_orm_test</POSTGRES_USER>
+                                        <POSTGRES_PASSWORD>hibernate_orm_test</POSTGRES_PASSWORD>
+                                        <POSTGRES_DB>hibernate_orm_test</POSTGRES_DB>
+                                    </env>
+                                    <ports>
+                                        <port>26257:26257</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>CockroachDB: </prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <wait>
+                                        <log>CockroachDB node starting at</log>
+                                    </wait>
+                                </run>
+                            </image>
                         </images>
                     </configuration>
                     <executions>
@@ -738,6 +774,25 @@
                 <jdbc.url>jdbc:sqlserver://localhost:1433;databaseName=tempdb</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
                 <jdbc.pass>ActuallyRequired11Complexity</jdbc.pass>
+            </properties>
+        </profile>
+
+        <!-- CockroachDB Docker container for tests -->
+        <!-- See test.database.run.cockroachdb.image.tag for the server version in use -->
+        <profile>
+            <id>ci-cockroachdb</id>
+            <properties>
+                <test.database.run.cockroachdb.skip>${test.database.run.skip}</test.database.run.cockroachdb.skip>
+                <db.dialect>org.hibernate.dialect.CockroachDB201Dialect</db.dialect>
+                <!-- CockroachDB uses the same client protocol as PostgreSQL (pgwire), so the driver is the same. -->
+                <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
+                <jdbc.driver.version>42.2.19</jdbc.driver.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jdbc.url>jdbc:postgresql://localhost:26257/defaultdb?sslmode=disable</jdbc.url>
+                <jdbc.user>root</jdbc.user>
+                <jdbc.pass></jdbc.pass>
+                <jdbc.isolation />
             </properties>
         </profile>
     </profiles>
