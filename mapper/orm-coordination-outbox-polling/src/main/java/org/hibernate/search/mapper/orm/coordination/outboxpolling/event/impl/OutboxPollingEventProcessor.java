@@ -82,6 +82,8 @@ public final class OutboxPollingEventProcessor {
 
 	public static Factory factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
 			ConfigurationPropertySource configurationSource) {
+		OutboxEventLoader loader = OutboxEventLoader.create( mapping.sessionFactory().getJdbcServices().getDialect() );
+
 		Duration pollingInterval = POLLING_INTERVAL.getAndTransform( configurationSource, Duration::ofMillis );
 		Duration pulseInterval = PULSE_INTERVAL.getAndTransform( configurationSource,
 				v -> OutboxConfigUtils.checkPulseInterval( Duration.ofMillis( v ), pollingInterval ) );
@@ -93,7 +95,7 @@ public final class OutboxPollingEventProcessor {
 		Integer transactionTimeout = TRANSACTION_TIMEOUT.get( configurationSource )
 				.orElse( null );
 
-		return new Factory( mapping, clock, tenantId, pollingInterval, pulseInterval, pulseExpiration,
+		return new Factory( mapping, clock, tenantId, loader, pollingInterval, pulseInterval, pulseExpiration,
 				batchSize, retryDelay, transactionTimeout );
 	}
 
@@ -101,6 +103,7 @@ public final class OutboxPollingEventProcessor {
 		private final AutomaticIndexingMappingContext mapping;
 		private final Clock clock;
 		private final String tenantId;
+		private final OutboxEventLoader loader;
 		private final Duration pollingInterval;
 		private final Duration pulseInterval;
 		private final Duration pulseExpiration;
@@ -109,11 +112,12 @@ public final class OutboxPollingEventProcessor {
 		private final Integer transactionTimeout;
 
 		private Factory(AutomaticIndexingMappingContext mapping, Clock clock, String tenantId,
-				Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
+				OutboxEventLoader loader, Duration pollingInterval, Duration pulseInterval, Duration pulseExpiration,
 				int batchSize, int retryDelay, Integer transactionTimeout) {
 			this.mapping = mapping;
 			this.clock = clock;
 			this.tenantId = tenantId;
+			this.loader = loader;
 			this.pollingInterval = pollingInterval;
 			this.pulseInterval = pulseInterval;
 			this.pulseExpiration = pulseExpiration;
@@ -143,6 +147,7 @@ public final class OutboxPollingEventProcessor {
 
 	private final String name;
 	private final AutomaticIndexingMappingContext mapping;
+	private final OutboxEventLoader loader;
 	private final long pollingInterval;
 	private final int batchSize;
 	private final int retryDelay;
@@ -163,6 +168,7 @@ public final class OutboxPollingEventProcessor {
 		this.name = name;
 		this.mapping = factory.mapping;
 		String tenantId = factory.tenantId;
+		this.loader = factory.loader;
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		this.batchSize = factory.batchSize;
 		this.retryDelay = factory.retryDelay;
@@ -267,7 +273,7 @@ public final class OutboxPollingEventProcessor {
 				// can see heavily concurrent access (the outbox table),
 				// so we do that in a separate transaction, one that is as short as possible.
 				OutboxEventUpdater eventUpdater = new OutboxEventUpdater(
-						failureHandler, eventProcessing, session, name, retryDelay );
+						failureHandler, loader, eventProcessing, session, name, retryDelay );
 				// We potentially perform this update in multiple transactions,
 				// each loading as many events as possible using SKIP_LOCKED,
 				// to only load events that are not already locked by another processor.

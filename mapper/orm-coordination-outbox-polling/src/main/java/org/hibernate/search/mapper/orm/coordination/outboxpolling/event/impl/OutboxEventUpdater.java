@@ -26,6 +26,7 @@ public class OutboxEventUpdater {
 	private static final int MAX_RETRIES = 3;
 
 	private final FailureHandler failureHandler;
+	private final OutboxEventLoader loader;
 	private final OutboxEventProcessingPlan processingPlan;
 	private final SessionImplementor session;
 	private final String processorName;
@@ -33,9 +34,10 @@ public class OutboxEventUpdater {
 	private final Set<Long> eventsIds;
 	private final Set<Long> failedEventIds;
 
-	public OutboxEventUpdater(FailureHandler failureHandler, OutboxEventProcessingPlan processingPlan,
-			SessionImplementor session, String processorName, int retryAfter) {
+	public OutboxEventUpdater(FailureHandler failureHandler, OutboxEventLoader loader,
+			OutboxEventProcessingPlan processingPlan, SessionImplementor session, String processorName, int retryAfter) {
 		this.failureHandler = failureHandler;
+		this.loader = loader;
 		this.processingPlan = processingPlan;
 		this.session = session;
 		this.processorName = processorName;
@@ -51,7 +53,7 @@ public class OutboxEventUpdater {
 	}
 
 	public void process() {
-		List<OutboxEvent> lockedEvents = OutboxEventLoader.loadLocking( session, eventsIds, processorName );
+		List<OutboxEvent> lockedEvents = loader.loadLocking( session, eventsIds, processorName );
 		List<OutboxEvent> eventToDelete = new ArrayList<>( lockedEvents );
 
 		for ( OutboxEvent event : lockedEvents ) {
