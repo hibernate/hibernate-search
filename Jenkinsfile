@@ -209,7 +209,9 @@ stage('Configure') {
                     new DatabaseBuildEnvironment(dbName: 'db2', mavenProfile: 'ci-db2',
                             condition: TestCondition.AFTER_MERGE),
                     new DatabaseBuildEnvironment(dbName: 'mssql', mavenProfile: 'ci-mssql',
-                            condition: TestCondition.AFTER_MERGE)
+                            condition: TestCondition.AFTER_MERGE),
+                    new DatabaseBuildEnvironment(dbName: 'cockroachdb', mavenProfile: 'ci-cockroachdb',
+                            condition: TestCondition.AFTER_MERGE),
 			],
 			esLocal: [
 					// --------------------------------------------

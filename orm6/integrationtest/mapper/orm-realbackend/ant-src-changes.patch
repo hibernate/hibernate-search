@@ -1,0 +1,22 @@
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java
+index ddf6d1caac..e19bbad6ec 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/realbackend/limitations/ConcurrentEmbeddedUpdateLimitationIT.java
+@@ -25,7 +25,7 @@
+ import org.hibernate.Session;
+ import org.hibernate.SessionFactory;
+ import org.hibernate.Transaction;
+-import org.hibernate.dialect.CockroachDB192Dialect;
++import org.hibernate.dialect.CockroachDialect;
+ import org.hibernate.dialect.SQLServerDialect;
+ import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
+ import org.hibernate.search.mapper.orm.Search;
+@@ -64,7 +64,7 @@ public void indexingStrategySession() throws Throwable {
+ 				.skipTestForDialect( SQLServerDialect.class,
+ 						"The execution could provoke a failure caused by a deadlock on SQLServer, "
+ 						+ "which will abort our requests and will make the tests fail." )
+-				.skipTestForDialect( CockroachDB192Dialect.class,
++				.skipTestForDialect( CockroachDialect.class,
+ 						"The execution could provoke a 'failed preemptive refresh due to a conflict' on CockroachDB,"
+ 						+ " which will abort our requests and will make the tests fail." )
+ 				.setup( Book.class, Author.class, BookEdition.class );
