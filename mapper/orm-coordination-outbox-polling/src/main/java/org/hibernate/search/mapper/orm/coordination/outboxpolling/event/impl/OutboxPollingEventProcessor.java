@@ -232,9 +232,20 @@ public final class OutboxPollingEventProcessor {
 		public CompletableFuture<?> work() {
 			lastExecutionProcessedEvents = false;
 
-			// Optimization: don't even try to open a transaction/session if we know it's not necessary.
-			if ( instructions != null && instructions.isStillValid()
-					&& !instructions.eventFinder.isPresent() ) {
+			if ( instructions == null || !instructions.isStillValid() ) {
+				// Never perform event processing in the same transaction as a pulse,
+				// to reduce transaction contention.
+				try ( SessionImplementor session = openSession() ) {
+					transactionHelper.inTransaction( session, s -> {
+						AgentRepository agentRepository = agentRepositoryProvider.create( session );
+						instructions = clusterLink.pulse( agentRepository );
+					} );
+				}
+			}
+
+			// Optimization: don't even try to open a transaction/session for event processing
+			// if we know it's not necessary.
+			if ( !instructions.eventFinder.isPresent() ) {
 				// Processing is disabled for the time being.
 				// We will try again later (complete() will be called, re-scheduling the polling for later).
 				return CompletableFuture.completedFuture( null );
@@ -243,10 +254,6 @@ public final class OutboxPollingEventProcessor {
 			try ( SessionImplementor session = openSession() ) {
 				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
 				transactionHelper.inTransaction( session, s -> {
-					if ( instructions == null || !instructions.isStillValid() ) {
-						AgentRepository agentRepository = agentRepositoryProvider.create( session );
-						instructions = clusterLink.pulse( agentRepository );
-					}
 					Optional<OutboxEventFinder> eventFinder = instructions.eventFinder;
 					if ( !eventFinder.isPresent() ) {
 						// Processing is disabled for the time being.
