@@ -168,39 +168,118 @@ public class PredicateDslIT {
 	}
 
 	@Test
-	public void bool() {
+	public void and() {
 		withinSearchSession( searchSession -> {
-			// tag::bool-or[]
+			// tag::and[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.should( f.match().field( "title" )
-									.matching( "robot" ) ) // <1>
-							.should( f.match().field( "description" )
-									.matching( "investigation" ) ) // <2>
+					.where( f -> f.and(
+									f.match().field( "title" )
+											.matching( "robot" ), // <1>
+									f.match().field( "description" )
+											.matching( "crime" ) // <2>
+							)
 					)
 					.fetchHits( 20 ); // <3>
-			// end::bool-or[]
+			// end::and[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::and-dynamicParameters-root[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.and().with( b -> { // <2>
+						b.add( f.matchAll() ); // <3>
+						if ( searchParameters.getGenreFilter() != null ) { // <4>
+							b.add( f.match().field( "genre" )
+									.matching( searchParameters.getGenreFilter() ) );
+						}
+						if ( searchParameters.getFullTextFilter() != null ) {
+							b.add( f.match().fields( "title", "description" )
+									.matching( searchParameters.getFullTextFilter() ) );
+						}
+						if ( searchParameters.getPageCountMaxFilter() != null ) {
+							b.add( f.range().field( "pageCount" )
+									.atMost( searchParameters.getPageCountMaxFilter() ) );
+						}
+					} ) )
+					.fetchHits( 20 );
+			// end::and-dynamicParameters-root[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::and-or-dynamicParameters-with[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.and().with( b -> { // <2>
+						b.add( f.matchAll() );
+						if ( searchParameters.getGenreFilter() != null ) {
+							b.add( f.match().field( "genre" )
+									.matching( searchParameters.getGenreFilter() ) );
+						}
+						if ( !searchParameters.getAuthorFilters().isEmpty() ) {
+							b.add( f.or().with( b2 -> { // <3>
+								for ( String authorFilter : searchParameters.getAuthorFilters() ) { // <4>
+									b2.add( f.match().fields( "authors.firstName", "authors.lastName" )
+											.matching( authorFilter ) );
+								}
+							} ) );
+						}
+					} ) )
+					.fetchHits( 20 );
+			// end::and-or-dynamicParameters-with[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void or() {
+		withinSearchSession( searchSession -> {
+			// tag::or[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.or(
+									f.match().field( "title" )
+											.matching( "robot" ), // <1>
+									f.match().field( "description" )
+											.matching( "investigation" ) // <2>
+							)
+					)
+					.fetchHits( 20 ); // <3>
+			// end::or[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::bool-and[]
+			// tag::or-dynamicParameters-root[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "title" )
-									.matching( "robot" ) ) // <1>
-							.must( f.match().field( "description" )
-									.matching( "crime" ) ) // <2>
-					)
-					.fetchHits( 20 ); // <3>
-			// end::bool-and[]
+					.where( f -> f.or().with( b -> { // <2>
+						if ( !searchParameters.getAuthorFilters().isEmpty() ) {
+							for ( String authorFilter : searchParameters.getAuthorFilters() ) { // <3>
+								b.add( f.match().fields( "authors.firstName", "authors.lastName" )
+										.matching( authorFilter ) );
+							}
+						}
+					} ) )
+					.fetchHits( 20 );
+			// end::or-dynamicParameters-root[]
 			assertThat( hits )
 					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK3_ID );
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
+	}
 
+	@Test
+	public void bool() {
 		withinSearchSession( searchSession -> {
 			// tag::bool-mustNot[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -513,15 +592,16 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::score-constantScore[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match()
+					.where( f -> f.and(
+							f.match()
 									.field( "genre" )
 									.matching( Genre.SCIENCE_FICTION )
-									.constantScore() )
-							.must( f.match()
+									.constantScore(),
+							f.match()
 									.field( "title" )
 									.matching( "robot" )
-									.boost( 2.0f ) ) )
+									.boost( 2.0f )
+					) )
 					.fetchHits( 20 );
 			// end::score-constantScore[]
 			assertThat( hits )
@@ -532,14 +612,15 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::score-boost[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match()
+					.where( f -> f.and(
+							f.match()
 									.field( "title" )
 									.matching( "robot" )
-									.boost( 2.0f ) )
-							.must( f.match()
+									.boost( 2.0f ),
+							f.match()
 									.field( "description" )
-									.matching( "self-aware" ) ) )
+									.matching( "self-aware" )
+					) )
 					.fetchHits( 20 );
 			// end::score-boost[]
 			assertThat( hits )

@@ -89,9 +89,10 @@ public class IndexedEmbeddedStructureFlattenedIT {
 
 			// tag::include[]
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.bool()
-							.must( f.match().field( "authors.firstName" ).matching( "Ty" ) ) // <1>
-							.must( f.match().field( "authors.lastName" ).matching( "Abraham" ) ) ) // <1>
+					.where( f -> f.and(
+							f.match().field( "authors.firstName" ).matching( "Ty" ), // <1>
+							f.match().field( "authors.lastName" ).matching( "Abraham" ) // <1>
+					) )
 					.fetchHits( 20 );
 
 			assertThat( hits ).isNotEmpty(); // <2>

@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -81,6 +82,55 @@ public interface SearchPredicateFactory {
 	 */
 	@Deprecated
 	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor);
+
+	/**
+	 * Match documents if they match all inner clauses.
+	 *
+	 * @return The initial step of a DSL where predicates that must match can be added and options can be set.
+	 * @see GenericSimpleBooleanOperatorPredicateClausesStep
+	 */
+	SimpleBooleanOperatorPredicateClausesStep<?> and();
+
+	/**
+	 * Match documents if they match all previously-built {@link SearchPredicate}.
+	 *
+	 * @return The step of a DSL where options can be set.
+	 */
+	SimpleBooleanOperatorPredicateOptionsStep<?> and(
+			SearchPredicate firstSearchPredicate,
+			SearchPredicate... otherSearchPredicates);
+
+	/**
+	 * Match documents if they match all clauses.
+	 *
+	 * @return The step of a DSL where options can be set.
+	 */
+	SimpleBooleanOperatorPredicateOptionsStep<?> and(PredicateFinalStep firstSearchPredicate,
+			PredicateFinalStep... otherSearchPredicates);
+
+	/**
+	 * Match documents if they match any inner clause.
+	 *
+	 * @return The initial step of a DSL where predicates that should match can be added and options can be set.
+	 * @see GenericSimpleBooleanOperatorPredicateClausesStep
+	 */
+	SimpleBooleanOperatorPredicateClausesStep<?> or();
+
+	/**
+	 * Match documents if they match any previously-built {@link SearchPredicate}.
+	 *
+	 * @return The step of a DSL where options can be set.
+	 */
+	SimpleBooleanOperatorPredicateOptionsStep<?> or(SearchPredicate firstSearchPredicate,
+			SearchPredicate... otherSearchPredicates);
+
+	/**
+	 * Match documents if they match any clause.
+	 *
+	 * @return The step of a DSL where options can be set.
+	 */
+	SimpleBooleanOperatorPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
+			PredicateFinalStep... otherSearchPredicates);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.
