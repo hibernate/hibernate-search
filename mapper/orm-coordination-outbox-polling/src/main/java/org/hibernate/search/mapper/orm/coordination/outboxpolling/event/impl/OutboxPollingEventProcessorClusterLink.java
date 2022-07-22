@@ -76,7 +76,7 @@ public final class OutboxPollingEventProcessorClusterLink
 						"Agent '%s': another agent '%s' is currently mass indexing",
 						selfReference(), now, agent );
 				agentPersister.setSuspended( self );
-				return instructCommitAndRetryPulseAfterInterval( now );
+				return instructCommitAndRetryPulseAfterDelay( now, pulseInterval );
 			}
 		}
 
@@ -94,7 +94,7 @@ public final class OutboxPollingEventProcessorClusterLink
 			contextBuilder.failingOperation( log.outboxEventProcessorPulse( selfReference() ) );
 			failureHandler.handle( contextBuilder.build() );
 			agentPersister.setSuspended( self );
-			return instructCommitAndRetryPulseAfterInterval( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pulseInterval );
 		}
 
 		Optional<ShardAssignmentDescriptor> shardAssignmentOptional =
@@ -106,7 +106,7 @@ public final class OutboxPollingEventProcessorClusterLink
 							+ " Target cluster: %s.",
 					selfReference(), clusterTarget.descriptor );
 			agentPersister.setSuspended( self );
-			return instructCommitAndRetryPulseAfterInterval( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pulseInterval );
 		}
 
 		ShardAssignmentDescriptor targetShardAssignment = shardAssignmentOptional.get();
@@ -117,7 +117,7 @@ public final class OutboxPollingEventProcessorClusterLink
 							+ " Target cluster: %s.",
 					selfReference(), clusterTarget.descriptor );
 			agentPersister.setSuspended( self );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		ShardAssignmentDescriptor persistedShardAssignment = self.getShardAssignment();
@@ -129,13 +129,13 @@ public final class OutboxPollingEventProcessorClusterLink
 					selfReference(), persistedShardAssignment, targetShardAssignment,
 					clusterTarget.descriptor );
 			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// Check whether excluded (superfluous) agents complied with the cluster target and suspended themselves.
 		if ( !excludedAgentsAreOutOfCluster( clusterTarget.excluded ) ) {
 			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// Check whether cluster members complied with the cluster target.
@@ -150,7 +150,7 @@ public final class OutboxPollingEventProcessorClusterLink
 		// one of those agents would see the other and take it into account when rebalancing.
 		if ( !clusterMembersAreInCluster( clusterTarget.membersInShardOrder, clusterTarget.descriptor ) ) {
 			agentPersister.setWaiting( self, clusterTarget.descriptor, targetShardAssignment );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// If all the conditions above are satisfied, then we can start processing.
@@ -217,19 +217,10 @@ public final class OutboxPollingEventProcessorClusterLink
 	}
 
 	@Override
-	protected OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseASAP(Instant now) {
-		Instant expiration = now.plus( pollingInterval );
+	protected OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay) {
+		Instant expiration = now.plus( delay );
 		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
-				selfReference(), pollingInterval, expiration );
-		// "As soon as possible" still means we wait for a polling interval,
-		// to avoid polling the database continuously.
-		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.empty() );
-	}
-
-	private OutboxPollingEventProcessingInstructions instructCommitAndRetryPulseAfterInterval(Instant now) {
-		Instant expiration = now.plus( pulseInterval );
-		log.tracef( "Agent '%s': instructions are to not process events and to retry a pulse in %s, around %s",
-				selfReference(), pulseInterval, expiration );
+				selfReference(), delay, expiration );
 		return new OutboxPollingEventProcessingInstructions( clock, expiration, Optional.empty() );
 	}
 
