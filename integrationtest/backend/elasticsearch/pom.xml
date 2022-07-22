@@ -13,6 +13,8 @@
     <description>Hibernate Search integration tests for the Elasticsearch backend, running the Backend TCK in particular</description>
 
     <properties>
+        <surefire.integration>elasticsearch</surefire.integration>
+
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
 
         <!-- By default we don't exclude tests because of the version, but profiles override this -->
@@ -77,6 +79,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.integration -->
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
