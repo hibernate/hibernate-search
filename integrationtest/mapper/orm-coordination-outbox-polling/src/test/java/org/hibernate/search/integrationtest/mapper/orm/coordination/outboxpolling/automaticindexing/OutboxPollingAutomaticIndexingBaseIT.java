@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 @ClasspathSuite.IncludeJars(true)
 @ClasspathSuite.ClassnameFilters({
 		// Just execute all automatic indexing tests
-		"org.hibernate.search.integrationtest.mapper.orm.automaticindexing..*Routing.*",
+		"org.hibernate.search.integrationtest.mapper.orm.automaticindexing..*",
 		// ... except tests designed for a particular coordination strategy:
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.coordination..*",
 		// ... and except these tests that just cannot work with the outbox table strategy:
