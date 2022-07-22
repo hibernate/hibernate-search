@@ -12,6 +12,10 @@
     <name>Hibernate Search ITs - Backend - Lucene</name>
     <description>Hibernate Search integration tests for the Lucene backend, running the Backend TCK in particular</description>
 
+    <properties>
+        <surefire.integration>lucene</surefire.integration>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -48,6 +52,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.integration -->
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
