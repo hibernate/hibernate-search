@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
+
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
@@ -61,8 +63,8 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 		return expect( link );
 	}
 
-	protected final MassIndexerAgentClusterLinkPulseExpectations expectInitialStateAndPulseASAP() {
-		return expect().pulseAgain( NOW.plus( POLLING_INTERVAL ) )
+	protected final MassIndexerAgentClusterLinkPulseExpectations expectInitialStateAndPulseAfterDelay(Duration delay) {
+		return expect().pulseAgain( NOW.plus( delay ) )
 				.agent( SELF_ID, repositoryMockHelper.selfInitialState() != null
 						// If self created before this pulse:
 						? repositoryMockHelper.selfInitialState()
@@ -141,7 +143,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
 
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( other2Id(), other3Id() ) );
 	}
@@ -251,7 +253,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
 
 		// Cleaning up expired agents takes precedence over suspending because a mass indexing agent exists.
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( other2Id(), other3Id() ) );
@@ -337,7 +339,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
 
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( MASS_INDEXING_ID ) );
 	}
@@ -404,7 +406,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseASAP().verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
 
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( MASS_INDEXING_ID ) );
 	}
