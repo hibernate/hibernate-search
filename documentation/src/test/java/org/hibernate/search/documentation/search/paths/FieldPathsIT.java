@@ -117,11 +117,12 @@ public class FieldPathsIT {
 	// tag::withRoot_method[]
 	private SearchPredicate matchFirstAndLastName(SearchPredicateFactory f,
 			String firstName, String lastName) {
-		return f.bool()
-				.must( f.match().field( "firstName" ) // <1>
-						.matching( firstName ) )
-				.must( f.match().field( "lastName" )
-						.matching( lastName ) )
+		return f.and(
+						f.match().field( "firstName" ) // <1>
+								.matching( firstName ),
+						f.match().field( "lastName" )
+								.matching( lastName )
+				)
 				.toPredicate();
 	}
 	// end::withRoot_method[]

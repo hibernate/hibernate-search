@@ -784,11 +784,143 @@ but can be <<search-dsl-predicate-common-boost,boosted>>,
 either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
 or for the whole predicate with a call to `.boost(...)` after `.matchingAny(...)` or `.matchingAll(...)`.
 
+[[search-dsl-predicate-and]]
+== `and`: match all clauses
+
+The `and` predicate matches documents that match **all** of its inner predicates, called "clauses".
+
+Matching "and" clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
+
+.Matching a document that matches all the multiple given predicates (~`AND` operator)
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and]
+----
+<1> The hits *must* have a `title` field matching the text `robot`,
+independently of other clauses in the same boolean predicate.
+<2> The hits *must* have a `description` field matching the text `crime`,
+independently of other clauses in the same boolean predicate.
+<3> All returned hits will match *all* the clauses above:
+they will have a `title` field matching the text `robot`
+*and* they will have a `description` field matching the text `crime`.
+====
+
+[[search-dsl-predicate-and-lambda]]
+=== Adding clauses dynamically with the lambda syntax
+
+It is possible to define the `and` predicate inside a lambda expression.
+This is especially useful when clauses need to be added dynamically to the `and` predicate,
+for example based on user input.
+
+.Easily adding clauses dynamically using `.where(...)` and the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and-dynamicParameters-root]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.where(Function)`.
+The function, implemented by a lambda expression, will receive a predicate factory, use it to build an `and` predicate,
+invoke the `with(Consumer)` method and return this predicate. The consumer, implemented by a lambda expression,
+will receive a clause collector for the `and` predicate as an argument, and will add clauses to that collector as necessary.
+<3> By default, a boolean predicate will match nothing if there is no clause.
+To match every document when there is no clause, add an `and` clause that matches everything.
+<4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
+to control the addition of clauses.
+In this case, we only add clauses if the relevant parameter was filled in by the user.
+====
+
+Another syntax relying on the method `with(...)` can be useful when the boolean predicate is not the root predicate,
+see <<example-and-or-dynamicParameters-with,this example>>.
+
+[[search-dsl-predicate-and-other]]
+=== Options
+
+* The score of an `and` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of an `and` predicate can be <<search-dsl-predicate-common-boost,boosted>>
+with a call to `.boost(...)`.
+
+[[search-dsl-predicate-or]]
+== `or`: match any clause
+
+The `or` predicate matches documents that match **any** of its inner predicates, called "clauses".
+
+Matching `or` clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
+
+.Matching a document that matches any of multiple given predicates (~`OR` operator)
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=or]
+----
+<1> The hits *should* have a `title` field matching the text `robot`,
+*or* they should match any other clause in the same boolean predicate.
+<2> The hits *should* have a `description` field matching the text `investigation`,
+*or* they should match any other clause in the same boolean predicate.
+<3> All returned hits will match *at least one* of the clauses above:
+they will have a `title` field matching the text `robot`
+*or* they will have a `description` field matching the text `investigation`.
+====
+
+[[search-dsl-predicate-or-lambda]]
+=== Adding clauses dynamically with the lambda syntax
+
+It is possible to define the `or` predicate inside a lambda expression.
+This is especially useful when clauses need to be added dynamically to the `or` predicate,
+for example based on user input.
+
+.Easily adding clauses dynamically using `.where(...)` and the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=or-dynamicParameters-root]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.0
+<2> Call `.where(Function)`.
+The function, implemented by a lambda expression, will receive a predicate factory, use it to build an `or` predicate,
+invoke the `with(Consumer)` method and return this predicate. The consumer, implemented by a lambda expression,
+will receive a clause collector for the `or` predicate as an argument, and will add clauses to that collector as necessary.
+<3> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
+to control the addition of clauses.
+In this case, we only add clauses if the relevant parameter was filled in by the user.
+====
+
+Another syntax relying on the method `with(...)` can be useful when the boolean predicate is not the root predicate:
+
+.[[example-and-or-dynamicParameters-with]]Easily adding clauses dynamically using `with(...)` and the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and-or-dynamicParameters-with]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.where(Function)` to create the root predicate, which is not the one we're interested in here.
+<3> Call `.or().with(Consumer)` to create an inner, non-root predicate.
+The consumer, implemented by a lambda expression, will receive a collector as an argument
+and will add clauses to that collector as necessary.
+<4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
+to control the addition of clauses.
+In this case, we add one clause per author filter.
+====
+
+[[search-dsl-predicate-or-other]]
+=== Options
+
+* The score of an `or` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of an `or` predicate can be <<search-dsl-predicate-common-boost,boosted>>
+with a call to `.boost(...)`.
+
 [[search-dsl-predicate-boolean]]
-== [[_combining_queries]] `bool`: combine predicates (or/and/...)
+== `bool`: advanced combinations of predicates (or/and/...)
+
+The `bool` predicate allows combining inner predicates in a more complex fashion than with simpler
+<<search-dsl-predicate-and,`and`>>/<<search-dsl-predicate-or,`or`>> predicates.
 
 The `bool` predicate matches documents that match one or more inner predicates, called "clauses".
-It can be used in particular to build `AND`/`OR` operators.
+It can be used in particular to build `AND`/`OR` operators with additional settings.
 
 Inner predicates are added as clauses of one of the following types:
 
@@ -825,42 +957,14 @@ and are simply used for scoring.
 [[search-dsl-predicate-boolean-or]]
 === Emulating an `OR` operator
 
-A `bool` predicate with only `should` clauses will behave as an `OR` operator.
-
-.Matching a document that matches any of multiple given predicates (~`OR` operator)
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-or]
-----
-<1> The hits *should* have a `title` field matching the text `robot`,
-*or* they should match any other clause in the same boolean predicate.
-<2> The hits *should* have a `description` field matching the text `investigation`,
-*or* they should match any other clause in the same boolean predicate.
-<3> All returned hits will match *at least one* of the clauses above:
-they will have a `title` field matching the text `robot`
-*or* they will have a `description` field matching the text `investigation`.
-====
+A `bool` predicate with only `should` clauses and no `minimumShouldMatch` specification will behave as an `OR` operator.
+In such case, using the simpler <<search-dsl-predicate-or,`or`>> syntax is recommended.
 
 [[search-dsl-predicate-boolean-and]]
 === Emulating an `AND` operator
 
 A `bool` predicate with only `must` clauses will behave as an `AND` operator.
-
-.Matching a document that matches all the multiple given predicates (~`AND` operator)
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-and]
-----
-<1> The hits *must* have a `title` field matching the text `robot`,
-independently of other clauses in the same boolean predicate.
-<2> The hits *must* have a `description` field matching the text `crime`,
-independently of other clauses in the same boolean predicate.
-<3> All returned hits will match *all* the clauses above:
-they will have a `title` field matching the text `robot`
-*and* they will have a `description` field matching the text `crime`.
-====
+In such case, using the simpler <<search-dsl-predicate-and,`and`>> syntax is recommended.
 
 [[search-dsl-predicate-boolean-mustNot]]
 === `mustNot`: excluding documents that match a given predicate
