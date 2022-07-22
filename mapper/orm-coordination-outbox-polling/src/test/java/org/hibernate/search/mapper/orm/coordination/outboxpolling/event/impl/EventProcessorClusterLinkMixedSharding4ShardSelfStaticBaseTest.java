@@ -81,7 +81,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfStaticBaseTest {
 
 		@Override
 		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectSuspendedAndPulseASAP();
+			return expectSuspendedAndPulseAfterDelay( POLLING_INTERVAL );
 		}
 
 		@Override
@@ -99,7 +99,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfStaticBaseTest {
 
 		@Override
 		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectSuspendedAndPulseASAP();
+			return expectSuspendedAndPulseAfterDelay( POLLING_INTERVAL );
 		}
 
 		@Override
@@ -118,7 +118,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfStaticBaseTest {
 
 		@Override
 		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectSuspendedAndPulseASAP();
+			return expectSuspendedAndPulseAfterDelay( POLLING_INTERVAL );
 		}
 
 		@Override
@@ -137,7 +137,7 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfStaticBaseTest {
 
 		@Override
 		protected EventProcessorClusterLinkPulseExpectations onNoOtherAgents() {
-			return expectSuspendedAndPulseASAP();
+			return expectSuspendedAndPulseAfterDelay( POLLING_INTERVAL );
 		}
 
 		@Override

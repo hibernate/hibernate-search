@@ -86,7 +86,7 @@ abstract class AbstractAgentClusterLink<R> {
 			agentRepository.delete( timedOutAgents );
 			log.infof( "Agent '%s': reassessing the new situation in the next pulse",
 					selfReference(), now );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// Delay expiration in each pulse
@@ -98,7 +98,18 @@ abstract class AbstractAgentClusterLink<R> {
 	protected abstract R doPulse(AgentRepository agentRepository, Instant now,
 			List<Agent> allAgentsInIdOrder, Agent self);
 
-	protected abstract R instructCommitAndRetryPulseASAP(Instant now);
+	/**
+	 * Instructs the processor to commit the transaction, wait for the given delay, then pulse again.
+	 * <p>
+	 * Use with:
+	 * <ul>
+	 * <li>pollingInterval to apply a minimal delay before the next pulse, to avoid hitting the database continuously.
+	 *     Useful when waiting for external changes.</li>
+	 * <li>pulseInterval to apply a large delay before the next pulse.
+	 *     Useful when suspended and waiting for a reason to resume.</li>
+	 * </ul>
+	 */
+	protected abstract R instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay);
 
 	public final void leaveCluster(AgentRepository agentRepository) {
 		agentPersister.leaveCluster( agentRepository );

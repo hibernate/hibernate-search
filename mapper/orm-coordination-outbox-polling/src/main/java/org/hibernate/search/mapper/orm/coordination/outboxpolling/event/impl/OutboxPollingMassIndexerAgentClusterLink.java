@@ -52,7 +52,7 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 		// Check whether event processors acknowledged our existence by suspending themselves.
 		if ( !eventProcessorsAreSuspended( eventProcessors ) ) {
 			agentPersister.setWaiting( self, SINGLE_NODE_CLUSTER_DESCRIPTOR, SINGLE_NODE_SHARD_ASSIGNMENT );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// Ensure that we won't just spawn the agent directly in the RUNNING state,
@@ -66,7 +66,7 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 		// one of those agents would see the other and take it into account.
 		if ( AgentState.SUSPENDED.equals( self.getState() ) ) {
 			agentPersister.setWaiting( self, SINGLE_NODE_CLUSTER_DESCRIPTOR, SINGLE_NODE_SHARD_ASSIGNMENT );
-			return instructCommitAndRetryPulseASAP( now );
+			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// If all the conditions above are satisfied, then we can start mass indexing.
@@ -90,10 +90,10 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 	}
 
 	@Override
-	protected OutboxPollingMassIndexingInstructions instructCommitAndRetryPulseASAP(Instant now) {
-		Instant expiration = now.plus( pollingInterval );
+	protected OutboxPollingMassIndexingInstructions instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay) {
+		Instant expiration = now.plus( delay );
 		log.tracef( "Agent '%s': instructions are to hold off mass indexing and to retry a pulse in %s, around %s",
-				selfReference(), pollingInterval, expiration );
+				selfReference(), delay, expiration );
 		return new OutboxPollingMassIndexingInstructions( clock, expiration, false );
 	}
 
