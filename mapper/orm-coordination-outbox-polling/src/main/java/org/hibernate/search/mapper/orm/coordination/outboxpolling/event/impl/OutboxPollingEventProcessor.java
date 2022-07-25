@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMa
 import org.hibernate.search.mapper.orm.common.spi.SessionHelper;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -149,10 +148,10 @@ public final class OutboxPollingEventProcessor {
 	private final int retryDelay;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
-	private final AgentRepositoryProvider agentRepositoryProvider;
 	private final OutboxPollingEventProcessorClusterLink clusterLink;
 	private final TransactionHelper transactionHelper;
 	private final SessionHelper sessionHelper;
+	private final AgentClusterLinkContextProvider clusterLinkContextProvider;
 	private final FailureHandler failureHandler;
 	private final Worker worker;
 	private final SingletonTask processingTask;
@@ -167,11 +166,13 @@ public final class OutboxPollingEventProcessor {
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		this.batchSize = factory.batchSize;
 		this.retryDelay = factory.retryDelay;
-		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
 		transactionHelper = new TransactionHelper( mapping.sessionFactory(), factory.transactionTimeout );
 		sessionHelper = new SessionHelper( mapping.sessionFactory(), transactionHelper, tenantId );
+		this.clusterLinkContextProvider = new AgentClusterLinkContextProvider( transactionHelper, sessionHelper,
+				agentRepositoryProvider );
+
 		failureHandler = mapping.failureHandler();
 		this.worker = new Worker();
 		processingTask = new SingletonTask(
@@ -206,10 +207,7 @@ public final class OutboxPollingEventProcessor {
 	}
 
 	private void leaveCluster() {
-		sessionHelper.inSessionAndTransaction( session -> {
-			AgentRepository agentRepository = agentRepositoryProvider.create( session );
-			clusterLink.leaveCluster( agentRepository );
-		} );
+		clusterLinkContextProvider.inTransaction( clusterLink::leaveCluster );
 	}
 
 	private class Worker implements SingletonTask.Worker {
@@ -224,10 +222,7 @@ public final class OutboxPollingEventProcessor {
 			if ( instructions == null || !instructions.isStillValid() ) {
 				// Never perform event processing in the same transaction as a pulse,
 				// to reduce transaction contention.
-				sessionHelper.inSessionAndTransaction( session -> {
-					AgentRepository agentRepository = agentRepositoryProvider.create( session );
-					instructions = clusterLink.pulse( agentRepository );
-				} );
+				instructions = clusterLinkContextProvider.inTransaction( clusterLink::pulse );
 			}
 
 			// Optimization: don't even try to open a transaction/session for event processing

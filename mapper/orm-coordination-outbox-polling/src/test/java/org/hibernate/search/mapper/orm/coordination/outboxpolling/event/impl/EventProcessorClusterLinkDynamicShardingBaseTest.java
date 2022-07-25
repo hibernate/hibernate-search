@@ -70,7 +70,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 					.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 							new ShardAssignmentDescriptor( 3, 2 ) );
 
-			expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+			expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( contextMock ) );
 		}
 
 		@Test
@@ -83,7 +83,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 					.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
 							new ShardAssignmentDescriptor( 3, 2 ) );
 
-			expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+			expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( contextMock ) );
 		}
 	}
 

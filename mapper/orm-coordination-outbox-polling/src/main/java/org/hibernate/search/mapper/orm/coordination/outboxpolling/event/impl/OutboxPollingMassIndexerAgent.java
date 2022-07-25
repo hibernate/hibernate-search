@@ -22,7 +22,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMa
 import org.hibernate.search.mapper.orm.common.spi.SessionHelper;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepositoryProvider;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
@@ -114,9 +113,8 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	private final long pollingInterval;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
-	private final AgentRepositoryProvider agentRepositoryProvider;
 	private final OutboxPollingMassIndexerAgentClusterLink clusterLink;
-	private final SessionHelper sessionHelper;
+	private final AgentClusterLinkContextProvider clusterLinkContextProvider;
 	private final Worker worker;
 	private final SingletonTask processingTask;
 
@@ -129,11 +127,13 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		AutomaticIndexingMappingContext mapping = factory.mapping;
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		String tenantId = factory.tenantId;
-		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
 		TransactionHelper transactionHelper = new TransactionHelper( mapping.sessionFactory(), null );
-		sessionHelper = new SessionHelper( mapping.sessionFactory(), transactionHelper, tenantId );
+		SessionHelper sessionHelper = new SessionHelper( mapping.sessionFactory(), transactionHelper, tenantId );
+		this.clusterLinkContextProvider = new AgentClusterLinkContextProvider( transactionHelper, sessionHelper,
+				agentRepositoryProvider );
+
 		worker = new Worker();
 		processingTask = new SingletonTask(
 				name,
@@ -168,10 +168,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 	}
 
 	private void leaveCluster() {
-		sessionHelper.inSessionAndTransaction( session -> {
-			AgentRepository agentRepository = agentRepositoryProvider.create( session );
-			clusterLink.leaveCluster( agentRepository );
-		} );
+		clusterLinkContextProvider.inTransaction( clusterLink::leaveCluster );
 	}
 
 	private class Worker implements SingletonTask.Worker {
@@ -187,13 +184,10 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 				return CompletableFuture.completedFuture( null );
 			}
 
-			sessionHelper.inSessionAndTransaction( session -> {
-				AgentRepository agentRepository = agentRepositoryProvider.create( session );
-				instructions = clusterLink.pulse( agentRepository );
-				if ( instructions.considerEventProcessingSuspended ) {
-					agentFullyStartedFuture.complete( null );
-				}
-			} );
+			instructions = clusterLinkContextProvider.inTransaction( clusterLink::pulse );
+			if ( instructions.considerEventProcessingSuspended ) {
+				agentFullyStartedFuture.complete( null );
+			}
 
 			return CompletableFuture.completedFuture( null );
 		}

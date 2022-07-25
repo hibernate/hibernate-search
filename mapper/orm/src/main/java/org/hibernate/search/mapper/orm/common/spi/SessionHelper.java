@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.common.spi;
 
-import java.util.function.Consumer;
-
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 
@@ -32,11 +29,5 @@ public final class SessionHelper {
 
 	public SessionImplementor openSession() {
 		return (SessionImplementor) sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
-	}
-
-	public void inSessionAndTransaction(Consumer<Session> action) {
-		try ( SessionImplementor session = openSession() ) {
-			transactionHelper.inTransaction( session, () -> action.accept( session ) );
-		}
 	}
 }

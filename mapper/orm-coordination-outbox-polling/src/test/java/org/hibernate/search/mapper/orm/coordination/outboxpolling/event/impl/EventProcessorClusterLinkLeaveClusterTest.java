@@ -11,12 +11,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
-
 import org.junit.Test;
 
 /**
- * Tests for {@link OutboxPollingEventProcessorClusterLink#leaveCluster(AgentRepository)}.
+ * Tests for {@link OutboxPollingEventProcessorClusterLink#leaveCluster(AgentClusterLinkContextProvider)}.
  */
 public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProcessorClusterLinkTest {
 	final OutboxPollingEventProcessorClusterLink setupLink() {
@@ -30,7 +28,7 @@ public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProc
 	@Test
 	public void didNotJoin() {
 		OutboxPollingEventProcessorClusterLink link = setupLink();
-		link.leaveCluster( repositoryMock );
+		link.leaveCluster( contextMock );
 	}
 
 	@Test
@@ -40,10 +38,10 @@ public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProc
 		repositoryMockHelper.defineOtherAgents();
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );
 		when( clockMock.instant() ).thenReturn( NOW );
-		link.pulse( repositoryMock );
+		link.pulse( contextMock );
 
 		when( repositoryMock.find( SELF_ID ) ).thenReturn( repositoryMockHelper.self() );
-		link.leaveCluster( repositoryMock );
+		link.leaveCluster( contextMock );
 		verify( repositoryMock ).delete( Collections.singletonList( repositoryMockHelper.self() ) );
 	}
 
@@ -54,10 +52,10 @@ public class EventProcessorClusterLinkLeaveClusterTest extends AbstractEventProc
 		repositoryMockHelper.defineOtherAgents();
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );
 		when( clockMock.instant() ).thenReturn( NOW );
-		link.pulse( repositoryMock );
+		link.pulse( contextMock );
 
 		when( repositoryMock.find( SELF_ID ) ).thenReturn( null );
-		link.leaveCluster( repositoryMock );
+		link.leaveCluster( contextMock );
 	}
 
 }

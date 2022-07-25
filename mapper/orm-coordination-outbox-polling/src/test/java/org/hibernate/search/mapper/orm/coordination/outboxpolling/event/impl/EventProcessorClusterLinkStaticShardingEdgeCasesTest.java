@@ -64,7 +64,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( new ShardAssignmentDescriptor( 4, 0 ) )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 
 		verifyNoMoreInvocationsOnAllMocks();
 
@@ -77,7 +77,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( newId, AgentState.WAITING )
 				.shardAssignment( new ShardAssignmentDescriptor( 4, 3 ) )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 
 		verify( repositoryMock ).create( repositoryMockHelper.self() );
 	}
@@ -102,7 +102,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 
 		ArgumentCaptor<FailureContext> failureCaptor = ArgumentCaptor.forClass( FailureContext.class );
 		verify( failureHandlerMock ).handle( failureCaptor.capture() );
@@ -142,7 +142,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.SUSPENDED )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 
 		ArgumentCaptor<FailureContext> failureCaptor = ArgumentCaptor.forClass( FailureContext.class );
 		verify( failureHandlerMock ).handle( failureCaptor.capture() );
@@ -186,7 +186,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.RUNNING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -212,7 +212,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -238,7 +238,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -264,7 +264,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -291,7 +291,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -318,7 +318,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.agent( SELF_ID, AgentState.WAITING )
 				.shardAssignment( selfStaticShardAssignment )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -343,7 +343,7 @@ public class EventProcessorClusterLinkStaticShardingEdgeCasesTest
 				.pulseAgain( NOW.plus( PULSE_INTERVAL ) )
 				.agent( SELF_ID, AgentState.SUSPENDED )
 				.build()
-				.verify( link.pulse( repositoryMock ) );
+				.verify( link.pulse( contextMock ) );
 	}
 
 }

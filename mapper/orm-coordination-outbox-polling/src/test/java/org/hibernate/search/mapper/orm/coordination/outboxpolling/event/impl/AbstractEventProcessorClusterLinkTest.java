@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -66,6 +68,9 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	@Mock
 	public AgentRepository repositoryMock;
 
+	@Mock(stubOnly = true, strictness = Mock.Strictness.LENIENT)
+	public AgentClusterLinkContext contextMock;
+
 	protected final OutboxEventFinderProvider eventFinderProviderStub = new OutboxEventFinderProvider() {
 		@Override
 		public OutboxEventFinder create(Optional<OutboxEventPredicate> predicate) {
@@ -81,6 +86,10 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	public final void initMocks() {
 		repositoryMockHelper = new AgentRepositoryMockingHelper( repositoryMock );
 		Collections.addAll( allMocks, failureHandlerMock, clockMock, eventFinderMock, repositoryMock );
+
+		when( contextMock.agentRepository() ).thenReturn( repositoryMock );
+		// We're not interested in transaction control here
+		doNothing().when( contextMock ).commitAndBeginNewTransaction();
 	}
 
 	@After
