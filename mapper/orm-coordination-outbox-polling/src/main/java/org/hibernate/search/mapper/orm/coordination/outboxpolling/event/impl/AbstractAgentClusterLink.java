@@ -45,29 +45,19 @@ abstract class AbstractAgentClusterLink<R> {
 	}
 
 	public final R pulse(AgentClusterLinkContext context) {
-		Instant now = clock.instant();
-		Instant newExpiration = now.plus( pulseExpiration );
+		Agent self = ensureRegistered( context );
 
 		// In order to avoid transaction deadlocks with some RDBMS (yes, I mean SQL Server),
-		// we make sure that *all* reads (listing all agents) happen before the write (creating/updating self).
+		// we make sure that *all* reads (listing all agents) happen before the write (updating self).
 		// I'm not entirely sure, but I think it goes like this:
 		// if we read, then write, then read again, then the second read can trigger a deadlock,
 		// with each transaction holding a write lock on some rows
 		// while waiting for a read lock on the whole table.
 		List<Agent> allAgentsInIdOrder = context.agentRepository().findAllOrderById();
 
-		Agent preExistingSelf = agentPersister.extractSelf( allAgentsInIdOrder );
-		Agent self;
-		if ( preExistingSelf != null ) {
-			self = preExistingSelf;
-		}
-		else {
-			self = agentPersister.createSelf( context.agentRepository(), allAgentsInIdOrder, newExpiration );
-		}
-
+		Instant now = clock.instant();
 		log.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
-				selfReference(), now, self, allAgentsInIdOrder
-		);
+				selfReference(), now, self, allAgentsInIdOrder );
 
 		// In order to avoid transaction deadlocks with some RDBMS (and this time I mean Oracle),
 		// we make sure that if we need to delete expired agents,
@@ -95,6 +85,24 @@ abstract class AbstractAgentClusterLink<R> {
 		self.setExpiration( newExpiration );
 
 		return doPulse( context.agentRepository(), now, allAgentsInIdOrder, self );
+	}
+
+	private Agent ensureRegistered(AgentClusterLinkContext context) {
+		Instant now = clock.instant();
+		Agent self = agentPersister.findSelf( context.agentRepository() );
+		if ( self == null ) {
+			agentPersister.createSelf( context.agentRepository(), now.plus( pulseExpiration ) );
+			// Make sure the transaction *only* registers the agent,
+			// so that the risk of deadlocks (see below) is minimal
+			// and other agents are made aware of this agent as soon as possible.
+			// This avoids unnecessary rebalancing when multiple nodes start in quick succession.
+			context.commitAndBeginNewTransaction();
+			self = agentPersister.findSelf( context.agentRepository() );
+			if ( self == null ) {
+				throw log.agentRegistrationIneffective( selfReference() );
+			}
+		}
+		return self;
 	}
 
 	protected abstract R doPulse(AgentRepository agentRepository, Instant now,

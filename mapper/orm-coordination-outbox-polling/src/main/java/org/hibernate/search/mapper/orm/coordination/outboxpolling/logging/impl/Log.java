@@ -168,4 +168,9 @@ public interface Log extends BasicLogger {
 			+ " Either mapping property %1$s or subset of name adjustment properties %2$s should be provided at the same time.")
 	SearchException outboxEventConfigurationPropertyConflict(String mappingPropertyName, String[] nameAdjustmentProperties);
 
+	@Message(id = ID_OFFSET + 28, value = "Agent '%1$s': could not find the agent after starting a new transaction."
+			+ " The agent was present just a moment ago."
+			+ " Either this problem is a rare occurrence, or the pulse expiration delay is too short.")
+	SearchException agentRegistrationIneffective(AgentReference agentReference);
+
 }
