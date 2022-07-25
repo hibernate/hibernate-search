@@ -134,7 +134,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
-		transactionHelper = new TransactionHelper( mapping.sessionFactory() );
+		transactionHelper = new TransactionHelper( mapping.sessionFactory(), null );
 		worker = new Worker();
 		processingTask = new SingletonTask(
 				name,
@@ -170,7 +170,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 
 	private void leaveCluster() {
 		try ( SessionImplementor session = openSession() ) {
-			transactionHelper.begin( session, null );
+			transactionHelper.begin( session );
 			try {
 				AgentRepository agentRepository = agentRepositoryProvider.create( session );
 				clusterLink.leaveCluster( agentRepository );
@@ -200,7 +200,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 			}
 
 			try ( SessionImplementor session = openSession() ) {
-				transactionHelper.inTransaction( session, null, s -> {
+				transactionHelper.inTransaction( session, s -> {
 					if ( instructions == null || !instructions.isStillValid() ) {
 						AgentRepository agentRepository = agentRepositoryProvider.create( session );
 						instructions = clusterLink.pulse( agentRepository );

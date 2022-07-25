@@ -37,19 +37,21 @@ public final class TransactionHelper {
 
 	private final TransactionManager transactionManager;
 	private final boolean useJta;
+	private final Integer transactionTimeout;
 
-	public TransactionHelper(SessionFactoryImplementor sessionFactory) {
+	public TransactionHelper(SessionFactoryImplementor sessionFactory, Integer transactionTimeout) {
 		ServiceRegistryImplementor serviceRegistry = sessionFactory.getServiceRegistry();
 		transactionManager = HibernateOrmUtils.getServiceOrFail( serviceRegistry, JtaPlatform.class )
 				.retrieveTransactionManager();
 		TransactionCoordinatorBuilder transactionCoordinatorBuilder =
 				HibernateOrmUtils.getServiceOrFail( serviceRegistry, TransactionCoordinatorBuilder.class );
 		this.useJta = shouldUseJta( transactionManager, transactionCoordinatorBuilder );
+		this.transactionTimeout = transactionTimeout;
 	}
 
-	public void inTransaction(SharedSessionContractImplementor session, Integer transactionTimeout,
+	public void inTransaction(SharedSessionContractImplementor session,
 			Consumer<SharedSessionContractImplementor> procedure) {
-		begin( session, transactionTimeout );
+		begin( session );
 		try {
 			procedure.accept( session );
 		}
@@ -60,9 +62,9 @@ public final class TransactionHelper {
 		commit( session );
 	}
 
-	public <T> T inTransaction(SharedSessionContractImplementor session, Integer transactionTimeout,
+	public <T> T inTransaction(SharedSessionContractImplementor session,
 			Function<SharedSessionContractImplementor, T> function) {
-		begin( session, transactionTimeout );
+		begin( session );
 
 		T result;
 		try {
@@ -76,7 +78,7 @@ public final class TransactionHelper {
 		return result;
 	}
 
-	public void begin(SharedSessionContractImplementor session, Integer transactionTimeout) {
+	public void begin(SharedSessionContractImplementor session) {
 		try {
 			if ( useJta ) {
 				if ( transactionTimeout != null ) {
