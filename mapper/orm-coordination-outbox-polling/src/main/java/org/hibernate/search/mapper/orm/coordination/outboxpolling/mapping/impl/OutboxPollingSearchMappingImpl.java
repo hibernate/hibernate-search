@@ -39,7 +39,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 	public OutboxPollingSearchMappingImpl(CoordinationStrategyStartContext context,
 			TenancyConfiguration tenancyConfiguration) {
 		this.sessionFactory = context.mapping().sessionFactory();
-		this.transactionHelper = new TransactionHelper( sessionFactory );
+		this.transactionHelper = new TransactionHelper( sessionFactory, null );
 		this.tenancyConfiguration = tenancyConfiguration;
 		this.tenantIds = this.tenancyConfiguration.tenantIdsOrFail();
 	}
@@ -49,7 +49,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkNoTenant();
 
 		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.getSingleResult();
@@ -62,7 +62,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkTenant( tenantId );
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.getSingleResult();
@@ -75,7 +75,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkNoTenant();
 
 		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
 				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
@@ -89,7 +89,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkTenant( tenantId );
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
 				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
@@ -103,7 +103,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkNoTenant();
 
 		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
 				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.executeUpdate();
@@ -116,7 +116,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkTenant( tenantId );
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, null, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
 				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.executeUpdate();

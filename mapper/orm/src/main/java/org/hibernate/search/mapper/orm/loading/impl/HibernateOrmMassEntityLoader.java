@@ -34,7 +34,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 		this.options = options;
 		this.sink = sink;
 		this.session = session;
-		this.transactionHelper = new TransactionHelper( session.getSessionFactory() );
+		this.transactionHelper = new TransactionHelper( session.getSessionFactory(), null );
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 
 	@Override
 	public void load(List<I> identifiers) throws InterruptedException {
-		transactionHelper.begin( session, null );
+		transactionHelper.begin( session );
 		try {
 			sink.accept( typeQueryLoader.uniquePropertyIsTheEntityId() ?
 					multiLoad( identifiers ) : queryByIds( identifiers ) );
