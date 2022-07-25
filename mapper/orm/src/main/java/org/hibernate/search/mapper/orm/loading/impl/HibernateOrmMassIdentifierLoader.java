@@ -38,9 +38,9 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 		this.options = options;
 		this.sink = sink;
 		this.session = session;
-		this.transactionHelper = new TransactionHelper( session.getFactory() );
+		this.transactionHelper = new TransactionHelper( session.getFactory(), options.idLoadingTransactionTimeout() );
 
-		transactionHelper.begin( session, options.idLoadingTransactionTimeout() );
+		transactionHelper.begin( session );
 
 		try {
 			long objectsLimit = options.objectsLimit();
