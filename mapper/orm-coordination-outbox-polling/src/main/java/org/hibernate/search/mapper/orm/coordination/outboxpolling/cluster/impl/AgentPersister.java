@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -40,34 +38,18 @@ public final class AgentPersister {
 		this.selfReference = selfReference;
 	}
 
-	public Agent extractSelf(List<Agent> allAgentsInIdOrder) {
+	public Agent findSelf(AgentRepository agentRepository) {
 		if ( selfReference != null ) {
-			for ( Agent agent : allAgentsInIdOrder ) {
-				if ( agent.getId().equals( selfReference.id ) ) {
-					return agent;
-				}
-			}
+			return agentRepository.find( selfReference.id );
 		}
 		return null;
 	}
 
-	public Agent createSelf(AgentRepository agentRepository, List<Agent> allAgentsInIdOrder, Instant expiration) {
+	public void createSelf(AgentRepository agentRepository, Instant expiration) {
 		Agent self = new Agent( type, name, expiration, AgentState.SUSPENDED, staticShardAssignment );
 		agentRepository.create( self );
 		selfReference = self.getReference();
-		ListIterator<Agent> it = allAgentsInIdOrder.listIterator();
-		// Find the position where self should be inserted
-		while ( it.hasNext() ) {
-			if ( it.next().getId() >= self.getId() ) {
-				if ( it.hasPrevious() ) {
-					it.previous();
-				}
-				break;
-			}
-		}
-		// Insert self
-		it.add( self );
-		return self;
+		log.infof( "Agent '%s': registering", selfReference );
 	}
 
 	public void leaveCluster(AgentRepository store) {
