@@ -405,7 +405,7 @@
         <version.sonar.plugin>3.9.1.2184</version.sonar.plugin>
         <version.scripting.plugin>3.0.0</version.scripting.plugin>
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
-        <version.org.codehaus.groovy-jsr223>3.0.11</version.org.codehaus.groovy-jsr223>
+        <version.org.codehaus.groovy-jsr223>3.0.12</version.org.codehaus.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>10.3.1</version.com.puppycrawl.tools.checkstyle>
 
         <!-- Asciidoctor -->
