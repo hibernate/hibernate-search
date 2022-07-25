@@ -378,7 +378,7 @@
         <version.exec.plugin>3.1.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.3</version.forbiddenapis.plugin>
         <version.help.plugin>3.2.0</version.help.plugin>
-        <version.install.plugin>2.5.2</version.install.plugin>
+        <version.install.plugin>3.0.1</version.install.plugin>
         <version.io.takari.maven>0.7.7</version.io.takari.maven>
         <version.jandex.plugin>1.2.3</version.jandex.plugin>
         <version.japicmp.plugin>0.15.7</version.japicmp.plugin>
