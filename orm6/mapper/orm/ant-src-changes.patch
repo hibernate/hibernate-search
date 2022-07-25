@@ -132,7 +132,7 @@ index 21503d08be..45b9fc0a50 100644
  		}
  		return result;
 diff --git a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
-index 39df0c5a24..159eb3207c 100644
+index 61cf2863dc..033ccecf9e 100644
 --- a/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 +++ b/main/java/org/hibernate/search/mapper/orm/loading/impl/HibernateOrmMassIdentifierLoader.java
 @@ -29,7 +29,7 @@
@@ -581,10 +581,10 @@ index 355980c45a..6489423a9c 100644
  					|| isWholePath && isAssociation( containedValueClass ) ) {
  				pathsAsStrings.add( propertyNode.toPropertyString() );
 diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-index c8ca89a1e0..9b2ef89c32 100644
+index c8ca89a1e0..f7140b4d52 100644
 --- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 +++ b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
-@@ -7,52 +7,45 @@
+@@ -7,52 +7,48 @@
  package org.hibernate.search.mapper.orm.search.query.impl;
  
  import java.lang.invoke.MethodHandles;
@@ -636,24 +636,25 @@ index c8ca89a1e0..9b2ef89c32 100644
  import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 -import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
  import org.hibernate.search.util.common.SearchTimeoutException;
--import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
+ import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 -import org.hibernate.transform.ResultTransformer;
 -import org.hibernate.type.Type;
  
 -@SuppressForbiddenApis(reason = "We need to extend the internal AbstractProducedQuery"
--		+ " in order to implement a org.hibernate.query.Query")
 +import jakarta.persistence.LockModeType;
 +import jakarta.persistence.PersistenceException;
 +import jakarta.persistence.QueryTimeoutException;
 +
++@SuppressForbiddenApis(reason = "We need to use the internal QueryOptionsImpl"
+ 		+ " in order to implement a org.hibernate.query.Query")
  @SuppressWarnings("unchecked") // For some reason javac issues warnings for all methods returning this; IDEA doesn't.
 -public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQuery<R> {
 +public final class HibernateOrmSearchQueryAdapter<R> extends AbstractQuery<R> {
  
  	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
  		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
-@@ -61,15 +54,16 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
+@@ -61,15 +57,16 @@ public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query)
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
  	private final SearchQueryImplementor<R> delegate;
@@ -674,7 +675,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  		this.loadingOptions = loadingOptions;
  	}
  
-@@ -84,83 +78,26 @@ public String toString() {
+@@ -84,83 +81,26 @@ public String toString() {
  
  	@Override
  	@SuppressWarnings("unchecked")
@@ -765,7 +766,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  	}
  
  	@Override
-@@ -168,6 +105,11 @@ public String getQueryString() {
+@@ -168,6 +108,11 @@ public String getQueryString() {
  		return delegate.queryString();
  	}
  
@@ -777,7 +778,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  	@Override
  	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
  		switch ( hintName ) {
-@@ -180,14 +122,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
+@@ -180,14 +125,12 @@ public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value)
  				break;
  			case HibernateOrmSearchQueryHints.JAVAX_FETCHGRAPH:
  			case HibernateOrmSearchQueryHints.JAKARTA_FETCHGRAPH:
@@ -794,7 +795,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  				break;
  		}
  		return this;
-@@ -200,148 +140,104 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
+@@ -200,148 +143,104 @@ public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
  	}
  
  	@Override
@@ -995,7 +996,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  		throw parametersNoSupported();
  	}
  
-@@ -350,18 +246,16 @@ private UnsupportedOperationException parametersNoSupported() {
+@@ -350,18 +249,16 @@ private UnsupportedOperationException parametersNoSupported() {
  	}
  
  	@Override
@@ -1019,7 +1020,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
  	}
  
-@@ -391,7 +285,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
+@@ -391,7 +288,12 @@ private UnsupportedOperationException lockOptionsNotSupported() {
  	}
  
  	@Override
@@ -1033,7 +1034,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
  	}
  
-@@ -400,30 +299,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
+@@ -400,30 +302,6 @@ public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lock
  		throw lockOptionsNotSupported();
  	}
  
@@ -1064,7 +1065,7 @@ index c8ca89a1e0..9b2ef89c32 100644
  	private static long hintValueToLong(Object value) {
  		if ( value instanceof Number ) {
  			return ( (Number) value ).longValue();
-@@ -442,8 +317,4 @@ private static int hintValueToInteger(Object value) {
+@@ -442,8 +320,4 @@ private static int hintValueToInteger(Object value) {
  		}
  	}
  
