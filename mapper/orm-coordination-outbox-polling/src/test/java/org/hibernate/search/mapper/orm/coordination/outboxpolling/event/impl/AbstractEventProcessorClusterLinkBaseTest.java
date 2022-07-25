@@ -172,7 +172,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 	public void noOtherAgent() {
 		repositoryMockHelper.defineOtherAgents();
 
-		onNoOtherAgents().verify( link.pulse( repositoryMock ) );
+		onNoOtherAgents().verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -188,7 +188,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( contextMock ) );
 
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( other2Id(), other3Id() ) );
 	}
@@ -203,7 +203,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -216,7 +216,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -229,7 +229,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
+		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -242,7 +242,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -255,7 +255,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.SUSPENDED,
 						isOther3Static() ? otherShardAssignmentIn4NodeCluster( 3 ) : null );
 
-		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( repositoryMock ) );
+		expectWaiting( selfShardAssignmentIn4NodeCluster() ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -268,7 +268,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.WAITING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
+		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -281,7 +281,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 				.other( other3Id(), other3Type(), LATER, AgentState.RUNNING,
 						otherShardAssignmentIn4NodeCluster( 3 ) );
 
-		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( repositoryMock ) );
+		onClusterWith4NodesAllOther3NodesReady().verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -298,7 +298,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( contextMock ) );
 
 		// Cleaning up expired agents takes precedence over suspending because a mass indexing agent exists.
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( other2Id(), other3Id() ) );
@@ -317,7 +317,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 
 		// The presence of a mass indexing agent is more important than rebalancing:
 		// we expect the agent to suspend itself.
-		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -331,7 +331,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 						otherShardAssignmentIn4NodeCluster( 3 ) )
 				.other( MASS_INDEXING_ID, AgentType.MASS_INDEXING, LATER, AgentState.RUNNING );
 
-		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -348,7 +348,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 		// Suspended mass indexing agents should not exist,
 		// but just for the sake of fully defining the behavior,
 		// we'll say they prevent automatic indexing too.
-		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -365,7 +365,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 		// Rebalancing mass indexing agents should not exist,
 		// but just for the sake of fully defining the behavior,
 		// we'll say they prevent automatic indexing too.
-		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectSuspendedAndPulseAfterDelay( PULSE_INTERVAL ).verify( link.pulse( contextMock ) );
 	}
 
 	@Test
@@ -382,7 +382,7 @@ abstract class AbstractEventProcessorClusterLinkBaseTest extends AbstractEventPr
 		// Do not update the agent, in order to avoid locks on Oracle in particular (maybe others);
 		// see the comment in AbstractAgentClusterLink#pulse.
 		// We will assess the situation in the next pulse.
-		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( repositoryMock ) );
+		expectInitialStateAndPulseAfterDelay( POLLING_INTERVAL ).verify( link.pulse( contextMock ) );
 
 		verify( repositoryMock ).delete( repositoryMockHelper.agentsInIdOrder( MASS_INDEXING_ID ) );
 	}
