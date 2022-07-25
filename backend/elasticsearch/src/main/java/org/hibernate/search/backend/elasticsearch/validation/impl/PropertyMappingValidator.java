@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {
@@ -68,11 +69,13 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 	private void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
 		LeafValidators.EQUAL.validateWithDefault(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "analyzer",
-				expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default"
+				expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), AnalyzerNames.DEFAULT
 		);
-		LeafValidators.EQUAL.validate(
+		LeafValidators.EQUAL.validateWithDefault(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "search_analyzer",
-				expectedMapping.getSearchAnalyzer(), actualMapping.getSearchAnalyzer()
+				expectedMapping.getSearchAnalyzer(), actualMapping.getSearchAnalyzer(),
+				expectedMapping.getAnalyzer() == null ? AnalyzerNames.DEFAULT : expectedMapping.getAnalyzer(),
+				actualMapping.getAnalyzer() == null ? AnalyzerNames.DEFAULT : actualMapping.getAnalyzer()
 		);
 		LeafValidators.EQUAL.validate(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "normalizer",
