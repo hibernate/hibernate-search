@@ -24,6 +24,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
+import org.hibernate.search.mapper.orm.common.spi.SessionHelper;
 import org.hibernate.search.mapper.orm.common.spi.TransactionHelper;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
@@ -143,7 +144,6 @@ public final class OutboxPollingEventProcessor {
 
 	private final String name;
 	private final AutomaticIndexingMappingContext mapping;
-	private final String tenantId;
 	private final long pollingInterval;
 	private final int batchSize;
 	private final int retryDelay;
@@ -152,6 +152,7 @@ public final class OutboxPollingEventProcessor {
 	private final AgentRepositoryProvider agentRepositoryProvider;
 	private final OutboxPollingEventProcessorClusterLink clusterLink;
 	private final TransactionHelper transactionHelper;
+	private final SessionHelper sessionHelper;
 	private final FailureHandler failureHandler;
 	private final Worker worker;
 	private final SingletonTask processingTask;
@@ -162,7 +163,7 @@ public final class OutboxPollingEventProcessor {
 			OutboxPollingEventProcessorClusterLink clusterLink) {
 		this.name = name;
 		this.mapping = factory.mapping;
-		this.tenantId = factory.tenantId;
+		String tenantId = factory.tenantId;
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		this.batchSize = factory.batchSize;
 		this.retryDelay = factory.retryDelay;
@@ -170,6 +171,7 @@ public final class OutboxPollingEventProcessor {
 		this.clusterLink = clusterLink;
 
 		transactionHelper = new TransactionHelper( mapping.sessionFactory(), factory.transactionTimeout );
+		sessionHelper = new SessionHelper( mapping.sessionFactory(), transactionHelper, tenantId );
 		failureHandler = mapping.failureHandler();
 		this.worker = new Worker();
 		processingTask = new SingletonTask(
@@ -204,21 +206,10 @@ public final class OutboxPollingEventProcessor {
 	}
 
 	private void leaveCluster() {
-		try ( SessionImplementor session = openSession() ) {
-			transactionHelper.begin( session );
-			try {
-				AgentRepository agentRepository = agentRepositoryProvider.create( session );
-				clusterLink.leaveCluster( agentRepository );
-				transactionHelper.commit( session );
-			}
-			catch (RuntimeException e) {
-				transactionHelper.rollbackSafely( session, e );
-			}
-		}
-	}
-
-	private SessionImplementor openSession() {
-		return (SessionImplementor) mapping.sessionFactory().withOptions().tenantIdentifier( tenantId ).openSession();
+		sessionHelper.inSessionAndTransaction( session -> {
+			AgentRepository agentRepository = agentRepositoryProvider.create( session );
+			clusterLink.leaveCluster( agentRepository );
+		} );
 	}
 
 	private class Worker implements SingletonTask.Worker {
@@ -233,12 +224,10 @@ public final class OutboxPollingEventProcessor {
 			if ( instructions == null || !instructions.isStillValid() ) {
 				// Never perform event processing in the same transaction as a pulse,
 				// to reduce transaction contention.
-				try ( SessionImplementor session = openSession() ) {
-					transactionHelper.inTransaction( session, () -> {
-						AgentRepository agentRepository = agentRepositoryProvider.create( session );
-						instructions = clusterLink.pulse( agentRepository );
-					} );
-				}
+				sessionHelper.inSessionAndTransaction( session -> {
+					AgentRepository agentRepository = agentRepositoryProvider.create( session );
+					instructions = clusterLink.pulse( agentRepository );
+				} );
 			}
 
 			// Optimization: don't even try to open a transaction/session for event processing
@@ -249,7 +238,7 @@ public final class OutboxPollingEventProcessor {
 				return CompletableFuture.completedFuture( null );
 			}
 
-			try ( SessionImplementor session = openSession() ) {
+			try ( SessionImplementor session = sessionHelper.openSession() ) {
 				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
 				transactionHelper.inTransaction( session, () -> {
 					Optional<OutboxEventFinder> eventFinder = instructions.eventFinder;
