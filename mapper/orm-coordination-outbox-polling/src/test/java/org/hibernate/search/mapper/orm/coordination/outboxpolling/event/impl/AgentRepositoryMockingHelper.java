@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
@@ -19,14 +20,15 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
 import org.mockito.ArgumentCaptor;
@@ -37,7 +39,7 @@ class AgentRepositoryMockingHelper {
 
 	private final List<Agent> otherAgents = new ArrayList<>();
 	private Supplier<Agent> selfSupplier = null;
-	private boolean selfPreExisting;
+	private BooleanSupplier selfExists;
 	private AgentState selfInitialState;
 	private Instant selfInitialExpiration;
 	private ShardAssignmentDescriptor selfInitialShardAssignment;
@@ -49,7 +51,7 @@ class AgentRepositoryMockingHelper {
 	void defineSelfCreatedByPulse(long selfId) {
 		ArgumentCaptor<Agent> selfCaptor = ArgumentCaptor.forClass( Agent.class );
 		selfSupplier = selfCaptor::getValue;
-		selfPreExisting = false;
+		selfExists = () -> !selfCaptor.getAllValues().isEmpty();
 		selfInitialState = null;
 		selfInitialExpiration = null;
 		selfInitialShardAssignment = null;
@@ -59,14 +61,17 @@ class AgentRepositoryMockingHelper {
 			return agent;
 		} )
 				.when( repositoryMock ).create( selfCaptor.capture() );
+		doAnswer( invocation -> selfExists.getAsBoolean() ? selfSupplier.get() : null )
+				.when( repositoryMock ).find( selfId );
 	}
 
 	void defineSelfPreExisting(Agent self) {
 		selfSupplier = () -> self;
-		selfPreExisting = true;
+		selfExists = () -> true;
 		selfInitialState = self.getState();
 		selfInitialExpiration = self.getExpiration();
 		selfInitialShardAssignment = self.getShardAssignment();
+		doReturn( self ).when( repositoryMock ).find( self.getId() );
 	}
 
 	AllAgentsDefinition defineOtherAgents() {
@@ -77,13 +82,13 @@ class AgentRepositoryMockingHelper {
 	Agent self() {
 		if ( selfSupplier == null ) {
 			throw new Error(
-					"You must call either expectSelfCreatedByPulse() or expectSelfPreExisting() before the test" );
+					"You must call either defineSelfCreatedByPulse() or defineSelfPreExisting() before the test" );
 		}
 		return selfSupplier.get();
 	}
 
 	List<Agent> allAgentsInIdOrder() {
-		return Stream.concat( otherAgents.stream(), selfPreExisting ? Stream.of( self() ) : Stream.empty() )
+		return Stream.concat( otherAgents.stream(), selfExists.getAsBoolean() ? Stream.of( selfSupplier.get() ) : Stream.empty() )
 				.sorted( Comparator.comparing( Agent::getId ) )
 				.collect( Collectors.toList() );
 	}

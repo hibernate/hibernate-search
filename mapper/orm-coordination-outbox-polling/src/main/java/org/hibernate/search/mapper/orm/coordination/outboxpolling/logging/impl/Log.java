@@ -160,4 +160,9 @@ public interface Log extends BasicLogger {
 			value = "Multi-tenancy is not enabled but a tenant id is specified. Trying to use the tenant id: '%1$s'.")
 	SearchException multiTenancyNotEnabled(String tenantId);
 
+	@Message(id = ID_OFFSET + 28, value = "Agent '%1$s': could not find the agent after starting a new transaction."
+			+ " The agent was present just a moment ago."
+			+ " Either this problem is a rare occurrence, or the pulse expiration delay is too short.")
+	SearchException agentRegistrationIneffective(AgentReference agentReference);
+
 }
