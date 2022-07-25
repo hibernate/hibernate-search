@@ -148,7 +148,6 @@ public final class OutboxPollingEventProcessor {
 	private final String tenantId;
 	private final long pollingInterval;
 	private final int batchSize;
-	private final Integer transactionTimeout;
 	private final int retryDelay;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
@@ -168,12 +167,11 @@ public final class OutboxPollingEventProcessor {
 		this.tenantId = factory.tenantId;
 		this.pollingInterval = factory.pollingInterval.toMillis();
 		this.batchSize = factory.batchSize;
-		this.transactionTimeout = factory.transactionTimeout;
 		this.retryDelay = factory.retryDelay;
 		this.agentRepositoryProvider = agentRepositoryProvider;
 		this.clusterLink = clusterLink;
 
-		transactionHelper = new TransactionHelper( mapping.sessionFactory() );
+		transactionHelper = new TransactionHelper( mapping.sessionFactory(), factory.transactionTimeout );
 		failureHandler = mapping.failureHandler();
 		this.worker = new Worker();
 		processingTask = new SingletonTask(
@@ -209,7 +207,7 @@ public final class OutboxPollingEventProcessor {
 
 	private void leaveCluster() {
 		try ( SessionImplementor session = openSession() ) {
-			transactionHelper.begin( session, transactionTimeout );
+			transactionHelper.begin( session );
 			try {
 				AgentRepository agentRepository = agentRepositoryProvider.create( session );
 				clusterLink.leaveCluster( agentRepository );
@@ -244,7 +242,7 @@ public final class OutboxPollingEventProcessor {
 
 			try ( SessionImplementor session = openSession() ) {
 				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
-				transactionHelper.inTransaction( session, transactionTimeout, s -> {
+				transactionHelper.inTransaction( session, s -> {
 					if ( instructions == null || !instructions.isStillValid() ) {
 						AgentRepository agentRepository = agentRepositoryProvider.create( session );
 						instructions = clusterLink.pulse( agentRepository );
@@ -290,7 +288,7 @@ public final class OutboxPollingEventProcessor {
 				// For more information, see
 				// org.hibernate.search.mapper.orm.coordination.outboxpolling.impl.OutboxEventLoader.tryLoadLocking
 				while ( eventUpdater.thereAreStillEventsToProcess() ) {
-					transactionHelper.inTransaction( session, transactionTimeout,
+					transactionHelper.inTransaction( session,
 							(Consumer<SharedSessionContractImplementor>) s -> eventUpdater.process()
 					);
 				}
