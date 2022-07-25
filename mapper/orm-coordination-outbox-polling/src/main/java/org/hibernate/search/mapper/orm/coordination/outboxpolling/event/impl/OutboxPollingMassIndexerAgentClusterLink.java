@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentPersister;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ClusterDescriptor;
@@ -43,16 +42,17 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 	}
 
 	@Override
-	protected OutboxPollingMassIndexingInstructions doPulse(AgentRepository agentRepository, Instant now,
-			List<Agent> allAgentsInIdOrder, Agent self) {
+	protected WriteAction<OutboxPollingMassIndexingInstructions> doPulse(List<Agent> allAgentsInIdOrder, Agent currentSelf) {
 		List<Agent> eventProcessors = allAgentsInIdOrder.stream()
 				.filter( a -> AgentType.EVENT_PROCESSING.contains( a.getType() ) )
 				.collect( Collectors.toList() );
 
 		// Check whether event processors acknowledged our existence by suspending themselves.
 		if ( !eventProcessorsAreSuspended( eventProcessors ) ) {
-			agentPersister.setWaiting( self, SINGLE_NODE_CLUSTER_DESCRIPTOR, SINGLE_NODE_SHARD_ASSIGNMENT );
-			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
+			return (now, self, agentPersister) -> {
+				agentPersister.setWaiting( self, SINGLE_NODE_CLUSTER_DESCRIPTOR, SINGLE_NODE_SHARD_ASSIGNMENT );
+				return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
+			};
 		}
 
 		// Ensure that we won't just spawn the agent directly in the RUNNING state,
@@ -64,14 +64,18 @@ public final class OutboxPollingMassIndexerAgentClusterLink
 		// By requiring at least two transactions to switch from "just spawned" to RUNNING,
 		// we make sure that on the second transaction,
 		// one of those agents would see the other and take it into account.
-		if ( AgentState.SUSPENDED.equals( self.getState() ) ) {
-			agentPersister.setWaiting( self, SINGLE_NODE_CLUSTER_DESCRIPTOR, SINGLE_NODE_SHARD_ASSIGNMENT );
-			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
+		if ( AgentState.SUSPENDED.equals( currentSelf.getState() ) ) {
+			return (now, self, agentPersister) -> {
+				agentPersister.setWaiting( self, SINGLE_NODE_CLUSTER_DESCRIPTOR, SINGLE_NODE_SHARD_ASSIGNMENT );
+				return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
+			};
 		}
 
 		// If all the conditions above are satisfied, then we can start mass indexing.
-		agentPersister.setRunning( self, SINGLE_NODE_CLUSTER_DESCRIPTOR );
-		return instructProceedWithMassIndexing( now );
+		return (now, self, agentPersister) -> {
+			agentPersister.setRunning( self, SINGLE_NODE_CLUSTER_DESCRIPTOR );
+			return instructProceedWithMassIndexing( now );
+		};
 	}
 
 	private boolean eventProcessorsAreSuspended(List<Agent> eventProcessors) {

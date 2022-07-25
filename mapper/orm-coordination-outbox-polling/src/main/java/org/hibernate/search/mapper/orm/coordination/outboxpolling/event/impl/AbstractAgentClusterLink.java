@@ -11,13 +11,13 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentPersister;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentReference;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -29,9 +29,8 @@ abstract class AbstractAgentClusterLink<R> {
 	protected final Duration pollingInterval;
 	protected final Duration pulseInterval;
 	protected final Duration pulseExpiration;
+	private final AgentPersister agentPersister;
 
-	// Accessible for test purposes
-	final AgentPersister agentPersister;
 
 	public AbstractAgentClusterLink(AgentPersister agentPersister,
 			FailureHandler failureHandler, Clock clock,
@@ -48,11 +47,8 @@ abstract class AbstractAgentClusterLink<R> {
 		Agent self = ensureRegistered( context );
 
 		// In order to avoid transaction deadlocks with some RDBMS (yes, I mean SQL Server),
-		// we make sure that *all* reads (listing all agents) happen before the write (updating self).
-		// I'm not entirely sure, but I think it goes like this:
-		// if we read, then write, then read again, then the second read can trigger a deadlock,
-		// with each transaction holding a write lock on some rows
-		// while waiting for a read lock on the whole table.
+		// we make sure that reads listing other agents always happen in a different transaction
+		// than writes.
 		List<Agent> allAgentsInIdOrder = context.agentRepository().findAllOrderById();
 
 		Instant now = clock.instant();
@@ -69,44 +65,61 @@ abstract class AbstractAgentClusterLink<R> {
 		// then the first agent tries to delete the second agent because it expired,
 		// then the second agent tries to delete the first agent because it expired,
 		// all in the same transaction,  well... here you have a deadlock.
+		Instant expirationLimit = now;
 		List<Agent> timedOutAgents = allAgentsInIdOrder.stream()
-				.filter( a -> !a.equals( self ) && a.getExpiration().isBefore( now ) )
+				.filter( Predicate.isEqual( self ).negate() ) // Ignore self: if expired, we'll correct that.
+				.filter( a -> a.getExpiration().isBefore( expirationLimit ) )
 				.collect( Collectors.toList() );
 		if ( !timedOutAgents.isEmpty() ) {
 			log.removingTimedOutAgents( selfReference(), timedOutAgents );
 			context.agentRepository().delete( timedOutAgents );
-			log.infof( "Agent '%s': reassessing the new situation in the next pulse",
-					selfReference(), now
-			);
+			log.infof( "Agent '%s': reassessing the new situation in the next pulse", selfReference() );
 			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
-		// Delay expiration in each pulse
-		self.setExpiration( newExpiration );
+		// Determine what needs to be done
+		WriteAction<R> pulseResult = doPulse( allAgentsInIdOrder, self );
 
-		return doPulse( context.agentRepository(), now, allAgentsInIdOrder, self );
+		// Write actions are always executed in a new transaction,
+		// so that the risk of deadlocks (see above) is minimal,
+		// and transactions are shorter (for lower transaction contention,
+		// important on CockroachDB in particular:
+		// https://www.cockroachlabs.com/docs/v22.1/transactions#transaction-contention ).
+		context.commitAndBeginNewTransaction();
+		now = clock.instant();
+		self = findSelfExpectRegistered( context );
+		// Delay expiration with each write
+		self.setExpiration( now.plus( pulseExpiration ) );
+		R instructions = pulseResult.applyAndReturnInstructions( now, self, agentPersister );
+		log.tracef( "Agent '%s': ending pulse at %s with self = %s",
+				selfReference(), now, self );
+		return instructions;
 	}
 
 	private Agent ensureRegistered(AgentClusterLinkContext context) {
-		Instant now = clock.instant();
 		Agent self = agentPersister.findSelf( context.agentRepository() );
 		if ( self == null ) {
+			Instant now = clock.instant();
 			agentPersister.createSelf( context.agentRepository(), now.plus( pulseExpiration ) );
 			// Make sure the transaction *only* registers the agent,
 			// so that the risk of deadlocks (see below) is minimal
 			// and other agents are made aware of this agent as soon as possible.
 			// This avoids unnecessary rebalancing when multiple nodes start in quick succession.
 			context.commitAndBeginNewTransaction();
-			self = agentPersister.findSelf( context.agentRepository() );
-			if ( self == null ) {
-				throw log.agentRegistrationIneffective( selfReference() );
-			}
+			self = findSelfExpectRegistered( context );
 		}
 		return self;
 	}
 
-	protected abstract R doPulse(AgentRepository agentRepository, Instant now,
-			List<Agent> allAgentsInIdOrder, Agent self);
+	private Agent findSelfExpectRegistered(AgentClusterLinkContext context) {
+		Agent self = agentPersister.findSelf( context.agentRepository() );
+		if ( self == null ) {
+			throw log.agentRegistrationIneffective( selfReference() );
+		}
+		return self;
+	}
+
+	protected abstract WriteAction<R> doPulse(List<Agent> allAgentsInIdOrder, Agent self);
 
 	/**
 	 * Instructs the processor to commit the transaction, wait for the given delay, then pulse again.
@@ -129,4 +142,11 @@ abstract class AbstractAgentClusterLink<R> {
 		return agentPersister.selfReference();
 	}
 
+	final AgentPersister getAgentPersisterForTests() {
+		return agentPersister;
+	}
+
+	protected interface WriteAction<R> {
+		R applyAndReturnInstructions(Instant now, Agent self, AgentPersister agentPersister);
+	}
 }

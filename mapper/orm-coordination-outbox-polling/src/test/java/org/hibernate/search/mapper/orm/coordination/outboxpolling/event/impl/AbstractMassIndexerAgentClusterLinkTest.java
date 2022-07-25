@@ -86,13 +86,13 @@ abstract class AbstractMassIndexerAgentClusterLinkTest {
 	}
 
 	protected void defineSelfNotCreatedYet(OutboxPollingMassIndexerAgentClusterLink link) {
-		link.agentPersister.setSelfReferenceForTests( null );
+		link.getAgentPersisterForTests().setSelfReferenceForTests( null );
 		repositoryMockHelper.defineSelfCreatedByPulse( SELF_ID );
 	}
 
 	protected void defineSelfCreatedAndStillPresent(OutboxPollingMassIndexerAgentClusterLink link,
 			AgentState state) {
-		link.agentPersister.setSelfReferenceForTests( SELF_REF );
+		link.getAgentPersisterForTests().setSelfReferenceForTests( SELF_REF );
 		Agent self = new Agent( AgentType.MASS_INDEXING, SELF_REF.name, NOW, state, null );
 		self.setId( SELF_ID );
 		repositoryMockHelper.defineSelfPreExisting( self );

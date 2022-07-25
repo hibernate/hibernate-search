@@ -98,13 +98,13 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	}
 
 	protected void defineSelfNotCreatedYet(OutboxPollingEventProcessorClusterLink link) {
-		link.agentPersister.setSelfReferenceForTests( null );
+		link.getAgentPersisterForTests().setSelfReferenceForTests( null );
 		repositoryMockHelper.defineSelfCreatedByPulse( SELF_ID );
 	}
 
 	protected void defineSelfCreatedAndStillPresent(OutboxPollingEventProcessorClusterLink link,
 			AgentState state, ShardAssignmentDescriptor shardAssignment) {
-		link.agentPersister.setSelfReferenceForTests( SELF_REF );
+		link.getAgentPersisterForTests().setSelfReferenceForTests( SELF_REF );
 		AgentType type;
 		if ( link.shardAssignmentIsStatic ) {
 			type = AgentType.EVENT_PROCESSING_STATIC_SHARDING;
