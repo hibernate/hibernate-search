@@ -200,7 +200,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 			}
 
 			try ( SessionImplementor session = openSession() ) {
-				transactionHelper.inTransaction( session, s -> {
+				transactionHelper.inTransaction( session, () -> {
 					if ( instructions == null || !instructions.isStillValid() ) {
 						AgentRepository agentRepository = agentRepositoryProvider.create( session );
 						instructions = clusterLink.pulse( agentRepository );

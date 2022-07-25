@@ -49,7 +49,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkNoTenant();
 
 		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.getSingleResult();
@@ -62,7 +62,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkTenant( tenantId );
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<Long> query = session.createQuery( COUNT_EVENTS_WITH_STATUS, Long.class );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.getSingleResult();
@@ -75,7 +75,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkNoTenant();
 
 		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
@@ -89,7 +89,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkTenant( tenantId );
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<?> query = session.createQuery( UPDATE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				query.setParameter( "newStatus", OutboxEvent.Status.PENDING );
@@ -103,7 +103,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkNoTenant();
 
 		try ( Session session = sessionFactory.openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.executeUpdate();
@@ -116,7 +116,7 @@ public class OutboxPollingSearchMappingImpl implements OutboxPollingSearchMappin
 		checkTenant( tenantId );
 
 		try ( Session session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession() ) {
-			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, s -> {
+			return transactionHelper.inTransaction( (SharedSessionContractImplementor) session, () -> {
 				Query<?> query = session.createQuery( DELETE_EVENTS_WITH_STATUS );
 				query.setParameter( "status", OutboxEvent.Status.ABORTED );
 				return query.executeUpdate();
