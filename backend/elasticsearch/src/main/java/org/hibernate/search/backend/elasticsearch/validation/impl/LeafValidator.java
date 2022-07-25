@@ -27,8 +27,18 @@ abstract class LeafValidator<T> {
 	public final void validateWithDefault(ValidationErrorCollector errorCollector,
 			ValidationContextType type, String name,
 			T expected, T actual, T defaultValueForNulls) {
-		T defaultedExpected = expected == null ? defaultValueForNulls : expected;
-		T defaultedActual = actual == null ? defaultValueForNulls : actual;
+		validateWithDefault( errorCollector, type, name, expected, actual, defaultValueForNulls, defaultValueForNulls );
+	}
+
+	/*
+	 * Validate that two values are equal, using a given default value when null is encountered on either value.
+	 * Useful to take into account the fact that Elasticsearch has default values for attributes.
+	 */
+	public final void validateWithDefault(ValidationErrorCollector errorCollector,
+			ValidationContextType type, String name,
+			T expected, T actual, T defaultValueForExpectedNull, T defaultValueForActualNull) {
+		T defaultedExpected = expected == null ? defaultValueForExpectedNull : expected;
+		T defaultedActual = actual == null ? defaultValueForActualNull : actual;
 		if ( defaultedExpected == defaultedActual ) {
 			// Covers null == null
 			return;
