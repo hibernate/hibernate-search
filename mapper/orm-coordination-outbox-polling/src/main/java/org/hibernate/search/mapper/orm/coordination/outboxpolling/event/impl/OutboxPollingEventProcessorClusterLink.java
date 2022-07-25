@@ -184,6 +184,10 @@ public final class OutboxPollingEventProcessorClusterLink
 	}
 
 	private boolean excludedAgentsAreOutOfCluster(List<Agent> excludedAgents) {
+		if ( excludedAgents.isEmpty() ) {
+			return true;
+		}
+
 		AgentState expectedState = AgentState.SUSPENDED;
 		for ( Agent agent : excludedAgents ) {
 			if ( !expectedState.equals( agent.getState() ) ) {
