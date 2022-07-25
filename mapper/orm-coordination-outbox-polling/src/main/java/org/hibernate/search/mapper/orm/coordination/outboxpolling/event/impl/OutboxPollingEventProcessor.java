@@ -16,10 +16,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -236,7 +234,7 @@ public final class OutboxPollingEventProcessor {
 				// Never perform event processing in the same transaction as a pulse,
 				// to reduce transaction contention.
 				try ( SessionImplementor session = openSession() ) {
-					transactionHelper.inTransaction( session, s -> {
+					transactionHelper.inTransaction( session, () -> {
 						AgentRepository agentRepository = agentRepositoryProvider.create( session );
 						instructions = clusterLink.pulse( agentRepository );
 					} );
@@ -253,7 +251,7 @@ public final class OutboxPollingEventProcessor {
 
 			try ( SessionImplementor session = openSession() ) {
 				final OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan( mapping, session );
-				transactionHelper.inTransaction( session, s -> {
+				transactionHelper.inTransaction( session, () -> {
 					Optional<OutboxEventFinder> eventFinder = instructions.eventFinder;
 					if ( !eventFinder.isPresent() ) {
 						// Processing is disabled for the time being.
@@ -295,9 +293,7 @@ public final class OutboxPollingEventProcessor {
 				// For more information, see
 				// org.hibernate.search.mapper.orm.coordination.outboxpolling.impl.OutboxEventLoader.tryLoadLocking
 				while ( eventUpdater.thereAreStillEventsToProcess() ) {
-					transactionHelper.inTransaction( session,
-							(Consumer<SharedSessionContractImplementor>) s -> eventUpdater.process()
-					);
+					transactionHelper.inTransaction( session, eventUpdater::process );
 				}
 
 				return CompletableFuture.completedFuture( null );
