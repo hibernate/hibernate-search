@@ -44,7 +44,7 @@ abstract class AbstractAgentClusterLink<R> {
 		this.pulseExpiration = pulseExpiration;
 	}
 
-	public final R pulse(AgentRepository agentRepository) {
+	public final R pulse(AgentClusterLinkContext context) {
 		Instant now = clock.instant();
 		Instant newExpiration = now.plus( pulseExpiration );
 
@@ -54,7 +54,7 @@ abstract class AbstractAgentClusterLink<R> {
 		// if we read, then write, then read again, then the second read can trigger a deadlock,
 		// with each transaction holding a write lock on some rows
 		// while waiting for a read lock on the whole table.
-		List<Agent> allAgentsInIdOrder = agentRepository.findAllOrderById();
+		List<Agent> allAgentsInIdOrder = context.agentRepository().findAllOrderById();
 
 		Agent preExistingSelf = agentPersister.extractSelf( allAgentsInIdOrder );
 		Agent self;
@@ -62,11 +62,12 @@ abstract class AbstractAgentClusterLink<R> {
 			self = preExistingSelf;
 		}
 		else {
-			self = agentPersister.createSelf( agentRepository, allAgentsInIdOrder, newExpiration );
+			self = agentPersister.createSelf( context.agentRepository(), allAgentsInIdOrder, newExpiration );
 		}
 
 		log.tracef( "Agent '%s': starting pulse at %s with self = %s, all agents = %s",
-				selfReference(), now, self, allAgentsInIdOrder );
+				selfReference(), now, self, allAgentsInIdOrder
+		);
 
 		// In order to avoid transaction deadlocks with some RDBMS (and this time I mean Oracle),
 		// we make sure that if we need to delete expired agents,
@@ -83,16 +84,17 @@ abstract class AbstractAgentClusterLink<R> {
 				.collect( Collectors.toList() );
 		if ( !timedOutAgents.isEmpty() ) {
 			log.removingTimedOutAgents( selfReference(), timedOutAgents );
-			agentRepository.delete( timedOutAgents );
+			context.agentRepository().delete( timedOutAgents );
 			log.infof( "Agent '%s': reassessing the new situation in the next pulse",
-					selfReference(), now );
+					selfReference(), now
+			);
 			return instructCommitAndRetryPulseAfterDelay( now, pollingInterval );
 		}
 
 		// Delay expiration in each pulse
 		self.setExpiration( newExpiration );
 
-		return doPulse( agentRepository, now, allAgentsInIdOrder, self );
+		return doPulse( context.agentRepository(), now, allAgentsInIdOrder, self );
 	}
 
 	protected abstract R doPulse(AgentRepository agentRepository, Instant now,
@@ -111,8 +113,8 @@ abstract class AbstractAgentClusterLink<R> {
 	 */
 	protected abstract R instructCommitAndRetryPulseAfterDelay(Instant now, Duration delay);
 
-	public final void leaveCluster(AgentRepository agentRepository) {
-		agentPersister.leaveCluster( agentRepository );
+	public final void leaveCluster(AgentClusterLinkContext context) {
+		agentPersister.leaveCluster( context.agentRepository() );
 	}
 
 	protected AgentReference selfReference() {

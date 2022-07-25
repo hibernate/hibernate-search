@@ -11,12 +11,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
-
 import org.junit.Test;
 
 /**
- * Tests for {@link OutboxPollingMassIndexerAgentClusterLink#leaveCluster(AgentRepository)}.
+ * Tests for {@link OutboxPollingMassIndexerAgentClusterLink#leaveCluster(AgentClusterLinkContextProvider)}.
  */
 public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassIndexerAgentClusterLinkTest {
 	final OutboxPollingMassIndexerAgentClusterLink setupLink() {
@@ -29,7 +27,7 @@ public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassInd
 	@Test
 	public void didNotJoin() {
 		OutboxPollingMassIndexerAgentClusterLink link = setupLink();
-		link.leaveCluster( repositoryMock );
+		link.leaveCluster( contextMock );
 	}
 
 	@Test
@@ -39,10 +37,10 @@ public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassInd
 		repositoryMockHelper.defineOtherAgents();
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );
 		when( clockMock.instant() ).thenReturn( NOW );
-		link.pulse( repositoryMock );
+		link.pulse( contextMock );
 
 		when( repositoryMock.find( SELF_ID ) ).thenReturn( repositoryMockHelper.self() );
-		link.leaveCluster( repositoryMock );
+		link.leaveCluster( contextMock );
 		verify( repositoryMock ).delete( Collections.singletonList( repositoryMockHelper.self() ) );
 	}
 
@@ -53,10 +51,10 @@ public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassInd
 		repositoryMockHelper.defineOtherAgents();
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );
 		when( clockMock.instant() ).thenReturn( NOW );
-		link.pulse( repositoryMock );
+		link.pulse( contextMock );
 
 		when( repositoryMock.find( SELF_ID ) ).thenReturn( null );
-		link.leaveCluster( repositoryMock );
+		link.leaveCluster( contextMock );
 	}
 
 }
