@@ -13,7 +13,7 @@
     <description>Hibernate Search integration tests for the Hibernate ORM integration using outbox polling as coordination strategy - Jakarta EE version</description>
 
     <properties>
-        <surefire.integration>coord-outbox</surefire.integration>
+        <surefire.module>coord-outbox</surefire.module>
 
         <transform.original.pathFromRoot>integrationtest/mapper/orm-coordination-outbox-polling</transform.original.pathFromRoot>
 
@@ -78,7 +78,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
-                            <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.integration -->
+                            <!-- WARNING: When using <dependenciesToScan>, be sure to set the Maven property surefire.module -->
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-mapper-orm</dependency>
                             </dependenciesToScan>

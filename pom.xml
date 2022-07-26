@@ -550,12 +550,12 @@
         <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
 
         <!-- This allows us to distinguish between multiple executions of the same test in test reports. -->
-        <surefire.reportNameSuffix>${surefire.integration}-${surefire.environment}</surefire.reportNameSuffix>
+        <surefire.reportNameSuffix>${surefire.module}-${surefire.environment}</surefire.reportNameSuffix>
         <!-- This should be set from the command line by CI jobs that execute the same tests in multiple environments -->
         <surefire.environment>default</surefire.environment>
         <!-- This should be set in modules that re-execute tests imported from a dependency (using <dependenciesToScan>)
              to differentiate multiple executions of the same tests in multiple modules. -->
-        <surefire.integration>default</surefire.integration>
+        <surefire.module>default</surefire.module>
 
         <!-- Containers executions tests properties -->
         <test.containers.run.skip>false</test.containers.run.skip>
