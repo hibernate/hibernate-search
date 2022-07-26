@@ -60,9 +60,14 @@ public final class RootFailureCollector implements FailureCollector {
 				EngineEventContextMessages.INSTANCE.failureReportFailuresNoBulletPoint()
 		);
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
-		if ( delegate != null ) {
-			delegate.appendFailuresTo( builder );
+		builder.startObject();
+		if ( failureCount.get() > FAILURE_LIMIT ) {
+			builder.value( log.collectedFailureLimitReached( process, FAILURE_LIMIT, failureCount.get() ) );
 		}
+		if ( delegate != null ) {
+			delegate.appendChildrenFailuresTo( builder );
+		}
+		builder.endObject();
 		return builder.toString();
 	}
 
@@ -76,12 +81,8 @@ public final class RootFailureCollector implements FailureCollector {
 		return delegate.withContext( contextElement );
 	}
 
-	private void onAddFailure() {
-		int theFailureCount = failureCount.incrementAndGet();
-		if ( theFailureCount > FAILURE_LIMIT ) {
-			String renderedFailures = renderFailures();
-			throw log.collectedFailureLimitReached( process, FAILURE_LIMIT, theFailureCount, renderedFailures );
-		}
+	private boolean shouldAddFailure() {
+		return failureCount.incrementAndGet() <= FAILURE_LIMIT;
 	}
 
 	private static class NonRootFailureCollector implements FailureCollector {
@@ -135,12 +136,6 @@ public final class RootFailureCollector implements FailureCollector {
 
 		void appendContextTo(StringJoiner joiner) {
 			// Nothing to do
-		}
-
-		void appendFailuresTo(ToStringTreeBuilder builder) {
-			builder.startObject();
-			appendChildrenFailuresTo( builder );
-			builder.endObject();
 		}
 
 		final synchronized void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
@@ -216,7 +211,6 @@ public final class RootFailureCollector implements FailureCollector {
 			joiner.add( context.render() );
 		}
 
-		@Override
 		synchronized void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
 			if ( !failureMessages.isEmpty() ) {
@@ -235,9 +229,9 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		private synchronized void doAdd(String failureMessage) {
-			// Do this FIRST, so that we actually stop collecting failures.
-			root.onAddFailure();
-			failureMessages.add( failureMessage );
+			if ( root.shouldAddFailure() ) {
+				failureMessages.add( failureMessage );
+			}
 		}
 	}
 

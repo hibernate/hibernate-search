@@ -9,8 +9,6 @@ package org.hibernate.search.engine.reporting.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hibernate.search.util.common.SearchException;
-
 import org.junit.Test;
 
 public class RootFailureCollectorTest {
@@ -31,16 +29,15 @@ public class RootFailureCollectorTest {
 		for ( int i = 0; i < 10; i++ ) {
 			ContextualFailureCollector failureCollector = rootFailureCollector.withContext(
 					EventContexts.fromType( "Type #" + i ) );
-			int finalI = i;
-			assertThatThrownBy( () -> failureCollector.add( "Error #" + finalI ) )
-					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Hibernate Search encountered failures during RootName",
-							"Stopped collecting failures after " + RootFailureCollector.FAILURE_LIMIT + " failures",
-							"Currently at " + ( RootFailureCollector.FAILURE_LIMIT + i + 1 ) + " failures and counting",
-							"Failures:" );
+			failureCollector.add( "Error #" + i );
 		}
-		// Check that we didn't report failures after the limit was reached
 		assertThatThrownBy( rootFailureCollector::checkNoFailure )
+				// Check that we mention that some failures are not being reported
+				.hasMessageContainingAll( "Hibernate Search encountered " + ( RootFailureCollector.FAILURE_LIMIT + 10 )
+						+ " failures during RootName",
+						"Only the first " + RootFailureCollector.FAILURE_LIMIT + " failures are displayed here",
+						"See the logs for extra failures" )
+				// Check that we didn't report failures after the limit was reached
 				.message().satisfies( message -> {
 					assertThat( countOccurrences( message, "Error #" ) )
 							.as( "Number of errors reported" ).isEqualTo( RootFailureCollector.FAILURE_LIMIT );
