@@ -21,6 +21,8 @@
     <description>Common build configuration for all Jakarta EE public artifacts</description>
 
     <properties>
+        <surefire.integration>jakarta</surefire.integration>
+
         <!-- JQAssistant does not seem to work correctly on these artifacts for some reason -->
         <jqassistant.skip>true</jqassistant.skip>
         <!-- Prevent these modules from artificially affecting Sonar metrics -->

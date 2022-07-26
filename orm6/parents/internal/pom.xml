@@ -21,6 +21,8 @@
     <description>Common build configuration for all internal (non-published) artifacts - ORM6 version</description>
 
     <properties>
+        <surefire.integration>orm6</surefire.integration>
+
         <!-- JQAssistant does not seem to work correctly on these artifacts for some reason -->
         <jqassistant.skip>true</jqassistant.skip>
         <!-- Forbiddenapis fails when some forbidden methods are not found, and some forbidden methods were removed in ORM 6 -->
