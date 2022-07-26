@@ -33,7 +33,8 @@ public final class RootFailureCollector implements FailureCollector {
 	 * which could be a problem when there is something fundamentally wrong
 	 * that will cause almost every operation to fail.
 	 */
-	private static final int FAILURE_LIMIT = 100;
+	// Exposed for tests
+	static final int FAILURE_LIMIT = 100;
 
 	private final String process;
 	private final NonRootFailureCollector delegate;
@@ -77,9 +78,9 @@ public final class RootFailureCollector implements FailureCollector {
 
 	private void onAddFailure() {
 		int theFailureCount = failureCount.incrementAndGet();
-		if ( theFailureCount >= FAILURE_LIMIT ) {
+		if ( theFailureCount > FAILURE_LIMIT ) {
 			String renderedFailures = renderFailures();
-			throw log.collectedFailureLimitReached( process, renderedFailures, theFailureCount );
+			throw log.collectedFailureLimitReached( process, FAILURE_LIMIT, theFailureCount, renderedFailures );
 		}
 	}
 
@@ -234,9 +235,9 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		private synchronized void doAdd(String failureMessage) {
-			failureMessages.add( failureMessage );
-
+			// Do this FIRST, so that we actually stop collecting failures.
 			root.onAddFailure();
+			failureMessages.add( failureMessage );
 		}
 	}
 
