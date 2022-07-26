@@ -7,16 +7,18 @@
 package org.hibernate.search.engine.reporting.spi;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.data.impl.InsertionOrder;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -87,8 +89,10 @@ public final class RootFailureCollector implements FailureCollector {
 
 	private static class NonRootFailureCollector implements FailureCollector {
 		protected final RootFailureCollector root;
-		// Use a LinkedHashMap for deterministic iteration
-		private final Map<EventContextElement, ContextualFailureCollectorImpl> children = new LinkedHashMap<>();
+		private final InsertionOrder<EventContextElement> childrenInsertionOrder = new InsertionOrder<>();
+		// Avoiding blocking implementations because we access this from reactive event loops
+		private final Map<InsertionOrder.Key<EventContextElement>, ContextualFailureCollectorImpl> children =
+				new ConcurrentSkipListMap<>();
 
 		private NonRootFailureCollector(RootFailureCollector root) {
 			this.root = root;
@@ -99,7 +103,7 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public synchronized ContextualFailureCollectorImpl withContext(EventContext context) {
+		public ContextualFailureCollectorImpl withContext(EventContext context) {
 			if ( context == null ) {
 				return withDefaultContext();
 			}
@@ -120,13 +124,13 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public synchronized ContextualFailureCollectorImpl withContext(EventContextElement contextElement) {
+		public ContextualFailureCollectorImpl withContext(EventContextElement contextElement) {
 			if ( contextElement == null ) {
 				return withDefaultContext();
 			}
 			return children.computeIfAbsent(
-					contextElement,
-					element -> new ContextualFailureCollectorImpl( this, element )
+					childrenInsertionOrder.wrapKey( contextElement ),
+					key -> new ContextualFailureCollectorImpl( this, key.get() )
 			);
 		}
 
@@ -138,7 +142,7 @@ public final class RootFailureCollector implements FailureCollector {
 			// Nothing to do
 		}
 
-		final synchronized void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
+		final void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
 			for ( ContextualFailureCollectorImpl child : children.values() ) {
 				// Some contexts may have been mentioned without any failure being ever reported.
 				// Only display contexts that had at least one failure reported.
@@ -148,8 +152,8 @@ public final class RootFailureCollector implements FailureCollector {
 			}
 		}
 
-		final Map<EventContextElement, ContextualFailureCollectorImpl> children() {
-			return children;
+		final Collection<ContextualFailureCollectorImpl> children() {
+			return children.values();
 		}
 	}
 
@@ -157,7 +161,8 @@ public final class RootFailureCollector implements FailureCollector {
 		private final NonRootFailureCollector parent;
 		private final EventContextElement context;
 
-		private final List<String> failureMessages = new ArrayList<>();
+		// Avoiding blocking implementations because we access this from reactive event loops
+		private final Collection<String> failureMessages = new ConcurrentLinkedDeque<>();
 
 		private ContextualFailureCollectorImpl(NonRootFailureCollector parent, EventContextElement context) {
 			super( parent );
@@ -166,11 +171,11 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public synchronized boolean hasFailure() {
+		public boolean hasFailure() {
 			if ( !failureMessages.isEmpty() ) {
 				return true;
 			}
-			for ( ContextualFailureCollectorImpl child : children().values() ) {
+			for ( ContextualFailureCollectorImpl child : children() ) {
 				if ( child.hasFailure() ) {
 					return true;
 				}
@@ -211,7 +216,7 @@ public final class RootFailureCollector implements FailureCollector {
 			joiner.add( context.render() );
 		}
 
-		synchronized void appendFailuresTo(ToStringTreeBuilder builder) {
+		void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
 			if ( !failureMessages.isEmpty() ) {
 				builder.attribute( EngineEventContextMessages.INSTANCE.failureReportFailures(), failureMessages );
@@ -220,7 +225,7 @@ public final class RootFailureCollector implements FailureCollector {
 			builder.endObject();
 		}
 
-		private synchronized void doAdd(Throwable failure, String failureMessage) {
+		private void doAdd(Throwable failure, String failureMessage) {
 			StringJoiner contextJoiner = new StringJoiner( CommonEventContextMessages.INSTANCE.contextSeparator() );
 			appendContextTo( contextJoiner );
 			log.newCollectedFailure( root.process, contextJoiner.toString(), failure );
@@ -228,7 +233,7 @@ public final class RootFailureCollector implements FailureCollector {
 			doAdd( failureMessage );
 		}
 
-		private synchronized void doAdd(String failureMessage) {
+		private void doAdd(String failureMessage) {
 			if ( root.shouldAddFailure() ) {
 				failureMessages.add( failureMessage );
 			}
