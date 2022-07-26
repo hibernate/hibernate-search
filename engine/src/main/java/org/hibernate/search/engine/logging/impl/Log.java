@@ -119,9 +119,10 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
 
 	@Message(id = ID_OFFSET + 19,
-			value = "Hibernate Search encountered failures during %1$s. Stopped collecting failures after '%3$s' failures."
-					+ " Failures:\n%2$s")
-	SearchException collectedFailureLimitReached(String process, String renderedFailures, int failureCount);
+			value = "Hibernate Search encountered failures during %1$s. Stopped collecting failures after %2$s failures."
+					+ " Currently at %3$s failures and counting."
+					+ " Failures:\n%4$s")
+	SearchException collectedFailureLimitReached(String process, int failureLimit, int failureCount, String renderedFailures);
 
 	@Message(id = ID_OFFSET + 20,
 			value = "Hibernate Search encountered failures during %1$s."
