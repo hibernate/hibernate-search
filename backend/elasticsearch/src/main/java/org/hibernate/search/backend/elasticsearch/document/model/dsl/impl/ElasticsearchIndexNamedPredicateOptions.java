@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 
 public class ElasticsearchIndexNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
 

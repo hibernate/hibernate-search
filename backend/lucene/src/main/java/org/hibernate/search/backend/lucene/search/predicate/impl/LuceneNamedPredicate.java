@@ -20,8 +20,8 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
-import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

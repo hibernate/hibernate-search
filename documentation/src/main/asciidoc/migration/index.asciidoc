@@ -67,9 +67,9 @@ is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersi
 Some incubating API changed:
 
 * org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider`
-is now `org.hibernate.search.engine.search.predicate.factories.PredicateDefinition`.
+is now `org.hibernate.search.engine.search.predicate.definition.PredicateDefinition`.
 * org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext`
-is now `org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext`.
+is now `org.hibernate.search.engine.search.predicate.definition.PredicateDefinitionContext`.
 
 Parts of the API have been deprecated, and may be removed in the next major version:
 

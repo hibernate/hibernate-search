@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexComposite
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.definition.PredicateDefinition;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
