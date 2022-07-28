@@ -14,18 +14,18 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context passed to {@link NamedPredicateProvider#create(NamedPredicateProviderContext)}.
- * @see NamedPredicateProvider#create(NamedPredicateProviderContext)
+ * The context passed to {@link PredicateDefinition#create(PredicateDefinitionContext)}.
+ * @see PredicateDefinition#create(PredicateDefinitionContext)
  */
 @Incubating
-public interface NamedPredicateProviderContext {
+public interface PredicateDefinitionContext {
 
 	/**
 	 * @return A predicate factory.
 	 * If the named predicate was registered on an object field,
 	 * this factory expects field paths to be provided relative to that same object field.
 	 * This factory is only valid in the present context and must not be used after
-	 * {@link NamedPredicateProvider#create(NamedPredicateProviderContext)} returns.
+	 * {@link PredicateDefinition#create(PredicateDefinitionContext)} returns.
 	 * @see SearchPredicateFactory
 	 */
 	SearchPredicateFactory predicate();

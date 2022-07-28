@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomTypeMappingAnnotationBaseIT;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -976,7 +976,7 @@ public class TypeBridgeBaseIT {
 			Contained contained;
 		}
 
-		NamedPredicateProvider namedPredicateProvider = context -> {
+		PredicateDefinition predicateDefinition = context -> {
 			throw new IllegalStateException( "should not be used" );
 		};
 
@@ -984,7 +984,7 @@ public class TypeBridgeBaseIT {
 				.objectField( "contained", b2 -> b2
 						.field( "string", String.class, b3 -> { } )
 						.namedPredicate( "named", b3 -> b3
-								.namedPredicateProvider( namedPredicateProvider )
+								.predicateDefinition( predicateDefinition )
 						)
 				)
 		);
@@ -997,7 +997,7 @@ public class TypeBridgeBaseIT {
 									.field( "string", f -> f.asString() )
 									.toReference();
 							context.indexSchemaElement()
-									.namedPredicate( "named", namedPredicateProvider );
+									.namedPredicate( "named", predicateDefinition );
 							context.bridge( new UnusedTypeBridge() );
 						} )
 		)
@@ -1021,7 +1021,7 @@ public class TypeBridgeBaseIT {
 			Contained contained;
 		}
 
-		NamedPredicateProvider namedPredicateProvider = context -> {
+		PredicateDefinition predicateDefinition = context -> {
 			throw new IllegalStateException( "should not be used" );
 		};
 
@@ -1029,7 +1029,7 @@ public class TypeBridgeBaseIT {
 				.objectField( "contained", b2 -> b2
 						.field( "included", String.class, b3 -> { } )
 						.namedPredicate( "named", b3 -> b3
-								.namedPredicateProvider( namedPredicateProvider )
+								.predicateDefinition( predicateDefinition )
 						)
 				)
 		);
@@ -1045,7 +1045,7 @@ public class TypeBridgeBaseIT {
 									.field( "excluded", f -> f.asString() )
 									.toReference();
 							context.indexSchemaElement()
-									.namedPredicate( "named", namedPredicateProvider );
+									.namedPredicate( "named", predicateDefinition );
 							context.bridge( new UnusedTypeBridge() );
 						} )
 		)

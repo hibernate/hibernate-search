@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
 
@@ -166,8 +166,8 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 			return this;
 		}
 
-		public Builder namedPredicateProvider(NamedPredicateProvider namedPredicateProvider) {
-			attribute( "namedPredicateProvider", namedPredicateProvider );
+		public Builder predicateDefinition(PredicateDefinition predicateDefinition) {
+			attribute( "predicateDefinition", predicateDefinition );
 			return this;
 		}
 

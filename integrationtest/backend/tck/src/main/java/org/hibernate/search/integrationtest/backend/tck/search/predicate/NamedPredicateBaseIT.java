@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -162,7 +162,7 @@ public class NamedPredicateBaseIT {
 			field2 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "field2" );
 			root.namedPredicate( "match-both-fields",
-					new TestNamedPredicateProvider( "field1", "field2" ) );
+					new TestPredicateDefinition( "field1", "field2" ) );
 
 			nested = ObjectFieldBinding.create( root, "nested", ObjectStructure.NESTED );
 			flattened = ObjectFieldBinding.create( root, "flattened", ObjectStructure.FLATTENED );
@@ -207,7 +207,7 @@ public class NamedPredicateBaseIT {
 			field2 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( objectField, "field2" );
 			objectField.namedPredicate( "match-both-fields",
-					new TestNamedPredicateProvider( "field1", "field2" ) );
+					new TestPredicateDefinition( "field1", "field2" ) );
 		}
 	}
 
@@ -225,18 +225,18 @@ public class NamedPredicateBaseIT {
 		}
 	}
 
-	public static class TestNamedPredicateProvider implements NamedPredicateProvider {
+	public static class TestPredicateDefinition implements PredicateDefinition {
 
 		private final String field1Name;
 		private final String field2Name;
 
-		public TestNamedPredicateProvider(String field1Name, String field2Name) {
+		public TestPredicateDefinition(String field1Name, String field2Name) {
 			this.field1Name = field1Name;
 			this.field2Name = field2Name;
 		}
 
 		@Override
-		public SearchPredicate create(NamedPredicateProviderContext context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			String word1 = (String) context.param( "value1" );
 			String word2 = (String) context.param( "value2" );
 			SearchPredicateFactory f = context.predicate();

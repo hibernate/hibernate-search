@@ -563,8 +563,8 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 144,
-			value = "Provider differs: '%1$s' vs. '%2$s'.")
-	SearchException differentProviderForQueryElement(Object provider1, Object provider2);
+			value = "Predicate definition differs: '%1$s' vs. '%2$s'.")
+	SearchException differentPredicateDefinitionForQueryElement(Object predicateDefinition1, Object predicateDefinition2);
 
 	@Message(id = ID_OFFSET + 146,
 			value = "Unable to apply query caching configuration: %1$s")

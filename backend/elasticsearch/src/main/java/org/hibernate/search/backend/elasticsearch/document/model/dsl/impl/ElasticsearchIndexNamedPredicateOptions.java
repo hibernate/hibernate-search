@@ -8,16 +8,16 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 
 public class ElasticsearchIndexNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
 
 	public final IndexFieldInclusion inclusion;
-	public final NamedPredicateProvider provider;
+	public final PredicateDefinition definition;
 
-	ElasticsearchIndexNamedPredicateOptions(IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
+	ElasticsearchIndexNamedPredicateOptions(IndexFieldInclusion inclusion, PredicateDefinition definition) {
 		this.inclusion = inclusion;
-		this.provider = provider;
+		this.definition = definition;
 	}
 
 }

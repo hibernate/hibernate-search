@@ -14,8 +14,8 @@ import java.util.Objects;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -97,7 +97,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 				.hasMessageContainingAll(
 						"Inconsistent configuration for index schema root in a search query across multiple indexes",
 						"Inconsistent support for 'predicate:named:my-predicate'",
-						"Provider differs:", TestedNamedPredicateProvider.class.getName()
+						"Predicate definition differs:", TestedPredicateDefinition.class.getName()
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
@@ -110,7 +110,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 		public IndexBinding(IndexSchemaElement root) {
 			field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "field" );
-			root.namedPredicate( "my-predicate", new TestedNamedPredicateProvider( "field" ) );
+			root.namedPredicate( "my-predicate", new TestedPredicateDefinition( "field" ) );
 		}
 	}
 
@@ -128,7 +128,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 		public IncompatibleIndexBinding(IndexSchemaElement root) {
 			field2 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "field2" );
-			root.namedPredicate( "my-predicate", new TestedNamedPredicateProvider( "field2" ) );
+			root.namedPredicate( "my-predicate", new TestedPredicateDefinition( "field2" ) );
 		}
 	}
 
@@ -146,9 +146,9 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 		}
 	}
 
-	private static class TestedNamedPredicateProvider implements NamedPredicateProvider {
+	private static class TestedPredicateDefinition implements PredicateDefinition {
 		private final String fieldName;
-		public TestedNamedPredicateProvider(
+		public TestedPredicateDefinition(
 				String fieldName) {
 			this.fieldName = fieldName;
 		}
@@ -161,7 +161,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 			if ( o == null || getClass() != o.getClass() ) {
 				return false;
 			}
-			TestedNamedPredicateProvider that = (TestedNamedPredicateProvider) o;
+			TestedPredicateDefinition that = (TestedPredicateDefinition) o;
 			return Objects.equals( fieldName, that.fieldName );
 		}
 
@@ -171,7 +171,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 		}
 
 		@Override
-		public SearchPredicate create(NamedPredicateProviderContext context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			return context.predicate().match().field( fieldName )
 					.matching( context.param( "value" ) )
 					.toPredicate();

@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomPropertyMappingAnnotationBaseIT;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -1116,14 +1116,14 @@ public class PropertyBridgeBaseIT {
 			Contained contained;
 		}
 
-		NamedPredicateProvider namedPredicateProvider = context -> {
+		PredicateDefinition predicateDefinition = context -> {
 			throw new IllegalStateException( "should not be used" );
 		};
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "string", String.class, b2 -> { } )
 				.namedPredicate( "named", b2 -> b2
-						.namedPredicateProvider( namedPredicateProvider )
+						.predicateDefinition( predicateDefinition )
 				)
 		);
 
@@ -1135,7 +1135,7 @@ public class PropertyBridgeBaseIT {
 									.field( "string", f -> f.asString() )
 									.toReference();
 							context.indexSchemaElement()
-									.namedPredicate( "named", namedPredicateProvider );
+									.namedPredicate( "named", predicateDefinition );
 							context.bridge( new UnusedPropertyBridge() );
 						} )
 		)
