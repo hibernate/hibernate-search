@@ -21,8 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -52,11 +52,11 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 	public static class Factory
 			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<NamedPredicateBuilder> {
-		private final NamedPredicateProvider provider;
+		private final PredicateDefinition definition;
 		private final String predicateName;
 
-		public Factory(NamedPredicateProvider provider, String predicateName) {
-			this.provider = provider;
+		public Factory(PredicateDefinition definition, String predicateName) {
+			this.definition = definition;
 			this.predicateName = predicateName;
 		}
 
@@ -64,30 +64,30 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
 			super.checkCompatibleWith( other );
 			Factory castedOther = (Factory) other;
-			if ( !provider.equals( castedOther.provider ) ) {
-				throw log.differentProviderForQueryElement( provider, castedOther.provider );
+			if ( !definition.equals( castedOther.definition ) ) {
+				throw log.differentPredicateDefinitionForQueryElement( definition, castedOther.definition );
 			}
 		}
 
 		@Override
 		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
-			return new Builder( provider, predicateName, scope, node );
+			return new Builder( definition, predicateName, scope, node );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
-		private final NamedPredicateProvider provider;
+		private final PredicateDefinition definition;
 		private final String predicateName;
 		private final ElasticsearchSearchIndexCompositeNodeContext field;
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(NamedPredicateProvider provider, String predicateName,
+		Builder(PredicateDefinition definition, String predicateName,
 				ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
 			super( scope, node );
-			this.provider = provider;
+			this.definition = definition;
 			this.predicateName = predicateName;
 			this.field = node;
 		}
@@ -104,24 +104,24 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public SearchPredicate build() {
-			ElasticsearchNamedPredicateProviderContext ctx = new ElasticsearchNamedPredicateProviderContext(
+			ElasticsearchPredicateDefinitionContext ctx = new ElasticsearchPredicateDefinitionContext(
 					factory, field, predicateName, params );
 
 			ElasticsearchSearchPredicate providedPredicate = ElasticsearchSearchPredicate.from(
-					scope, provider.create( ctx ) );
+					scope, definition.create( ctx ) );
 
 			return new ElasticsearchNamedPredicate( this, providedPredicate );
 		}
 	}
 
-	private static class ElasticsearchNamedPredicateProviderContext implements NamedPredicateProviderContext {
+	private static class ElasticsearchPredicateDefinitionContext implements PredicateDefinitionContext {
 
 		private final SearchPredicateFactory factory;
 		private final ElasticsearchSearchIndexCompositeNodeContext field;
 		private final String predicateName;
 		private final Map<String, Object> params;
 
-		ElasticsearchNamedPredicateProviderContext(SearchPredicateFactory factory,
+		ElasticsearchPredicateDefinitionContext(SearchPredicateFactory factory,
 				ElasticsearchSearchIndexCompositeNodeContext field, String predicateName,
 				Map<String, Object> params) {
 			this.factory = factory;

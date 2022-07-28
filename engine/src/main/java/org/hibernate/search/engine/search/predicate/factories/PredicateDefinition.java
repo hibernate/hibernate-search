@@ -11,22 +11,25 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * A factory for predicates, which is given a name and assigned to an element in the index schema.
+ * A component able to define a predicate using the Hibernate Search Predicate DSL.
  * <p>
- * This factory takes advantage of provided metadata
+ * This definition takes advantage of provided metadata
  * to pick, configure and create a {@link SearchPredicate}.
+ * <p>
+ * Used in particular for named predicates,
+ * where the definition is given a name and assigned to an element in the index schema.
  *
  * @see SearchPredicate
  *
  */
 @Incubating
-public interface NamedPredicateProvider {
+public interface PredicateDefinition {
 
 	/**
-	 * Creates a named predicate.
+	 * Creates a predicate.
 	 * @param context The context, exposing in particular a {@link SearchPredicateFactory}.
 	 * @return The created {@link SearchPredicate}.
 	 */
-	SearchPredicate create(NamedPredicateProviderContext context);
+	SearchPredicate create(PredicateDefinitionContext context);
 
 }

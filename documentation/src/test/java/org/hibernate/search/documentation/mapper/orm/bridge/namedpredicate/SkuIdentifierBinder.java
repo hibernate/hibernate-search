@@ -13,8 +13,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -45,7 +45,7 @@ public class SkuIdentifierBinder implements PropertyBinder {
 
 		skuIdObjectField.namedPredicate( // <1>
 				"skuIdMatch", // <2>
-				new SkuIdentifierMatchPredicateProvider() // <3>
+				new SkuIdentifierMatchPredicateDefinition() // <3>
 		);
 	}
 
@@ -85,12 +85,12 @@ public class SkuIdentifierBinder implements PropertyBinder {
 
 	// ... class continues below
 	//end::bridge[]
-	//tag::named-predicate-provider[]
+	//tag::predicate-definition[]
 	// ... class SkuIdentifierBinder (continued)
 
-	private static class SkuIdentifierMatchPredicateProvider implements NamedPredicateProvider { // <1>
+	private static class SkuIdentifierMatchPredicateDefinition implements PredicateDefinition { // <1>
 		@Override
-		public SearchPredicate create(NamedPredicateProviderContext context) {
+		public SearchPredicate create(PredicateDefinitionContext context) {
 			SearchPredicateFactory f = context.predicate(); // <2>
 
 			String pattern = (String) context.param( "pattern" ); // <3>
@@ -118,4 +118,4 @@ public class SkuIdentifierBinder implements PropertyBinder {
 		}
 	}
 }
-//end::named-predicate-provider[]
+//end::predicate-definition[]

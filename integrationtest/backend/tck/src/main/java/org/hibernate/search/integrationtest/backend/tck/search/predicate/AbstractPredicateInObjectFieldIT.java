@@ -18,8 +18,8 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -285,7 +285,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 			super( objectField, parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName, fieldTypes );
 			relativeName = relativeFieldName;
 			reference = objectField.toReference();
-			objectField.namedPredicate( StubPredicateProvider.NAME, new StubPredicateProvider() );
+			objectField.namedPredicate( StubPredicateDefinition.NAME, new StubPredicateDefinition() );
 			if ( depth < MAX_DEPTH ) {
 				nested = create( objectField, absolutePath, "nested", ObjectStructure.NESTED,
 						fieldTypes, depth + 1 );
@@ -299,13 +299,13 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		}
 	}
 
-	public static class StubPredicateProvider implements NamedPredicateProvider {
+	public static class StubPredicateDefinition implements PredicateDefinition {
 		public static final String NAME = "stub-predicate";
 		public static final String IMPL_PARAM_NAME = "impl";
 
 		@Override
-		public SearchPredicate create(NamedPredicateProviderContext context) {
-			NamedPredicateProvider impl = (NamedPredicateProvider) context.param( IMPL_PARAM_NAME );
+		public SearchPredicate create(PredicateDefinitionContext context) {
+			PredicateDefinition impl = (PredicateDefinition) context.param( IMPL_PARAM_NAME );
 			return impl.create( context );
 		}
 	}

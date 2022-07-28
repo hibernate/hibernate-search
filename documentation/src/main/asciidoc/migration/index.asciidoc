@@ -64,6 +64,13 @@ This affects the following configuration properties:
 The https://hibernate.org/community/compatibility-policy/#code-categorization[API]
 is backward-compatible with Hibernate Search {hibernateSearchPreviousStableVersionShort}.
 
+Some incubating API changed:
+
+* org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider`
+is now `org.hibernate.search.engine.search.predicate.factories.PredicateDefinition`.
+* org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext`
+is now `org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext`.
+
 Parts of the API have been deprecated, and may be removed in the next major version:
 
 * `SearchPredicateFactory#bool(Consumer)`, which enables the syntax `f.bool(b -> { b.must(...); b.must(...); }`:

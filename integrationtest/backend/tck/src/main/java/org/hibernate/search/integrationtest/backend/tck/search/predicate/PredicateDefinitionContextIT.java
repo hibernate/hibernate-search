@@ -17,8 +17,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinitionContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -30,7 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class NamedPredicateProviderContextIT {
+public class PredicateDefinitionContextIT {
 
 	private static final String DOCUMENT_1 = "document1";
 
@@ -59,7 +59,7 @@ public class NamedPredicateProviderContextIT {
 						.param( "param2", givenParams[1] )
 						.param( "param3", givenParams[2] )
 						.param( "param4", givenParams[3] )
-						.param( "impl", (NamedPredicateProvider) context -> {
+						.param( "impl", (PredicateDefinition) context -> {
 							receivedParams[0] = context.param( "param1" );
 							receivedParams[1] = context.param( "param2" );
 							receivedParams[2] = context.param( "param3" );
@@ -78,7 +78,7 @@ public class NamedPredicateProviderContextIT {
 
 		assertThatQuery( index.query()
 				.where( f -> f.named( "stub-predicate" )
-						.param( "impl", (NamedPredicateProvider) context -> {
+						.param( "impl", (PredicateDefinition) context -> {
 							actualsParams[0] = context.paramOptional( "absent" );
 							return context.predicate().matchAll().toPredicate();
 						} ) ) )
@@ -90,7 +90,7 @@ public class NamedPredicateProviderContextIT {
 	@Test
 	public void param_nullName() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
-				.param( "impl", (NamedPredicateProvider) context -> {
+				.param( "impl", (PredicateDefinition) context -> {
 					context.param( null );
 					return context.predicate().matchAll().toPredicate();
 				} )
@@ -102,7 +102,7 @@ public class NamedPredicateProviderContextIT {
 	@Test
 	public void missingParam() {
 		assertThatThrownBy( () -> index.createScope().predicate().named( "stub-predicate" )
-				.param( "impl", (NamedPredicateProvider) context -> {
+				.param( "impl", (PredicateDefinition) context -> {
 					context.param( "missing" );
 					return context.predicate().matchAll().toPredicate();
 				} )
@@ -120,7 +120,7 @@ public class NamedPredicateProviderContextIT {
 		IndexBinding(IndexSchemaElement root) {
 			field1 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "field1" );
-			root.namedPredicate( "stub-predicate", new StubPredicateProvider() );
+			root.namedPredicate( "stub-predicate", new StubPredicateDefinition() );
 
 			nested = ObjectFieldBinding.create( root, "nested", ObjectStructure.NESTED );
 			flattened = ObjectFieldBinding.create( root, "flattened", ObjectStructure.FLATTENED );
@@ -141,14 +141,14 @@ public class NamedPredicateProviderContextIT {
 			reference = objectField.toReference();
 			field1 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( objectField, "field1" );
-			objectField.namedPredicate( "stub-predicate", new StubPredicateProvider() );
+			objectField.namedPredicate( "stub-predicate", new StubPredicateDefinition() );
 		}
 	}
 
-	public static class StubPredicateProvider implements NamedPredicateProvider {
+	public static class StubPredicateDefinition implements PredicateDefinition {
 		@Override
-		public SearchPredicate create(NamedPredicateProviderContext context) {
-			NamedPredicateProvider impl = (NamedPredicateProvider) context.param( "impl" );
+		public SearchPredicate create(PredicateDefinitionContext context) {
+			PredicateDefinition impl = (PredicateDefinition) context.param( "impl" );
 			return impl.create( context );
 		}
 	}

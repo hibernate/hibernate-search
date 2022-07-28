@@ -27,7 +27,7 @@ Note this predicate is assigned to an object field.
 <2> The predicate name will be used to refer to this predicate when <<search-dsl-predicate-named,calling the named predicate>>.
 Since the predicate is assigned to an object field,
 callers will have to prefix the predicate name with the path to that object field.
-<3> The named predicate provider will define how to create the predicate when searching.
+<3> The predicate definition will define how to create the predicate when searching.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -41,20 +41,20 @@ but you are obviously free to implement it in a separate java file.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/namedpredicate/SkuIdentifierBinder.java[tags=named-predicate-provider]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/namedpredicate/SkuIdentifierBinder.java[tags=predicate-definition]
 ----
-<1> The named predicate provider must implement the `NamedPredicateProvider` interface.
+<1> The predicate definition must implement the `PredicateDefinition` interface.
 +
-Here the named predicate provider class is nested in the binder class,
+Here the predicate definition class is nested in the binder class,
 because it is more convenient,
 but you are obviously free to implement it in a separate java file.
-<2> The context passed to the provider exposes the predicate factory,
+<2> The context passed to the definition exposes the predicate factory,
 which is the entry point to the <<search-dsl-predicate,predicate DSL>>,
 used to create predicates.
-<3> The provider can access parameters that are passed when calling the named predicates.
+<3> The definition can access parameters that are passed when calling the named predicates.
 Getting the param using the `param` method assumes that the param has been defined.
 Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
-<4> The provider uses the predicate factory to create predicates.
+<4> The definition uses the predicate factory to create predicates.
 In this example, this implementation transforms a pattern with a custom format into three patterns,
 one for each field populated by the bridge.
 <5> Be careful: the search predicate factory expects paths

@@ -28,7 +28,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexComposite
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -78,13 +78,13 @@ public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements 
 
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, IndexFieldInclusion inclusion,
-			NamedPredicateProvider provider) {
+			PredicateDefinition definition) {
 		ElasticsearchIndexNamedPredicateOptions options = new ElasticsearchIndexNamedPredicateOptions(
-			inclusion, provider );
+			inclusion, definition );
 		putNamedPredicate( name, options );
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
-					new ElasticsearchNamedPredicate.Factory( options.provider, name ) );
+					new ElasticsearchNamedPredicate.Factory( options.definition, name ) );
 		}
 		return options;
 	}

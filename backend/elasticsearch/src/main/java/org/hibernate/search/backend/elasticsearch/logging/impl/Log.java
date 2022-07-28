@@ -666,8 +666,8 @@ public interface Log extends BasicLogger {
 	SearchException indexSchemaNamedPredicateNameConflict(String relativeFilterName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 138,
-			value = "Provider differs: '%1$s' vs. '%2$s'.")
-	SearchException differentProviderForQueryElement(Object provider1, Object provider2);
+			value = "Predicate definition differs: '%1$s' vs. '%2$s'.")
+	SearchException differentPredicateDefinitionForQueryElement(Object predicateDefinition1, Object predicateDefinition2);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET + 140, value = "A search query fetching all hits was requested," +

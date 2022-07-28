@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.PredicateDefinition;
 
 public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 
@@ -34,11 +34,11 @@ public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 	 *
 	 * @param relativeNamedPredicateName The relative name of the new named predicate.
 	 * @param inclusion Whether fields matching this template should be included, provided their parent is included.
-	 * @param provider The provider of named predicate instances.
+	 * @param definition The definition of the named predicate.
 	 * @return A DSL step where the named predicate can be defined in more details.
 	 */
 	IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
-			IndexFieldInclusion inclusion, NamedPredicateProvider provider);
+			IndexFieldInclusion inclusion, PredicateDefinition definition);
 
 	/**
 	 * Create a new object field and add it to the current builder.
