@@ -17,13 +17,10 @@ import org.hibernate.engine.spi.SessionImplementor;
 public final class SessionHelper {
 
 	private final SessionFactoryImplementor sessionFactory;
-	private final TransactionHelper transactionHelper;
 	private final String tenantId;
 
-	public SessionHelper(SessionFactoryImplementor sessionFactory, TransactionHelper transactionHelper,
-			String tenantId) {
+	public SessionHelper(SessionFactoryImplementor sessionFactory, String tenantId) {
 		this.sessionFactory = sessionFactory;
-		this.transactionHelper = transactionHelper;
 		this.tenantId = tenantId;
 	}
 
