@@ -175,7 +175,7 @@ public final class OutboxPollingEventProcessor {
 		this.clusterLink = clusterLink;
 
 		transactionHelper = new TransactionHelper( mapping.sessionFactory(), factory.transactionTimeout );
-		sessionHelper = new SessionHelper( mapping.sessionFactory(), transactionHelper, tenantId );
+		sessionHelper = new SessionHelper( mapping.sessionFactory(), tenantId );
 		this.clusterLinkContextProvider = new AgentClusterLinkContextProvider( transactionHelper, sessionHelper,
 				agentRepositoryProvider );
 

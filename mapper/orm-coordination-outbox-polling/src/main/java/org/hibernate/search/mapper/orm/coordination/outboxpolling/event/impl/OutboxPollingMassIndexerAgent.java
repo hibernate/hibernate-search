@@ -130,7 +130,7 @@ public final class OutboxPollingMassIndexerAgent implements PojoMassIndexerAgent
 		this.clusterLink = clusterLink;
 
 		TransactionHelper transactionHelper = new TransactionHelper( mapping.sessionFactory(), null );
-		SessionHelper sessionHelper = new SessionHelper( mapping.sessionFactory(), transactionHelper, tenantId );
+		SessionHelper sessionHelper = new SessionHelper( mapping.sessionFactory(), tenantId );
 		this.clusterLinkContextProvider = new AgentClusterLinkContextProvider( transactionHelper, sessionHelper,
 				agentRepositoryProvider );
 
