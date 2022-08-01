@@ -320,9 +320,11 @@ stage('Configure') {
 					new OpenSearchAwsBuildEnvironment(version: '1.1', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.ON_DEMAND),
 					new OpenSearchAwsBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
+							condition: TestCondition.ON_DEMAND),
+					new OpenSearchAwsBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
-					new OpenSearchAwsBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.0',
+					new OpenSearchAwsBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
 							staticCredentials: true,
 							condition: TestCondition.AFTER_MERGE)
 			]
