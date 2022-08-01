@@ -2,7 +2,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.search/hibernate-search-mapper-orm.svg?label=Maven%20Central&style=for-the-badge)](https://search.maven.org/search?q=g:%22org.hibernate.search%22)
 [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-search%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/job/hibernate-search/job/main)
-[![Coverage Status](https://img.shields.io/coveralls/github/hibernate/hibernate-search/main?logo=coveralls&style=for-the-badge)](https://coveralls.io/github/hibernate/hibernate-search?branch=main)
+[![Sonar Coverage](https://img.shields.io/sonar/coverage/org.hibernate.search:hibernate-search-parent?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/project/activity?id=org.hibernate.search%3Ahibernate-search-parent&graph=coverage)
 [![Quality gate](https://img.shields.io/sonar/alert_status/org.hibernate.search:hibernate-search-parent?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
 
 ## Description

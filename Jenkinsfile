@@ -71,13 +71,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  * Then you will also need to add AWS credentials in Jenkins
  * and reference them from the configuration file (see below).
  *
- * #### Coveralls (optional)
- *
- * You need to enable your repository in Coveralls first: see https://coveralls.io/repos/new.
- *
- * Then you will also need to add the Coveralls repository token as credentials in Jenkins
- * and reference it from the configuration file (see below).
- *
  * #### Sonarcloud (optional)
  *
  * You need to enable the SonarCloud GitHub app for your repository:
@@ -127,11 +120,6 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  *       # String containing the ID of aws credentials. Mandatory in order to test against an Elasticsearch service hosted on AWS.
  *       # Expects username/password credentials where the username is the AWS access key
  *       # and the password is the AWS secret key.
- *       credentials: ...
- *     coveralls:
- *       # String containing the ID of coveralls credentials. Optional.
- *       # Expects secret text credentials containing the repository token.
- *       # Note these credentials should be registered at the job level, not system-wide.
  *       credentials: ...
  *     sonar:
  *       # String containing the ID of Sonar credentials. Optional.
@@ -446,29 +434,8 @@ stage('Default build') {
 					$mavenArgs \
 			"""
 
-			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
+			// Don't try to report to SonarCloud if coverage data is missing
 			if (enableDefaultBuildIT) {
-				if (helper.configuration.file?.coveralls?.credentials) {
-					def coverallsCredentialsId = helper.configuration.file.coveralls.credentials
-					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
-					// To that end, escape the '$' when referencing the variables.
-					// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
-					withCredentials([string(credentialsId: coverallsCredentialsId, variable: 'COVERALLS_TOKEN')]) {
-						sh """ \
-								mvn coveralls:report \
-								-DrepoToken=\${COVERALLS_TOKEN} \
-								${helper.scmSource.pullRequest ? """ \
-										-DpullRequest=${helper.scmSource.pullRequest.id} \
-								""" : """ \
-										-Dbranch=${helper.scmSource.branch.name} \
-								"""} \
-						"""
-					}
-				}
-				else {
-					echo "No Coveralls token configured - skipping Coveralls report."
-				}
-
 				if (helper.configuration.file?.sonar?.credentials) {
 					def sonarCredentialsId = helper.configuration.file.sonar.credentials
 					// WARNING: Make sure credentials are evaluated by sh, not Groovy.
