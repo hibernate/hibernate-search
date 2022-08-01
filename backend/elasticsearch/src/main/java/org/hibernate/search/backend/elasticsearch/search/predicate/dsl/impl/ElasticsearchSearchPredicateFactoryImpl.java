@@ -29,12 +29,17 @@ public class ElasticsearchSearchPredicateFactoryImpl
 
 	@Override
 	public ElasticsearchSearchPredicateFactory withRoot(String objectFieldPath) {
-		return new ElasticsearchSearchPredicateFactoryImpl( dslContext.rescope(
-				dslContext.scope().withRoot( objectFieldPath ) ) );
+		return new ElasticsearchSearchPredicateFactoryImpl(
+				dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) )
+		);
 	}
 
 	@Override
 	public PredicateFinalStep fromJson(String jsonString) {
+		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( jsonString ) );
+	}
+
+	public PredicateFinalStep notCoveredByTests(String jsonString) {
 		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( jsonString ) );
 	}
 

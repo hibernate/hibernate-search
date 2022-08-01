@@ -91,7 +91,9 @@ public abstract class AbstractSearchPredicateFactory<
 
 	@Override
 	public MatchPredicateFieldStep<?> match() {
-		return new MatchPredicateFieldStepImpl( dslContext );
+		return new MatchPredicateFieldStepImpl(
+				dslContext
+		);
 	}
 
 	@Override
