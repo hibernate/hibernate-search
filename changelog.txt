@@ -1,6 +1,36 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.6.Final (2022-08-04)
+-------------------------
+
+** Bug
+    * HSEARCH-4654 Deadlock in RootFailureCollector when exceeding the failure limit (100) with concurrent failures from different threads
+    * HSEARCH-4652 Schema validation fails if search analyzer is set explicitly to the same value as the analyzer
+    * HSEARCH-4647 High transaction contention in outbox-polling processes
+    * HSEARCH-4634 Executing task 'Outbox event processor' fail with CockroachDB v22.1.1 SKIP LOCKED lock wait policy is not supported
+    * HSEARCH-4604 AWS Request signing ignores the target port of service endpoint
+    * HSEARCH-4584 Projection and sort on the same nested field fails with the Lucene Backend
+    * HSEARCH-4580 "_routing" in custom Elasticsearch schema leads to "JsonIOException: JSON document was not fully consumed."
+    * HSEARCH-4565 Cyclic dependency detection for IndexingDependency(derivedFrom = ...) does not detect "buried" cycles
+
+** Improvement
+    * HSEARCH-4635 Prepare -orm6 artifacts for changes coming in Hibernate ORM 6.1.2.Final
+    * HSEARCH-4611 Improve exception and log messages involving multi-valued elements
+    * HSEARCH-4608 Upgrade to the latest version of Jakarta dependencies in -orm6/-jakarta artifacts
+    * HSEARCH-4596 Upgrade to Hibernate ORM 6.0.2.Final for -orm6 artifacts
+    * HSEARCH-4585 Upgrade to Hibernate ORM 5.6.9.Final
+
+** Task
+    * HSEARCH-4649 Fix "File name too long" errors when creating test reports
+    * HSEARCH-4648 Restore execution of many automatic indexing tests when testing outbox polling
+    * HSEARCH-4644 Test against CockroachDB in continuous integration
+    * HSEARCH-4607 Test for compatibility with ORM 6.1 in Search 6.1
+    * HSEARCH-4600 Fix flaky assertion in OutboxPollingAutomaticIndexingEventSendingIT
+    * HSEARCH-4589 Safer closing of resources in SavedState
+    * HSEARCH-4588 Fix mention of Hibernate Search requiring ORM 5.5 instead of 5.6 in the migration guide
+    * HSEARCH-4578 Improve error messages in tests when failure report assertions fail
+
 6.1.5.Final (2022-05-11)
 -------------------------
 
