@@ -20,6 +20,7 @@ Hibernate Search Changelog
     * HSEARCH-4608 Upgrade to the latest version of Jakarta dependencies in -orm6/-jakarta artifacts
     * HSEARCH-4596 Upgrade to Hibernate ORM 6.0.2.Final for -orm6 artifacts
     * HSEARCH-4585 Upgrade to Hibernate ORM 5.6.9.Final
+    * HSEARCH-4628 Upgrade to Hibernate ORM 5.6.10.Final
 
 ** Task
     * HSEARCH-4649 Fix "File name too long" errors when creating test reports
