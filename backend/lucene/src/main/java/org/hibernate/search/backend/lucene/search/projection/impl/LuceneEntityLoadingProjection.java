@@ -13,10 +13,10 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class LuceneEntityProjection<E> extends AbstractLuceneProjection<E>
+public class LuceneEntityLoadingProjection<E> extends AbstractLuceneProjection<E>
 		implements LuceneSearchProjection.Extractor<Object, E> {
 
-	LuceneEntityProjection(LuceneSearchIndexScope<?> scope) {
+	LuceneEntityLoadingProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 

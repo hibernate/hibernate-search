@@ -12,12 +12,12 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProjection<E>
+public class ElasticsearchEntityLoadingProjection<E> extends AbstractElasticsearchProjection<E>
 		implements ElasticsearchSearchProjection.Extractor<Object, E> {
 
 	private final DocumentReferenceExtractionHelper helper;
 
-	ElasticsearchEntityProjection(ElasticsearchSearchIndexScope<?> scope,
+	ElasticsearchEntityLoadingProjection(ElasticsearchSearchIndexScope<?> scope,
 			DocumentReferenceExtractionHelper helper) {
 		super( scope );
 		this.helper = helper;

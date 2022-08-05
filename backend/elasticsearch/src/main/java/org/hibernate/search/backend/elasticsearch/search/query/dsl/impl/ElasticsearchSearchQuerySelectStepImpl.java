@@ -54,7 +54,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity() {
-		return select( scope.projectionBuilders().entity() );
+		return select( scope.projectionBuilders().entityLoading() );
 	}
 
 	@Override

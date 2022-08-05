@@ -12,17 +12,17 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubEntityProjection<T> implements StubSearchProjection<T> {
+public class StubEntityLoadingProjection<T> implements StubSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
-	private static final StubSearchProjection INSTANCE = new StubEntityProjection();
+	private static final StubSearchProjection INSTANCE = new StubEntityLoadingProjection();
 
 	@SuppressWarnings("unchecked")
-	public static <T> StubEntityProjection<T> get() {
-		return (StubEntityProjection<T>) INSTANCE;
+	public static <T> StubEntityLoadingProjection<T> get() {
+		return (StubEntityLoadingProjection<T>) INSTANCE;
 	}
 
-	private StubEntityProjection() {
+	private StubEntityLoadingProjection() {
 	}
 
 	@Override
