@@ -30,8 +30,8 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	}
 
 	@Override
-	public <E> SearchProjection<E> entity() {
-		return new LuceneEntityProjection<>( scope );
+	public <E> SearchProjection<E> entityLoading() {
+		return new LuceneEntityLoadingProjection<>( scope );
 	}
 
 	@Override

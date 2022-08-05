@@ -19,7 +19,7 @@ public interface SearchProjectionBuilderFactory {
 
 	SearchProjection<DocumentReference> documentReference();
 
-	<E> SearchProjection<E> entity();
+	<E> SearchProjection<E> entityLoading();
 
 	<R> SearchProjection<R> entityReference();
 

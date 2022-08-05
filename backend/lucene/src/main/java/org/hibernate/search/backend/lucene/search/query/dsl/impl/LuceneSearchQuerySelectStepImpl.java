@@ -53,7 +53,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public LuceneSearchQueryWhereStep<E, LOS> selectEntity() {
-		return select( scope.projectionBuilders().entity() );
+		return select( scope.projectionBuilders().entityLoading() );
 	}
 
 	@Override

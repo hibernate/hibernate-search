@@ -34,8 +34,8 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <E> SearchProjection<E> entity() {
-		return new ElasticsearchEntityProjection<>( scope, documentReferenceExtractionHelper );
+	public <E> SearchProjection<E> entityLoading() {
+		return new ElasticsearchEntityLoadingProjection<>( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
