@@ -95,6 +95,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return entityPersister;
 	}
 
+	@Override
 	public IdentifierMapping identifierMapping() {
 		return identifierMapping;
 	}
@@ -104,6 +105,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return loadingStrategy;
 	}
 
+	@Override
 	public List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes() {
 		return ascendingSuperTypes;
 	}
