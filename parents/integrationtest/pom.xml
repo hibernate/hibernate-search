@@ -57,14 +57,6 @@
                 <artifactId>hibernate-search-integrationtest-backend-tck</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            <!-- JDBC drivers -->
-            <!-- Profile-specific driver, used in most database-sensitive integration tests -->
-            <dependency>
-                <groupId>${jdbc.driver.groupId}</groupId>
-                <artifactId>${jdbc.driver.artifactId}</artifactId>
-                <version>${jdbc.driver.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -682,7 +674,6 @@
                 <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
                 <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
-                <jdbc.driver.version>2.1.214</jdbc.driver.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
@@ -700,7 +691,6 @@
                 <db.dialect>org.hibernate.dialect.PostgreSQL10Dialect</db.dialect>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <jdbc.driver.version>42.2.19</jdbc.driver.version>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jdbc.url>jdbc:postgresql://localhost:5432/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
@@ -718,7 +708,6 @@
                 <db.dialect>org.hibernate.dialect.MariaDB103Dialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
-                <jdbc.driver.version>2.2.4</jdbc.driver.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
                 <jdbc.url>jdbc:mariadb://localhost/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
@@ -736,7 +725,6 @@
                 <db.dialect>org.hibernate.dialect.MySQL8Dialect</db.dialect>
                 <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
-                <jdbc.driver.version>8.0.17</jdbc.driver.version>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
                 <jdbc.url>jdbc:mysql://localhost/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
@@ -754,7 +742,6 @@
                 <db.dialect>org.hibernate.dialect.DB297Dialect</db.dialect>
                 <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
-                <jdbc.driver.version>11.5.5.0</jdbc.driver.version>
                 <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
                 <jdbc.url>jdbc:db2://localhost:50005/hreact</jdbc.url>
                 <jdbc.user>hreact</jdbc.user>
@@ -772,7 +759,6 @@
                 <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>ojdbc8</jdbc.driver.artifactId>
-                <jdbc.driver.version>21.1.0.0</jdbc.driver.version>
                 <jdbc.driver>oracle.jdbc.OracleDriver</jdbc.driver>
                 <jdbc.url>jdbc:oracle:thin:@localhost:1521/XE</jdbc.url>
                 <jdbc.user>SYSTEM</jdbc.user>
@@ -792,7 +778,6 @@
                 <db.dialect>org.hibernate.dialect.SQLServer2012Dialect</db.dialect>
                 <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
-                <jdbc.driver.version>9.2.1.jre11</jdbc.driver.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jdbc.url>jdbc:sqlserver://localhost:1433;databaseName=tempdb</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
@@ -810,7 +795,6 @@
                 <!-- CockroachDB uses the same client protocol as PostgreSQL (pgwire), so the driver is the same. -->
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <jdbc.driver.version>42.2.19</jdbc.driver.version>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jdbc.url>jdbc:postgresql://localhost:26257/defaultdb?sslmode=disable</jdbc.url>
                 <jdbc.user>root</jdbc.user>
