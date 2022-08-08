@@ -342,15 +342,24 @@
         <version.org.jboss.weld>3.1.9.Final</version.org.jboss.weld>
         <version.org.jboss.weld.jakarta>4.0.3.Final</version.org.jboss.weld.jakarta>
 
+        <!-- >>> JDBC Drivers -->
+        <version.com.h2database>2.1.214</version.com.h2database>
+        <!-- Sticking to Derby 10.14 for now since later versions require JDK 9+, and we need to test with JDK 8.
+             See https://db.apache.org/derby/derby_downloads.html -->
+        <version.org.apache.derby>10.14.2.0</version.org.apache.derby>
+        <version.org.postgresql>42.2.19</version.org.postgresql>
+        <version.org.mariadb.jdbc>2.2.4</version.org.mariadb.jdbc>
+        <version.mysql.mysql-connector-java>8.0.17</version.mysql.mysql-connector-java>
+        <version.com.ibm.db2.jcc>11.5.5.0</version.com.ibm.db2.jcc>
+        <version.com.oracle.database.jdbc>21.1.0.0</version.com.oracle.database.jdbc>
+        <version.com.microsoft.sqlserver.mssql-jdbc>9.2.1.jre11</version.com.microsoft.sqlserver.mssql-jdbc>
+
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.35</version.org.openjdk.jmh>
 
         <!-- >>> JSR 352: JBatch runtime -->
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
         <version.com.ibm.jbatch.jakarta>2.1.1</version.com.ibm.jbatch.jakarta>
-        <!-- Sticking to Derby 10.14 for now since later versions require JDK 9+, and we need to test with JDK 8.
-             See https://db.apache.org/derby/derby_downloads.html -->
-        <version.org.apache.derby>10.14.2.0</version.org.apache.derby>
 
         <!-- >>> JSR 352: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.1.0.Final</version.org.jboss.marshalling>
@@ -1263,6 +1272,48 @@
                 <version>${version.org.jboss.weld}</version>
             </dependency>
 
+            <!-- JDBC Drivers -->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.com.h2database}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${version.org.apache.derby}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${version.org.postgresql}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${version.org.mariadb.jdbc}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${version.mysql.mysql-connector-java}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.db2</groupId>
+                <artifactId>jcc</artifactId>
+                <version>${version.com.ibm.db2.jcc}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${version.com.oracle.database.jdbc}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>${version.com.microsoft.sqlserver.mssql-jdbc}</version>
+            </dependency>
+
             <!-- Performance tests -->
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -1319,11 +1370,6 @@
                 <artifactId>com.ibm.jbatch.container</artifactId>
                 <version>${version.com.ibm.jbatch.jakarta}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>${version.org.apache.derby}</version>
-            </dependency>
 
             <!-- JBeret Core and JBeret SE runtime dependencies -->
             <dependency>
@@ -1347,11 +1393,6 @@
                 <groupId>org.jberet</groupId>
                 <artifactId>jberet-se</artifactId>
                 <version>${version.org.jberet}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${version.com.h2database}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
