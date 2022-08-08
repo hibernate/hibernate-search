@@ -53,3 +53,6 @@ updates:
       # maven-assembly-plugin 3.1.1+ and 3.3+ behaves in a significantly different way, which makes the upgrade quite complex
       # TODO HSEARCH-4380 Remove this when upgrading
       - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
+      # This dependency uses classifiers (.jre11, -preview, ...) in its version, and dependabot can't decide which versions are relevant.
+      # See https://github.com/dependabot/dependabot-core/issues/4028
+      - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
