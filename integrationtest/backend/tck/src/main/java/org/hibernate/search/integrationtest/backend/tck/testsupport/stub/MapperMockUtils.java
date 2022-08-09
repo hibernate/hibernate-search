@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -34,16 +33,14 @@ public final class MapperMockUtils {
 
 	/**
 	 * @param loadingContextMock The mock for the loading context.
-	 * @param referenceTransformerMock The mock for the reference transformer.
 	 * @param hitMappingDefinition A definition of the reference -> entity mapping.
 	 * @param <R> The reference type.
 	 * @param <E> The entity type.
 	 */
 	public static <R, E> void expectHitMapping(
 			SearchLoadingContext<R, E> loadingContextMock,
-			DocumentReferenceConverter<R> referenceTransformerMock,
 			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
-		reset( loadingContextMock, referenceTransformerMock );
+		reset( (Object) loadingContextMock );
 
 		@SuppressWarnings("unchecked")
 		ProjectionHitMapper<R, E> projectionHitMapperMock = Mockito.mock( ProjectionHitMapper.class );
