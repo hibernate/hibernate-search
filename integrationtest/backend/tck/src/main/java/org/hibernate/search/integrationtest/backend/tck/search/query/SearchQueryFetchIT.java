@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -261,8 +262,50 @@ public class SearchQueryFetchIT {
 	@Test
 	public void fetchTotalHitCount() {
 		assertThat( matchAllQuerySortByField().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
+		assertThat( matchAllQuerySortByField().toQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
 
 		assertThat( matchFirstHalfQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT / 2 );
+		assertThat( matchFirstHalfQuery().toQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT / 2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3511")
+	public void fetchTotalHitCount_offset_limit() {
+		SearchQuery<DocumentReference> query = matchAllQuerySortByField().toQuery();
+
+		// Using an offset/limit should not affect later counts
+		query.fetch( 1, 1 );
+		assertThat( query.fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
+
+		query.fetch( 0, 1 );
+		assertThat( query.fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
+	}
+
+	@Test
+	public void fetchTotalHitCount_withProjection() {
+		assertThat( index.query()
+				.select( f -> f.field( "integer", Integer.class ) )
+				.where( f -> f.matchAll() )
+				.fetchTotalHitCount() )
+				.isEqualTo( DOCUMENT_COUNT );
+		assertThat( index.query()
+				.select( f -> f.field( "integer", Integer.class ) )
+				.where( f -> f.matchAll() )
+				.toQuery()
+				.fetchTotalHitCount() )
+				.isEqualTo( DOCUMENT_COUNT );
+
+		assertThat( index.query()
+				.select( f -> f.field( "integer", Integer.class ) )
+				.where( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
+				.fetchTotalHitCount() )
+				.isEqualTo( DOCUMENT_COUNT / 2 );
+		assertThat( index.query()
+				.select( f -> f.field( "integer", Integer.class ) )
+				.where( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
+				.toQuery()
+				.fetchTotalHitCount() )
+				.isEqualTo( DOCUMENT_COUNT / 2 );
 	}
 
 	@Test
@@ -395,7 +438,8 @@ public class SearchQueryFetchIT {
 			text = root.field( "text", f -> f.asString()
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 					.toReference();
-			integer = root.field( "integer", f -> f.asInteger().sortable( Sortable.YES ) )
+			integer = root.field( "integer", f -> f.asInteger()
+							.projectable( Projectable.YES ).sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}

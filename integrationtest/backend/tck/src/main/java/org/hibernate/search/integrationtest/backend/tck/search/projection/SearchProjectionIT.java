@@ -175,13 +175,13 @@ public class SearchProjectionIT {
 				scope.projection().documentReference().toProjection();
 		SearchProjection<StubTransformedReference> entityReferenceProjection =
 				scope.projection().entityReference().toProjection();
-		SearchProjection<StubLoadedObject> objectProjection =
+		SearchProjection<StubLoadedObject> entityProjection =
 				scope.projection().entity().toProjection();
 		query = scope.query( loadingContextMock )
 				.select(
 						documentReferenceProjection,
 						entityReferenceProjection,
-						objectProjection
+						entityProjection
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
