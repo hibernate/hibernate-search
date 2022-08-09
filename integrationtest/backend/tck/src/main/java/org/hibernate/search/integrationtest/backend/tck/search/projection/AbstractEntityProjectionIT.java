@@ -69,9 +69,19 @@ public abstract class AbstractEntityProjectionIT {
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex;
+	private final SimpleMappedIndex<IndexBinding> multiIndex1;
+	private final SimpleMappedIndex<IndexBinding> multiIndex2;
+	private final SimpleMappedIndex<IndexBinding> multiIndex3;
+	private final SimpleMappedIndex<IndexBinding> multiIndex4;
 
-	protected AbstractEntityProjectionIT(SimpleMappedIndex<IndexBinding> mainIndex) {
+	protected AbstractEntityProjectionIT(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<IndexBinding> multiIndex1, SimpleMappedIndex<IndexBinding> multiIndex2,
+			SimpleMappedIndex<IndexBinding> multiIndex3, SimpleMappedIndex<IndexBinding> multiIndex4) {
 		this.mainIndex = mainIndex;
+		this.multiIndex1 = multiIndex1;
+		this.multiIndex2 = multiIndex2;
+		this.multiIndex3 = multiIndex3;
+		this.multiIndex4 = multiIndex4;
 	}
 
 	public abstract <R, E, LOS> SearchQueryWhereStep<?, E, LOS, ?> select(
@@ -390,18 +400,127 @@ public abstract class AbstractEntityProjectionIT {
 				} );
 	}
 
+	/**
+	 * Tests the entity projection when targeting multiple types:
+	 * two types with loading available,
+	 * and two types with loading unavailable but each with its own projection in the registry.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4579")
+	public void projectionRegistryFallback_multiType() {
+		DocumentReference type1Doc1Reference = reference( multiIndex1.typeName(), DOCUMENT_1_ID );
+		DocumentReference type1Doc2Reference = reference( multiIndex1.typeName(), DOCUMENT_2_ID );
+		DocumentReference type2Doc1Reference = reference( multiIndex2.typeName(), DOCUMENT_1_ID );
+		DocumentReference type2Doc2Reference = reference( multiIndex2.typeName(), DOCUMENT_2_ID );
+		DocumentReference type3Doc1Reference = reference( multiIndex3.typeName(), DOCUMENT_1_ID );
+		DocumentReference type3Doc2Reference = reference( multiIndex3.typeName(), DOCUMENT_2_ID );
+		DocumentReference type4Doc1Reference = reference( multiIndex4.typeName(), DOCUMENT_1_ID );
+		DocumentReference type4Doc2Reference = reference( multiIndex4.typeName(), DOCUMENT_2_ID );
+
+		ProjectionMappedTypeContext type1ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
+		ProjectionMappedTypeContext type2ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
+		ProjectionMappedTypeContext type3ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
+		ProjectionMappedTypeContext type4ContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
+		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		when( type1ContextMock.name() ).thenReturn( multiIndex1.typeName() );
+		when( type1ContextMock.loadingAvailable() ).thenReturn( true );
+
+		when( type2ContextMock.name() ).thenReturn( multiIndex2.typeName() );
+		when( type2ContextMock.loadingAvailable() ).thenReturn( true );
+
+		when( type3ContextMock.name() ).thenReturn( multiIndex3.typeName() );
+		when( type3ContextMock.loadingAvailable() ).thenReturn( false );
+		doReturn( StubType3.class )
+				.when( type3ContextMock ).javaClass();
+		CompositeProjectionDefinition<StubType3> type3ProjectionDefinitionStub =
+				// Simulate a projection that instantiates the entity based on field values extracted from the index.
+				// Here we're just retrieving a field containing the ID.
+				(f, initialStep) -> initialStep.from( f.field( multiIndex3.binding().idField.relativeFieldName, String.class ) )
+						.as( id -> new StubType3( reference( multiIndex3.typeName(), id ) ) );
+		when( projectionRegistryMock.compositeOptional( StubType3.class ) )
+				.thenReturn( Optional.of( type3ProjectionDefinitionStub ) );
+		when( projectionRegistryMock.composite( StubType3.class ) )
+				.thenReturn( type3ProjectionDefinitionStub );
+
+		when( type4ContextMock.name() ).thenReturn( multiIndex4.typeName() );
+		when( type4ContextMock.loadingAvailable() ).thenReturn( false );
+		doReturn( StubType4.class )
+				.when( type4ContextMock ).javaClass();
+		CompositeProjectionDefinition<StubType4> type4ProjectionDefinitionStub =
+				// Simulate a projection that instantiates the entity based on field values extracted from the index.
+				// Here we're just retrieving a field containing the ID.
+				(f, initialStep) -> initialStep.from( f.field( multiIndex4.binding().idField.relativeFieldName, String.class ) )
+						.as( id -> new StubType4( reference( multiIndex4.typeName(), id ) ) );
+		when( projectionRegistryMock.compositeOptional( StubType4.class ) )
+				.thenReturn( Optional.of( type4ProjectionDefinitionStub ) );
+		when( projectionRegistryMock.composite( StubType4.class ) )
+				.thenReturn( type4ProjectionDefinitionStub );
+
+		multiIndex1.mapping().with()
+				.typeContext( multiIndex1.typeName(), type1ContextMock )
+				.typeContext( multiIndex2.typeName(), type2ContextMock )
+				.typeContext( multiIndex3.typeName(), type3ContextMock )
+				.typeContext( multiIndex4.typeName(), type4ContextMock )
+				.projectionRegistry( projectionRegistryMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							multiIndex1.createGenericScope( loadingContextMock, multiIndex2, multiIndex3, multiIndex4 );
+
+					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( type1Doc1Reference, new StubType1( type1Doc1Reference ) )
+									.load( type1Doc2Reference, new StubType1( type1Doc2Reference ) )
+									.load( type2Doc1Reference, new StubType2( type2Doc1Reference ) )
+									.load( type2Doc2Reference, new StubType2( type2Doc2Reference ) )
+					);
+					assertThatQuery( query )
+							.hits().asIs().usingRecursiveFieldByFieldElementComparator()
+							.containsExactlyInAnyOrder(
+									new StubType1( type1Doc1Reference ),
+									new StubType1( type1Doc2Reference ),
+									new StubType2( type2Doc1Reference ),
+									new StubType2( type2Doc2Reference ),
+									new StubType3( type3Doc1Reference ),
+									new StubType3( type3Doc2Reference ),
+									new StubType4( type4Doc1Reference ),
+									new StubType4( type4Doc2Reference )
+							);
+				} );
+	}
+
 	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {
 		try ( SearchScroll<H> scroll = query.scroll( 10 ) ) {
 			return scroll.next().hits();
 		}
 	}
 
-	public static void initData(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer) {
-		IndexBinding mainIndexBinding = mainIndex.binding();
-		mainIndexer
-				.add( DOCUMENT_1_ID, document -> document.addValue( mainIndexBinding.idField.reference, DOCUMENT_1_ID ) )
-				.add( DOCUMENT_2_ID, document -> document.addValue( mainIndexBinding.idField.reference, DOCUMENT_2_ID ) );
+	public static void initData(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
+			SimpleMappedIndex<IndexBinding> multiIndex1, BulkIndexer multiIndex1Indexer,
+			SimpleMappedIndex<IndexBinding> multiIndex2, BulkIndexer multiIndex2Indexer,
+			SimpleMappedIndex<IndexBinding> multiIndex3, BulkIndexer multiIndex3Indexer,
+			SimpleMappedIndex<IndexBinding> multiIndex4, BulkIndexer multiIndex4Indexer) {
+		initIndex( mainIndex, mainIndexer );
+		initIndex( multiIndex1, multiIndex1Indexer );
+		initIndex( multiIndex2, multiIndex2Indexer );
+		initIndex( multiIndex3, multiIndex3Indexer );
+		initIndex( multiIndex4, multiIndex4Indexer );
 	}
+
+	private static void initIndex(SimpleMappedIndex<IndexBinding> index, BulkIndexer indexer) {
+		IndexBinding binding = index.binding();
+		indexer
+				.add( DOCUMENT_1_ID, document -> document.addValue( binding.idField.reference, DOCUMENT_1_ID ) )
+				.add( DOCUMENT_2_ID, document -> document.addValue( binding.idField.reference, DOCUMENT_2_ID ) );
+	}
+
 
 	public static class IndexBinding {
 		final SimpleFieldModel<String> idField;
@@ -414,4 +533,24 @@ public abstract class AbstractEntityProjectionIT {
 		}
 	}
 
+	static final class StubType1 extends StubEntity {
+		public StubType1(DocumentReference documentReference) {
+			super( documentReference );
+		}
+	}
+	static final class StubType2 extends StubEntity {
+		public StubType2(DocumentReference documentReference) {
+			super( documentReference );
+		}
+	}
+	static final class StubType3 extends StubEntity {
+		public StubType3(DocumentReference documentReference) {
+			super( documentReference );
+		}
+	}
+	static final class StubType4 extends StubEntity {
+		public StubType4(DocumentReference documentReference) {
+			super( documentReference );
+		}
+	}
 }

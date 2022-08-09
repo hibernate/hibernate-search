@@ -22,18 +22,20 @@ public final class SearchProjectionBackendContext {
 		this.idProjectionExtractionHelper = idProjectionExtractionHelper;
 	}
 
-	DocumentReferenceExtractionHelper createDocumentReferenceExtractionHelper(
-			ElasticsearchSearchIndexScope<?> scope) {
+	ProjectionExtractionHelper<String> createMappedTypeNameExtractionHelper(ElasticsearchSearchIndexScope<?> scope) {
 		Set<String> mappedTypeNames = scope.mappedTypeNameToIndex().keySet();
-		ProjectionExtractionHelper<String> mappedTypeNameHelper;
 		if ( mappedTypeNames.size() == 1 ) {
 			// Only one type targeted by the search: use a simpler implementation that will always work.
-			mappedTypeNameHelper = new SingleTypeNameExtractionHelper( mappedTypeNames.iterator().next() );
+			return new SingleTypeNameExtractionHelper( mappedTypeNames.iterator().next() );
 		}
 		else {
-			mappedTypeNameHelper = complexMappedTypeNameProjectionExtractionHelper;
+			return complexMappedTypeNameProjectionExtractionHelper;
 		}
-		return new DocumentReferenceExtractionHelper( mappedTypeNameHelper, idProjectionExtractionHelper );
+	}
+
+	DocumentReferenceExtractionHelper createDocumentReferenceExtractionHelper(
+			ProjectionExtractionHelper<String> mappedTypeNameExtractionHelper) {
+		return new DocumentReferenceExtractionHelper( mappedTypeNameExtractionHelper, idProjectionExtractionHelper );
 	}
 
 	public ProjectionExtractionHelper<String> idProjectionExtractionHelper() {

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -64,5 +66,14 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	@Override
 	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
 		return new StubThrowingProjection<>( exceptionSupplier );
+	}
+
+	@Override
+	public <T> SearchProjection<T> byTypeName(Map<String, ? extends SearchProjection<? extends T>> inners) {
+		Map<String, StubSearchProjection<? extends T>> stubInners = new HashMap<>();
+		for ( Map.Entry<String, ? extends SearchProjection<? extends T>> entry : inners.entrySet() ) {
+			stubInners.put( entry.getKey(), StubSearchProjection.from( entry.getValue() ) );
+		}
+		return new StubByMappedTypeProjection<>( stubInners );
 	}
 }

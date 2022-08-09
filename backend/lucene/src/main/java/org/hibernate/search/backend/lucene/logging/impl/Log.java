@@ -609,4 +609,9 @@ public interface Log extends BasicLogger {
 			value = "Unable to start index: %1$s")
 	SearchException unableToStartShard(String causeMessage, @Cause Exception cause);
 
+	@Message(id = ID_OFFSET + 155,
+			value = "Unexpected mapped type name extracted from hits: '%1$s'. Expected one of: %2$s."
+					+ " The document was probably indexed with a different configuration: full reindexing is necessary.")
+	SearchException unexpectedMappedTypeNameForByMappedTypeProjection(String typeName, Set<String> expectedTypeNames);
+
 }

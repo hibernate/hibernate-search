@@ -726,4 +726,9 @@ public interface Log extends BasicLogger {
 	SearchException invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(String absolutePath,
 			String objectFieldAbsolutePath);
 
+	@Message(id = ID_OFFSET + 156,
+			value = "Unexpected mapped type name extracted from hits: '%1$s'. Expected one of: %2$s."
+					+ " The document was probably indexed with a different configuration: full reindexing is necessary.")
+	SearchException unexpectedMappedTypeNameForByMappedTypeProjection(String typeName, Set<String> expectedTypeNames);
+
 }

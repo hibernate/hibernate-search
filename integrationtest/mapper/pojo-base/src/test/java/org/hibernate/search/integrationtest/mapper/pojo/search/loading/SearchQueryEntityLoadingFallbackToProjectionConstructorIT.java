@@ -27,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.data.Pair;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -215,4 +216,172 @@ public class SearchQueryEntityLoadingFallbackToProjectionConstructorIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	public void multiType() {
+		class Model {
+			@Indexed
+			class IndexedEntityWithLoadingStrategy {
+				@DocumentId
+				// Necessary because there's no way to project on the id with @ProjectionConstructor yet
+				// TODO HSEARCH-4574 remove this field and use @IdProjection or similar in the constructor instead
+				@GenericField
+				public Integer id;
+				@FullTextField
+				public String text;
+
+				public IndexedEntityWithLoadingStrategy(Integer id, String text) {
+					this.id = id;
+					this.text = text;
+				}
+			}
+
+			@Indexed
+			class IndexedEntityWithLoadingStrategyChild extends IndexedEntityWithLoadingStrategy {
+				public static final String NAME = "WithLoadChild";
+
+				// A projection constructor unlike the parent class, but the loading strategy is inherited
+				@ProjectionConstructor
+				public IndexedEntityWithLoadingStrategyChild(Integer id, String text) {
+					super( id, text );
+				}
+			}
+
+			@Indexed
+			class IndexedEntityWithProjectionConstructor {
+				public static final String NAME = "WithProj";
+				@DocumentId
+				// Necessary because there's no way to project on the id with @ProjectionConstructor yet
+				// TODO HSEARCH-4574 remove this field and use @IdProjection or similar in the constructor instead
+				@GenericField
+				public Integer id;
+				@FullTextField
+				public String text;
+
+				@ProjectionConstructor
+				public IndexedEntityWithProjectionConstructor(Integer id, String text) {
+					this.id = id;
+					this.text = text;
+				}
+			}
+
+			@Indexed
+			class IndexedEntityWithProjectionConstructorChild extends IndexedEntityWithProjectionConstructor {
+				public static final String NAME = "WithProjChild";
+
+				// No projection constructor unlike the parent class, but there is a loading strategy
+				public IndexedEntityWithProjectionConstructorChild(Integer id, String text) {
+					super( id, text );
+				}
+			}
+		}
+
+		String entityWithLoadingStrategyName = "WithLoad";
+		PersistenceTypeKey<Model.IndexedEntityWithLoadingStrategy, Integer> entityWithLoadingStrategyTypeKey =
+				new PersistenceTypeKey<>( Model.IndexedEntityWithLoadingStrategy.class, Integer.class );
+		String entityWithLoadingStrategyChildName = "WithLoadChild";
+		String entityWithProjectionConstructorName = "WithProj";
+		String entityWithProjectionConstructorChildName = "WithProjChild";
+		PersistenceTypeKey<Model.IndexedEntityWithProjectionConstructorChild, Integer> entityWithProjectionConstructorChildTypeKey =
+				new PersistenceTypeKey<>( Model.IndexedEntityWithProjectionConstructorChild.class, Integer.class );
+
+		backendMock.expectAnySchema( entityWithLoadingStrategyName );
+		backendMock.expectAnySchema( entityWithLoadingStrategyChildName );
+		backendMock.expectAnySchema( entityWithProjectionConstructorName );
+		backendMock.expectAnySchema( entityWithProjectionConstructorChildName );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( b -> b
+						.addEntityType(
+								Model.IndexedEntityWithLoadingStrategy.class,
+								entityWithLoadingStrategyName,
+								c -> c.selectionLoadingStrategy(
+										new StubSelectionLoadingStrategy<>( entityWithLoadingStrategyTypeKey ) )
+						)
+						.addEntityType(
+								Model.IndexedEntityWithLoadingStrategyChild.class,
+								entityWithLoadingStrategyChildName
+						)
+						.addEntityType(
+								Model.IndexedEntityWithProjectionConstructor.class,
+								entityWithProjectionConstructorName
+						)
+						.addEntityType(
+								Model.IndexedEntityWithProjectionConstructorChild.class,
+								entityWithProjectionConstructorChildName,
+								c -> c.selectionLoadingStrategy( new StubSelectionLoadingStrategy<>(
+										entityWithProjectionConstructorChildTypeKey ) )
+						)
+				)
+				.withAnnotatedTypes(
+						Model.IndexedEntityWithLoadingStrategy.class,
+						Model.IndexedEntityWithLoadingStrategyChild.class,
+						Model.IndexedEntityWithProjectionConstructor.class,
+						Model.IndexedEntityWithProjectionConstructorChild.class
+				)
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		Model.IndexedEntityWithLoadingStrategy withLoadingStrategyInstance =
+				model.new IndexedEntityWithLoadingStrategy( 1, "text1" );
+		Model.IndexedEntityWithLoadingStrategyChild withLoadingStrategyChildInstance =
+				model.new IndexedEntityWithLoadingStrategyChild( 2, "text2" );
+		Model.IndexedEntityWithProjectionConstructor withProjectionConstructorInstance =
+				model.new IndexedEntityWithProjectionConstructor( 3, "text3" );
+		Model.IndexedEntityWithProjectionConstructorChild withProjectionConstructorChildInstance =
+				model.new IndexedEntityWithProjectionConstructorChild( 3, "text3" );
+
+		loadingContext.persistenceMap( entityWithLoadingStrategyTypeKey )
+				.put( withLoadingStrategyInstance.id, withLoadingStrategyInstance );
+		loadingContext.persistenceMap( entityWithLoadingStrategyTypeKey )
+				.put( withLoadingStrategyChildInstance.id, withLoadingStrategyChildInstance );
+		loadingContext.persistenceMap( entityWithProjectionConstructorChildTypeKey )
+				.put( withProjectionConstructorChildInstance.id, withProjectionConstructorChildInstance );
+
+		try ( SearchSession session = mapping.createSessionWithOptions()
+				.loading( o -> o.context( StubLoadingContext.class, loadingContext ) )
+				.build() ) {
+			backendMock.expectSearchProjection(
+					Arrays.asList( entityWithLoadingStrategyName, entityWithLoadingStrategyChildName,
+							entityWithProjectionConstructorName, entityWithProjectionConstructorChildName ),
+					StubSearchWorkBehavior.of(
+							4,
+							reference( entityWithLoadingStrategyName, String.valueOf( withLoadingStrategyInstance.id ) ),
+							// The loading strategy takes precedence over the projection constructor,
+							// so expect IndexedEntityWithLoadingStrategyChild to be loaded.
+							reference( entityWithLoadingStrategyChildName, String.valueOf( withLoadingStrategyChildInstance.id ) ),
+							new Pair<>( entityWithProjectionConstructorName,
+									Arrays.asList( withProjectionConstructorInstance.id, withProjectionConstructorInstance.text ) ),
+							// The loading strategy takes precedence over the projection constructor,
+							// so expect IndexedEntityWithProjectionConstructorChild to be loaded.
+							reference( entityWithProjectionConstructorChildName,
+									String.valueOf( withProjectionConstructorChildInstance.id ) )
+					)
+			);
+
+			assertThat( session.search( Arrays.asList( Model.IndexedEntityWithLoadingStrategy.class,
+							Model.IndexedEntityWithProjectionConstructor.class
+					) )
+					.where( f -> f.matchAll() )
+					.fetchAllHits() )
+					.usingRecursiveComparison()
+					.isEqualTo( Arrays.asList(
+							withLoadingStrategyInstance,
+							withLoadingStrategyChildInstance,
+							withProjectionConstructorInstance,
+							withProjectionConstructorChildInstance
+					) );
+
+			// Three out of the four types should actually rely on loading;
+			// the one entity without a loading strategy relies on projection constructors.
+			assertThat( loadingContext.loaderCalls() )
+					.satisfiesExactlyInAnyOrder(
+							c -> assertThat( c.ids ).containsExactlyInAnyOrder( withLoadingStrategyInstance.id,
+									withLoadingStrategyChildInstance.id ),
+							c -> assertThat( c.ids ).containsExactlyInAnyOrder(
+									withProjectionConstructorChildInstance.id )
+					);
+		}
+		backendMock.verifyExpectationsMet();
+	}
 }
