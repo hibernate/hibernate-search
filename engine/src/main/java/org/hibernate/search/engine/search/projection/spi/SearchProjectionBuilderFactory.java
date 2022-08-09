@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -40,5 +41,13 @@ public interface SearchProjectionBuilderFactory {
 	 * @param <T> The type of projected values.
 	 */
 	<T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier);
+
+	/**
+	 * @param inners A map from type name to projection.
+	 * @return A projection that delegates to the given projections,
+	 * picking the delegate based on the document's type name.
+	 * @param <T> The type of projected values.
+	 */
+	<T> SearchProjection<T> byTypeName(Map<String, ? extends SearchProjection<? extends T>> inners);
 
 }

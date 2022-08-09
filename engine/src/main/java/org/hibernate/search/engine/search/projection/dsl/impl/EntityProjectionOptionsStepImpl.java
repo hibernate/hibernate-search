@@ -7,7 +7,9 @@
 package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -17,7 +19,6 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -51,8 +52,11 @@ public final class EntityProjectionOptionsStepImpl<E>
 		if ( canUseProjectionFromFirst ) {
 			return toProjection( first );
 		}
-		// TODO implement multi-type
-		throw new AssertionFailure( "Not implemented yet" );
+		Map<String, SearchProjection<? extends E>> byTypeName = new HashMap<>();
+		for ( ProjectionMappedTypeContext mappedTypeContext : mappedTypeContexts ) {
+			byTypeName.put( mappedTypeContext.name(), toProjection( mappedTypeContext ) );
+		}
+		return scope.projectionBuilders().byTypeName( byTypeName );
 	}
 
 	// The casts are safe because a query making use of this projection can only target entity types extending E

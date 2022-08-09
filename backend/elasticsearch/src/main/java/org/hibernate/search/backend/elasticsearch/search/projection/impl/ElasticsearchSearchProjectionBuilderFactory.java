@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
@@ -21,13 +23,16 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
 	private final ElasticsearchSearchIndexScope<?> scope;
+	private final ProjectionExtractionHelper<String> mappedTypeNameExtractionHelper;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 	private final ProjectionExtractionHelper<String> idProjectionExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
 			ElasticsearchSearchIndexScope<?> scope) {
 		this.scope = scope;
-		this.documentReferenceExtractionHelper = searchProjectionBackendContext.createDocumentReferenceExtractionHelper( scope );
+		this.mappedTypeNameExtractionHelper = searchProjectionBackendContext.createMappedTypeNameExtractionHelper( scope );
+		this.documentReferenceExtractionHelper =
+				searchProjectionBackendContext.createDocumentReferenceExtractionHelper( mappedTypeNameExtractionHelper );
 		this.idProjectionExtractionHelper = searchProjectionBackendContext.idProjectionExtractionHelper();
 	}
 
@@ -71,6 +76,16 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
 		return new ElasticsearchThrowingProjection<>( scope, exceptionSupplier );
+	}
+
+	@Override
+	public <T> SearchProjection<T> byTypeName(Map<String, ? extends SearchProjection<? extends T>> inners) {
+		Map<String, ElasticsearchSearchProjection<? extends T>> elasticsearchInners = new HashMap<>();
+		for ( Map.Entry<String, ? extends SearchProjection<? extends T>> entry : inners.entrySet() ) {
+			elasticsearchInners.put( entry.getKey(), ElasticsearchSearchProjection.from( scope, entry.getValue() ) );
+		}
+		return new ElasticsearchByMappedTypeProjection<>( scope, mappedTypeNameExtractionHelper,
+				elasticsearchInners );
 	}
 
 	public SearchProjection<JsonObject> source() {

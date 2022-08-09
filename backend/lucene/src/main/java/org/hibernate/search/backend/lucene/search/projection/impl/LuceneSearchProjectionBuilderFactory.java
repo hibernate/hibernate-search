@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
@@ -67,6 +69,15 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	@Override
 	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
 		return new LuceneThrowingProjection<>( scope, exceptionSupplier );
+	}
+
+	@Override
+	public <T> SearchProjection<T> byTypeName(Map<String, ? extends SearchProjection<? extends T>> inners) {
+		Map<String, LuceneSearchProjection<? extends T>> luceneInners = new HashMap<>();
+		for ( Map.Entry<String, ? extends SearchProjection<? extends T>> entry : inners.entrySet() ) {
+			luceneInners.put( entry.getKey(), LuceneSearchProjection.from( scope, entry.getValue() ) );
+		}
+		return new LuceneByMappedTypeProjection<>( scope, luceneInners );
 	}
 
 	public SearchProjection<Document> document() {
