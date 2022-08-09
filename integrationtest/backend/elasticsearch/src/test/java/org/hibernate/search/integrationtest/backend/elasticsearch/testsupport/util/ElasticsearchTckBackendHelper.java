@@ -10,6 +10,8 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -114,5 +116,10 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 								+ "}"
 						+ "\""
 				+ "} }" );
+	}
+
+	@Override
+	public <R, E, LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
+		return ElasticsearchExtension.get();
 	}
 }
