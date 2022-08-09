@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -24,7 +23,6 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -71,8 +69,6 @@ public class SearchQueryScrollResultLoadingIT {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -81,7 +77,7 @@ public class SearchQueryScrollResultLoadingIT {
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, scroll );
+		verifyLoading( loadingContextMock, scroll );
 	}
 
 	@Test
@@ -89,8 +85,6 @@ public class SearchQueryScrollResultLoadingIT {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -100,7 +94,7 @@ public class SearchQueryScrollResultLoadingIT {
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, scroll );
+		verifyLoading( loadingContextMock, scroll );
 	}
 
 	@Test
@@ -108,8 +102,6 @@ public class SearchQueryScrollResultLoadingIT {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -120,18 +112,17 @@ public class SearchQueryScrollResultLoadingIT {
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 
 		// softTimeout is passed to the entity loading too
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, scroll );
+		verifyLoading( loadingContextMock, scroll );
 	}
 
 	private void verifyLoading(SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
-			DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock,
 			SearchScroll<StubLoadedObject> scroll) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {
 			int base = j * 5;
 
 			expectHitMapping(
-					loadingContextMock, documentReferenceConverterMock,
+					loadingContextMock,
 					c -> {
 						for ( int i = 0; i < 5; i++ ) {
 							c.load( references[base + i].reference, references[base + i].loadedObject );
@@ -152,7 +143,7 @@ public class SearchQueryScrollResultLoadingIT {
 
 		// page with the few remaining items
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> {
 					for ( int i = 35; i <= 36; i++ ) {
 						c.load( references[i].reference, references[i].loadedObject );

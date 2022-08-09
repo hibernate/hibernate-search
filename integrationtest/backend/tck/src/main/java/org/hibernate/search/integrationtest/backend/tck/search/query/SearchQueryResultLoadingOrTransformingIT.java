@@ -31,7 +31,6 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -90,8 +89,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -100,7 +97,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainLoadedObject )
 						.load( emptyReference, emptyLoadedObject )
@@ -113,7 +110,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainLoadedObject )
 						.load( emptyReference, emptyLoadedObject )
@@ -131,8 +128,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -142,7 +137,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainLoadedObject )
 						.load( emptyReference, emptyLoadedObject )
@@ -155,7 +150,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainLoadedObject )
 						.load( emptyReference, emptyLoadedObject )
@@ -205,8 +200,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -216,7 +209,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
 						.entityReference( emptyReference, emptyTransformedReference )
@@ -229,7 +222,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
 						.entityReference( emptyReference, emptyTransformedReference )
@@ -247,8 +240,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -258,7 +249,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainLoadedObject )
 						.load( emptyReference, emptyLoadedObject )
@@ -271,7 +262,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainLoadedObject )
 						.load( emptyReference, emptyLoadedObject )
@@ -297,7 +288,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainReference )
 						.load( emptyReference, emptyReference )
@@ -311,7 +302,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
 		reset( loadingContextMock );
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						.load( mainReference, mainReference )
 						.load( emptyReference, emptyReference )
@@ -329,8 +320,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				mock( StubDocumentReferenceConverter.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -339,7 +328,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock,
+				loadingContextMock,
 				c -> c
 						// Return "null" when loading, meaning the entity failed to load
 						.load( mainDocumentReference, null )
