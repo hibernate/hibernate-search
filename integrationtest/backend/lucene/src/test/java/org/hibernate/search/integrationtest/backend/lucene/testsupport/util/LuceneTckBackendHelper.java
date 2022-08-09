@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -79,5 +81,10 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	public PredicateFinalStep createSlowPredicate(SearchPredicateFactory f) {
 		return f.extension( LuceneExtension.get() )
 				.fromLuceneQuery( new SlowQuery( 100 ) );
+	}
+
+	@Override
+	public <R, E, LOS> SearchQueryDslExtension<? extends SearchQuerySelectStep<?, R, E, LOS, ?, ?>, R, E, LOS> queryDslExtension() {
+		return LuceneExtension.get();
 	}
 }
