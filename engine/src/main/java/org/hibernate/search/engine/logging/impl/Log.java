@@ -57,7 +57,7 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_LEGACY = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET_LEGACY + 230, value = "Starting executor '%1$s'" )
+	@Message(id = ID_OFFSET_LEGACY + 230, value = "Starting executor '%1$s'")
 	void startingExecutor(String name);
 
 	@LogMessage(level = DEBUG)
@@ -79,11 +79,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 1,
 			value = "Invalid value for configuration property '%1$s': '%2$s'. %3$s")
-	SearchException unableToConvertConfigurationProperty(String key, Object rawValue, String errorMessage, @Cause Exception cause);
+	SearchException unableToConvertConfigurationProperty(String key, Object rawValue, String errorMessage,
+			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 2,
 			value = "Invalid value: expected either an instance of '%1$s' or a String that can be parsed into that type. %2$s")
-	SearchException invalidPropertyValue(@FormatWith(ClassFormatter.class) Class<?> expectedType, String errorMessage, @Cause Exception cause);
+	SearchException invalidPropertyValue(@FormatWith(ClassFormatter.class) Class<?> expectedType, String errorMessage,
+			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 3,
 			value = "Invalid Boolean value: expected either a Boolean, the String 'true' or the String 'false'. %1$s")
@@ -116,13 +118,14 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 16,
-			value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon." )
-	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
+			value = "Invalid polygon: the first point '%1$s' should be identical to the last point '%2$s' to properly close the polygon.")
+	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint,
+			GeoPoint lastPoint);
 
 	@Message(id = ID_OFFSET + 19,
 			value = "Hibernate Search encountered %3$s failures during %1$s."
-						+ " Only the first %2$s failures are displayed here."
-						+ " See the logs for extra failures.")
+					+ " Only the first %2$s failures are displayed here."
+					+ " See the logs for extra failures.")
 	String collectedFailureLimitReached(String process, int failureLimit, int failureCount);
 
 	@Message(id = ID_OFFSET + 20,
@@ -181,7 +184,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToInstantiateClass(String className, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 42, value = "Invalid type '%1$s': this type cannot be assigned to type '%2$s'.")
-	SearchException subtypeExpected(@FormatWith(ClassFormatter.class) Class<?> classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+	SearchException subtypeExpected(@FormatWith(ClassFormatter.class) Class<?> classToLoad,
+			@FormatWith(ClassFormatter.class) Class<?> superType);
 
 	@Message(id = ID_OFFSET + 43, value = "Invalid type '%1$s': this type is an interface. An implementation class is required.")
 	SearchException implementationRequired(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
@@ -225,26 +229,28 @@ public interface Log extends BasicLogger {
 			DateTimeFormatter formatter, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 58, value = "Invalid %1$s value: expected either a Number or a String that can be parsed into a %1$s. %2$s")
-	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type, String nestedErrorMessage, @Cause Exception cause);
+	SearchException invalidNumberPropertyValue(@FormatWith(SimpleNameClassFormatter.class) Class<? extends Number> type,
+			String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 59, value = "Invalid string for type '%2$s': '%1$s'. %3$s")
 	SearchException invalidStringForType(String value, @FormatWith(ClassFormatter.class) Class<?> type,
 			String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 60, value = "Invalid value for enum '%2$s': '%1$s'.")
-	SearchException invalidStringForEnum(String value, @FormatWith(ClassFormatter.class) Class<? extends Enum<?>> enumType, @Cause Exception cause);
+	SearchException invalidStringForEnum(String value,
+			@FormatWith(ClassFormatter.class) Class<? extends Enum<?>> enumType, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 61, value = "Multiple hits when a single hit was expected.")
 	SearchException nonSingleHit();
 
 	@Message(id = ID_OFFSET + 62,
 			value = "Unable to submit work to '%1$s': thread received interrupt signal."
-					+ " The work has been discarded." )
+					+ " The work has been discarded.")
 	SearchException threadInterruptedWhileSubmittingWork(String orchestratorName);
 
 	@Message(id = ID_OFFSET + 63,
 			value = "Unable to submit work to '%1$s': this orchestrator is stopped."
-					+ " The work has been discarded." )
+					+ " The work has been discarded.")
 	SearchException submittedWorkToStoppedOrchestrator(String orchestratorName);
 
 	@Message(id = ID_OFFSET + 64,
@@ -253,12 +259,13 @@ public interface Log extends BasicLogger {
 	SearchException unableToParseGeoPoint(String value);
 
 	@Message(id = ID_OFFSET + 65,
-			value = "Unknown aggregation key '%1$s'. This key was not used when building the search query." )
+			value = "Unknown aggregation key '%1$s'. This key was not used when building the search query.")
 	SearchException unknownAggregationKey(AggregationKey<?> key);
 
 	@Message(id = ID_OFFSET + 66,
 			value = "Invalid configuration property checking strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidConfigurationPropertyCheckingStrategyName(String invalidRepresentation, List<String> validRepresentations);
+	SearchException invalidConfigurationPropertyCheckingStrategyName(String invalidRepresentation,
+			List<String> validRepresentations);
 
 	@LogMessage(level = Logger.Level.INFO)
 	@Message(id = ID_OFFSET + 67,
@@ -309,7 +316,8 @@ public interface Log extends BasicLogger {
 			value = "Ambiguous bean reference to type '%1$s':"
 					+ " multiple beans are explicitly defined for this type in Hibernate Search's internal registry."
 					+ " Explicitly defined beans: %2$s.")
-	BeanNotFoundException multipleConfiguredBeanReferencesForType(@FormatWith(ClassFormatter.class) Class<?> exposedType,
+	BeanNotFoundException multipleConfiguredBeanReferencesForType(
+			@FormatWith(ClassFormatter.class) Class<?> exposedType,
 			List<? extends BeanReference<?>> references);
 
 	@Message(id = ID_OFFSET + 77,
@@ -318,7 +326,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 78,
 			value = "No beans defined for type '%1$s' and name '%2$s' in Hibernate Search's internal registry.")
-	BeanNotFoundException noConfiguredBeanReferenceForTypeAndName(@FormatWith(ClassFormatter.class) Class<?> exposedType,
+	BeanNotFoundException noConfiguredBeanReferenceForTypeAndName(
+			@FormatWith(ClassFormatter.class) Class<?> exposedType,
 			String nameReference);
 
 	@Message(id = ID_OFFSET + 79,
@@ -400,15 +409,15 @@ public interface Log extends BasicLogger {
 			List<String> validPrefixes, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 93,
-		value = "Named predicate name '%1$s' is invalid: field names cannot be null or empty.")
+			value = "Named predicate name '%1$s' is invalid: field names cannot be null or empty.")
 	SearchException relativeNamedPredicateNameCannotBeNullOrEmpty(String relativeNamedPredicateName,
-		@Param EventContext context);
+			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 94,
-		value = "Named predicate name '%1$s' is invalid: field names cannot contain a dot ('.')."
-		+ " Remove the dot from your named predicate name.")
+			value = "Named predicate name '%1$s' is invalid: field names cannot contain a dot ('.')."
+					+ " Remove the dot from your named predicate name.")
 	SearchException relativeNamedPredicateNameCannotContainDot(String relativeNamedPredicateName,
-		@Param EventContext context);
+			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 96, value = "Different mappings trying to define two backends " +
 			"with the same name '%1$s' but having different expectations on multi-tenancy.")
@@ -448,7 +457,7 @@ public interface Log extends BasicLogger {
 			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
 	SearchException differentAttribute(String attributeName, Object component1, Object component2);
 
-	@Message(id = ID_OFFSET + 104, value = "Cannot use '%2$s' on %1$s. %3$s" )
+	@Message(id = ID_OFFSET + 104, value = "Cannot use '%2$s' on %1$s. %3$s")
 	SearchException cannotUseQueryElementForIndexNode(
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
 			SearchQueryElementTypeKey<?> key, String hint, @Param EventContext context);
@@ -504,5 +513,12 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 113,
 			value = "Unable to access the Search integration: initialization hasn't completed yet.")
 	SearchException noIntegrationBecauseInitializationNotComplete();
+
+	@Message(id = ID_OFFSET + 114,
+			value = "Cannot project on entity type '%1$s': this type cannot be loaded from an external datasource,"
+					+ " and the documents from the index cannot be projected to its Java class '%2$s'."
+					+ " %3$s")
+	SearchException cannotCreateEntityProjection(String name, @FormatWith(ClassFormatter.class) Class<?> javaClass,
+			String hint);
 
 }

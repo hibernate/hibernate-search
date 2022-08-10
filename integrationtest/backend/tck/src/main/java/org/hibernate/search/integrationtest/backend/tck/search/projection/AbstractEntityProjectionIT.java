@@ -6,34 +6,53 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
+import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingHints;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -44,12 +63,14 @@ public abstract class AbstractEntityProjectionIT {
 	private static final String DOCUMENT_1_ID = "1";
 	private static final String DOCUMENT_2_ID = "2";
 
+	private static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
+
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	private final StubMappedIndex mainIndex;
+	private final SimpleMappedIndex<IndexBinding> mainIndex;
 
-	protected AbstractEntityProjectionIT(StubMappedIndex mainIndex) {
+	protected AbstractEntityProjectionIT(SimpleMappedIndex<IndexBinding> mainIndex) {
 		this.mainIndex = mainIndex;
 	}
 
@@ -67,33 +88,39 @@ public abstract class AbstractEntityProjectionIT {
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubEntity> query = select( scope.query() )
-				.where( f -> f.matchAll() )
-				.toQuery();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
 
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.load( doc1Reference, doc1LoadedEntity )
-						.load( doc2Reference, doc2LoadedEntity )
-		);
-		assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
-		// Check in particular that the backend gets the projection hit mapper from the loading context,
-		// which must happen every time we execute the query,
-		// so that the mapper can run state checks (session is still open, ...).
-		verify( loadingContextMock ).createProjectionHitMapper();
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<StubEntity> query = select( scope.query() )
+							.where( f -> f.matchAll() )
+							.toQuery();
 
-		// check the same for the scroll API
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.load( doc1Reference, doc1LoadedEntity )
-						.load( doc2Reference, doc2LoadedEntity )
-		);
-		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
-		verify( loadingContextMock ).createProjectionHitMapper();
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+					// Check in particular that the backend gets the projection hit mapper from the loading context,
+					// which must happen every time we execute the query,
+					// so that the mapper can run state checks (session is still open, ...).
+					verify( loadingContextMock ).createProjectionHitMapper();
+
+					// check the same for the scroll API
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+					verify( loadingContextMock ).createProjectionHitMapper();
+				} );
 	}
 
 	@Test
@@ -106,34 +133,40 @@ public abstract class AbstractEntityProjectionIT {
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubEntity> query = select( scope.query() )
-				.where( f -> f.matchAll() )
-				.failAfter( 1000L, TimeUnit.HOURS )
-				.toQuery();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
 
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.load( doc1Reference, doc1LoadedEntity )
-						.load( doc2Reference, doc2LoadedEntity )
-		);
-		assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
-		// Check in particular that the backend gets the projection hit mapper from the loading context,
-		// which must happen every time we execute the query,
-		// so that the mapper can run state checks (session is still open, ...).
-		verify( loadingContextMock ).createProjectionHitMapper();
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<StubEntity> query = select( scope.query() )
+							.where( f -> f.matchAll() )
+							.failAfter( 1000L, TimeUnit.HOURS )
+							.toQuery();
 
-		// check the same for the scroll API
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.load( doc1Reference, doc1LoadedEntity )
-						.load( doc2Reference, doc2LoadedEntity )
-		);
-		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
-		verify( loadingContextMock ).createProjectionHitMapper();
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+					// Check in particular that the backend gets the projection hit mapper from the loading context,
+					// which must happen every time we execute the query,
+					// so that the mapper can run state checks (session is still open, ...).
+					verify( loadingContextMock ).createProjectionHitMapper();
+
+					// check the same for the scroll API
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+					verify( loadingContextMock ).createProjectionHitMapper();
+				} );
 	}
 
 	@Test
@@ -159,34 +192,40 @@ public abstract class AbstractEntityProjectionIT {
 		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<DocumentReference, DocumentReference> scope =
-				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<DocumentReference> query = select( scope.query() )
-				.where( f -> f.matchAll() )
-				.toQuery();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
 
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.load( doc1Reference, doc1Reference )
-						.load( doc2Reference, doc2Reference )
-		);
-		query.fetchAll();
-		// Check in particular that the backend gets the projection hit mapper from the loading context,
-		// which must happen every time we execute the query,
-		// so that the mapper can run state checks (session is still open, ...).
-		verify( loadingContextMock ).createProjectionHitMapper();
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<DocumentReference, DocumentReference> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<DocumentReference> query = select( scope.query() )
+							.where( f -> f.matchAll() )
+							.toQuery();
 
-		// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
-		reset( loadingContextMock );
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.load( doc1Reference, doc1Reference )
-						.load( doc2Reference, doc2Reference )
-		);
-		query.fetchAll();
-		verify( loadingContextMock ).createProjectionHitMapper();
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1Reference )
+									.load( doc2Reference, doc2Reference )
+					);
+					query.fetchAll();
+					// Check in particular that the backend gets the projection hit mapper from the loading context,
+					// which must happen every time we execute the query,
+					// so that the mapper can run state checks (session is still open, ...).
+					verify( loadingContextMock ).createProjectionHitMapper();
+
+					// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
+					reset( loadingContextMock );
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1Reference )
+									.load( doc2Reference, doc2Reference )
+					);
+					query.fetchAll();
+					verify( loadingContextMock ).createProjectionHitMapper();
+				} );
 	}
 
 	@Test
@@ -199,21 +238,156 @@ public abstract class AbstractEntityProjectionIT {
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubEntity> query = select( scope.query() )
-				.where( f -> f.matchAll() )
-				.toQuery();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
 
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						// Return "null" when loading, meaning the entity failed to load
-						.load( doc1Reference, null )
-						.load( doc2Reference, doc2LoadedObject )
-		);
-		// Expect the main document to be excluded from hits, since it could not be loaded.
-		assertThatQuery( query ).hasHitsAnyOrder( doc2LoadedObject );
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<StubEntity> query = select( scope.query() )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									// Return "null" when loading, meaning the entity failed to load
+									.load( doc1Reference, null )
+									.load( doc2Reference, doc2LoadedObject )
+					);
+					// Expect the main document to be excluded from hits, since it could not be loaded.
+					assertThatQuery( query ).hasHitsAnyOrder( doc2LoadedObject );
+				} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4579")
+	public void noLoadingAvailable_noProjectionRegistryEntry_fails() {
+		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
+
+		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
+		when( mainTypeContextMock.name() ).thenReturn( mainIndex.typeName() );
+		doReturn( StubEntity.class )
+				.when( mainTypeContextMock ).javaClass();
+		when( projectionRegistryMock.compositeOptional( StubEntity.class ) )
+				.thenReturn( Optional.empty() );
+
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.projectionRegistry( projectionRegistryMock )
+				.run( () -> {
+					GenericStubMappingScope<DocumentReference, DocumentReference> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<DocumentReference> query = select( scope.query( loadingContextMock ) )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					assertThatThrownBy( query::fetchAll )
+							.isInstanceOf( SearchException.class )
+							.hasMessageContainingAll(
+									"Cannot project on entity type '" + mainIndex.typeName() + "': this type cannot be loaded from an external datasource,"
+											+ " and the documents from the index cannot be projected to its Java class '" + StubEntity.class.getName() + "'",
+									StubMappingHints.INSTANCE.noEntityProjectionAvailable()
+							);
+
+					// Fetching the total hit count should still work fine,
+					// since the projection is not needed in that case.
+					// This is especially important for the syntax .search(MyEntity.class).where(...).fetchTotalHitCount(),
+					// where the (entity) projection is impossible but it's just the default so it's not the user's fault,
+					// and in the end does not matter because the projection is never executed anyway.
+					assertThat( query.fetchTotalHitCount() ).isEqualTo( 2 );
+				} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4579")
+	public void projectionRegistryFallback_withLoadingAvailable_doesNotCheckProjectionRegistry() {
+		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
+		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
+		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
+		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
+
+		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
+
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.projectionRegistry( projectionRegistryMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.load( doc1Reference, doc1LoadedEntity )
+									.load( doc2Reference, doc2LoadedEntity )
+					);
+					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
+				} );
+
+		// We don't want the projection registry to be checked at any point:
+		// loading is available, so the projection registry is irrelevant.
+		verify( projectionRegistryMock, never() ).compositeOptional( any() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4579")
+	public void projectionRegistryFallback_noLoadingAvailable_withProjectionRegistryEntry_usesProjectionRegistry() {
+		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
+		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
+
+		ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
+				mock( SearchLoadingContext.class );
+
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( false );
+		doReturn( StubEntity.class )
+				.when( mainTypeContextMock ).javaClass();
+		CompositeProjectionDefinition<StubEntity> projectionDefinitionStub =
+				// Simulate a projection that instantiates the entity based on field values extracted from the index.
+				// Here we're just retrieving a field containing the ID.
+				(f, initialStep) -> initialStep.from( f.field( mainIndex.binding().idField.relativeFieldName, String.class ) )
+						.as( id -> new StubEntity( reference( mainIndex.typeName(), id ) ) );
+		when( projectionRegistryMock.compositeOptional( StubEntity.class ) )
+				.thenReturn( Optional.of( projectionDefinitionStub ) );
+		when( projectionRegistryMock.composite( StubEntity.class ) )
+				.thenReturn( projectionDefinitionStub );
+
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.projectionRegistry( projectionRegistryMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+
+					SearchQuery<StubEntity> query = select( scope.query( loadingContextMock ) )
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					@SuppressWarnings("unchecked")
+					ProjectionHitMapper<StubTransformedReference, StubEntity> projectionHitMapperMock =
+							Mockito.mock( ProjectionHitMapper.class );
+					when( loadingContextMock.createProjectionHitMapper() )
+							.thenReturn( projectionHitMapperMock );
+					assertThatQuery( query )
+							.hits().asIs().usingRecursiveFieldByFieldElementComparator()
+							.containsExactlyInAnyOrder(
+									new StubEntity( doc1Reference ),
+									new StubEntity( doc2Reference )
+							);
+				} );
 	}
 
 	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {
@@ -222,10 +396,22 @@ public abstract class AbstractEntityProjectionIT {
 		}
 	}
 
-	public static void initData(BulkIndexer indexer) {
-		indexer
-				.add( DOCUMENT_1_ID, document -> { } )
-				.add( DOCUMENT_2_ID, document -> { } );
+	public static void initData(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer) {
+		IndexBinding mainIndexBinding = mainIndex.binding();
+		mainIndexer
+				.add( DOCUMENT_1_ID, document -> document.addValue( mainIndexBinding.idField.reference, DOCUMENT_1_ID ) )
+				.add( DOCUMENT_2_ID, document -> document.addValue( mainIndexBinding.idField.reference, DOCUMENT_2_ID ) );
+	}
+
+	public static class IndexBinding {
+		final SimpleFieldModel<String> idField;
+
+		public IndexBinding(IndexSchemaElement root) {
+			idField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
+					.map( root, "id", c -> c.projectable(
+							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+									? Projectable.DEFAULT : Projectable.YES ) );
+		}
 	}
 
 }

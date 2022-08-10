@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -47,6 +49,16 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 			closer.push( SearchIntegration::close, integrationHandle, SearchIntegration.Handle::getOrNull );
 			integrationHandle = null;
 		}
+	}
+
+	@Override
+	public BackendMappingHints hints() {
+		return StubMappingHints.INSTANCE;
+	}
+
+	@Override
+	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
+		return fixture.typeContext( mappedTypeName );
 	}
 
 	@Override

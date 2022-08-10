@@ -83,7 +83,7 @@ public abstract class AbstractSearchProjectionFactory<
 
 	@Override
 	public EntityProjectionOptionsStep<?, E> entity() {
-		return new EntityProjectionOptionsStepImpl<>( dslContext );
+		return new EntityProjectionOptionsStepImpl<>( dslContext, this );
 	}
 
 	@Override

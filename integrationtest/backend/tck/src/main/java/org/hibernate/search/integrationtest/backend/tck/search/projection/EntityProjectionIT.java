@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -20,7 +20,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final StubMappedIndex mainIndex = StubMappedIndex.withoutFields();
+	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
 
 	public EntityProjectionIT() {
 		super( mainIndex );
@@ -31,7 +31,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		setupHelper.start().withIndex( mainIndex ).setup();
 
 		BulkIndexer indexer = mainIndex.bulkIndexer();
-		initData( indexer );
+		initData( mainIndex, indexer );
 		indexer.join();
 	}
 

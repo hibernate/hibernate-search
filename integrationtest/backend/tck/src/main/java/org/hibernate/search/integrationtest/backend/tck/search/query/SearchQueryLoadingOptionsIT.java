@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.function.Consumer;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -26,6 +28,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -33,6 +36,8 @@ import org.mockito.quality.Strictness;
 @TestForIssue(jiraKey = "HSEARCH-3988")
 @SuppressWarnings("unchecked") // Mocking parameterized types
 public class SearchQueryLoadingOptionsIT {
+
+	private static final ProjectionMappedTypeContext typeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -53,12 +58,19 @@ public class SearchQueryLoadingOptionsIT {
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				index.createGenericScope( loadingContextMock );
-		scope.query( loadingOptionsStepMock )
-				.where( f -> f.matchAll() )
-				.loading( o -> o.accept( someOption ) )
-				.toQuery();
+
+		when( typeContextMock.loadingAvailable() ).thenReturn( true );
+
+		index.mapping().with()
+				.typeContext( index.typeName(), typeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							index.createGenericScope( loadingContextMock );
+					scope.query( loadingOptionsStepMock )
+							.where( f -> f.matchAll() )
+							.loading( o -> o.accept( someOption ) )
+							.toQuery();
+				} );
 		// Expect our loading options to be altered
 		verify( loadingOptionsStepMock ).accept( someOption );
 	}
@@ -69,13 +81,20 @@ public class SearchQueryLoadingOptionsIT {
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				index.createGenericScope( loadingContextMock );
-		scope.query( loadingOptionsStepMock )
-				.selectEntity()
-				.where( f -> f.matchAll() )
-				.loading( o -> o.accept( someOption ) )
-				.toQuery();
+
+		when( typeContextMock.loadingAvailable() ).thenReturn( true );
+
+		index.mapping().with()
+				.typeContext( index.typeName(), typeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							index.createGenericScope( loadingContextMock );
+					scope.query( loadingOptionsStepMock )
+							.selectEntity()
+							.where( f -> f.matchAll() )
+							.loading( o -> o.accept( someOption ) )
+							.toQuery();
+				} );
 		// Expect our loading options to be altered
 		verify( loadingOptionsStepMock ).accept( someOption );
 	}
@@ -86,13 +105,18 @@ public class SearchQueryLoadingOptionsIT {
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				index.createGenericScope( loadingContextMock );
-		scope.query( loadingOptionsStepMock )
-				.selectEntityReference()
-				.where( f -> f.matchAll() )
-				.loading( o -> o.accept( someOption ) )
-				.toQuery();
+
+		index.mapping().with()
+				.typeContext( index.typeName(), typeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							index.createGenericScope( loadingContextMock );
+					scope.query( loadingOptionsStepMock )
+							.selectEntityReference()
+							.where( f -> f.matchAll() )
+							.loading( o -> o.accept( someOption ) )
+							.toQuery();
+				} );
 		// Expect our loading options to be altered
 		verify( loadingOptionsStepMock ).accept( someOption );
 	}
@@ -104,13 +128,20 @@ public class SearchQueryLoadingOptionsIT {
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				index.createGenericScope( loadingContextMock );
-		scope.query( loadingOptionsStepMock )
-				.select( f -> f.composite( f.entity(), f.field( "string" ) ) )
-				.where( f -> f.matchAll() )
-				.loading( o -> o.accept( someOption ) )
-				.toQuery();
+
+		when( typeContextMock.loadingAvailable() ).thenReturn( true );
+
+		index.mapping().with()
+				.typeContext( index.typeName(), typeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							index.createGenericScope( loadingContextMock );
+					scope.query( loadingOptionsStepMock )
+							.select( f -> f.composite( f.entity(), f.field( "string" ) ) )
+							.where( f -> f.matchAll() )
+							.loading( o -> o.accept( someOption ) )
+							.toQuery();
+				} );
 		// Expect our loading options to be altered
 		verify( loadingOptionsStepMock ).accept( someOption );
 	}

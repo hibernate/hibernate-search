@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.search.definition.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
@@ -25,12 +26,18 @@ public final class PojoSearchQueryElementRegistry implements ProjectionRegistry 
 
 	@Override
 	public <T> CompositeProjectionDefinition<T> composite(Class<T> objectClass) {
+		Optional<CompositeProjectionDefinition<T>> definition = compositeOptional( objectClass );
+		if ( !definition.isPresent() ) {
+			throw log.invalidObjectClassForProjection( objectClass );
+		}
+		return definition.get();
+	}
+
+	@Override
+	public <T> Optional<CompositeProjectionDefinition<T>> compositeOptional(Class<T> objectClass) {
 		@SuppressWarnings("unchecked") // By construction, we know the definition has that type if it exists.
 		CompositeProjectionDefinition<T> definition =
 				(CompositeProjectionDefinition<T>) compositeProjectionDefinitions.get( objectClass );
-		if ( definition == null ) {
-			throw log.invalidObjectClassForProjection( objectClass );
-		}
-		return definition;
+		return Optional.ofNullable( definition );
 	}
 }

@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.util.common.SearchException;
 
 import com.google.gson.JsonObject;
 
@@ -63,6 +66,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public <T> SearchProjection<T> constant(T value) {
 		return new ElasticsearchConstantProjection<>( scope, value );
+	}
+
+	@Override
+	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
+		return new ElasticsearchThrowingProjection<>( scope, exceptionSupplier );
 	}
 
 	public SearchProjection<JsonObject> source() {

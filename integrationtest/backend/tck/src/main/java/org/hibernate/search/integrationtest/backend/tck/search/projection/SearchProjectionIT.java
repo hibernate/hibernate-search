@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.Normalizatio
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -50,6 +52,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -64,6 +67,8 @@ public class SearchProjectionIT {
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY = "empty";
+
+	private static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -160,50 +165,56 @@ public class SearchProjectionIT {
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<List<?>> query;
-		/*
-		 * Note to test writers: make sure to assign these projections to variables,
-		 * just so that tests do not compile if someone changes the APIs in an incorrect way.
-		 */
-		SearchProjection<DocumentReference> documentReferenceProjection =
-				scope.projection().documentReference().toProjection();
-		SearchProjection<StubTransformedReference> entityReferenceProjection =
-				scope.projection().entityReference().toProjection();
-		SearchProjection<StubEntity> entityProjection =
-				scope.projection().entity().toProjection();
-		query = scope.query()
-				.select(
-						documentReferenceProjection,
-						entityReferenceProjection,
-						entityProjection
-				)
-				.where( f -> f.matchAll() )
-				.toQuery();
+		when( mainTypeContextMock.loadingAvailable() ).thenReturn( true );
 
-		expectHitMapping(
-				loadingContextMock,
-				/*
-				 * Expect each reference to be transformed because of the reference projection,
-				 * but also loaded because of the entity projection.
-				 */
-				c -> c
-						.entityReference( document1Reference, document1TransformedReference )
-						.load( document1Reference, document1LoadedEntity )
-						.entityReference( document2Reference, document2TransformedReference )
-						.load( document2Reference, document2LoadedEntity )
-						.entityReference( document3Reference, document3TransformedReference )
-						.load( document3Reference, document3LoadedEntity )
-						.entityReference( emptyReference, emptyTransformedReference )
-						.load( emptyReference, emptyLoadedEntity )
-		);
-		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
-			b.list( document1Reference, document1TransformedReference, document1LoadedEntity );
-			b.list( document2Reference, document2TransformedReference, document2LoadedEntity );
-			b.list( document3Reference, document3TransformedReference, document3LoadedEntity );
-			b.list( emptyReference, emptyTransformedReference, emptyLoadedEntity );
-		} );
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<List<?>> query;
+					/*
+					 * Note to test writers: make sure to assign these projections to variables,
+					 * just so that tests do not compile if someone changes the APIs in an incorrect way.
+					 */
+					SearchProjection<DocumentReference> documentReferenceProjection =
+							scope.projection().documentReference().toProjection();
+					SearchProjection<StubTransformedReference> entityReferenceProjection =
+							scope.projection().entityReference().toProjection();
+					SearchProjection<StubEntity> entityProjection =
+							scope.projection().entity().toProjection();
+					query = scope.query()
+							.select(
+									documentReferenceProjection,
+									entityReferenceProjection,
+									entityProjection
+							)
+							.where( f -> f.matchAll() )
+							.toQuery();
+
+					expectHitMapping(
+							loadingContextMock,
+							/*
+							 * Expect each reference to be transformed because of the reference projection,
+							 * but also loaded because of the entity projection.
+							 */
+							c -> c
+									.entityReference( document1Reference, document1TransformedReference )
+									.load( document1Reference, document1LoadedEntity )
+									.entityReference( document2Reference, document2TransformedReference )
+									.load( document2Reference, document2LoadedEntity )
+									.entityReference( document3Reference, document3TransformedReference )
+									.load( document3Reference, document3LoadedEntity )
+									.entityReference( emptyReference, emptyTransformedReference )
+									.load( emptyReference, emptyLoadedEntity )
+					);
+					assertThatQuery( query ).hasListHitsAnyOrder( b -> {
+						b.list( document1Reference, document1TransformedReference, document1LoadedEntity );
+						b.list( document2Reference, document2TransformedReference, document2LoadedEntity );
+						b.list( document3Reference, document3TransformedReference, document3LoadedEntity );
+						b.list( emptyReference, emptyTransformedReference, emptyLoadedEntity );
+					} );
+				} );
 	}
 
 	@Test

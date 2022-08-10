@@ -342,6 +342,7 @@
             - or the name of the declaring type ends with 'ConfigurationProperty';
             - or the name of the declaring type ends with 'ConfigurationPropertySource'.
             - or the name of the declaring type ends with: 'ScrollableResultsAdapter'.
+            - or the name of the declaring type ends with: '_$bundle'.
         </description>
         <cypher><![CDATA[
             MATCH
@@ -357,6 +358,7 @@
                 AND NOT type.name ENDS WITH "ConfigurationProperty"
                 AND NOT type.name ENDS WITH "ConfigurationPropertySource"
                 AND NOT type.name ENDS WITH "ScrollableResultsAdapter"
+                AND NOT type.name ENDS WITH "_$bundle"
             RETURN
                 type, method
         ]]></cypher>

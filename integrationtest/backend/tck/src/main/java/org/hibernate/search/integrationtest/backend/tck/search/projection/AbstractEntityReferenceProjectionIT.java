@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -31,6 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -40,6 +42,8 @@ public abstract class AbstractEntityReferenceProjectionIT {
 
 	private static final String DOCUMENT_1_ID = "1";
 	private static final String DOCUMENT_2_ID = "2";
+
+	private static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -78,33 +82,37 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
-				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubTransformedReference> referencesQuery = select( scope.query() )
-				.where( f -> f.matchAll() )
-				.toQuery();
+		mainIndex.mapping().with()
+				.typeContext( mainIndex.typeName(), mainTypeContextMock )
+				.run( () -> {
+					GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
+							mainIndex.createGenericScope( loadingContextMock );
+					SearchQuery<StubTransformedReference> referencesQuery = select( scope.query() )
+							.where( f -> f.matchAll() )
+							.toQuery();
 
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.entityReference( doc1Reference, doc1TransformedReference )
-						.entityReference( doc2Reference, doc2TransformedReference )
-		);
-		assertThatQuery( referencesQuery ).hasHitsAnyOrder( doc1TransformedReference, doc2TransformedReference );
-		// Check in particular that the backend gets the projection hit mapper from the loading context,
-		// which must happen every time we execute the query,
-		// so that the mapper can run state checks (session is still open, ...).
-		verify( loadingContextMock ).createProjectionHitMapper();
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.entityReference( doc1Reference, doc1TransformedReference )
+									.entityReference( doc2Reference, doc2TransformedReference )
+					);
+					assertThatQuery( referencesQuery ).hasHitsAnyOrder( doc1TransformedReference, doc2TransformedReference );
+					// Check in particular that the backend gets the projection hit mapper from the loading context,
+					// which must happen every time we execute the query,
+					// so that the mapper can run state checks (session is still open, ...).
+					verify( loadingContextMock ).createProjectionHitMapper();
 
-		// check the same for the scroll API
-		expectHitMapping(
-				loadingContextMock,
-				c -> c
-						.entityReference( doc1Reference, doc1TransformedReference )
-						.entityReference( doc2Reference, doc2TransformedReference )
-		);
-		assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( doc1TransformedReference, doc2TransformedReference );
-		verify( loadingContextMock ).createProjectionHitMapper();
+					// check the same for the scroll API
+					expectHitMapping(
+							loadingContextMock,
+							c -> c
+									.entityReference( doc1Reference, doc1TransformedReference )
+									.entityReference( doc2Reference, doc2TransformedReference )
+					);
+					assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( doc1TransformedReference, doc2TransformedReference );
+					verify( loadingContextMock ).createProjectionHitMapper();
+				} );
 	}
 
 	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {
