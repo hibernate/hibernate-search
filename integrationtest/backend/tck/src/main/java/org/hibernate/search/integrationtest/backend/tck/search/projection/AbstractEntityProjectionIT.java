@@ -68,8 +68,8 @@ public abstract class AbstractEntityProjectionIT {
 				mock( SearchLoadingContext.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				mainIndex.createGenericScope();
-		SearchQuery<StubLoadedObject> query = select( scope.query( loadingContextMock ) )
+				mainIndex.createGenericScope( loadingContextMock );
+		SearchQuery<StubLoadedObject> query = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -107,8 +107,8 @@ public abstract class AbstractEntityProjectionIT {
 				mock( SearchLoadingContext.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				mainIndex.createGenericScope();
-		SearchQuery<StubLoadedObject> query = select( scope.query( loadingContextMock ) )
+				mainIndex.createGenericScope( loadingContextMock );
+		SearchQuery<StubLoadedObject> query = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.failAfter( 1000L, TimeUnit.HOURS )
 				.toQuery();
@@ -159,8 +159,9 @@ public abstract class AbstractEntityProjectionIT {
 		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<DocumentReference, DocumentReference> scope = mainIndex.createGenericScope();
-		SearchQuery<DocumentReference> query = select( scope.query( loadingContextMock ) )
+		GenericStubMappingScope<DocumentReference, DocumentReference> scope =
+				mainIndex.createGenericScope( loadingContextMock );
+		SearchQuery<DocumentReference> query = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -199,8 +200,8 @@ public abstract class AbstractEntityProjectionIT {
 				mock( SearchLoadingContext.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				mainIndex.createGenericScope();
-		SearchQuery<StubLoadedObject> objectsQuery = select( scope.query( loadingContextMock ) )
+				mainIndex.createGenericScope( loadingContextMock );
+		SearchQuery<StubLoadedObject> objectsQuery = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.toQuery();
 

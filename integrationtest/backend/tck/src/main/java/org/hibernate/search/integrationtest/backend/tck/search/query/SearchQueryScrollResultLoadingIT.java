@@ -70,8 +70,8 @@ public class SearchQueryScrollResultLoadingIT {
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
-		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope( loadingContextMock );
+		SearchQuery<StubLoadedObject> objectsQuery = scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.toQuery();
@@ -86,8 +86,9 @@ public class SearchQueryScrollResultLoadingIT {
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
-		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				index.createGenericScope( loadingContextMock );
+		SearchQuery<StubLoadedObject> objectsQuery = scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.failAfter( 1000, TimeUnit.HOURS )
@@ -103,8 +104,9 @@ public class SearchQueryScrollResultLoadingIT {
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
-		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+				index.createGenericScope( loadingContextMock );
+		SearchQuery<StubLoadedObject> objectsQuery = scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.truncateAfter( 1000, TimeUnit.HOURS )

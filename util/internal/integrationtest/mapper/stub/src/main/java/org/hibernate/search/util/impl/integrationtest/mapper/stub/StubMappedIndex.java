@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 /**
@@ -206,12 +207,13 @@ public abstract class StubMappedIndex {
 	/**
 	 * @return A scope containing this index and the given other indexes.
 	 */
-	public <R, E> GenericStubMappingScope<R, E> createGenericScope(StubMappedIndex... others) {
+	public <R, E> GenericStubMappingScope<R, E> createGenericScope(
+			SearchLoadingContext<R, E> loadingContext, StubMappedIndex... others) {
 		MappedIndexScopeBuilder<R, E> builder = delegate().createScopeBuilder( mapping );
 		for ( StubMappedIndex other : others ) {
 			other.delegate().addTo( builder );
 		}
-		return new GenericStubMappingScope<>( mapping, builder.build() );
+		return new GenericStubMappingScope<>( mapping, builder.build(), loadingContext );
 	}
 
 	protected abstract void bind(IndexedEntityBindingContext context);

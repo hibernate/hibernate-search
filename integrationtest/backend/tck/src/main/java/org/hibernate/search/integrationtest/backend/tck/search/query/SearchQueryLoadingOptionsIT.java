@@ -54,8 +54,8 @@ public class SearchQueryLoadingOptionsIT {
 
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				index.createGenericScope();
-		scope.query( loadingContextMock, loadingOptionsStepMock )
+				index.createGenericScope( loadingContextMock );
+		scope.query( loadingOptionsStepMock )
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
@@ -70,8 +70,8 @@ public class SearchQueryLoadingOptionsIT {
 
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				index.createGenericScope();
-		scope.query( loadingContextMock, loadingOptionsStepMock )
+				index.createGenericScope( loadingContextMock );
+		scope.query( loadingOptionsStepMock )
 				.selectEntity()
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
@@ -85,8 +85,8 @@ public class SearchQueryLoadingOptionsIT {
 
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				index.createGenericScope();
-		scope.query( loadingContextMock, loadingOptionsStepMock )
+				index.createGenericScope( loadingContextMock );
+		scope.query( loadingOptionsStepMock )
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
@@ -101,8 +101,8 @@ public class SearchQueryLoadingOptionsIT {
 
 		Object someOption = new Object();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				index.createGenericScope();
-		scope.query( loadingContextMock, loadingOptionsStepMock )
+				index.createGenericScope( loadingContextMock );
+		scope.query( loadingOptionsStepMock )
 				.select( f -> f.composite( f.entity(), f.field( "string" ) ) )
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )

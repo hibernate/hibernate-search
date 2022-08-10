@@ -79,8 +79,8 @@ public abstract class AbstractEntityReferenceProjectionIT {
 				mock( SearchLoadingContext.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				mainIndex.createGenericScope();
-		SearchQuery<StubTransformedReference> referencesQuery = select( scope.query( loadingContextMock ) )
+				mainIndex.createGenericScope( loadingContextMock );
+		SearchQuery<StubTransformedReference> referencesQuery = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
