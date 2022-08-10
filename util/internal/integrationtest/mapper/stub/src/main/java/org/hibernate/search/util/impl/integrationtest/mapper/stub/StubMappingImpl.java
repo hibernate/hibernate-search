@@ -26,17 +26,17 @@ import org.hibernate.search.util.common.impl.Futures;
 public class StubMappingImpl implements StubMapping, MappingImplementor<StubMappingImpl> {
 
 	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
-	private final ProjectionRegistry projectionRegistry;
 	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
 
 	private final ToDocumentValueConvertContext toDocumentFieldValueConvertContext;
 
 	private SearchIntegration.Handle integrationHandle;
 
+	StubMappingFixture fixture = new StubMappingFixture( this );
+
 	StubMappingImpl(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
-			ProjectionRegistry projectionRegistry, StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+			StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
-		this.projectionRegistry = projectionRegistry;
 		this.schemaManagementStrategy = schemaManagementStrategy;
 		this.toDocumentFieldValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 	}
@@ -66,7 +66,7 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 
 	@Override
 	public ProjectionRegistry projectionRegistry() {
-		return projectionRegistry;
+		return fixture.projectionRegistry;
 	}
 
 	@Override
@@ -117,6 +117,11 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 	@Override
 	public void stop() {
 		// Nothing to do
+	}
+
+	@Override
+	public StubMappingFixture with() {
+		return new StubMappingFixture( this );
 	}
 
 	private CompletableFuture<?> doSchemaManagementOperation(

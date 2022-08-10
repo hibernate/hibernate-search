@@ -9,17 +9,13 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
-import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 
 public class StubMappingPartialBuildState implements MappingPartialBuildState {
 
 	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
-	private final ProjectionRegistry projectionRegistry;
 
-	StubMappingPartialBuildState(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
-			ProjectionRegistry projectionRegistry) {
+	StubMappingPartialBuildState(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier) {
 		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
-		this.projectionRegistry = projectionRegistry;
 	}
 
 	@Override
@@ -28,7 +24,7 @@ public class StubMappingPartialBuildState implements MappingPartialBuildState {
 	}
 
 	public StubMappingImpl finalizeMapping(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
-		StubMappingImpl mapping = new StubMappingImpl( mappedIndexesByTypeIdentifier, projectionRegistry,
+		StubMappingImpl mapping = new StubMappingImpl( mappedIndexesByTypeIdentifier,
 				schemaManagementStrategy );
 		for ( StubMappedIndex index : mappedIndexesByTypeIdentifier.values() ) {
 			index.onMappingCreated( mapping );

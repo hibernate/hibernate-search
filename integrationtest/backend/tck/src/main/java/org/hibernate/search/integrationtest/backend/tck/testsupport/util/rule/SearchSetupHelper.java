@@ -27,14 +27,11 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationEnvironment;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.search.projection.definition.spi.CompositeProjectionDefinition;
-import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -167,12 +164,6 @@ public class SearchSetupHelper implements TestRule {
 		private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 		private TenancyMode tenancyMode = TenancyMode.SINGLE_TENANCY;
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
-		private ProjectionRegistry projectionRegistry = new ProjectionRegistry() {
-			@Override
-			public <T> CompositeProjectionDefinition<T> composite(Class<T> objectClass) {
-				throw new AssertionFailure( "Projection definitions are not supported in the stub mapper, unless a projection registry is set explicitly" );
-			}
-		};
 
 		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
@@ -239,11 +230,6 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
-		public SetupContext withProjectionRegistry(ProjectionRegistry projectionRegistry) {
-			this.projectionRegistry = projectionRegistry;
-			return this;
-		}
-
 		public PartialSetup setupFirstPhaseOnly() {
 			return setupFirstPhaseOnly( Optional.empty() );
 		}
@@ -259,7 +245,7 @@ public class SearchSetupHelper implements TestRule {
 					previousMapping.get().integration().restartBuilder( environment ) :
 					SearchIntegration.builder( environment );
 
-			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode, projectionRegistry );
+			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
 			mappedIndexes.forEach( initiator::add );
 			StubMappingKey mappingKey = new StubMappingKey();
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );
