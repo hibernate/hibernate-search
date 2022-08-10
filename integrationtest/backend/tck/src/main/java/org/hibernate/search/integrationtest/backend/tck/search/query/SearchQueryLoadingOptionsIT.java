@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
@@ -49,11 +49,11 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void defaultResultType() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				index.createGenericScope( loadingContextMock );
 		scope.query( loadingOptionsStepMock )
 				.where( f -> f.matchAll() )
@@ -65,11 +65,11 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void selectEntity() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				index.createGenericScope( loadingContextMock );
 		scope.query( loadingOptionsStepMock )
 				.selectEntity()
@@ -80,11 +80,11 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void selectEntityReference() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				index.createGenericScope( loadingContextMock );
 		scope.query( loadingOptionsStepMock )
 				.selectEntityReference()
@@ -95,12 +95,12 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void select() {
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				index.createGenericScope( loadingContextMock );
 		scope.query( loadingOptionsStepMock )
 				.select( f -> f.composite( f.entity(), f.field( "string" ) ) )

@@ -8,10 +8,10 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
-public class StubLoadedObject {
+public class StubEntity {
 	private final DocumentReference documentReference;
 
-	public StubLoadedObject(DocumentReference documentReference) {
+	public StubEntity(DocumentReference documentReference) {
 		this.documentReference = documentReference;
 	}
 

@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
@@ -61,25 +61,25 @@ public abstract class AbstractEntityProjectionIT {
 	public void entityLoading() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
-		StubLoadedObject doc1LoadedObject = new StubLoadedObject( doc1Reference );
-		StubLoadedObject doc2LoadedObject = new StubLoadedObject( doc2Reference );
+		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
+		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubLoadedObject> query = select( scope.query() )
+		SearchQuery<StubEntity> query = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		expectHitMapping(
 				loadingContextMock,
 				c -> c
-						.load( doc1Reference, doc1LoadedObject )
-						.load( doc2Reference, doc2LoadedObject )
+						.load( doc1Reference, doc1LoadedEntity )
+						.load( doc2Reference, doc2LoadedEntity )
 		);
-		assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedObject, doc2LoadedObject );
+		assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
 		// Check in particular that the backend gets the projection hit mapper from the loading context,
 		// which must happen every time we execute the query,
 		// so that the mapper can run state checks (session is still open, ...).
@@ -89,10 +89,10 @@ public abstract class AbstractEntityProjectionIT {
 		expectHitMapping(
 				loadingContextMock,
 				c -> c
-						.load( doc1Reference, doc1LoadedObject )
-						.load( doc2Reference, doc2LoadedObject )
+						.load( doc1Reference, doc1LoadedEntity )
+						.load( doc2Reference, doc2LoadedEntity )
 		);
-		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedObject, doc2LoadedObject );
+		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
 		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
@@ -100,15 +100,15 @@ public abstract class AbstractEntityProjectionIT {
 	public void entityLoading_timeout() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
-		StubLoadedObject doc1LoadedObject = new StubLoadedObject( doc1Reference );
-		StubLoadedObject doc2LoadedObject = new StubLoadedObject( doc2Reference );
+		StubEntity doc1LoadedEntity = new StubEntity( doc1Reference );
+		StubEntity doc2LoadedEntity = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubLoadedObject> query = select( scope.query() )
+		SearchQuery<StubEntity> query = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.failAfter( 1000L, TimeUnit.HOURS )
 				.toQuery();
@@ -116,10 +116,10 @@ public abstract class AbstractEntityProjectionIT {
 		expectHitMapping(
 				loadingContextMock,
 				c -> c
-						.load( doc1Reference, doc1LoadedObject )
-						.load( doc2Reference, doc2LoadedObject )
+						.load( doc1Reference, doc1LoadedEntity )
+						.load( doc2Reference, doc2LoadedEntity )
 		);
-		assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedObject, doc2LoadedObject );
+		assertThatQuery( query ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
 		// Check in particular that the backend gets the projection hit mapper from the loading context,
 		// which must happen every time we execute the query,
 		// so that the mapper can run state checks (session is still open, ...).
@@ -129,10 +129,10 @@ public abstract class AbstractEntityProjectionIT {
 		expectHitMapping(
 				loadingContextMock,
 				c -> c
-						.load( doc1Reference, doc1LoadedObject )
-						.load( doc2Reference, doc2LoadedObject )
+						.load( doc1Reference, doc1LoadedEntity )
+						.load( doc2Reference, doc2LoadedEntity )
 		);
-		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedObject, doc2LoadedObject );
+		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( doc1LoadedEntity, doc2LoadedEntity );
 		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
@@ -194,14 +194,14 @@ public abstract class AbstractEntityProjectionIT {
 	public void entityLoading_failed_skipHit() {
 		DocumentReference doc1Reference = reference( mainIndex.typeName(), DOCUMENT_1_ID );
 		DocumentReference doc2Reference = reference( mainIndex.typeName(), DOCUMENT_2_ID );
-		StubLoadedObject doc2LoadedObject = new StubLoadedObject( doc2Reference );
+		StubEntity doc2LoadedObject = new StubEntity( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				mainIndex.createGenericScope( loadingContextMock );
-		SearchQuery<StubLoadedObject> objectsQuery = select( scope.query() )
+		SearchQuery<StubEntity> query = select( scope.query() )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -213,7 +213,7 @@ public abstract class AbstractEntityProjectionIT {
 						.load( doc2Reference, doc2LoadedObject )
 		);
 		// Expect the main document to be excluded from hits, since it could not be loaded.
-		assertThatQuery( objectsQuery ).hasHitsAnyOrder( doc2LoadedObject );
+		assertThatQuery( query ).hasHitsAnyOrder( doc2LoadedObject );
 	}
 
 	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {
