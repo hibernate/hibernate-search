@@ -29,7 +29,7 @@ public class StubLoadingContext {
 
 	public static final class LoaderCall {
 		final Object strategy;
-		final List<?> ids;
+		public final List<Object> ids;
 
 		public LoaderCall(Object strategy, List<?> ids) {
 			this.strategy = strategy;

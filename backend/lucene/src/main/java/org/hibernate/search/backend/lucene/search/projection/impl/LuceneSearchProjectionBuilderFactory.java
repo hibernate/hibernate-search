@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.util.common.SearchException;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -59,6 +62,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	@Override
 	public <T> SearchProjection<T> constant(T value) {
 		return new LuceneConstantProjection<>( scope, value );
+	}
+
+	@Override
+	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
+		return new LuceneThrowingProjection<>( scope, exceptionSupplier );
 	}
 
 	public SearchProjection<Document> document() {

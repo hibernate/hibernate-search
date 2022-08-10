@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
@@ -16,13 +17,24 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExte
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
-		implements SearchIndexedEntity<E>, HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
+		implements ProjectionMappedTypeContext,
+				SearchIndexedEntity<E>, HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
 
 	private final MappedIndexManager indexManager;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( builder, sessionFactory );
 		this.indexManager = builder.indexManager;
+	}
+
+	@Override
+	public String name() {
+		return jpaEntityName();
+	}
+
+	@Override
+	public boolean loadingAvailable() {
+		return true;
 	}
 
 	@Override

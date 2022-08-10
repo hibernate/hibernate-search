@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
@@ -58,4 +61,8 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		return new StubConstantProjection<>( value );
 	}
 
+	@Override
+	public <T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier) {
+		return new StubThrowingProjection<>( exceptionSupplier );
+	}
 }

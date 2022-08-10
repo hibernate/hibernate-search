@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
 import org.hibernate.search.mapper.pojo.standalone.scope.impl.StandalonePojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSessionIndexedTypeContext;
@@ -15,13 +16,19 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExte
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class StandalonePojoIndexedTypeContext<E> extends AbstractStandalonePojoTypeContext<E>
-		implements StandalonePojoScopeIndexedTypeContext<E>, StandalonePojoSessionIndexedTypeContext<E> {
+		implements ProjectionMappedTypeContext,
+				StandalonePojoScopeIndexedTypeContext<E>, StandalonePojoSessionIndexedTypeContext<E> {
 
 	private final MappedIndexManager indexManager;
 
 	private StandalonePojoIndexedTypeContext(Builder<E> builder) {
 		super( builder );
 		this.indexManager = builder.indexManager;
+	}
+
+	@Override
+	public boolean loadingAvailable() {
+		return selectionLoadingStrategy().isPresent();
 	}
 
 	@Override

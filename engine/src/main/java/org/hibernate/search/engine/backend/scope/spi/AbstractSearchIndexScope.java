@@ -24,6 +24,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -46,17 +47,21 @@ public abstract class AbstractSearchIndexScope<
 	// Targeted indexes
 	private final Set<String> hibernateSearchIndexNames;
 	private final Set<? extends M> indexModels;
+	private final List<ProjectionMappedTypeContext> mappedTypeContexts;
 
 	// withRoot(...)
 	private final C overriddenRoot;
+
 
 	public AbstractSearchIndexScope(BackendMappingContext mappingContext, Set<? extends M> indexModels) {
 		this.mappingContext = mappingContext;
 
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNames = new LinkedHashSet<>();
+		this.mappedTypeContexts = new ArrayList<>();
 		for ( M model : indexModels ) {
 			hibernateSearchIndexNames.add( model.hibernateSearchName() );
+			mappedTypeContexts.add( mappingContext.mappedTypeContext( model.mappedTypeName() ) );
 		}
 		this.indexModels = indexModels;
 
@@ -67,7 +72,13 @@ public abstract class AbstractSearchIndexScope<
 		this.mappingContext = parentScope.mappingContext;
 		this.hibernateSearchIndexNames = parentScope.hibernateSearchIndexNames;
 		this.indexModels = parentScope.indexModels;
+		this.mappedTypeContexts = parentScope.mappedTypeContexts;
 		this.overriddenRoot = overriddenRoot;
+	}
+
+	@Override
+	public BackendMappingContext mappingContext() {
+		return mappingContext;
 	}
 
 	@Override
@@ -209,6 +220,11 @@ public abstract class AbstractSearchIndexScope<
 	@Override
 	public ProjectionRegistry projectionRegistry() {
 		return mappingContext.projectionRegistry();
+	}
+
+	@Override
+	public List<? extends ProjectionMappedTypeContext> mappedTypeContexts() {
+		return mappedTypeContexts;
 	}
 
 	protected abstract C createMultiIndexSearchRootContext(List<C> rootForEachIndex);

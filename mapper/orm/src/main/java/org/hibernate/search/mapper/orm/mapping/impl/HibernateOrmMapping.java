@@ -23,6 +23,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -33,6 +34,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQueueEventProcessingPlanImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
@@ -44,6 +46,7 @@ import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
+import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmMappingHints;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
@@ -207,6 +210,18 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			closer.push( CoordinationStrategy::stop, coordinationStrategyHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, coordinationStrategyHolder );
 		}
+	}
+
+	@Override
+	public BackendMappingHints hints() {
+		return HibernateOrmMappingHints.INSTANCE;
+	}
+
+	@Override
+	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
+		PojoRawTypeIdentifier<?> typeIdentifier =
+				typeContextContainer.typeIdentifierForEntityName( mappedTypeName );
+		return typeContextContainer.indexedForExactType( typeIdentifier );
 	}
 
 	@Override

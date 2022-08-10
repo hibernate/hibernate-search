@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import java.util.function.Supplier;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * A factory for search projection builders.
@@ -30,5 +33,12 @@ public interface SearchProjectionBuilderFactory {
 	CompositeProjectionBuilder composite();
 
 	<T> SearchProjection<T> constant(T value);
+
+	/**
+	 * @param exceptionSupplier A supplier of the exception to throw.
+	 * @return A projection that throws an exception as soon as it's applied to at least one document.
+	 * @param <T> The type of projected values.
+	 */
+	<T> SearchProjection<T> throwing(Supplier<SearchException> exceptionSupplier);
 
 }

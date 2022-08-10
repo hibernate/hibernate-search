@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import java.util.List;
+
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 
@@ -15,5 +17,7 @@ public interface SearchProjectionIndexScope<S extends SearchProjectionIndexScope
 	SearchProjectionBuilderFactory projectionBuilders();
 
 	ProjectionRegistry projectionRegistry();
+
+	List<? extends ProjectionMappedTypeContext> mappedTypeContexts();
 
 }

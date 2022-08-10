@@ -13,6 +13,7 @@ import org.hibernate.search.integrationtest.backend.tck.search.projection.Abstra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
@@ -28,8 +29,8 @@ public class SearchQuerySelectIT {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final StubMappedIndex selectEntityIndex = StubMappedIndex.withoutFields()
-			.name( "entity" );
+	private static final SimpleMappedIndex<AbstractEntityProjectionIT.IndexBinding> selectEntityIndex =
+			SimpleMappedIndex.of( AbstractEntityProjectionIT.IndexBinding::new ).name( "entity" );
 	private static final StubMappedIndex selectEntityReferenceIndex = StubMappedIndex.withoutFields()
 			.name( "entityref" );
 
@@ -38,7 +39,7 @@ public class SearchQuerySelectIT {
 		setupHelper.start().withIndexes( selectEntityIndex, selectEntityReferenceIndex ).setup();
 
 		BulkIndexer selectEntityIndexer = selectEntityIndex.bulkIndexer();
-		AbstractEntityProjectionIT.initData( selectEntityIndexer );
+		AbstractEntityProjectionIT.initData( selectEntityIndex, selectEntityIndexer );
 		BulkIndexer selectEntityReferenceIndexer = selectEntityReferenceIndex.bulkIndexer();
 		AbstractEntityReferenceProjectionIT.initData( selectEntityReferenceIndexer );
 		selectEntityIndexer.join( selectEntityReferenceIndexer );
