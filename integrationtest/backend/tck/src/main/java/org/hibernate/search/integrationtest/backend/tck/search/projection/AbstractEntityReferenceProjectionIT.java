@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
@@ -75,10 +75,10 @@ public abstract class AbstractEntityReferenceProjectionIT {
 		StubTransformedReference doc1TransformedReference = new StubTransformedReference( doc1Reference );
 		StubTransformedReference doc2TransformedReference = new StubTransformedReference( doc2Reference );
 
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				mainIndex.createGenericScope( loadingContextMock );
 		SearchQuery<StubTransformedReference> referencesQuery = select( scope.query() )
 				.where( f -> f.matchAll() )

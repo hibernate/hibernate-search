@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -67,15 +67,15 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope( loadingContextMock );
-		SearchQuery<StubLoadedObject> objectsQuery = scope.query()
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope = index.createGenericScope( loadingContextMock );
+		SearchQuery<StubEntity> query = scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.toQuery();
-		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
+		SearchScroll<StubEntity> scroll = query.scroll( 5 );
 
 		verifyLoading( loadingContextMock, scroll );
 	}
@@ -83,17 +83,17 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				index.createGenericScope( loadingContextMock );
-		SearchQuery<StubLoadedObject> objectsQuery = scope.query()
+		SearchQuery<StubEntity> query = scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.failAfter( 1000, TimeUnit.HOURS )
 				.toQuery();
-		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
+		SearchScroll<StubEntity> scroll = query.scroll( 5 );
 
 		verifyLoading( loadingContextMock, scroll );
 	}
@@ -101,24 +101,24 @@ public class SearchQueryScrollResultLoadingIT {
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
 		@SuppressWarnings("unchecked")
-		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+		SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
 
-		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
+		GenericStubMappingScope<StubTransformedReference, StubEntity> scope =
 				index.createGenericScope( loadingContextMock );
-		SearchQuery<StubLoadedObject> objectsQuery = scope.query()
+		SearchQuery<StubEntity> query = scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.truncateAfter( 1000, TimeUnit.HOURS )
 				.toQuery();
-		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
+		SearchScroll<StubEntity> scroll = query.scroll( 5 );
 
 		// softTimeout is passed to the entity loading too
 		verifyLoading( loadingContextMock, scroll );
 	}
 
-	private void verifyLoading(SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
-			SearchScroll<StubLoadedObject> scroll) {
+	private void verifyLoading(SearchLoadingContext<StubTransformedReference, StubEntity> loadingContextMock,
+			SearchScroll<StubEntity> scroll) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {
 			int base = j * 5;
@@ -127,14 +127,14 @@ public class SearchQueryScrollResultLoadingIT {
 					loadingContextMock,
 					c -> {
 						for ( int i = 0; i < 5; i++ ) {
-							c.load( references[base + i].reference, references[base + i].loadedObject );
+							c.load( references[base + i].reference, references[base + i].loadedEntity );
 						}
 					}
 			);
-			SearchScrollResult<StubLoadedObject> chunk = scroll.next();
+			SearchScrollResult<StubEntity> chunk = scroll.next();
 			assertThatHits( chunk.hits() ).hasHitsAnyOrder(
-					references[base + 0].loadedObject, references[base + 1].loadedObject, references[base + 2].loadedObject,
-					references[base + 3].loadedObject, references[base + 4].loadedObject
+					references[base + 0].loadedEntity, references[base + 1].loadedEntity, references[base + 2].loadedEntity,
+					references[base + 3].loadedEntity, references[base + 4].loadedEntity
 			);
 			// Check in particular that the backend gets the projection hit mapper from the loading context,
 			// which must happen every time we load entities,
@@ -148,13 +148,13 @@ public class SearchQueryScrollResultLoadingIT {
 				loadingContextMock,
 				c -> {
 					for ( int i = 35; i <= 36; i++ ) {
-						c.load( references[i].reference, references[i].loadedObject );
+						c.load( references[i].reference, references[i].loadedEntity );
 					}
 				}
 		);
-		SearchScrollResult<StubLoadedObject> chunk = scroll.next();
+		SearchScrollResult<StubEntity> chunk = scroll.next();
 		assertThatHits( chunk.hits() ).hasHitsAnyOrder(
-				references[35].loadedObject, references[36].loadedObject
+				references[35].loadedEntity, references[36].loadedEntity
 		);
 		verify( loadingContextMock ).createProjectionHitMapper();
 		assertThat( chunk.total().hitCount() ).isEqualTo( 37 );
@@ -164,13 +164,13 @@ public class SearchQueryScrollResultLoadingIT {
 		final String id;
 		final int value;
 		final DocumentReference reference;
-		final StubLoadedObject loadedObject;
+		final StubEntity loadedEntity;
 
 		IndexItem(int i) {
 			id = i + "";
 			value = i;
 			reference = reference( index.typeName(), id );
-			loadedObject = new StubLoadedObject( reference );
+			loadedEntity = new StubEntity( reference );
 		}
 	}
 
