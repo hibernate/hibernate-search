@@ -1413,7 +1413,7 @@
                         <configuration>
                             <executable>${java-version.main.compiler}</executable>
                             <commandlineArgs>-version</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                     <!-- This is necessary even if we have the above,
@@ -1427,7 +1427,7 @@
                         <configuration>
                             <executable>${java-version.main.compiler.java_home}/bin/java</executable>
                             <commandlineArgs>-version</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                     <execution>
@@ -1439,7 +1439,7 @@
                         <configuration>
                             <executable>echo</executable>
                             <commandlineArgs>Main code compiled with -release ${maven.compiler.release}</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                     <execution>
@@ -1451,7 +1451,7 @@
                         <configuration>
                             <executable>${java-version.test.compiler}</executable>
                             <commandlineArgs>-version</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                     <!-- This is necessary even if we have the above,
@@ -1465,7 +1465,7 @@
                         <configuration>
                             <executable>${java-version.test.compiler.java_home}/bin/java</executable>
                             <commandlineArgs>-version</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                     <execution>
@@ -1477,7 +1477,7 @@
                         <configuration>
                             <executable>${java-version.test.launcher}</executable>
                             <commandlineArgs>-version</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                     <execution>
@@ -1489,7 +1489,7 @@
                         <configuration>
                             <executable>echo</executable>
                             <commandlineArgs>Tests compiled with -release ${maven.compiler.testRelease}</commandlineArgs>
-                            <useMavenLogger>true</useMavenLogger>
+                            <inheritIo>true</inheritIo>
                         </configuration>
                     </execution>
                 </executions>
