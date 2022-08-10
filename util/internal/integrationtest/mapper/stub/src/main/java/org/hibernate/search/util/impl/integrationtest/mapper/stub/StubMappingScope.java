@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 /**
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,
@@ -19,15 +18,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 public class StubMappingScope extends GenericStubMappingScope<DocumentReference, DocumentReference> {
 
 	StubMappingScope(StubMapping mapping, MappedIndexScope<DocumentReference, DocumentReference> delegate) {
-		super( mapping, delegate );
-	}
-
-	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
-		return query( new StubSearchLoadingContext() );
-	}
-
-	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query(
-			StubSession sessionContext) {
-		return query( sessionContext, new StubSearchLoadingContext() );
+		super( mapping, delegate, new StubSearchLoadingContext() );
 	}
 }

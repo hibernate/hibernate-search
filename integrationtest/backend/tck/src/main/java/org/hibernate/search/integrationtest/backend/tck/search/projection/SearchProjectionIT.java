@@ -161,7 +161,7 @@ public class SearchProjectionIT {
 				mock( SearchLoadingContext.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				mainIndex.createGenericScope();
+				mainIndex.createGenericScope( loadingContextMock );
 		SearchQuery<List<?>> query;
 		/*
 		 * Note to test writers: make sure to assign these projections to variables,
@@ -173,7 +173,7 @@ public class SearchProjectionIT {
 				scope.projection().entityReference().toProjection();
 		SearchProjection<StubLoadedObject> entityProjection =
 				scope.projection().entity().toProjection();
-		query = scope.query( loadingContextMock )
+		query = scope.query()
 				.select(
 						documentReferenceProjection,
 						entityReferenceProjection,

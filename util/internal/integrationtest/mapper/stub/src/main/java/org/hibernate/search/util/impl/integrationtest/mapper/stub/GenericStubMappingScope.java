@@ -24,29 +24,29 @@ public class GenericStubMappingScope<R, E> {
 
 	private final StubMapping mapping;
 	private final MappedIndexScope<R, E> delegate;
+	private final SearchLoadingContext<R, E> loadingContext;
 
-	GenericStubMappingScope(StubMapping mapping, MappedIndexScope<R, E> delegate) {
+	GenericStubMappingScope(StubMapping mapping, MappedIndexScope<R, E> delegate,
+			SearchLoadingContext<R, E> loadingContext) {
 		this.mapping = mapping;
 		this.delegate = delegate;
+		this.loadingContext = loadingContext;
 	}
 
-	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(
-			SearchLoadingContext<R, E> loadingContext) {
-		return query( mapping.session(), loadingContext );
+	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query() {
+		return query( mapping.session() );
 	}
 
-	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubSession sessionContext,
-			SearchLoadingContext<R, E> loadingContext) {
-		return query( sessionContext, loadingContext, new StubLoadingOptionsStep() );
+	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubSession sessionContext) {
+		return query( sessionContext, new StubLoadingOptionsStep() );
 	}
 
-	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(
-			SearchLoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
-		return query( mapping.session(), loadingContext, loadingOptionsStep );
+	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(LOS loadingOptionsStep) {
+		return query( mapping.session(), loadingOptionsStep );
 	}
 
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubSession sessionContext,
-			SearchLoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
+			LOS loadingOptionsStep) {
 		SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder = new SearchLoadingContextBuilder<R, E, LOS>() {
 			@Override
 			public LOS toAPI() {
