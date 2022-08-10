@@ -10,22 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
-import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, StubMappingPartialBuildState> {
 
 	private final TenancyMode tenancyMode;
-	private final ProjectionRegistry projectionRegistry;
 	private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 
-	public StubMappingInitiator(TenancyMode tenancyMode, ProjectionRegistry projectionRegistry) {
+	public StubMappingInitiator(TenancyMode tenancyMode) {
 		this.tenancyMode = tenancyMode;
-		this.projectionRegistry = projectionRegistry;
 	}
 
 	public void add(StubMappedIndex mappedIndex) {
@@ -43,7 +40,7 @@ public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, S
 	@Override
 	public Mapper<StubMappingPartialBuildState> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider) {
-		return new StubMapper( buildContext, contributorProvider, tenancyMode, projectionRegistry );
+		return new StubMapper( buildContext, contributorProvider, tenancyMode );
 	}
 
 }

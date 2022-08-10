@@ -68,7 +68,7 @@ public abstract class AbstractBackendHolder {
 		SearchIntegration.Builder integrationBuilder =
 				SearchIntegration.builder( environment );
 
-		StubMappingInitiator initiator = new StubMappingInitiator( TenancyMode.SINGLE_TENANCY, null );
+		StubMappingInitiator initiator = new StubMappingInitiator( TenancyMode.SINGLE_TENANCY );
 		StubMappingKey mappingKey = new StubMappingKey();
 		integrationBuilder.addMappingInitiator( mappingKey, initiator );
 

@@ -63,7 +63,7 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	public static ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
+	private static final ProjectionRegistry projectionRegistryMock = Mockito.mock( ProjectionRegistry.class );
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -169,46 +169,50 @@ public abstract class AbstractCompositeProjectionFromAsIT<B extends AbstractComp
 		@Test
 		@TestForIssue(jiraKey = "HSEARCH-3927")
 		public void as_class() {
-			// We simulate a projection definition on the mapper side;
-			// normally this would involve annotation mapping.
-			when( projectionRegistryMock.composite( ValueWrapper.class ) )
-					.thenReturn( (f, initialStep) ->
-							// Critically, in a real-world scenario the inner projections
-							// will be defined relative to the composite node
-							// (which may not be the root in the case of object projections).
-							// We need to do the same here, to check that the engine/backend compensates
-							// by passing a projection factory whose root is the composite node.
-							doFrom( f, index.binding().composite(), CompositeBinding::relativePath, initialStep )
-									.asArray( ValueWrapper<Object[]>::new ) );
-			assertThatQuery( index.createScope().query()
-					.select( f -> startProjection( f ).as( ValueWrapper.class ) )
-					.where( f -> f.matchAll() ) )
-					.hasHitsAnyOrder( expectedArrays().stream()
-							.<ValueWrapper<Object[]>>map( ValueWrapper::new )
-							.collect( Collectors.toList() ) );
+			index.mapping().with().projectionRegistry( projectionRegistryMock ).run( () -> {
+				// We simulate a projection definition on the mapper side;
+				// normally this would involve annotation mapping.
+				when( projectionRegistryMock.composite( ValueWrapper.class ) )
+						.thenReturn( (f, initialStep) ->
+								// Critically, in a real-world scenario the inner projections
+								// will be defined relative to the composite node
+								// (which may not be the root in the case of object projections).
+								// We need to do the same here, to check that the engine/backend compensates
+								// by passing a projection factory whose root is the composite node.
+								doFrom( f, index.binding().composite(), CompositeBinding::relativePath, initialStep )
+										.asArray( ValueWrapper<Object[]>::new ) );
+				assertThatQuery( index.createScope().query()
+						.select( f -> startProjection( f ).as( ValueWrapper.class ) )
+						.where( f -> f.matchAll() ) )
+						.hasHitsAnyOrder( expectedArrays().stream()
+								.<ValueWrapper<Object[]>>map( ValueWrapper::new )
+								.collect( Collectors.toList() ) );
+			} );
 		}
 
 		@Test
 		@TestForIssue(jiraKey = "HSEARCH-3927")
 		@SuppressWarnings("rawtypes")
 		public void as_class_multi() {
-			// We simulate a projection definition on the mapper side;
-			// normally this would involve annotation mapping.
-			when( projectionRegistryMock.composite( ValueWrapper.class ) )
-					.thenReturn( (f, initialStep) ->
-							// Inner projections need to be defined relative to the composite node;
-							// see as_class.
-							doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
-									.asArray( ValueWrapper<Object[]>::new ) );
-			assertThatQuery( index.createScope().query()
-					.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class ).multi() )
-					.where( f -> f.matchAll() ) )
-					.hits().asIs().usingRecursiveFieldByFieldElementComparator()
-					.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti().stream()
-							.map( perDocList -> perDocList.stream()
-									.<ValueWrapper>map( ValueWrapper::new )
-									.collect( Collectors.toList() ) )
-							.collect( Collectors.toList() ) );
+			index.mapping().with().projectionRegistry( projectionRegistryMock ).run( () -> {
+				// We simulate a projection definition on the mapper side;
+				// normally this would involve annotation mapping.
+				when( projectionRegistryMock.composite( ValueWrapper.class ) )
+						.thenReturn( (f, initialStep) ->
+								// Inner projections need to be defined relative to the composite node;
+								// see as_class.
+								doFrom( f, index.binding().compositeForMulti(), CompositeBinding::relativePath, initialStep )
+										.asArray( ValueWrapper<Object[]>::new ) );
+				assertThatQuery( index.createScope().query()
+						.select( f -> startProjectionForMulti( f ).as( ValueWrapper.class ).multi() )
+						.where( f -> f.matchAll() ) )
+						.hits().asIs().usingRecursiveFieldByFieldElementComparator()
+						.containsExactlyInAnyOrderElementsOf( expectedArraysForMulti().stream()
+								.map( perDocList -> perDocList.stream()
+										.<ValueWrapper>map( ValueWrapper::new )
+										.collect( Collectors.toList() ) )
+								.collect( Collectors.toList() ) );
+			} );
 		}
 
 		@Test
