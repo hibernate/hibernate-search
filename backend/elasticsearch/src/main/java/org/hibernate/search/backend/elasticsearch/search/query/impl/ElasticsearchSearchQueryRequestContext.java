@@ -79,6 +79,11 @@ class ElasticsearchSearchQueryRequestContext implements ProjectionRequestContext
 	}
 
 	@Override
+	public ProjectionRequestContext root() {
+		return this;
+	}
+
+	@Override
 	public ProjectionRequestContext forField(String absoluteFieldPath, String[] absoluteFieldPathComponents) {
 		return new FieldProjectionRequestContext( this, absoluteFieldPath, absoluteFieldPathComponents );
 	}

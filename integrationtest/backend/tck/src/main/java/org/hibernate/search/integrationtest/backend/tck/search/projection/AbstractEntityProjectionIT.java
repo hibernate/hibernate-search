@@ -25,7 +25,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -38,6 +42,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -60,10 +65,12 @@ import org.mockito.quality.Strictness;
 @SuppressWarnings("unchecked") // Mocking parameterized types
 public abstract class AbstractEntityProjectionIT {
 
-	private static final String DOCUMENT_1_ID = "1";
-	private static final String DOCUMENT_2_ID = "2";
+	protected static final String DOCUMENT_1_ID = "1";
+	protected static final String DOCUMENT_2_ID = "2";
+	protected static final String TEXT_VALUE_1_1 = "some text 1_1";
+	protected static final String TEXT_VALUE_1_2 = "some text 1_2";
 
-	private static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
+	protected static final ProjectionMappedTypeContext mainTypeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -517,19 +524,53 @@ public abstract class AbstractEntityProjectionIT {
 	private static void initIndex(SimpleMappedIndex<IndexBinding> index, BulkIndexer indexer) {
 		IndexBinding binding = index.binding();
 		indexer
-				.add( DOCUMENT_1_ID, document -> document.addValue( binding.idField.reference, DOCUMENT_1_ID ) )
+				.add( DOCUMENT_1_ID, document -> {
+					document.addValue( binding.idField.reference, DOCUMENT_1_ID );
+					DocumentElement object = document.addObject( binding.nested.reference );
+					object.addValue( binding.nested.field.reference, TEXT_VALUE_1_1 );
+					object = document.addObject( binding.nested.reference );
+					object.addValue( binding.nested.field.reference, TEXT_VALUE_1_2 );
+				} )
 				.add( DOCUMENT_2_ID, document -> document.addValue( binding.idField.reference, DOCUMENT_2_ID ) );
 	}
 
 
 	public static class IndexBinding {
 		final SimpleFieldModel<String> idField;
+		final ObjectFieldBinding nested;
 
 		public IndexBinding(IndexSchemaElement root) {
 			idField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "id", c -> c.projectable(
 							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
 									? Projectable.DEFAULT : Projectable.YES ) );
+			nested = ObjectFieldBinding.create( root, "nested" );
+		}
+	}
+
+	static class ObjectFieldBinding {
+		final IndexObjectFieldReference reference;
+		final String absolutePath;
+
+		final SimpleFieldModel<String> field;
+
+		static ObjectFieldBinding create(IndexSchemaElement parent, String relativeFieldName) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED )
+					.multiValued();
+			return new ObjectFieldBinding( objectField, relativeFieldName );
+		}
+
+		ObjectFieldBinding(IndexSchemaObjectField objectField, String absolutePath) {
+			reference = objectField.toReference();
+			this.absolutePath = absolutePath;
+			field = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE )
+					.map( objectField, "field", c -> c.projectable(
+							TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+									? Projectable.DEFAULT : Projectable.YES ) );
+		}
+
+		String fieldPath() {
+			return absolutePath + "." + field.relativeFieldName;
 		}
 	}
 

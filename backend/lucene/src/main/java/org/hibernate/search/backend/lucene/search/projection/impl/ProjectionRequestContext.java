@@ -48,6 +48,10 @@ public final class ProjectionRequestContext {
 		}
 	}
 
+	public ProjectionRequestContext root() {
+		return new ProjectionRequestContext( extractionRequirementsBuilder, null );
+	}
+
 	public ProjectionRequestContext forField(String absoluteFieldPath) {
 		checkValidField( absoluteFieldPath );
 		return new ProjectionRequestContext( extractionRequirementsBuilder, absoluteFieldPath );
