@@ -155,10 +155,17 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-entity]]
 == `entity`: return matched entities
 
-The `entityReference` projection returns the entity corresponding to the document that matched.
+The `entity` projection returns the entity corresponding to the document that matched.
 
-NOTE: With the Hibernate ORM integration, returned objects are managed entities loaded from the database.
+How the entity is loaded exactly depends on your mapper and configuration:
+
+* With the <<mapper-orm,Hibernate ORM integration>>, returned objects are managed entities loaded by Hibernate ORM from the database.
 You can use them as you would use any entity returned from traditional Hibernate ORM queries.
+* With the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+entities are loaded from an external datastore if <<mapper-pojo-standalone-search-query-loading,configured>>,
+or (failing that) are projected from the index if the entity type declares a <<mapping-projection,projection constructor>>.
+If neither loading configuration nor projection constructor are found,
+the `entity` projection will simply fail.
 
 .Returning matched entities loaded from the database
 ====
@@ -168,7 +175,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-NOTE: If an entity cannot be loaded (e.g. it was deleted and the index wasn't updated yet),
+NOTE: If an entity cannot be loaded from the external datastore/database
+(e.g. it was deleted there, and the index wasn't updated yet),
 the hit will be omitted and won't appear in the returned `List` at all.
 The total hit count, however, will not take this omission into account.
 
