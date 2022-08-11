@@ -76,6 +76,8 @@ public class SearchQueryLoadingOptionsIT {
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
+		// Expect our loading options to be altered
+		verify( loadingOptionsStepMock ).accept( someOption );
 	}
 
 	@Test
@@ -91,6 +93,8 @@ public class SearchQueryLoadingOptionsIT {
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
+		// Expect our loading options to be altered
+		verify( loadingOptionsStepMock ).accept( someOption );
 	}
 
 	@Test
