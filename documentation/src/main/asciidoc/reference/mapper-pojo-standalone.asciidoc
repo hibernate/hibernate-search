@@ -249,6 +249,17 @@ Because by default, the Standalone POJO Mapper does not know anything about wher
 <<search-dsl-query-generality,entity loading in search queries>>
 requires plugging in a way to load entities from the other datastore.
 
+[TIP]
+====
+With the Standalone POJO Mapper, if you want entities to be loaded from the index,
+instead of an external datasource,
+add a <<mapping-projection,projection constructor>> to your entity type.
+
+This will automatically result in your entity being loaded from the index
+when the configuration described in this section is missing and loading is required
+(for example when not using `select()` in a search query).
+====
+
 This is done on <<mapper-pojo-standalone-startup,startup>>
 by assigning a `SelectionLoadingStrategy` to each entity type that will require loading in search queries:
 

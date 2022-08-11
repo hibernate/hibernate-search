@@ -29,11 +29,19 @@ bound to the entity manager used to create the search session.
 This provides all the benefits of Hibernate ORM,
 in particular the ability to navigate the entity graph to retrieve associated entities if necessary.
 
-For the <<mapper-pojo-standalone,Standalone POJO Mapper>>, however,
-loading entities <<mapper-pojo-standalone-search-query-loading,requires explicit configuration>>
-and thus the query above will fail by default;
-either configure entity loading to get the query above to work,
-or use explicit <<search-dsl-projection,projections>> to retrieve data from the index instead.
+[NOTE]
+====
+For the <<mapper-pojo-standalone,Standalone POJO Mapper>>,
+the snippet above will fail by default.
+
+You will need to either:
+
+* <<mapper-pojo-standalone-search-query-loading,configure target entity types to enable loading>>,
+if you want to load entities from an external datasource.
+* add a <<mapping-projection-basics,projection constructor>> to target entity types,
+if you want to reconstruct entities from the content of the index.
+* use explicit <<search-dsl-projection,projections>> to retrieve specific data from the index instead.
+====
 
 The query DSL offers many features, detailed in the following sections.
 Some commonly used features include:
