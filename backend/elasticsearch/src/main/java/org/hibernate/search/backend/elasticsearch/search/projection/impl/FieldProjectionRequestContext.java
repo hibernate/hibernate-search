@@ -58,6 +58,11 @@ public class FieldProjectionRequestContext implements ProjectionRequestContext {
 	}
 
 	@Override
+	public ProjectionRequestContext root() {
+		return root;
+	}
+
+	@Override
 	public ProjectionRequestContext forField(String absoluteFieldPath, String[] absoluteFieldPathComponents) {
 		checkValidField( absoluteFieldPath );
 		String[] relativeFieldPathComponents = Arrays.copyOfRange( absoluteFieldPathComponents,

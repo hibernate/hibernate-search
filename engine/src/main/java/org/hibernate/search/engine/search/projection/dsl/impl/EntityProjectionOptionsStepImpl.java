@@ -68,7 +68,9 @@ public final class EntityProjectionOptionsStepImpl<E>
 		else {
 			Class<?> javaClass = mappedTypeContext.javaClass();
 			if ( scope.projectionRegistry().compositeOptional( javaClass ).isPresent() ) {
-				return (SearchProjection<E>) projectionFactory.composite().as( javaClass ).toProjection();
+				return scope.projectionBuilders().rootContext(
+						(SearchProjection<E>) projectionFactory.composite().as( javaClass ).toProjection()
+				);
 			}
 		}
 		// If the projection is impossible, we delay the exception until we actually have to project a document.

@@ -80,6 +80,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		return new LuceneByMappedTypeProjection<>( scope, luceneInners );
 	}
 
+	@Override
+	public <T> SearchProjection<T> rootContext(SearchProjection<T> inner) {
+		return new LuceneRootContextProjection<>( scope, LuceneSearchProjection.from( scope, inner ) );
+	}
+
 	public SearchProjection<Document> document() {
 		return new LuceneDocumentProjection( scope );
 	}

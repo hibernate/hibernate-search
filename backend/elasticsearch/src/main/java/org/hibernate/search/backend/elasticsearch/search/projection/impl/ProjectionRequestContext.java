@@ -17,6 +17,8 @@ public interface ProjectionRequestContext {
 
 	void checkValidField(String absoluteFieldPath);
 
+	ProjectionRequestContext root();
+
 	ProjectionRequestContext forField(String absoluteFieldPath, String[] absoluteFieldPathComponents);
 
 	String absoluteCurrentFieldPath();

@@ -88,6 +88,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 				elasticsearchInners );
 	}
 
+	@Override
+	public <T> SearchProjection<T> rootContext(SearchProjection<T> inner) {
+		return new ElasticsearchRootContextProjection<>( scope, ElasticsearchSearchProjection.from( scope, inner ) );
+	}
+
 	public SearchProjection<JsonObject> source() {
 		return new ElasticsearchSourceProjection( scope );
 	}
