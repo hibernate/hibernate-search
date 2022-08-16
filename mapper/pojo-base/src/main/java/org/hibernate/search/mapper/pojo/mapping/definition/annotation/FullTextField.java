@@ -91,7 +91,7 @@ public @interface FullTextField {
 
 	/**
 	 * @return Whether this field should be searchable.
-	 * @see GenericField#sortable()
+	 * @see GenericField#searchable()
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
