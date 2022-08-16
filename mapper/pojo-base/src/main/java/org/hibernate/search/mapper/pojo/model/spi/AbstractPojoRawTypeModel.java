@@ -127,6 +127,22 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public PojoTypeModel<? extends T> cast(PojoTypeModel<?> other) {
+		if ( other.rawType().isSubTypeOf( this ) ) {
+			// Redundant cast; no need to create a new type.
+			return (PojoTypeModel<? extends T>) other;
+		}
+		else {
+			return doCast( other );
+		}
+	}
+
+	protected PojoTypeModel<? extends T> doCast(PojoTypeModel<?> other) {
+		return other.castTo( typeIdentifier.javaClass() ).orElse( this );
+	}
+
+	@Override
 	public final PojoCaster<T> caster() {
 		return caster;
 	}

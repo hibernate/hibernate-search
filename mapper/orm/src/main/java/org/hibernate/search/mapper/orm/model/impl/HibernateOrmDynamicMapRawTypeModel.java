@@ -82,17 +82,10 @@ public class HibernateOrmDynamicMapRawTypeModel
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public PojoTypeModel<? extends Map> cast(PojoTypeModel<?> other) {
-		if ( other.rawType().isSubTypeOf( this ) ) {
-			// Redundant cast; no need to create a new type.
-			return (PojoTypeModel<? extends Map>) other;
-		}
-		else {
-			// There is no generic type information to retain for dynamic-map types; we can just return this.
-			// Also, calling other.castTo(...) would mean losing the type name, and we definitely don't want that.
-			return this;
-		}
+	protected PojoTypeModel<? extends Map> doCast(PojoTypeModel<?> other) {
+		// There is no generic type information to retain for dynamic-map types; we can just return this.
+		// Also, calling other.castTo(...) would mean losing the type name, and we definitely don't want that.
+		return this;
 	}
 
 	@Override
