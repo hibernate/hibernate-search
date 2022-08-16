@@ -31,12 +31,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-[NOTE]
-====
-There are a few constraints regarding sorts by field.
-In particular, in order for a field to be "sortable", it must be <<mapping-directfieldmapping-sortable,marked as such in the mapping>>,
-so that the correct data structures are available in the index.
-====
+include::components/field-sort-important.asciidoc[]
 
 The sort DSL offers more sort types, and multiple options for each type of sort.
 To learn more about the `field` sort, and all the other types of sort,
@@ -107,6 +102,19 @@ See <<search-dsl-sort-stabilize>> for a solution to unstable sorts.
 
 `field` sorts on the value of a given field for each document.
 
+[[search-dsl-sort-field-prerequisites]]
+include::components/field-sort-important.asciidoc[]
+
+[NOTE]
+====
+The values of <<mapping-geopoint,GeoPoint>> fields cannot be compared directly
+and thus the `field` sort cannot be used on those fields.
+
+Refer to the <<search-dsl-sort-distance,distance sort>> for these fields.
+====
+
+The sort order is defined as follows:
+
 * in ascending order (the default), documents with a lower value appear first in the list of hits.
 * in descending order, documents with a higher value appear first in the list of hits.
 
@@ -114,22 +122,6 @@ See <<search-dsl-sort-stabilize>> for a solution to unstable sorts.
 ====
 For text fields, "lower" means "lower in the alphabetical order".
 ====
-
-[[search-dsl-sort-field-prerequisites]]
-=== Prerequisites
-
-In order for the `field` sort to be available on a given field,
-you need to mark the field as <<mapping-directfieldmapping-sortable,sortable>> in the mapping.
-
-<<mapping-geopoint,GeoPoint>> fields cannot be marked as sortable;
-refer to the <<search-dsl-sort-distance,distance sort>> for these fields.
-
-<<mapping-directfieldmapping-annotations-fulltextfield,full-text fields>> (multi-word text fields)
-cannot be marked as sortable;
-you need to use <<mapping-directfieldmapping-annotations-keywordfield,keyword fields>> for text sorts.
-Remember you can <<mapping-directfieldmapping-basics,map a single property to multiple fields with different names>>,
-so you can have a full-text field for predicates along with a keyword field for sorts,
-all for the same property.
 
 [[search-dsl-sort-field-syntax]]
 === Syntax

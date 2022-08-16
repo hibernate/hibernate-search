@@ -55,12 +55,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 
 // Search 5 anchors backward compatibility
 [[example-faceting-entity]]
-[NOTE]
-====
-There are a few constraints regarding aggregations.
-In particular, in order for a field to be "aggregable", it must be <<mapping-directfieldmapping-aggregable,marked as such in the mapping>>,
-so that it is correctly stored in the index.
-====
+include::components/field-aggregation-important.asciidoc[]
 
 // Search 5 anchors backward compatibility
 [[example-restricting-query-results]]
@@ -83,6 +78,8 @@ refer to the following sections.
 == [[discrete-faceting-request]] `terms`: group by the value of a field
 
 The `terms` aggregation returns a count of documents for each term value of a given field.
+
+include::components/field-aggregation-important.asciidoc[]
 
 [NOTE]
 ====
@@ -232,9 +229,11 @@ but that can be <<search-dsl-aggregation-common-filter,controlled explicitly wit
 
 The `range` aggregation returns a count of documents for given ranges of values of a given field.
 
+include::components/field-aggregation-important.asciidoc[]
+
 [NOTE]
 ====
-The `range` aggregation is not available on text fields or geo-point fields.
+The `range` aggregation is not available on geo-point fields.
 ====
 
 .Counting hits grouped by range of values for a field
