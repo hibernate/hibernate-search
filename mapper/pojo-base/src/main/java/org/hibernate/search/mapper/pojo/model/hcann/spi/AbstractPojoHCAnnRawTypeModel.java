@@ -82,18 +82,6 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public PojoTypeModel<? extends T> cast(PojoTypeModel<?> other) {
-		if ( other.rawType().isSubTypeOf( this ) ) {
-			// Redundant cast; no need to create a new type.
-			return (PojoTypeModel<? extends T>) other;
-		}
-		else {
-			return other.castTo( typeIdentifier.javaClass() ).orElse( this );
-		}
-	}
-
-	@Override
 	protected final Stream<String> declaredPropertyNames() {
 		return Stream.concat(
 				declaredFieldAccessXPropertiesByName().keySet().stream(),

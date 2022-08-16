@@ -79,7 +79,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	 * @param other The type to cast to this type.
 	 * @return A new type model, representing the given type cast to this type.
 	 * If casting is not possible, returns {@code this}.
-	 * If casting is possible, the returned type type model
+	 * If casting is possible, the returned type model
 	 * will retain as much contextual type information as possible (type arguments, ...),
 	 * so casting {@code List<Integer>} to {@code Collection} for example would return {@code Collection<Integer>}.
 	 */
