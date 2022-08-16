@@ -78,12 +78,13 @@ See <<concepts-analysis>> for more details about analyzers and full-text analysi
 Note you can also define <<mapping-directfieldmapping-search-analyzer,a search analyzer>>
 to analyze searched terms differently.
 +
-IMPORTANT: Full-text fields cannot be sorted on.
-If you need to sort on the value of a property,
+IMPORTANT: Full-text fields cannot be sorted on nor aggregated.
+If you need to sort on, or aggregate on, the value of a property,
 it is recommended to use `@KeywordField`, with a normalizer if necessary (see below).
 Note that multiple fields can be added to the same property,
 so you can use both `@FullTextField` and `@KeywordField` if you need both
-full-text search and sorting.
+full-text search and sorting:
+you will just need to use a distinct <<mapper-orm-directfieldmapping-name,name>> for each of those two fields.
 
 [[mapping-directfieldmapping-annotations-keywordfield]] [[mapper-orm-directfieldmapping-annotations-keywordfield]] `@KeywordField`::
 A text field whose value is considered as a single keyword.
@@ -91,7 +92,8 @@ Only works for `String` fields.
 +
 Keyword fields allow <<search-dsl-predicate-match-analysis,more subtle matches>>, similarly to full-text fields,
 with the limitation that keyword fields only contain one token.
-On the other hand, this limitation allows keyword fields to be <<mapping-directfieldmapping-sortable,sorted on>>.
+On the other hand, this limitation allows keyword fields to be <<mapping-directfieldmapping-sortable,sorted on>>
+and <<mapping-directfieldmapping-aggregable,aggregated>>.
 +
 Keyword fields may be assigned a <<mapping-directfieldmapping-normalizer,normalizer>>, referenced by its name.
 See <<concepts-analysis>> for more details about normalizers and full-text analysis.
@@ -175,6 +177,12 @@ i.e. whether the field value is stored in a specific data structure in the index
 to allow aggregations later when querying.
 +
 Value: `Aggregable.YES`, `Aggregable.NO`, `Aggregable.DEFAULT`.
++
+[IMPORTANT]
+====
+This option is not available for `@FullTextField`.
+See <<mapping-directfieldmapping-annotations-fulltextfield,here>> for an explanation and some solutions.
+====
 
 `searchable`::
 Whether the field can be searched on.
