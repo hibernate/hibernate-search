@@ -323,16 +323,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public ThreadPoolProvider threadPoolProvider() {
-		return delegate().threadPoolProvider();
-	}
-
-	@Override
-	public FailureHandler failureHandler() {
-		return delegate().failureHandler();
-	}
-
-	@Override
 	public HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager) {
 		return HibernateOrmSearchSession.get( this, HibernateOrmUtils.toSessionImplementor( entityManager ) );
 	}
