@@ -12,8 +12,6 @@ import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLo
 
 public interface StandalonePojoScopeMappingContext extends BackendMappingContext {
 
-	DetachedBackendSessionContext detachedBackendSessionContext(String tenantId);
-
 	StandalonePojoLoadingContext.Builder loadingContextBuilder(DetachedBackendSessionContext sessionContext);
 
 }

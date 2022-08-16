@@ -80,7 +80,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public SearchWorkspace workspace(String tenantId) {
-		return workspace( mappingContext.detachedBackendSessionContext( tenantId ) );
+		return workspace( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
 	}
 
 	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
@@ -94,7 +94,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( mappingContext.detachedBackendSessionContext( tenantId ) );
+		return massIndexer( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
 	}
 
 	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {

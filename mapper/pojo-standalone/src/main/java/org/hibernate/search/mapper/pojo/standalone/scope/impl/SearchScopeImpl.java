@@ -16,6 +16,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
@@ -24,11 +29,6 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandaloneP
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
-import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchWorkspaceImpl;
 
@@ -75,7 +75,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public SearchWorkspace workspace(String tenantId) {
-		return workspace( mappingContext.detachedBackendSessionContext( tenantId ) );
+		return workspace( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
 	}
 
 	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
@@ -105,7 +105,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( mappingContext.detachedBackendSessionContext( tenantId ) );
+		return massIndexer( DetachedBackendSessionContext.of( mappingContext, tenantId ) );
 	}
 
 	public MassIndexer massIndexer(DetachedBackendSessionContext sessionContext) {
