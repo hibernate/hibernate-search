@@ -593,7 +593,8 @@ See below for examples.
 Built-in analyzers are available out-of-the-box and don't require explicit configuration.
 If necessary, they can be overridden by defining your own analyzer with the same name.
 
-The Lucene backend comes with a series of built-in analyzer:
+The Lucene backend comes with a series of built-in analyzer;
+their names are listed as constants in `org.hibernate.search.engine.backend.analysis.AnalyzerNames`:
 
 `default`::
 The analyzer used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
@@ -722,6 +723,33 @@ It is also possible to assign a name to an analyzer instance:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedLuceneAnalysisConfigurer.java[tags=instance]
 ----
+====
+
+[[backend-lucene-analysis-analyzers-default]]
+=== Overriding the default analyzer
+
+The default analyzer when using <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>
+without specifying an analyzer explicitly, is named `default`.
+
+Like any other <<backend-lucene-analysis-builtin,built-in analyzer>>, it is possible to override the default analyzer
+by defining a <<backend-lucene-analysis-analyzers,custom analyzer>> with the same name:
+
+.Overriding the default analyzer in the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysisConfigurer.java[tags=include]
+----
+<1> Start the definition of a custom analyzer that happens to be named `default`.
+Here we rely on constants from `org.hibernate.search.engine.backend.analysis.AnalyzerNames` to use the correct name,
+but hardcoding `"default"` would work just as well.
+<2> Continue the analyzer definition <<backend-lucene-analysis-analyzers,as we would for any other custom analyzer>>.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/lucene-default-override.properties[]
+----
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
 
 [[backend-lucene-analysis-similarity]]
