@@ -134,7 +134,12 @@ A `CompletionStage` is returned.
 
 include::components/mapper-orm-only-note.asciidoc[]
 
-You can select a subset of target entities to be reindexed.
+You can select a subset of target entities to be reindexed
+by passing a condition as string to the mass indexer.
+The condition will be applied when querying the database for entities to index.
+
+The condition string is expected to follow the link:{hibernateDocUrl}#query-language[Hibernate Query Language (HQL)] syntax.
+Accessible entity properties are those of the entity being reindexed (and nothing more).
 
 .Use of conditional reindexing
 ====
