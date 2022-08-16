@@ -34,13 +34,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-[NOTE]
-====
-There are a few constraints regarding `field` projections.
-In particular, in order for a field to be "projectable", it must either be <<mapping-directfieldmapping-projectable,explicitly marked as such in the mapping>>,
-or be implicitly projectable based on the underlying backend (Elasticsearch),
-so that it is correctly stored in the index.
-====
+include::components/field-projection-important.asciidoc[]
 
 While `field` projections are certainly the most common,
 they are not the only type of projection.
@@ -186,10 +180,7 @@ The total hit count, however, will not take this omission into account.
 The `field` projection returns the value of a given field for the matched document.
 
 [[search-dsl-projection-field-prerequisites]]
-=== Prerequisites
-
-In order for the `field` projection to be available on a given field,
-you need to mark the field as <<mapping-directfieldmapping-projectable,projectable>> in the mapping.
+include::components/field-projection-important.asciidoc[]
 
 [[search-dsl-projection-field-syntax]]
 === Syntax
@@ -290,10 +281,7 @@ The `distance` projection returns the distance between a given point
 and the geo-point value of a given field for the matched document.
 
 [[search-dsl-projection-distance-prerequisites]]
-=== Prerequisites
-
-In order for the `distance` projection to be available on a given field,
-you need to mark the field as <<mapping-directfieldmapping-projectable,projectable>> in the mapping.
+include::components/field-projection-important.asciidoc[]
 
 [[search-dsl-projection-distance-syntax]]
 === Syntax

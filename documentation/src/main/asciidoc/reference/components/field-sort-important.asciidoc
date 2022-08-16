@@ -1,0 +1,8 @@
+[IMPORTANT]
+====
+In order to use sorts based on the value of a given field,
+you need to mark the field as <<mapping-directfieldmapping-sortable,sortable>> in the mapping.
+
+This is not possible for full-text fields (multi-word text fields), in particular;
+see <<mapping-directfieldmapping-annotations-fulltextfield,here>> for an explanation and some solutions.
+====

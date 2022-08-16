@@ -1,0 +1,8 @@
+[IMPORTANT]
+====
+In order to use projections based on the value of a given field,
+you need to mark the field as <<mapping-directfieldmapping-projectable,projectable>> in the mapping.
+
+This is optional with the <<backend-elasticsearch,Elasticsearch backend>>,
+where all fields are projectable by default.
+====
