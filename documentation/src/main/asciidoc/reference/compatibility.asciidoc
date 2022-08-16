@@ -152,6 +152,31 @@ so that Hibernate Search doesn't even try to use Spring to retrieve the componen
 and thus avoids the deadlock in Spring.
 See <<configuration-bean-reference-parsing,this section>> for more information.
 
+[[compatibility-framework-spring-boot-elasticsearch-auto-configuration]]
+==== Spring Boot's Elasticsearch client and auto-configuration
+
+As you may know, Spring Boot includes "auto-configuration" that triggers as soon as a dependency is detected in the classpath.
+
+This may lead to problems in some cases when dependencies are used by the application, but not through Spring Boot.
+
+In particular, Hibernate Search transitively brings in a dependency to Elasticsearch's low-level REST Client.
+Spring Boot, through link:https://docs.spring.io/spring-boot/docs/{testSpringBootVersion}/api/org/springframework/boot/autoconfigure/elasticsearch/ElasticsearchRestClientAutoConfiguration.html[`ElasticsearchRestClientAutoConfiguration`],
+will automatically set up an Elasticsearch REST client targeting (by default) `http://localhost:9200`
+as soon as it detects that dependency to the Elasticsearch REST Client JAR.
+
+If your Elasticsearch cluster is not reachable at `http://localhost:9200`,
+this might lead to errors on startup.
+
+To get rid of these errors, either
+link:https://docs.spring.io/spring-boot/docs/{testSpringBootVersion}/reference/html/features.html#features.nosql.elasticsearch.connecting-using-rest[configure Spring's Elasticsearch client manually],
+or https://www.baeldung.com/spring-data-disable-auto-config[disable this specific auto-configuration].
+
+[NOTE]
+====
+Spring Boot's Elasticsearch client is completely separate from Hibernate Search:
+the configuration of one won't affect the other.
+====
+
 [[compatibility-framework-other]]
 === [[gettingstarted-framework-other]] Other
 
