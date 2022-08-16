@@ -1009,9 +1009,35 @@ The Elasticsearch backend comes with several built-in analyzers.
 The exact list depends on the version of Elasticsearch and can be found
 link:{elasticsearchDocUrl}/analysis-analyzers.html[here].
 
-One important built-in analyzer is the one named `default`:
-it is used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
-Unless overridden explicitly, this analyzer uses a `standard` tokenizer and a `lowercase` filter.
+Regardless of the Elasticsearch version;
+analyzers whose name is listed as a constant in `org.hibernate.search.engine.backend.analysis.AnalyzerNames`
+are always available:
+
+`default`::
+The analyzer used by default with <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
++
+This is just an alias for `standard` by default.
+`standard`::
+Default behavior: first, tokenize using the standard tokenizer, which follows Word Break rules from the
+Unicode Text Segmentation algorithm, as specified in http://unicode.org/reports/tr29/[Unicode Standard Annex #29].
+Then, lowercase each token.
+`simple`::
+Default behavior: first, split the text at non-letter characters.
+Then, lowercase each token.
+`whitespace`::
+Default behavior: split the text at whitespace characters.
+Do not change the tokens.
+`stop`::
+Default behavior: first, split the text at non-letter characters.
+Then, lowercase each token.
+Finally, remove English stop words.
+`keyword`::
+Default behavior: do not change the text in any way.
++
+With this analyzer a full text field would behave similarly to a keyword field,
+but with fewer features: no terms aggregations, for example.
++
+Consider using a <<mapping-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
 
 [[backend-elasticsearch-analysis-builtin-normalizer]]
 === Built-in normalizers
@@ -1067,6 +1093,33 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-charfilters.html[character filters],
 {elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
+
+[[backend-elasticsearch-analysis-analyzers-default]]
+=== Overriding the default analyzer
+
+The default analyzer when using <<mapping-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>
+without specifying an analyzer explicitly, is named `default`.
+
+Like any other <<backend-elasticsearch-analysis-builtin,built-in analyzer>>, it is possible to override the default analyzer
+by defining a <<backend-elasticsearch-analysis-analyzers,custom analyzer>> with the same name:
+
+.Overriding the default analyzer in the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+<1> Start the definition of a custom analyzer that happens to be named `default`.
+Here we rely on constants from `org.hibernate.search.engine.backend.analysis.AnalyzerNames` to use the correct name,
+but hardcoding `"default"` would work just as well.
+<2> Continue the analyzer definition <<backend-elasticsearch-analysis-analyzers,as we would for any other custom analyzer>>.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/elasticsearch-default-override.properties[]
+----
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
+====
 
 [[backend-elasticsearch-configuration-index-settings]]
 == [[_custom_index_settings]] Custom index settings

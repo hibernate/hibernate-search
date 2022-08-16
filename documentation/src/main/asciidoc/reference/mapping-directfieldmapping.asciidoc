@@ -74,6 +74,9 @@ match fields ignoring diacritics,
 Full-text fields should be assigned an <<mapping-directfieldmapping-analyzer,analyzer>>, referenced by its name.
 By default, the analyzer named `default` will be used.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
+For instructions on how to change the default analyzer,
+see the dedicated section in the documentation of your backend:
+<<>>
 +
 Note you can also define <<mapping-directfieldmapping-search-analyzer,a search analyzer>>
 to analyze searched terms differently.

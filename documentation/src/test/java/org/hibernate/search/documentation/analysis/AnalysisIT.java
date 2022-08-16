@@ -92,6 +92,45 @@ public class AnalysisIT {
 		} );
 	}
 
+	@Test
+	public void default_override() {
+		EntityManagerFactory entityManagerFactory = setupHelper.start()
+				.withProperties(
+						isLucene()
+								? "/analysis/lucene-default-override.properties"
+								: "/analysis/elasticsearch-default-override.properties"
+				)
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
+								.type( IndexedEntity.class )
+								.property( "text" )
+								.fullTextField()
+				)
+				.setup( IndexedEntity.class );
+
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setText( "un language châtié" );
+			entityManager.persist( entity );
+		} );
+
+		with( entityManagerFactory ).runInTransaction( entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			assertThat(
+					searchSession.search( IndexedEntity.class )
+							.where( f -> f.match()
+									.field( "text" )
+									.matching( "châtier" )
+							)
+							.fetchHits( 20 )
+			)
+					.hasSize( 1 );
+		} );
+	}
+
+
 	@Entity(name = IndexedEntity.NAME)
 	@Indexed
 	static class IndexedEntity {
