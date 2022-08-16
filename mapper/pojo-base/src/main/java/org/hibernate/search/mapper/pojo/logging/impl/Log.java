@@ -724,4 +724,10 @@ public interface Log extends BasicLogger {
 			value = "Exception while retrieving the Jandex index for JAR '%1$s': %2$s")
 	SearchException errorDiscoveringJandexIndex(Path jarPath, String causeMessage, @Cause Exception cause);
 
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 120,
+			value = "Both \"dropAndCreateSchemaOnStart()\" and \"purgeAllOnStart()\" are enabled. " +
+					"Consider having just one setting enabled as after the index is recreated there is nothing to purge.")
+	void redundantPurgeAfterDrop();
+
 }

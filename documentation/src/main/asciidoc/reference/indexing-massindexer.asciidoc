@@ -217,7 +217,8 @@ you can also use a schema manager to manage schemas manually at the time of your
 <<schema-management-manager>>.
 
 |`purgeAllOnStart(boolean)`
-|`true`
+|Default value depends on <<indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart(boolean)`>>.
+Defaults to `false` if the mass indexer is configured to drop and create the schema on start, to `true` otherwise.
 |Removes all entities from the indexes before indexing.
 
 Only set this to `false` if you know the index is already empty;
