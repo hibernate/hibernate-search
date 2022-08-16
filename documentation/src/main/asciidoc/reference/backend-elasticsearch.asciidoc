@@ -223,14 +223,11 @@ Expects a string value.
 This property has no default and must be provided for the AWS authentication to work.
 
 By default, Hibernate Search will rely on the default credentials provider from the AWS SDK.
-This provider will look for credentials in the following place and in the following order:
-
-1. Java System Properties: `aws.accessKeyId` and `aws.secretKey`.
-2. Environment Variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
-3. Credential profiles file at the default location (`~/.aws/credentials`) shared by all AWS SDKs and the AWS CLI.
-4. Credentials delivered through the Amazon EC2 container service if `AWS_CONTAINER_CREDENTIALS_RELATIVE_URI` environment
-   variable is set and security manager has permission to access the variable.
-5. Instance profile credentials delivered through the Amazon EC2 metadata service.
+This provider will look for credentials in various places
+(Java system properties, environment variables, AWS-specific configuration, ...).
+For more information about how the default credentials provider works,
+see
+https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html#credentials-default[its official documentation].
 
 Optionally, you can set static credentials with the following options:
 
