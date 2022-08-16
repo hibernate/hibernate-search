@@ -245,6 +245,7 @@ See also link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual[this section of
 The syntax for configuring AWS authentication changed slightly in Hibernate Search 6.
 +
 In short, the following configuration in Hibernate Search 5:
++
 [source]
 ----
 hibernate.search.default.elasticsearch.aws.signing.enabled = true
@@ -254,6 +255,7 @@ hibernate.search.default.elasticsearch.aws.secret_key = wJalrXUtnFEMI/K7MDENG+bP
 ----
 +
 Will look like this in Hibernate Search 6:
++
 [source]
 ----
 hibernate.search.backend.aws.signing.enabled = true
