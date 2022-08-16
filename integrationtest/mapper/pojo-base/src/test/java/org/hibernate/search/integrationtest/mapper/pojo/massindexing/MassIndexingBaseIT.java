@@ -144,11 +144,9 @@ public class MassIndexingBaseIT {
 			backendMock.expectSchemaManagementWorks( Book.INDEX )
 					.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
 
-			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
-			// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
+			// because we set dropAndCreateSchemaOnStart = true and do not explicitly set the purge value
+			// it means that purge will default to false hence only flush and refresh are expected:
 			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
-					.purge()
-					.mergeSegments()
 					.flush()
 					.refresh();
 
@@ -196,6 +194,56 @@ public class MassIndexingBaseIT {
 			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
 					.purge()
 					.mergeSegments()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+
+		}
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void dropAndCreateSchemaOnStartAndPurgeBothEnabled() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			MassIndexer indexer = searchSession.massIndexer()
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext )
+					.dropAndCreateSchemaOnStart( true )
+					.purgeAllOnStart( true );
+
+			// add operations on indexes can follow any random order,
+			// since they are executed by different threads
+			backendMock.expectWorks(
+							Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					);
+
+			backendMock.expectSchemaManagementWorks( Book.INDEX )
+					.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
+
+			// as purgeAllOnStart is explicitly set to true, and merge is true by default
+			// it means that both purge and merge will be triggered:
+			backendMock.expectIndexScaleWorks( Book.INDEX, searchSession.tenantIdentifier() )
+					.purge()
 					.mergeSegments()
 					.flush()
 					.refresh();

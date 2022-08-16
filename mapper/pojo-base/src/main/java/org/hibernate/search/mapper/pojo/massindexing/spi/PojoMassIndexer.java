@@ -84,7 +84,8 @@ public interface PojoMassIndexer {
 	 * Set this to false only if you know there are no
 	 * entities in the indexes: otherwise search results may be duplicated.
 	 * <p>
-	 * Defaults to {@code true}.
+	 * Default value depends on {@link #dropAndCreateSchemaOnStart(boolean)}. Defaults to {@code false} if the mass indexer
+	 * is configured to drop and create the schema on start, to {@code true} otherwise.
 	 * @param purgeAll if {@code true} all entities will be removed from the indexes before starting the indexing
 	 * @return {@code this} for method chaining
 	 */

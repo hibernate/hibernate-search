@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
@@ -21,6 +23,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding
@@ -30,6 +33,8 @@ import org.hibernate.search.util.common.impl.Futures;
  * @author Sanne Grinovero
  */
 public class PojoDefaultMassIndexer implements PojoMassIndexer {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoMassIndexingContext indexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
@@ -43,8 +48,8 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	private int typesToIndexInParallel = 1;
 	private int documentBuilderThreads = 6;
 	private boolean mergeSegmentsOnFinish = false;
-	private boolean dropAndCreateSchemaOnStart = false;
-	private boolean purgeAtStart = true;
+	private Boolean dropAndCreateSchemaOnStart;
+	private Boolean purgeAtStart;
 	private boolean mergeSegmentsAfterPurge = true;
 
 	private MassIndexingFailureHandler failureHandler;
@@ -156,13 +161,22 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 				getOrCreateFailureHandler(),
 				getOrCreateMonitor()
 		);
+
+		if ( Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) && Boolean.TRUE.equals( purgeAtStart ) ) {
+			log.redundantPurgeAfterDrop();
+		}
+
 		return new PojoMassIndexingBatchCoordinator(
 				mappingContext,
 				notifier,
 				typeGroupsToIndex, scopeSchemaManager, detachedSession, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
-				mergeSegmentsOnFinish, dropAndCreateSchemaOnStart,
-				purgeAtStart, mergeSegmentsAfterPurge
+				mergeSegmentsOnFinish,
+				// false by default:
+				Boolean.TRUE.equals( dropAndCreateSchemaOnStart ),
+				// false if not set explicitly and dropAndCreateSchemaOnStart is set to true, otherwise true by default:
+				purgeAtStart == null ? !Boolean.TRUE.equals( dropAndCreateSchemaOnStart ) : purgeAtStart,
+				mergeSegmentsAfterPurge
 		);
 	}
 
