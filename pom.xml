@@ -279,7 +279,7 @@
              and to our own explicit dependencies in the relevant artifacts.
           -->
         <version.io.smallrye.jandex>3.0.5</version.io.smallrye.jandex>
-        <version.org.hibernate.commons.annotations.orm6>6.0.2.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.org.hibernate.commons.annotations.orm6>6.0.3.Final</version.org.hibernate.commons.annotations.orm6>
         <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
         <version.jakarta.transaction-api>2.0.0</version.jakarta.transaction-api>
         <version.jakarta.interceptor-api>2.0.1</version.jakarta.interceptor-api>
