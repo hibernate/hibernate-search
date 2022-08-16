@@ -205,16 +205,6 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
-	public ThreadPoolProvider threadPoolProvider() {
-		return delegate().threadPoolProvider();
-	}
-
-	@Override
-	public FailureHandler failureHandler() {
-		return delegate().failureHandler();
-	}
-
-	@Override
 	public PojoMassIndexerAgent createMassIndexerAgent(PojoMassIndexerAgentCreateContext context) {
 		// No coordination: we don't prevent automatic indexing from continuing while mass indexing.
 		return PojoMassIndexerAgent.noOp();
