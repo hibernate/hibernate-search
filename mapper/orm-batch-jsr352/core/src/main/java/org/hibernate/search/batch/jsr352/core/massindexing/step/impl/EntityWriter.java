@@ -80,7 +80,7 @@ public class EntityWriter extends AbstractItemWriter {
 		emf = jobContextData.getEntityManagerFactory();
 		searchMapping = Search.mapping( emf );
 		mappingContext = (BatchMappingContext) searchMapping;
-		typeIdentifier = mappingContext.typeContextProvider().typeIdentifierForEntityName( entityName );
+		typeIdentifier = mappingContext.typeContextProvider().byEntityName().getOrFail( entityName ).typeIdentifier();
 		workspace = searchMapping.scope( typeIdentifier.javaClass(), entityName ).workspace( tenantId );
 
 		/*

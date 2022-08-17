@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.common.logging.impl;
 
+import java.util.Collection;
+
 public final class CommaSeparatedClassesFormatter {
 
 	public static String format(Class<?>[] classes) {
@@ -20,6 +22,10 @@ public final class CommaSeparatedClassesFormatter {
 	}
 
 	private final Class<?>[] classes;
+
+	public CommaSeparatedClassesFormatter(Collection<Class<?>> classes) {
+		this.classes = classes.toArray( new Class<?>[0] );
+	}
 
 	public CommaSeparatedClassesFormatter(Class<?>[] classes) {
 		this.classes = classes;

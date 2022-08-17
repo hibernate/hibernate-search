@@ -66,7 +66,7 @@ public class PojoIndexingPlanEventProcessingStrategy implements PojoIndexingPlan
 	}
 
 	@Override
-	public <I, E> PojoIndexedTypeIndexingPlan<I, E> createDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
+	public <I, E> PojoIndexedTypeIndexingPlan<I, E> createIndexedDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
 			PojoWorkSessionContext sessionContext,
 			PojoIndexingProcessorRootContext processorContext) {
 		// Will process indexing events locally, and send additional events upon reindexing resolution.

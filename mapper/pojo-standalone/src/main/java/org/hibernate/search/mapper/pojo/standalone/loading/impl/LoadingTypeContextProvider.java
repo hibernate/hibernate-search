@@ -12,6 +12,8 @@ public interface LoadingTypeContextProvider {
 
 	<E> LoadingTypeContext<E> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
+	<E> LoadingTypeContext<E> forExactTypeOrNull(PojoRawTypeIdentifier<E> typeIdentifier);
+
 	<E> LoadingTypeContext<E> indexedForExactClass(Class<E> typeIdentifier);
 
 }

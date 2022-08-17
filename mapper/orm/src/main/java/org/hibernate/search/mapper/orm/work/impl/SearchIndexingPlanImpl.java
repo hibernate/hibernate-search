@@ -77,11 +77,11 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		return sessionContext.runtimeIntrospector().detectEntityType( entity );
 	}
 
-	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {
-		return typeContextProvider.typeIdentifierForJavaClass( entityType );
+	private PojoRawTypeIdentifier<?> getTypeIdentifier(Class<?> entityType) {
+		return typeContextProvider.forExactClass( entityType ).typeIdentifier();
 	}
 
-	private PojoRawTypeIdentifier<?> getTypeIdentifier(String hibernateOrmEntityName) {
-		return typeContextProvider.typeIdentifierForEntityName( hibernateOrmEntityName );
+	private PojoRawTypeIdentifier<?> getTypeIdentifier(String entityName) {
+		return typeContextProvider.byEntityName().getOrFail( entityName ).typeIdentifier();
 	}
 }

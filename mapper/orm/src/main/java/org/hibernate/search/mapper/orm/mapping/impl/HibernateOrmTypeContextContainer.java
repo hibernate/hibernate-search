@@ -24,89 +24,146 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeConte
 import org.hibernate.search.mapper.orm.spi.BatchTypeIdentifierProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class HibernateOrmTypeContextContainer
 		implements HibernateOrmListenerTypeContextProvider, HibernateOrmSessionTypeContextProvider,
-		AutomaticIndexingTypeContextProvider, LoadingIndexedTypeContextProvider, BatchTypeIdentifierProvider {
+				AutomaticIndexingTypeContextProvider, LoadingIndexedTypeContextProvider, BatchTypeIdentifierProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeIdentifier<?>, AbstractHibernateOrmTypeContext<?>> typeContexts = new LinkedHashMap<>();
-	private final Map<String, AbstractHibernateOrmTypeContext<?>> typeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
-	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
-	private final Map<String, AbstractHibernateOrmTypeContext<?>> typeContextsByJpaEntityName = new LinkedHashMap<>();
-
 	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
 
+	private final KeyValueProvider<PojoRawTypeIdentifier<?>, AbstractHibernateOrmTypeContext<?>> byTypeIdentifier;
+	private final KeyValueProvider<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedByTypeIdentifier;
+	private final KeyValueProvider<Class<?>, AbstractHibernateOrmTypeContext<?>> byExactClass;
+	private final KeyValueProvider<Class<?>, HibernateOrmIndexedTypeContext<?>> indexedByExactClass;
+	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byEntityName;
+	private final KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByEntityName;
+	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityName;
+	private final KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityName;
+	private final KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityName;
+
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
+		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
+		// Use a LinkedHashMap for deterministic iteration
+		Map<PojoRawTypeIdentifier<?>, AbstractHibernateOrmTypeContext<?>> byTypeIdentifierContent = new LinkedHashMap<>();
+		Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedByTypeIdentifierContent = new LinkedHashMap<>();
+		Map<Class<?>, AbstractHibernateOrmTypeContext<?>> byExactClassContent = new LinkedHashMap<>();
+		Map<Class<?>, HibernateOrmIndexedTypeContext<?>> indexedByExactClassContent = new LinkedHashMap<>();
+		Map<String, AbstractHibernateOrmTypeContext<?>> byEntityNameContent = new LinkedHashMap<>();
+		Map<String, HibernateOrmIndexedTypeContext<?>> indexedByEntityNameContent = new LinkedHashMap<>();
+		Map<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityNameContent = new LinkedHashMap<>();
+		Map<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityNameContent = new LinkedHashMap<>();
+		Map<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityNameContent = new LinkedHashMap<>();
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
-			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
-			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.typeIdentifier();
-			typeContexts.put( typeIdentifier, indexedTypeContext );
-			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
-			typeContextsByHibernateOrmEntityName.put( indexedTypeContext.hibernateOrmEntityName(), indexedTypeContext );
-			typeContextsByJpaEntityName.put( indexedTypeContext.jpaEntityName(), indexedTypeContext );
+			HibernateOrmIndexedTypeContext<?> typeContext = contextBuilder.build( sessionFactory );
+			PojoRawTypeIdentifier<?> typeIdentifier = typeContext.typeIdentifier();
+
+			byTypeIdentifierContent.put( typeIdentifier, typeContext );
+			indexedByTypeIdentifierContent.put( typeIdentifier, typeContext );
+
+			if ( !typeIdentifier.isNamed() ) {
+				byExactClassContent.put( typeIdentifier.javaClass(), typeContext );
+				indexedByExactClassContent.put( typeIdentifier.javaClass(), typeContext );
+			}
+
+			byEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
+			indexedByEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
+			// Use putIfAbsent here to avoid overriding JPA entity names,
+			// see org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver.Builder.addByName
+			byEntityNameContent.putIfAbsent( typeContext.hibernateOrmEntityName(), typeContext );
+			indexedByEntityNameContent.putIfAbsent( typeContext.hibernateOrmEntityName(), typeContext );
+
+			byJpaEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
+			indexedByJpaEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
+
+			byHibernateOrmEntityNameContent.put( typeContext.hibernateOrmEntityName(), typeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
-			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
-			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.typeIdentifier();
-			typeContexts.put( typeIdentifier, containedTypeContext );
-			typeContextsByHibernateOrmEntityName.put( containedTypeContext.hibernateOrmEntityName(), containedTypeContext );
-			typeContextsByJpaEntityName.put( containedTypeContext.jpaEntityName(), containedTypeContext );
-		}
+			HibernateOrmContainedTypeContext<?> typeContext = contextBuilder.build( sessionFactory );
+			PojoRawTypeIdentifier<?> typeIdentifier = typeContext.typeIdentifier();
 
-		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
+			byTypeIdentifierContent.put( typeIdentifier, typeContext );
+
+			if ( !typeIdentifier.isNamed() ) {
+				byExactClassContent.put( typeIdentifier.javaClass(), typeContext );
+			}
+
+			byEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
+			// Use putIfAbsent here to avoid overriding JPA entity names,
+			// see org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver.Builder.addByName
+			byEntityNameContent.putIfAbsent( typeContext.hibernateOrmEntityName(), typeContext );
+
+			byJpaEntityNameContent.put( typeContext.jpaEntityName(), typeContext );
+
+			byHibernateOrmEntityNameContent.put( typeContext.hibernateOrmEntityName(), typeContext );
+		}
+		this.byTypeIdentifier = new KeyValueProvider<>( byTypeIdentifierContent, log::unknownTypeIdentifierForMappedEntityType );
+		this.indexedByTypeIdentifier = new KeyValueProvider<>( indexedByTypeIdentifierContent, log::unknownTypeIdentifierForIndexedEntityType );
+		this.byExactClass = new KeyValueProvider<>( byExactClassContent, log::unknownClassForMappedEntityType );
+		this.indexedByExactClass = new KeyValueProvider<>( indexedByExactClassContent, log::unknownClassForIndexedEntityType );
+		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+		this.indexedByEntityName = new KeyValueProvider<>( indexedByEntityNameContent, log::unknownEntityNameForIndexedEntityType );
+		this.byJpaEntityName = new KeyValueProvider<>( byJpaEntityNameContent, log::unknownJpaEntityNameForMappedEntityType );
+		this.indexedByJpaEntityName = new KeyValueProvider<>( indexedByJpaEntityNameContent, log::unknownJpaEntityNameForIndexedEntityType );
+		this.byHibernateOrmEntityName = new KeyValueProvider<>( byHibernateOrmEntityNameContent, log::unknownHibernateOrmEntityNameForMappedEntityType );
+	}
+
+	@Override
+	public HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver() {
+		return typeIdentifierResolver;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <E> AbstractHibernateOrmTypeContext<E> forExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
-		return (AbstractHibernateOrmTypeContext<E>) typeContexts.get( typeIdentifier );
+		return (AbstractHibernateOrmTypeContext<E>) byTypeIdentifier.getOrFail( typeIdentifier );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <E> HibernateOrmIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
-		return (HibernateOrmIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
+		return (HibernateOrmIndexedTypeContext<E>) indexedByTypeIdentifier.getOrFail( typeIdentifier );
 	}
 
 	@Override
-	public AbstractHibernateOrmTypeContext<?> forJpaEntityName(String indexName) {
-		return typeContextsByJpaEntityName.get( indexName );
+	@SuppressWarnings("unchecked")
+	public <E> AbstractHibernateOrmTypeContext<E> forExactClass(Class<E> typeIdentifier) {
+		return (AbstractHibernateOrmTypeContext<E>) byExactClass.getOrFail( typeIdentifier );
+	}
+
+	@SuppressWarnings("unchecked")
+	public <E> HibernateOrmIndexedTypeContext<E> indexedForExactClass(Class<E> typeIdentifier) {
+		return (HibernateOrmIndexedTypeContext<E>) indexedByExactClass.getOrFail( typeIdentifier );
 	}
 
 	@Override
-	public AbstractHibernateOrmTypeContext<?> forHibernateOrmEntityName(String hibernateOrmEntityName) {
-		return typeContextsByHibernateOrmEntityName.get( hibernateOrmEntityName );
+	public KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byEntityName() {
+		return byEntityName;
+	}
+
+	public KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByEntityName() {
+		return indexedByEntityName;
 	}
 
 	@Override
-	public <T> PojoRawTypeIdentifier<T> typeIdentifierForJavaClass(Class<T> clazz) {
-		return typeIdentifierResolver.resolveByJavaClass( clazz );
+	public KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byJpaEntityName() {
+		return byJpaEntityName;
+	}
+
+	public KeyValueProvider<String, HibernateOrmIndexedTypeContext<?>> indexedByJpaEntityName() {
+		return indexedByJpaEntityName;
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<?> typeIdentifierForHibernateOrmEntityName(String entityName) {
-		PojoRawTypeIdentifier<?> result = typeIdentifierResolver.resolveByHibernateOrmEntityName( entityName );
-		if ( result == null ) {
-			throw log.invalidEntityName( entityName, typeIdentifierResolver.allKnownHibernateOrmEntityNames() );
-		}
-		return result;
+	public KeyValueProvider<String, AbstractHibernateOrmTypeContext<?>> byHibernateOrmEntityName() {
+		return byHibernateOrmEntityName;
 	}
 
-	@Override
-	public PojoRawTypeIdentifier<?> typeIdentifierForEntityName(String entityName) {
-		PojoRawTypeIdentifier<?> result = typeIdentifierResolver.resolveByJpaOrHibernateOrmEntityName( entityName );
-		if ( result == null ) {
-			throw log.invalidEntityName( entityName, typeIdentifierResolver.allKnownJpaOrHibernateOrmEntityNames() );
-		}
-		return result;
-	}
-
-	Collection<HibernateOrmIndexedTypeContext<?>> allIndexed() {
-		return indexedTypeContexts.values();
+	Collection<? extends HibernateOrmIndexedTypeContext<?>> allIndexed() {
+		return indexedByTypeIdentifier.values();
 	}
 
 	static class Builder {

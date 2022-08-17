@@ -323,9 +323,11 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET + 37,
-			value = "Invalid type '%1$s' in an indexing plan:"
-					+ " this type is not indexed, neither directly nor as a contained entity in another indexed type.")
-	SearchException nonIndexedNorContainedTypeInIndexingPlan(PojoRawTypeIdentifier<?> targetedType);
+			value = "No matching entity type for type identifier '%1$s'."
+					+ " Either this type is not an entity type, or the entity type is not mapped in Hibernate Search."
+					+ " Valid identifiers for mapped entity types are: %2$s")
+	SearchException unknownTypeIdentifierForMappedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
+			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
 
 	@Message(id = ID_OFFSET + 38, value = "The entity identifier must not be null." )
 	SearchException nullProvidedIdentifier();
@@ -335,8 +337,11 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> requestedType);
 
 	@Message(id = ID_OFFSET + 40,
-			value = "Invalid type '%1$s' in an indexer: this type is not indexed.")
-	SearchException nonIndexedTypeInIndexer(PojoRawTypeIdentifier<?> targetedType);
+			value = "No matching indexed entity type for type identifier '%1$s'."
+					+ " Either this type is not an entity type, or the entity type is not indexed in Hibernate Search."
+					+ " Valid identifiers for indexed entity types are: %2$s")
+	SearchException unknownTypeIdentifierForIndexedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
+			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
 
 	@Message(id = ID_OFFSET + 41,
 			value = "Invalid reference to default extractors:"
@@ -597,8 +602,10 @@ public interface Log extends BasicLogger {
 	SearchException nullEntityForIndexerAddOrUpdate();
 
 	@Message(id = ID_OFFSET + 89,
-			value = "Invalid entity name '%1$s' in an indexing event: this entity does not exist or is not indexed.")
-	SearchException nonIndexedTypeInIndexingEvent(String entityName);
+			value = "No matching entity type for name '%1$s'."
+					+ " Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search."
+					+ " Valid names for mapped entity types are: %2$s")
+	SearchException unknownEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
 
 	@Message(id = ID_OFFSET + 90, value = "The required identifier type '%1$s'"
 			+ " does not match the actual identifier type '%2$s':"

@@ -6,18 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
 public interface PojoWorkTypeContextProvider {
 
-	<E> Optional<? extends PojoWorkIndexedTypeContext<?, E>> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> PojoWorkTypeContext<?, E> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	Optional<? extends PojoWorkIndexedTypeContext<?,?>> indexedForEntityName(String entityName);
+	<E> PojoWorkIndexedTypeContext<?, E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	<E> Optional<? extends PojoWorkContainedTypeContext<?, E>> containedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
-
-	Optional<? extends PojoWorkContainedTypeContext<?,?>> containedForEntityName(String entityName);
+	KeyValueProvider<String, ? extends PojoWorkTypeContext<?,?>> byEntityName();
 
 }

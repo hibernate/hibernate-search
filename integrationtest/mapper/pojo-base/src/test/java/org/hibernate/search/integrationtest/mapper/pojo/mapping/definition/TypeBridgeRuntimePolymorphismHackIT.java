@@ -102,7 +102,7 @@ public class TypeBridgeRuntimePolymorphismHackIT {
 			assertThatThrownBy( () -> session.indexingPlan()
 					.addOrUpdate( 2, null, contained2, "otherProperty" ) )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "this type is not indexed, neither directly nor as a contained entity" );
+					.hasMessageContaining( "the entity type is not mapped in Hibernate Search" );
 		}
 		backendMock.verifyExpectationsMet();
 	}

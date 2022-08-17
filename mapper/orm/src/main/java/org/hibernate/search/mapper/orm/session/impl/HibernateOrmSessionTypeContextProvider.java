@@ -9,11 +9,12 @@ package org.hibernate.search.mapper.orm.session.impl;
 import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContextProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospectorTypeContextProvider;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanTypeContextProvider;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
 public interface HibernateOrmSessionTypeContextProvider
 		extends HibernateOrmRuntimeIntrospectorTypeContextProvider,
 				SearchIndexingPlanTypeContextProvider, LoadingIndexedTypeContextProvider {
 
-	HibernateOrmSessionTypeContext<?> forJpaEntityName(String indexName);
+	KeyValueProvider<String, ? extends HibernateOrmSessionTypeContext<?>> byJpaEntityName();
 
 }

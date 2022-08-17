@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.log.impl;
 
+import java.util.Collection;
 import java.util.List;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
@@ -13,6 +14,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
@@ -44,11 +46,16 @@ public interface Log extends BasicLogger {
 	)
 	SearchException namedTypesNotSupported(String name);
 
-	@Message(id = ID_OFFSET + 9, value = "Type '%1$s' is not an entity type, or this entity type is not indexed.")
-	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
+	@Message(id = ID_OFFSET + 9, value = "No matching indexed entity type for class '%1$s'."
+			+ " Either this class is not an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid classes for indexed entity types are: %2$s")
+	SearchException unknownClassForIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
 
-	@Message(id = ID_OFFSET + 10, value = "Entity type '%1$s' does not exist or is not indexed.")
-	SearchException notIndexedEntityName(String name);
+	@Message(id = ID_OFFSET + 10, value = "No matching indexed entity type for name '%1$s'."
+			+ " Either this is not the name of an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid names for indexed entity types are: %2$s")
+	SearchException unknownEntityNameForIndexedEntityType(String invalidName, Collection<String> validNames);
 
 	@Message(id = ID_OFFSET + 11,
 			value = "Invalid String value for the bean provider: '%s'. The bean provider must be an instance of '%s'.")
@@ -65,5 +72,23 @@ public interface Log extends BasicLogger {
 			+ " Valid names are: %2$s.")
 	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation,
 			List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET + 16, value = "No matching entity type for type identifier '%1$s'."
+			+ " Either this type is not an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid identifiers for mapped entity types are: %2$s")
+	SearchException unknownTypeIdentifierForMappedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
+			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
+
+	@Message(id = ID_OFFSET + 17, value = "No matching indexed entity type for type identifier '%1$s'."
+			+ " Either this type is not an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid identifiers for indexed entity types are: %2$s")
+	SearchException unknownTypeIdentifierForIndexedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
+			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
+
+	@Message(id = ID_OFFSET + 18, value = "No matching entity type for class '%1$s'."
+			+ " Either this class is not an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid classes for mapped entity types are: %2$s")
+	SearchException unknownClassForMappedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
 
 }

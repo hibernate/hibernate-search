@@ -8,10 +8,11 @@ package org.hibernate.search.mapper.pojo.standalone.session.impl;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContextProvider;
 import org.hibernate.search.mapper.pojo.standalone.work.impl.SearchIndexingPlanTypeContextProvider;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
 public interface StandalonePojoSearchSessionTypeContextProvider
 		extends SearchIndexingPlanTypeContextProvider, LoadingTypeContextProvider {
 
-	StandalonePojoSessionIndexedTypeContext<?> indexedForEntityName(String indexName);
+	KeyValueProvider<String, ? extends StandalonePojoSessionIndexedTypeContext<?>> indexedByEntityName();
 
 }

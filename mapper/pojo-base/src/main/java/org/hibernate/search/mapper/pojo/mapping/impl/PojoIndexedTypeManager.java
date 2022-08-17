@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -78,6 +79,11 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 				.attribute( "documentRouter", documentRouter )
 				.attribute( "processor", processor )
 				.attribute( "reindexingResolver", reindexingResolver );
+	}
+
+	@Override
+	public Optional<PojoIndexedTypeManager<I, E>> asIndexed() {
+		return Optional.of( this );
 	}
 
 	@Override

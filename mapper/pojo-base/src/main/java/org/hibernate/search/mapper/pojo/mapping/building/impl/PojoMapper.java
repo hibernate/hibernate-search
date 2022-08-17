@@ -407,7 +407,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					identifierMapping, pathOrdinals, reindexingResolver
 			);
 			log.containedTypeManager( entityType, typeManager );
-			typeManagerContainerBuilder.addContained( entityType, typeManager );
+			typeManagerContainerBuilder.addContained( typeManager );
 		}
 	}
 

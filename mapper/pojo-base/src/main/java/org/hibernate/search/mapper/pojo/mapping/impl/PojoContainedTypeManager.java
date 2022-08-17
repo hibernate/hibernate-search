@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
@@ -26,5 +28,10 @@ public class PojoContainedTypeManager<I, E> extends AbstractPojoTypeManager<I, E
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
 				identifierMapping, pathOrdinals, reindexingResolver );
+	}
+
+	@Override
+	public Optional<PojoContainedTypeManager<I, E>> asContained() {
+		return Optional.of( this );
 	}
 }
