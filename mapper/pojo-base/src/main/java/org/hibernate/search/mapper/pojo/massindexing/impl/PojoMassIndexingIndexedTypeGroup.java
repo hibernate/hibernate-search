@@ -115,7 +115,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	public Object extractReference(PojoMassIndexingSessionContext sessionContext, Object entity) {
 		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
-		PojoMassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.forExactType( targetType )
+		PojoMassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.indexedForExactType( targetType )
 				.orElseThrow( () -> new AssertionFailure(
 						"Processing a non-indexed type in the MassIndexer: " + targetType ) );
 		String entityName = typeContext.entityName();
@@ -168,7 +168,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	private boolean isFirstSuperTypeOfSecond(PojoMassIndexingIndexedTypeContext<?> first,
 			PojoMassIndexingIndexedTypeContext<?> second) {
-		return typeContextProvider.allForSuperType( first.typeIdentifier() )
+		return typeContextProvider.allIndexedForSuperType( first.typeIdentifier() )
 				.map( s -> s.contains( second ) )
 				.orElse( false );
 	}
