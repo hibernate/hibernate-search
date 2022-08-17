@@ -37,8 +37,7 @@ public class PojoIndexingPlanImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
-	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
+	private final PojoWorkTypeContextProvider typeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final PojoIndexingPlanStrategy strategy;
@@ -51,12 +50,10 @@ public class PojoIndexingPlanImpl
 	private boolean mayRequireLoading = false;
 	private PojoLoadingPlan<Object> loadingPlan = null;
 
-	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
-			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
+	public PojoIndexingPlanImpl(PojoWorkTypeContextProvider typeContextProvider,
 			PojoWorkSessionContext sessionContext,
 			PojoIndexingPlanStrategy strategy) {
-		this.indexedTypeContextProvider = indexedTypeContextProvider;
-		this.containedTypeContextProvider = containedTypeContextProvider;
+		this.typeContextProvider = typeContextProvider;
 		this.sessionContext = sessionContext;
 		this.introspector = sessionContext.runtimeIntrospector();
 		this.strategy = strategy;
@@ -243,7 +240,7 @@ public class PojoIndexingPlanImpl
 
 	private AbstractPojoTypeIndexingPlan<?, ?, ?> createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
-				indexedTypeContextProvider.forExactType( typeIdentifier );
+				typeContextProvider.indexedForExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
 			// extracting a variable to workaround an Eclipse compiler issue
 			PojoWorkIndexedTypeContext<?, ?> typeContext = indexedTypeContextOptional.get();
@@ -253,7 +250,7 @@ public class PojoIndexingPlanImpl
 		}
 		else {
 			Optional<? extends PojoWorkContainedTypeContext<?, ?>> containedTypeContextOptional =
-					containedTypeContextProvider.forExactType( typeIdentifier );
+					typeContextProvider.containedForExactType( typeIdentifier );
 			if ( containedTypeContextOptional.isPresent() ) {
 				PojoContainedTypeIndexingPlan<?, ?> delegate = createDelegate( containedTypeContextOptional.get() );
 				containedTypeDelegates.put( typeIdentifier, delegate );
@@ -271,7 +268,7 @@ public class PojoIndexingPlanImpl
 		}
 
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
-				indexedTypeContextProvider.forExactType( typeIdentifier );
+				typeContextProvider.indexedForExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
 			// extracting a variable to workaround an Eclipse compiler issue
 			PojoWorkIndexedTypeContext<?, ?> typeContext = indexedTypeContextOptional.get();

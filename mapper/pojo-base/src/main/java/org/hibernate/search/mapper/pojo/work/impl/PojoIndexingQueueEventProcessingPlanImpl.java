@@ -25,16 +25,13 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
-	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
+	private final PojoWorkTypeContextProvider typeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
 	private final PojoIndexingPlan delegate;
 
-	public PojoIndexingQueueEventProcessingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
-			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
+	public PojoIndexingQueueEventProcessingPlanImpl(PojoWorkTypeContextProvider typeContextProvider,
 			PojoWorkSessionContext sessionContext, PojoIndexingPlan delegate) {
-		this.indexedTypeContextProvider = indexedTypeContextProvider;
-		this.containedTypeContextProvider = containedTypeContextProvider;
+		this.typeContextProvider = typeContextProvider;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;
 	}
@@ -75,9 +72,9 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	}
 
 	private PojoWorkTypeContext<?, ?> typeContext(String entityName) {
-		Optional<? extends PojoWorkTypeContext<?, ?>> optional = indexedTypeContextProvider.forEntityName( entityName );
+		Optional<? extends PojoWorkTypeContext<?, ?>> optional = typeContextProvider.indexedForEntityName( entityName );
 		if ( !optional.isPresent() ) {
-			optional = containedTypeContextProvider.forEntityName( entityName );
+			optional = typeContextProvider.containedForEntityName( entityName );
 			if ( !optional.isPresent() ) {
 				throw log.nonIndexedTypeInIndexingEvent( entityName );
 			}

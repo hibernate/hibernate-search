@@ -13,9 +13,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoMassIndexingTypeContextProvider {
 
-	<E> Optional<? extends PojoMassIndexingIndexedTypeContext<E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> Optional<? extends PojoMassIndexingIndexedTypeContext<E>> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	<E> Optional<? extends Set<? extends PojoMassIndexingIndexedTypeContext<? extends E>>> allForSuperType(
+	<E> Optional<? extends Set<? extends PojoMassIndexingIndexedTypeContext<? extends E>>> allIndexedForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

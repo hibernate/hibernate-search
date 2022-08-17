@@ -30,7 +30,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
@@ -121,7 +121,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 				.orElseGet( PojoIndexingProcessor::noOp );
 	}
 
-	void buildAndAddTo(PojoIndexedTypeManagerContainer.Builder typeManagersBuilder,
+	void buildAndAddTo(PojoTypeManagerContainer.Builder typeManagerContainerBuilder,
 			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper,
 			PojoTypeAdditionalMetadata typeAdditionalMetadata) {
 		if ( preBuiltIndexingProcessor == null ) {
@@ -158,7 +158,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		);
 		log.indexedTypeManager( typeModel, typeManager );
 
-		typeManagersBuilder.add( typeModel, typeManager );
+		typeManagerContainerBuilder.addIndexed( typeModel, typeManager );
 
 		closed = true;
 	}

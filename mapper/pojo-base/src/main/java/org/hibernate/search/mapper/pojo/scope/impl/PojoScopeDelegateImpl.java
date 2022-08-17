@@ -51,7 +51,7 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 
 	public static <R, E, C> PojoScopeDelegate<R, E, C> create(
 			PojoScopeMappingContext mappingContext,
-			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
+			PojoScopeTypeContextProvider typeContextProvider,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( targetedTypes.isEmpty() ) {
@@ -62,7 +62,7 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 		Set<PojoRawTypeIdentifier<?>> nonIndexedTypes = new LinkedHashSet<>();
 		for ( PojoRawTypeIdentifier<? extends E> targetedType : targetedTypes ) {
 			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> targetedTypeManagersForType =
-					indexedTypeContextProvider.allForSuperType( targetedType );
+					typeContextProvider.allIndexedForSuperType( targetedType );
 			if ( targetedTypeManagersForType.isPresent() ) {
 				targetedTypeContexts.addAll( targetedTypeManagersForType.get() );
 			}
@@ -83,19 +83,19 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new PojoScopeDelegateImpl<>(
-				mappingContext, indexedTypeContextProvider,
+				mappingContext, typeContextProvider,
 				targetedTypeContexts, targetedTypeExtendedContexts
 		);
 	}
 
 	private final PojoScopeMappingContext mappingContext;
-	private final PojoScopeIndexedTypeContextProvider indexedTypeContextProvider;
+	private final PojoScopeTypeContextProvider indexedTypeContextProvider;
 	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts;
 	private final Set<C> targetedTypeExtendedContexts;
 	private MappedIndexScope<R, E> delegate;
 
 	private PojoScopeDelegateImpl(PojoScopeMappingContext mappingContext,
-			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
+			PojoScopeTypeContextProvider indexedTypeContextProvider,
 			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts,
 			Set<C> targetedTypeExtendedContexts) {
 		this.mappingContext = mappingContext;

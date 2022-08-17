@@ -35,7 +35,6 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoIndexerImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.util.common.impl.Closer;
 
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
@@ -43,30 +42,24 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 	private final TenancyMode tenancyMode;
-	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
-	private final PojoContainedTypeManagerContainer containedTypeManagers;
+	private final PojoTypeManagerContainer typeManagers;
 	private final PojoSearchQueryElementRegistry searchQueryElementRegistry;
 
 	public PojoMappingDelegateImpl(ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler,
 			TenancyMode tenancyMode,
-			PojoIndexedTypeManagerContainer indexedTypeManagers,
-			PojoContainedTypeManagerContainer containedTypeManagers,
+			PojoTypeManagerContainer typeManagers,
 			PojoSearchQueryElementRegistry searchQueryElementRegistry) {
 		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 		this.tenancyMode = tenancyMode;
-		this.indexedTypeManagers = indexedTypeManagers;
-		this.containedTypeManagers = containedTypeManagers;
+		this.typeManagers = typeManagers;
 		this.searchQueryElementRegistry = searchQueryElementRegistry;
 	}
 
 	@Override
 	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.all() );
-			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.all() );
-		}
+		typeManagers.close();
 	}
 
 	@Override
@@ -96,7 +89,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
-				indexedTypeManagers,
+				typeManagers,
 				targetedTypes,
 				indexedTypeExtendedContextProvider
 		);
@@ -105,16 +98,16 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public <R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(PojoScopeMappingContext mappingContext,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
-		if ( indexedTypeManagers.all().isEmpty() ) {
+		if ( typeManagers.allIndexed().isEmpty() ) {
 			return Optional.empty();
 		}
 		Set<PojoRawTypeIdentifier<?>> typeIdentifiers = new LinkedHashSet<>();
-		for ( PojoIndexedTypeManager<?, ?> typeManager : indexedTypeManagers.all() ) {
-			typeIdentifiers.add( typeManager.typeIdentifier() );
+		for ( PojoIndexedTypeManager<?, ?> typeContext : typeManagers.allIndexed() ) {
+			typeIdentifiers.add( typeContext.typeIdentifier() );
 		}
 		return Optional.of( PojoScopeDelegateImpl.create(
 				mappingContext,
-				indexedTypeManagers,
+				typeManagers,
 				typeIdentifiers,
 				indexedTypeExtendedContextProvider
 		) );
@@ -123,13 +116,13 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
+		return new PojoIndexingPlanImpl( typeManagers, context,
 				new PojoIndexingPlanLocalStrategy( commitStrategy, refreshStrategy ) );
 	}
 
 	@Override
 	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sendingPlan) {
-		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
+		return new PojoIndexingPlanImpl( typeManagers, context,
 				new PojoIndexingPlanEventSendingStrategy( sendingPlan ) );
 	}
 
@@ -137,15 +130,15 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	public PojoIndexingQueueEventProcessingPlan createEventProcessingPlan(PojoWorkSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
 			PojoIndexingQueueEventSendingPlan sendingPlan) {
-		return new PojoIndexingQueueEventProcessingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
-				new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
+		return new PojoIndexingQueueEventProcessingPlanImpl( typeManagers, context,
+				new PojoIndexingPlanImpl( typeManagers, context,
 						new PojoIndexingPlanEventProcessingStrategy( commitStrategy, refreshStrategy, sendingPlan ) ) );
 	}
 
 	@Override
 	public PojoIndexer createIndexer(PojoWorkSessionContext context) {
 		return new PojoIndexerImpl(
-				indexedTypeManagers,
+				typeManagers,
 				context
 		);
 	}
