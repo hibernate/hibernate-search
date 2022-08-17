@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -85,13 +84,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	private PojoTypeIndexer<?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
-		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> typeContextOptional =
-				typeContextProvider.indexedForExactType( typeIdentifier );
-		if ( !typeContextOptional.isPresent() ) {
-			throw log.nonIndexedTypeInIndexer( typeIdentifier );
-		}
-
-		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContextOptional.get();
+		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContextProvider.indexedForExactType( typeIdentifier );
 		return new PojoTypeIndexer<>( typeContext, sessionContext, typeContext.createIndexer( sessionContext ) );
 	}
 }

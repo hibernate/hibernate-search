@@ -25,9 +25,11 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
@@ -175,10 +177,10 @@ public interface Log extends BasicLogger {
 	)
 	SearchException unknownNamedType(String typeName, Collection<String> availableNamedTypes);
 
-	@Message(id = ID_OFFSET + 28,
-			value = "Unknown entity name: '%1$s'. Available entity names: %2$s."
-	)
-	SearchException invalidEntityName(String entityName, Collection<String> availableEntityNames);
+	@Message(id = ID_OFFSET + 28, value = "No matching entity type for name '%1$s'."
+			+ " This is not the name of a Hibernate ORM entity type."
+			+ " Valid names for Hibernate ORM entity types are: %2$s")
+	SearchException unknownEntityNameForEntityType(String invalidName, Collection<String> validNames);
 
 	@Message(id = ID_OFFSET + 29,
 			value = "Invalid type for '%1$s': the entity type must extend '%2$s'," +
@@ -193,11 +195,16 @@ public interface Log extends BasicLogger {
 	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation,
 			List<String> validRepresentations);
 
-	@Message(id = ID_OFFSET + 33, value = "Type '%1$s' is not an entity type, or this entity type is not indexed.")
-	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
+	@Message(id = ID_OFFSET + 33, value = "No matching indexed entity type for class '%1$s'."
+			+ " Either this class is not an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid classes for indexed entity types are: %2$s")
+	SearchException unknownClassForIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
 
-	@Message(id = ID_OFFSET + 34, value = "Entity type '%1$s' is not indexed.")
-	SearchException notIndexedEntityName(String name);
+	@Message(id = ID_OFFSET + 34, value = "No matching indexed entity type for name '%1$s'."
+			+ " Either this is not the name of an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid names for indexed entity types are: %2$s")
+	SearchException unknownEntityNameForIndexedEntityType(String invalidName, Collection<String> validNames);
 
 	@LogMessage(level = Logger.Level.ERROR)
 	@Message(id = ID_OFFSET + 35, value = "Unable to shut down Hibernate Search: %1$s")
@@ -259,5 +266,43 @@ public interface Log extends BasicLogger {
 			+ " for example with .loading(o -> o.fetchSize(50))."
 			+ " See the reference documentation for more information.")
 	SearchException cannotSetFetchSize();
+
+	@Message(id = ID_OFFSET + 58, value = "No matching entity type for type identifier '%1$s'."
+			+ " Either this type is not an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid identifiers for mapped entity types are: %2$s")
+	SearchException unknownTypeIdentifierForMappedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
+			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
+
+	@Message(id = ID_OFFSET + 59, value = "No matching indexed entity type for type identifier '%1$s'."
+			+ " Either this type is not an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid identifiers for indexed entity types are: %2$s")
+	SearchException unknownTypeIdentifierForIndexedEntityType(PojoRawTypeIdentifier<?> invalidTypeId,
+			Collection<PojoRawTypeIdentifier<?>> validTypeIds);
+
+	@Message(id = ID_OFFSET + 60, value = "No matching entity type for class '%1$s'."
+			+ " Either this class is not an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid classes for mapped entity types are: %2$s")
+	SearchException unknownClassForMappedEntityType(@FormatWith(ClassFormatter.class) Class<?> invalidClass,
+			@FormatWith(CommaSeparatedClassesFormatter.class) Collection<Class<?>> validClasses);
+
+	@Message(id = ID_OFFSET + 61, value = "No matching entity type for name '%1$s'."
+			+ " Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid names for mapped entity types are: %2$s")
+	SearchException unknownEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
+
+	@Message(id = ID_OFFSET + 62, value = "No matching entity type for name '%1$s'."
+			+ " Either this is not the JPA name of an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid JPA names for mapped entities are: %2$s")
+	SearchException unknownJpaEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
+
+	@Message(id = ID_OFFSET + 63, value = "No matching indexed entity type for name '%1$s'."
+			+ " Either this is not the JPA name of an entity type, or the entity type is not indexed in Hibernate Search."
+			+ " Valid JPA names for indexed entities are: %2$s")
+	SearchException unknownJpaEntityNameForIndexedEntityType(String invalidName, Collection<String> validNames);
+
+	@Message(id = ID_OFFSET + 64, value = "No matching entity type for name '%1$s'."
+			+ " Either this is not the Hibernate ORM name of an entity type, or the entity type is not mapped in Hibernate Search."
+			+ " Valid Hibernate ORM names for mapped entities are: %2$s")
+	SearchException unknownHibernateOrmEntityNameForMappedEntityType(String invalidName, Collection<String> validNames);
 
 }

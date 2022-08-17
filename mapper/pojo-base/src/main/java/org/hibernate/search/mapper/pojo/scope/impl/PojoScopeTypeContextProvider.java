@@ -17,7 +17,7 @@ public interface PojoScopeTypeContextProvider
 		extends PojoWorkTypeContextProvider, PojoMassIndexingTypeContextProvider {
 
 	@Override
-	<E> Optional<? extends PojoScopeIndexedTypeContext<?, E>> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> PojoScopeIndexedTypeContext<?, E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 	@Override
 	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allIndexedForSuperType(

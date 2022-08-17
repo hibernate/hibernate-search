@@ -48,6 +48,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.mapping.spi.CoordinationStrategyContext;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -70,7 +71,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -216,9 +216,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public ProjectionMappedTypeContext mappedTypeContext(String mappedTypeName) {
-		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.typeIdentifierForEntityName( mappedTypeName );
-		return typeContextContainer.indexedForExactType( typeIdentifier );
+		return typeContextContainer.indexedByJpaEntityName().getOrFail( mappedTypeName );
 	}
 
 	@Override
@@ -228,12 +226,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public EntityReference createEntityReference(String typeName, Object identifier) {
-		HibernateOrmSessionTypeContext<?> typeContext = typeContextContainer.forJpaEntityName( typeName );
-		if ( typeContext == null ) {
-			throw new AssertionFailure(
-					"Type " + typeName + " refers to an unknown type"
-			);
-		}
+		HibernateOrmSessionTypeContext<?> typeContext = typeContextContainer.byJpaEntityName().getOrFail( typeName );
 		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
 	}
 
@@ -259,24 +252,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public <E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType) {
-		PojoRawTypeIdentifier<E> typeIdentifier =
-				typeContextContainer.typeIdentifierForJavaClass( entityType );
-		SearchIndexedEntity<E> type = typeContextContainer.indexedForExactType( typeIdentifier );
-		if ( type == null ) {
-			throw log.notIndexedEntityType( entityType );
-		}
-		return type;
+		return typeContextContainer.indexedForExactClass( entityType );
 	}
 
 	@Override
 	public SearchIndexedEntity<?> indexedEntity(String entityName) {
-		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.typeIdentifierForEntityName( entityName );
-		SearchIndexedEntity<?> type = typeContextContainer.indexedForExactType( typeIdentifier );
-		if ( type == null ) {
-			throw log.notIndexedEntityName( entityName );
-		}
-		return type;
+		return typeContextContainer.indexedByEntityName().getOrFail( entityName );
 	}
 
 	@Override
@@ -379,7 +360,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
 		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
 		for ( Class<? extends T> clazz : classes ) {
-			typeIdentifiers.add( typeContextContainer.typeIdentifierForJavaClass( clazz ) );
+			typeIdentifiers.add( typeContextContainer.typeIdentifierResolver().resolveByJavaClass( clazz ) );
 		}
 		return doCreateScope( typeIdentifiers );
 	}
@@ -417,8 +398,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private <T> PojoRawTypeIdentifier<? extends T> entityTypeIdentifier(Class<T> expectedSuperType,
 			String entityName) {
-		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.typeIdentifierForEntityName( entityName );
+		HibernateOrmRawTypeIdentifierResolver resolver = typeContextContainer.typeIdentifierResolver();
+		PojoRawTypeIdentifier<?> typeIdentifier = resolver.resolveByJpaOrHibernateOrmEntityName( entityName );
+		if ( typeIdentifier == null ) {
+			throw log.unknownEntityNameForEntityType( entityName, resolver.allKnownJpaOrHibernateOrmEntityNames() );
+		}
 		Class<?> actualJavaType = typeIdentifier.javaClass();
 		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
 			throw log.invalidEntitySuperType( entityName, expectedSuperType, actualJavaType );

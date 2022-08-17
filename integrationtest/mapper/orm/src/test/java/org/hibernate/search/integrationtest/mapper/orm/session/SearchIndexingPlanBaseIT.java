@@ -190,9 +190,13 @@ public class SearchIndexingPlanBaseIT {
 					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Invalid type '" + invalidClass.getName()
-							+ "' in an indexing plan: this type is not indexed,"
-							+ " neither directly nor as a contained entity in another indexed type" );
+					.hasMessageContainingAll( "No matching entity type for class '" + invalidClass.getName() + "'",
+							"Either this class is not an entity type, or the entity type is not mapped in Hibernate Search",
+							"Valid classes for mapped entity types are: ["
+									+ IndexedEntity1.class.getName() + ", "
+									+ IndexedEntity2.class.getName() + ", "
+									+ ContainedEntity.class.getName()
+									+ "]" );
 		} );
 	}
 
@@ -222,17 +226,16 @@ public class SearchIndexingPlanBaseIT {
 					() -> indexingPlan.purge( invalidName, 42, null )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll(
-							"Unknown entity name: '" + invalidName + "'",
-							"Available entity names: ["
-									// Hibernate ORM entity names
-									+ ContainedEntity.class.getName() + ", "
-									+ IndexedEntity1.class.getName() + ", "
-									+ IndexedEntity2.class.getName() + ", "
-									// JPA entity names
-									+ ContainedEntity.NAME + ", "
+					.hasMessageContainingAll( "No matching entity type for name '" + invalidName + "'",
+							"Either this is not the name of an entity type, or the entity type is not mapped in Hibernate Search",
+							"Valid names for mapped entity types are: ["
+									// JPA entity names + Hibernate ORM entity names
 									+ IndexedEntity1.NAME + ", "
-									+ IndexedEntity2.NAME
+									+ IndexedEntity1.class.getName() + ", "
+									+ IndexedEntity2.NAME + ", "
+									+ IndexedEntity2.class.getName() + ", "
+									+ ContainedEntity.NAME + ", "
+									+ ContainedEntity.class.getName()
 									+ "]"
 					);
 		} );

@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoading
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.AssertionFailure;
 
 public class PojoMassIndexingIndexedTypeGroup<E> {
 
@@ -115,9 +114,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	public Object extractReference(PojoMassIndexingSessionContext sessionContext, Object entity) {
 		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
-		PojoMassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.indexedForExactType( targetType )
-				.orElseThrow( () -> new AssertionFailure(
-						"Processing a non-indexed type in the MassIndexer: " + targetType ) );
+		PojoMassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.indexedForExactType( targetType );
 		String entityName = typeContext.entityName();
 		Object identifier = extractIdentifier( typeContext, sessionContext, entity );
 		return mappingContext.entityReferenceFactory().createEntityReference( entityName, identifier );

@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.mapper.orm.work.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
 public interface SearchIndexingPlanTypeContextProvider {
 
-	<T> PojoRawTypeIdentifier<T> typeIdentifierForJavaClass(Class<T> javaClass);
+	<T> PojoTypeContext<T> forExactClass(Class<T> javaClass);
 
-	PojoRawTypeIdentifier<?> typeIdentifierForEntityName(String entityName);
+	KeyValueProvider<String, ? extends PojoTypeContext<?>> byEntityName();
 
 }

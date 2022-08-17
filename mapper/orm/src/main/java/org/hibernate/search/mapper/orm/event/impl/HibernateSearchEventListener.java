@@ -91,7 +91,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 		Object entity = event.getEntity();
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( event.getPersister() );
+		HibernateOrmListenerTypeContext typeContext = getTypeContextOrNull( event.getPersister() );
 		if ( typeContext == null ) {
 			return;
 		}
@@ -106,7 +106,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 		final Object entity = event.getEntity();
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( event.getPersister() );
+		HibernateOrmListenerTypeContext typeContext = getTypeContextOrNull( event.getPersister() );
 		if ( typeContext == null ) {
 			return;
 		}
@@ -121,7 +121,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 		final Object entity = event.getEntity();
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( event.getPersister() );
+		HibernateOrmListenerTypeContext typeContext = getTypeContextOrNull( event.getPersister() );
 		if ( typeContext == null ) {
 			// This type is not indexed, nor contained in an indexed type.
 			// Return early, to avoid creating an indexing plan.
@@ -246,9 +246,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return contextProvider.currentIndexingPlan( sessionImplementor, false );
 	}
 
-	private HibernateOrmListenerTypeContext getTypeContext(EntityPersister entityPersister) {
+	private HibernateOrmListenerTypeContext getTypeContextOrNull(EntityPersister entityPersister) {
 		String entityName = entityPersister.getEntityName();
-		return contextProvider.typeContextProvider().forHibernateOrmEntityName( entityName );
+		return contextProvider.typeContextProvider().byHibernateOrmEntityName().getOrNull( entityName );
 	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
@@ -264,7 +264,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		}
 
 		HibernateOrmListenerTypeContext typeContext = contextProvider.typeContextProvider()
-				.forHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
+				.byHibernateOrmEntityName().getOrNull( event.getAffectedOwnerEntityName() );
 		if ( typeContext == null ) {
 			// This type is not indexed, nor contained in an indexed type.
 			// Return early, to avoid creating an indexing plan.

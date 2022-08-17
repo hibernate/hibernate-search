@@ -31,30 +31,7 @@ public class HibernateOrmRawTypeIdentifierResolver {
 	private HibernateOrmRawTypeIdentifierResolver(Builder builder) {
 		this.byJavaClass = Collections.unmodifiableMap( builder.byJavaClass );
 		this.byHibernateOrmEntityName = Collections.unmodifiableMap( builder.byHibernateOrmEntityName );
-		Map<String, PojoRawTypeIdentifier<?>> mergedEntityNameMap = new LinkedHashMap<>();
-		/*
-		 * There are two names for each entity type: the JPA name and the Hibernate ORM name.
-		 * They are often different:
-		 *  - the Hibernate ORM name is the fully-qualified class name for class entities,
-		 *    or the name defined in the hbm.xml for dynamic-map entities.
-		 *  - by default, the JPA name is the unqualified class name by default for class entities,
-		 *    or the name defined in the hbm.xml for dynamic-map entities.
-		 *    It can be overridden with @Entity(name = ...) for class entities.
-		 *
-		 * In theory, there could be conflicts where a given name points to one entity for JPA
-		 * and another entity for ORM. However that would require a very strange mapping:
-		 * one would need to set the JPA name of one entity to the fully qualified name of another entity class.
-		 *
-		 * In Hibernate Search APIs, we accept that conflicts can arise:
-		 * JPA entity names will always work,
-		 * and when there is no naming conflict (99% of the time) Hibernate ORM entity names will work too.
-		 *
-		 * We still keep around the map by Hibernate ORM entity name because Search often needs to use
-		 * the Hibernate ORM name internally when using Hibernate ORM features (Session.load, ...).
-		 */
-		mergedEntityNameMap.putAll( builder.byHibernateOrmEntityName );
-		mergedEntityNameMap.putAll( builder.byJpaEntityName ); // This must be last!
-		this.byJpaOrHibernateOrmEntityName = Collections.unmodifiableMap( mergedEntityNameMap );
+		this.byJpaOrHibernateOrmEntityName = Collections.unmodifiableMap( builder.byJpaOrHibernateOrmEntityName );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,19 +64,48 @@ public class HibernateOrmRawTypeIdentifierResolver {
 		private final Map<Class<?>, PojoRawTypeIdentifier<?>> byJavaClass = new LinkedHashMap<>();
 		private final Map<String, PojoRawTypeIdentifier<?>> byJpaEntityName = new LinkedHashMap<>();
 		private final Map<String, PojoRawTypeIdentifier<?>> byHibernateOrmEntityName = new LinkedHashMap<>();
+		private final Map<String, PojoRawTypeIdentifier<?>> byJpaOrHibernateOrmEntityName = new LinkedHashMap<>();
 
 		<T> void addClassEntityType(Class<T> javaClass, String jpaEntityName, String hibernateOrmEntityName) {
 			PojoRawTypeIdentifier<T> typeIdentifier = createClassTypeIdentifier( javaClass );
 			byJavaClass.put( javaClass, typeIdentifier );
-			byJpaEntityName.put( jpaEntityName, typeIdentifier );
-			byHibernateOrmEntityName.put( hibernateOrmEntityName, typeIdentifier );
+			addByName( typeIdentifier, jpaEntityName, hibernateOrmEntityName );
 		}
 
 		@SuppressWarnings("rawtypes")
 		void addDynamicMapEntityType(String jpaEntityName, String hibernateOrmEntityName) {
 			PojoRawTypeIdentifier<Map> typeIdentifier = createDynamicMapTypeIdentifier( hibernateOrmEntityName );
+			addByName( typeIdentifier, jpaEntityName, hibernateOrmEntityName );
+		}
+
+		/*
+		 * There are two names for each entity type: the JPA name and the Hibernate ORM name.
+		 * They are often different:
+		 *  - the Hibernate ORM name is the fully-qualified class name for class entities,
+		 *    or the name defined in the hbm.xml for dynamic-map entities.
+		 *  - by default, the JPA name is the unqualified class name by default for class entities,
+		 *    or the name defined in the hbm.xml for dynamic-map entities.
+		 *    It can be overridden with @Entity(name = ...) for class entities.
+		 *
+		 * In theory, there could be conflicts where a given name points to one entity for JPA
+		 * and another entity for ORM. However that would require a very strange mapping:
+		 * one would need to set the JPA name of one entity to the fully qualified name of another entity class.
+		 *
+		 * In Hibernate Search APIs, we accept that conflicts can arise:
+		 * JPA entity names will always work,
+		 * and when there is no naming conflict (99% of the time) Hibernate ORM entity names will work too.
+		 *
+		 * We still keep around the map by Hibernate ORM entity name because Search often needs to use
+		 * the Hibernate ORM name internally when using Hibernate ORM features (Session.load, ...).
+		 */
+		private <T> void addByName(PojoRawTypeIdentifier<T> typeIdentifier, String jpaEntityName,
+				String hibernateOrmEntityName) {
 			byJpaEntityName.put( jpaEntityName, typeIdentifier );
 			byHibernateOrmEntityName.put( hibernateOrmEntityName, typeIdentifier );
+
+			byJpaOrHibernateOrmEntityName.put( jpaEntityName, typeIdentifier );
+			// Use putIfAbsent here to avoid overriding JPA entity names, see above.
+			byJpaOrHibernateOrmEntityName.putIfAbsent( hibernateOrmEntityName, typeIdentifier );
 		}
 
 		HibernateOrmRawTypeIdentifierResolver build() {

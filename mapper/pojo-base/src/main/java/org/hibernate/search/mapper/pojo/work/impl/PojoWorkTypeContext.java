@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
@@ -21,6 +22,10 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  * @param <E> The entity type.
  */
 public interface PojoWorkTypeContext<I, E> extends PojoLoadingTypeContext<E> {
+
+	Optional<? extends PojoWorkIndexedTypeContext<I, E>> asIndexed();
+
+	Optional<? extends PojoWorkContainedTypeContext<I, E>> asContained();
 
 	IdentifierMappingImplementor<I, E> identifierMapping();
 

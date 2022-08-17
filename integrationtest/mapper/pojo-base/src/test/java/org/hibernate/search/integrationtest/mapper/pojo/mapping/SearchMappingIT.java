@@ -78,7 +78,15 @@ public class SearchMappingIT {
 	public void indexedEntity_byName_notEntity() {
 		assertThatThrownBy( () -> mapping.indexedEntity( "invalid" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Entity type 'invalid' does not exist or is not indexed" );
+				.hasMessageContainingAll(
+						"No matching indexed entity type for name 'invalid'",
+						"Either this is not the name of an entity type, or the entity type is not indexed in Hibernate Search",
+						"Valid names for indexed entity types are: ["
+								+ Person.ENTITY_NAME + ", "
+								+ Pet.ENTITY_NAME
+								// This should NOT include Toy, which is not an indexed entity type
+								+ "]"
+				);
 	}
 
 	@Test
@@ -86,7 +94,15 @@ public class SearchMappingIT {
 	public void indexedEntity_byName_notIndexed() {
 		assertThatThrownBy( () -> mapping.indexedEntity( Toy.ENTITY_NAME ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Entity type '" + Toy.ENTITY_NAME + "' does not exist or is not indexed" );
+				.hasMessageContainingAll(
+						"No matching indexed entity type for name '" + Toy.ENTITY_NAME + "'",
+						"Either this is not the name of an entity type, or the entity type is not indexed in Hibernate Search",
+						"Valid names for indexed entity types are: ["
+								+ Person.ENTITY_NAME + ", "
+								+ Pet.ENTITY_NAME
+								// This should NOT include Toy, which is not an indexed entity type
+								+ "]"
+				);
 	}
 
 	@Test
@@ -105,8 +121,14 @@ public class SearchMappingIT {
 	public void indexedEntity_byJavaClass_notEntity() {
 		assertThatThrownBy( () -> mapping.indexedEntity( String.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"Type '" + String.class.getName() + "' is not an entity type, or this entity type is not indexed"
+				.hasMessageContainingAll(
+						"No matching indexed entity type for class '" + String.class.getName() + "'",
+						"Either this class is not an entity type, or the entity type is not indexed in Hibernate Search",
+						"Valid classes for indexed entity types are: ["
+								+ Person.class.getName() + ", "
+								+ Pet.class.getName()
+								// This should NOT include Toy, which is not an indexed entity type
+								+ "]"
 				);
 	}
 
@@ -115,8 +137,14 @@ public class SearchMappingIT {
 	public void indexedEntity_byJavaClass_notIndexed() {
 		assertThatThrownBy( () -> mapping.indexedEntity( Toy.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"Type '" + Toy.class.getName() + "' is not an entity type, or this entity type is not indexed"
+				.hasMessageContainingAll(
+						"No matching indexed entity type for class '" + Toy.class.getName() + "'",
+						"Either this class is not an entity type, or the entity type is not indexed in Hibernate Search",
+						"Valid classes for indexed entity types are: ["
+								+ Person.class.getName() + ", "
+								+ Pet.class.getName()
+								// This should NOT include Toy, which is not an indexed entity type
+								+ "]"
 				);
 	}
 

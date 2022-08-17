@@ -46,7 +46,6 @@ import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
@@ -208,12 +207,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public EntityReference fromDocumentReference(DocumentReference reference) {
 		HibernateOrmSessionTypeContext<?> typeContext =
-				typeContextProvider.forJpaEntityName( reference.typeName() );
-		if ( typeContext == null ) {
-			throw new AssertionFailure(
-					"Document reference " + reference + " refers to an unknown type"
-			);
-		}
+				typeContextProvider.byJpaEntityName().getOrFail( reference.typeName() );
 		Object id = typeContext.identifierMapping()
 				.fromDocumentIdentifier( reference.id(), this );
 		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), id );

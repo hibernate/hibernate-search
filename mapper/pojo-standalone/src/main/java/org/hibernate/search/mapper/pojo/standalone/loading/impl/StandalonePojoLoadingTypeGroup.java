@@ -44,7 +44,7 @@ public final class StandalonePojoLoadingTypeGroup<E> implements LoadingTypeGroup
 	@Override
 	public boolean includesInstance(Object entity) {
 		PojoRawTypeIdentifier<?> targetType = introspector.detectEntityType( entity );
-		LoadingTypeContext<?> typeContextOrNull = typeContextProvider.forExactType( targetType );
+		LoadingTypeContext<?> typeContextOrNull = typeContextProvider.forExactTypeOrNull( targetType );
 		if ( typeContextOrNull == null ) {
 			return false;
 		}

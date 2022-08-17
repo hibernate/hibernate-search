@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.spi;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeContext;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 
 public interface BatchTypeIdentifierProvider {
 
-	PojoRawTypeIdentifier<?> typeIdentifierForEntityName(String hibernateOrmEntityName);
+	KeyValueProvider<String, ? extends PojoTypeContext<?>> byEntityName();
 
 }

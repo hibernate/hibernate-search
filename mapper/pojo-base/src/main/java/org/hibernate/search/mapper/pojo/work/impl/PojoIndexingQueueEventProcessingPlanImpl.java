@@ -6,24 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndexingQueueEventProcessingPlan {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkTypeContextProvider typeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
@@ -72,13 +66,6 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	}
 
 	private PojoWorkTypeContext<?, ?> typeContext(String entityName) {
-		Optional<? extends PojoWorkTypeContext<?, ?>> optional = typeContextProvider.indexedForEntityName( entityName );
-		if ( !optional.isPresent() ) {
-			optional = typeContextProvider.containedForEntityName( entityName );
-			if ( !optional.isPresent() ) {
-				throw log.nonIndexedTypeInIndexingEvent( entityName );
-			}
-		}
-		return optional.get();
+		return typeContextProvider.byEntityName().getOrFail( entityName );
 	}
 }

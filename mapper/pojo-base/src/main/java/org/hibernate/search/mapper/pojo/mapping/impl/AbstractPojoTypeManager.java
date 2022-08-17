@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -94,6 +95,16 @@ public class AbstractPojoTypeManager<I, E>
 	@Override
 	public final PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
+	}
+
+	@Override
+	public Optional<PojoIndexedTypeManager<I, E>> asIndexed() {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<PojoContainedTypeManager<I, E>> asContained() {
+		return Optional.empty();
 	}
 
 	@Override

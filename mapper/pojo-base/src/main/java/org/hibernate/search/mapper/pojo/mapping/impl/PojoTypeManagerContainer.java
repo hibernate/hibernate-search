@@ -6,49 +6,74 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeTypeContextProvider;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkTypeContextProvider;
+import org.hibernate.search.util.common.data.spi.KeyValueProvider;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoTypeManagerContainer
 		implements AutoCloseable, PojoWorkTypeContextProvider, PojoScopeTypeContextProvider {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static Builder builder() {
 		return new Builder();
 	}
 
-	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactType;
-	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> containedByExactType;
+	private final KeyValueProvider<PojoRawTypeIdentifier<?>, AbstractPojoTypeManager<?, ?>> byExactType;
+	private final KeyValueProvider<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactType;
+	private final KeyValueProvider<String, AbstractPojoTypeManager<?, ?>> byEntityName;
+
 	private final Map<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?>>> indexedBySuperType;
-	private final Map<String, PojoIndexedTypeManager<?, ?>> indexedByEntityName;
-	private final Map<String, PojoContainedTypeManager<?, ?>> containedByEntityName;
-	private final Set<PojoIndexedTypeManager<?, ?>> allIndexed;
+
+	private final Collection<PojoIndexedTypeManager<?, ?>> allIndexed;
 
 	private PojoTypeManagerContainer(Builder builder) {
 		// Use a LinkedHashMap for deterministic iteration in the "all" set
-		this.indexedByExactType = new LinkedHashMap<>( builder.indexedByExactType );
-		this.containedByExactType = new LinkedHashMap<>( builder.containedByExactType );
+		Map<PojoRawTypeIdentifier<?>, AbstractPojoTypeManager<?, ?>> byExactTypeContent = new LinkedHashMap<>();
+		Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactTypeContent = new LinkedHashMap<>();
+		Map<String, AbstractPojoTypeManager<?, ?>> byEntityNameContent = new LinkedHashMap<>();
+
+		for ( PojoIndexedTypeManager<?, ?> typeManager : builder.indexed ) {
+			PojoRawTypeIdentifier<?> typeIdentifier = typeManager.typeIdentifier;
+
+			byExactTypeContent.put( typeIdentifier, typeManager );
+			indexedByExactTypeContent.put( typeIdentifier, typeManager );
+
+			byEntityNameContent.put( typeManager.entityName(), typeManager );
+		}
+		for ( PojoContainedTypeManager<?, ?> typeManager : builder.contained ) {
+			PojoRawTypeIdentifier<?> typeIdentifier = typeManager.typeIdentifier;
+
+			byExactTypeContent.put( typeIdentifier, typeManager );
+
+			byEntityNameContent.put( typeManager.entityName(), typeManager );
+		}
+
+		this.byExactType = new KeyValueProvider<>( byExactTypeContent, log::unknownTypeIdentifierForMappedEntityType );
+		this.indexedByExactType = new KeyValueProvider<>( indexedByExactTypeContent, log::unknownTypeIdentifierForIndexedEntityType );
+		this.byEntityName = new KeyValueProvider<>( byEntityNameContent, log::unknownEntityNameForMappedEntityType );
+
 		this.indexedBySuperType = new LinkedHashMap<>( builder.indexedBySuperType );
-		this.indexedBySuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
-		this.indexedByEntityName = new LinkedHashMap<>( builder.indexedByExactType.size() );
-		for ( PojoIndexedTypeManager<?, ?> typeManager : builder.indexedByExactType.values() ) {
-			indexedByEntityName.put( typeManager.entityName(), typeManager );
-		}
-		this.containedByEntityName = new LinkedHashMap<>( builder.containedByExactType.size() );
-		for ( PojoContainedTypeManager<?, ?> typeManager : builder.containedByExactType.values() ) {
-			containedByEntityName.put( typeManager.entityName(), typeManager );
-		}
-		this.allIndexed = Collections.unmodifiableSet( new LinkedHashSet<>( indexedByExactType.values() ) );
+		indexedBySuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+
+		this.allIndexed = Collections.unmodifiableCollection( indexedByExactTypeContent.values() );
 	}
 
 	@Override
@@ -60,9 +85,14 @@ public class PojoTypeManagerContainer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoIndexedTypeManager<?, E>> indexedForExactType(
-			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return Optional.ofNullable( (PojoIndexedTypeManager<?, E>) indexedByExactType.get( typeIdentifier ) );
+	public <E> AbstractPojoTypeManager<?, E> forExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+		return (AbstractPojoTypeManager<?, E>) byExactType.getOrFail( typeIdentifier );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> PojoIndexedTypeManager<?, E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+		return (PojoIndexedTypeManager<?, E>) indexedByExactType.getOrFail( typeIdentifier );
 	}
 
 	@Override
@@ -73,38 +103,26 @@ public class PojoTypeManagerContainer
 	}
 
 	@Override
-	public Optional<? extends PojoIndexedTypeManager<?, ?>> indexedForEntityName(String entityName) {
-		return Optional.ofNullable( (PojoIndexedTypeManager<?, ?>) indexedByEntityName.get( entityName ) );
+	public KeyValueProvider<String, ? extends PojoWorkTypeContext<?, ?>> byEntityName() {
+		return byEntityName;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoContainedTypeManager<?, E>> containedForExactType(
-			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return Optional.ofNullable( (PojoContainedTypeManager<?, E>) containedByExactType.get( typeIdentifier ) );
-	}
-
-	@Override
-	public Optional<? extends PojoContainedTypeManager<?, ?>> containedForEntityName(String entityName) {
-		return Optional.ofNullable( (PojoContainedTypeManager<?, ?>) containedByEntityName.get( entityName ) );
-	}
-
-	Set<PojoIndexedTypeManager<?, ?>> allIndexed() {
+	Collection<PojoIndexedTypeManager<?, ?>> allIndexed() {
 		return allIndexed;
 	}
 
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> indexedByExactType = new LinkedHashMap<>();
-		private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> containedByExactType = new LinkedHashMap<>();
+		private final List<PojoIndexedTypeManager<?, ?>> indexed = new ArrayList<>();
+		private final List<PojoContainedTypeManager<?, ?>> contained = new ArrayList<>();
 		private final Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> indexedBySuperType = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
 		public <E> void addIndexed(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E> typeManager) {
-			indexedByExactType.put( typeModel.typeIdentifier(), typeManager );
+			indexed.add( typeManager );
 			typeModel.ascendingSuperTypes()
 					.map( PojoRawTypeModel::typeIdentifier )
 					.forEach( clazz ->
@@ -113,14 +131,14 @@ public class PojoTypeManagerContainer
 					);
 		}
 
-		public <E> void addContained(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<?, E> typeManager) {
-			containedByExactType.put( typeModel.typeIdentifier(), typeManager );
+		public <E> void addContained(PojoContainedTypeManager<?, E> typeManager) {
+			contained.add( typeManager );
 		}
 
 		public void closeOnFailure() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				closer.pushAll( PojoIndexedTypeManager::close, indexedByExactType.values() );
-				closer.pushAll( PojoContainedTypeManager::close, containedByExactType.values() );
+				closer.pushAll( PojoIndexedTypeManager::close, indexed );
+				closer.pushAll( PojoContainedTypeManager::close, contained );
 			}
 		}
 
