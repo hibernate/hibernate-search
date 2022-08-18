@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.dynamicmap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
@@ -36,6 +37,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -127,6 +129,31 @@ public class DynamicMapBaseIT {
 					(Map) session.load( entityTypeName, 1 )
 			);
 		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4656")
+	public void typeName_invalid() {
+		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
+		String entityTypeName = "Book";
+
+		assertThatThrownBy( () -> ormSetupHelper.start()
+				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> {
+							context.programmaticMapping().type( "invalid" );
+						}
+				)
+				.setup() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Unknown type: 'invalid'",
+						"Available named types: [" + entityTypeName + "]",
+						"For entity types, the correct type name is the entity name",
+						"For component types (embeddeds, ...) in dynamic-map entities,"
+								+ " the correct type name is name of the owner entity followed by a dot ('.')"
+								+ " followed by the dot-separated path to the component",
+						"e.g. 'MyEntity.myEmbedded' or 'MyEntity.myEmbedded.myNestedEmbedded'." );
 	}
 
 	@Test
