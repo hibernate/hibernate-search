@@ -302,8 +302,13 @@ public class SearchQueryBaseIT {
 			Class<?> invalidClass = String.class;
 
 			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
-					.hasMessageContainingAll( "Invalid target types: [" + invalidClass.getName() + "]",
-							"These types are not indexed, nor is any of their subtypes" );
+					.hasMessageContainingAll( "No matching indexed entity types for types: [" + invalidClass.getName() + "]",
+							"These types are not indexed entity types, nor is any of their subtypes",
+							"Valid indexed entity classes, superclasses and superinterfaces are: ["
+									+ Object.class.getName() + ", "
+									+ Author.class.getName() + ", "
+									+ Book.class.getName()
+									+ "]" );
 		} );
 	}
 

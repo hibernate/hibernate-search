@@ -59,8 +59,8 @@ public class QueryValidationTest extends SearchTestBase {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, C.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Invalid target types: [" + C.class.getName() + "]",
-						"These types are not indexed, nor is any of their subtypes" );
+				.hasMessageContainingAll( "No matching indexed entity types for types: [" + C.class.getName() + "]",
+						"These types are not indexed entity types, nor is any of their subtypes" );
 	}
 
 	@Test
@@ -68,8 +68,8 @@ public class QueryValidationTest extends SearchTestBase {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, D.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Invalid target types: [" + D.class.getName() + "]",
-						"These types are not indexed, nor is any of their subtypes" );
+				.hasMessageContainingAll( "No matching indexed entity types for types: [" + D.class.getName() + "]",
+						"These types are not indexed entity types, nor is any of their subtypes" );
 	}
 
 	@Override

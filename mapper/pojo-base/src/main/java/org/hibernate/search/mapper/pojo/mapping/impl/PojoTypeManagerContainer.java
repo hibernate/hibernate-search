@@ -96,6 +96,11 @@ public class PojoTypeManagerContainer
 	}
 
 	@Override
+	public Set<PojoRawTypeIdentifier<?>> allIndexedSuperTypes() {
+		return indexedBySuperType.keySet();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allIndexedForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
@@ -123,7 +128,7 @@ public class PojoTypeManagerContainer
 
 		public <E> void addIndexed(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E> typeManager) {
 			indexed.add( typeManager );
-			typeModel.ascendingSuperTypes()
+			typeModel.descendingSuperTypes()
 					.map( PojoRawTypeModel::typeIdentifier )
 					.forEach( clazz ->
 							indexedBySuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )

@@ -142,10 +142,12 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 234,
-			value = "Invalid target types: %1$s"
-					+ " These types are not indexed, nor is any of their subtypes."
+			value = "No matching indexed entity types for types: %1$s"
+					+ " These types are not indexed entity types, nor is any of their subtypes."
+					+ " Valid indexed entity classes, superclasses and superinterfaces are: %2$s."
 	)
-	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes);
+	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
+			Collection<PojoRawTypeIdentifier<?>> validSuperTypes);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 295, value = "Invalid value for type '$2%s': '$1%s'. %3$s")
 	SearchException parseException(String text, @FormatWith(SimpleNameClassFormatter.class) Class<?> readerClass,
