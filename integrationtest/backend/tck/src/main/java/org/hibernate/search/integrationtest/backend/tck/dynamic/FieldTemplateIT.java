@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +23,15 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -233,6 +238,33 @@ public class FieldTemplateIT {
 						.between( 41, 43 ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4500")
+	public void parentTemplate_wrongType() {
+		Consumer<IndexSchemaElement> templatesBinder = root -> {
+			root.fieldTemplate( "template1", f -> f.asString() );
+			IndexSchemaFieldTemplateOptionsStep<?> step =
+					root.fieldTemplate( "template2", f -> f.asString() )
+							.matchingPathGlob( "parent.*" );
+			if ( fieldStructure.isMultiValued() ) {
+				step.multiValued();
+			}
+		};
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
+
+		assertThatThrownBy( () -> index.createIndexer().add( referenceProvider( DOCUMENT_1 ),
+				document -> initDocument( document, "parent.foo",
+						"matchedValue", "notMatchedValue1", "notMatchedValue2"
+				),
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
+		) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unable to resolve field '" + getFieldPath( "parent.foo" ) + "'",
+						"Invalid type: field '" + getFieldPath( "parent" ) + "' is not composite"
+				);
 	}
 
 	private SearchQuery<DocumentReference> query(
