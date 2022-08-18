@@ -37,7 +37,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -219,6 +218,18 @@ public class SearchMappingIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4656")
+	public void indexManager_invalidName() {
+		assertThatThrownBy( () -> mapping.indexManager( "invalid" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"No index manager with name 'invalid'",
+						"Check that at least one entity is configured to target that index",
+						"The following indexes can be retrieved by name: [" + Person.INDEX_NAME + ", " + Pet.ENTITY_NAME + "]"
+				);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3640", "HSEARCH-3950" })
 	public void backend_default() {
 		Backend backend = mapping.backend();
@@ -230,6 +241,19 @@ public class SearchMappingIT {
 	public void backend_byName() {
 		Backend backend = mapping.backend( BACKEND_2_NAME );
 		checkBackend( EventContexts.fromBackendName( BACKEND_2_NAME ), backend );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4656")
+	public void backend_byName_invalidName() {
+		assertThatThrownBy( () -> mapping.backend( "invalid" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"No backend with name 'invalid'",
+						"Check that at least one entity is configured to target that backend",
+						"The following backends can be retrieved by name: [" + BACKEND_2_NAME + "]",
+						"The default backend can be retrieved"
+				);
 	}
 
 	private void checkIndexManager(String expectedIndexName, IndexManager indexManager) {

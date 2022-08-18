@@ -25,7 +25,9 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise) {
-		setupContext = setupContext.withBackendProperty( "type", defaultBackendMock.factory( mappingHandlePromise ) );
+		if ( defaultBackendMock != null ) {
+			setupContext = setupContext.withBackendProperty( "type", defaultBackendMock.factory( mappingHandlePromise ) );
+		}
 		for ( Map.Entry<String, BackendMock> entry : namedBackendMocks.entrySet() ) {
 			BackendMock backendMock = entry.getValue();
 			setupContext = setupContext.withBackendProperty( entry.getKey(),

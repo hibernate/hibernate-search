@@ -163,7 +163,9 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	public static ReusableOrmSetupHolder withBackendMocks(BackendMock defaultBackendMock,
 			Map<String, BackendMock> namedBackendMocks) {
 		List<BackendMock> allBackendMocks = new ArrayList<>();
-		allBackendMocks.add( defaultBackendMock );
+		if ( defaultBackendMock != null ) {
+			allBackendMocks.add( defaultBackendMock );
+		}
 		allBackendMocks.addAll( namedBackendMocks.values() );
 		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks ),
 				allBackendMocks, IndexDataClearStrategy.NONE );

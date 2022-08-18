@@ -66,7 +66,9 @@ public final class OrmSetupHelper
 	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
 			Map<String, BackendMock> namedBackendMocks) {
 		List<BackendMock> backendMocks = new ArrayList<>();
-		backendMocks.add( defaultBackendMock );
+		if ( defaultBackendMock != null ) {
+			backendMocks.add( defaultBackendMock );
+		}
 		backendMocks.addAll( namedBackendMocks.values() );
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks ),
