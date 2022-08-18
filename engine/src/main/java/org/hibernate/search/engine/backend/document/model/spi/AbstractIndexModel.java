@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.spi;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +17,11 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
@@ -28,6 +32,7 @@ public abstract class AbstractIndexModel<
 				F extends IndexField<?, ?>
 		>
 		implements EventContextProvider, IndexDescriptor {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String hibernateSearchIndexName;
 	private final EventContext eventContext;
@@ -94,8 +99,13 @@ public abstract class AbstractIndexModel<
 	}
 
 	public final F fieldOrNull(String absolutePath, IndexFieldFilter filter) {
-		F field = fieldOrNullIgnoringInclusion( absolutePath );
-		return field == null ? null : filter.filter( field, field.inclusion() );
+		try {
+			F field = fieldOrNullIgnoringInclusion( absolutePath );
+			return field == null ? null : filter.filter( field, field.inclusion() );
+		}
+		catch (SearchException e) {
+			throw log.unableToResolveField( absolutePath, e.getMessage(), e, eventContext );
+		}
 	}
 
 	@Override

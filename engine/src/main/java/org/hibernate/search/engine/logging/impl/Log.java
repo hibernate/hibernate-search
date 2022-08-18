@@ -532,4 +532,8 @@ public interface Log extends BasicLogger {
 	SearchException cannotCreateEntityProjection(String name, @FormatWith(ClassFormatter.class) Class<?> javaClass,
 			String hint);
 
+	@Message(id = ID_OFFSET + 115,
+			value = "Unable to resolve field '%1$s': %2$s")
+	SearchException unableToResolveField(String absolutePath, String causeMessage, @Cause SearchException e,
+			@Param EventContext context);
 }
