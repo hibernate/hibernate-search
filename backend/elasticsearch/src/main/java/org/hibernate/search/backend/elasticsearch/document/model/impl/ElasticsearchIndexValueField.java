@@ -21,10 +21,10 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 public final class ElasticsearchIndexValueField<F>
 		extends AbstractIndexValueField<
-		ElasticsearchIndexValueField<F>,
+						ElasticsearchIndexValueField<F>,
 						ElasticsearchSearchIndexScope<?>,
 						ElasticsearchIndexValueFieldType<F>,
-		ElasticsearchIndexCompositeNode,
+						ElasticsearchIndexCompositeNode,
 						F
 				>
 		implements ElasticsearchIndexField, ElasticsearchSearchIndexValueFieldContext<F> {
