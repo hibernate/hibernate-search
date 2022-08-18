@@ -172,13 +172,23 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 33,
 			value = "No backend with name '%1$s'."
-					+ " Check that at least one entity is configured to target that backend.")
-	SearchException noBackendRegistered(String backendName);
+					+ " Check that at least one entity is configured to target that backend."
+					+ " The following backends can be retrieved by name: %2$s."
+					+ " %3$s")
+	SearchException unknownNameForBackend(String backendName, Collection<String> validBackendNames,
+			String defaultBackendMessage);
+
+	@Message(value = "The default backend can be retrieved")
+	String defaultBackendAvailable();
+
+	@Message(value = "The default backend cannot be retrieved, because no entity is mapped to that backend")
+	String defaultBackendUnavailable();
 
 	@Message(id = ID_OFFSET + 34,
 			value = "No index manager with name '%1$s'."
-					+ " Check that at least one entity is configured to target that index.")
-	SearchException noIndexManagerRegistered(String indexManagerName);
+					+ " Check that at least one entity is configured to target that index."
+					+ " The following indexes can be retrieved by name: %2$s.")
+	SearchException unknownNameForIndexManager(String indexManagerName, Collection<String> validIndexNames);
 
 	@Message(id = ID_OFFSET + 40, value = "Unable to instantiate class '%1$s': %2$s")
 	SearchException unableToInstantiateClass(String className, String causeMessage, @Cause Exception cause);
@@ -309,8 +319,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 75,
 			value = "No default backend."
-					+ " Check that at least one entity is configured to target the default backend.")
-	SearchException noDefaultBackendRegistered();
+					+ " Check that at least one entity is configured to target the default backend."
+					+ " The following backends can be retrieved by name: %1$s.")
+	SearchException noDefaultBackendRegistered(Collection<String> validBackendNames);
 
 	@Message(id = ID_OFFSET + 76,
 			value = "Ambiguous bean reference to type '%1$s':"

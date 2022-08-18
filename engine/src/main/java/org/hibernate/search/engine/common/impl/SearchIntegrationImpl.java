@@ -9,10 +9,12 @@ package org.hibernate.search.engine.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -78,7 +80,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend backend() {
 		BackendImplementor backend = backends.get( null );
 		if ( backend == null ) {
-			throw log.noDefaultBackendRegistered();
+			throw log.noDefaultBackendRegistered( backends.keySet() );
 		}
 		return backend.toAPI();
 	}
@@ -87,7 +89,10 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend backend(String backendName) {
 		BackendImplementor backend = backends.get( backendName );
 		if ( backend == null ) {
-			throw log.noBackendRegistered( backendName );
+			throw log.unknownNameForBackend( backendName,
+					backends.keySet().stream().filter( Objects::nonNull ).collect( Collectors.toList() ),
+					backends.containsKey( null ) ? log.defaultBackendAvailable()
+							: log.defaultBackendUnavailable() );
 		}
 		return backend.toAPI();
 	}
@@ -96,7 +101,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public IndexManager indexManager(String indexManagerName) {
 		IndexManagerImplementor indexManager = indexManagers.get( indexManagerName );
 		if ( indexManager == null ) {
-			throw log.noIndexManagerRegistered( indexManagerName );
+			throw log.unknownNameForIndexManager( indexManagerName, indexManagers.keySet() );
 		}
 		return indexManager.toAPI();
 	}
