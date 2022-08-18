@@ -73,7 +73,7 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 		}
 
 		if ( !nonIndexedTypes.isEmpty() ) {
-			throw log.invalidScopeTarget( nonIndexedTypes );
+			throw log.invalidScopeTarget( nonIndexedTypes, typeContextProvider.allIndexedSuperTypes() );
 		}
 
 		Set<C> targetedTypeExtendedContexts =

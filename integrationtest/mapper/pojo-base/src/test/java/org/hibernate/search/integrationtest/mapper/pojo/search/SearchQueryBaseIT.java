@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.lang.invoke.MethodHandles;
@@ -113,6 +114,22 @@ public class SearchQueryBaseIT {
 					EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
 					EntityReferenceImpl.withName( Author.class, Author.NAME, 2 )
 			);
+		}
+	}
+
+	@Test
+	public void target_byClass_invalidClass() {
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			Class<?> invalidClass = String.class;
+
+			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
+					.hasMessageContainingAll( "No matching indexed entity types for types: [" + invalidClass.getName() + "]",
+							"These types are not indexed entity types, nor is any of their subtypes",
+							"Valid indexed entity classes, superclasses and superinterfaces are: ["
+									+ Object.class.getName() + ", "
+									+ Book.class.getName() + ", "
+									+ Author.class.getName()
+									+ "]" );
 		}
 	}
 
