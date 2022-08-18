@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -184,6 +186,21 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	}
 
 	@Override
+	public IndexManager indexManager(String indexName) {
+		return searchIntegration().indexManager( indexName );
+	}
+
+	@Override
+	public Backend backend() {
+		return searchIntegration().backend();
+	}
+
+	@Override
+	public Backend backend(String backendName) {
+		return searchIntegration().backend( backendName );
+	}
+
+	@Override
 	public StandalonePojoLoadingContext.Builder loadingContextBuilder(DetachedBackendSessionContext sessionContext) {
 		return new StandalonePojoLoadingContext.Builder( this, typeContextContainer, sessionContext );
 	}
@@ -197,6 +214,10 @@ public class StandalonePojoMapping extends AbstractPojoMappingImplementor<Standa
 	@Override
 	public StandalonePojoMassIndexingSessionContext createSession(DetachedBackendSessionContext sessionContext) {
 		return createSessionBuilder().tenantId( sessionContext.tenantIdentifier() ).build();
+	}
+
+	private SearchIntegration searchIntegration() {
+		return integrationHandle.getOrFail();
 	}
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
