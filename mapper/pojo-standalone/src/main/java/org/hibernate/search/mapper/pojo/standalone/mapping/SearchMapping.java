@@ -10,6 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -80,6 +83,23 @@ public interface SearchMapping {
 	 * @return A collection containing one {@link SearchIndexedEntity} for each indexed entity
 	 */
 	Collection<? extends SearchIndexedEntity<?>> allIndexedEntities();
+
+	/**
+	 * @param indexName The name of an index. See {@link Indexed#index()}.
+	 * @return The index manager for the index having {@code indexName} as name.
+	 */
+	IndexManager indexManager(String indexName);
+
+	/**
+	 * @return The default backend, if any.
+	 */
+	Backend backend();
+
+	/**
+	 * @param backendName The name of a backend. See {@link Indexed#backend()}.
+	 * @return The backend having {@code backendName} as name.
+	 */
+	Backend backend(String backendName);
 
 	/**
 	 * @return A {@link SearchMapping} builder.

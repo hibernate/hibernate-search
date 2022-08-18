@@ -11,11 +11,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
@@ -34,6 +37,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,25 +45,36 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 
 public class SearchMappingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	private static final String BACKEND_2_NAME = "stubBackend2";
 
 	@Rule
-	public StandalonePojoMappingSetupHelper setupHelper =
-			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public BackendMock defaultBackendMock = new BackendMock();
+
+	@Rule
+	public BackendMock backend2Mock = new BackendMock();
+
+	@Rule
+	public StandalonePojoMappingSetupHelper setupHelper;
 
 	private SearchMapping mapping;
 
+	public SearchMappingIT() {
+		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
+		namedBackendMocks.put( BACKEND_2_NAME, backend2Mock );
+		setupHelper = StandalonePojoMappingSetupHelper.withBackendMocks( MethodHandles.lookup(),
+				defaultBackendMock, namedBackendMocks );
+	}
+
 	@Before
 	public void before() {
-		backendMock.expectAnySchema( Person.INDEX_NAME );
-		backendMock.expectAnySchema( Pet.ENTITY_NAME );
+		defaultBackendMock.expectAnySchema( Person.INDEX_NAME );
+		backend2Mock.expectAnySchema( Pet.ENTITY_NAME );
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( Person.class, Person.ENTITY_NAME )
 				.withAnnotatedEntityType( Pet.class, Pet.ENTITY_NAME )
 				.withAnnotatedEntityType( Toy.class, Toy.ENTITY_NAME )
 				.setup();
-		backendMock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -189,6 +204,34 @@ public class SearchMappingIT {
 				);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3640")
+	public void indexManager_customIndexName() {
+		IndexManager indexManager = mapping.indexManager( Person.INDEX_NAME );
+		checkIndexManager( Person.INDEX_NAME, indexManager );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3640")
+	public void indexManager_defaultIndexName() {
+		IndexManager indexManager = mapping.indexManager( Pet.ENTITY_NAME );
+		checkIndexManager( Pet.ENTITY_NAME, indexManager );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3640", "HSEARCH-3950" })
+	public void backend_default() {
+		Backend backend = mapping.backend();
+		checkBackend( EventContexts.defaultBackend(), backend );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3640")
+	public void backend_byName() {
+		Backend backend = mapping.backend( BACKEND_2_NAME );
+		checkBackend( EventContexts.fromBackendName( BACKEND_2_NAME ), backend );
+	}
+
 	private void checkIndexManager(String expectedIndexName, IndexManager indexManager) {
 		assertThat( indexManager )
 				.asInstanceOf( InstanceOfAssertFactories.type( StubIndexManager.class ) )
@@ -222,7 +265,7 @@ public class SearchMappingIT {
 		}
 	}
 
-	@Indexed
+	@Indexed(backend = BACKEND_2_NAME)
 	private static class Pet {
 		public static final String ENTITY_NAME = "Pet";
 
