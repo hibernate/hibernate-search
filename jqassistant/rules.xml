@@ -296,7 +296,7 @@
             MATCH
                 (type:Type:Public)-[:EXTENDS|:IMPLEMENTS]->(superType:Type:Impl)
             RETURN
-                type AS ExposingSite, superType AS ExposedType
+                type AS ExposingSite, superType.fqn AS ExposedType
 
             // return values
             UNION ALL
@@ -305,7 +305,7 @@
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
             RETURN
-                method AS ExposingSite, returnType AS ExposedType
+                ( method.signature + " (in " + type.fqn + ")" ) AS ExposingSite, returnType.fqn AS ExposedType
 
             // parameters
             UNION ALL
@@ -314,7 +314,7 @@
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
             RETURN
-                method AS ExposingSite, parameterType AS ExposedType
+                ( method.signature + " (in " + type.fqn + ")" ) AS ExposingSite, parameterType.fqn AS ExposedType
 
             // fields
             UNION ALL
@@ -323,7 +323,7 @@
             WHERE
                 (field.visibility="public" OR field.visibility="protected")
             RETURN
-                field AS ExposingSite, fieldType AS ExposedType
+                ( field.signature + " (in " + type.fqn + ")" ) AS ExposingSite, fieldType.fqn AS ExposedType
         ]]></cypher>
     </constraint>
 
