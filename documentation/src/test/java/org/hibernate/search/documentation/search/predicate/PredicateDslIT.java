@@ -190,18 +190,18 @@ public class PredicateDslIT {
 			// tag::and-dynamicParameters-root[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.and().with( b -> { // <2>
-						b.add( f.matchAll() ); // <3>
+					.where( f -> f.and().with( and -> { // <2>
+						and.add( f.matchAll() ); // <3>
 						if ( searchParameters.getGenreFilter() != null ) { // <4>
-							b.add( f.match().field( "genre" )
+							and.add( f.match().field( "genre" )
 									.matching( searchParameters.getGenreFilter() ) );
 						}
 						if ( searchParameters.getFullTextFilter() != null ) {
-							b.add( f.match().fields( "title", "description" )
+							and.add( f.match().fields( "title", "description" )
 									.matching( searchParameters.getFullTextFilter() ) );
 						}
 						if ( searchParameters.getPageCountMaxFilter() != null ) {
-							b.add( f.range().field( "pageCount" )
+							and.add( f.range().field( "pageCount" )
 									.atMost( searchParameters.getPageCountMaxFilter() ) );
 						}
 					} ) )
@@ -237,10 +237,10 @@ public class PredicateDslIT {
 			// tag::or-dynamicParameters-root[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.or().with( b -> { // <2>
+					.where( f -> f.or().with( or -> { // <2>
 						if ( !searchParameters.getAuthorFilters().isEmpty() ) {
 							for ( String authorFilter : searchParameters.getAuthorFilters() ) { // <3>
-								b.add( f.match().fields( "authors.firstName", "authors.lastName" )
+								or.add( f.match().fields( "authors.firstName", "authors.lastName" )
 										.matching( authorFilter ) );
 							}
 						}
