@@ -53,3 +53,10 @@ updates:
       # This dependency uses classifiers (.jre11, -preview, ...) in its version, and dependabot can't decide which versions are relevant.
       # See https://github.com/dependabot/dependabot-core/issues/4028
       - dependency-name: "com.microsoft.sqlserver:mssql-jdbc"
+      # Sticking to SLF4J 1.x for now since later versions require to upgrade providers
+      # (Log4j, ... see https://www.slf4j.org/faq.html#changesInVersion200),
+      # and also because we only need this dependency for AWS SDK,
+      # which is currently still on SLF4J 1.x
+      # (see https://search.maven.org/artifact/software.amazon.awssdk/aws-sdk-java-pom/2.17.257/pom)
+      - dependency-name: "org.slf4j:*"
+        update-types: ["version-update:semver-major"]
