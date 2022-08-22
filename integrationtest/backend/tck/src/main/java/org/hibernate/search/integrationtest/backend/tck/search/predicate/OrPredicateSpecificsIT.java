@@ -165,13 +165,13 @@ public class OrPredicateSpecificsIT {
 	public void with() {
 		assertThatQuery( index.query()
 				.where( f -> f.or()
-						.with( b -> b.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) ) )
+						.with( or -> or.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		assertThatQuery( index.query()
 				.where( f -> f.or()
-						.with( b -> b.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
-						.with( b -> b.add( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) ) ) ) )
+						.with( or -> or.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.with( or -> or.add( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 

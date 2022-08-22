@@ -95,22 +95,22 @@ public class SkuIdentifierBinder implements PropertyBinder {
 
 			String pattern = (String) context.param( "pattern" ); // <3>
 
-			return f.and().with( b -> { // <4>
+			return f.and().with( and -> { // <4>
 				// An SKU identifier pattern is formatted this way: "<department code>.<collection code>.<item code>".
 				// Each part supports * and ? wildcards.
 				String[] patternParts = pattern.split( "\\." );
 				if ( patternParts.length > 0 ) {
-					b.add( f.wildcard()
+					and.add( f.wildcard()
 							.field( "departmentCode" ) // <5>
 							.matching( patternParts[0] ) );
 				}
 				if ( patternParts.length > 1 ) {
-					b.add( f.wildcard()
+					and.add( f.wildcard()
 							.field( "collectionCode" )
 							.matching( patternParts[1] ) );
 				}
 				if ( patternParts.length > 2 ) {
-					b.add( f.wildcard()
+					and.add( f.wildcard()
 							.field( "itemCode" )
 							.matching( patternParts[2] ) );
 				}
