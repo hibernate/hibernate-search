@@ -813,7 +813,7 @@ It is possible to define the `and` predicate inside a lambda expression.
 This is especially useful when clauses need to be added dynamically to the `and` predicate,
 for example based on user input.
 
-.Easily adding clauses dynamically using `.where(...)` and the lambda syntax
+.Easily adding clauses dynamically using `with(...)` and the lambda syntax
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -830,9 +830,6 @@ To match every document when there is no clause, add an `and` clause that matche
 to control the addition of clauses.
 In this case, we only add clauses if the relevant parameter was filled in by the user.
 ====
-
-Another syntax relying on the method `with(...)` can be useful when the boolean predicate is not the root predicate,
-see <<example-and-or-dynamicParameters-with,this example>>.
 
 [[search-dsl-predicate-and-other]]
 === Options
@@ -871,7 +868,7 @@ It is possible to define the `or` predicate inside a lambda expression.
 This is especially useful when clauses need to be added dynamically to the `or` predicate,
 for example based on user input.
 
-.Easily adding clauses dynamically using `.where(...)` and the lambda syntax
+.Easily adding clauses dynamically using `with(...)` and the lambda syntax
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -887,23 +884,6 @@ to control the addition of clauses.
 In this case, we only add clauses if the relevant parameter was filled in by the user.
 ====
 
-Another syntax relying on the method `with(...)` can be useful when the boolean predicate is not the root predicate:
-
-.[[example-and-or-dynamicParameters-with]]Easily adding clauses dynamically using `with(...)` and the lambda syntax
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=and-or-dynamicParameters-with]
-----
-<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
-<2> Call `.where(Function)` to create the root predicate, which is not the one we're interested in here.
-<3> Call `.or().with(Consumer)` to create an inner, non-root predicate.
-The consumer, implemented by a lambda expression, will receive a collector as an argument
-and will add clauses to that collector as necessary.
-<4> Inside the lambda, the code is free to use any Java language constructs, such as `if` or `for`,
-to control the addition of clauses.
-In this case, we add one clause per author filter.
-====
 
 [[search-dsl-predicate-or-other]]
 === Options
@@ -914,7 +894,7 @@ but can be <<search-dsl-predicate-common-constantScore,made constant with `.cons
 with a call to `.boost(...)`.
 
 [[search-dsl-predicate-boolean]]
-== `bool`: advanced combinations of predicates (or/and/...)
+== [[_combining_queries]] `bool`: advanced combinations of predicates (or/and/...)
 
 The `bool` predicate allows combining inner predicates in a more complex fashion than with simpler
 <<search-dsl-predicate-and,`and`>>/<<search-dsl-predicate-or,`or`>> predicates.
@@ -957,7 +937,7 @@ and are simply used for scoring.
 [[search-dsl-predicate-boolean-or]]
 === Emulating an `OR` operator
 
-A `bool` predicate with only `should` clauses and no `minimumShouldMatch` specification will behave as an `OR` operator.
+A `bool` predicate with only `should` clauses and no <<search-dsl-predicate-boolean-minimumshouldmatch,`minimumShouldMatch` specification>> will behave as an `OR` operator.
 In such case, using the simpler <<search-dsl-predicate-or,`or`>> syntax is recommended.
 
 [[search-dsl-predicate-boolean-and]]

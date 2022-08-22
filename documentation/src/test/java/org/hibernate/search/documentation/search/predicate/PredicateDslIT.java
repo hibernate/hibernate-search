@@ -212,31 +212,6 @@ public class PredicateDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
 		} );
 
-		withinSearchSession( searchSession -> {
-			// tag::and-or-dynamicParameters-with[]
-			MySearchParameters searchParameters = getSearchParameters(); // <1>
-			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.and().with( b -> { // <2>
-						b.add( f.matchAll() );
-						if ( searchParameters.getGenreFilter() != null ) {
-							b.add( f.match().field( "genre" )
-									.matching( searchParameters.getGenreFilter() ) );
-						}
-						if ( !searchParameters.getAuthorFilters().isEmpty() ) {
-							b.add( f.or().with( b2 -> { // <3>
-								for ( String authorFilter : searchParameters.getAuthorFilters() ) { // <4>
-									b2.add( f.match().fields( "authors.firstName", "authors.lastName" )
-											.matching( authorFilter ) );
-								}
-							} ) );
-						}
-					} ) )
-					.fetchHits( 20 );
-			// end::and-or-dynamicParameters-with[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
-		} );
 	}
 
 	@Test
