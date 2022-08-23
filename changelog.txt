@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.10.Final (2022-08-23)
+-------------------------
+
+** Bug
+    * HSEARCH-4513 Using a SearchSort instance in multiple queries with the Lucene backend has side effects and leads to unexpected results
+
+** Task
+    * HSEARCH-4665 Fix Asciidoc formatting of the migration guide
+    * HSEARCH-4578 Improve error messages in tests when failure report assertions fail
+    * HSEARCH-4519 Update links markup in Getting Started Guide 
+
 6.0.9.Final (2022-03-17)
 -------------------------
 
