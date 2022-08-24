@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.spi;
 
-import static org.hibernate.search.engine.search.predicate.dsl.impl.SimpleBooleanOperatorPredicateClausesStepImpl.SimpleBooleanPredicateOperator.AND;
-import static org.hibernate.search.engine.search.predicate.dsl.impl.SimpleBooleanOperatorPredicateClausesStepImpl.SimpleBooleanPredicateOperator.OR;
+import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanOperatorPredicateClausesStep.SimpleBooleanPredicateOperator.AND;
+import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanOperatorPredicateClausesStep.SimpleBooleanPredicateOperator.OR;
 
 import java.util.function.Consumer;
 

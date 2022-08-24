@@ -491,9 +491,9 @@ public class ObjectFieldTemplateIT {
 	private void checkNested(String objectFieldPath) {
 		assertThatQuery( query(
 				f -> f.nested( objectFieldPath )
-						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
+						.add( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
 								.matching( FIRSTNAME_1 ) )
-						.must( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
+						.add( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
 								.matching( LASTNAME_1 ) )
 		) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED );
@@ -502,19 +502,19 @@ public class ObjectFieldTemplateIT {
 	private void checkFlattened(String objectFieldPath) {
 		assertThatThrownBy( () -> query(
 				f -> f.nested( objectFieldPath )
-						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
+						.add( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
 								.matching( FIRSTNAME_1 ) )
-						.must( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
+						.add( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
 								.matching( LASTNAME_1 ) )
 		) )
 				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field '" + objectFieldPath + "'.",
 						"Some object field features require a nested structure; "
 								+ "try setting the field structure to 'NESTED' and reindexing all your data" );
 		assertThatQuery( query(
-				f -> f.bool()
-						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
+				f -> f.and()
+						.add( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
 								.matching( FIRSTNAME_1 ) )
-						.must( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
+						.add( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
 								.matching( LASTNAME_1 ) )
 		) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED, DOCUMENT_MATCHING_FOR_ALL );

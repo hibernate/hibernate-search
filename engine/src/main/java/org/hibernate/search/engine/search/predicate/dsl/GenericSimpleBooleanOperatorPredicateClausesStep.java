@@ -25,7 +25,7 @@ public interface GenericSimpleBooleanOperatorPredicateClausesStep
 			S extends C,
 			C extends SimpleBooleanOperatorPredicateClausesCollector<?>
 		>
-		extends SimpleBooleanOperatorPredicateClausesCollector<C> {
+		extends SimpleBooleanOperatorPredicateClausesCollector<C>, PredicateFinalStep {
 	@Override
 	default S add(PredicateFinalStep searchPredicate)
 	{

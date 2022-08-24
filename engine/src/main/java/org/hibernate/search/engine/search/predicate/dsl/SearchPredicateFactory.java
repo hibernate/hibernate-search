@@ -202,6 +202,9 @@ public interface SearchPredicateFactory {
 	/**
 	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches inner predicates
 	 * to be defined in the next steps.
+	 * <p>
+	 * The resulting nested predicate must match <em>all</em> inner clauses,
+	 * similarly to an {@link #and() "and" predicate}.
 	 *
 	 * @param objectFieldPath The <a href="#field-paths">path</a> to the (nested) object field that must match.
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.
