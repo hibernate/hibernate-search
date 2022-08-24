@@ -12,27 +12,45 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
- * A generic superinterface for "simple boolean operator predicate" DSL steps that involve collecting clauses.
+ * An object where the clauses and options of a simple boolean operator predicate
+ * ({@link SearchPredicateFactory#and() and}, {@link SearchPredicateFactory#or() or})
+ * can be set.
+ *
+ * <h2 id="clauses">Clauses</h2>
+ * <p>
+ * Depending on the outer predicate,
+ * documents will have to match either <em>all</em> clauses,
+ * or <em>any</em> clause:
+ * <ul>
+ * <li>
+ *     For the {@link SearchPredicateFactory#and() and} predicate,
+ *     documents will have to match <em>all</em> clauses.
+ * </li>
+ * <li>
+ *     For the {@link SearchPredicateFactory#or() or} predicate,
+ *     documents will have to match <em>any</em> clauses (at least one).
+ * </li>
+ * </ul>
  *
  * @param <S> The "self" type (the actual exposed type of this collector).
  */
 public interface SimpleBooleanOperatorPredicateClausesCollector<S extends SimpleBooleanOperatorPredicateClausesCollector<?>> {
 	/**
-	 * Adds the specified predicate to the list of clauses.
+	 * Adds the specified predicate to the list of <a href="#clauses">clauses</a>.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
 	S add(PredicateFinalStep searchPredicate);
 
 	/**
-	 * Adds the specified previously-built {@link SearchPredicate} to the list of clauses.
+	 * Adds the specified previously-built {@link SearchPredicate} to the list of <a href="#clauses">clauses</a>.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
 	S add(SearchPredicate searchPredicate);
 
 	/**
-	 * Adds a clause to be defined by the given function.
+	 * Adds a <a href="#clauses">clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
@@ -45,7 +63,7 @@ public interface SimpleBooleanOperatorPredicateClausesCollector<S extends Simple
 	S add(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
-	 * Delegates setting clauses and options to a given consumer.
+	 * Delegates setting <a href="#clauses">clauses</a> and options to a given consumer.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
