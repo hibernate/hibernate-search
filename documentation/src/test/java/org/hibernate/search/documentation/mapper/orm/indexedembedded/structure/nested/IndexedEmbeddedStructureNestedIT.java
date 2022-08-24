@@ -90,8 +90,8 @@ public class IndexedEmbeddedStructureNestedIT {
 			// tag::include[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.nested( "authors" ) // <1>
-							.must( f.match().field( "authors.firstName" ).matching( "Ty" ) ) // <2>
-							.must( f.match().field( "authors.lastName" ).matching( "Abraham" ) ) ) // <2>
+							.add( f.match().field( "authors.firstName" ).matching( "Ty" ) ) // <2>
+							.add( f.match().field( "authors.lastName" ).matching( "Abraham" ) ) ) // <2>
 					.fetchHits( 20 );
 
 			assertThat( hits ).isEmpty(); // <3>

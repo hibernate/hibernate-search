@@ -66,7 +66,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	public void nestedX1_explicit() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( binding.nested.absolutePath )
-						.must( predicate( f, binding.nested, 0 ) ) )
+						.add( predicate( f, binding.nested, 0 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
@@ -83,8 +83,8 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	public void nestedX2_explicit() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( binding.nested.absolutePath )
-						.must( f.nested( binding.nested.nested.absolutePath )
-								.must( predicate( f, binding.nested.nested, 0 ) ) ) )
+						.add( f.nested( binding.nested.nested.absolutePath )
+								.add( predicate( f, binding.nested.nested, 0 ) ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
@@ -101,7 +101,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	public void nestedX2_explicit_implicit() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( binding.nested.absolutePath )
-						.must( predicate( f, binding.nested.nested, 0 ) ) )
+						.add( predicate( f, binding.nested.nested, 0 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
@@ -110,8 +110,8 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	public void nestedX3_explicitX2_implicit() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( binding.nested.absolutePath )
-						.must( f.nested( binding.nested.nested.absolutePath )
-								.must( predicate( f, binding.nested.nested.nested, 0 ) ) ) )
+						.add( f.nested( binding.nested.nested.absolutePath )
+								.add( predicate( f, binding.nested.nested.nested, 0 ) ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
@@ -120,7 +120,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	public void nestedX3_explicit_implicitX2() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested( binding.nested.absolutePath )
-						.must( predicate( f, binding.nested.nested.nested, 0 ) ) )
+						.add( predicate( f, binding.nested.nested.nested, 0 ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}

@@ -30,6 +30,10 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *     For the {@link SearchPredicateFactory#or() or} predicate,
  *     documents will have to match <em>any</em> clauses (at least one).
  * </li>
+ * <li>
+ *     For the {@link SearchPredicateFactory#nested(String) nested} predicate,
+ *     documents will have to match <em>all</em> clauses.
+ * </li>
  * </ul>
  *
  * @param <S> The "self" type (the actual exposed type of this collector).

@@ -273,8 +273,8 @@ public class FieldTemplateIT {
 				.where( f -> {
 					if ( fieldStructure.isInNested() ) {
 						return f.nested( getParentFieldPath() )
-								.must( predicateContributor )
-								.must( f.match().field( getFieldPath( "discriminator" ) )
+								.add( predicateContributor )
+								.add( f.match().field( getFieldPath( "discriminator" ) )
 										.matching( "included" ) );
 					}
 					else {

@@ -141,7 +141,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.where( f -> f.nested( "nestedObject" )
-						.must( f.match()
+						.add( f.match()
 								.field( "nestedObject.string" ).matching( STRING_VALUE_1 ) )
 				)
 				.toQuery();
@@ -155,7 +155,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.where( f -> f.nested( "nestedObject" )
-						.must( f.match()
+						.add( f.match()
 								.field( "nestedObject.string" ).matching( STRING_VALUE_1 ) )
 				)
 				.toQuery();
@@ -256,7 +256,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.where( f -> f.nested( "nestedObject" )
-						.must( f.match()
+						.add( f.match()
 								.field( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				)
 				.toQuery();
@@ -283,7 +283,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.where( f -> f.nested( "nestedObject" )
-						.must( f.match()
+						.add( f.match()
 								.field( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				)
 				.toQuery();
@@ -308,7 +308,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.where( f -> f.nested( "nestedObject" )
-						.must( f.match()
+						.add( f.match()
 								.field( "nestedObject.string" ).matching( STRING_VALUE_1 ) )
 				)
 				.toQuery();

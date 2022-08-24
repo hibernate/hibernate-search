@@ -7,16 +7,17 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * The step in a nested predicate definition where clauses can be added.
+ * The step in a nested predicate definition where
+ * <a href="SimpleBooleanOperatorPredicateClausesCollector.html#clauses">clauses</a> can be added.
  * <p>
- * Different types of clauses have different effects;
- * see {@link BooleanPredicateOptionsCollector}.
+ * The resulting nested predicate must match <em>all</em> inner clauses,
+ * similarly to an {@link SearchPredicateFactory#and() "and" predicate}.
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
 public interface NestedPredicateClausesStep<S extends NestedPredicateClausesStep<?>>
-		extends GenericBooleanPredicateClausesStep<S, NestedPredicateOptionsCollector<?>>,
-				NestedPredicateOptionsCollector<NestedPredicateOptionsCollector<?>> {
+		extends GenericSimpleBooleanOperatorPredicateClausesStep<S, NestedPredicateClausesCollector<?>>,
+				NestedPredicateClausesCollector<NestedPredicateClausesCollector<?>> {
 
 	// TODO HSEARCH-3090 add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
 

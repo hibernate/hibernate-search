@@ -116,7 +116,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						b.must( f.nested( "copies" )
 								.with( b2 -> {
 									for ( LibraryServiceOption service : libraryServices ) {
-										b2.must( f.match()
+										b2.add( f.match()
 												.field( "copies.library.services" )
 												.matching( service )
 										);
