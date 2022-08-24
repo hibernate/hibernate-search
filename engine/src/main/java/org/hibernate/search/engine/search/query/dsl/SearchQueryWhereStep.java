@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesCollector;
 
 /**
  * The step in a query definition where the predicate, i.e. the "WHERE" clause, can be set.
@@ -49,10 +50,12 @@ public interface SearchQueryWhereStep<
 	/**
 	 * Set the predicate for this query.
 	 * @param predicateContributor A consumer that will use the factory passed in parameter to create predicates
-	 * and add them to the collector passed in parameter.
+	 * and add them as clauses to the collector passed in parameter.
 	 * Should generally be a lambda expression.
+	 * The resulting root predicate will have to match <em>all</em> clauses.
 	 * @return The next step.
+	 * @see SimpleBooleanPredicateClausesCollector
 	 */
-	N where(BiConsumer<? super PDF, ? super BooleanPredicateOptionsCollector<?>> predicateContributor);
+	N where(BiConsumer<? super PDF, ? super SimpleBooleanOperatorPredicateClausesCollector<?>> predicateContributor);
 
 }

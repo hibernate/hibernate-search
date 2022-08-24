@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -32,6 +33,11 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * </li>
  * <li>
  *     For the {@link SearchPredicateFactory#nested(String) nested} predicate,
+ *     documents will have to match <em>all</em> clauses.
+ * </li>
+ * <li>
+ *     For the root predicate defined through the second parameter of the lambda passed
+ *     to {@link org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep#where(BiConsumer)},
  *     documents will have to match <em>all</em> clauses.
  * </li>
  * </ul>
