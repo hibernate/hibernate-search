@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.spi;
 
-import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanOperatorPredicateClausesStep.SimpleBooleanPredicateOperator.AND;
-import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanOperatorPredicateClausesStep.SimpleBooleanPredicateOperator.OR;
+import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanPredicateClausesStep.SimpleBooleanPredicateOperator.AND;
+import static org.hibernate.search.engine.search.predicate.dsl.impl.AbstractSimpleBooleanPredicateClausesStep.SimpleBooleanPredicateOperator.OR;
 
 import java.util.function.Consumer;
 
@@ -29,8 +29,8 @@ import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
@@ -47,7 +47,7 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.PhrasePredicateFiel
 import org.hibernate.search.engine.search.predicate.dsl.impl.RangePredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.RegexpPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateFactoryExtensionStep;
-import org.hibernate.search.engine.search.predicate.dsl.impl.SimpleBooleanOperatorPredicateClausesStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.SimpleBooleanPredicateClausesStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SimpleQueryStringPredicateFieldStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SpatialPredicateInitialStepImpl;
 import org.hibernate.search.engine.search.predicate.dsl.impl.TermsPredicateFieldStepImpl;
@@ -89,38 +89,38 @@ public abstract class AbstractSearchPredicateFactory<
 	}
 
 	@Override
-	public SimpleBooleanOperatorPredicateClausesStep<?> and() {
-		return new SimpleBooleanOperatorPredicateClausesStepImpl( AND, dslContext, this );
+	public SimpleBooleanPredicateClausesStep<?> and() {
+		return new SimpleBooleanPredicateClausesStepImpl( AND, dslContext, this );
 	}
 
 	@Override
-	public SimpleBooleanOperatorPredicateOptionsStep<?> and(
+	public SimpleBooleanPredicateOptionsStep<?> and(
 			SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicates) {
-		return new SimpleBooleanOperatorPredicateClausesStepImpl( AND, dslContext, this, firstSearchPredicate, otherSearchPredicates );
+		return new SimpleBooleanPredicateClausesStepImpl( AND, dslContext, this, firstSearchPredicate, otherSearchPredicates );
 	}
 
 	@Override
-	public SimpleBooleanOperatorPredicateOptionsStep<?> and(PredicateFinalStep firstSearchPredicate,
+	public SimpleBooleanPredicateOptionsStep<?> and(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicate) {
-		return new SimpleBooleanOperatorPredicateClausesStepImpl( AND, dslContext, this, firstSearchPredicate, otherSearchPredicate );
+		return new SimpleBooleanPredicateClausesStepImpl( AND, dslContext, this, firstSearchPredicate, otherSearchPredicate );
 	}
 
 	@Override
-	public SimpleBooleanOperatorPredicateClausesStep<?> or() {
-		return new SimpleBooleanOperatorPredicateClausesStepImpl( OR, dslContext, this );
+	public SimpleBooleanPredicateClausesStep<?> or() {
+		return new SimpleBooleanPredicateClausesStepImpl( OR, dslContext, this );
 	}
 
 	@Override
-	public SimpleBooleanOperatorPredicateOptionsStep<?> or(SearchPredicate firstSearchPredicate,
+	public SimpleBooleanPredicateOptionsStep<?> or(SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicate) {
-		return new SimpleBooleanOperatorPredicateClausesStepImpl( OR, dslContext, this, firstSearchPredicate, otherSearchPredicate );
+		return new SimpleBooleanPredicateClausesStepImpl( OR, dslContext, this, firstSearchPredicate, otherSearchPredicate );
 	}
 
 	@Override
-	public SimpleBooleanOperatorPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
+	public SimpleBooleanPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicate) {
-		return new SimpleBooleanOperatorPredicateClausesStepImpl( OR, dslContext, this, firstSearchPredicate, otherSearchPredicate );
+		return new SimpleBooleanPredicateClausesStepImpl( OR, dslContext, this, firstSearchPredicate, otherSearchPredicate );
 	}
 
 	@Override

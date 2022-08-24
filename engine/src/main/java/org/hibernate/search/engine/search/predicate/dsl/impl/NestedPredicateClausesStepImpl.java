@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 
 public final class NestedPredicateClausesStepImpl
-		extends AbstractSimpleBooleanOperatorPredicateClausesStep<NestedPredicateClausesStepImpl, NestedPredicateClausesCollector<?>>
+		extends AbstractSimpleBooleanPredicateClausesStep<NestedPredicateClausesStepImpl, NestedPredicateClausesCollector<?>>
 		implements NestedPredicateClausesStep<NestedPredicateClausesStepImpl> {
 
 	private final NestedPredicateBuilder builder;

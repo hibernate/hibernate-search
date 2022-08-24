@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
- * An object where the clauses and options of a simple boolean operator predicate
+ * An object where the clauses and options of a simple boolean predicate
  * ({@link SearchPredicateFactory#and() and}, {@link SearchPredicateFactory#or() or})
  * can be set.
  *
@@ -44,7 +44,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *
  * @param <S> The "self" type (the actual exposed type of this collector).
  */
-public interface SimpleBooleanOperatorPredicateClausesCollector<S extends SimpleBooleanOperatorPredicateClausesCollector<?>> {
+public interface SimpleBooleanPredicateClausesCollector<S extends SimpleBooleanPredicateClausesCollector<?>> {
 	/**
 	 * Adds the specified predicate to the list of <a href="#clauses">clauses</a>.
 	 *

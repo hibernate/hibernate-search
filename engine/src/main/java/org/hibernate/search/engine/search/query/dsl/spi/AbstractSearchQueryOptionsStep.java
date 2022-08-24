@@ -22,8 +22,8 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesCollector;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -72,9 +72,9 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public S where(BiConsumer<? super PDF, ? super SimpleBooleanOperatorPredicateClausesCollector<?>> predicateContributor) {
+	public S where(BiConsumer<? super PDF, ? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		PDF factory = predicateFactory();
-		SimpleBooleanOperatorPredicateClausesStep<?> andStep = factory.and();
+		SimpleBooleanPredicateClausesStep<?> andStep = factory.and();
 		predicateContributor.accept( factory, andStep );
 		searchQueryBuilder.predicate( andStep.toPredicate() );
 		return thisAsS();
