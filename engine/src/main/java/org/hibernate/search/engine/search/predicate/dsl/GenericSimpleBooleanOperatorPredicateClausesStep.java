@@ -12,7 +12,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
- * A generic superinterface for "simple boolean operator predicate" DSL steps that involve collecting clauses.
+ * A generic superinterface for "simple boolean operator predicate" DSL steps that involve collecting
+ * <a href="SimpleBooleanOperatorPredicateClausesCollector.html#clauses">clauses</a>.
  * <p>
  * See also {@link PredicateScoreStep} or {@link PredicateFinalStep}.
  *
