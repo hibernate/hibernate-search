@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -100,7 +100,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public LuceneSearchQueryOptionsStep<E, LOS> where(
-			BiConsumer<? super LuceneSearchPredicateFactory, ? super SimpleBooleanOperatorPredicateClausesCollector<?>> predicateContributor) {
+			BiConsumer<? super LuceneSearchPredicateFactory, ? super SimpleBooleanPredicateClausesCollector<?>> predicateContributor) {
 		return selectEntity().where( predicateContributor );
 	}
 

@@ -11,19 +11,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateOptionsCollector;
-import org.hibernate.search.engine.search.predicate.dsl.GenericSimpleBooleanOperatorPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.GenericSimpleBooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesCollector;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
-public abstract class AbstractSimpleBooleanOperatorPredicateClausesStep<S extends C, C extends SimpleBooleanOperatorPredicateClausesCollector<?>>
+public abstract class AbstractSimpleBooleanPredicateClausesStep<S extends C, C extends SimpleBooleanPredicateClausesCollector<?>>
 		extends AbstractPredicateFinalStep
-		implements GenericSimpleBooleanOperatorPredicateClausesStep<S, C> {
+		implements GenericSimpleBooleanPredicateClausesStep<S, C> {
 
 	public enum SimpleBooleanPredicateOperator
 			implements BiConsumer<BooleanPredicateBuilder, SearchPredicate> {
@@ -49,7 +47,7 @@ public abstract class AbstractSimpleBooleanOperatorPredicateClausesStep<S extend
 
 	private final SearchPredicateFactory factory;
 
-	AbstractSimpleBooleanOperatorPredicateClausesStep(SimpleBooleanPredicateOperator operator,
+	AbstractSimpleBooleanPredicateClausesStep(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
 		super( dslContext );

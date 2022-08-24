@@ -9,21 +9,21 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesCollector;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanOperatorPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesCollector;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleBooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-public final class SimpleBooleanOperatorPredicateClausesStepImpl
-		extends AbstractSimpleBooleanOperatorPredicateClausesStep<SimpleBooleanOperatorPredicateClausesStepImpl, SimpleBooleanOperatorPredicateClausesCollector<?>>
-		implements SimpleBooleanOperatorPredicateClausesStep<SimpleBooleanOperatorPredicateClausesStepImpl> {
+public final class SimpleBooleanPredicateClausesStepImpl
+		extends AbstractSimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl, SimpleBooleanPredicateClausesCollector<?>>
+		implements SimpleBooleanPredicateClausesStep<SimpleBooleanPredicateClausesStepImpl> {
 
-	public SimpleBooleanOperatorPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
+	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
 		super( operator, dslContext, factory );
 	}
 
-	public SimpleBooleanOperatorPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
+	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory,
 			SearchPredicate firstSearchPredicate,
@@ -35,7 +35,7 @@ public final class SimpleBooleanOperatorPredicateClausesStepImpl
 		}
 	}
 
-	public SimpleBooleanOperatorPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
+	public SimpleBooleanPredicateClausesStepImpl(SimpleBooleanPredicateOperator operator,
 			SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory,
 			PredicateFinalStep firstSearchPredicate,
@@ -48,7 +48,7 @@ public final class SimpleBooleanOperatorPredicateClausesStepImpl
 	}
 
 	@Override
-	protected SimpleBooleanOperatorPredicateClausesStepImpl self() {
+	protected SimpleBooleanPredicateClausesStepImpl self() {
 		return this;
 	}
 }

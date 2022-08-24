@@ -87,16 +87,16 @@ public interface SearchPredicateFactory {
 	 * Match documents if they match all inner clauses.
 	 *
 	 * @return The initial step of a DSL where predicates that must match can be added and options can be set.
-	 * @see GenericSimpleBooleanOperatorPredicateClausesStep
+	 * @see GenericSimpleBooleanPredicateClausesStep
 	 */
-	SimpleBooleanOperatorPredicateClausesStep<?> and();
+	SimpleBooleanPredicateClausesStep<?> and();
 
 	/**
 	 * Match documents if they match all previously-built {@link SearchPredicate}.
 	 *
 	 * @return The step of a DSL where options can be set.
 	 */
-	SimpleBooleanOperatorPredicateOptionsStep<?> and(
+	SimpleBooleanPredicateOptionsStep<?> and(
 			SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicates);
 
@@ -105,23 +105,23 @@ public interface SearchPredicateFactory {
 	 *
 	 * @return The step of a DSL where options can be set.
 	 */
-	SimpleBooleanOperatorPredicateOptionsStep<?> and(PredicateFinalStep firstSearchPredicate,
+	SimpleBooleanPredicateOptionsStep<?> and(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicates);
 
 	/**
 	 * Match documents if they match any inner clause.
 	 *
 	 * @return The initial step of a DSL where predicates that should match can be added and options can be set.
-	 * @see GenericSimpleBooleanOperatorPredicateClausesStep
+	 * @see GenericSimpleBooleanPredicateClausesStep
 	 */
-	SimpleBooleanOperatorPredicateClausesStep<?> or();
+	SimpleBooleanPredicateClausesStep<?> or();
 
 	/**
 	 * Match documents if they match any previously-built {@link SearchPredicate}.
 	 *
 	 * @return The step of a DSL where options can be set.
 	 */
-	SimpleBooleanOperatorPredicateOptionsStep<?> or(SearchPredicate firstSearchPredicate,
+	SimpleBooleanPredicateOptionsStep<?> or(SearchPredicate firstSearchPredicate,
 			SearchPredicate... otherSearchPredicates);
 
 	/**
@@ -129,7 +129,7 @@ public interface SearchPredicateFactory {
 	 *
 	 * @return The step of a DSL where options can be set.
 	 */
-	SimpleBooleanOperatorPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
+	SimpleBooleanPredicateOptionsStep<?> or(PredicateFinalStep firstSearchPredicate,
 			PredicateFinalStep... otherSearchPredicates);
 
 	/**
