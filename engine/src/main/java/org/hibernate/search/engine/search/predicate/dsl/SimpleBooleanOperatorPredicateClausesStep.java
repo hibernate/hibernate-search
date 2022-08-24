@@ -7,7 +7,8 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * The initial and final step in a "simple predicate" definition, where clauses can be added and options can be set.
+ * The initial and final step in a "simple boolean operator predicate" definition,
+ * where clauses can be added and options can be set.
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */

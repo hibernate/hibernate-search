@@ -12,9 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
- * A generic superinterface for "simple predicate" DSL steps that involve collecting clauses.
- * <p>
- * See also {@link PredicateScoreStep} or {@link PredicateFinalStep}.
+ * A generic superinterface for "simple boolean operator predicate" DSL steps that involve collecting clauses.
  *
  * @param <S> The "self" type (the actual exposed type of this collector).
  */
