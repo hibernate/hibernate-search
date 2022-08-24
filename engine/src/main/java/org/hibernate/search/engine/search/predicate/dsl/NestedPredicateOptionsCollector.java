@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * An object where the clauses and options of a {@link SearchPredicateFactory#nested(String)} nested predicate} can be set.
+ * An object where the clauses and options of a {@link SearchPredicateFactory#nested(String) nested predicate} can be set.
  * <p>
  * Different types of clauses have different effects, see {@link BooleanPredicateOptionsCollector}.
  */
