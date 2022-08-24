@@ -190,6 +190,32 @@ public class PredicateDslIT {
 			// tag::and-dynamicParameters-root[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
+					.where( (f, root) -> { // <2>
+						root.add( f.matchAll() ); // <3>
+						if ( searchParameters.getGenreFilter() != null ) { // <4>
+							root.add( f.match().field( "genre" )
+									.matching( searchParameters.getGenreFilter() ) );
+						}
+						if ( searchParameters.getFullTextFilter() != null ) {
+							root.add( f.match().fields( "title", "description" )
+									.matching( searchParameters.getFullTextFilter() ) );
+						}
+						if ( searchParameters.getPageCountMaxFilter() != null ) {
+							root.add( f.range().field( "pageCount" )
+									.atMost( searchParameters.getPageCountMaxFilter() ) );
+						}
+					} )
+					.fetchHits( 20 );
+			// end::and-dynamicParameters-root[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::and-dynamicParameters-with[]
+			MySearchParameters searchParameters = getSearchParameters(); // <1>
+			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.and().with( and -> { // <2>
 						and.add( f.matchAll() ); // <3>
 						if ( searchParameters.getGenreFilter() != null ) { // <4>
@@ -206,7 +232,7 @@ public class PredicateDslIT {
 						}
 					} ) )
 					.fetchHits( 20 );
-			// end::and-dynamicParameters-root[]
+			// end::and-dynamicParameters-with[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
@@ -333,45 +359,19 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::bool-dynamicParameters-root[]
-			MySearchParameters searchParameters = getSearchParameters(); // <1>
-			List<Book> hits = searchSession.search( Book.class )
-					.where( (f, b) -> { // <2>
-						b.must( f.matchAll() ); // <3>
-						if ( searchParameters.getGenreFilter() != null ) { // <4>
-							b.must( f.match().field( "genre" )
-									.matching( searchParameters.getGenreFilter() ) );
-						}
-						if ( searchParameters.getFullTextFilter() != null ) {
-							b.must( f.match().fields( "title", "description" )
-									.matching( searchParameters.getFullTextFilter() ) );
-						}
-						if ( searchParameters.getPageCountMaxFilter() != null ) {
-							b.must( f.range().field( "pageCount" )
-									.atMost( searchParameters.getPageCountMaxFilter() ) );
-						}
-					} )
-					.fetchHits( 20 );
-			// end::bool-dynamicParameters-root[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID );
-		} );
-
-		withinSearchSession( searchSession -> {
 			// tag::bool-dynamicParameters-with[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
-					.where( (f, b) -> { // <2>
-						b.must( f.matchAll() );
+					.where( (f, root) -> { // <2>
+						root.add( f.matchAll() );
 						if ( searchParameters.getGenreFilter() != null ) {
-							b.must( f.match().field( "genre" )
+							root.add( f.match().field( "genre" )
 									.matching( searchParameters.getGenreFilter() ) );
 						}
 						if ( !searchParameters.getAuthorFilters().isEmpty() ) {
-							b.must( f.bool().with( b2 -> { // <3>
+							root.add( f.bool().with( b -> { // <3>
 								for ( String authorFilter : searchParameters.getAuthorFilters() ) { // <4>
-									b2.should( f.match().fields( "authors.firstName", "authors.lastName" )
+									b.should( f.match().fields( "authors.firstName", "authors.lastName" )
 											.matching( authorFilter ) );
 								}
 							} ) );

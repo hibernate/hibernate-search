@@ -95,9 +95,9 @@ public class NestedPredicateSpecificsIT {
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
 		assertThatQuery( mainIndex.query()
-				.where( (f, b) -> b
+				.where( (f, root) -> root
 						// This is referred to as "condition 1" in the data initialization method
-						.must( f.nested( "nestedObject.nestedObject" )
+						.add( f.nested( "nestedObject.nestedObject" )
 								.add( f.match()
 										.field( "nestedObject.nestedObject.field1" )
 										.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
@@ -108,7 +108,7 @@ public class NestedPredicateSpecificsIT {
 								)
 						)
 						// This is referred to as "condition 2" in the data initialization method
-						.must( f.nested( "nestedObject.nestedObject" )
+						.add( f.nested( "nestedObject.nestedObject" )
 								.add( f.match()
 										.field( "nestedObject.nestedObject.field1" )
 										.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
@@ -126,9 +126,9 @@ public class NestedPredicateSpecificsIT {
 	@Test
 	public void with() {
 		assertThatQuery( mainIndex.query()
-				.where( (f, b) -> b
+				.where( (f, root) -> root
 						// This is referred to as "condition 1" in the data initialization method
-						.must( f.nested( "nestedObject.nestedObject" )
+						.add( f.nested( "nestedObject.nestedObject" )
 								.with( n -> {
 									n.add( f.match()
 											.field( "nestedObject.nestedObject.field1" )
@@ -141,7 +141,7 @@ public class NestedPredicateSpecificsIT {
 								} )
 						)
 						// This is referred to as "condition 2" in the data initialization method
-						.must( f.nested( "nestedObject.nestedObject" )
+						.add( f.nested( "nestedObject.nestedObject" )
 								.with( n -> {
 									n.add( f.match()
 											.field( "nestedObject.nestedObject.field1" )

@@ -195,6 +195,29 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
+	public void where() {
+		assertThatQuery( index.query()
+				.where( (f, root) -> {
+					root.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+				} ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+
+		assertThatQuery( index.query()
+				.where( (f, root) -> {
+					root.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+					root.add( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) );
+				} ) )
+				.hasNoHits();
+
+		assertThatQuery( index.query()
+				.where( (f, root) -> {
+					root.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
+					root.add( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) );
+				} ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+	}
+
+	@Test
 	public void with() {
 		assertThatQuery( index.query()
 				.where( f -> f.and().with( and -> and.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) ) )

@@ -62,15 +62,15 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		return Search.session( entityManager ).search( Book.class )
-				.where( (f, b) -> {
+				.where( (f, root) -> {
 					if ( terms != null && !terms.isEmpty() ) {
-						b.must( f.match()
+						root.add( f.match()
 								.field( "title" ).boost( 2.0f )
 								.field( "summary" )
 								.matching( terms )
 						);
 					}
-					b.must( f.match().field( "copies.medium" ).matching( medium ) );
+					root.add( f.match().field( "copies.medium" ).matching( medium ) );
 				} )
 				.sort( b -> b.field( "title_sort" ) )
 				.fetchHits( offset, limit );
@@ -82,10 +82,10 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			List<LibraryServiceOption> libraryServices,
 			int offset, int limit) {
 		return Search.session( entityManager ).search( DOCUMENT_CLASS )
-				.where( (f, b) -> {
+				.where( (f, root) -> {
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
-						b.must( f.match()
+						root.add( f.match()
 								.field( "title" ).boost( 2.0f )
 								.field( "summary" )
 								.matching( terms )
@@ -94,7 +94,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					// Bridged query with complex bridge: TODO HSEARCH-3320 rely on the bridge to split the String
 					String[] splitTags = tags == null ? null : tags.split( "," );
 					if ( splitTags != null && splitTags.length > 0 ) {
-						b.must( f.bool().with( b2 -> {
+						root.add( f.bool().with( b2 -> {
 							for ( String tag : splitTags ) {
 								b2.must( f.match()
 										.field( "tags" )
@@ -105,7 +105,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					}
 					// Spatial query
 					if ( myLocation != null && maxDistanceInKilometers != null ) {
-						b.must( f.spatial()
+						root.add( f.spatial()
 								.within()
 								.field( "copies.library.location" )
 								.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
@@ -113,7 +113,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					}
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {
-						b.must( f.nested( "copies" )
+						root.add( f.nested( "copies" )
 								.with( b2 -> {
 									for ( LibraryServiceOption service : libraryServices ) {
 										b2.add( f.match()
