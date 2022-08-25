@@ -205,17 +205,18 @@
         <version.org.elasticsearch.client>8.4.0</version.org.elasticsearch.client>
         <!-- The main compatible version of Elasticsearch, advertised by default. Used in documentation links. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
-             to make sure the corresponding profile (e.g. elasticsearch-8.3) becomes the default. -->
-        <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest-8.3}</version.org.elasticsearch.compatible.main>
+             to make sure the corresponding profile (e.g. elasticsearch-8.4) becomes the default. -->
+        <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest-8.4}</version.org.elasticsearch.compatible.main>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.compatible.main.majorVersion}.${parsed-version.org.elasticsearch.compatible.main.minorVersion}</documentation.org.elasticsearch.url>
 
         <!-- The versions of Elasticsearch advertised as compatible with Hibernate Search -->
         <!-- Make sure to only mention tested versions here -->
         <!-- Make sure that 7.10 stays explicitly mentioned here, because that's the last open-source version -->
-        <version.org.elasticsearch.compatible.regularly-tested.text>5.6, 6.8, 7.10, 7.17 or 8.3</version.org.elasticsearch.compatible.regularly-tested.text>
+        <version.org.elasticsearch.compatible.regularly-tested.text>5.6, 6.8, 7.10, 7.17 or 8.4</version.org.elasticsearch.compatible.regularly-tested.text>
         <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
         <version.org.elasticsearch.compatible.not-regularly-tested.text>7.0 or 8.0</version.org.elasticsearch.compatible.not-regularly-tested.text>
         <!-- The latest micro of each Elasticsearch release line -->
+        <version.org.elasticsearch.latest-8.4>8.4.0</version.org.elasticsearch.latest-8.4>
         <version.org.elasticsearch.latest-8.3>8.3.3</version.org.elasticsearch.latest-8.3>
         <version.org.elasticsearch.latest-8.2>8.2.3</version.org.elasticsearch.latest-8.2>
         <version.org.elasticsearch.latest-8.1>8.1.3</version.org.elasticsearch.latest-8.1>
