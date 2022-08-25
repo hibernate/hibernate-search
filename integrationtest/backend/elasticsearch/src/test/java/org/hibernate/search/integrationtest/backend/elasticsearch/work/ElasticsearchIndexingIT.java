@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -71,7 +71,7 @@ public class ElasticsearchIndexingIT {
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy

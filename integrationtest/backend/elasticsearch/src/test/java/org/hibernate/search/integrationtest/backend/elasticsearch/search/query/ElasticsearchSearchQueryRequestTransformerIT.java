@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
@@ -56,7 +56,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withIndexes( mainIndex, otherIndex )
 				.setup();

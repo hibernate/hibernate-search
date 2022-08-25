@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
@@ -63,9 +63,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
-			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_FACTORY )
+			ConfigurationProperty.forKey( ElasticsearchBackendImplSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
-					.withDefault( ElasticsearchBackendSpiSettings.Defaults.CLIENT_FACTORY )
+					.withDefault( ElasticsearchBackendImplSettings.Defaults.CLIENT_FACTORY )
 					.build();
 
 	private static final ConfigurationProperty<TypeNameMappingStrategyName> MAPPING_TYPE_STRATEGY =

@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
@@ -61,7 +61,7 @@ public class ElasticsearchFieldTypesIT {
 
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withIndex( index )
 				.setup();

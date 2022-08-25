@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
@@ -81,7 +81,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, it messes with our assertions
