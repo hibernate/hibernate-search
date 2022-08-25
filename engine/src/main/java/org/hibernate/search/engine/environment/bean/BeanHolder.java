@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,6 +55,16 @@ public interface BeanHolder<T> extends AutoCloseable {
 	 */
 	static <T> BeanHolder<T> of(T instance) {
 		return new SimpleBeanHolder<>( instance );
+	}
+
+	/**
+	 * @param instance The bean instance.
+	 * @param <T> The type of the bean instance.
+	 * @return A {@link BeanHolder} whose {@link #get()} method returns the given instance,
+	 * and whose {@link #close()} method calls {@link Closeable#close()} on the given instance.
+	 */
+	static <T extends Closeable> BeanHolder<T> ofCloseable(T instance) {
+		return new CloseableBeanHolder<>( instance );
 	}
 
 	/**

@@ -28,6 +28,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.common.timing.Deadline;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -52,7 +53,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private static final Log requestLog = LoggerFactory.make( Log.class, ElasticsearchLogCategories.REQUEST );
 
-	private final RestClient restClient;
+	private final BeanHolder<? extends RestClient> restClientHolder;
 
 	private final Sniffer sniffer;
 
@@ -64,11 +65,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
+	ElasticsearchClientImpl(BeanHolder<? extends RestClient> restClientHolder, Sniffer sniffer,
 			ScheduledExecutorService timeoutExecutorService,
 			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {
-		this.restClient = restClient;
+		this.restClientHolder = restClientHolder;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = timeoutExecutorService;
 		this.requestTimeoutMs = requestTimeoutMs;
@@ -92,7 +93,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> clientClass) {
 		if ( RestClient.class.isAssignableFrom( clientClass ) ) {
-			return (T) restClient;
+			return (T) restClientHolder.get();
 		}
 		throw log.clientUnwrappingWithUnkownType( clientClass, RestClient.class );
 	}
@@ -109,7 +110,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			return completableFuture;
 		}
 
-		restClient.performRequestAsync(
+		restClientHolder.get().performRequestAsync(
 				toRequest( elasticsearchRequest, entity ),
 				new ResponseListener() {
 					@Override
@@ -265,7 +266,8 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			 * currently running requests when closing.
 			 */
 			closer.push( Sniffer::close, this.sniffer );
-			closer.push( RestClient::close, this.restClient );
+			// The BeanHolder is responsible for calling close() on the client if necessary.
+			closer.push( BeanHolder::close, this.restClientHolder );
 		}
 		catch (RuntimeException | IOException e) {
 			throw log.unableToShutdownClient( e.getMessage(), e );

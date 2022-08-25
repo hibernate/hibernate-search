@@ -80,12 +80,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.elasticsearch.client.RestClient;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -967,6 +969,38 @@ public class ElasticsearchClientFactoryImplIT {
 				.hasMessageContaining(
 						"Invalid target hosts configuration: the list of hosts must not be empty"
 				);
+	}
+
+	@Test
+	public void clientInstance() throws IOException {
+		try ( RestClient myRestClient = RestClient.builder( HttpHost.create( httpUrisFor( wireMockRule1 ) ) ).build() ) {
+			String payload = "{ \"foo\": \"bar\" }";
+			String statusMessage = "StatusMessage";
+			String responseBody = "{ \"foo\": \"bar\" }";
+			wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+					.withRequestBody( equalToJson( payload ) )
+					.andMatching( httpProtocol() )
+					.willReturn( elasticsearchResponse().withStatus( 200 )
+							.withStatusMessage( statusMessage )
+							.withBody( responseBody ) ) );
+
+			try ( ElasticsearchClientImplementor client = createClient( properties -> {
+				properties.accept( ElasticsearchBackendSettings.CLIENT_INSTANCE, BeanReference.ofInstance( myRestClient ) );
+			} ) ) {
+				ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+				assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+				assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+				assertJsonEquals( responseBody, result.body().toString() );
+
+				wireMockRule1.verify(
+						postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
+								.andMatching( httpProtocol() )
+				);
+			}
+
+			// Hibernate Search must not close provided client instances
+			assertThat( myRestClient ).returns( true, RestClient::isRunning );
+		}
 	}
 
 	private ElasticsearchClientImplementor createClient() {
