@@ -9,13 +9,14 @@ package org.hibernate.search.backend.elasticsearch.cfg.spi;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 
 /**
- * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
+ * Implementation-related settings, used for testing only.
  */
-public final class ElasticsearchBackendSpiSettings {
+public final class ElasticsearchBackendImplSettings {
 
-	private ElasticsearchBackendSpiSettings() {
+	private ElasticsearchBackendImplSettings() {
 	}
 
 	public static final String CLIENT_FACTORY = "client_factory";

@@ -17,7 +17,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
@@ -62,7 +62,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getActualVersion().toString()
 				)
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -95,7 +95,7 @@ public class ElasticsearchBootstrapIT {
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 						)
 						.withBackendProperty(
-								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+								ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 								elasticsearchClientSpy.factoryReference()
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -133,7 +133,7 @@ public class ElasticsearchBootstrapIT {
 								ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
 						)
 						.withBackendProperty(
-								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+								ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 								elasticsearchClientSpy.factoryReference()
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -167,7 +167,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly
 				)
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -205,7 +205,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
 				)
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -252,7 +252,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
 				)
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
@@ -287,7 +287,7 @@ public class ElasticsearchBootstrapIT {
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty( ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly )
-				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+				.withBackendProperty( ElasticsearchBackendImplSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.factoryReference() )
 				.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"bootstrap-it/custom-settings.json" )
