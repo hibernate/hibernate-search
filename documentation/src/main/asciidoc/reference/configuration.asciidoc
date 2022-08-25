@@ -341,10 +341,10 @@ so they will be released on shutdown.
 Be careful to define the scope of your beans as appropriate.
 
 Immutable beans or beans used only once such as `ElasticsearchAnalysisConfigurer`
-may safely most scopes,
-but some beans are expected to be mutable and instantiated multiple times,
-such as for example `PropertyBinder`.
+may be safely assigned any scope.
 
+However, some beans are expected to be mutable and instantiated multiple times,
+such as for example `PropertyBinder`.
 For these beans, it is recommended to use the "dependent" scope (CDI terminology)
 or the "prototype" scope (Spring terminology).
 When in doubt, this is also generally the safest choice
