@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
@@ -62,10 +63,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
-	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
+	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
 			ConfigurationProperty.forKey( ElasticsearchBackendImplSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
-					.withDefault( ElasticsearchBackendImplSettings.Defaults.CLIENT_FACTORY )
 					.build();
 
 	private static final ConfigurationProperty<TypeNameMappingStrategyName> MAPPING_TYPE_STRATEGY =
@@ -101,7 +101,18 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		try {
 			threads = new BackendThreads( eventContext.render() );
 
-			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
+			Optional<BeanHolder<? extends ElasticsearchClientFactory>> customClientFactoryHolderOptional =
+					CLIENT_FACTORY.getAndMap( propertySource, beanResolver::resolve );
+			if ( customClientFactoryHolderOptional.isPresent() ) {
+				clientFactoryHolder = customClientFactoryHolderOptional.get();
+				log.debugf(
+						"Elasticsearch backend will use client factory '%s'. Context: %s",
+						clientFactoryHolder, eventContext.render()
+				);
+			}
+			else {
+				clientFactoryHolder = BeanHolder.of( new ElasticsearchClientFactoryImpl() );
+			}
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(

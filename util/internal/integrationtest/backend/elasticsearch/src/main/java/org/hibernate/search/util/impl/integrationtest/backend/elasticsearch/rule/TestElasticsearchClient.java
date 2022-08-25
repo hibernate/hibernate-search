@@ -27,7 +27,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -515,16 +514,13 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * We use a {@link ElasticsearchClientFactoryImpl} to create our low-level client.
 		 *
 		 * The main advantage is that we ensure we connect to Elasticsearch exactly the same way
-		 * as any test-created SearchFactory, allowing to support things like testing on AWS
+		 * as any test-created SearchFactory, enabling support for things like testing on AWS
 		 * (using the hibernate-search-elasticsearch-aws module).
 		 */
-		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
-			client = factoryHolder.get().create( beanResolver, backendProperties,
-					threadPoolProvider.threadProvider(), "Client",
-					timeoutExecutorService,
-					GsonProvider.create( GsonBuilder::new, true ) );
-		}
+		client = new ElasticsearchClientFactoryImpl().create( beanResolver, backendProperties,
+				threadPoolProvider.threadProvider(), "Client",
+				timeoutExecutorService,
+				GsonProvider.create( GsonBuilder::new, true ) );
 	}
 
 	@Override

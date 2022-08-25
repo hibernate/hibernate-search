@@ -34,12 +34,11 @@ import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -1008,13 +1007,10 @@ public class ElasticsearchClientFactoryImplIT {
 				AllAwareConfigurationPropertySource.fromMap( beanResolverConfiguration )
 
 		);
-		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
-			return factoryHolder.get().create( beanResolver, clientPropertySource,
-					threadPoolProvider.threadProvider(), "Client",
-					timeoutExecutorService,
-					GsonProvider.create( GsonBuilder::new, true ) );
-		}
+		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
+				threadPoolProvider.threadProvider(), "Client",
+				timeoutExecutorService,
+				GsonProvider.create( GsonBuilder::new, true ) );
 	}
 
 	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
