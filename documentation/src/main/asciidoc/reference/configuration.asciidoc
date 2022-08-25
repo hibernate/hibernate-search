@@ -40,8 +40,11 @@ configuration properties must be set programmatically as you build the mapping.
 
 See <<mapper-pojo-standalone-basics,this section>> for more information.
 
+[[configuration-property]]
+== Configuration properties
+
 [[configuration-structure]]
-== Structure of configuration properties
+=== Structure of configuration properties
 
 Configuration properties are all grouped under a common root.
 In the ORM integration, this root is `hibernate.search`,
@@ -108,41 +111,9 @@ Other index properties are explained in the relevant parts of this documentation
 * <<backend-lucene-configuration,Lucene backend>>
 * <<backend-elasticsearch-configuration,Elasticsearch backend>>
 
-[[configuration-property-types]]
-== Type of configuration properties
-
-Property values can be set programmatically as Java objects,
-or through a configuration file as a string that will have to be parsed.
-
-Each configuration property in Hibernate Search has an assigned type,
-and this type defines the accepted values in both cases.
-
-Here are the definitions of all property types.
-
-[cols="h,1,2a", options="header"]
-|===============
-|Designation|Accepted Java objects|Accepted String format
-|String|`java.lang.String`|Any string
-|Boolean|`java.lang.Boolean`|`true` or `false` (case-insensitive)
-|Integer|`java.lang.Number` (will call .intValue())|Any string that can be parsed by `Integer.parseInt`
-|Long|`java.lang.Number` (will call .longValue())|Any string that can be parsed by `Long.parseLong`
-
-|Bean reference of type T
-|An instance of `T` or `BeanReference`
-or a reference by type as a `java.lang.Class`
-(see <<configuration-bean-reference>>)
-|See <<configuration-bean-reference-parsing>>
-|===============
-
-When a configuration property of any type above is documented as multivalued,
-that property accepts either:
-
-* A `java.util.Collection` containing any Java object that would be accepted for a single-valued property of the same type (see above);
-* or a comma-separated string containing strings that would be accepted for a single-valued property of the same type (see above);
-* or a single Java object that would be accepted for a single-valued property of the same type (see above).
-
 [[configuration-builder]]
-=== Configuration Builders
+=== Building property keys programmatically
+
 Both `BackendSettings` and `IndexSettings` provide tools to help build the configuration property keys.
 
 BackendSettings::
@@ -176,6 +147,39 @@ or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/Luce
 include::{sourcedir}/org/hibernate/search/documentation/configuration/ElasticsearchConfigurationIT.java[tags=build-hibernate-configuration]
 ----
 ====
+
+[[configuration-property-types]]
+=== Type of configuration properties
+
+Property values can be set programmatically as Java objects,
+or through a configuration file as a string that will have to be parsed.
+
+Each configuration property in Hibernate Search has an assigned type,
+and this type defines the accepted values in both cases.
+
+Here are the definitions of all property types.
+
+[cols="h,1,2a", options="header"]
+|===============
+|Designation|Accepted Java objects|Accepted String format
+|String|`java.lang.String`|Any string
+|Boolean|`java.lang.Boolean`|`true` or `false` (case-insensitive)
+|Integer|`java.lang.Number` (will call .intValue())|Any string that can be parsed by `Integer.parseInt`
+|Long|`java.lang.Number` (will call .longValue())|Any string that can be parsed by `Long.parseLong`
+
+|Bean reference of type T
+|An instance of `T` or `BeanReference`
+or a reference by type as a `java.lang.Class`
+(see <<configuration-bean-reference>>)
+|See <<configuration-bean-reference-parsing>>
+|===============
+
+When a configuration property of any type above is documented as multivalued,
+that property accepts either:
+
+* A `java.util.Collection` containing any Java object that would be accepted for a single-valued property of the same type (see above);
+* or a comma-separated string containing strings that would be accepted for a single-valued property of the same type (see above);
+* or a single Java object that would be accepted for a single-valued property of the same type (see above).
 
 [[configuration-property-checking]]
 == [[configuration-property-tracking]] Configuration property checking
@@ -228,7 +232,7 @@ beans can only be retrieved using reflection by calling the public, no-arg const
 see <<configuration-bean-resolution>>.
 
 [[configuration-bean-reference]]
-== Bean references
+=== Bean references
 
 Bean references are composed of two parts:
 
@@ -383,8 +387,14 @@ Beans <<configuration-bean-resolution,resolved by Hibernate Search>>
 using a <<configuration-bean-frameworks,supported framework>>
 can take advantage of injection features of this framework.
 
+[[configuration-global]]
+== Global configuration
+
+This section presents global configuration, common to all <<architecture-hsearch-components-mapper,mappers>>
+and <<architecture-hsearch-components-backend,backends>>.
+
 [[configuration-background-failure-handling]]
-== [[exception-handling]] Background failure handling
+=== [[exception-handling]] Background failure handling
 
 Hibernate Search generally propagates exceptions occurring in background threads to the user thread,
 but in some cases, such as Lucene segment merging failures,
@@ -432,7 +442,7 @@ It will not be propagated.
 ====
 
 [[configuration-multi-tenancy]]
-== Multi-tenancy
+=== Multi-tenancy
 
 If your application uses Hibernate ORM's link:{hibernateDocUrl}#multitenacy[multi-tenancy support],
 or if you <<mapper-pojo-standalone-multi-tenancy,configured multi-tenancy explicitly in the Standalone POJO Mapper>>,
