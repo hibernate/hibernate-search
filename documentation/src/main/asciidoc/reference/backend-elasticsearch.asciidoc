@@ -335,7 +335,7 @@ Any setting defined by a custom http client configurer will override any other s
 ====
 
 [[backend-elasticsearch-configuration-version]]
-=== [[backend-elasticsearch-configuration-dialect]] Version
+== [[backend-elasticsearch-configuration-dialect]] Version compatibility
 
 Different distributions and versions of Elasticsearch expose slightly different APIs.
 As a result, Hibernate Search needs to be aware of the distribution and version of Elasticsearch it is talking to
@@ -374,10 +374,10 @@ This can be helpful while developing, in particular.
 ====
 
 [[backend-elasticsearch-configuration-logging]]
-=== [[elasticsearch-log-json-pretty-printing]] Logging
+== [[elasticsearch-log-json-pretty-printing]] Request logging
 
 The `hibernate.search.backend.log.json_pretty_printing` <<configuration-property-types,boolean property>>
-defines whether JSON included in <<troubleshooting-logging,logs>> should be pretty-printed (indented, with line breaks).
+defines whether JSON included in <<troubleshooting-logging,request logs>> should be pretty-printed (indented, with line breaks).
 It defaults to `false`.
 
 [[backend-elasticsearch-configuration-sharding]]
