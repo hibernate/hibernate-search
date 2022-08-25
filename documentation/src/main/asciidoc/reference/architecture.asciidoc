@@ -16,7 +16,7 @@ that can be used without Hibernate ORM.
 +
 The mapper is configured partly through annotations on the domain model,
 and partly through configuration properties.
-Backend:: The backend is the abstraction over the full-text engines, where "things get done".
+[[architecture-hsearch-components-backend]]Backend:: The backend is the abstraction over the full-text engines, where "things get done".
 It implements generic indexing and searching interfaces for use by the mapper
 through "index managers", each providing access to one index.
 +
