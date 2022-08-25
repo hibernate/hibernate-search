@@ -53,6 +53,8 @@ public final class ElasticsearchBackendSettings {
 	 * Defaults to {@link Defaults#HOSTS}.
 	 * <p>
 	 * Multiple servers may be specified for load-balancing: requests will be assigned to each host in turns.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String HOSTS = "hosts";
 
@@ -64,6 +66,8 @@ public final class ElasticsearchBackendSettings {
 	 * Cannot be used if {@link #URIS} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#PROTOCOL}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String PROTOCOL = "protocol";
 
@@ -80,6 +84,8 @@ public final class ElasticsearchBackendSettings {
 	 * Cannot be used if {@link #HOSTS} or {@link #PROTOCOL} are set.
 	 * <p>
 	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String URIS = "uris";
 
@@ -88,6 +94,8 @@ public final class ElasticsearchBackendSettings {
 	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
 	 * <p>
 	 * Defaults to {@link Defaults#PATH_PREFIX}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String PATH_PREFIX = "path_prefix";
 
@@ -118,6 +126,8 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no username (anonymous access).
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String USERNAME = "username";
 
@@ -127,6 +137,8 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no username (anonymous access).
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String PASSWORD = "password";
 
@@ -139,6 +151,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to no request timeout.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String REQUEST_TIMEOUT = "request_timeout";
 
@@ -149,6 +163,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#READ_TIMEOUT}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String READ_TIMEOUT = "read_timeout";
 
@@ -159,6 +175,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#CONNECTION_TIMEOUT}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String CONNECTION_TIMEOUT = "connection_timeout";
 
@@ -170,6 +188,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String MAX_CONNECTIONS = "max_connections";
 
@@ -180,6 +200,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#MAX_CONNECTIONS_PER_ROUTE}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
 
@@ -190,6 +212,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a string that can be parsed to such Boolean value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_ENABLED}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
 
@@ -200,6 +224,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
 
@@ -214,8 +240,29 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
 	 * <p>
 	 * Defaults to no value.
+	 * <p>
+	 * This property is ignored when {@value #CLIENT_INSTANCE} is set.
 	 */
 	public static final String CLIENT_CONFIGURER = "client.configurer";
+
+	/**
+	 * A external Elasticsearch client instance that Hibernate Search should use for all requests to Elasticsearch.
+	 * <p>
+	 * If this is set, Hibernate Search will not attempt to create its own Elasticsearch,
+	 * and all other client-related configuration properties
+	 * (hosts/uris, authentication, discovery, timeouts, max connections, configurer, ...)
+	 * will be ignored.
+	 * <p>
+	 * Expects a reference to a bean of type {@link org.elasticsearch.client.RestClient}.
+	 * <p>
+	 * Defaults to nothing: if no client instance is provided, Hibernate Search will create its own.
+	 * <p>
+	 * <strong>WARNING - Incubating API:</strong> the underlying client class may change without notice.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String CLIENT_INSTANCE = "client.instance";
 
 	/**
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).

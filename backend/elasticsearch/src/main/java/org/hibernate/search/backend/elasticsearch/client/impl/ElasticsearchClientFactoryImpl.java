@@ -24,6 +24,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.auth.AuthScope;
@@ -45,6 +46,11 @@ import org.elasticsearch.client.sniff.SnifferBuilder;
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final OptionalConfigurationProperty<BeanReference<? extends RestClient>>
+			CLIENT_INSTANCE = ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_INSTANCE )
+					.asBeanReference( RestClient.class )
+					.build();
 
 	private static final OptionalConfigurationProperty<List<String>> HOSTS =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
@@ -131,20 +137,31 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
-		ServerUris hosts = ServerUris
-				.fromOptionalStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ), URIS.get( propertySource ) );
-		RestClient restClient = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts,
-				PATH_PREFIX.get( propertySource ) );
-		Sniffer sniffer = createSniffer( propertySource, restClient, hosts );
+		Optional<BeanHolder<? extends RestClient>> providedRestClientHolder = CLIENT_INSTANCE.getAndMap(
+				propertySource, beanResolver::resolve );
+
+		BeanHolder<? extends RestClient> restClientHolder;
+		Sniffer sniffer;
+		if ( providedRestClientHolder.isPresent() ) {
+			restClientHolder = providedRestClientHolder.get();
+			sniffer = null;
+		}
+		else {
+			ServerUris hosts = ServerUris.fromOptionalStrings( PROTOCOL.get( propertySource ),
+					HOSTS.get( propertySource ), URIS.get( propertySource ) );
+			restClientHolder = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts,
+					PATH_PREFIX.get( propertySource ) );
+			sniffer = createSniffer( propertySource, restClientHolder.get(), hosts );
+		}
 
 		return new ElasticsearchClientImpl(
-				restClient, sniffer, timeoutExecutorService,
+				restClientHolder, sniffer, timeoutExecutorService,
 				requestTimeoutMs, connectionTimeoutMs,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
 		);
 	}
 
-	private RestClient createClient(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
+	private BeanHolder<? extends RestClient> createClient(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ServerUris hosts, String pathPrefix) {
 		RestClientBuilder builder = RestClient.builder( hosts.asHostsArray() );
@@ -155,11 +172,12 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig = CLIENT_CONFIGURER
 				.getAndMap( propertySource, beanResolver::resolve );
 
+		RestClient client = null;
 		List<BeanReference<ElasticsearchHttpClientConfigurer>> httpClientConfigurerReferences =
 				beanResolver.allConfiguredForRole( ElasticsearchHttpClientConfigurer.class );
 		try ( BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurersHolder =
 				beanResolver.resolve( httpClientConfigurerReferences ) ) {
-			return builder
+			client = builder
 					.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 					.setHttpClientConfigCallback(
 							b -> customizeHttpClientConfig(
@@ -171,6 +189,12 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 							)
 					)
 					.build();
+			return BeanHolder.ofCloseable( client );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( client );
+			throw e;
 		}
 		finally {
 			if ( customConfig.isPresent() ) {

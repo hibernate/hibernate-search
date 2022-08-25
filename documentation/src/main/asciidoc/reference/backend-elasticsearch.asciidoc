@@ -334,6 +334,26 @@ include::{resourcesdir}/configuration/http-client-configurer.properties[]
 Any setting defined by a custom http client configurer will override any other setting defined by Hibernate Search.
 ====
 
+[[backend-elasticsearch-configuration-client-instance]]
+== Providing a client instance
+
+If you already use a low-level Elasticsearch client (an instance of `org.elasticsearch.client.RestClient`)
+in your application,
+you can tell Hibernate Search to use that client instead of creating its own.
+
+Providing a `RestClient` requires two steps:
+
+. Define the `org.elasticsearch.client.RestClient` instance
+as a bean in your <<configuration-bean-frameworks,supported dependency injection framework>>,
+for example by defining a CDI bean producer annotated with `@Named("myRestClient")`.
+. Configure Hibernate Search to use that instance by setting the configuration property
+`hibernate.search.backend.client.instance`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the bean,
+for example `bean:myRestClient`.
+
+IMPORTANT: If Hibernate Search uses a provided client, it won't create its own client,
+and thus all other <<backend-elasticsearch-configuration-client,client configuration properties>> will be ignored.
+
 [[backend-elasticsearch-configuration-version]]
 == [[backend-elasticsearch-configuration-dialect]] Version compatibility
 
