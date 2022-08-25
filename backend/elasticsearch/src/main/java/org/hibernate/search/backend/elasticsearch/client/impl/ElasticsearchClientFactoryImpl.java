@@ -24,7 +24,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.auth.AuthScope;
@@ -46,23 +45,6 @@ import org.elasticsearch.client.sniff.SnifferBuilder;
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = (BeanResolver beanResolver) -> {
-		List<BeanReference<ElasticsearchHttpClientConfigurer>> httpClientConfigurerReferences =
-				beanResolver.allConfiguredForRole( ElasticsearchHttpClientConfigurer.class );
-		BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
-				beanResolver.resolve( httpClientConfigurerReferences );
-		try {
-			ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl(
-					httpClientConfigurerHolders.get() );
-			return BeanHolder.<ElasticsearchClientFactory>of( factory )
-					.withDependencyAutoClosing( httpClientConfigurerHolders );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( httpClientConfigurerHolders );
-			throw e;
-		}
-	};
 
 	private static final OptionalConfigurationProperty<List<String>> HOSTS =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
@@ -141,12 +123,6 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			.asBeanReference( ElasticsearchHttpClientConfigurer.class )
 			.build();
 
-	private final List<ElasticsearchHttpClientConfigurer> httpClientConfigurers;
-
-	ElasticsearchClientFactoryImpl(List<ElasticsearchHttpClientConfigurer> httpClientConfigurers) {
-		this.httpClientConfigurers = httpClientConfigurers;
-	}
-
 	@Override
 	public ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
@@ -179,7 +155,10 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig = CLIENT_CONFIGURER
 				.getAndMap( propertySource, beanResolver::resolve );
 
-		try {
+		List<BeanReference<ElasticsearchHttpClientConfigurer>> httpClientConfigurerReferences =
+				beanResolver.allConfiguredForRole( ElasticsearchHttpClientConfigurer.class );
+		try ( BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurersHolder =
+				beanResolver.resolve( httpClientConfigurerReferences ) ) {
 			return builder
 					.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 					.setHttpClientConfigCallback(
@@ -188,7 +167,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 									beanResolver, propertySource,
 									threadProvider, threadNamePrefix,
 									hosts,
-									httpClientConfigurers, customConfig
+									httpClientConfigurersHolder.get(), customConfig
 							)
 					)
 					.build();

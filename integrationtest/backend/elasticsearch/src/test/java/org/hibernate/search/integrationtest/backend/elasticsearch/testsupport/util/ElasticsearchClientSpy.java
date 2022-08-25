@@ -78,14 +78,7 @@ public class ElasticsearchClientSpy implements TestRule {
 	}
 
 	public BeanReference<ElasticsearchClientFactory> factoryReference() {
-		return beanResolver -> {
-			BeanHolder<ElasticsearchClientFactory> delegateHolder =
-					beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE );
-			SpyingElasticsearchClientFactory spyingFactory =
-					new SpyingElasticsearchClientFactory( delegateHolder.get() );
-			return BeanHolder.<ElasticsearchClientFactory>of( spyingFactory )
-					.withDependencyAutoClosing( delegateHolder );
-		};
+		return beanResolver -> BeanHolder.of( new SpyingElasticsearchClientFactory( new ElasticsearchClientFactoryImpl() ) );
 	}
 
 	public void expectNext(ElasticsearchRequest request, ElasticsearchRequestAssertionMode assertionMode) {

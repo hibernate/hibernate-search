@@ -26,7 +26,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -208,13 +207,10 @@ public class ElasticsearchContentLengthIT {
 		ConfigurationPropertySource clientPropertySource = AllAwareConfigurationPropertySource.fromMap( clientProperties );
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
-		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
-				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
-			return factoryHolder.get().create( beanResolver, clientPropertySource,
-					threadPoolProvider.threadProvider(), "Client",
-					timeoutExecutorService,
-					GsonProvider.create( GsonBuilder::new, true ) );
-		}
+		return new ElasticsearchClientFactoryImpl().create( beanResolver, clientPropertySource,
+				threadPoolProvider.threadProvider(), "Client",
+				timeoutExecutorService,
+				GsonProvider.create( GsonBuilder::new, true ) );
 	}
 
 	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, Collection<JsonObject> bodyParts) {
