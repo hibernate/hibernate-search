@@ -205,7 +205,10 @@
                                         <color>blue</color>
                                     </log>
                                     <wait>
-                                        <log>database system is ready to accept connections</log>
+                                        <!-- For some reason, Postgres will tell us it's ready *twice*,
+                                             and that's the truth the second time only.
+                                             See https://github.com/fabric8io/docker-maven-plugin/issues/628 -->
+                                        <log>(?s)ready to accept connections.*ready to accept connections</log>
                                     </wait>
                                 </run>
                             </image>
