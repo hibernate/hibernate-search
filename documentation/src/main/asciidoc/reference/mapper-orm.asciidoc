@@ -35,10 +35,10 @@ The Hibernate ORM shutdown will block until all ongoing indexing operations comp
 [[mapper-orm-mapping-dynamicmap]]
 == [[mapper-orm-programmatic-mapping-dynamicmap]] Mapping `Map`-based models
 
-link:{hibernateDocUrl}#dynamic-model["dynamic-map" entity models],
+link:{hibernateDocUrl}#dynamic-model["Dynamic-map" entity models],
 i.e. models based on `java.util.Map` instead of custom classes,
 cannot be mapped using annotations.
-However, they can be mapped using the programmatic mapping API.
+However, they can be mapped using the <<mapping-programmatic,programmatic mapping API>>.
 You just need to refer to the types by their name using `context.programmaticMapping().type("thename")`:
 
 * Pass the entity name for dynamic entity types.
