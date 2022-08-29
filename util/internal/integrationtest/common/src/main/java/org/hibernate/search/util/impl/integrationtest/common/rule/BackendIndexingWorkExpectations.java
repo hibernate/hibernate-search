@@ -78,7 +78,7 @@ public final class BackendIndexingWorkExpectations {
 					// We're only waiting for in-memory state to change,
 					// so it's fine to poll aggressively every 5ms.
 					.pollInterval( Duration.ofMillis( 5 ) )
-					.atMost( Duration.ofSeconds( 15 ) )
+					.atMost( Duration.ofSeconds( 30 ) )
 					.until( completion::isDone );
 		}
 	}
