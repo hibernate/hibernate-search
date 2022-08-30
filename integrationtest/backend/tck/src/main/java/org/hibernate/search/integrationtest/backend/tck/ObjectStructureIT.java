@@ -170,9 +170,9 @@ public class ObjectStructureIT {
 			scope.predicate().nested( "flattenedObject" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject'.",
-						"Some object field features require a nested structure; "
-								+ "try setting the field structure to 'NESTED' and reindexing all your data" );
+				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject'",
+						"Some object field features require a nested structure",
+						"try setting the field structure to 'NESTED' and reindexing all your data" );
 	}
 
 	@Test
@@ -183,7 +183,7 @@ public class ObjectStructureIT {
 				scope.predicate().nested( "flattenedObject.string" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject.string'.",
+				.hasMessageContainingAll( "Cannot use 'predicate:nested' on field 'flattenedObject.string'",
 						"'predicate:nested' is not available for fields of this type" );
 	}
 

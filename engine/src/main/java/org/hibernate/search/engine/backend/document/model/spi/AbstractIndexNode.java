@@ -11,6 +11,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexNodeTypeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractIndexNode<
@@ -40,6 +41,11 @@ public abstract class AbstractIndexNode<
 	public final <T> T queryElement(SearchQueryElementTypeKey<T> key, SC scope) {
 		SearchQueryElementFactory<? extends T, ? super SC, ? super S> factory = type.queryElementFactory( key );
 		return helper().queryElement( key, factory, scope, self() );
+	}
+
+	@Override
+	public SearchException cannotUseQueryElement(SearchQueryElementTypeKey<?> key, String hint, Exception causeOrNull) {
+		return helper().cannotUseQueryElement( key, self(), hint, causeOrNull );
 	}
 
 	abstract SearchIndexSchemaElementContextHelper helper();

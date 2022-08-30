@@ -614,4 +614,10 @@ public interface Log extends BasicLogger {
 					+ " The document was probably indexed with a different configuration: full reindexing is necessary.")
 	SearchException unexpectedMappedTypeNameForByMappedTypeProjection(String typeName, Set<String> expectedTypeNames);
 
+	@Message(value = "This multi-valued field has a 'FLATTENED' structure,"
+			+ " which means the structure of objects is not preserved upon indexing,"
+			+ " making object projections impossible."
+			+ " Try setting the field structure to 'NESTED' and reindexing all your data.")
+	String missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode();
+
 }

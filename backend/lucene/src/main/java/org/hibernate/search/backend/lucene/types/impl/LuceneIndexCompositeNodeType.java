@@ -34,9 +34,9 @@ public class LuceneIndexCompositeNodeType
 		public Builder(ObjectStructure objectStructure) {
 			super( objectStructure );
 			queryElementFactory( PredicateTypeKeys.EXISTS, LuceneObjectExistsPredicate.Factory.INSTANCE );
+			queryElementFactory( ProjectionTypeKeys.OBJECT, new LuceneObjectProjection.Factory() );
 			if ( ObjectStructure.NESTED.equals( objectStructure ) ) {
 				queryElementFactory( PredicateTypeKeys.NESTED, LuceneNestedPredicate.Factory.INSTANCE );
-				queryElementFactory( ProjectionTypeKeys.OBJECT, new LuceneObjectProjection.Factory() );
 			}
 		}
 

@@ -80,11 +80,15 @@ public class DistanceProjectionBaseIT {
 		private static final List<DataSet<GeoPoint, Double, DistanceProjectionTestValues>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
-			for ( ObjectStructure structure :
-					TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForObjectProjection()
-							? new ObjectStructure[] { ObjectStructure.NESTED }
-							: new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
-				DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet = new DataSet<>( testValues(), structure );
+			for ( ObjectStructure singleValuedObjectStructure :
+					new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
+				ObjectStructure multiValuedObjectStructure =
+						ObjectStructure.NESTED.equals( singleValuedObjectStructure )
+								|| TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
+								? ObjectStructure.NESTED
+								: ObjectStructure.FLATTENED;
+				DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet = new DataSet<>( testValues(),
+						singleValuedObjectStructure, multiValuedObjectStructure );
 				dataSets.add( dataSet );
 				parameters.add( new Object[] { dataSet } );
 			}

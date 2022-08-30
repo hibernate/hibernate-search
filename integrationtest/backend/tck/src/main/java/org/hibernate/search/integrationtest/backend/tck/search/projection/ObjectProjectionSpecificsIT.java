@@ -56,7 +56,7 @@ public class ObjectProjectionSpecificsIT {
 	@Test
 	public void nonObjectFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( "level1.field1" ) )
-				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'level1.field1'." );
+				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'level1.field1'" );
 	}
 
 	@Test
@@ -85,17 +85,19 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void flattenedObjectField_unsupported() {
+	public void multiValuedObjectField_flattened_unsupported() {
 		assumeTrue(
-				"This test is only relevant if the backend relies on nested documents to implement object projections",
-				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForObjectProjection()
+				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields",
+				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
 		);
 		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "flattenedLevel1" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'flattenedLevel1'.",
-						"Some object field features require a nested structure;"
-								+ " try setting the field structure to 'NESTED' and reindexing all your data" );
+				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'flattenedLevel1'",
+						"This multi-valued field has a 'FLATTENED' structure,"
+								+ " which means the structure of objects is not preserved upon indexing,"
+								+ " making object projections impossible",
+						"Try setting the field structure to 'NESTED' and reindexing all your data" );
 	}
 
 	@Test

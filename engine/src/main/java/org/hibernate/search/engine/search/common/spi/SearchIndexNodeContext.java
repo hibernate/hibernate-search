@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.common.spi;
 
 import java.util.List;
 
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
@@ -58,5 +59,7 @@ public interface SearchIndexNodeContext<SC extends SearchIndexScope<?>>
 	// Query elements: predicates, sorts, projections, aggregations, ...
 
 	<T> T queryElement(SearchQueryElementTypeKey<T> key, SC searchContext);
+
+	SearchException cannotUseQueryElement(SearchQueryElementTypeKey<?> key, String hint, Exception causeOrNull);
 
 }

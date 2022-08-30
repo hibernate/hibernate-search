@@ -112,6 +112,11 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 		return helper().queryElement( key, factory, scope, self() );
 	}
 
+	@Override
+	public SearchException cannotUseQueryElement(SearchQueryElementTypeKey<?> key, String hint, Exception causeOrNull) {
+		return helper().cannotUseQueryElement( key, self(), hint, causeOrNull );
+	}
+
 	abstract SearchIndexSchemaElementContextHelper helper();
 
 	@Override

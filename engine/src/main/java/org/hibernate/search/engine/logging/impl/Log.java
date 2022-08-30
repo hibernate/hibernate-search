@@ -468,10 +468,10 @@ public interface Log extends BasicLogger {
 			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
 	SearchException differentAttribute(String attributeName, Object component1, Object component2);
 
-	@Message(id = ID_OFFSET + 104, value = "Cannot use '%2$s' on %1$s. %3$s")
+	@Message(id = ID_OFFSET + 104, value = "Cannot use '%2$s' on %1$s: %3$s")
 	SearchException cannotUseQueryElementForIndexNode(
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
-			SearchQueryElementTypeKey<?> key, String hint, @Param EventContext context);
+			SearchQueryElementTypeKey<?> key, String hint, @Param EventContext context, @Cause Exception cause);
 
 	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
 			+ " If it already is, then '%1$s' is not available for fields of this type.")
@@ -481,12 +481,6 @@ public interface Log extends BasicLogger {
 			+ " try setting the field structure to 'NESTED' and reindexing all your data."
 			+ " If you are trying to use another feature, it probably isn't available for this field.")
 	String missingSupportHintForCompositeNode();
-
-	@Message(id = ID_OFFSET + 105, value = "Cannot use '%2$s' on %1$s: %3$s")
-	SearchException cannotUseQueryElementForIndexElementBecauseCreationException(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
-			SearchQueryElementTypeKey<?> key, String causeMessage, @Cause SearchException cause,
-			@Param EventContext elementContextAsParam);
 
 	@Message(id = ID_OFFSET + 106,
 			value = "'%1$s' can be used in some of the targeted indexes, but not all of them. %2$s")

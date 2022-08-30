@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.SortMode;
 
 public abstract class TckBackendFeatures {
@@ -109,6 +110,10 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
-	public abstract boolean reliesOnNestedDocumentsForObjectProjection();
+	public boolean projectionPreservesEmptySingleValuedObject(ObjectStructure structure) {
+		return true;
+	}
+
+	public abstract boolean reliesOnNestedDocumentsForMultiValuedObjectProjection();
 
 }

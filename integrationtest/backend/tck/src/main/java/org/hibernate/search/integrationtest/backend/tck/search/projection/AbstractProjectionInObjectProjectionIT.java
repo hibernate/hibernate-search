@@ -489,10 +489,14 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 								dataSet.values.projectedValues( 10, 11 )
 						) ),
 						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, null ),
-						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, new ObjectDto<>(
-								null,
-								Collections.emptyList()
-						) ),
+						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID,
+								TckConfiguration.get().getBackendFeatures()
+										.projectionPreservesEmptySingleValuedObject( dataSet.singleValuedObjectStructure )
+										? new ObjectDto<>(
+												null,
+												Collections.emptyList() )
+										: null
+						),
 						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, null ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, null ),
 						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, null ),
@@ -882,44 +886,44 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 	}
 
 	private String level1Path() {
-		return mainIndex.binding().level1( dataSet.structure ).absolutePath;
+		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).absolutePath;
 	}
 
 	private String level1SingleValuedFieldPath() {
-		return mainIndex.binding().level1( dataSet.structure )
+		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure )
 				.singleValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
 	private String level1MultiValuedFieldPath() {
-		return mainIndex.binding().level1( dataSet.structure )
+		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure )
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
 	private String singleValuedLevel1Path() {
-		return mainIndex.binding().singleValuedLevel1( dataSet.structure ).absolutePath;
+		return mainIndex.binding().singleValuedLevel1( dataSet.singleValuedObjectStructure ).absolutePath;
 	}
 
 	private String singleValuedLevel1SingleValuedFieldPath() {
-		return mainIndex.binding().singleValuedLevel1( dataSet.structure )
+		return mainIndex.binding().singleValuedLevel1( dataSet.singleValuedObjectStructure )
 				.singleValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
 	private String singleValuedLevel1MultiValuedFieldPath() {
-		return mainIndex.binding().singleValuedLevel1( dataSet.structure )
+		return mainIndex.binding().singleValuedLevel1( dataSet.singleValuedObjectStructure )
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
 	private String level2Path() {
-		return mainIndex.binding().level1( dataSet.structure ).level2.absolutePath;
+		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).level2.absolutePath;
 	}
 
 	private String level2SingleValuedFieldPath() {
-		return mainIndex.binding().level1( dataSet.structure ).level2
+		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).level2
 				.singleValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
 	private String level2MultiValuedFieldPath() {
-		return mainIndex.binding().level1( dataSet.structure ).level2
+		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).level2
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
@@ -929,11 +933,15 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 
 	public static final class DataSet<F, P, V extends AbstractProjectionTestValues<F, P>>
 			extends AbstractPerFieldTypeProjectionDataSet<F, P, V> {
-		private final ObjectStructure structure;
+		private final ObjectStructure singleValuedObjectStructure;
+		private final ObjectStructure multiValuedObjectStructure;
 
-		public DataSet(V values, ObjectStructure structure) {
-			super( values.fieldType.getUniqueName() + "/" + structure.name(), values );
-			this.structure = structure;
+		public DataSet(V values, ObjectStructure singleValuedObjectStructure,
+				ObjectStructure multiValuedObjectStructure) {
+			super( values.fieldType.getUniqueName() + "/single=" + singleValuedObjectStructure.name()
+					+ "/multi=" + multiValuedObjectStructure, values );
+			this.singleValuedObjectStructure = singleValuedObjectStructure;
+			this.multiValuedObjectStructure = multiValuedObjectStructure;
 		}
 
 		public String docId(String docIdConstant) {
@@ -956,9 +964,9 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						DocumentElement level2Object;
 						DocumentElement singleValuedLevel1Object;
 
-						level1 = mainIndex.binding().level1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
 						level2 = level1.level2;
-						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( structure );
+						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						document.addNullObject( level1.reference );
 
@@ -1003,9 +1011,9 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						DocumentElement level2Object;
 						DocumentElement singleValuedLevel1Object;
 
-						level1 = mainIndex.binding().level1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
 						level2 = level1.level2;
-						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( structure );
+						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						level1Object = document.addObject( level1.reference );
 						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
@@ -1026,9 +1034,9 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						DocumentElement level2Object;
 						DocumentElement singleValuedLevel1Object;
 
-						level1 = mainIndex.binding().level1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
 						level2 = level1.level2;
-						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( structure );
+						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						level1Object = document.addObject( level1.reference );
 						level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
@@ -1052,8 +1060,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						Level1ObjectFieldBinding level1;
 						Level1ObjectFieldBinding singleValuedLevel1;
 
-						level1 = mainIndex.binding().level1( structure );
-						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
+						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						document.addObject( level1.reference );
 						document.addObject( singleValuedLevel1.reference );
@@ -1062,8 +1070,8 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						Level1ObjectFieldBinding level1;
 						Level1ObjectFieldBinding singleValuedLevel1;
 
-						level1 = mainIndex.binding().level1( structure );
-						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
+						singleValuedLevel1 = mainIndex.binding().singleValuedLevel1( singleValuedObjectStructure );
 
 						document.addNullObject( level1.reference );
 						document.addNullObject( singleValuedLevel1.reference );
@@ -1076,7 +1084,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						DocumentElement level1Object;
 						DocumentElement level2Object;
 
-						level1 = mainIndex.binding().level1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
 						level2 = level1.level2;
 
 						level1Object = document.addObject( level1.reference );
@@ -1096,7 +1104,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						ObjectFieldBinding level2;
 						DocumentElement level1Object;
 
-						level1 = mainIndex.binding().level1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
 						level2 = level1.level2;
 
 						level1Object = document.addObject( level1.reference );
@@ -1108,7 +1116,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 					.add( docId( LEVEL2_NO_OBJECT_DOCUMENT_ID ), routingKey, document -> {
 						Level1ObjectFieldBinding level1;
 
-						level1 = mainIndex.binding().level1( structure );
+						level1 = mainIndex.binding().level1( multiValuedObjectStructure );
 
 						document.addObject( level1.reference );
 
@@ -1121,7 +1129,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				DocumentElement level1Object;
 				DocumentElement level2Object;
 
-				level1 = missingLevel1SingleValuedFieldIndex.binding().level1( structure );
+				level1 = missingLevel1SingleValuedFieldIndex.binding().level1( multiValuedObjectStructure );
 				level2 = level1.level2;
 
 				level1Object = document.addObject( level1.reference );
@@ -1152,7 +1160,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				ObjectFieldBinding level1;
 				DocumentElement level1Object;
 
-				level1 = missingLevel2Index.binding().level1( structure );
+				level1 = missingLevel2Index.binding().level1( multiValuedObjectStructure );
 
 				level1Object = document.addObject( level1.reference );
 				level1Object.addValue( level1.singleValuedField.get( values.fieldType ).reference, values.fieldValue( 0 ) );
@@ -1170,7 +1178,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				DocumentElement level1Object;
 				DocumentElement level2Object;
 
-				level1 = missingLevel2SingleValuedFieldIndex.binding().level1( structure );
+				level1 = missingLevel2SingleValuedFieldIndex.binding().level1( multiValuedObjectStructure );
 				level2 = level1.level2;
 
 				level1Object = document.addObject( level1.reference );
