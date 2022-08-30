@@ -14,13 +14,21 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.Values;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ProjectionCompositor;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.util.common.SearchException;
 
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.join.QueryBitSetProducer;
+import org.apache.lucene.util.BitSet;
 
 /**
  * A projection that yields one composite value per object in a given object field.
@@ -35,6 +43,8 @@ public class LuceneObjectProjection<E, V, P>
 		extends AbstractLuceneProjection<P> {
 
 	private final String absoluteFieldPath;
+	private final boolean nested;
+	private final Query filter;
 	private final String nestedDocumentPath;
 	private final String requiredContextAbsoluteFieldPath;
 	private final LuceneSearchProjection<?>[] inners;
@@ -45,6 +55,8 @@ public class LuceneObjectProjection<E, V, P>
 			ProjectionCompositor<E, V> compositor, ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		super( builder.scope );
 		this.absoluteFieldPath = builder.objectField.absolutePath();
+		this.nested = builder.objectField.type().nested();
+		this.filter = builder.filter;
 		this.nestedDocumentPath = builder.objectField.nestedDocumentPath();
 		this.requiredContextAbsoluteFieldPath = accumulatorProvider.isSingleValued()
 				? builder.objectField.closestMultiValuedParentAbsolutePath() : null;
@@ -64,7 +76,14 @@ public class LuceneObjectProjection<E, V, P>
 
 	@Override
 	public Extractor<?, P> request(ProjectionRequestContext context) {
-		ProjectionRequestContext innerContext = context.forField( absoluteFieldPath );
+		ProjectionRequestContext innerContext;
+		if ( nested ) {
+			innerContext = context.forField( absoluteFieldPath );
+		}
+		else {
+			context.checkValidField( absoluteFieldPath );
+			innerContext = context;
+		}
 		if ( requiredContextAbsoluteFieldPath != null
 				&& !requiredContextAbsoluteFieldPath.equals( context.absoluteCurrentFieldPath() ) ) {
 			throw log.invalidSingleValuedProjectionOnValueFieldInMultiValuedObjectField(
@@ -113,15 +132,23 @@ public class LuceneObjectProjection<E, V, P>
 
 		private class ObjectFieldValues extends AbstractNestingAwareAccumulatingValues<E, A> {
 			private final Values<?>[] inners;
+			private final QueryBitSetProducer filterBitSetProducer;
+
+			private BitSet filterMatchedBitSet;
 
 			private ObjectFieldValues(TopDocsDataCollectorExecutionContext context, Values<?>[] inners) {
 				super( contextAbsoluteFieldPath, nestedDocumentPath, ObjectFieldExtractor.this.accumulator, context );
 				this.inners = inners;
+				this.filterBitSetProducer = filter == null ? null : new QueryBitSetProducer( filter );
+
 			}
 
 			@Override
 			public void context(LeafReaderContext context) throws IOException {
 				super.context( context );
+				if ( filterBitSetProducer != null ) {
+					filterMatchedBitSet = filterBitSetProducer.getBitSet( context );
+				}
 				for ( Values<?> inner : inners ) {
 					inner.context( context );
 				}
@@ -129,6 +156,11 @@ public class LuceneObjectProjection<E, V, P>
 
 			@Override
 			protected A accumulate(A accumulated, int docId) throws IOException {
+				if ( filterBitSetProducer != null && ( filterMatchedBitSet == null || !filterMatchedBitSet.get( docId ) ) ) {
+					// The object didn't match the given filter: act as if it didn't exist.
+					// Note that filters are used to detect flattened objects that were null upon indexing.
+					return accumulated;
+				}
 				E components = compositor.createInitial();
 				for ( int i = 0; i < inners.length; i++ ) {
 					Object extractedDataForInner = inners[i].get( docId );
@@ -160,7 +192,25 @@ public class LuceneObjectProjection<E, V, P>
 			extends AbstractLuceneCompositeNodeSearchQueryElementFactory<Builder> {
 		@Override
 		public Builder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
-			return new Builder( scope, node );
+			Query filter = null;
+			if ( !node.type().nested() ) {
+				if ( node.multiValued() ) {
+					throw node.cannotUseQueryElement( ProjectionTypeKeys.OBJECT,
+							log.missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode(), null );
+				}
+				try {
+					filter = LuceneSearchPredicate.from( scope, node.queryElement( PredicateTypeKeys.EXISTS, scope ).build() )
+							.toQuery( PredicateRequestContext.root() );
+				}
+				catch (SearchException e) {
+					throw node.cannotUseQueryElement( ProjectionTypeKeys.OBJECT, e.getMessage(), e );
+				}
+			}
+			if ( node.multiValued() && !node.type().nested() ) {
+				throw node.cannotUseQueryElement( ProjectionTypeKeys.OBJECT,
+						log.missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode(), null );
+			}
+			return new Builder( scope, node, filter );
 		}
 	}
 
@@ -168,10 +218,12 @@ public class LuceneObjectProjection<E, V, P>
 
 		private final LuceneSearchIndexScope<?> scope;
 		private final LuceneSearchIndexCompositeNodeContext objectField;
+		private final Query filter;
 
-		Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext objectField) {
+		Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext objectField, Query filter) {
 			this.scope = scope;
 			this.objectField = objectField;
+			this.filter = filter;
 		}
 
 		@Override

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
 class LuceneTckBackendFeatures extends TckBackendFeatures {
@@ -27,7 +28,15 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean reliesOnNestedDocumentsForObjectProjection() {
+	public boolean projectionPreservesEmptySingleValuedObject(ObjectStructure structure) {
+		// For single-valued, flattened object fields,
+		// we cannot distinguish between an empty object (non-null object, but no subfield carries a value)
+		// and an empty object.
+		return ObjectStructure.NESTED.equals( structure );
+	}
+
+	@Override
+	public boolean reliesOnNestedDocumentsForMultiValuedObjectProjection() {
 		return true;
 	}
 }

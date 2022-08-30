@@ -50,8 +50,8 @@ public class ObjectProjectionBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
-	private static ObjectStructure requiredObjectStructure() {
-		return TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForObjectProjection()
+	private static ObjectStructure requiredObjectStructure(boolean multivalued) {
+		return multivalued && TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
 				? ObjectStructure.NESTED : ObjectStructure.DEFAULT;
 	}
 
@@ -100,7 +100,7 @@ public class ObjectProjectionBaseIT {
 			private static class ObjectBinding extends AbstractCompositeProjectionFromAsIT.CompositeBinding {
 				public static ObjectBinding create(IndexSchemaElement parent, String relativeName,
 						boolean multiValued) {
-					IndexSchemaObjectField objectField = parent.objectField( relativeName, requiredObjectStructure() );
+					IndexSchemaObjectField objectField = parent.objectField( relativeName, requiredObjectStructure( multiValued ) );
 					if ( multiValued ) {
 						objectField.multiValued();
 					}

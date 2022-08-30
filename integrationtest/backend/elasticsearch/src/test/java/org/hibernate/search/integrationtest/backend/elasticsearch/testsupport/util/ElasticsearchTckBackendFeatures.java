@@ -211,7 +211,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean reliesOnNestedDocumentsForObjectProjection() {
+	public boolean reliesOnNestedDocumentsForMultiValuedObjectProjection() {
 		return false;
 	}
 }

@@ -78,11 +78,14 @@ public class FieldProjectionBaseIT {
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
 			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				for ( ObjectStructure structure :
-						TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForObjectProjection()
-								? new ObjectStructure[] { ObjectStructure.NESTED }
-								: new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
-					DataSet<?, ?, ?> dataSet = new DataSet<>( testValues( fieldType ), structure );
+				for ( ObjectStructure singleValuedObjectStructure :
+						new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
+					ObjectStructure multiValuedObjectStructure =
+							ObjectStructure.NESTED.equals( singleValuedObjectStructure )
+									|| TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
+									? ObjectStructure.NESTED
+									: ObjectStructure.FLATTENED;
+					DataSet<?, ?, ?> dataSet = new DataSet<>( testValues( fieldType ), singleValuedObjectStructure, multiValuedObjectStructure );
 					dataSets.add( dataSet );
 					parameters.add( new Object[] { dataSet } );
 				}
