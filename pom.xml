@@ -267,9 +267,10 @@
         <version.javax.persistence>2.2</version.javax.persistence>
         <version.javax.enterprise>2.0</version.javax.enterprise>
         <version.net.bytebuddy>1.12.9</version.net.bytebuddy>
+        <version.io.smallrye.jandex>3.0.1</version.io.smallrye.jandex>
 
         <!-- >>> ORM 6 / Jakarta Persistence -->
-        <version.org.hibernate.orm>6.0.2.Final</version.org.hibernate.orm>
+        <version.org.hibernate.orm>6.2.0-SNAPSHOT</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
         <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
@@ -278,8 +279,8 @@
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
-        <version.org.hibernate.commons.annotations.orm6>6.0.1.Final</version.org.hibernate.commons.annotations.orm6>
-        <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
+        <version.org.hibernate.commons.annotations.orm6>6.0.4.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
         <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
         <version.jakarta.xml.bind>3.0.1</version.jakarta.xml.bind>
         <version.net.bytebuddy.orm6>1.12.9</version.net.bytebuddy.orm6>

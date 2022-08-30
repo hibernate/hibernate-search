@@ -56,6 +56,23 @@
                         <groupId>org.hibernate.common</groupId>
                         <artifactId>hibernate-commons-annotations</artifactId>
                     </exclusion>
+                    <!-- We use Jandex 3 -->
+                    <exclusion>
+                        <groupId>org.jboss</groupId>
+                        <artifactId>jandex</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-common</artifactId>
+                <version>${project.version}</version>
+                <exclusions>
+                    <!-- We use Jandex 3 -->
+                    <exclusion>
+                        <groupId>org.jboss</groupId>
+                        <artifactId>jandex</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -63,13 +80,14 @@
                 <artifactId>hibernate-search-util-internal-test-common</artifactId>
                 <version>${project.version}</version>
                 <exclusions>
-                    <!-- Trust the ORM 6 dependency to bring in the correct version of Jandex and Bytebuddy
-                         (which, unfortunately, might be different from the version used in ORM 5.x
-                         on which our utils are aligned) -->
+                    <!-- We use Jandex 3 -->
                     <exclusion>
                         <groupId>org.jboss</groupId>
                         <artifactId>jandex</artifactId>
                     </exclusion>
+                    <!-- Trust the ORM 6 dependency to bring in the correct version of Bytebuddy
+                         (which, unfortunately, might be different from the version used in ORM 5.x
+                         on which our utils are aligned) -->
                     <exclusion>
                         <groupId>net.bytebuddy</groupId>
                         <artifactId>byte-buddy</artifactId>
@@ -195,6 +213,28 @@
                                     <directory>${transform.output.test.resources.path}</directory>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>ban-jandex-2</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <!-- We use Jandex 3 instead: io.smallrye:jandex, io.smallrye:jandex-maven-plugin -->
+                                        <exclude>org.jboss:jandex*</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
