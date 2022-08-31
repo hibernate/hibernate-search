@@ -63,7 +63,7 @@ public final class BackendIndexingWorkExpectations {
 					// are only about in-memory state (i.e. the CallQueues in BackendMock),
 					// so it's fine to poll aggressively every 5ms.
 					.pollInterval( Duration.ofMillis( 5 ) )
-					.atMost( Duration.ofSeconds( 15 ) )
+					.atMost( Duration.ofSeconds( 30 ) )
 					.untilAsserted( assertions );
 		}
 	}
