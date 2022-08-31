@@ -362,7 +362,6 @@
             <outputDirectory>dist/lib/provided</outputDirectory>
             <scope>provided</scope>
             <includes>
-                <include>org.jboss.spec.javax.annotation:*</include>
                 <include>javax.persistence:javax.persistence-api</include>
                 <include>org.jboss.spec.javax.transaction:*</include>
                 <include>javax.batch:javax.batch-api</include>

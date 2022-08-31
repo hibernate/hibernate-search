@@ -40,6 +40,37 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by Hibernate ORM -->
+                    <exclusion>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                    </exclusion>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se-shaded</artifactId>
@@ -63,6 +94,16 @@
                     <exclusion>
                         <groupId>org.infinispan</groupId>
                         <artifactId>infinispan-commons</artifactId>
+                    </exclusion>
+                    <!-- We depend on a different version, the one used by Hibernate ORM -->
+                    <exclusion>
+                        <groupId>jakarta.enterprise</groupId>
+                        <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                    </exclusion>
+                    <!-- We depend on a different version, the one used by Hibernate ORM -->
+                    <exclusion>
+                        <groupId>jakarta.annotation</groupId>
+                        <artifactId>jakarta.annotation-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
