@@ -268,30 +268,32 @@
         <version.org.hibernate>5.6.11.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
-        <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
-        <!-- This version must be kept in sync with the version of the dependency in Hibernate ORM.
-             DO NOT USE DEPENDENCY MANAGEMENT FOR THIS DEPENDENCY!
-             Thanks to not using dependency management for this dependency, we get a build failure
+        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM.
+             DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
+             Thanks to not using dependency management for these dependencies, we get a build failure
              when the versions start diverging, thanks to the maven-enforcer-plugin
-             and to our own explicit dependency in the utils-common artifact.
+             and to our own explicit dependencies in the relevant artifacts.
           -->
         <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
+        <version.org.hibernate.commons.annotations>5.1.2.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
-        <!-- This version must be kept in sync with the version of the dependency in Hibernate ORM.
-             DO NOT USE DEPENDENCY MANAGEMENT IN THE ROOT POM FOR THIS DEPENDENCY!
-             If we do not use dependency management for this dependency, we get a build failure
-             when the versions start diverging, thanks to the maven-enforcer-plugin
-             and to an artificial dependency in the mapper-orm artifact
-             (which is only necessary for the maven-enforcer-plugin checks to work).
-          -->
+        <version.javax.enterprise>2.0</version.javax.enterprise>
         <version.net.bytebuddy>1.12.9</version.net.bytebuddy>
 
         <!-- >>> ORM 6 / Jakarta Persistence -->
         <version.org.hibernate.orm>6.1.2.Final</version.org.hibernate.orm>
         <javadoc.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/javadocs/</javadoc.org.hibernate.orm.url>
         <documentation.org.hibernate.orm.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.orm.majorVersion}.${parsed-version.org.hibernate.orm.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.orm.url>
-        <version.org.hibernate.commons.annotations.orm6>6.0.4.Final</version.org.hibernate.commons.annotations.orm6>
-        <version.jakarta.persistence>3.1.0</version.jakarta.persistence>
+        <!-- These version must be kept in sync with the version of the dependency in Hibernate ORM 6.
+             DO NOT USE DEPENDENCY MANAGEMENT FOR THESE DEPENDENCIES!
+             Thanks to not using dependency management for these dependencies, we get a build failure
+             when the versions start diverging, thanks to the maven-enforcer-plugin
+             and to our own explicit dependencies in the relevant artifacts.
+          -->
+        <version.org.hibernate.commons.annotations.orm6>6.0.2.Final</version.org.hibernate.commons.annotations.orm6>
+        <version.jakarta.persistence>3.0.0</version.jakarta.persistence>
+        <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
+        <version.jakarta.xml.bind>3.0.1</version.jakarta.xml.bind>
         <version.net.bytebuddy.orm6>1.12.9</version.net.bytebuddy.orm6>
 
         <!-- >>> JSR 352 -->
@@ -304,20 +306,8 @@
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
         <version.javax.inject>1</version.javax.inject>
         <version.jakarta.inject-api>2.0.1</version.jakarta.inject-api>
-        <version.javax.enterprise>2.0</version.javax.enterprise>
-        <version.jakarta.enterprise>3.0.1</version.jakarta.enterprise>
-        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
-        <version.jakarta.annotation-api>2.1.1</version.jakarta.annotation-api>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
-        <version.jakarta.transaction-api>2.0.1</version.jakarta.transaction-api>
-        <!-- We need dependency management on these ones to avoid dependency divergence created by our own dependencies
-             (Hibernate ORM, JBatch, ...).
-             Ideally, we should remove this dependency management when the dependencies fix their dependency divergence.
-         -->
-        <version.jakarta.xml.bind>4.0.0</version.jakarta.xml.bind>
-        <version.jakarta.activation>2.1.0</version.jakarta.activation>
-        <version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec>1.0.1.Final</version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec>
-        <version.jakarta.interceptor-api>2.1.0</version.jakarta.interceptor-api>
+        <version.jakarta.transaction-api>2.0.0</version.jakarta.transaction-api>
         <!-- This is used to generate a link to the Java EE javadoc -->
         <javadoc.javaee.url>https://javaee.github.io/javaee-spec/javadocs/</javadoc.javaee.url>
         <javadoc.jakarta.batch.url>https://jakarta.ee/specifications/batch/2.0/apidocs/</javadoc.jakarta.batch.url>
@@ -942,6 +932,14 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core-jakarta</artifactId>
                 <version>${version.org.hibernate}</version>
+                <exclusions>
+                    <!-- hibernate-core-jakarta already depends on jakarta.xml.bind-api,
+                         which depends on com.sun.activation, which bundles the activation API already -->
+                    <exclusion>
+                        <groupId>jakarta.activation</groupId>
+                        <artifactId>jakarta.activation-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.orm</groupId>
@@ -962,11 +960,6 @@
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-envers</artifactId>
                 <version>${version.org.hibernate.orm}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.common</groupId>
-                <artifactId>hibernate-commons-annotations</artifactId>
-                <version>${version.org.hibernate.commons.annotations}</version>
             </dependency>
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
@@ -1037,27 +1030,6 @@
 
             <!-- JavaEE/JakartaEE dependencies -->
             <dependency>
-                <groupId>javax.persistence</groupId>
-                <artifactId>javax.persistence-api</artifactId>
-                <version>${version.javax.persistence}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.persistence</groupId>
-                <artifactId>jakarta.persistence-api</artifactId>
-                <version>${version.jakarta.persistence}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>${version.javax.enterprise}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.enterprise</groupId>
-                <artifactId>jakarta.enterprise.cdi-api</artifactId>
-                <version>${version.jakarta.enterprise}</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>${version.javax.inject}</version>
@@ -1066,38 +1038,6 @@
                 <groupId>jakarta.inject</groupId>
                 <artifactId>jakarta.inject-api</artifactId>
                 <version>${version.jakarta.inject-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.annotation</groupId>
-                <artifactId>jboss-annotations-api_1.2_spec</artifactId>
-                <version>${version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>${version.jakarta.annotation-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.transaction</groupId>
-                <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-                <version>${version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.transaction</groupId>
-                <artifactId>jakarta.transaction-api</artifactId>
-                <version>${version.jakarta.transaction-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.interceptor</groupId>
-                <artifactId>jboss-interceptor-api_1.2_spec</artifactId>
-                <version>${version.org.jboss.spec.javax.interceptor.jboss-interceptor-api_1.2_spec}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.interceptor</groupId>
-                <artifactId>jakarta.interceptor-api</artifactId>
-                <version>${version.jakarta.interceptor-api}</version>
             </dependency>
             <dependency>
                 <groupId>javax.batch</groupId>
@@ -1110,18 +1050,6 @@
                 <artifactId>jakarta.batch-api</artifactId>
                 <version>${version.jakarta.batch}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <!-- Fixes for dependency divergence in Hibernate ORM -->
-            <dependency>
-                <groupId>jakarta.xml.bind</groupId>
-                <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>${version.jakarta.xml.bind}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.activation</groupId>
-                <artifactId>jakarta.activation-api</artifactId>
-                <version>${version.jakarta.activation}</version>
             </dependency>
 
             <!-- Jackson: used by the Elasticsearch REST client and in tests (wiremock, ...) -->

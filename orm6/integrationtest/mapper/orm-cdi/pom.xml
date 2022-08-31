@@ -34,6 +34,8 @@
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.enterprise}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

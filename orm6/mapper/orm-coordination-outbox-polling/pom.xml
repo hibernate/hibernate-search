@@ -35,6 +35,8 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.xml.bind}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

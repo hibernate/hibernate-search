@@ -32,6 +32,8 @@
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.javax.enterprise}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
