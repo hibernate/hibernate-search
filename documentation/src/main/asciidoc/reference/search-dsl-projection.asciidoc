@@ -536,7 +536,8 @@ However, there are two key differences:
 ====
 With the <<backend-lucene,Lucene backend>>, the object projection has a few limitations:
 
-1. It is only available for object fields with a
+1. It is only available for single-valued object fields regardless of their <<mapping-indexedembedded-structure,structure>>,
+or multi-valued object fields with a
 <<mapping-indexedembedded-structure-nested,`NESTED` structure>>.
 2. It will never yield `null` objects for multi-valued object fields.
 The Lucene backend does not index `null` objects,
