@@ -45,11 +45,38 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
             <dependency>
-                <groupId>org.hibernate.common</groupId>
-                <artifactId>hibernate-commons-annotations</artifactId>
-                <version>${version.org.hibernate.commons.annotations.orm6}</version>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-pojo-base</artifactId>
+                <version>${project.version}</version>
+                <exclusions>
+                    <!-- Also imported by Hibernate ORM -->
+                    <exclusion>
+                        <groupId>org.hibernate.common</groupId>
+                        <artifactId>hibernate-commons-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-test-common</artifactId>
+                <version>${project.version}</version>
+                <exclusions>
+                    <!-- Trust the ORM 6 dependency to bring in the correct version of Jandex and Bytebuddy
+                         (which, unfortunately, might be different from the version used in ORM 5.x
+                         on which our utils are aligned) -->
+                    <exclusion>
+                        <groupId>org.jboss</groupId>
+                        <artifactId>jandex</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>net.bytebuddy</groupId>
+                        <artifactId>byte-buddy</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se-shaded</artifactId>
@@ -80,25 +107,6 @@
                 <groupId>org.jberet</groupId>
                 <artifactId>jberet-se</artifactId>
                 <version>${version.org.jberet.jakarta}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test-common</artifactId>
-                <version>${project.version}</version>
-                <exclusions>
-                    <!-- Trust the ORM 6 dependency to bring in the correct version of Jandex and Bytebuddy
-                         (which, unfortunately, might be different from the version used in ORM 5.x
-                         on which our utils are aligned) -->
-                    <exclusion>
-                        <groupId>org.jboss</groupId>
-                        <artifactId>jandex</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.bytebuddy</groupId>
-                        <artifactId>byte-buddy</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
