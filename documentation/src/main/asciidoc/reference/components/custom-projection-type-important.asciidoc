@@ -10,6 +10,6 @@ or Hibernate Search will <<mapping-projection-type-detection,require additional 
 In particular, with the <<backend-lucene,Lucene backend>>, value fields involved in the projection
 must be configured as <<mapping-directfieldmapping-projectable,projectable>>.
 * When projecting on object fields, the constraints of the <<search-dsl-projection-object,`object`>> projection still apply.
-In particular, with the <<backend-lucene,Lucene backend>>, object fields involved in the projection
+In particular, with the <<backend-lucene,Lucene backend>>, multi-valued object fields involved in the projection
 must be configured as <<mapping-indexedembedded-structure-nested,nested>>.
 ====
