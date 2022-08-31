@@ -38,21 +38,27 @@
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jandex</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE this dependency. See the version property declaration. -->
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
             <version>${version.org.jboss.jandex}</version>
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.javax.persistence}</version>
         </dependency>
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.javax.enterprise}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.common</groupId>
             <artifactId>hibernate-commons-annotations</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.org.hibernate.commons.annotations}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -71,7 +77,7 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <!-- DO NOT REMOVE and DO NOT MANAGE this dependency. See the version property declaration. -->
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
             <version>${version.net.bytebuddy}</version>
             <scope>test</scope>
         </dependency>
