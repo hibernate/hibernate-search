@@ -60,11 +60,12 @@
                     <!-- See https://maven.apache.org/plugins/maven-dependency-plugin/examples/unpacking-artifacts.html -->
                     <execution>
                         <id>unpack-dependencies-javadoc-packagelists</id>
-                        <phase>generate-resources</phase>
+                        <phase>${javadoc.download.phase}</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${maven.javadoc.skip}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
@@ -131,6 +132,7 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
+                            <skipAssembly>${maven.javadoc.skip}</skipAssembly>
                             <descriptors>
                                 <descriptor>src/main/assembly/dependencies-javadoc-packagelists.xml</descriptor>
                             </descriptors>

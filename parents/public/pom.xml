@@ -188,11 +188,12 @@
                         <executions>
                             <execution>
                                 <id>unpack-dependencies-javadoc-packagelists</id>
-                                <phase>generate-resources</phase>
+                                <phase>${javadoc.download.phase}</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>${javadoc.download.phase}</skip>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
