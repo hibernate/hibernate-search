@@ -343,6 +343,7 @@
             check for regressions. Which is obviously good for us, too.
          -->
         <puppycrawl.checkstyle.version>8.8</puppycrawl.checkstyle.version>
+        <version.versions.plugin>2.11.0</version.versions.plugin>
 
         <!-- Asciidoctor -->
 
@@ -394,6 +395,9 @@
          -->
         <version.org.codehaus.plexus.plexus-compiler-eclipse>2.8.5</version.org.codehaus.plexus.plexus-compiler-eclipse>
         <version.org.eclipse.jdt.ecj>3.17.0</version.org.eclipse.jdt.ecj>
+
+        <!-- Set non-empty default value to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <maven.javadoc.skip>false</maven.javadoc.skip>
 
         <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
@@ -1655,6 +1659,11 @@
                     <version>${version.exec.plugin}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${version.versions.plugin}</version>
+                </plugin>
+                <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
                     <version>${version.forbiddenapis.plugin}</version>
@@ -2017,6 +2026,72 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Profile used when testing dependency updates on CI -->
+        <profile>
+            <id>dependency-update</id>
+            <properties>
+                <!-- Skip parts of the build that may fail but don't matter when testing upgrades -->
+                <checkstyle.skip>true</checkstyle.skip>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+                <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!-- We don't care about deprecation and other warnings when
+                                 testing compatibility with updated dependencies. -->
+                            <failOnWarning>false</failOnWarning>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <repositories>
+                <!--
+                    Enable the sonatype-oss Snapshots repository, for Hibernate ORM 6+ in particular.
+                 -->
+                <repository>
+                    <id>sonatype-oss</id>
+                    <name>JBoss Public Maven Repository Group</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
+                             unless we enable releases.
+                             This is most likely a bug. -->
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+                <!--
+                    Enable the JBoss Snapshots repository, for Hibernate ORM 5.6 in particular.
+                 -->
+                <repository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Maven Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
+                             unless we enable releases.
+                             This is most likely a bug. -->
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
         </profile>
 
         <profile>
