@@ -1,0 +1,186 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+
+@Library('hibernate-jenkins-pipeline-helpers@1.5') _
+
+// NOTE: Remember to update the matrix axes below when adding/removing entries here.
+Map settings() {
+	switch (env.DEPENDENCY_UPDATE_NAME) {
+		case 'orm5.6':
+			return [
+					mavenArgs: """ \
+							-pl mapper/orm -amd \
+					""",
+					updateProperties: ['version.org.hibernate']
+			]
+		case 'orm6.1':
+			return [
+					mavenArgs: """ \
+							-pl orm6/mapper/orm -amd \
+					""",
+					updateProperties: ['version.org.hibernate.orm']
+			]
+		case 'orm6.2':
+			return [
+					mavenArgs: """ \
+							-pl orm6/mapper/orm -amd \
+					""",
+					updateProperties: ['version.org.hibernate.orm']
+			]
+		case 'orm6-in-main-code':
+			return [
+					mavenArgs: "", // In this case we'll test everything.
+					updateProperties: ['version.org.hibernate.orm']
+			]
+		default:
+			return [:]
+	}
+}
+
+// Perform authenticated pulls of container images, to avoid failure due to download throttling on dockerhub.
+def pullContainerImages() {
+	String containerImageRefsString = ((String) sh(script: "./ci/list-container-images.sh -U -Pdist -Pdependency-update ${settings().mavenArgs}", returnStdout: true))
+	String[] containerImageRefs = containerImageRefsString ? containerImageRefsString.split('\\s+') : new String[0]
+	echo 'Container images to be used in tests: ' + Arrays.toString(containerImageRefs)
+	if (containerImageRefs.length == 0) {
+		return
+	}
+	docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
+		// Cannot use a foreach loop because then Jenkins wants to serialize the iterator,
+		// and obviously the iterator is not serializable.
+		for (int i = 0; i < containerImageRefs.length; i++) {
+			containerImageRef = containerImageRefs[i]
+			docker.image(containerImageRef).pull()
+		}
+	}
+}
+
+def withMavenWorkspace(Closure body) {
+	withMaven(jdk: 'OpenJDK 17 Latest', maven: 'Apache Maven 3.8',
+			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
+			options: [artifactsPublisher(disabled: true)]) {
+		body()
+	}
+}
+
+pipeline {
+	agent none
+	triggers {
+		// Run at least once per week, in case of snapshot updates.
+		cron '@weekly'
+	}
+	options {
+		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
+		disableConcurrentBuilds(abortPrevious: true)
+		// Run at most twice per week, to preserve CI workers for more urgent tasks.
+		rateLimitBuilds(throttle: [count: 2, durationName: 'week', userBoost: true])
+	}
+	stages {
+		stage('BuildAndTest') {
+			matrix {
+				agent {
+					label 'Worker&&Containers'
+				}
+				post {
+					cleanup {
+						sh 'ci/docker-cleanup.sh'
+					}
+				}
+				axes {
+					axis {
+						name 'DEPENDENCY_UPDATE_NAME'
+						// NOTE: Remember to update the settings() method above when changing this.
+						values 'orm5.6', 'orm6.1', 'orm6.2', 'orm6-in-main-code'
+					}
+				}
+				stages {
+					stage('Init') {
+						steps {
+							sh 'ci/docker-cleanup.sh'
+						}
+					}
+					stage('Merge WIP') {
+						steps {
+							script {
+								String branchToMerge = "origin/wip/${BRANCH_NAME}-dependency-update-${env.DEPENDENCY_UPDATE_NAME}"
+								if (0 == sh(script: "git rev-parse --quiet --verify ${branchToMerge}", returnStatus: true)) {
+									// A branch exists with patches to apply, merge it
+									sh "git merge ${branchToMerge}"
+								}
+								else {
+									echo "No WIP branch found; skipping."
+								}
+							}
+						}
+					}
+					stage('Update properties') {
+						when {
+							expression {
+								return settings().updateProperties
+							}
+						}
+						steps {
+							withMavenWorkspace {
+								// We allow any update, but constrain using a rules file (more flexible)
+								sh """
+										mvn -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
+										-DgenerateBackupPoms=false \
+										-DallowMajorUpdates=true \
+										-DallowMinorUpdates=true \
+										-DallowSnapshots=true \
+										-DincludeProperties='${settings().updateProperties.join(",")}' \
+										-Dmaven.version.rules="file://\$(pwd)/ci/dependency-update/rules-${env.DEPENDENCY_UPDATE_NAME}.xml" \
+								"""
+								sh "echo 'Updated version properties:' && git diff HEAD"
+								sh "git diff | grep -q '.' || { echo \"ERROR: The automatic version update didn't change the POMs.\" && false; }"
+							}
+						}
+					}
+					// If we're going to execute only a few tests,
+					// make sure all artifacts are built and can be used as dependency in those tests.
+					stage('Pre-build') {
+						when {
+							expression {
+								return !settings().mavenArgs.isBlank()
+							}
+						}
+						options {
+							timeout(time: 30, unit: 'MINUTES')
+						}
+						steps {
+							withMavenWorkspace {
+								sh """ \
+									mvn clean install -U -Pdependency-update -Pdist -DskipTests \
+								"""
+							}
+						}
+					}
+					stage('Test') {
+						options {
+							timeout(time: 1, unit: 'HOURS')
+						}
+						steps {
+							withMavenWorkspace {
+								pullContainerImages()
+								sh """ \
+									mvn clean install -U -Pdependency-update -Pdist -Dsurefire.environment=${env.DEPENDENCY_UPDATE_NAME} \
+									--fail-at-end \
+									${settings().mavenArgs} \
+								"""
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	post {
+		always {
+			notifyBuildResult notifySuccessAfterSuccess: true, maintainers: 'yoann@hibernate.org'
+		}
+	}
+}

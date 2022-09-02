@@ -406,6 +406,7 @@
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
         <version.org.codehaus.groovy-jsr223>3.0.12</version.org.codehaus.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>10.3.3</version.com.puppycrawl.tools.checkstyle>
+        <version.versions.plugin>2.11.0</version.versions.plugin>
 
         <!-- Asciidoctor -->
 
@@ -517,6 +518,14 @@
 
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
+
+        <!-- Set empty default value to avoid Maven leaving property references (${...}) when it doesn't find a value -->
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <!-- We control whether we should download javadoc based on this property
+             that defines the phase of some Maven plugin executions,
+             because just skipping those plugins doesn't skip dependency resolution,
+             which will fail if javadco wasn't downloaded. -->
+        <javadoc.download.phase>generate-resources</javadoc.download.phase>
 
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
@@ -1872,6 +1881,11 @@
                     <version>${version.buildhelper.plugin}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${version.versions.plugin}</version>
+                </plugin>
+                <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
                     <version>${version.forbiddenapis.plugin}</version>
@@ -2398,6 +2412,73 @@
                 <module>orm6</module>
                 <module>distribution</module>
             </modules>
+        </profile>
+
+        <!-- Profile used when testing dependency updates on CI -->
+        <profile>
+            <id>dependency-update</id>
+            <properties>
+                <!-- Skip parts of the build that may fail but don't matter when testing upgrades -->
+                <checkstyle.skip>true</checkstyle.skip>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+                <javadoc.download.phase>none</javadoc.download.phase>
+                <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!-- We don't care about deprecation and other warnings when
+                                 testing compatibility with updated dependencies. -->
+                            <failOnWarning>false</failOnWarning>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <repositories>
+                <!--
+                    Enable the sonatype-oss Snapshots repository, for Hibernate ORM 6+ in particular.
+                 -->
+                <repository>
+                    <id>sonatype-oss</id>
+                    <name>JBoss Public Maven Repository Group</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
+                             unless we enable releases.
+                             This is most likely a bug. -->
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+                <!--
+                    Enable the JBoss Snapshots repository, for Hibernate ORM 5.6 in particular.
+                 -->
+                <repository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Maven Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <!-- versions-maven-plugin will ignore this repo, even for snapshots,
+                             unless we enable releases.
+                             This is most likely a bug. -->
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
         </profile>
 
         <profile>

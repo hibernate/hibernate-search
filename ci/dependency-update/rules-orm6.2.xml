@@ -1,0 +1,12 @@
+<ruleset comparisonMethod="maven"
+         xmlns="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0 http://mojo.codehaus.org/versions-maven-plugin/xsd/rule-2.0.0.xsd">
+  <ignoreVersions>
+    <ignoreVersion type="regex">.*\.Alpha.*</ignoreVersion>
+    <ignoreVersion type="regex">.*\.Beta.*</ignoreVersion>
+    <ignoreVersion type="regex">.*\.CR.*</ignoreVersion>
+    <!-- This is the easiest way to stick to a particular major/minor;
+         forbidding minor/major upgrades in the plugin configuration doesn't always work for some reason. -->
+    <ignoreVersion type="regex">(?!6\.2\.).*</ignoreVersion>
+  </ignoreVersions>
+</ruleset>
