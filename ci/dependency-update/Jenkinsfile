@@ -10,6 +10,12 @@
 // NOTE: Remember to update the matrix axes below when adding/removing entries here.
 Map settings() {
 	switch (env.DEPENDENCY_UPDATE_NAME) {
+		case 'jandex3':
+			return [
+					mavenArgs: """ \
+							-pl mapper/pojo-base,mapper/orm,jakarta/mapper/orm,orm6/mapper/orm -amd \
+					"""
+			]
 		case 'orm5.6':
 			return [
 					mavenArgs: """ \
@@ -94,7 +100,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'orm5.6', 'orm6.1', 'orm6.2', 'orm6-in-main-code'
+						values 'jandex3', 'orm5.6', 'orm6.1', 'orm6.2', 'orm6-in-main-code'
 					}
 				}
 				stages {
