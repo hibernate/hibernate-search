@@ -76,10 +76,10 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss</groupId>
+            <groupId>io.smallrye</groupId>
             <artifactId>jandex</artifactId>
             <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
-            <version>${version.org.jboss.jandex}</version>
+            <version>${version.io.smallrye.jandex}</version>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
@@ -103,7 +103,7 @@
             </plugin>
             <!-- This is only necessary to implement a few tests in other Maven modules; see JandexUtilsTest -->
             <plugin>
-                <groupId>org.jboss.jandex</groupId>
+                <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
                 <executions>
                     <execution>
