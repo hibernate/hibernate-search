@@ -22,6 +22,12 @@
             <artifactId>hibernate-search-mapper-orm</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>jandex</artifactId>
+            <!-- DO NOT MANAGE this dependency. See the version property declaration. -->
+            <version>${version.io.smallrye.jandex}</version>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-lucene</artifactId>
         </dependency>

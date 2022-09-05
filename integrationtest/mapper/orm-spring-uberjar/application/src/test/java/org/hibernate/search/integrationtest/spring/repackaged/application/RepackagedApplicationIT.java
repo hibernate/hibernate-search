@@ -103,9 +103,7 @@ public class RepackagedApplicationIT {
 
 							classInfo = index.getClassByName( DotName.createSimple( MyProjection.class.getName() ) );
 							assertThat( classInfo ).isNotNull();
-							assertThat(
-									classInfo.annotations()
-											.get( DotName.createSimple( ProjectionConstructor.class.getName() ) ) )
+							assertThat( classInfo.annotation( DotName.createSimple( ProjectionConstructor.class.getName() ) ) )
 									.isNotNull();
 							name = classInfo.field( "name" );
 							assertThat( name ).isNotNull();
