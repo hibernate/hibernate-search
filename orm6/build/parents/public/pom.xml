@@ -83,7 +83,7 @@
                 <exclusions>
                     <!-- We use Jandex 3 -->
                     <exclusion>
-                        <groupId>org.jboss</groupId>
+                        <groupId>io.smallrye</groupId>
                         <artifactId>jandex</artifactId>
                     </exclusion>
                     <!-- Trust the ORM 6 dependency to bring in the correct version of Jandex and Bytebuddy

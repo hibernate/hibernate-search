@@ -26,10 +26,10 @@
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss</groupId>
+            <groupId>io.smallrye</groupId>
             <artifactId>jandex</artifactId>
             <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.org.jboss.jandex}</version>
+            <version>${version.io.smallrye.jandex}</version>
         </dependency>
 
         <dependency>

@@ -264,10 +264,8 @@
              when the versions start diverging, thanks to the maven-enforcer-plugin
              and to our own explicit dependencies in the relevant artifacts.
           -->
-        <version.org.jboss.jandex>2.4.2.Final</version.org.jboss.jandex>
         <version.org.hibernate.commons.annotations>${version.org.hibernate.commons.annotations.orm6}</version.org.hibernate.commons.annotations>
         <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
-        <version.io.smallrye.jandex>3.0.0</version.io.smallrye.jandex>
 
         <!-- >>> ORM 6 with Jakarta Persistence -->
         <version.org.hibernate.orm>6.2.0.CR2</version.org.hibernate.orm>
@@ -365,7 +363,7 @@
         <version.exec.plugin>3.1.0</version.exec.plugin>
         <version.forbiddenapis.plugin>3.4</version.forbiddenapis.plugin>
         <version.install.plugin>3.1.1</version.install.plugin>
-        <version.jandex.plugin>1.2.3</version.jandex.plugin>
+        <version.jandex.plugin>3.0.3</version.jandex.plugin>
         <version.japicmp.plugin>0.17.2</version.japicmp.plugin>
         <version.jar.plugin>3.3.0</version.jar.plugin>
         <version.javadoc.plugin>3.5.0</version.javadoc.plugin>
@@ -1603,6 +1601,12 @@
                                     <version>${maven.min.version}</version>
                                 </requireMavenVersion>
                                 <banDuplicatePomDependencyVersions />
+                                <bannedDependencies>
+                                    <excludes>
+                                        <!-- We use Jandex 3 instead: io.smallrye:jandex, io.smallrye:jandex-maven-plugin -->
+                                        <exclude>org.jboss:jandex*</exclude>
+                                    </excludes>
+                                </bannedDependencies>
                             </rules>
                         </configuration>
                     </execution>
@@ -2024,7 +2028,7 @@
                     <version>1.0.2</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.jboss.jandex</groupId>
+                    <groupId>io.smallrye</groupId>
                     <artifactId>jandex-maven-plugin</artifactId>
                     <version>${version.jandex.plugin}</version>
                     <executions>
