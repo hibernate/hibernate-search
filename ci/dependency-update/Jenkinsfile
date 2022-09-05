@@ -77,7 +77,7 @@ pipeline {
 		buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '3')
 		disableConcurrentBuilds(abortPrevious: true)
 		// Run at most twice per week, to preserve CI workers for more urgent tasks.
-		rateLimitBuilds(throttle: [count: 2, durationName: 'week', userBoost: true])
+		//rateLimitBuilds(throttle: [count: 2, durationName: 'week', userBoost: true])
 	}
 	stages {
 		stage('BuildAndTest') {
