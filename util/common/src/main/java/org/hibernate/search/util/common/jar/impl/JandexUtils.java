@@ -70,7 +70,7 @@ public final class JandexUtils {
 		for ( AnnotationInstance retentionAnnotation : index.getAnnotations( metaAnnotation ) ) {
 			ClassInfo annotation = retentionAnnotation.target().asClass();
 			annotations.add( annotation.name() );
-			AnnotationInstance repeatable = annotation.classAnnotation( REPEATABLE );
+			AnnotationInstance repeatable = annotation.declaredAnnotation( REPEATABLE );
 			if ( repeatable != null ) {
 				Type containing = repeatable.value().asClass();
 				annotations.add( containing.name() );
