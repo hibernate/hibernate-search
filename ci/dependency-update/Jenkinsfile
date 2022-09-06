@@ -80,7 +80,7 @@ pipeline {
 		rateLimitBuilds(throttle: [count: 2, durationName: 'week', userBoost: true])
 	}
 	stages {
-		stage('BuildAndTest') {
+		stage('Update dependency and test') {
 			matrix {
 				agent {
 					label 'Worker&&Containers'
@@ -103,40 +103,15 @@ pipeline {
 							sh 'ci/docker-cleanup.sh'
 						}
 					}
-					stage('Merge WIP') {
-						steps {
-							script {
-								String branchToMerge = "origin/wip/${BRANCH_NAME}/dependency-update/${env.DEPENDENCY_UPDATE_NAME}"
-								if (0 == sh(script: "git rev-parse --quiet --verify ${branchToMerge}", returnStatus: true)) {
-									// A branch exists with patches to apply, merge it
-									sh "git merge ${branchToMerge}"
-								}
-								else {
-									echo "No WIP branch found; skipping."
-								}
-							}
-						}
-					}
-					stage('Update properties') {
-						when {
-							expression {
-								return settings().updateProperties
-							}
-						}
+					stage('Update dependency') {
 						steps {
 							withMavenWorkspace {
-								// We allow any update, but constrain using a rules file (more flexible)
-								sh """
-										mvn -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
-										-DgenerateBackupPoms=false \
-										-DallowMajorUpdates=true \
-										-DallowMinorUpdates=true \
-										-DallowSnapshots=true \
-										-DincludeProperties='${settings().updateProperties.join(",")}' \
-										-Dmaven.version.rules="file://\$(pwd)/ci/dependency-update/rules-${env.DEPENDENCY_UPDATE_NAME}.xml" \
-								"""
-								sh "echo 'Updated version properties:' && git diff HEAD"
-								sh "git diff | grep -q '.' || { echo \"ERROR: The automatic version update didn't change the POMs.\" && false; }"
+								sh "ci/dependency-update/perform-update.sh ${env.DEPENDENCY_UPDATE_NAME} '${settings().updateProperties?.join(",")}'"
+							}
+							script {
+								if (0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
+									error "This job does not seem to update any dependency; perhaps it is misconfigured? The source code has not been updated, neither by merging a WIP branch nor by updating version properties."
+								}
 							}
 						}
 					}

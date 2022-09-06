@@ -65,6 +65,12 @@ this job may automatically merge a branch before running the build.
 By convention, such a branch will be named `wip/<base-branch>-dependency-update-<update-name>`,
 e.g. `wip/main-dependency-update-orm6.1`.
 
+Note you can test dependency updates locally by calling the script `ci/dependency-update/perform-update.sh`, e.g.:
+
+```shell
+ci/dependency-update/perform-update.sh orm6.2 version.org.hibernate.orm
+```
+
 ### Performance pipeline
 
 https://ci.hibernate.org/job/hibernate-search-performance/
