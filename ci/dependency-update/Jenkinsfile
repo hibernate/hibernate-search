@@ -101,7 +101,7 @@ pipeline {
 					stage('Update dependency') {
 						steps {
 							withMavenWorkspace {
-								sh "ci/dependency-update/perform-update.sh ${env.DEPENDENCY_UPDATE_NAME} '${settings().updateProperties?.join(",")}'"
+								sh "ci/dependency-update/perform-update.sh ${env.DEPENDENCY_UPDATE_NAME} '${settings().updateProperties?.join(",") ?: ''}'"
 							}
 							script {
 								if (0 != sh(script: "git diff origin/${BRANCH_NAME} | grep -q '.'", returnStatus: true)) {
