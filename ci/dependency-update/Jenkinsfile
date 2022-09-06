@@ -106,7 +106,7 @@ pipeline {
 					stage('Merge WIP') {
 						steps {
 							script {
-								String branchToMerge = "origin/wip/${BRANCH_NAME}-dependency-update-${env.DEPENDENCY_UPDATE_NAME}"
+								String branchToMerge = "origin/wip/${BRANCH_NAME}/dependency-update/${env.DEPENDENCY_UPDATE_NAME}"
 								if (0 == sh(script: "git rev-parse --quiet --verify ${branchToMerge}", returnStatus: true)) {
 									// A branch exists with patches to apply, merge it
 									sh "git merge ${branchToMerge}"
