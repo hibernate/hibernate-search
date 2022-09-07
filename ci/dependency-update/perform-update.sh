@@ -30,8 +30,11 @@ fi
 
 DEPENDENCY_UPDATE_NAME="$1"
 shift
-PROPERTIES="$1"
-shift
+if (( $# > 1 ))
+then
+	PROPERTIES="$1"
+	shift
+fi
 
 : ${BRANCH_NAME:="$(git branch --show-current)"}
 
