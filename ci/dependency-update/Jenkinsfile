@@ -13,7 +13,7 @@ Map settings() {
 		case 'orm5.6':
 			return [
 					mavenArgs: """ \
-							-pl mapper/orm -amd \
+							-pl mapper/orm,jakarta/mapper/orm -amd \
 					""",
 					updateProperties: ['version.org.hibernate']
 			]
