@@ -70,7 +70,7 @@ if [ -n "$PROPERTIES" ]
 then
 	echo "Updating properties '$PROPERTIES'."
 	# We allow any update, but constrain using a rules file (more flexible)
-	./mvnw --quiet -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
+	mvn --quiet -U -Pdependency-update -Pdist org.codehaus.mojo:versions-maven-plugin:update-properties \
 		-DgenerateBackupPoms=false \
 		-DallowMajorUpdates=true -DallowMinorUpdates=true -DallowSnapshots=true \
 		-DincludeProperties="$PROPERTIES" \
