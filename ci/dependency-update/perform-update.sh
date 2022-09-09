@@ -30,7 +30,7 @@ fi
 
 DEPENDENCY_UPDATE_NAME="$1"
 shift
-if (( $# > 1 ))
+if (( $# >= 1 ))
 then
 	PROPERTIES="$1"
 	shift
