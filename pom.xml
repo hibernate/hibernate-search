@@ -406,7 +406,7 @@
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
         <version.org.codehaus.groovy-jsr223>3.0.12</version.org.codehaus.groovy-jsr223>
         <version.com.puppycrawl.tools.checkstyle>10.3.3</version.com.puppycrawl.tools.checkstyle>
-        <version.versions.plugin>2.11.0</version.versions.plugin>
+        <version.versions.plugin>2.12.0</version.versions.plugin>
 
         <!-- Asciidoctor -->
 
