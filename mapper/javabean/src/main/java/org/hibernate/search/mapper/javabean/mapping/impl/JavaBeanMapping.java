@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
-import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.logging.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;

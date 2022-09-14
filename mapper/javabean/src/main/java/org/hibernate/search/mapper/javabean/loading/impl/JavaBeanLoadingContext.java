@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.SelectionLoadingOptions;
 import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.dsl.SelectionLoadingOptionsStep;
-import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.logging.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;

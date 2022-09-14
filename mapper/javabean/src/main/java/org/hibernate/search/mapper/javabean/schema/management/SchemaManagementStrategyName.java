@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.schema.management;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum SchemaManagementStrategyName {

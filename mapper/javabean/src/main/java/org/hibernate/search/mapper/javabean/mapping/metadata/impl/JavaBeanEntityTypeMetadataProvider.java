@@ -14,7 +14,7 @@ import java.util.Set;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
-import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.logging.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurationContext;
 import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;

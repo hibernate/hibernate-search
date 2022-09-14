@@ -25,7 +25,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
-import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.logging.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurer;
