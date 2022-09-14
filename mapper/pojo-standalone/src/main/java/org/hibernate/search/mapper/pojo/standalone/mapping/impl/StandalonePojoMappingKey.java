@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.mapping.impl;
 
-import org.hibernate.search.mapper.pojo.standalone.log.impl.StandalonePojoEventContextMessages;
+import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoEventContextMessages;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 
 public final class StandalonePojoMappingKey implements MappingKey<StandalonePojoMappingPartialBuildState, StandalonePojoMapping> {

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalysisDefinition;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
 import com.google.gson.JsonElement;
 
