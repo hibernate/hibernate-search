@@ -800,6 +800,46 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="hsearch:JBossLoggerTypesMustBeInLoggingPackages">
+        <requiresConcept refId="hsearch:Impl" />
+        <description>
+            All internal (impl) JBoss Logger types
+            must be in packages matching org.hibernate.search.*.logging.impl,
+            so that they are correctly exported to the JBoss Logging module in module-info.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type:Impl)<-[:CONTAINS]-(package:Package)
+            WHERE
+                type.name ENDS WITH "_$logger"
+                AND NOT package.fqn =~ "org\\.hibernate\\.search\\..*\\.logging\\.impl"
+            SET
+                type:Impl
+            RETURN
+                type
+        ]]></cypher>
+    </constraint>
+
+    <constraint id="hsearch:JBossMessageTypesMustBeInReportingPackages">
+        <requiresConcept refId="hsearch:Impl" />
+        <description>
+            All internal (impl) JBoss Message types
+            must be in packages matching org.hibernate.search.*.reporting.impl,
+            so that they are correctly exported to the JBoss Logging module in module-info.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type:Impl)<-[:CONTAINS]-(package:Package)
+            WHERE
+                type.name ENDS WITH "_$bundle"
+                AND NOT package.fqn =~ "org\\.hibernate\\.search\\..*\\.reporting\\.impl"
+            SET
+                type:Impl
+            RETURN
+                type
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="hsearch:PublicTypesMayNotExposeInternalTypes" />
         <includeConstraint refId="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
@@ -815,6 +855,8 @@
         <includeConstraint refId="hsearch:ImplPackagesMustNotHaveSubPackages" />
         <includeConstraint refId="hsearch:NestedTestTypesShouldBeAnnotatedWithNested" />
         <includeConstraint refId="hsearch:StandalonePojoAPIAndSPIShouldBeAnnotatedWithIncubating" />
+        <includeConstraint refId="hsearch:JBossLoggerTypesMustBeInLoggingPackages" />
+        <includeConstraint refId="hsearch:JBossMessageTypesMustBeInReportingPackages" />
     </group>
 
     <group id="cycles">
