@@ -10,22 +10,23 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.integrationtest.java.modules.config.MyElasticsearchAnalysisConfigurer;
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-@Entity
+// See AuthorService#triggerValidationFailure
+@Entity(name = "Author")
 @Indexed
-public class Author {
+public class AuthorWithSlightlyDifferentIndex {
 
 	@Id
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = MyElasticsearchAnalysisConfigurer.MY_ANALYZER)
+	@FullTextField(analyzer = AnalyzerNames.DEFAULT)
 	private String name;
 
-	public Author() {
+	public AuthorWithSlightlyDifferentIndex() {
 	}
 
 	public Integer getId() {

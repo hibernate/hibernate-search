@@ -15,9 +15,12 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.integrationtest.java.modules.entity.Author;
+import org.hibernate.search.integrationtest.java.modules.entity.AuthorWithSlightlyDifferentIndex;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class AuthorService implements AutoCloseable {
@@ -34,6 +37,20 @@ public class AuthorService implements AutoCloseable {
 		Metadata metadata = new MetadataSources( serviceRegistry ).addAnnotatedClass( Author.class ).buildMetadata();
 		SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
 		return sfb.build();
+	}
+
+	public void triggerValidationFailure() {
+		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
+		registryBuilder.applySetting( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, "none" );
+		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
+		Metadata metadata = new MetadataSources( serviceRegistry )
+				.addAnnotatedClass( AuthorWithSlightlyDifferentIndex.class )
+				.buildMetadata();
+		SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
+		try ( SessionFactory sessionFactory = sfb.build() ) {
+			Search.mapping( sessionFactory ).scope( Object.class ).schemaManager().validate();
+			throw new AssertionFailure( "Validation failure was not triggered?" );
+		}
 	}
 
 	public void add(String name) {
