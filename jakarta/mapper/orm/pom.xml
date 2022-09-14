@@ -107,6 +107,11 @@
                                 <moduleInfo>
                                     <requires>
                                         static jakarta.cdi;
+                                        org.hibernate.*.impl;
+                                        org.hibernate.*.internal;
+                                        org.hibernate.*.impl.*;
+                                        org.hibernate.*.internal.*;
+                                        transitive org.hibernate.*;
                                         *;
                                     </requires>
                                 </moduleInfo>
