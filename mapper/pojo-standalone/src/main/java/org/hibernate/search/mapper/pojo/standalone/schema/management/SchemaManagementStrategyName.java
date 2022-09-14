@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.standalone.schema.management;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
-import org.hibernate.search.mapper.pojo.standalone.log.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

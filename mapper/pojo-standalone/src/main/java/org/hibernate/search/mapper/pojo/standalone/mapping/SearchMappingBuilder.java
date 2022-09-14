@@ -26,7 +26,7 @@ import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.impl.StandalonePojoMappingInitiator;
-import org.hibernate.search.mapper.pojo.standalone.log.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.impl.StandalonePojoMappingKey;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.EntityConfigurer;
