@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.schema.management.impl;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchValidationMessages;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexAliasDefinitionValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexSettingsValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.RootTypeMappingValidator;

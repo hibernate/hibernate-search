@@ -25,6 +25,9 @@ public interface PojoEventContextMessages {
 
 	PojoEventContextMessages INSTANCE = Messages.getBundle( PojoEventContextMessages.class );
 
+	@Message(value = "Schema management")
+	String schemaManagement();
+
 	@Message(value = "constructor with parameter types %1$s")
 	String constructor(@FormatWith(CommaSeparatedClassesFormatter.class) Class<?>[] parameterTypes);
 

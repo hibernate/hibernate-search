@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
 import com.google.gson.JsonElement;
 
