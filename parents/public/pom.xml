@@ -165,6 +165,19 @@
                                         org.hibernate.search.*.impl to org.hibernate.search.engine;
                                         *;
                                     </exports>
+                                    <!-- Requires:
+                                             - impl/internal Hibernate ORM and Hibernate Search packages are required non-transitively
+                                             - all other Hibernate ORM and Hibernate Search packages are required transitively
+                                             - all other packages are required non-transitively
+                                     -->
+                                    <requires>
+                                        org.hibernate.*.impl;
+                                        org.hibernate.*.internal;
+                                        org.hibernate.*.impl.*;
+                                        org.hibernate.*.internal.*;
+                                        transitive org.hibernate.*;
+                                        *;
+                                    </requires>
                                 </moduleInfo>
                             </module>
                             <jdepsExtraArgs>
