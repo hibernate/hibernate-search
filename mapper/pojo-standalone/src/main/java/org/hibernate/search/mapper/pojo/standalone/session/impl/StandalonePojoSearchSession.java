@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.standalone.loading.dsl.SelectionLoadingO
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoSelectionLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.standalone.log.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SearchSchemaManager;

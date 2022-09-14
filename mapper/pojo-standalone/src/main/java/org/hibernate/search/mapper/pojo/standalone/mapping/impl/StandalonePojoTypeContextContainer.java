@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.LoadingTypeContextProvider;
-import org.hibernate.search.mapper.pojo.standalone.log.impl.Log;
+import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.StandalonePojoEntityTypeMetadata;
 import org.hibernate.search.mapper.pojo.standalone.session.impl.StandalonePojoSearchSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
