@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;

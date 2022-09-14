@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.mapping.spi;
 
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.search.projection.definition.spi.ProjectionRegistry;
 import org.hibernate.search.engine.search.projection.spi.ProjectionMappedTypeContext;

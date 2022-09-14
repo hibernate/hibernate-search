@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 
 public final class StubMappingHints implements BackendMappingHints {
 	public static final StubMappingHints INSTANCE = new StubMappingHints();
