@@ -7,10 +7,12 @@
 package org.hibernate.search.integrationtest.java.module.service;
 
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Test;
 
@@ -32,6 +34,14 @@ public class JavaModulePathIT {
 		service.add( "bar" );
 		service.add( "foo bar" );
 		assertEquals( 2, service.search( "foo" ).size() );
+
+		assertThatThrownBy( service::triggerValidationFailure )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Hibernate Search encountered failures during Schema management",
+						"attribute 'analyzer'",
+						"Invalid value. Expected 'default', actual is 'myAnalyzer'"
+				);
 	}
 
 	private void checkIsInModulePath(Class<?> clazz) {
