@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
 class NormalizerDefinitionValidator extends AnalysisDefinitionValidator<NormalizerDefinition> {
 

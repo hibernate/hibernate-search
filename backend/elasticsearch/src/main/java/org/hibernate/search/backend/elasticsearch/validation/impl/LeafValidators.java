@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;

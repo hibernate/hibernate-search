@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
-import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmEventContextMessages;
+import org.hibernate.search.mapper.orm.reporting.impl.HibernateOrmEventContextMessages;
 
 public final class HibernateOrmMappingKey
 		implements MappingKey<HibernateOrmMappingPartialBuildState, HibernateOrmMapping> {

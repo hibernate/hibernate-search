@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
-import org.hibernate.search.mapper.javabean.log.impl.JavaBeanEventContextMessages;
+import org.hibernate.search.mapper.javabean.reporting.impl.JavaBeanEventContextMessages;
 import org.hibernate.search.mapper.javabean.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.util.common.impl.Futures;

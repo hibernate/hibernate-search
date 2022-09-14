@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.PojoEventContextMessages;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;

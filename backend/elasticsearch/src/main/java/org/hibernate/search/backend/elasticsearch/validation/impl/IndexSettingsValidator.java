@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.T
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
 
 import com.google.gson.JsonElement;
 
