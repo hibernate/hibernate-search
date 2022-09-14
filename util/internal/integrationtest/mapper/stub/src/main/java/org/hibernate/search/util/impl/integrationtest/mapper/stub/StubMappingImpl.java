@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;

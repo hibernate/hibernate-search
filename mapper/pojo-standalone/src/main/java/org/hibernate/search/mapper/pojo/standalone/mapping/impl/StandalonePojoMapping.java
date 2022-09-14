@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
@@ -35,7 +35,7 @@ import org.hibernate.search.mapper.pojo.standalone.common.impl.EntityReferenceIm
 import org.hibernate.search.mapper.pojo.standalone.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.standalone.loading.impl.StandalonePojoLoadingContext;
 import org.hibernate.search.mapper.pojo.standalone.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.standalone.logging.impl.StandalonePojoMappingHints;
+import org.hibernate.search.mapper.pojo.standalone.reporting.impl.StandalonePojoMappingHints;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.impl.StandalonePojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;

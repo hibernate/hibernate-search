@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingHints;
+import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
