@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.log.impl.JavaBeanEventContextMessages;
+import org.hibernate.search.mapper.javabean.reporting.impl.JavaBeanEventContextMessages;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 
 public final class JavaBeanMappingKey implements MappingKey<JavaBeanMappingPartialBuildState, SearchMapping> {

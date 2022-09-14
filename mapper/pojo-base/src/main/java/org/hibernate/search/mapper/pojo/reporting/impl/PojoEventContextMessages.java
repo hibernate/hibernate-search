@@ -24,6 +24,9 @@ public interface PojoEventContextMessages {
 
 	PojoEventContextMessages INSTANCE = Messages.getBundle( PojoEventContextMessages.class );
 
+	@Message(value = "Schema management")
+	String schemaManagement();
+
 	@Message(value = "path '%1$s'")
 	String path(String pathString);
 

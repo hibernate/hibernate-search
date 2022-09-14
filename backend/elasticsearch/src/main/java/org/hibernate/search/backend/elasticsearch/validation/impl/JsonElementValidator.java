@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
+import org.hibernate.search.backend.elasticsearch.reporting.impl.ElasticsearchValidationMessages;
+
 import com.google.gson.JsonElement;
 
 class JsonElementValidator implements Validator<JsonElement> {
