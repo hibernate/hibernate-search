@@ -143,8 +143,6 @@ and the documentation to [docs.jboss.org](https://docs.jboss.org/hibernate/searc
   * Add a new YAML release file to `_data/projects/search/releases`.
   * Depending on which series you want to have displayed,
     make sure to adjust the `end-of-life`/`displayed` flag of the `series.yml` file of the old series.
-  * **If it's a Final release**:
-    * Don't forget to add a line containing `stable: true` to the new YAML release file.
   * Push to the production branch.
 * Blog about release on [in.relation.to](https://github.com/hibernate/in.relation.to).
   Make sure to use the tags "Hibernate Search" and "Releases" for the blog entry.
