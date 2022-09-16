@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+6.1.7.Final (2022-09-16)
+-------------------------
+
+** Bug
+    * HSEARCH-4701 org.jboss.logging module needs to access org.hibernate.search.backend.elasticsearch module
+
+** Improvement
+    * HSEARCH-4692 Upgrade to Hibernate ORM 5.6.11.Final
+
+** Task
+    * HSEARCH-4696 Move all Jenkins-related config to ci/
+    * HSEARCH-4695 Add Jenkins jobs to test component upgrades
+    * HSEARCH-4691 Remove dependency management for dependencies in common with Hibernate ORM
+    * HSEARCH-4687 Fix flaky test org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.automaticindexing.OutboxPollingAutomaticIndexingDynamicShardingRebalancingIT(coord-outbox-default-database-cockroachdb) 
+    * HSEARCH-4684 Fix tests starting before postgresql containers are ready on CI
+    * HSEARCH-4682 Fix heading levels in the Configuration section of the documentation
+
 6.1.6.Final (2022-08-04)
 -------------------------
 
