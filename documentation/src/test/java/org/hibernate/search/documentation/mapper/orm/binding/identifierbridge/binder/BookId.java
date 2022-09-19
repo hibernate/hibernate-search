@@ -9,7 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.identifierbridge.b
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class BookId implements Serializable {

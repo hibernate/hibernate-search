@@ -12,8 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.batch.runtime.context.JobContext;
-import javax.persistence.EntityManagerFactory;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;

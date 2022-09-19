@@ -38,8 +38,8 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 		try {
 			return doLoadEntities( identifiers, timeout );
 		}
-		catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
-				javax.persistence.LockTimeoutException e) {
+		catch (QueryTimeoutException | jakarta.persistence.QueryTimeoutException | LockTimeoutException |
+				jakarta.persistence.LockTimeoutException e) {
 			if ( deadline == null ) {
 				// ORM-initiated timeout: just propagate the exception.
 				throw e;

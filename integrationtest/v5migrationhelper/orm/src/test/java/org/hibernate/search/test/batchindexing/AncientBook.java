@@ -9,9 +9,9 @@ package org.hibernate.search.test.batchindexing;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 
 import org.hibernate.search.annotations.Indexed;
 

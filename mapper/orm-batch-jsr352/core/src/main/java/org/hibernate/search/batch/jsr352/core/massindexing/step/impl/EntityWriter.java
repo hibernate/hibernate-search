@@ -11,12 +11,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.batch.api.BatchProperty;
-import javax.batch.api.chunk.AbstractItemWriter;
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
+import jakarta.batch.api.BatchProperty;
+import jakarta.batch.api.chunk.AbstractItemWriter;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.batch.runtime.context.StepContext;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

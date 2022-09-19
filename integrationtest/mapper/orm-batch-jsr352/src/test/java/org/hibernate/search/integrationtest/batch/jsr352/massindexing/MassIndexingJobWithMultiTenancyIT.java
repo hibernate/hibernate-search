@@ -13,9 +13,9 @@ import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil
 import java.util.Arrays;
 import java.util.List;
 
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
+import jakarta.batch.operations.JobOperator;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.JobExecution;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;

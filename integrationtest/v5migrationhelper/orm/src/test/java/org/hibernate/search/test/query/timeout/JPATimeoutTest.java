@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.QueryTimeoutException;
+import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -58,7 +58,7 @@ public class JPATimeoutTest extends JPATestCase {
 		em.getTransaction().begin();
 		FullTextQuery hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 
-		hibernateQuery.setHint( "javax.persistence.query.timeout", 1 );
+		hibernateQuery.setHint( "jakarta.persistence.query.timeout", 1 );
 		try {
 			hibernateQuery.getResultList();
 			fail( "timeout exception should happen" );
