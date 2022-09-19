@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.test.embedded.polymorphism.uninitializedproxy;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Entity;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

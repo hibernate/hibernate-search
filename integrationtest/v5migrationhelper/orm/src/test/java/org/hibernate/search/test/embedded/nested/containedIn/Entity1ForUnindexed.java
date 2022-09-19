@@ -9,10 +9,10 @@ package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 import org.hibernate.search.annotations.Field;
 
@@ -21,10 +21,10 @@ import org.hibernate.search.annotations.Field;
  *
  * @author grolland
  */
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @org.hibernate.annotations.Proxy(lazy = false)
 @org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
-@javax.persistence.Table(name = "entity1")
+@jakarta.persistence.Table(name = "entity1")
 public class Entity1ForUnindexed implements Serializable {
 
 	private static final long serialVersionUID = -3191273589083411349L;
@@ -38,7 +38,7 @@ public class Entity1ForUnindexed implements Serializable {
 	@Version
 	private int optlock;
 
-	@javax.persistence.OneToMany(mappedBy = "entity1", cascade = { })
+	@jakarta.persistence.OneToMany(mappedBy = "entity1", cascade = { })
 	@org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
 	private java.util.List<Entity2ForUnindexed> entities2 = new java.util.ArrayList<Entity2ForUnindexed>();
 

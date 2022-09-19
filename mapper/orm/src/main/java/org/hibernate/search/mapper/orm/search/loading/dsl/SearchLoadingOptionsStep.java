@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.search.loading.dsl;
 
 import java.util.function.Consumer;
 
-import javax.persistence.EntityGraph;
+import jakarta.persistence.EntityGraph;
 
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.query.Query;
@@ -61,7 +61,7 @@ public interface SearchLoadingOptionsStep {
 	 * @param graphName The name of the graph to apply.
 	 * @param semantic The semantic to use when applying the graph.
 	 * @return {@code this} for method chaining.
-	 * @see javax.persistence.NamedEntityGraph
+	 * @see jakarta.persistence.NamedEntityGraph
 	 */
 	SearchLoadingOptionsStep graph(String graphName, GraphSemantic semantic);
 

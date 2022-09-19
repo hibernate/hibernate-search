@@ -16,7 +16,7 @@ public interface EntityReference extends org.hibernate.search.engine.common.Enti
 
 	/**
 	 * @return The name of the referenced entity in the Hibernate ORM mapping.
-	 * @see javax.persistence.Entity#name()
+	 * @see jakarta.persistence.Entity#name()
 	 */
 	@Override
 	String name();

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 import org.hibernate.search.util.impl.test.function.ThrowingBiConsumer;
 import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;

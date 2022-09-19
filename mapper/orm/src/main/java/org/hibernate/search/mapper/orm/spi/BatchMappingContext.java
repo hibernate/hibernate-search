@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.spi;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 public interface BatchMappingContext {
 

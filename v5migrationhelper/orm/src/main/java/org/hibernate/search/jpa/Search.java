@@ -8,8 +8,8 @@ package org.hibernate.search.jpa;
 
 import java.lang.invoke.MethodHandles;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 import org.hibernate.Session;
 import org.hibernate.search.util.common.SearchException;

@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;

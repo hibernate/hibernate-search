@@ -15,12 +15,12 @@
 |{hibernateVersion}
 |Also compatible with version {hibernateOrm6Version}
 but requires <<other-integrations-orm6,different Maven artifacts>>.
-|JPA (Java EE) (for the <<mapper-orm,Hibernate ORM mapper>>
-|{jpaVersion}
-|
 |Jakarta Persistence (for the <<mapper-orm,Hibernate ORM mapper>>
 |{jakartaPersistenceVersion}
-|Requires <<other-integrations-jakarta,different Maven artifacts>>.
+|
+|JPA (Java EE) (for the <<mapper-orm,Hibernate ORM mapper>>
+|{jpaVersion}
+|Requires <<other-integrations-javaee,different Maven artifacts>>.
 |Apache Lucene (for the <<backend-lucene,Lucene backend>>)
 |{luceneVersion}
 |

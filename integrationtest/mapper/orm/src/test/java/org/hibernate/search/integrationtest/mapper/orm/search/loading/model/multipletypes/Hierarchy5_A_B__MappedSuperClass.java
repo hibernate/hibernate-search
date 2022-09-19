@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes;
 
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class Hierarchy5_A_B__MappedSuperClass extends Hierarchy5_A__Abstract {

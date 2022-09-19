@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiFunction;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.IdClass;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import org.hibernate.type.ComponentType;
 

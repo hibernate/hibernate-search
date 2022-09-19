@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.dto.LibrarySimpleProjectionRecord;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
