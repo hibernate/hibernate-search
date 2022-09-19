@@ -25,7 +25,7 @@ public enum BeanRetrieval {
 	 * <p>
 	 * Retrieve the bean from the bean manager (e.g. CDI, Spring, ...).
 	 * If a name is provided, it is interpreted as a bean name,
-	 * for example assigned through {@code javax.inject.Named}.
+	 * for example assigned through {@code jakarta.inject.Named}.
 	 */
 	BEAN,
 	/**

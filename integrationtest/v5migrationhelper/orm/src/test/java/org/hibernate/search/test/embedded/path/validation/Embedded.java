@@ -9,8 +9,8 @@ package org.hibernate.search.test.embedded.path.validation;
 
 import java.util.Set;
 
-import javax.persistence.Embeddable;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -21,7 +21,7 @@ public class Embedded {
 	@Field
 	public String e1;
 
-	@javax.persistence.ElementCollection
+	@jakarta.persistence.ElementCollection
 	public Set<Integer> e2;
 
 	@IndexedEmbedded

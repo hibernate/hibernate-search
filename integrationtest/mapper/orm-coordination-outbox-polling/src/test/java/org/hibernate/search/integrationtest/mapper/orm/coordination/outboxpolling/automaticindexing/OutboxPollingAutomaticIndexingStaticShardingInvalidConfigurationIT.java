@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.function.UnaryOperator;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;

@@ -12,9 +12,9 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.testsupport.util.OutboxEventFilter;

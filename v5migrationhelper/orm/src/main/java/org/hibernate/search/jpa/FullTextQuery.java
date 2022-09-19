@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Query;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -37,7 +37,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Sort;
 
 /**
- * The base interface for full-text queries using the JPA API ({@link javax.persistence.Query}).
+ * The base interface for full-text queries using the JPA API ({@link jakarta.persistence.Query}).
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
@@ -288,7 +288,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	/**
 	 * Define a timeout period for a given unit of time.
 	 * Note that this is time out is on a best effort basis.
-	 * When the query goes beyond the timeout, a {@link javax.persistence.QueryTimeoutException} is raised.
+	 * When the query goes beyond the timeout, a {@link jakarta.persistence.QueryTimeoutException} is raised.
 	 *
 	 * @param timeout time out period
 	 * @param timeUnit time out unit

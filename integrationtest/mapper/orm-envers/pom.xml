@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-envers</artifactId>
+            <artifactId>hibernate-envers-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

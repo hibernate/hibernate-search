@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity(name = Hierarchy5_A__Abstract.NAME)
 public abstract class Hierarchy5_A__Abstract {

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.QueryTimeoutException;
+import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;

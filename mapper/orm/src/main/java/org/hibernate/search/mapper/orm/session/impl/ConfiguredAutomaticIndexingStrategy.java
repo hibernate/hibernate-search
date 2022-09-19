@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.transaction.Synchronization;
+import jakarta.transaction.Synchronization;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;

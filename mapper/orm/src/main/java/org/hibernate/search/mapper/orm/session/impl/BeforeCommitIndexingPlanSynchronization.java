@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.logging.impl.Log;

@@ -49,12 +49,12 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-envers</artifactId>
+            <artifactId>hibernate-envers-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-testing</artifactId>
+            <artifactId>hibernate-testing-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

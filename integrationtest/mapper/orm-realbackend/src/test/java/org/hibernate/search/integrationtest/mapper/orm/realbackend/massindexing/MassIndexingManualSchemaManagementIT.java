@@ -11,7 +11,7 @@ import static org.assertj.core.api.Fail.fail;
 import static org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCreatorUtils.prepareBooks;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.Book;

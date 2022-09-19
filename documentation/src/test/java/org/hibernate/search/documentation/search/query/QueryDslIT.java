@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.SharedCacheMode;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.SharedCacheMode;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
@@ -309,7 +309,7 @@ public class QueryDslIT {
 			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
 					.where( f -> f.matchAll() )
 					.toQuery(); // <2>
-			javax.persistence.TypedQuery<Book> jpaQuery = Search.toJpaQuery( query ); // <3>
+			jakarta.persistence.TypedQuery<Book> jpaQuery = Search.toJpaQuery( query ); // <3>
 			org.hibernate.query.Query<Book> ormQuery = Search.toOrmQuery( query ); // <4>
 			// end::searchQuery-toORM[]
 			List<Book> hits = jpaQuery.getResultList();

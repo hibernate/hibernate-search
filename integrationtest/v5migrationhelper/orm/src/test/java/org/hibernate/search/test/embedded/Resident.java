@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.embedded;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 import org.hibernate.search.annotations.Field;
 

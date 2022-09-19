@@ -8,7 +8,7 @@ package org.hibernate.search.jpa;
 
 import java.io.Serializable;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;

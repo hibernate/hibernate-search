@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.document.model.dsl
 
 import java.math.BigDecimal;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class InvoiceLineItem {

@@ -6,8 +6,8 @@
  */
 package acme.org.hibernate.search.integrationtest.spring.repackaged.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.documentation.search.sort;
 
-import javax.persistence.Basic;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Embeddable;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 

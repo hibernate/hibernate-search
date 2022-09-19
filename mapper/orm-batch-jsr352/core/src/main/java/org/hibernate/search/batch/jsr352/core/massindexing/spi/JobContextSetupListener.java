@@ -21,11 +21,11 @@ import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJo
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.SESSION_CLEAR_INTERVAL;
 
-import javax.batch.api.BatchProperty;
-import javax.batch.api.listener.AbstractJobListener;
-import javax.batch.runtime.context.JobContext;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.batch.api.BatchProperty;
+import jakarta.batch.api.listener.AbstractJobListener;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchJobScoped;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.documentation.testsupport.data;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 public class ISBNAttributeConverter implements AttributeConverter<ISBN, String> {
 

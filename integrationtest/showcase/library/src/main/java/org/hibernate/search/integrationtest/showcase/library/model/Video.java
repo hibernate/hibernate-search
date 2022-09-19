@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.model;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 /**
  * A video document.
