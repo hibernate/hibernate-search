@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.util.concurrent.CompletableFuture;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;

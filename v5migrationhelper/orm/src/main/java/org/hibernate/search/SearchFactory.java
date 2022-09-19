@@ -32,7 +32,7 @@ import org.hibernate.search.query.dsl.sort.SortContext;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchMapping}
- * using {@link org.hibernate.search.mapper.orm.Search#mapping(javax.persistence.EntityManagerFactory)},
+ * using {@link org.hibernate.search.mapper.orm.Search#mapping(jakarta.persistence.EntityManagerFactory)},
  * or {@link org.hibernate.search.mapper.orm.Search#mapping(SessionFactory)}.
  * See the individual methods for the replacement of each method.
  * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
@@ -72,7 +72,7 @@ public interface SearchFactory {
 	 *
 	 * @throws org.hibernate.search.util.common.SearchException if the definition name is unknown
 	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchMapping}
-	 * using {@link org.hibernate.search.mapper.orm.Search#mapping(javax.persistence.EntityManagerFactory)},
+	 * using {@link org.hibernate.search.mapper.orm.Search#mapping(jakarta.persistence.EntityManagerFactory)},
 	 * or {@link org.hibernate.search.mapper.orm.Search#mapping(SessionFactory)},
 	 * then get access to the backend using {@link SearchMapping#backend()},
 	 * then convert it to a {@link LuceneBackend} using {@link Backend#unwrap(Class)},
@@ -92,7 +92,7 @@ public interface SearchFactory {
 	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
 	 * class is not an indexed entity.
 	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchMapping}
-	 * using {@link org.hibernate.search.mapper.orm.Search#mapping(javax.persistence.EntityManagerFactory)},
+	 * using {@link org.hibernate.search.mapper.orm.Search#mapping(jakarta.persistence.EntityManagerFactory)},
 	 * or {@link org.hibernate.search.mapper.orm.Search#mapping(SessionFactory)},
 	 * then get access to the entity metadata using {@link SearchMapping#indexedEntity(Class)},
 	 * then get the corresponding index using {@link SearchIndexedEntity#indexManager()},
@@ -116,7 +116,7 @@ public interface SearchFactory {
 	 *
 	 * @return the set of currently indexed types. If no types are indexed the empty set is returned.
 	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchMapping}
-	 * using {@link org.hibernate.search.mapper.orm.Search#mapping(javax.persistence.EntityManagerFactory)},
+	 * using {@link org.hibernate.search.mapper.orm.Search#mapping(jakarta.persistence.EntityManagerFactory)},
 	 * or {@link org.hibernate.search.mapper.orm.Search#mapping(SessionFactory)},
 	 * then get access to the entity metadata using {@link SearchMapping#allIndexedEntities()}.
 	 */

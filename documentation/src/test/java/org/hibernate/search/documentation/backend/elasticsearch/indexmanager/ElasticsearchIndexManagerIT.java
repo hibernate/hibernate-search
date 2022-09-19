@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.backend.elasticsearch.indexmanager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;

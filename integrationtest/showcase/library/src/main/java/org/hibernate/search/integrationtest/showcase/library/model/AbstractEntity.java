@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.Objects;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 import org.hibernate.Hibernate;
 

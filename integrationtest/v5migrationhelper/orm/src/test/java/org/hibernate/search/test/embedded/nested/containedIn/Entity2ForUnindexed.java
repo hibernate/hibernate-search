@@ -7,20 +7,20 @@
 
 package org.hibernate.search.test.embedded.nested.containedIn;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 /**
  * Entite 2
  *
  * @author grolland
  */
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @org.hibernate.annotations.Proxy(lazy = false)
 @org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
-@javax.persistence.Table(name = "entity2")
+@jakarta.persistence.Table(name = "entity2")
 @org.hibernate.search.annotations.Indexed
 public class Entity2ForUnindexed {
 
@@ -38,7 +38,7 @@ public class Entity2ForUnindexed {
 	@Version
 	private int optlock;
 
-	@javax.persistence.ManyToOne(cascade = { }, fetch = javax.persistence.FetchType.LAZY)
+	@jakarta.persistence.ManyToOne(cascade = { }, fetch = jakarta.persistence.FetchType.LAZY)
 	@org.hibernate.search.annotations.IndexedEmbedded()
 	@org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
 	private Entity1ForUnindexed entity1;

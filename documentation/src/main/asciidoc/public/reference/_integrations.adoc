@@ -4,12 +4,16 @@
 [[other-integrations-jakarta]]
 == Jakarta EE
 
-include::../components/_incubating-warning.adoc[]
+Hibernate Search targets link:{jakartaUrl}[Jakarta EE] where relevant,
+in particular Jakarta Persistence {jakartaPersistenceVersion} with the <<mapper-orm,Hibernate ORM Mapper>>.
 
-Hibernate Search includes experimental support for link:{jakartaUrl}[Jakarta EE],
+[[other-integrations-javaee]]
+== Java EE
+
+Hibernate Search includes legacy support for link:{javaeeUrl}[Java EE],
 and it requires only one small change:
 when declaring the dependencies of your project,
-you must add `-jakarta` to some artifact identifiers.
+you must add `-javaee` to some artifact identifiers.
 
 For example, an application using Hibernate ORM and the Elasticsearch backend
 will need to update its dependencies as follows:
@@ -18,13 +22,12 @@ will need to update its dependencies as follows:
 ----
 <dependency>
    <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-core-jakarta</artifactId> <!--1-->
+   <artifactId>hibernate-core-javaee</artifactId> <!--1-->
    <version>{hibernateVersion}</version>
 </dependency>
 <dependency>
    <groupId>org.hibernate.search</groupId>
-   <artifactId></artifactId>
-   <artifactId>hibernate-search-mapper-orm-jakarta</artifactId> <!--2-->
+   <artifactId>hibernate-search-mapper-orm-javaee</artifactId> <!--2-->
    <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
@@ -35,18 +38,18 @@ will need to update its dependencies as follows:
 ----
 <1> Replaces `hibernate-core`.
 <2> Replaces `hibernate-search-mapper-orm`.
-<3> No replacement necessary: this artifact does not rely on Java EE.
+<3> No replacement necessary: this artifact does not rely on Jakarta EE.
 
-All artifacts relying directly or indirectly on Java EE must be replaced with their Jakarta counterpart.
+All artifacts relying directly or indirectly on Jakarta EE must be replaced with their Java EE counterpart.
 This includes in particular:
 
 * https://in.relation.to/2021/06/04/hibernate-is-jakarta-jpa-2/#get-it[Hibernate ORM artifacts]
-* `hibernate-search-mapper-orm` => `hibernate-search-mapper-orm-jakarta`
-* `hibernate-search-mapper-orm-batch-jsr352-core` => `hibernate-search-mapper-orm-batch-jsr352-core-jakarta`
+* `hibernate-search-mapper-orm` => `hibernate-search-mapper-orm-javaee`
+* `hibernate-search-mapper-orm-batch-jsr352-core` => `hibernate-search-mapper-orm-batch-jsr352-core-javaee`
 * ...
 
-Artifacts that do not rely on Java EE at all, on the other hand,
-do not have a Jakarta counterpart and must not be replaced.
+Artifacts that do not rely on Jakarta EE at all, on the other hand,
+do not have a Java EE counterpart and must not be replaced.
 These artifacts should be excluded from your replacements in particular:
 
 * `hibernate-search-engine`

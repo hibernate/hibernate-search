@@ -13,8 +13,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;

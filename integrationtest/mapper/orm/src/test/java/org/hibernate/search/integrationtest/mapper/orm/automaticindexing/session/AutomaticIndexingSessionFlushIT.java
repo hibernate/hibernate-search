@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.FlushMode;
 import org.hibernate.Session;

@@ -8,9 +8,9 @@ package org.hibernate.search.test.jpa;
 
 import static org.junit.Assert.assertThat;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 import org.apache.lucene.search.Query;
 import org.hamcrest.CoreMatchers;

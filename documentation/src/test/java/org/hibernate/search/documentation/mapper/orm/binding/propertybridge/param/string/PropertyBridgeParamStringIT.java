@@ -13,7 +13,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItem;
 import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItemCategory;

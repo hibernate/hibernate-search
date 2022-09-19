@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.schema.management.strategy;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;

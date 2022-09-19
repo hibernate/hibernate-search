@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.test.embedded;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.DocumentId;

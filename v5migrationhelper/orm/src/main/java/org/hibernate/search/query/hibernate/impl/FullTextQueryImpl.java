@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Parameter;
-import javax.persistence.QueryTimeoutException;
-import javax.persistence.TemporalType;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.Parameter;
+import jakarta.persistence.QueryTimeoutException;
+import jakarta.persistence.TemporalType;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -422,7 +422,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	 * but we must implement it without generics (otherwise it won't compile).
 	 *
 	 * The actual reason is a bit hard to explain: basically we implement
-	 * javax.persistence.Query as a raw type at some point, and our superclass
+	 * jakarta.persistence.Query as a raw type at some point, and our superclass
 	 * (also extended as a raw type) also implements this interface, but as a non-raw type.
 	 * This seems to confuse the compiler, which thinks there are two different methods.
 	 */

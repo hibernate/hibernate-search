@@ -11,8 +11,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.rule.Backend
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.concurrent.atomic.AtomicReference;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;

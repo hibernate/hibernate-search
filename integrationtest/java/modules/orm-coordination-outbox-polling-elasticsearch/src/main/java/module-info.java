@@ -11,7 +11,7 @@ module org.hibernate.search.integrationtest.java.module.orm.elasticsearch.coordi
 	opens org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.coordination.outboxpolling.config to
 			org.hibernate.search.engine; // For reflective instantiation of the analysis configurer
 
-	requires java.persistence;
+	requires jakarta.persistence;
 	requires org.hibernate.orm.core;
 	requires org.hibernate.search.mapper.orm;
 	requires org.hibernate.search.backend.elasticsearch;

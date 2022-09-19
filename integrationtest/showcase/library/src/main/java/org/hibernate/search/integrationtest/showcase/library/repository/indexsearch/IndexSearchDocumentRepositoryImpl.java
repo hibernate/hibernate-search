@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.repository.indexse
 
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;

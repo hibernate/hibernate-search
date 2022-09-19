@@ -14,9 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.QueryTimeoutException;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -1060,7 +1060,7 @@ public class ToHibernateOrmScrollableResultsIT {
 			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
 					DEFAULT_FETCH_SIZE, b -> b.failAfter( 200, TimeUnit.MILLISECONDS ) );
 			try ( ScrollableResults scroll = createSimpleQuery( session )
-					.setHint( "javax.persistence.query.timeout", 200 )
+					.setHint( "jakarta.persistence.query.timeout", 200 )
 					.scroll() ) {
 				backendMock.verifyExpectationsMet();
 

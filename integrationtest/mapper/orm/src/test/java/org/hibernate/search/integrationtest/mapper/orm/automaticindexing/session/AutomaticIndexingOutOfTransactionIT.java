@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.Search;

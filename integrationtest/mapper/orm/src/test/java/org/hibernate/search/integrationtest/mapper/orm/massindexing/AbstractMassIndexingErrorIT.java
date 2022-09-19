@@ -14,8 +14,8 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.BaseSessionEventListener;
 import org.hibernate.SessionFactory;

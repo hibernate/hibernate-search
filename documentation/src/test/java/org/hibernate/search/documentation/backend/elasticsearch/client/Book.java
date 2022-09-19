@@ -7,8 +7,8 @@
 package org.hibernate.search.documentation.backend.elasticsearch.client;
 
 import java.sql.Date;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;

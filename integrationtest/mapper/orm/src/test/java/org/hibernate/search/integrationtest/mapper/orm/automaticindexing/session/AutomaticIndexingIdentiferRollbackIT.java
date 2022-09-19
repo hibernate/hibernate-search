@@ -9,9 +9,9 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.sessio
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.atomic.AtomicReference;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;

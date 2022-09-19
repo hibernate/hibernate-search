@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.spring.jta.entity;
 
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.NaturalId;
 

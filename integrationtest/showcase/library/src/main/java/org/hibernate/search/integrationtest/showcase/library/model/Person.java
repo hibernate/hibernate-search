@@ -7,10 +7,10 @@
 package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.StringJoiner;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;

@@ -11,11 +11,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.Dependent;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.Dependent;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -290,7 +290,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 	public static class DependentBean {
 		public static final CounterKeys KEYS = new CounterKeys();
 
-		protected DependentBean() {
+		public DependentBean() {
 			StaticCounters.get().increment( KEYS.instantiate );
 		}
 

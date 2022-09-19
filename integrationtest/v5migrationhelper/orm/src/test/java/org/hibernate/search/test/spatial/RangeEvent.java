@@ -18,9 +18,9 @@ import org.hibernate.search.spatial.Coordinates;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 /**
  * Hibernate Search spatial : Event test entity

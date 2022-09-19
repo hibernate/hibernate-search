@@ -8,14 +8,14 @@ package org.hibernate.search.batch.jsr352.core.massindexing.step.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
-import javax.batch.api.BatchProperty;
-import javax.batch.api.listener.AbstractStepListener;
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
+import jakarta.batch.api.BatchProperty;
+import jakarta.batch.api.listener.AbstractStepListener;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.batch.runtime.context.StepContext;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;

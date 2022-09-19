@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;

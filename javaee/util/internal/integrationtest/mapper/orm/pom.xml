@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-util-internal-integrationtest-javaee</artifactId>
+        <version>6.2.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm-javaee</artifactId>
+
+    <name>Hibernate Search Utils - Internal - ITs - ORM Mapper - Java EE</name>
+    <description>Hibernate Search integration testing utilities for tests involving the Hibernate ORM Mapper - Java EE version</description>
+
+    <properties>
+        <transform.original.pathFromRoot>util/internal/integrationtest/mapper/orm</transform.original.pathFromRoot>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-test-orm-javaee</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <!-- We're importing this through hibernate-search-util-internal-test-orm above,
+                     and that module adds specific exclusions to the dependency -->
+                <exclusion>
+                    <groupId>org.hibernate.search</groupId>
+                    <artifactId>hibernate-search-util-internal-test-common</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm-javaee</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-testing</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+

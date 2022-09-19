@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <target name="copy">
+        <!-- https://ant.apache.org/manual/Tasks/copy.html -->
+        <copy todir="${transform.output.root.path}" failonerror="false" overwrite="true">
+            <fileset dir="${transform.original.path}/src/"/>
+        </copy>
+    </target>
+    <target name="test-output-present">
+        <available file="${transform.output.root.path}" type="dir" property="output.present"/>
+    </target>
+    <target name="transform" depends="copy,test-output-present" if="output.present">
+        <!-- https://ant.apache.org/manual/Tasks/replace.html -->
+        <replace dir="${transform.output.root.path}">
+            <replacefilter token="requires jakarta.persistence" value="requires java.persistence"/>
+            <replacefilter token="jakarta.persistence" value="javax.persistence"/>
+            <replacefilter token="jakarta.transaction" value="javax.transaction"/>
+            <replacefilter token="jakarta.enterprise" value="javax.enterprise"/>
+            <replacefilter token="jakarta.annotation" value="javax.annotation"/>
+            <replacefilter token="jakarta.inject" value="javax.inject"/>
+            <replacefilter token="jakarta.batch" value="javax.batch"/>
+        </replace>
+        <replace dir="${transform.output.root.path}" includes="**/beans.xml">
+            <replacefilter token="https://jakarta.ee/xml/ns/jakartaee/beans_3_0.xsd" value="https://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd"/>
+            <replacefilter token="https://jakarta.ee/xml/ns/jakartaee" value="https://xmlns.jcp.org/xml/ns/javaee"/>
+            <replacefilter>
+                <replacetoken>version="1.2"</replacetoken>
+                <replacevalue>version="3.0"</replacevalue>
+            </replacefilter>
+            <replacefilter>
+                <replacetoken>version="2.0"</replacetoken>
+                <replacevalue>version="3.0"</replacevalue>
+            </replacefilter>
+        </replace>
+        <replace dir="${transform.output.root.path}" includes="**/persistence.xml">
+            <replacefilter token="https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" value="https://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"/>
+            <replacefilter token="https://jakarta.ee/xml/ns/jakartaee" value="https://xmlns.jcp.org/xml/ns/javaee"/>
+            <replacefilter token="https://jakarta.ee/xml/ns/persistence" value="https://xmlns.jcp.org/xml/ns/persistence"/>
+            <replacefilter>
+                <replacetoken>version="3.0"</replacetoken>
+                <replacevalue>version="2.2"</replacevalue>
+            </replacefilter>
+        </replace>
+        <replace dir="${transform.output.root.path}" includes="**/batch.xml,**/hibernate-search-mass-indexing.xml">
+            <replacefilter token="https://jakarta.ee/xml/ns/jakartaee/jobXML_2_0.xsd" value="https://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"/>
+            <replacefilter token="https://jakarta.ee/xml/ns/jakartaee" value="https://xmlns.jcp.org/xml/ns/javaee"/>
+            <replacefilter>
+                <replacetoken>version="2.0"</replacetoken>
+                <replacevalue>version="1.0"</replacevalue>
+            </replacefilter>
+        </replace>
+    </target>
+</project>

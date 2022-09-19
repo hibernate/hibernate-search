@@ -7,9 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import java.util.Locale;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;

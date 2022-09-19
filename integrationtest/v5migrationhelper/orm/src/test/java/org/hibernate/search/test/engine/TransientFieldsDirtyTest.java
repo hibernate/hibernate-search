@@ -9,10 +9,10 @@ package org.hibernate.search.test.engine;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -35,7 +35,7 @@ import org.apache.lucene.search.Query;
 
 /**
  * Verify we don't rely on dirtyness values from Hibernate ORM on fields
- * mapped with {@link javax.persistence.Transient}.
+ * mapped with {@link jakarta.persistence.Transient}.
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  */

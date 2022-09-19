@@ -9,9 +9,9 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Consumer;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.Search;

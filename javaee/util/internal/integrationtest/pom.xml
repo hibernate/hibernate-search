@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-internal-javaee</artifactId>
+        <version>6.2.0-SNAPSHOT</version>
+        <relativePath>../../../build/parents/internal</relativePath>
+    </parent>
+    <artifactId>hibernate-search-util-internal-integrationtest-javaee</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Utils - Internal - ITs - Java EE - Aggregator POM</name>
+    <description>Aggregator POM of Hibernate Search integration testing utilities</description>
+
+    <properties>
+        <!-- Apply the main JDK release settings to all code in integration tests utils, even code in src/main
+             That way, we can reuse utils compiled in with JDK 11 when running tests against JDK 8,
+             like we do for main artifacts (engine, ...).
+         -->
+        <java-version.main.release>${java-version.test.release}</java-version.main.release>
+        <java-version.main.compiler.java_home>${java-version.test.compiler.java_home}</java-version.main.compiler.java_home>
+        <java-version.main.compiler>${java-version.test.compiler}</java-version.main.compiler>
+    </properties>
+
+    <modules>
+        <module>mapper/orm</module>
+        <module>jbatch-runtime</module>
+        <module>jberet-se</module>
+    </modules>
+</project>
+

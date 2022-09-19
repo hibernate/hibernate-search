@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.realbackend.util;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Locale;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.mapper.orm.Search;
 

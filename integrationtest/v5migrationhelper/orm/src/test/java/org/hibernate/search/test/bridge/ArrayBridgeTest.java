@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Test indexing of {@link javax.persistence.ElementCollection} annotated arrays.
+ * Test indexing of {@link jakarta.persistence.ElementCollection} annotated arrays.
  *
  * @author Davide D'Alto
  */

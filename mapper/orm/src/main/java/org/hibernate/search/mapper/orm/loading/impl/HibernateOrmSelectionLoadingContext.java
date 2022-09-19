@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import javax.persistence.EntityGraph;
+import jakarta.persistence.EntityGraph;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;

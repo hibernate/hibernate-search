@@ -7,9 +7,9 @@
 package org.hibernate.search.batch.jsr352.core.massindexing.step.impl;
 
 import java.io.Serializable;
-import javax.batch.api.partition.PartitionCollector;
-import javax.batch.runtime.context.StepContext;
-import javax.inject.Inject;
+import jakarta.batch.api.partition.PartitionCollector;
+import jakarta.batch.runtime.context.StepContext;
+import jakarta.inject.Inject;
 
 /**
  * Progress collectors run on the partitioned step threads and there's one collector per partition. They collect the

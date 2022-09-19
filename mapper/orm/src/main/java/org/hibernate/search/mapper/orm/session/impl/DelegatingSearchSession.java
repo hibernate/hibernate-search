@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
 import java.util.function.Supplier;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;

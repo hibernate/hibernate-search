@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Entity;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 

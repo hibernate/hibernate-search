@@ -9,7 +9,7 @@ package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;

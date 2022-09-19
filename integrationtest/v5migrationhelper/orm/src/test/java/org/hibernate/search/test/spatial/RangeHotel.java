@@ -13,8 +13,8 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 /**
  * Hibernate Search spatial: Hotel test entity with Range Spatial indexation
