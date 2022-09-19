@@ -382,7 +382,7 @@
         <version.io.takari.maven>0.7.7</version.io.takari.maven>
         <version.jandex.plugin>1.2.3</version.jandex.plugin>
         <version.japicmp.plugin>0.16.0</version.japicmp.plugin>
-        <version.jar.plugin>3.2.2</version.jar.plugin>
+        <version.jar.plugin>3.3.0</version.jar.plugin>
         <version.javadoc.plugin>3.4.1</version.javadoc.plugin>
         <version.jdeps.plugin>0.5.1</version.jdeps.plugin>
         <version.nexus-staging.plugin>1.6.13</version.nexus-staging.plugin>
