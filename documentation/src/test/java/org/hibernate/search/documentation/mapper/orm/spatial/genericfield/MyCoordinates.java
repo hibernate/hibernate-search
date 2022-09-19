@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.documentation.mapper.orm.spatial.genericfield;
 
-import javax.persistence.Basic;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Embeddable;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 

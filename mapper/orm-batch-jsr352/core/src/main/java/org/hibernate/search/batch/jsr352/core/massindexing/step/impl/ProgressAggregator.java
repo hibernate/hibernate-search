@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.batch.api.partition.AbstractPartitionAnalyzer;
-import javax.batch.runtime.context.StepContext;
-import javax.inject.Inject;
+import jakarta.batch.api.partition.AbstractPartitionAnalyzer;
+import jakarta.batch.runtime.context.StepContext;
+import jakarta.inject.Inject;
 
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

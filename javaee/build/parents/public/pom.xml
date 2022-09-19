@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-public</artifactId>
+        <version>6.2.2-SNAPSHOT</version>
+        <relativePath>../../../../build/parents/public</relativePath>
+    </parent>
+    <artifactId>hibernate-search-parent-public-javaee</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Parent POM for Public Artifacts - Java EE</name>
+    <description>Common build configuration for all Java EE public artifacts</description>
+
+    <properties>
+        <surefire.integration>jakarta</surefire.integration>
+
+        <!-- JQAssistant does not seem to work correctly on these artifacts for some reason -->
+        <jqassistant.skip>true</jqassistant.skip>
+        <!-- Prevent these modules from artificially affecting Sonar metrics -->
+        <sonar.skip>true</sonar.skip>
+
+        <!-- To be set by child modules -->
+        <transform.original.pathFromRoot></transform.original.pathFromRoot>
+        <transform.original.path>${rootProject.directory}/${transform.original.pathFromRoot}</transform.original.path>
+        <transform.output.root.path>${project.build.directory}/copied-sources</transform.output.root.path>
+        <transform.output.main.sources.path>${transform.output.root.path}/main/java</transform.output.main.sources.path>
+        <transform.output.main.resources.path>${transform.output.root.path}/main/resources</transform.output.main.resources.path>
+        <transform.output.test.sources.path>${transform.output.root.path}/test/java</transform.output.test.sources.path>
+        <transform.output.test.resources.path>${transform.output.root.path}/test/resources</transform.output.test.resources.path>
+        <documentation.config.properties.skip>true</documentation.config.properties.skip>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by Hibernate ORM -->
+                    <exclusion>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                    </exclusion>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jberet</groupId>
+                <artifactId>jberet-core</artifactId>
+                <version>${version.org.jberet.javaee}</version>
+                <exclusions>
+                    <!-- These dependencies are marked as "provided" but will never be there at runtime.
+                         This confuses maven-enforcer-plugin, so we'll exclude them. -->
+                    <exclusion>
+                        <groupId>org.jboss.logging</groupId>
+                        <artifactId>jboss-logging-processor</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.infinispan</groupId>
+                        <artifactId>infinispan-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.infinispan</groupId>
+                        <artifactId>infinispan-commons</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <executions>
+                        <execution>
+                            <id>copy-and-transform-sources</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <!-- WARNING: if you update this, make sure to update the "internal" and "integrationtest" parent POMs, too -->
+                                <target>
+                                    <ant dir="${rootProject.directory}/javaee/" antfile="ant-copy-and-transform-sources.xml">
+                                        <target name="copy"/>
+                                        <target name="transform"/>
+                                    </ant>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-sources-copy</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${transform.output.main.sources.path}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-resources-copy</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${transform.output.main.resources.path}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-sources-copy</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${transform.output.test.sources.path}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-resources-copy</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${transform.output.test.resources.path}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -30,7 +30,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 
 /**
- * Test indexing of {@link javax.persistence.ElementCollection} annotated iterables.
+ * Test indexing of {@link jakarta.persistence.ElementCollection} annotated iterables.
  *
  * @author Davide D'Alto
  */

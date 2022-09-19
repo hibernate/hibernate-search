@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity(name = BasicContainedEntity.NAME)
 public class BasicContainedEntity {

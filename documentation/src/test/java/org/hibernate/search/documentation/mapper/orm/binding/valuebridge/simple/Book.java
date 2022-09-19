@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.valuebridge.simple;
 
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.documentation.testsupport.data.ISBNAttributeConverter;

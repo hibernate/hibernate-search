@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.documentation.mapper.orm.programmatic.simple;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 

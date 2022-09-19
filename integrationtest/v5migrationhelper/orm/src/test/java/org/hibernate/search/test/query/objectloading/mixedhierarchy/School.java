@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.test.query.objectloading.mixedhierarchy;
 
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * @author Gunnar Morling

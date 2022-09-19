@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.embedded;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.annotations.Indexed;
 

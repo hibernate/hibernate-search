@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.documentation.backend.lucene.type.asnative;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;

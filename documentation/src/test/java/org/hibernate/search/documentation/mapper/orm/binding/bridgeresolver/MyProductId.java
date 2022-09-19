@@ -9,7 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.binding.bridgeresolver;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class MyProductId implements Serializable {

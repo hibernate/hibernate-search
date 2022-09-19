@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.bridgeresolver;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.engine.backend.types.Projectable;

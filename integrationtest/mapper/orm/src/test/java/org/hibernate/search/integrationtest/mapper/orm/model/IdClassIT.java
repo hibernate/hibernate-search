@@ -12,9 +12,9 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -28,7 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests behavior when an entity uses {@link javax.persistence.IdClass},
+ * Tests behavior when an entity uses {@link jakarta.persistence.IdClass},
  */
 public class IdClassIT {
 

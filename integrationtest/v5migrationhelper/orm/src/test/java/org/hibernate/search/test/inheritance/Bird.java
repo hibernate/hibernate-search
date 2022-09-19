@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.inheritance;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;

@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.documentation.mapper.orm.reindexing.associationinverseside;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 

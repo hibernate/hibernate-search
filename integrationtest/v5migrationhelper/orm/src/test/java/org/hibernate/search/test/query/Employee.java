@@ -8,8 +8,8 @@ package org.hibernate.search.test.query;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;

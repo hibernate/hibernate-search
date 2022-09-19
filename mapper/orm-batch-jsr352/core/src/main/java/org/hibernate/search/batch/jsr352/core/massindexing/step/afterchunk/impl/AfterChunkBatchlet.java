@@ -10,11 +10,11 @@ import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJo
 
 import java.lang.invoke.MethodHandles;
 
-import javax.batch.api.AbstractBatchlet;
-import javax.batch.api.BatchProperty;
-import javax.batch.runtime.context.JobContext;
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
+import jakarta.batch.api.AbstractBatchlet;
+import jakarta.batch.api.BatchProperty;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;

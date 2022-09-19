@@ -9,11 +9,11 @@ package org.hibernate.search.documentation.mapper.orm.binding.propertybridge.par
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OrderColumn;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OrderColumn;
 
 import org.hibernate.search.documentation.mapper.orm.binding.propertybridge.param.annotation.InvoiceLineItem;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;

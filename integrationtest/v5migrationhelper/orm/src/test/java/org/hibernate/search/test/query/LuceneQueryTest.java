@@ -539,7 +539,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		graph.addAttributeNodes( "authors" );
 
 		List result = fullTextSession.createFullTextQuery( query, Book.class )
-				.setHint( "javax.persistence.loadgraph", graph )
+				.setHint( "jakarta.persistence.loadgraph", graph )
 				.list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit entity graph", 1, result.size() );
@@ -563,7 +563,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		graph.addAttributeNodes( "authors" );
 
 		List result = fullTextSession.createFullTextQuery( query, Book.class )
-				.setHint( "javax.persistence.fetchgraph", graph )
+				.setHint( "jakarta.persistence.fetchgraph", graph )
 				.list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit entity graph", 1, result.size() );

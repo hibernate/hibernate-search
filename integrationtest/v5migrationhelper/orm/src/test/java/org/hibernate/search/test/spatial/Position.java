@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.spatial;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;

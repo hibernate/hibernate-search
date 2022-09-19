@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.documentation.mapper.orm.binding.bridgeresolver;
 
-import javax.persistence.Basic;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Embeddable;
 
 // Let's assume this type cannot be changed to implement GeoPoint.
 @Embeddable

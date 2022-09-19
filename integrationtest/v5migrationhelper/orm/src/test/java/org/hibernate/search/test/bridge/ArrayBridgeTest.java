@@ -31,7 +31,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 
 /**
- * Test indexing of {@link javax.persistence.ElementCollection} annotated arrays.
+ * Test indexing of {@link jakarta.persistence.ElementCollection} annotated arrays.
  *
  * @author Davide D'Alto
  */
