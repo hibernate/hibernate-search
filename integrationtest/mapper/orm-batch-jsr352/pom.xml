@@ -118,7 +118,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
-                                <classpathDependencyExclude>com.ibm.jbatch:com.ibm.jbatch-runtime</classpathDependencyExclude>
+                                <classpathDependencyExclude>com.ibm.jbatch:com.ibm.jbatch.container</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
@@ -155,7 +155,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
                                 <classpathDependencyExclude>org.hibernate.search:hibernate-search-util-internal-integrationtest-jbatch-runtime</classpathDependencyExclude>
-                                <classpathDependencyExclude>com.ibm.jbatch:com.ibm.jbatch-runtime</classpathDependencyExclude>
+                                <classpathDependencyExclude>com.ibm.jbatch:com.ibm.jbatch.container</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                             <systemPropertyVariables>
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.batch.jsr352.core.context.jpa.spi;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
  * An abstract contract allowing to retrieve an entity manager factory.

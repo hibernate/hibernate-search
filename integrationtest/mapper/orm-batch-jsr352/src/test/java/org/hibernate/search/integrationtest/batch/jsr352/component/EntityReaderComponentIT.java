@@ -15,9 +15,9 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
-import javax.persistence.EntityManagerFactory;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.batch.runtime.context.StepContext;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;

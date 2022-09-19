@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.work;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 /**
  * An interface for indexing entities in the context of an ORM Session.

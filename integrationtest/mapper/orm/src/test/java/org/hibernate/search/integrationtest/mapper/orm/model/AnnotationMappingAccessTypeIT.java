@@ -11,19 +11,19 @@ import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -277,7 +277,7 @@ public class AnnotationMappingAccessTypeIT {
 
 	}
 
-	@javax.persistence.Embeddable
+	@jakarta.persistence.Embeddable
 	@Access(AccessType.FIELD)
 	public static class EmbeddableWithDefaultFieldAccess {
 		@Basic
@@ -307,7 +307,7 @@ public class AnnotationMappingAccessTypeIT {
 		}
 	}
 
-	@javax.persistence.Embeddable
+	@jakarta.persistence.Embeddable
 	@Access(AccessType.PROPERTY)
 	public static class EmbeddableWithDefaultMethodAccess {
 		@Access(AccessType.FIELD)

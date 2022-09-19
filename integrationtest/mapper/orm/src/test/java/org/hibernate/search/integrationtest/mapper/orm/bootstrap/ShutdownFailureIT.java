@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
