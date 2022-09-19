@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.attributeconverter;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 

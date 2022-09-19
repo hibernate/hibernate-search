@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

@@ -8,9 +8,9 @@ package org.hibernate.search.test.embedded.doubleinsert;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;

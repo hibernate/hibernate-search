@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.EntityTypeDescriptor;
 

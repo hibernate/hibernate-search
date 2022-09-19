@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import javax.persistence.QueryTimeoutException;
+import jakarta.persistence.QueryTimeoutException;
 
 import org.hibernate.ScrollableResults;
 import org.hibernate.query.spi.ScrollableResultsImplementor;

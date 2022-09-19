@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 public interface SearchIndexedEntity<E> {
 
 	/**
-	 * @return The {@link javax.persistence.Entity#name() JPA name} of the entity.
+	 * @return The {@link jakarta.persistence.Entity#name() JPA name} of the entity.
 	 */
 	String jpaName();
 

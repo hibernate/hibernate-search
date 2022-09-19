@@ -7,18 +7,18 @@
 
 package org.hibernate.search.test.embedded.nested.containedIn;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 /**
  * @author grolland
  */
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @org.hibernate.annotations.Proxy(lazy = true)
-@javax.persistence.Table(name = "entity2")
+@jakarta.persistence.Table(name = "entity2")
 public class Entity2ForDoc0 {
 
 	@Id
@@ -29,7 +29,7 @@ public class Entity2ForDoc0 {
 	@Version
 	private int optlock;
 
-	@javax.persistence.ManyToOne(cascade = { }, fetch = javax.persistence.FetchType.LAZY)
+	@jakarta.persistence.ManyToOne(cascade = { }, fetch = jakarta.persistence.FetchType.LAZY)
 	private Entity1ForDoc0 entity1;
 
 	@Basic

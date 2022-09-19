@@ -9,8 +9,8 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 public final class SimpleEntityManagerFactoryBuilder {
 

@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.showcase.library.repository.indexse
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.mapper.orm.Search;

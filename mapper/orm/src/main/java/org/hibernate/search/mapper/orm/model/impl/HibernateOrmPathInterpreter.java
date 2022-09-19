@@ -153,7 +153,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     </li>
  *     <li>
  *         Otherwise, no string representation can be assigned and an exception will be thrown.
- *         This includes in particular all cases when the path points to a {@link javax.persistence.Transient} property,
+ *         This includes in particular all cases when the path points to a {@link jakarta.persistence.Transient} property,
  *         or when a custom or {@link Optional} value extractor
  *         is used before we can detect a prefix matching the conditions described above.
  *     </li>
