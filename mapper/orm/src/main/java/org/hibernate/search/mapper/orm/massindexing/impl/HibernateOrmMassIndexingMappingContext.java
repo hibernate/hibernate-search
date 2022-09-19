@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;

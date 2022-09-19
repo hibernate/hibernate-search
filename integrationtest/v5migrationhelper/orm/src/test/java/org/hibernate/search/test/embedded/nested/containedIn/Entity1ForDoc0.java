@@ -9,10 +9,10 @@ package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 import org.hibernate.search.annotations.Field;
 
@@ -21,10 +21,10 @@ import org.hibernate.search.annotations.Field;
  *
  * @author grolland
  */
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @org.hibernate.annotations.Proxy(lazy = true)
 @org.hibernate.search.annotations.Indexed
-@javax.persistence.Table(name = "entity1")
+@jakarta.persistence.Table(name = "entity1")
 //@SequenceGenerator( name="ids_generator1", sequenceName = "ids_generator1")
 public class Entity1ForDoc0 implements Serializable {
 
@@ -39,7 +39,7 @@ public class Entity1ForDoc0 implements Serializable {
 	@Version
 	private int optlock;
 
-	@javax.persistence.OneToMany(mappedBy = "entity1", cascade = { })
+	@jakarta.persistence.OneToMany(mappedBy = "entity1", cascade = { })
 	@org.hibernate.search.annotations.IndexedEmbedded(includeEmbeddedObjectId = true)
 	private java.util.List<Entity2ForDoc0> entities2 = new java.util.ArrayList<Entity2ForDoc0>();
 

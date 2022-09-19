@@ -298,8 +298,8 @@
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0.1</version.javax.batch>
         <version.jakarta.batch>2.1.1</version.jakarta.batch>
-        <version.org.jberet>1.4.8.Final</version.org.jberet>
-        <version.org.jberet.jakarta>2.0.4.Final</version.org.jberet.jakarta>
+        <version.org.jberet.javaee>1.4.8.Final</version.org.jberet.javaee>
+        <version.org.jberet>2.0.4.Final</version.org.jberet>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
@@ -328,8 +328,8 @@
         <version.org.apache.commons.math3>3.6.1</version.org.apache.commons.math3>
         <version.commons-codec>1.17.1</version.commons-codec>
         <version.org.apache.avro>1.11.4</version.org.apache.avro>
-        <version.org.jboss.weld>3.1.9.Final</version.org.jboss.weld>
-        <version.org.jboss.weld.jakarta>4.0.3.Final</version.org.jboss.weld.jakarta>
+        <version.org.jboss.weld.javaee>3.1.9.Final</version.org.jboss.weld.javaee>
+        <version.org.jboss.weld>4.0.3.Final</version.org.jboss.weld>
 
         <!-- >>> JDBC Drivers -->
         <version.com.h2database>2.1.214</version.com.h2database>
@@ -347,8 +347,8 @@
         <version.org.openjdk.jmh>1.36</version.org.openjdk.jmh>
 
         <!-- >>> JSR 352: JBatch runtime -->
-        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
-        <version.com.ibm.jbatch.jakarta>2.1.1</version.com.ibm.jbatch.jakarta>
+        <version.com.ibm.jbatch.javaee>1.0</version.com.ibm.jbatch.javaee>
+        <version.com.ibm.jbatch>2.1.1</version.com.ibm.jbatch>
 
         <!-- >>> JSR 352: JBeret SE dependencies -->
         <version.org.jboss.marshalling>2.1.1.Final</version.org.jboss.marshalling>
@@ -760,7 +760,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test-orm-jakarta</artifactId>
+                <artifactId>hibernate-search-util-internal-test-orm-javaee</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -805,7 +805,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-jakarta</artifactId>
+                <artifactId>hibernate-search-mapper-orm-javaee</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -825,7 +825,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-v5migrationhelper-orm-jakarta</artifactId>
+                <artifactId>hibernate-search-v5migrationhelper-orm-javaee</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -840,7 +840,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core-jakarta</artifactId>
+                <artifactId>hibernate-search-mapper-orm-batch-jsr352-core-javaee</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -855,7 +855,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet-jakarta</artifactId>
+                <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet-javaee</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -870,7 +870,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling-jakarta</artifactId>
+                <artifactId>hibernate-search-mapper-orm-coordination-outbox-polling-javaee</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1317,6 +1317,8 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- Hibernate ORM testing tools -->
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-testing-jakarta</artifactId>
@@ -1346,12 +1348,12 @@
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
                 <artifactId>com.ibm.jbatch-runtime</artifactId>
-                <version>${version.com.ibm.jbatch}</version>
+                <version>${version.com.ibm.jbatch.javaee}</version>
             </dependency>
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
                 <artifactId>com.ibm.jbatch.container</artifactId>
-                <version>${version.com.ibm.jbatch.jakarta}</version>
+                <version>${version.com.ibm.jbatch}</version>
             </dependency>
 
             <!-- JBeret Core and JBeret SE runtime dependencies -->
@@ -1385,6 +1387,36 @@
                 <version>${version.jsoup}</version>
             </dependency>
 
+            <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by Hibernate ORM -->
+                    <exclusion>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                    </exclusion>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
+                <exclusions>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2499,7 +2531,7 @@
         <profile>
             <id>dist</id>
             <modules>
-                <module>jakarta</module>
+                <module>javaee</module>
                 <module>orm6</module>
                 <module>distribution</module>
                 <module>build/configuration-properties-collector</module>

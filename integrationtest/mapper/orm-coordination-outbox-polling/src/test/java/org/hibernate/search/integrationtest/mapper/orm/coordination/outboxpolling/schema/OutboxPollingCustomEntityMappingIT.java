@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -230,7 +230,7 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
-				.withProperty( "javax.persistence.create-database-schemas", true )
+				.withProperty( "jakarta.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.schema", CUSTOM_SCHEMA )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", CUSTOM_AGENT_TABLE_NAME )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.schema", CUSTOM_SCHEMA )
@@ -286,7 +286,7 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
-				.withProperty( "javax.persistence.create-database-schemas", true )
+				.withProperty( "jakarta.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.uuid_gen_strategy", "time" )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
 				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )
@@ -331,7 +331,7 @@ public class OutboxPollingCustomEntityMappingIT {
 				.withProperty( HibernateOrmMapperOutboxPollingImplSettings.COORDINATION_INTERNAL_CONFIGURER,
 						new TestingOutboxPollingInternalConfigurer().outboxEventFilter( eventFilter ) )
 				// Allow ORM to create schema as we want to use non-default for this testcase:
-				.withProperty( "javax.persistence.create-database-schemas", true )
+				.withProperty( "jakarta.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_type", "uuid-char" )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.uuid_type", "uuid-char" )
 				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )

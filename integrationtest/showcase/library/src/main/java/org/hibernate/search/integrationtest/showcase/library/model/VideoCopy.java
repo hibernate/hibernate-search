@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.model;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 

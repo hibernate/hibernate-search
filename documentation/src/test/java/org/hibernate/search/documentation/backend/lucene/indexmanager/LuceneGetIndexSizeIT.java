@@ -8,7 +8,7 @@ package org.hibernate.search.documentation.backend.lucene.indexmanager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.documentation.backend.lucene.analyzer.Book;

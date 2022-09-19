@@ -8,7 +8,7 @@ package org.hibernate.search;
 
 import java.sql.Connection;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Interceptor;

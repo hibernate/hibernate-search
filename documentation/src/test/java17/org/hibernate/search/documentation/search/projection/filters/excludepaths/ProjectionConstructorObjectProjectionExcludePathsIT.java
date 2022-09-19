@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.util.Arrays;
 import java.util.Collections;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.search.projection.filters.Human;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
