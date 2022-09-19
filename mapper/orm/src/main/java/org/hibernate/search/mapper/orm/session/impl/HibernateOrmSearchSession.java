@@ -11,8 +11,8 @@ import static org.hibernate.search.util.common.impl.CollectionHelper.asSetIgnore
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
-import javax.persistence.EntityManager;
-import javax.transaction.Synchronization;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Synchronization;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;

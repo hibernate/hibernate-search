@@ -8,9 +8,9 @@ package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.applyInJPATransaction;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;

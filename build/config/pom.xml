@@ -70,7 +70,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-core</artifactId>
+                                    <artifactId>hibernate-core-jakarta</artifactId>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.org.hibernate}</version>
@@ -101,8 +101,8 @@
                                     <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-queryparser</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>javax.batch</groupId>
-                                    <artifactId>javax.batch-api</artifactId>
+                                    <groupId>jakarta.batch</groupId>
+                                    <artifactId>jakarta.batch-api</artifactId>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <version>${version.javax.batch}</version>

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.service;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
