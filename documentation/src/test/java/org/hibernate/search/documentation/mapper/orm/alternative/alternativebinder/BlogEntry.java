@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.documentation.mapper.orm.alternative.alternativebinder;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.AlternativeDiscriminator;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;

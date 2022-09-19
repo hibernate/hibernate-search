@@ -33,20 +33,26 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
+            <artifactId>hibernate-core-jakarta</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
             <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.javax.persistence}</version>
+            <version>${version.jakarta.persistence}</version>
         </dependency>
         <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
-            <version>${version.javax.enterprise}</version>
+            <version>${version.jakarta.enterprise}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
+            <!-- DO NOT REMOVE and DO NOT MANAGE the version of this dependency. See the version property declaration. -->
+            <version>${version.jakarta.transaction-api}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.common</groupId>
@@ -85,12 +91,21 @@
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
-                        <!--
-                        This module depends on some packages of unnamed module jar: cdi-api*.jar.
-                        It seems that it is not possible to use directly unnamed modules from an explicit module,
-                        but we need an automatic module that acts as a bridge.
-                        -->
-                        <phase>none</phase>
+                        <configuration>
+                            <module>
+                                <moduleInfo>
+                                    <requires>
+                                        static jakarta.cdi;
+                                        org.hibernate.*.impl;
+                                        org.hibernate.*.internal;
+                                        org.hibernate.*.impl.*;
+                                        org.hibernate.*.internal.*;
+                                        transitive org.hibernate.*;
+                                        *;
+                                    </requires>
+                                </moduleInfo>
+                            </module>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

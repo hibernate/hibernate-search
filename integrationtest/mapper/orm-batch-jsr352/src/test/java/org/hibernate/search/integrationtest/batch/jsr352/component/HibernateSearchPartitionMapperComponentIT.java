@@ -14,9 +14,9 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Properties;
 
-import javax.batch.api.partition.PartitionPlan;
-import javax.batch.runtime.context.JobContext;
-import javax.persistence.EntityManagerFactory;
+import jakarta.batch.api.partition.PartitionPlan;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.query.objectloading.mixedhierarchy;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.hibernate.search.annotations.Indexed;
 

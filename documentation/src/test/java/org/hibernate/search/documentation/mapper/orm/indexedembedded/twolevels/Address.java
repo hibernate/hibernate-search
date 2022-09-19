@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.documentation.mapper.orm.indexedembedded.twolevels;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 

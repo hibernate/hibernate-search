@@ -19,12 +19,12 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.BackendConfigurations;
@@ -50,8 +50,8 @@ import org.junit.rules.MethodRule;
 
 /**
  * Tests that mass indexing job can handle entity having
- * {@link javax.persistence.EmbeddedId} annotation, or
- * {@link javax.persistence.IdClass} annotation.
+ * {@link jakarta.persistence.EmbeddedId} annotation, or
+ * {@link jakarta.persistence.IdClass} annotation.
  *
  * @author Mincong Huang
  */

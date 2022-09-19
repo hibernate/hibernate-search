@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.orm.mapping;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.Backend;
