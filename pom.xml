@@ -477,6 +477,12 @@
         <maven.compiler.testTarget>${maven.compiler.testRelease}</maven.compiler.testTarget>
 
         <!--
+            This is an explicit setting to control compiler plugin execution for the no `-parameters` flag case.
+            Needed as when `testIncludes` doesn't match any test classes, it brings all test sources and re-compiles them.
+         -->
+        <maven.compiler.testSources.noParameterCompilation.skip>true</maven.compiler.testSources.noParameterCompilation.skip>
+
+        <!--
                 Options to compile with the Eclipse compiler when building with maven (not with the IDE).
                 See profile "compiler-eclipse".
                 Note the version of ECJ is overridden because the one bundled with the latest plexus-compiler version
@@ -1611,6 +1617,18 @@
                             </sources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-test-source-java17-noparameters</id>
+                        <phase>${java-version.test.java17.add-test-source-phase}</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java17-noparameters</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Skip the deploy plugin explicitly: we use nexus-staging-maven-plugin instead -->
@@ -1793,6 +1811,26 @@
                                 <compilerArgs combine.self="append">
                                     <compilerArg>-parameters</compilerArg>
                                 </compilerArgs>
+                                <testExcludes>
+                                    <testExclude>**/*NoParametersCompilerFlag*</testExclude>
+                                </testExcludes>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>noparameters-testCompile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${maven.compiler.testSources.noParameterCompilation.skip}</skip>
+                                <fork>true</fork>
+                                <proc>none</proc>
+                                <executable>${java-version.test.compiler}</executable>
+                                <compilerArgs combine.self="override" />
+                                <testIncludes>
+                                    <testInclude>**/*NoParametersCompilerFlag*</testInclude>
+                                </testIncludes>
                             </configuration>
                         </execution>
                     </executions>
@@ -2609,6 +2647,15 @@
                             <executions>
                                 <execution>
                                     <id>default-testCompile</id>
+                                    <configuration>
+                                        <compilerArgs combine.children="append">
+                                            <!-- Ignore warnings that are too annoying for tests -->
+                                            <compilerArg>-warn:-unused,resource</compilerArg>
+                                        </compilerArgs>
+                                    </configuration>
+                                </execution>
+                                <execution>
+                                    <id>noparameters-testCompile</id>
                                     <configuration>
                                         <compilerArgs combine.children="append">
                                             <!-- Ignore warnings that are too annoying for tests -->

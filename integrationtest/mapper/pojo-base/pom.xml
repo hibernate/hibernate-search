@@ -19,6 +19,10 @@
     <name>Hibernate Search ITs - POJO Mapper Base</name>
     <description>Hibernate Search integration tests for the abstract base for POJO Mappers</description>
 
+    <properties>
+        <maven.compiler.testSources.noParameterCompilation.skip>false</maven.compiler.testSources.noParameterCompilation.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
