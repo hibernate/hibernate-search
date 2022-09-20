@@ -112,13 +112,16 @@ https://hibernate.atlassian.net/browse/HSEARCH-4577[at the moment].
 
 Hibernate Search infers the path of the field to project on from the name of the corresponding constructor parameter.
 
-You should set the name of a constructor parameter (in the Java code) to the name of the field to project on,
-and make sure to compile your code with the `-parameters` compiler flag.
+You should set the name of a constructor parameter (in the Java code) to the name of the field to project on.
+For the canonical constructor of record types, you will not need to do anything else.
+However, when using `@ProjectionConstructor` on non-record types or non-canonical constructors,
+code must be compiled with the `-parameters` compiler flag.
 
 [WARNING]
 ====
-Projection types compiled without the `-parameters` compiler flag
-will lead to exceptions on startup https://hibernate.atlassian.net/browse/HSEARCH-4574[at the moment].
+Without the `-parameters` compiler flag,
+errors will be thrown on startup as soon as `@ProjectionConstructor` is applied to a non-record type or a non-canonical constructor.
+Hibernate Search may provide workarounds https://hibernate.atlassian.net/browse/HSEARCH-4574[in the future].
 ====
 
 [[mapping-projection-multiple-constructors]]
