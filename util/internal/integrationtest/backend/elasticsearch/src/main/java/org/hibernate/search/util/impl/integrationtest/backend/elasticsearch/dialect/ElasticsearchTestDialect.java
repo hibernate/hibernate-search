@@ -86,4 +86,6 @@ public interface ElasticsearchTestDialect {
 
 	boolean ignoresFieldSortWhenNestedFieldMissing();
 
+	boolean hasBugForDateFormattedAsYear();
+
 }

@@ -214,4 +214,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean reliesOnNestedDocumentsForMultiValuedObjectProjection() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsYearType() {
+		return !dialect.hasBugForDateFormattedAsYear();
+	}
 }

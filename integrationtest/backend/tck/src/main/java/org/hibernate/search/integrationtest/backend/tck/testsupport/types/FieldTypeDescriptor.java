@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public abstract class FieldTypeDescriptor<F> {
 
@@ -23,7 +24,9 @@ public abstract class FieldTypeDescriptor<F> {
 
 	public static List<FieldTypeDescriptor<?>> getAll() {
 		if ( all == null ) {
-			all = Collections.unmodifiableList( Arrays.asList(
+			List<FieldTypeDescriptor<?>> list = new ArrayList<>();
+			Collections.addAll(
+					list,
 					KeywordStringFieldTypeDescriptor.INSTANCE,
 					AnalyzedStringFieldTypeDescriptor.INSTANCE,
 					NormalizedStringFieldTypeDescriptor.INSTANCE,
@@ -39,7 +42,6 @@ public abstract class FieldTypeDescriptor<F> {
 					LocalDateTimeFieldTypeDescriptor.INSTANCE,
 					LocalTimeFieldTypeDescriptor.INSTANCE,
 					ZonedDateTimeFieldTypeDescriptor.INSTANCE,
-					YearFieldTypeDescriptor.INSTANCE,
 					YearMonthFieldTypeDescriptor.INSTANCE,
 					MonthDayFieldTypeDescriptor.INSTANCE,
 					OffsetDateTimeFieldTypeDescriptor.INSTANCE,
@@ -47,7 +49,11 @@ public abstract class FieldTypeDescriptor<F> {
 					GeoPointFieldTypeDescriptor.INSTANCE,
 					BigDecimalFieldTypeDescriptor.INSTANCE,
 					BigIntegerFieldTypeDescriptor.INSTANCE
-			) );
+			);
+			if ( TckConfiguration.get().getBackendFeatures().supportsYearType() ) {
+				list.add( YearFieldTypeDescriptor.INSTANCE );
+			}
+			all = Collections.unmodifiableList( list );
 		}
 		return all;
 	}

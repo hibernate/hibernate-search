@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -182,5 +183,11 @@ public class Elasticsearch712TestDialect implements ElasticsearchTestDialect {
 	@Override
 	public boolean ignoresFieldSortWhenNestedFieldMissing() {
 		return true;
+	}
+
+	@Override
+	public boolean hasBugForDateFormattedAsYear() {
+		// https://github.com/elastic/elasticsearch/issues/90187
+		return ElasticsearchVersion.of( "elastic:8.4.2" ).matches( ElasticsearchTestDialect.getActualVersion() );
 	}
 }
