@@ -116,4 +116,8 @@ public abstract class TckBackendFeatures {
 
 	public abstract boolean reliesOnNestedDocumentsForMultiValuedObjectProjection();
 
+	public boolean supportsYearType() {
+		return true;
+	}
+
 }
