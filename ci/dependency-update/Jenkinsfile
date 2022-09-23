@@ -105,7 +105,7 @@ pipeline {
 	}
 	post {
 		always {
-			notifyBuildResult notifySuccessAfterSuccess: true, maintainers: 'yoann@hibernate.org'
+			notifyBuildResult maintainers: 'yoann@hibernate.org'
 		}
 	}
 }
