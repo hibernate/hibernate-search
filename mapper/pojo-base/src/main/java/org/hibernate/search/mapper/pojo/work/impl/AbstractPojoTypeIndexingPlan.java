@@ -238,9 +238,6 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void doAddOrUpdate(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
-			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
-				initialStatus = EntityStatus.PRESENT;
-			}
 			currentStatus = EntityStatus.PRESENT;
 		}
 
