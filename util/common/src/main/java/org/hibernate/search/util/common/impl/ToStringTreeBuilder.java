@@ -9,6 +9,8 @@ package org.hibernate.search.util.common.impl;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -46,6 +48,13 @@ public class ToStringTreeBuilder {
 			startList( name );
 			for ( Object element : (Iterable<?>) value ) {
 				value( element );
+			}
+			endList();
+		}
+		else if ( value instanceof Map ) {
+			startObject( name );
+			for ( Map.Entry<?, ?> entry : ( (Map<?, ?>) value ).entrySet() ) {
+				attribute( Objects.toString( entry.getKey() ), entry.getValue() );
 			}
 			endList();
 		}
