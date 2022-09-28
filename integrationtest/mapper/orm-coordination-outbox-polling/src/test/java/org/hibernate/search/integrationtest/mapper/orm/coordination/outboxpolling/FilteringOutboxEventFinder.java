@@ -11,10 +11,10 @@ import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxPollingOutboxEventAdditionalJaxbMappingProducer.ENTITY_NAME;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
@@ -29,8 +29,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 
 public class FilteringOutboxEventFinder {
 
-	private boolean filter = true;
-	private final Set<Long> allowedIds = new HashSet<>();
+	private volatile boolean filter = true;
+	private final Set<Long> allowedIds = ConcurrentHashMap.newKeySet();
 
 	public FilteringOutboxEventFinder() {
 	}
