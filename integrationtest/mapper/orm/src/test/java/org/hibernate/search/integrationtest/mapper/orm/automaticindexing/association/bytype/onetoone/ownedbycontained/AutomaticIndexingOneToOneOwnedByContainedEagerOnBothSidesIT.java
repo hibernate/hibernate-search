@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontained;
 
-import static org.junit.Assume.assumeTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -92,46 +90,6 @@ public class AutomaticIndexingOneToOneOwnedByContainedEagerOnBothSidesIT
 			containing.setContainedElementCollectionAssociationsIndexedEmbedded( null );
 			containing.setContainedElementCollectionAssociationsNonIndexedEmbedded( null );
 		} );
-	}
-
-	@Override
-	public void directAssociationUpdate_indexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	@Override
-	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	@Override
-	public void directAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_indexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_usedInCrossEntityDerivedProperty() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	@Override
-	public void indirectAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
-	}
-
-	private void notTestedBecauseOfHSEARCH4305AndHSEARCH4708() {
-		assumeTrue( "Association update tests fail because of https://hibernate.atlassian.net/browse/HSEARCH-4305 / https://hibernate.atlassian.net/browse/HSEARCH-4708",
-				false );
 	}
 
 	@Entity(name = "containing")
