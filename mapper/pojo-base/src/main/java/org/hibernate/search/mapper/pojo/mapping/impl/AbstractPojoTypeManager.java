@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCol
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -122,8 +121,8 @@ public class AbstractPojoTypeManager<I, E>
 	}
 
 	@Override
-	public PojoPathFilter dirtySelfOrContainingFilter() {
-		return reindexingResolver.dirtySelfOrContainingFilter();
+	public PojoImplicitReindexingResolver<E> reindexingResolver() {
+		return reindexingResolver;
 	}
 
 	@Override

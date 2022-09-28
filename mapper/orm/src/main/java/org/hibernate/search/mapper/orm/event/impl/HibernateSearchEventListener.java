@@ -111,8 +111,21 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-		getCurrentIndexingPlan( event.getSession() )
-				.add( typeContext.typeIdentifier(), providedId, null, entity );
+		PojoIndexingPlan plan = getCurrentIndexingPlan( event.getSession() );
+
+		plan.add( typeContext.typeIdentifier(), providedId, null, entity );
+
+		BitSet dirtyAssociationPaths = typeContext.dirtyContainingAssociationFilter().all();
+
+		// In case ToOne associations are updated on the "contained" side only,
+		// make sure to remember that the association was updated on the "containing" side too.
+		// This will only work correctly if the containing side of the association
+		// is lazy and has not yet been loaded (otherwise it will be out of date when reindexing)
+		// but that's the best we can do.
+		if ( dirtyAssociationPaths != null ) {
+			plan.updateAssociationInverseSide( typeContext.typeIdentifier(), dirtyAssociationPaths, null,
+					event.getState() );
+		}
 	}
 
 	@Override
@@ -128,39 +141,52 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
+		boolean considerAllDirty;
 		BitSet dirtyPaths;
+		BitSet dirtyDirectAssociationPaths;
 		if ( dirtyCheckingEnabled ) {
 			int[] dirtyProperties = event.getDirtyProperties();
 			if ( dirtyProperties == null || dirtyProperties.length == 0 ) {
 				// No information about dirty properties.
 				// This can happen when an entity is merged before it's even been loaded.
 				// Just assume everything is dirty.
+				considerAllDirty = true;
 				dirtyPaths = null;
+				dirtyDirectAssociationPaths = typeContext.dirtyContainingAssociationFilter().all();
 			}
 			else {
+				considerAllDirty = false;
 				dirtyPaths = typeContext.dirtyFilter().filter( dirtyProperties );
-				if ( dirtyPaths == null ) {
-					// No property relevant for indexing was changed.
-					// Return early, to avoid creating an indexing plan.
-					return;
-				}
+				dirtyDirectAssociationPaths = typeContext.dirtyContainingAssociationFilter().filter( dirtyProperties );
 			}
 		}
 		else {
 			// Dirty checking is disabled.
 			// Just assume everything is dirty.
+			considerAllDirty = true;
 			dirtyPaths = null;
+			dirtyDirectAssociationPaths = typeContext.dirtyContainingAssociationFilter().all();
 		}
 
 		PojoIndexingPlan plan = getCurrentIndexingPlan( event.getSession() );
 		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-		if ( dirtyPaths != null ) {
+		if ( considerAllDirty ) {
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity,
+					true, true, null );
+		}
+		else if ( dirtyPaths != null ) {
 			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity,
 					false, false, dirtyPaths );
 		}
-		else {
-			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity,
-					true, true, null );
+
+		// In case ToOne associations are updated on the "contained" side only,
+		// make sure to remember that the association was updated on the "containing" side too.
+		// This will only work correctly if the containing side of the association
+		// is lazy and has not yet been loaded (otherwise it will be out of date when reindexing)
+		// but that's the best we can do.
+		if ( dirtyDirectAssociationPaths != null ) {
+			plan.updateAssociationInverseSide( typeContext.typeIdentifier(), dirtyDirectAssociationPaths,
+					event.getOldState(), event.getState() );
 		}
 	}
 

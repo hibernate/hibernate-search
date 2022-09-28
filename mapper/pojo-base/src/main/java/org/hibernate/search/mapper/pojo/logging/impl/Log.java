@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
@@ -31,6 +32,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeMultilineFormatter;
@@ -650,4 +652,15 @@ public interface Log extends BasicLogger {
 	SearchProcessingWithContextException searchProcessingFailure(@Cause Throwable cause, String causeMessage,
 			@Param EventContext context);
 
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 122,
+			value = "An unexpected failure occurred while configuring resolution of association inverse side for reindexing."
+					+ " This may lead to incomplete reindexing and thus out-of-sync indexes."
+					+ " The exception is being ignored to preserve backwards compatibility with earlier versions of Hibernate Search."
+					+ " Failure: %3$s"
+					+ " %2$s" // Context
+					+ " Association inverse side: %1$s.")
+	void failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
+			Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inversePathByInverseType, @FormatWith(EventContextFormatter.class) EventContext context,
+			String causeMessage, @Cause Exception cause);
 }

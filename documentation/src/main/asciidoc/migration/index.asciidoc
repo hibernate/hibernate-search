@@ -116,6 +116,8 @@ for an example of how to migrate backend implementations.
 Parts of the SPI have been deprecated, and will be removed in the next major version:
 
 * `ElasticsearcAwsCredentialsProvider`: implement `ElasticsearchAwsCredentialsProvider` instead.
+* `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition)`:
+use `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider)` instead.
 
 [[behavior]]
 == Behavior changes

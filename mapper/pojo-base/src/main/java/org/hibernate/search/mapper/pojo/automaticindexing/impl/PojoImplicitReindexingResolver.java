@@ -35,14 +35,18 @@ public interface PojoImplicitReindexingResolver<T> extends AutoCloseable, ToStri
 	PojoPathFilter dirtySelfOrContainingFilter();
 
 	/**
-	 * Add all entities that should be reindexed to {@code collector},
-	 * taking into account the given "dirtiness state".
+	 * Adds all entities that should be reindexed to {@code collector},
+	 * taking into account the given "dirty entity" and the context describing its "dirtiness".
 	 * @param collector A collector for dirty entities that should be reindexed.
 	 * @param dirty The entity whose dirtiness is to be checked.
-	 * @param context The set of dirty paths in the given entity.
- 	 * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
+	 * @param context A context related to the entity root
 	 */
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context);
+
+	/**
+	 * @return A path filter that only accepts direct paths to associations to containing entities.
+	 */
+	PojoImplicitReindexingAssociationInverseSideResolver associationInverseSideResolver();
 
 }

@@ -61,4 +61,20 @@ public interface PojoPathFilter {
 	 */
 	BitSet filter(int[] pathOrdinals);
 
+	/**
+	 * For the given path ordinal,
+	 * sets the corresponding ordinal in a bitset if the path is accepted by the filter,
+	 * and return that bitset or {@code null} if the path is not relevant.
+	 *
+	 * @param pathOrdinal A path ordinal.
+	 * @return A {@link BitSet} representing the single given path if it is accepted by this filter,
+	 * or {@code null} if it is not.
+	 */
+	BitSet filter(int pathOrdinal);
+
+	/**
+	 * @return A {@link BitSet} representing all paths that are accepted by this filter, or {@code null} if there is none.
+	 */
+	BitSet all();
+
 }
