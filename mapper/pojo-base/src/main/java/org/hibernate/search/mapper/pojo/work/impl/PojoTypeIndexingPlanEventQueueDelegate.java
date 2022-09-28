@@ -48,7 +48,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 		// if the dirty paths require the entity itself OR a containing entity to be reindexed.
 		// In both cases, we will send an event so that the reindexing is done in a background process.
 		return forceSelfDirty || forceContainingDirty
-				|| dirtyPathsOrNull != null && typeContext.dirtySelfOrContainingFilter().test( dirtyPathsOrNull );
+				|| dirtyPathsOrNull != null && typeContext.reindexingResolver().dirtySelfOrContainingFilter().test( dirtyPathsOrNull );
 	}
 
 	@Override

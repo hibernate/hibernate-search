@@ -24,4 +24,8 @@ public interface PojoTypeExtendedMappingCollector {
 
 	void dirtyFilter(PojoPathFilter dirtyFilter);
 
+	default void dirtyContainingAssociationFilter(PojoPathFilter filter) {
+		// Default implementation: ignore this information.
+	}
+
 }

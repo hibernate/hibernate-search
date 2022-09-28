@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +22,7 @@ import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWal
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoRuntimePathsBuildingHelper;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -31,9 +33,13 @@ class PojoImplicitReindexingResolverBuilder<T> {
 	}
 
 	private final PojoRawTypeModel<T> rawTypeModel;
+	private final PojoImplicitReindexingResolverBuildingHelper buildingHelper;
 
 	// Use a LinkedHashSet for deterministic iteration
 	private final Set<PojoModelPathValueNode> dirtyPathsTriggeringSelfReindexing = new LinkedHashSet<>();
+
+	private final Map<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> containingAssociationPaths =
+			new LinkedHashMap<>();
 
 	private final PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> containingEntitiesResolverRootBuilder;
 
@@ -42,6 +48,7 @@ class PojoImplicitReindexingResolverBuilder<T> {
 	PojoImplicitReindexingResolverBuilder(PojoRawTypeModel<T> rawTypeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		this.rawTypeModel = rawTypeModel;
+		this.buildingHelper = buildingHelper;
 		this.containingEntitiesResolverRootBuilder = new PojoImplicitReindexingResolverOriginalTypeNodeBuilder<>(
 				BoundPojoModelPath.root( rawTypeModel ), buildingHelper
 		);
@@ -61,29 +68,36 @@ class PojoImplicitReindexingResolverBuilder<T> {
 		dirtyPathsTriggeringSelfReindexing.add( dirtyPathFromEntityType.toUnboundPath() );
 	}
 
+	void addContainingAssociationPath(PojoModelPathValueNode pathFromContainedSide,
+			PojoRawTypeModel<?> containingType, PojoModelPathValueNode pathFromContainingSide) {
+		checkNotFrozen();
+		containingAssociationPaths.computeIfAbsent( pathFromContainedSide, ignored -> new LinkedHashMap<>() )
+				.put( containingType, pathFromContainingSide );
+	}
+
 	PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> containingEntitiesResolverRoot() {
 		return containingEntitiesResolverRootBuilder;
 	}
 
-	/**
-	 * @param pathFilterProvider A provider for path filters that will be used in the resolver (and its nested resolvers)
-	 */
-	final Optional<PojoImplicitReindexingResolver<T>> build(PojoPathFilterProvider pathFilterProvider) {
+	final Optional<PojoImplicitReindexingResolver<T>> build() {
 		freeze();
+
+		PojoRuntimePathsBuildingHelper pathsBuildingHelper = buildingHelper.runtimePathsBuildingHelper( rawTypeModel );
 
 		Set<PojoModelPathValueNode> immutableDirtyPathsAcceptedByFilter = dirtyPathsTriggeringSelfReindexing;
 
 		Optional<PojoImplicitReindexingResolverNode<T>> containingEntitiesResolverRootOptional =
-				containingEntitiesResolverRootBuilder.build( pathFilterProvider, null );
+				containingEntitiesResolverRootBuilder.build( pathsBuildingHelper, null );
 
-		if ( immutableDirtyPathsAcceptedByFilter.isEmpty() && !containingEntitiesResolverRootOptional.isPresent() ) {
+		if ( immutableDirtyPathsAcceptedByFilter.isEmpty() && !containingEntitiesResolverRootOptional.isPresent()
+				&& containingAssociationPaths.isEmpty() ) {
 			/*
 			 * If this resolver won't resolve to anything, it is useless and we don't need to build it.
 			 */
 			return Optional.empty();
 		}
 		else {
-			PojoPathFilter dirtySelfFilter = pathFilterProvider.create( immutableDirtyPathsAcceptedByFilter );
+			PojoPathFilter dirtySelfFilter = pathsBuildingHelper.createFilter( immutableDirtyPathsAcceptedByFilter );
 
 			PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot =
 					containingEntitiesResolverRootOptional.orElseGet( PojoImplicitReindexingResolverNode::noOp );
@@ -92,10 +106,11 @@ class PojoImplicitReindexingResolverBuilder<T> {
 					new HashSet<>( immutableDirtyPathsAcceptedByFilter );
 			dirtySelfOrContainingPaths.addAll(
 					containingEntitiesResolverRootBuilder.getDirtyPathsTriggeringReindexingIncludingNestedNodes() );
-			PojoPathFilter dirtySelfOrContainingFilter = pathFilterProvider.create( dirtySelfOrContainingPaths );
+			PojoPathFilter dirtySelfOrContainingFilter = pathsBuildingHelper.createFilter( dirtySelfOrContainingPaths );
 
 			return Optional.of( new PojoImplicitReindexingResolverImpl<>( dirtySelfFilter, dirtySelfOrContainingFilter,
-					containingEntitiesResolverRoot ) );
+					containingEntitiesResolverRoot,
+					buildingHelper.createAssociationInverseSideResolver( rawTypeModel, containingAssociationPaths ) ) );
 		}
 	}
 

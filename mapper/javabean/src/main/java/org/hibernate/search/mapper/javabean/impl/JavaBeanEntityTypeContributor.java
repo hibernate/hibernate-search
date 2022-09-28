@@ -23,6 +23,8 @@ class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 	}
 
 	@Override
+	// Keeping the deprecated form in order to test that it works correctly (for Infinispan in particular)
+	@SuppressWarnings("deprecation")
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		if ( !typeIdentifier.equals( collector.typeIdentifier() ) ) {
 			// Entity metadata is not inherited; only contribute it to the exact type.

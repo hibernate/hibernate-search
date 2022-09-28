@@ -22,7 +22,8 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathsDefinitionAdapter;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -46,12 +47,20 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		return rawTypeModel.typeIdentifier();
 	}
 
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(String entityName,
+			org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition pathsDefinition) {
+		return markAsEntity( entityName, new PojoPathsDefinitionAdapter( pathsDefinition ) );
+	}
+
 	@Override
 	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(String entityName,
-			PojoPathsDefinition pathsDefinition) {
+			PojoPathDefinitionProvider pathDefinitionProvider) {
 		if ( entityTypeMetadataBuilder == null ) {
 			entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder(
-					entityName, pathsDefinition );
+					entityName, pathDefinitionProvider );
 		}
 		else {
 			entityTypeMetadataBuilder.checkSameEntity( entityName );
