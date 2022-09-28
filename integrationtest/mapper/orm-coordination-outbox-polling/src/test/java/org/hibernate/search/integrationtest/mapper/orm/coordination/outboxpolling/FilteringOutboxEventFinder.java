@@ -95,16 +95,8 @@ public class FilteringOutboxEventFinder {
 		allowedIds.clear();
 	}
 
-	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
-		checkFiltering();
-		Query<OutboxEvent> query = session.createQuery(
-				"select e from " + ENTITY_NAME + " e order by e.id", OutboxEvent.class );
-		avoidLockingConflicts( query );
-		return query.list();
-	}
-
 	// Orders events by ID, regardless of what order is used when processing them.
-	public List<OutboxEvent> findOutboxEventsNoFilterOrderById(Session session) {
+	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
 				"select e from " + ENTITY_NAME + " e order by e.id", OutboxEvent.class );

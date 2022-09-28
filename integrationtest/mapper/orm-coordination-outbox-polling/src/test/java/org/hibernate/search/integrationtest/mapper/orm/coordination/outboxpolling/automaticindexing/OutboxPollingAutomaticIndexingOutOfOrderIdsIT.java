@@ -88,7 +88,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// Correct order when ordered by id (you'll have to trust me on that)
 			// add
@@ -107,7 +107,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
 			// delete
@@ -199,7 +199,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id (you'll have to trust me on that)
 			// delete
@@ -216,7 +216,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id (you'll have to trust me on that)
 			// add
@@ -312,7 +312,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Correct order when ordered by id
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1",
@@ -332,7 +332,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterOrderById( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 2 );
 			// Out-of-order when ordered by id
 			OutboxPollingAutomaticIndexingEventSendingIT.verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1",
