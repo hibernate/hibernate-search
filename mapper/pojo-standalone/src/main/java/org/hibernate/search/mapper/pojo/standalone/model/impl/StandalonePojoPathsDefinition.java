@@ -12,7 +12,6 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 
 /**
  * A factory for filters expecting a simple string representation of dirty paths,
@@ -20,7 +19,9 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
  * <p>
  * See {@link PojoModelPathPropertyNode#toPropertyString()}.
  */
-public class StandalonePojoPathsDefinition implements PojoPathsDefinition {
+// Keeping the deprecated interface in order to test that it works correctly (for Infinispan in particular)
+@SuppressWarnings("deprecation")
+public class StandalonePojoPathsDefinition implements org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition {
 
 	@Override
 	public List<String> preDefinedOrdinals() {

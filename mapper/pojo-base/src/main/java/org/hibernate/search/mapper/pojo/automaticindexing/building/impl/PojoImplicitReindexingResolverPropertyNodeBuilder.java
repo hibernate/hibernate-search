@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoRuntimePathsBuildingHelper;
 import org.hibernate.search.util.common.impl.Closer;
 
 class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
@@ -105,18 +105,18 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	}
 
 	@Override
-	Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterProvider pathFilterProvider,
+	Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoRuntimePathsBuildingHelper pathsBuildingHelper,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		Collection<PojoImplicitReindexingResolverNode<P>> valueWithoutExtractorTypeNodes =
-				valueWithoutExtractorsBuilderDelegate.buildTypeNodes( pathFilterProvider, allPotentialDirtyPaths );
+				valueWithoutExtractorsBuilderDelegate.buildTypeNodes( pathsBuildingHelper, allPotentialDirtyPaths );
 		Collection<PojoImplicitReindexingResolverNode<? super P>> immutableNestedNodes = new ArrayList<>();
 		immutableNestedNodes.addAll( valueWithoutExtractorTypeNodes );
 		containerElementNodeBuilders.values().stream()
 				.distinct() // Necessary because the default extractor path has two possible keys with the same value
 				.filter( Objects::nonNull )
-				.map( builder -> builder.build( pathFilterProvider, allPotentialDirtyPaths ) )
+				.map( builder -> builder.build( pathsBuildingHelper, allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableNestedNodes::add );

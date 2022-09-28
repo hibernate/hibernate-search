@@ -56,7 +56,7 @@ public class ToStringTreeBuilder {
 			for ( Map.Entry<?, ?> entry : ( (Map<?, ?>) value ).entrySet() ) {
 				attribute( Objects.toString( entry.getKey() ), entry.getValue() );
 			}
-			endList();
+			endObject();
 		}
 		else {
 			startEntry( name, null );

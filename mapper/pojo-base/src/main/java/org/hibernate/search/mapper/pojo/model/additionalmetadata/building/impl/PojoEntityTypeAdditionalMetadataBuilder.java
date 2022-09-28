@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorEntityTypeNode {
@@ -20,12 +20,12 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String entityName;
-	private final PojoPathsDefinition pathsDefinition;
+	private final PojoPathDefinitionProvider pathDefinitionProvider;
 	private String entityIdPropertyName;
 
-	PojoEntityTypeAdditionalMetadataBuilder(String entityName, PojoPathsDefinition pathsDefinition) {
+	PojoEntityTypeAdditionalMetadataBuilder(String entityName, PojoPathDefinitionProvider pathDefinitionProvider) {
 		this.entityName = entityName;
-		this.pathsDefinition = pathsDefinition;
+		this.pathDefinitionProvider = pathDefinitionProvider;
 	}
 
 	void checkSameEntity(String entityName) {
@@ -46,7 +46,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	public PojoEntityTypeAdditionalMetadata build() {
 		return new PojoEntityTypeAdditionalMetadata(
 				entityName,
-				pathsDefinition,
+				pathDefinitionProvider,
 				Optional.ofNullable( entityIdPropertyName )
 		);
 	}

@@ -74,4 +74,22 @@ final class PojoPathFilterImpl implements PojoPathFilter {
 		return bitSet;
 	}
 
+	@Override
+	public BitSet filter(int pathOrdinal) {
+		if ( !acceptedPaths.get( pathOrdinal ) ) {
+			return null;
+		}
+		BitSet bitSet = new BitSet();
+		bitSet.set( pathOrdinal );
+		return bitSet;
+	}
+
+	@Override
+	public BitSet all() {
+		if ( acceptedPaths.isEmpty() ) {
+			return null;
+		}
+		// BitSet is mutable, so we must clone it...
+		return (BitSet) acceptedPaths.clone();
+	}
 }

@@ -28,6 +28,6 @@ public class PojoImplicitReindexingResolverMarkingNode<T> extends PojoImplicitRe
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context) {
-		collector.markForReindexing( dirty );
+		collector.updateBecauseOfContained( context.detectContainingEntityType( dirty ), dirty );
 	}
 }

@@ -6,31 +6,54 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingAssociationInverseSideResolver;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingAssociationInverseSideResolverMarkingNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingAssociationInverseSideResolverNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverImpl;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinalReference;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoRuntimePathsBuildingHelper;
+import org.hibernate.search.mapper.pojo.model.path.spi.BindablePojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinition;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathEntityStateRepresentation;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ContainerExtractorBinder extractorBinder;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -41,6 +64,8 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	private final Map<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> concreteEntitySubTypesByEntitySuperType =
 			new HashMap<>();
 	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverBuilder<?>> builderByType =
+			new HashMap<>();
+	private final Map<PojoRawTypeModel<?>, PojoRuntimePathsBuildingHelper> runtimePathsBuildingHelperByType =
 			new HashMap<>();
 
 	public PojoImplicitReindexingResolverBuildingHelper(
@@ -84,21 +109,20 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 	}
 
-	public <T> PojoImplicitReindexingResolver<T> build(PojoRawTypeModel<T> typeModel,
-			PojoPathFilterProvider pathFilterProvider) {
-		return buildOptional( typeModel, pathFilterProvider )
+	public <T> PojoImplicitReindexingResolver<T> build(PojoRawTypeModel<T> typeModel) {
+		return buildOptional( typeModel )
 				.orElseGet( () -> {
-					PojoPathFilter emptyFilter = pathFilterProvider
-							.create( Collections.emptySet() );
+					PojoRuntimePathsBuildingHelper helper = runtimePathsBuildingHelper( typeModel );
+					PojoPathFilter emptyFilter = helper.createFilter( Collections.emptySet() );
 					return new PojoImplicitReindexingResolverImpl<>(
 							emptyFilter, emptyFilter,
-							PojoImplicitReindexingResolverNode.noOp()
+							PojoImplicitReindexingResolverNode.noOp(),
+							createAssociationInverseSideResolver( typeModel, Collections.emptyMap() )
 					);
 				} );
 	}
 
-	public <T> Optional<PojoImplicitReindexingResolver<T>> buildOptional(PojoRawTypeModel<T> typeModel,
-			PojoPathFilterProvider pathFilterProvider) {
+	public <T> Optional<PojoImplicitReindexingResolver<T>> buildOptional(PojoRawTypeModel<T> typeModel) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverBuilder<T> builder =
 				(PojoImplicitReindexingResolverBuilder<T>) builderByType.get( typeModel );
@@ -106,8 +130,117 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			return Optional.empty();
 		}
 		else {
-			return builder.build( pathFilterProvider );
+			return builder.build();
 		}
+	}
+
+	public <T> PojoRuntimePathsBuildingHelper runtimePathsBuildingHelper(PojoRawTypeModel<T> typeModel) {
+		return runtimePathsBuildingHelperByType.computeIfAbsent( typeModel, theTypeModel -> {
+			PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( theTypeModel )
+					.getEntityTypeMetadata()
+					// This should not be possible since this method is only called for entity types (see callers)
+					.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + theTypeModel ) );
+			return new PojoRuntimePathsBuildingHelper( entityTypeMetadata.pathDefinitionProvider() );
+		} );
+	}
+
+	public PojoImplicitReindexingAssociationInverseSideResolver createAssociationInverseSideResolver(
+			PojoRawTypeModel<?> typeModel,
+			Map<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inversePathByInverseTypeByDirectContainingPath) {
+		PojoRuntimePathsBuildingHelper pathsBuildingHelper = runtimePathsBuildingHelper( typeModel );
+		List<List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>>> resolversByOrdinal =
+				createResolversByOrdinal( typeModel, pathsBuildingHelper, inversePathByInverseTypeByDirectContainingPath );
+		PojoPathFilter filter = pathsBuildingHelper.createFilterForNonNullOrdinals( resolversByOrdinal );
+		return new PojoImplicitReindexingAssociationInverseSideResolver(
+				pathsBuildingHelper.pathOrdinals(), filter, resolversByOrdinal
+		);
+	}
+
+	private List<List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>>> createResolversByOrdinal(
+			PojoRawTypeModel<?> typeModel, PojoRuntimePathsBuildingHelper pathsBuildingHelper,
+			Map<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inversePathByInverseTypeByDirectContainingPath) {
+		List<List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>>> result = new ArrayList<>();
+		for ( Map.Entry<PojoModelPathValueNode, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> entry :
+				inversePathByInverseTypeByDirectContainingPath.entrySet() ) {
+			PojoModelPathValueNode path = entry.getKey();
+			Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inversePathByInverseType = entry.getValue();
+			int ordinal;
+			PojoImplicitReindexingAssociationInverseSideResolverNode<Object> nodeForOrdinal;
+			try {
+				// Bind the path to get a canonical representation (no "default extractors" in particular),
+				// otherwise toPathDefinition() might lack some information and fail.
+				BoundPojoModelPathValueNode<?, ?, ?> boundPath = bindPath( typeModel, path );
+				PojoPathDefinition pathDefinition = pathsBuildingHelper.toPathDefinition( boundPath.toUnboundPath() );
+				Optional<PojoPathEntityStateRepresentation> entityStateRepresentationOptional = pathDefinition.entityStateRepresentation();
+				if ( !entityStateRepresentationOptional.isPresent() ) {
+					// Ignore: we don't have metadata to resolve the inverse side of this association from entity state.
+					// This may happen with the Standalone POJO Mapper,
+					// but also for ToMany associations with the ORM Mapper (until we address HSEARCH-3567).
+					continue;
+				}
+				PojoPathEntityStateRepresentation entityStateRepresentation = entityStateRepresentationOptional.get();
+				ordinal = entityStateRepresentation.ordinalInStateArray();
+				// Fill with nulls if necessary
+				for ( int i = result.size(); i <= ordinal; i++ ) {
+					result.add( null );
+				}
+				nodeForOrdinal = createAssociationInverseSideResolverNode(
+						entityStateRepresentation.pathFromStateArrayElement(), inversePathByInverseType );
+			}
+			catch (RuntimeException e) {
+				// We're logging instead of re-throwing for backwards compatibility,
+				// as we don't want this feature to cause errors in existing applications.
+				// TODO HSEARCH-4720 when we can afford breaking changes (in the next major), we should probably throw an exception
+				//  instead of just logging a warning here?
+				// Wrap the failure to append a message "please report this bug"
+				AssertionFailure assertionFailure = e instanceof AssertionFailure ? (AssertionFailure) e
+						: new AssertionFailure( e.getMessage(), e );
+				log.failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
+						inversePathByInverseType, EventContexts.fromType( typeModel ).append( PojoEventContexts.fromPath( path ) ),
+						assertionFailure.getMessage(), assertionFailure );
+				continue;
+			}
+			List<PojoImplicitReindexingAssociationInverseSideResolverNode<Object>> nodesForOrdinal = result.get( ordinal );
+			if ( nodesForOrdinal == null ) {
+				nodesForOrdinal = new ArrayList<>();
+				result.set( ordinal, nodesForOrdinal );
+			}
+			nodesForOrdinal.add( nodeForOrdinal );
+		}
+		return result;
+	}
+
+	private PojoImplicitReindexingAssociationInverseSideResolverNode<Object> createAssociationInverseSideResolverNode(
+			Optional<BindablePojoModelPath> pathFromStateArrayElementOptional,
+			Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inverseSide) {
+		Map<PojoRawTypeIdentifier<?>, PojoPathOrdinalReference> ordinalByType = new HashMap<>();
+		for ( Map.Entry<PojoRawTypeModel<?>, PojoModelPathValueNode> entry : inverseSide.entrySet() ) {
+			PojoRawTypeModel<?> typeModel = entry.getKey();
+			PojoModelPathValueNode path = entry.getValue();
+			PojoRuntimePathsBuildingHelper inverseSideRuntimePathsHelper = runtimePathsBuildingHelper( typeModel );
+			PojoPathOrdinals ordinals = inverseSideRuntimePathsHelper.pathOrdinals();
+			int firstOrdinal = ordinals.toExistingOrNewOrdinal( inverseSideRuntimePathsHelper.toPathDefinition( path )
+					.stringRepresentations().iterator().next() );
+			ordinalByType.put( typeModel.typeIdentifier(), new PojoPathOrdinalReference( firstOrdinal, ordinals ) );
+		}
+		PojoImplicitReindexingAssociationInverseSideResolverMarkingNode markingNode =
+				new PojoImplicitReindexingAssociationInverseSideResolverMarkingNode( ordinalByType );
+		if ( !pathFromStateArrayElementOptional.isPresent() ) {
+			return markingNode;
+		}
+
+		// Build a tree (well, a linked list, really) of nodes that will go through the given path
+		BindablePojoModelPath pathFromStateArrayElement = pathFromStateArrayElementOptional.get();
+
+		BoundPojoModelPathValueNode<?, ?, ?> boundPath = bindPath( pathFromStateArrayElement.rootType(),
+				pathFromStateArrayElement.path() );
+
+		return PojoImplicitReindexingAssociationInverseSideResolverNode.bind( extractorBinder, boundPath, markingNode );
+	}
+
+	public BoundPojoModelPathValueNode<?, ?, ?> bindPath(PojoTypeModel<?> rootType, PojoModelPathValueNode unboundPath) {
+		return PojoModelPathBinder.bind( BoundPojoModelPath.root( rootType ),
+				unboundPath, BoundPojoModelPath.walker( extractorBinder ) );
 	}
 
 	public boolean isSingleConcreteTypeInEntityHierarchy(PojoRawTypeModel<?> typeModel) {
