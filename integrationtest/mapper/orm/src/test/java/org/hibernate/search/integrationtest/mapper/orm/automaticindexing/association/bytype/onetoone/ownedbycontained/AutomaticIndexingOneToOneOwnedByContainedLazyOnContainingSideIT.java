@@ -71,31 +71,31 @@ public class AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT
 
 	@Override
 	public void directAssociationUpdate_indexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305();
+		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
 	}
 
 	@Override
 	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		notTestedBecauseOfHSEARCH4305();
+		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
 	}
 
 	@Override
 	public void indirectAssociationUpdate_indexedEmbedded() {
-		notTestedBecauseOfHSEARCH4305();
+		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
 	}
 
 	@Override
 	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
-		notTestedBecauseOfHSEARCH4305();
+		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
 	}
 
 	@Override
 	public void indirectAssociationUpdate_usedInCrossEntityDerivedProperty() {
-		notTestedBecauseOfHSEARCH4305();
+		notTestedBecauseOfHSEARCH4305AndHSEARCH4708();
 	}
 
-	private void notTestedBecauseOfHSEARCH4305() {
-		assumeTrue( "Association update tests fail because of https://hibernate.atlassian.net/browse/HSEARCH-4305",
+	private void notTestedBecauseOfHSEARCH4305AndHSEARCH4708() {
+		assumeTrue( "Association update tests fail because of https://hibernate.atlassian.net/browse/HSEARCH-4305 / https://hibernate.atlassian.net/browse/HSEARCH-4708",
 				false );
 	}
 
