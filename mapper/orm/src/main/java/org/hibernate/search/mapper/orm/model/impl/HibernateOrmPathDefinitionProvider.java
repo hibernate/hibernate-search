@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,14 +29,15 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinition;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * A {@link PojoPathsDefinition} suitable for use with Hibernate ORM,
+ * A {@link PojoPathDefinitionProvider} suitable for use with Hibernate ORM,
  * in particular with its event system.
  * <p>
  * Paths passed to this factory are assigned a string representation so as to match the property names
@@ -145,7 +147,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     </li>
  * </ul>
  */
-public class HibernateOrmPathsDefinition implements PojoPathsDefinition {
+public class HibernateOrmPathDefinitionProvider implements PojoPathDefinitionProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Set<String> PRIMITIVE_EXTRACTOR_NAMES = CollectionHelper.asImmutableSet(
@@ -161,7 +163,7 @@ public class HibernateOrmPathsDefinition implements PojoPathsDefinition {
 
 	private final PersistentClass persistentClass;
 
-	public HibernateOrmPathsDefinition(PersistentClass persistentClass) {
+	public HibernateOrmPathDefinitionProvider(PersistentClass persistentClass) {
 		this.persistentClass = persistentClass;
 	}
 
@@ -177,10 +179,10 @@ public class HibernateOrmPathsDefinition implements PojoPathsDefinition {
 	}
 
 	@Override
-	public void interpretPaths(Set<String> target, Set<PojoModelPathValueNode> source) {
-		for ( PojoModelPathValueNode path : source ) {
-			addDirtyPathStringRepresentations( target, path );
-		}
+	public PojoPathDefinition interpretPath(PojoModelPathValueNode source) {
+		Set<String> stringRepresentations = new LinkedHashSet<>();
+		addDirtyPathStringRepresentations( stringRepresentations, source );
+		return new PojoPathDefinition( stringRepresentations, Optional.empty() );
 	}
 
 	private void addDirtyPathStringRepresentations(Set<String> pathsAsStrings, PojoModelPathValueNode path) {
@@ -232,7 +234,7 @@ public class HibernateOrmPathsDefinition implements PojoPathsDefinition {
 		if ( extractorPath.isDefault() ) {
 			throw new AssertionFailure(
 					"Expected a non-default extractor path as per the "
-					+ HibernateOrmPathsDefinition.class.getSimpleName() + " contract"
+					+ HibernateOrmPathDefinitionProvider.class.getSimpleName() + " contract"
 			);
 		}
 

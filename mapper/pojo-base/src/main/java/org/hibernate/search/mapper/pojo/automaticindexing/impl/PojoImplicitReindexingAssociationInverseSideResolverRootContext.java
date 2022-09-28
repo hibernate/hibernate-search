@@ -6,31 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractionContext;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 /**
- * The context passed to a {@link PojoImplicitReindexingResolver}
- * and propagated to every {@link PojoImplicitReindexingResolverNode}.
- * <p>
- * This includes telling whether changes require the changed entity to be reindexed,
- * but also retrieving all entities that use the changed entity in their indexed form
- * so that they can be reindexed by Hibernate Search.
+ * The context passed to a {@link PojoImplicitReindexingAssociationInverseSideResolver}
+ * and propagated to every {@link PojoImplicitReindexingAssociationInverseSideResolverNode}.
  */
-public interface PojoImplicitReindexingResolverRootContext extends ContainerExtractionContext {
+public interface PojoImplicitReindexingAssociationInverseSideResolverRootContext extends ContainerExtractionContext {
 
-	/**
-	 * @return The context for the current session.
-	 */
-	PojoImplicitReindexingResolverSessionContext sessionContext();
-
-	/**
-	 * @param filter A path filter for dirty paths.
-	 * @return Whether the root is dirty according to the given filter.
-	 */
-	boolean isDirtyForReindexingResolution(PojoPathFilter filter);
+	PojoRuntimeIntrospector runtimeIntrospector();
 
 	PojoRawTypeIdentifier<?> detectContainingEntityType(Object containingEntity);
 

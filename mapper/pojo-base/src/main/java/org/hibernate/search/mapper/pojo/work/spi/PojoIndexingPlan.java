@@ -140,6 +140,30 @@ public interface PojoIndexingPlan {
 			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths);
 
 	/**
+	 * Consider an association updated with the given entities removed,
+	 * and perform reindexing of the relevant entities on the inverse side of that association as necessary.
+	 * <p>
+	 * This is mostly useful for cases where callers do not receive update events for associations on both sides,
+	 * to have Hibernate Search act "as if" the inverse side of the association had been updated.
+	 * <p>
+	 * <strong>WARNING:</strong> Getters returning the current state of the association on the removed entities
+	 * are still expected to return the updated state of the association (for example through lazy-loading).
+	 * Failing that, reindexing will index out-of-date information.
+	 *
+	 * @param typeIdentifier The identifier of the entity type on one side of the association.
+	 * @param dirtyAssociationPaths The association paths to consider dirty, as a {@link BitSet}.
+	 * You can build such a {@link BitSet} by obtaining the
+	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyContainingAssociationFilter(PojoPathFilter) dirty association filter}
+	 * for the entity type and calling one of the {@code filter} methods.
+	 * @param oldState The old state of the entity whose associations are dirty.
+	 * May be {@code null}, in which case this state will not yield any reindexing.
+	 * @param newState The new state of the entity whose associations are dirty.
+	 * May be {@code null}, in which case this state will not yield any reindexing.
+	 */
+	void updateAssociationInverseSide(PojoRawTypeIdentifier<?> typeIdentifier,
+			BitSet dirtyAssociationPaths, Object[] oldState, Object[] newState);
+
+	/**
 	 * Extract all data from objects passed to the indexing plan so far,
 	 * create documents to be indexed and put them into an internal buffer,
 	 * without writing them to the indexes.

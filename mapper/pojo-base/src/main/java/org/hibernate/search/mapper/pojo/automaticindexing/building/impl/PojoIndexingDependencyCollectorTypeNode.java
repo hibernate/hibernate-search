@@ -10,10 +10,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
@@ -167,6 +169,28 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 						buildingHelper.getOrCreateResolverBuilder( concreteEntityType )
 								.containingEntitiesResolverRoot();
 				parentNode.markForReindexing( builder, dirtyPathFromEntityType );
+			}
+		}
+
+		// For associations,
+		// populate metadata that will be useful for PojoIndexingPlan.updateAssociationInverseSide.
+		PojoTypeModel<?> valueType = dirtyPathFromEntityType.getTypeModel();
+		PojoRawTypeModel<?> valueRawType = valueType.rawType();
+		if ( buildingHelper.isEntity( valueRawType ) ) {
+			for ( PojoRawTypeModel<?> concreteEntityType :
+					buildingHelper.getConcreteEntitySubTypesForEntitySuperType( valueRawType ) ) {
+				Optional<PojoModelPathValueNode> inversePath = buildingHelper.pathInverter().invertPath(
+						concreteEntityType, dirtyPathFromEntityType );
+				if ( !inversePath.isPresent() ) {
+					// Ignore: we just can't handle PojoIndexingPlan.updateAssociationInverseSide in this case.
+					// If this prevents reindexing resolution (ReindexOnUpdate != SHALLOW / NO),
+					// an exception will be thrown elsewhere with the appropriate context and explanation.
+					continue;
+				}
+				PojoImplicitReindexingResolverBuilder<?> valueTypeReindexingResolverBuilder =
+						buildingHelper.getOrCreateResolverBuilder( concreteEntityType );
+				valueTypeReindexingResolverBuilder.addContainingAssociationPath( inversePath.get(),
+						rawType, dirtyPathFromEntityType.toUnboundPath() );
 			}
 		}
 	}

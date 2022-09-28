@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.util.Optional;
 
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.search.mapper.orm.model.impl.HibernateOrmPathsDefinition;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmPathDefinitionProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -35,7 +35,7 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 		}
 		collector.markAsEntity(
 				persistentClass.getJpaEntityName(),
-				new HibernateOrmPathsDefinition( persistentClass )
+				new HibernateOrmPathDefinitionProvider( persistentClass )
 		)
 				.entityIdPropertyName( identifierPropertyNameOptional.orElse( null ) );
 	}

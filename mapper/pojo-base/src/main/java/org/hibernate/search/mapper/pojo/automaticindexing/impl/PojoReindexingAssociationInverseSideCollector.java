@@ -13,8 +13,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
  * <p>
  * Used by {@link PojoImplicitReindexingResolver} to return the resolved entities.
  */
-public interface PojoReindexingCollector {
+public interface PojoReindexingAssociationInverseSideCollector {
 
-	void updateBecauseOfContained(PojoRawTypeIdentifier<?> typeIdentifier, Object containingEntity);
+	void updateBecauseOfContainedAssociation(PojoRawTypeIdentifier<?> typeIdentifier, Object containingEntity,
+			int dirtyAssociationPathOrdinal);
 
 }

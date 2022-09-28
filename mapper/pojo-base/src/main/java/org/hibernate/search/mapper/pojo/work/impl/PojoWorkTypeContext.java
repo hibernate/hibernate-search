@@ -9,12 +9,12 @@ package org.hibernate.search.mapper.pojo.work.impl;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
@@ -33,7 +33,7 @@ public interface PojoWorkTypeContext<I, E> extends PojoLoadingTypeContext<E> {
 
 	String entityName();
 
-	PojoPathFilter dirtySelfOrContainingFilter();
+	PojoImplicitReindexingResolver<E> reindexingResolver();
 
 	E toEntity(Object unproxiedEntity);
 

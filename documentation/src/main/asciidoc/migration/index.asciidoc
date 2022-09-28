@@ -105,6 +105,8 @@ Below are the most notable SPI changes:
 Use `.annotationMapping().discoverAnnotationsFromReferencedTypes(...)` instead.
 * `org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory` is deprecated.
 Use/implement `org.hibernate.search.util.common.reflect.spi.ValueHandleFactory` instead.
+* `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition)` is deprecated.
+Use `PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider)` instead.
 
 [[behavior]]
 == Behavior changes

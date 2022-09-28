@@ -17,4 +17,6 @@ public interface HibernateOrmListenerTypeContext {
 
 	PojoPathFilter dirtyFilter();
 
+	PojoPathFilter dirtyContainingAssociationFilter();
+
 }

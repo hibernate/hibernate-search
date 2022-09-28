@@ -8,18 +8,18 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
 
 public class PojoEntityTypeAdditionalMetadata {
 	private final String entityName;
-	private final PojoPathsDefinition pathsDefinition;
+	private final PojoPathDefinitionProvider pathDefinitionProvider;
 	private final Optional<String> entityIdPropertyName;
 
 	public PojoEntityTypeAdditionalMetadata(String entityName,
-			PojoPathsDefinition pathsDefinition,
+			PojoPathDefinitionProvider pathDefinitionProvider,
 			Optional<String> entityIdPropertyName) {
 		this.entityName = entityName;
-		this.pathsDefinition = pathsDefinition;
+		this.pathDefinitionProvider = pathDefinitionProvider;
 		this.entityIdPropertyName = entityIdPropertyName;
 	}
 
@@ -27,11 +27,8 @@ public class PojoEntityTypeAdditionalMetadata {
 		return entityName;
 	}
 
-	/**
-	 * @return A path filter factory for this type.
-	 */
-	public PojoPathsDefinition getPathsDefinition() {
-		return pathsDefinition;
+	public PojoPathDefinitionProvider pathDefinitionProvider() {
+		return pathDefinitionProvider;
 	}
 
 	public Optional<String> getEntityIdPropertyName() {
