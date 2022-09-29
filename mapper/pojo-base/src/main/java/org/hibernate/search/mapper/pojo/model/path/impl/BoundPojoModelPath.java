@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathWalker;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**

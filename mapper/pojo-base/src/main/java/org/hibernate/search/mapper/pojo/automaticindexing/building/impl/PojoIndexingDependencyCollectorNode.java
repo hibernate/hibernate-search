@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathWalker;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
 
 public abstract class PojoIndexingDependencyCollectorNode {
