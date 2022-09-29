@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoModelPathWalker;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
