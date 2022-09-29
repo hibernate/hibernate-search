@@ -6,14 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.binding.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
-public interface PojoModelPathWalker<T, P, V> {
+public interface PojoModelPathWalker<C, T, P, V> {
 
-	P property(T typeNode, String propertyName);
+	P property(C context, T typeNode, PojoModelPathPropertyNode pathNode);
 
-	V value(P propertyNode, ContainerExtractorPath extractorPath);
+	V value(C context, P propertyNode, PojoModelPathValueNode pathNode);
 
-	T type(V valueNode);
+	T type(C context, V valueNode);
 
 }
