@@ -16,7 +16,7 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverImpl;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -134,7 +134,7 @@ class PojoImplicitReindexingResolverBuilder<T> {
 	}
 
 	static class Walker implements PojoModelPathWalker<
-			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?>,
+			Void, AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?>,
 			PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?>,
 			PojoImplicitReindexingResolverValueNodeBuilderDelegate<?>
 			> {
@@ -142,20 +142,21 @@ class PojoImplicitReindexingResolverBuilder<T> {
 
 		@Override
 		public PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> property(
-				AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNode, String propertyName) {
-			return typeNode.property( propertyName );
+				Void context, AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNode,
+				PojoModelPathPropertyNode pathNode) {
+			return typeNode.property( pathNode.propertyName() );
 		}
 
 		@Override
 		public PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> value(
-				PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNode,
-				ContainerExtractorPath extractorPath) {
-			return propertyNode.value( extractorPath );
+				Void context, PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNode,
+				PojoModelPathValueNode pathNode) {
+			return propertyNode.value( pathNode.extractorPath() );
 		}
 
 		@Override
 		public AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> type(
-				PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> valueNode) {
+				Void context, PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> valueNode) {
 			return valueNode.type();
 		}
 	}

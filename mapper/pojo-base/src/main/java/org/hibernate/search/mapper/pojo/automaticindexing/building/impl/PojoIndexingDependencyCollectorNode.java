@@ -7,7 +7,8 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
 
@@ -60,7 +61,7 @@ public abstract class PojoIndexingDependencyCollectorNode {
 	abstract ReindexOnUpdate reindexOnUpdate();
 
 	static class Walker implements PojoModelPathWalker<
-			PojoIndexingDependencyCollectorTypeNode<?>,
+			Void, PojoIndexingDependencyCollectorTypeNode<?>,
 			PojoIndexingDependencyCollectorPropertyNode<?, ?>,
 			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?>
 			> {
@@ -72,22 +73,24 @@ public abstract class PojoIndexingDependencyCollectorNode {
 
 		@Override
 		public PojoIndexingDependencyCollectorPropertyNode<?, ?> property(
-				PojoIndexingDependencyCollectorTypeNode<?> typeNode, String propertyName) {
-			return typeNode.property( propertyName );
+				Void context, PojoIndexingDependencyCollectorTypeNode<?> typeNode,
+				PojoModelPathPropertyNode pathNode) {
+			return typeNode.property( pathNode.propertyName() );
 		}
 
 		@Override
 		public AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> value(
-				PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyNode,
-				ContainerExtractorPath extractorPath) {
-			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> node = propertyNode.value( extractorPath );
+				Void context, PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyNode,
+				PojoModelPathValueNode pathNode) {
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> node =
+					propertyNode.value( pathNode.extractorPath() );
 			node.doCollectDependency( derivedDependencyPath );
 			return node;
 		}
 
 		@Override
 		public PojoIndexingDependencyCollectorTypeNode<?> type(
-				AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> valueNode) {
+				Void context, AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> valueNode) {
 			return valueNode.type();
 		}
 	}
