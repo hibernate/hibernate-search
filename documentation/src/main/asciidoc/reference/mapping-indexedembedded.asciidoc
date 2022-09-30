@@ -495,6 +495,45 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedd
 NOTE: With the <<backend-lucene,Lucene backend>>, the nested structure is also necessary if
 you want to perform <<search-dsl-projection-object,`object` projections>>.
 
+[[mapping-indexedembedded-filtering-association]]
+== Filtering association elements
+
+Sometimes, only some elements of an association should be included in an `@IndexedEmbedded`.
+
+For example a `Book` entity might index-embed `BookEdition` instances,
+but some editions might be retired and thus need to be filtered out before indexing.
+
+Such filtering can be achieved by applying `@IndexedEmbedded` to a transient getter representing the filtered association,
+and configuring reindexing with <<mapper-orm-reindexing-associationinverseside,`@AssociationInverseSide`>>
+and <<mapping-reindexing-derivedfrom,`@IndexingDependency.derivedFrom`>>.
+
+.Filtered an `@IndexedEmbedded` association with a transient getter, `@AssociationInverseSide` and `@IndexingDependency.derivedFrom`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/filteredassociation/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/filteredassociation/BookEdition.java[tags=include;!getters-setters]
+----
+<1> The association between `Book` and `BookEdition` is mapped in Hibernate ORM, but not Hibernate Search.
+<2> The transient `editionsNotRetired` property dynamically returns the editions that are not retired.
+<3> `@IndexedEmbedded` is applied to `editionsNotRetired` instead of `editions`.
+If we wanted to, we could use <<mapping-indexedembedded-name,`@IndexedEmbedded(name = "editions")>>
+to make this transparent when searching.
+<4> Hibernate ORM does not know about `editionsNotRetired`, so Hibernate Search cannot infer the inverse side of this "filtered" association.
+Thus, we use `@AssociationInverseSide` to tell Hibernate Search that.
+Should the label of a `BookEdition` be modified, Hibernate Search
+will use this information to retrieve the corresponding `Book` to reindex.
+<5> We use `@IndexingDependency.derivedFrom` to tell Hibernate Search
+that whenever the status of an edition changes,
+the result of `getEditionsNotRetired()` may have changed as well,
+requiring reindexing.
+<6> While `BookEdition#status` is not annotated, Hibernate Search will still
+track its changes because of the `@IndexingDependency` annotation in `Book`.
+====
+
 [[mapping-indexedembedded-programmatic]]
 == [[mapper-orm-indexedembedded-programmatic]] Programmatic mapping
 
