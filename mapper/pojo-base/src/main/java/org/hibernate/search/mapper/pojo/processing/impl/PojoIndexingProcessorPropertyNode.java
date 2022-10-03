@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.common.annotation.impl.SearchProcessingW
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

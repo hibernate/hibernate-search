@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorMultiNode;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;

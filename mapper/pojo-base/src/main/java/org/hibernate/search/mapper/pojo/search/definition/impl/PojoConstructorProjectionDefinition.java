@@ -33,7 +33,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
