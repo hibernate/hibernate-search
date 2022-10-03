@@ -15,6 +15,7 @@ import org.hibernate.mapping.Property;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinition;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 /**
  * A {@link PojoPathDefinitionProvider} suitable for use with Hibernate ORM,
@@ -27,27 +28,30 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvide
  */
 public class HibernateOrmPathDefinitionProvider implements PojoPathDefinitionProvider {
 
+	private final PojoRawTypeModel<?> typeModel;
 	private final PersistentClass persistentClass;
+	private final List<String> propertyStringRepresentationByOrdinal;
 	private final HibernateOrmPathInterpreter interpreter = new HibernateOrmPathInterpreter();
 
-	public HibernateOrmPathDefinitionProvider(PersistentClass persistentClass) {
+	@SuppressWarnings("unchecked")
+	public HibernateOrmPathDefinitionProvider(PojoRawTypeModel<?> typeModel, PersistentClass persistentClass) {
+		this.typeModel = typeModel;
 		this.persistentClass = persistentClass;
+		this.propertyStringRepresentationByOrdinal = new ArrayList<>();
+		for ( Iterator<Property> iterator = persistentClass.getPropertyClosureIterator(); iterator.hasNext(); ) {
+			Property property = iterator.next();
+			propertyStringRepresentationByOrdinal.add( property.getName() );
+		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<String> preDefinedOrdinals() {
-		List<String> preDefinedOrdinals = new ArrayList<>();
-		for ( Iterator<Property> iterator = persistentClass.getPropertyClosureIterator(); iterator.hasNext(); ) {
-			Property property = iterator.next();
-			preDefinedOrdinals.add( property.getName() );
-		}
-		return preDefinedOrdinals;
+		return propertyStringRepresentationByOrdinal;
 	}
 
 	@Override
 	public PojoPathDefinition interpretPath(PojoModelPathValueNode source) {
-		return interpreter.interpretPath( persistentClass, source );
+		return interpreter.interpretPath( typeModel, persistentClass, propertyStringRepresentationByOrdinal, source );
 	}
 
 }
