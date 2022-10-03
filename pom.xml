@@ -1812,7 +1812,7 @@
                                     <compilerArg>-parameters</compilerArg>
                                 </compilerArgs>
                                 <testExcludes>
-                                    <testExclude>**/*NoParametersCompilerFlag*</testExclude>
+                                    <testExclude>**/noparameters/**/*</testExclude>
                                 </testExcludes>
                             </configuration>
                         </execution>
@@ -1829,7 +1829,7 @@
                                 <executable>${java-version.test.compiler}</executable>
                                 <compilerArgs combine.self="override" />
                                 <testIncludes>
-                                    <testInclude>**/*NoParametersCompilerFlag*</testInclude>
+                                    <testInclude>**/noparameters/**/*</testInclude>
                                 </testIncludes>
                             </configuration>
                         </execution>
@@ -2105,6 +2105,26 @@
                             <goals>
                                 <goal>check</goal>
                             </goals>
+                        </execution>
+                        <execution>
+                            <!--
+                            Execution specific to test sources that are compiled with no `-parameters` flag.
+                            Checks whether package of such tests is constructed with a `noparameters` subpackage.
+                            -->
+                            <id>check-style-noparameters</id>
+                            <phase>verify</phase>
+                            <!-- not using checkstyle:checkstyle here, as for
+                                some reason checkstyle:check finds more errors -->
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${maven.compiler.testSources.noParameterCompilation.skip}</skip>
+                                <configLocation>checkstyle-noparameters.xml</configLocation>
+                                <testSourceDirectories>
+                                    <testSourceDirectory>${project.basedir}/src/test/java17-noparameters</testSourceDirectory>
+                                </testSourceDirectories>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>

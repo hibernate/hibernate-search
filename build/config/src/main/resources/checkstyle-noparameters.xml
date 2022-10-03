@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+
+    <property name="cacheFile" value="${checkstyle.cache.file}" />
+
+    <module name="TreeWalker">
+
+        <module name="SuppressionCommentFilter" />
+
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*\.noparameters(\.[a-z][a-z0-9]*)*$" />
+        </module>
+
+    </module>
+
+</module>
