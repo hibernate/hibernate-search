@@ -71,7 +71,7 @@ public final class HibernateOrmMappingConfigurationContributor implements PojoMa
 					new ErrorCollectingPojoTypeMetadataContributor()
 							// Ensure entities are declared as such
 							.add( new HibernateOrmEntityTypeMetadataContributor(
-									typeModel.typeIdentifier(), persistentClass, identifierPropertyNameOptional
+									typeModel, persistentClass, identifierPropertyNameOptional
 							) )
 							// Ensure Hibernate ORM metadata about properties is translated into Hibernate Search metadata
 							.add( new HibernateOrmMappingPropertiesMetadataContributor(

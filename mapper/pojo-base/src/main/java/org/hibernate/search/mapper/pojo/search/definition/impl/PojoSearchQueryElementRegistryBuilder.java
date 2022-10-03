@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoSearchMappingCo
 import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoSearchQueryElementRegistryBuilder {
