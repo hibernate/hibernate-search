@@ -256,6 +256,165 @@ public class PojoModelPathTest {
 				.hasMessageContaining( errorMessage );
 	}
 
+	@Test
+	public void relativize_correctPrefix() {
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" )
+						.toValuePath() ) )
+				.hasValueSatisfying( isPath(
+						"bar", ContainerExtractorPath.defaultExtractors()
+				) );
+
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.property( "foobar" )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" )
+						.toValuePath() ) )
+				.hasValueSatisfying( isPath(
+						"foobar", ContainerExtractorPath.defaultExtractors(),
+						"bar", ContainerExtractorPath.defaultExtractors()
+				) );
+
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.property( "foobar" )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" )
+						.property( "foobar" )
+						.toValuePath() ) )
+				.hasValueSatisfying( isPath(
+						"bar", ContainerExtractorPath.defaultExtractors()
+				) );
+
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+						.toValuePath() ) )
+				.hasValueSatisfying( isPath(
+						"bar", ContainerExtractorPath.defaultExtractors()
+				) );
+
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+				.property( "foobar" ).value( BuiltinContainerExtractors.MAP_KEY )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+						.toValuePath() ) )
+				.hasValueSatisfying( isPath(
+						"foobar", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ),
+						"bar", ContainerExtractorPath.defaultExtractors()
+				) );
+
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+				.property( "foobar" ).value( BuiltinContainerExtractors.MAP_KEY )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+						.property( "foobar" ).value( BuiltinContainerExtractors.MAP_KEY )
+						.toValuePath() ) )
+				.hasValueSatisfying( isPath(
+						"bar", ContainerExtractorPath.defaultExtractors()
+				) );
+	}
+
+	@Test
+	public void relativize_self() {
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" )
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).valueWithoutExtractors()
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).valueWithoutExtractors()
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+				.property( "bar" ).valueWithoutExtractors()
+				.property( "foobar" ).valueWithDefaultExtractors()
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).value( BuiltinContainerExtractors.COLLECTION )
+						.property( "bar" ).valueWithoutExtractors()
+						.property( "foobar" ).valueWithDefaultExtractors()
+						.toValuePath() ) )
+				.isEmpty();
+	}
+
+	@Test
+	public void relativize_unrelated() {
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "bar" )
+						.property( "foobar" )
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.property( "bar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foobar" )
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.property( "bar" )
+				.property( "foobar" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" )
+						.property( "foobar" )
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" ).valueWithDefaultExtractors()
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "foo" ).valueWithoutExtractors()
+						.property( "bar" )
+						.toValuePath() ) )
+				.isEmpty();
+		assertThat( PojoModelPath.builder()
+				.property( "foo" )
+				.toValuePath()
+				.relativize( PojoModelPath.builder()
+						.property( "bar" )
+						.property( "foo" )
+						.toValuePath() ) )
+				.isEmpty();
+	}
+
 	private static <T extends PojoModelPath> Consumer<T> isPath(Object ... pathComponents) {
 		return path -> {
 			Deque<Object> components = new ArrayDeque<>();

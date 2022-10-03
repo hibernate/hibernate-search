@@ -28,7 +28,9 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -260,4 +262,14 @@ public interface Log extends BasicLogger {
 			+ " See the reference documentation for more information.")
 	SearchException cannotSetFetchSize();
 
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 121,
+			value = "An unexpected failure occurred while resolving the representation of path '%1$s' in the entity state array,"
+					+ " which is necessary to configure resolution of association inverse side for reindexing."
+					+ " This may lead to incomplete reindexing and thus out-of-sync indexes."
+					+ " The exception is being ignored to preserve backwards compatibility with earlier versions of Hibernate Search."
+					+ " Failure: %3$s"
+					+ " %2$s") // Context
+	void failedToResolveStateRepresentation(String path, @FormatWith(EventContextFormatter.class) EventContext context, String causeMessage,
+			@Cause Exception cause);
 }

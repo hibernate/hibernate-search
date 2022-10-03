@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.path;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -73,6 +74,11 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 	 */
 	public PojoModelPathPropertyNode property(String propertyName) {
 		return new PojoModelPathPropertyNode( this, propertyName );
+	}
+
+	public Optional<PojoModelPathValueNode> relativize(PojoModelPathValueNode other) {
+		return parent.relativize( other )
+				.map( newParent -> new PojoModelPathValueNode( newParent, extractorPath ) );
 	}
 
 	@Override
