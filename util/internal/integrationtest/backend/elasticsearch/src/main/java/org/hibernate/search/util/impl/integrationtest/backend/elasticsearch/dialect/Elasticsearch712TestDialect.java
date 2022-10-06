@@ -188,6 +188,9 @@ public class Elasticsearch712TestDialect implements ElasticsearchTestDialect {
 	@Override
 	public boolean hasBugForDateFormattedAsYear() {
 		// https://github.com/elastic/elasticsearch/issues/90187
-		return ElasticsearchVersion.of( "elastic:8.4.2" ).matches( ElasticsearchTestDialect.getActualVersion() );
+		// Seems like this was fixed in 8.5.1 and they won't backport to 8.4:
+		// https://github.com/elastic/elasticsearch/pull/90458
+		return ElasticsearchVersion.of( "elastic:8.4.2" ).matches( ElasticsearchTestDialect.getActualVersion() )
+				|| ElasticsearchVersion.of( "elastic:8.4.3" ).matches( ElasticsearchTestDialect.getActualVersion() );
 	}
 }
