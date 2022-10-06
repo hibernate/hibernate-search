@@ -1827,7 +1827,6 @@
                                 <fork>true</fork>
                                 <proc>none</proc>
                                 <executable>${java-version.test.compiler}</executable>
-                                <compilerArgs combine.self="override" />
                                 <testIncludes>
                                     <testInclude>**/noparameters/**/*</testInclude>
                                 </testIncludes>
