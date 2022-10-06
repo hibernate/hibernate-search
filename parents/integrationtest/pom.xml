@@ -66,12 +66,17 @@
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${version.compiler.plugin}</version>
-                    <configuration>
-                        <compilerArgs combine.children="append">
-                            <!-- Use the -parameters for all code, even code in src/main. -->
-                            <compilerArg>-parameters</compilerArg>
-                        </compilerArgs>
-                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <!-- Use the -parameters for all code in src/main. -->
+                            <configuration>
+                                <compilerArgs combine.children="append">
+                                    <compilerArg>-parameters</compilerArg>
+                                </compilerArgs>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>io.fabric8</groupId>
