@@ -656,7 +656,7 @@
         <test.database.run.oracle.skip>true</test.database.run.oracle.skip>
         <!-- See https://hub.docker.com/r/gvenzl/oracle-xe -->
         <test.database.run.oracle.image.name>gvenzl/oracle-xe</test.database.run.oracle.image.name>
-        <test.database.run.oracle.image.tag>11-slim</test.database.run.oracle.image.tag>
+        <test.database.run.oracle.image.tag>21-slim-faststart</test.database.run.oracle.image.tag>
         <!-- MS SQL Server -->
         <test.database.run.mssql.skip>true</test.database.run.mssql.skip>
         <test.database.run.mssql.image.name>mcr.microsoft.com/mssql/server</test.database.run.mssql.image.name>

@@ -764,7 +764,7 @@
             <id>ci-oracle</id>
             <properties>
                 <test.database.run.oracle.skip>${test.database.run.skip}</test.database.run.oracle.skip>
-                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.Oracle12cDialect</db.dialect>
                 <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>ojdbc8</jdbc.driver.artifactId>
                 <jdbc.driver>oracle.jdbc.OracleDriver</jdbc.driver>
