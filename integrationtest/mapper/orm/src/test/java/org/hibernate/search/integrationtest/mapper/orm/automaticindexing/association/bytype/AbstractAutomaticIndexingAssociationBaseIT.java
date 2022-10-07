@@ -276,7 +276,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 3 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( entity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbedded().get( entity1 );
+			primitives.containingAsIndexedEmbedded().clear( oldContained );
 			primitives.containedIndexedEmbedded().set( entity1, containedEntity );
 			primitives.containingAsIndexedEmbedded().set( containedEntity, entity1 );
 
@@ -295,7 +296,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
-			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( entity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbedded().get( entity1 );
+			primitives.containingAsIndexedEmbedded().clear( oldContained );
 			primitives.containedIndexedEmbedded().clear( entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
@@ -345,7 +347,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 3 );
 			primitives.nonIndexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( entity1 ) );
+			TContained oldContained = primitives.containedNonIndexedEmbedded().get( entity1 );
+			primitives.containingAsNonIndexedEmbedded().clear( oldContained );
 			primitives.containedNonIndexedEmbedded().set( entity1, containedEntity );
 			primitives.containingAsNonIndexedEmbedded().set( containedEntity, entity1 );
 
@@ -359,7 +362,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
 
-			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( entity1 ) );
+			TContained oldContained = primitives.containedNonIndexedEmbedded().get( entity1 );
+			primitives.containingAsNonIndexedEmbedded().clear( oldContained );
 			primitives.containedNonIndexedEmbedded().clear( entity1 );
 
 			// Do not expect any work
@@ -413,8 +417,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 3 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate()
-					.clear( primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( entity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( entity1 );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( oldContained );
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( entity1, containedEntity );
 			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().set( containedEntity, entity1 );
 
@@ -432,10 +436,10 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		// Test removing a value
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
-			TContained containedEntity = session.get( primitives.getContainedClass(), 3 );
 
+			TContained oldContained = primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( entity1 );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( oldContained );
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().clear( entity1 );
-			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( containedEntity );
 
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> { } );
@@ -484,8 +488,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 3 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate()
-					.clear( primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( entity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( entity1 );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( oldContained );
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( entity1, containedEntity );
 			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().set( containedEntity, entity1 );
 
@@ -498,10 +502,10 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		// Test removing a value
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
-			TContained containedEntity = session.get( primitives.getContainedClass(), 3 );
 
+			TContained oldContained = primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( entity1 );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( oldContained );
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().clear( entity1 );
-			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( containedEntity );
 
 			// Do not expect any work
 		} );
@@ -732,7 +736,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 5 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbedded().get( containingEntity1 );
+			primitives.containingAsIndexedEmbedded().clear( oldContained );
 			primitives.containedIndexedEmbedded().set( containingEntity1, containedEntity );
 			primitives.containingAsIndexedEmbedded().set( containedEntity, containingEntity1 );
 
@@ -769,7 +774,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		setupHolder.runInTransaction( session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
-			primitives.containingAsIndexedEmbedded().clear( primitives.containedIndexedEmbedded().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbedded().get( containingEntity1 );
+			primitives.containingAsIndexedEmbedded().clear( oldContained );
 			primitives.containedIndexedEmbedded().clear( containingEntity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
@@ -828,7 +834,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 5 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedNonIndexedEmbedded().get( containingEntity1 );
+			primitives.containingAsNonIndexedEmbedded().clear( oldContained );
 			primitives.containedNonIndexedEmbedded().set( containingEntity1, containedEntity );
 			primitives.containingAsNonIndexedEmbedded().set( containedEntity, containingEntity1 );
 
@@ -842,7 +849,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		setupHolder.runInTransaction( session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
-			primitives.containingAsNonIndexedEmbedded().clear( primitives.containedNonIndexedEmbedded().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedNonIndexedEmbedded().get( containingEntity1 );
+			primitives.containingAsNonIndexedEmbedded().clear( oldContained );
 			primitives.containedNonIndexedEmbedded().clear( containingEntity1 );
 
 			// Do not expect any work
@@ -906,8 +914,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 5 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate()
-					.clear( primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbeddedShallowReindexOnUpdate().get( containingEntity1 );
+			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( oldContained );
 			primitives.containedIndexedEmbeddedShallowReindexOnUpdate().set( containingEntity1, containedEntity );
 			primitives.containingAsIndexedEmbeddedShallowReindexOnUpdate().set( containedEntity, containingEntity1 );
 
@@ -989,8 +997,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			TContained containedEntity = primitives.newContained( 5 );
 			primitives.indexedField().set( containedEntity, "updatedValue" );
 
-			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate()
-					.clear( primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedIndexedEmbeddedNoReindexOnUpdate().get( containingEntity1 );
+			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().clear( oldContained );
 			primitives.containedIndexedEmbeddedNoReindexOnUpdate().set( containingEntity1, containedEntity );
 			primitives.containingAsIndexedEmbeddedNoReindexOnUpdate().set( containedEntity, containingEntity1 );
 
@@ -1076,7 +1084,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 			primitives.fieldUsedInCrossEntityDerivedField1().set( containedEntity, "field1_updatedValue" );
 			primitives.fieldUsedInCrossEntityDerivedField2().set( containedEntity, "field2_updatedValue" );
 
-			primitives.containingAsUsedInCrossEntityDerivedProperty().clear( primitives.containedUsedInCrossEntityDerivedProperty().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedUsedInCrossEntityDerivedProperty().get( containingEntity1 );
+			primitives.containingAsUsedInCrossEntityDerivedProperty().clear( oldContained );
 			primitives.containedUsedInCrossEntityDerivedProperty().set( containingEntity1, containedEntity );
 			primitives.containingAsUsedInCrossEntityDerivedProperty().set( containedEntity, containingEntity1 );
 
@@ -1115,8 +1124,8 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 		setupHolder.runInTransaction( session -> {
 			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
 
-			primitives.containingAsUsedInCrossEntityDerivedProperty()
-					.clear( primitives.containedUsedInCrossEntityDerivedProperty().get( containingEntity1 ) );
+			TContained oldContained = primitives.containedUsedInCrossEntityDerivedProperty().get( containingEntity1 );
+			primitives.containingAsUsedInCrossEntityDerivedProperty().clear( oldContained );
 			primitives.containedUsedInCrossEntityDerivedProperty().clear( containingEntity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
