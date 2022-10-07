@@ -481,7 +481,7 @@
             Needed as when `testIncludes` doesn't match any test classes, it brings all test sources and re-compiles them.
          -->
         <maven.compiler.testSources.noParameterCompilation.skip>true</maven.compiler.testSources.noParameterCompilation.skip>
-
+        <java-version.test.java17.noParameters.skip>${maven.compiler.testSources.noParameterCompilation.skip}</java-version.test.java17.noParameters.skip>
         <!--
                 Options to compile with the Eclipse compiler when building with maven (not with the IDE).
                 See profile "compiler-eclipse".
@@ -1823,7 +1823,7 @@
                                 <goal>testCompile</goal>
                             </goals>
                             <configuration>
-                                <skip>${maven.compiler.testSources.noParameterCompilation.skip}</skip>
+                                <skip>${java-version.test.java17.noParameters.skip}</skip>
                                 <fork>true</fork>
                                 <proc>none</proc>
                                 <executable>${java-version.test.compiler}</executable>
@@ -2577,6 +2577,7 @@
                 <java-version.test.java17.add-main-source-phase>none</java-version.test.java17.add-main-source-phase>
                 <java-version.test.java11.add-test-source-phase>none</java-version.test.java11.add-test-source-phase>
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
+                <java-version.test.java17.noParameters.skip>true</java-version.test.java17.noParameters.skip>
             </properties>
         </profile>
 
@@ -2597,6 +2598,7 @@
                 <!-- Tests specific to Java 17+ won't work with JDK 11, so we disable them. -->
                 <java-version.test.java17.add-main-source-phase>none</java-version.test.java17.add-main-source-phase>
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
+                <java-version.test.java17.noParameters.skip>true</java-version.test.java17.noParameters.skip>
             </properties>
         </profile>
 
