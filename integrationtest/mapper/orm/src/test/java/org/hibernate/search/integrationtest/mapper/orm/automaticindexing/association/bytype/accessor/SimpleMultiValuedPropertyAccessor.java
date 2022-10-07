@@ -4,23 +4,28 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor;
 
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public final class MultiValuedPropertyAccessor<R, V, C> implements PropertyAccessor<R, V> {
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
+
+final class SimpleMultiValuedPropertyAccessor<R, V, C>
+		implements MultiValuedPropertyAccessor<R, V, C> {
 
 	private final Function<R, C> getContainerMethod;
 	private final BiConsumer<R, C> setContainerMethod;
 	private final ContainerPrimitives<C, V> containerPrimitives;
 
-	public MultiValuedPropertyAccessor(ContainerPrimitives<C, V> containerPrimitives, Function<R, C> getContainerMethod) {
+	SimpleMultiValuedPropertyAccessor(ContainerPrimitives<C, V> containerPrimitives,
+			Function<R, C> getContainerMethod) {
 		this( containerPrimitives, getContainerMethod, null );
 	}
 
-	public MultiValuedPropertyAccessor(ContainerPrimitives<C, V> containerPrimitives, Function<R, C> getContainerMethod,
+	SimpleMultiValuedPropertyAccessor(ContainerPrimitives<C, V> containerPrimitives,
+			Function<R, C> getContainerMethod,
 			BiConsumer<R, C> setContainerMethod) {
 		this.getContainerMethod = getContainerMethod;
 		this.setContainerMethod = setContainerMethod;
@@ -54,16 +59,19 @@ public final class MultiValuedPropertyAccessor<R, V, C> implements PropertyAcces
 		containerPrimitives.clear( container );
 	}
 
+	@Override
 	public void add(R root, V value) {
 		C container = getContainer( root );
 		containerPrimitives.add( container, value );
 	}
 
+	@Override
 	public void remove(R root, V value) {
 		C container = getContainer( root );
 		containerPrimitives.remove( container, value );
 	}
 
+	@Override
 	public void setContainer(R root, C container) {
 		if ( setContainerMethod == null ) {
 			throw new UnsupportedOperationException();
@@ -71,6 +79,7 @@ public final class MultiValuedPropertyAccessor<R, V, C> implements PropertyAcces
 		setContainerMethod.accept( root, container );
 	}
 
+	@Override
 	public C getContainer(R root) {
 		return getContainerMethod.apply( root );
 	}
