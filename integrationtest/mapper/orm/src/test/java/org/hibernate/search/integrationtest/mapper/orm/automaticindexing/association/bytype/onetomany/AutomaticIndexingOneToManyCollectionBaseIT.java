@@ -27,9 +27,8 @@ import javax.persistence.Transient;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.AbstractAutomaticIndexingMultiValuedAssociationBaseIT;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.ContainerPrimitives;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.MultiValuedPropertyAccessor;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.PropertyAccessor;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.SingleValuedPropertyAccessor;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.MultiValuedPropertyAccessor;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.PropertyAccessor;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -52,198 +51,12 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 		> {
 
 	public AutomaticIndexingOneToManyCollectionBaseIT() {
-		super( new ModelPrimitivesImpl() );
+		super( IndexedEntity.PRIMITIVES, ContainingEntity.PRIMITIVES, ContainedEntity.PRIMITIVES );
 	}
 
-	private static class ModelPrimitivesImpl
-			implements MultiValuedModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-					Collection<ContainedEntity>> {
-
-		@Override
-		public String getIndexName() {
-			return IndexedEntity.INDEX;
-		}
-
-		@Override
-		public boolean isAssociationOwnedByContainedSide() {
-			return true;
-		}
-
-		@Override
-		public Class<IndexedEntity> getIndexedClass() {
-			return IndexedEntity.class;
-		}
-
-		@Override
-		public Class<ContainingEntity> getContainingClass() {
-			return ContainingEntity.class;
-		}
-
-		@Override
-		public Class<ContainedEntity> getContainedClass() {
-			return ContainedEntity.class;
-		}
-
-		@Override
-		public IndexedEntity newIndexed(int id) {
-			IndexedEntity entity = new IndexedEntity();
-			entity.setId( id );
-			return entity;
-		}
-
-		@Override
-		public ContainingEntity newContaining(int id) {
-			ContainingEntity entity = new ContainingEntity();
-			entity.setId( id );
-			return entity;
-		}
-
-		@Override
-		public ContainedEntity newContained(int id) {
-			ContainedEntity entity = new ContainedEntity();
-			entity.setId( id );
-			return entity;
-		}
-
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainingEntity, String> containingEntityNonIndexedField() {
-			return new SingleValuedPropertyAccessor<>( ContainingEntity::setNonIndexedField );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainingEntity, ContainingEntity> child() {
-			return new SingleValuedPropertyAccessor<>( ContainingEntity::setChild );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainingEntity, ContainingEntity> parent() {
-			return new SingleValuedPropertyAccessor<>( ContainingEntity::setParent );
-		}
-
-		@Override
-		public Collection<ContainedEntity> newContainedAssociation(Collection<ContainedEntity> original) {
-			return new ArrayList<>( original );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbedded() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainingEntity::getContainedIndexedEmbedded, ContainingEntity::setContainedIndexedEmbedded );
-		}
-
-		@Override
-		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbedded() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbedded,
-					ContainedEntity::getContainingAsIndexedEmbedded );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedNonIndexedEmbedded() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainingEntity::getContainedNonIndexedEmbedded, ContainingEntity::setContainedNonIndexedEmbedded );
-		}
-
-		@Override
-		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsNonIndexedEmbedded() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsNonIndexedEmbedded,
-					ContainedEntity::getContainingAsNonIndexedEmbedded );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbeddedShallowReindexOnUpdate() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainingEntity::getContainedIndexedEmbeddedShallowReindexOnUpdate,
-					ContainingEntity::setContainedIndexedEmbeddedShallowReindexOnUpdate );
-		}
-
-		@Override
-		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbeddedShallowReindexOnUpdate,
-					ContainedEntity::getContainingAsIndexedEmbeddedShallowReindexOnUpdate );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbeddedNoReindexOnUpdate() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainingEntity::getContainedIndexedEmbeddedNoReindexOnUpdate,
-					ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
-		}
-
-		@Override
-		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbeddedNoReindexOnUpdate,
-					ContainedEntity::getContainingAsIndexedEmbeddedNoReindexOnUpdate );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedUsedInCrossEntityDerivedProperty() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainingEntity::getContainedUsedInCrossEntityDerivedProperty,
-					ContainingEntity::setContainedUsedInCrossEntityDerivedProperty );
-		}
-
-		@Override
-		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsUsedInCrossEntityDerivedProperty() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsUsedInCrossEntityDerivedProperty,
-					ContainedEntity::getContainingAsUsedInCrossEntityDerivedProperty );
-		}
-
-		@Override
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbeddedWithCast() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					root -> (Collection) root.getContainedIndexedEmbeddedWithCast() );
-		}
-
-		@Override
-		public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedWithCast() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setContainingAsIndexedEmbeddedWithCast );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainedEntity, String> indexedField() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setIndexedField );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainedEntity, String> nonIndexedField() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setNonIndexedField );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainedEntity, String, List<String>> indexedElementCollectionField() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainedEntity::getIndexedElementCollectionField,
-					ContainedEntity::setIndexedElementCollectionField );
-		}
-
-		@Override
-		public MultiValuedPropertyAccessor<ContainedEntity, String, List<String>> nonIndexedElementCollectionField() {
-			return new MultiValuedPropertyAccessor<>( ContainerPrimitives.collection(),
-					ContainedEntity::getNonIndexedElementCollectionField,
-					ContainedEntity::setNonIndexedElementCollectionField );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInContainedDerivedField1() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInContainedDerivedField1 );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInContainedDerivedField2() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInContainedDerivedField2 );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField1() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInCrossEntityDerivedField1 );
-		}
-
-		@Override
-		public SingleValuedPropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField2() {
-			return new SingleValuedPropertyAccessor<>( ContainedEntity::setFieldUsedInCrossEntityDerivedField2 );
-		}
+	@Override
+	protected boolean isAssociationOwnedByContainedSide() {
+		return true;
 	}
 
 	@Entity(name = "containing")
@@ -402,6 +215,80 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 					) )
 			);
 		}
+
+		static final ContainingEntityPrimitives<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> PRIMITIVES = new ContainingEntityPrimitives<ContainingEntity, ContainedEntity, Collection<ContainedEntity>>() {
+			@Override
+			public Class<ContainingEntity> entityClass() {
+				return ContainingEntity.class;
+			}
+
+			@Override
+			public ContainingEntity newInstance(int id) {
+				ContainingEntity entity = new ContainingEntity();
+				entity.setId( id );
+				return entity;
+			}
+
+			@Override
+			public PropertyAccessor<ContainingEntity, ContainingEntity> child() {
+				return PropertyAccessor.create( ContainingEntity::setChild );
+			}
+
+			@Override
+			public PropertyAccessor<ContainingEntity, ContainingEntity> parent() {
+				return PropertyAccessor.create( ContainingEntity::setParent );
+			}
+
+			@Override
+			public Collection<ContainedEntity> newContainedAssociation(Collection<ContainedEntity> original) {
+				return new ArrayList<>( original );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbedded() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEntity::getContainedIndexedEmbedded, ContainingEntity::setContainedIndexedEmbedded );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedNonIndexedEmbedded() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEntity::getContainedNonIndexedEmbedded, ContainingEntity::setContainedNonIndexedEmbedded );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbeddedShallowReindexOnUpdate() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEntity::getContainedIndexedEmbeddedShallowReindexOnUpdate,
+						ContainingEntity::setContainedIndexedEmbeddedShallowReindexOnUpdate );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbeddedNoReindexOnUpdate() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEntity::getContainedIndexedEmbeddedNoReindexOnUpdate,
+						ContainingEntity::setContainedIndexedEmbeddedNoReindexOnUpdate );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedUsedInCrossEntityDerivedProperty() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEntity::getContainedUsedInCrossEntityDerivedProperty,
+						ContainingEntity::setContainedUsedInCrossEntityDerivedProperty );
+			}
+
+			@Override
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			public MultiValuedPropertyAccessor<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbeddedWithCast() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						root -> (Collection) root.getContainedIndexedEmbeddedWithCast() );
+			}
+
+			@Override
+			public PropertyAccessor<ContainingEntity, String> nonIndexedField() {
+				return PropertyAccessor.create( ContainingEntity::setNonIndexedField );
+			}
+		};
 	}
 
 	@Entity(name = "indexed")
@@ -410,6 +297,24 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 
 		static final String INDEX = "IndexedEntity";
 
+		static final IndexedEntityPrimitives<IndexedEntity> PRIMITIVES = new IndexedEntityPrimitives<IndexedEntity>() {
+			@Override
+			public Class<IndexedEntity> entityClass() {
+				return IndexedEntity.class;
+			}
+
+			@Override
+			public String indexName() {
+				return IndexedEntity.INDEX;
+			}
+
+			@Override
+			public IndexedEntity newInstance(int id) {
+				IndexedEntity entity = new IndexedEntity();
+				entity.setId( id );
+				return entity;
+			}
+		};
 	}
 
 	@Entity(name = "contained")
@@ -612,5 +517,98 @@ public class AutomaticIndexingOneToManyCollectionBaseIT
 		public Optional<String> getContainedDerivedField() {
 			return computeDerived( Stream.of( fieldUsedInContainedDerivedField1, fieldUsedInContainedDerivedField2 ) );
 		}
+
+		static ContainedEntityPrimitives<ContainedEntity, ContainingEntity> PRIMITIVES = new ContainedEntityPrimitives<ContainedEntity, ContainingEntity>() {
+			@Override
+			public Class<ContainedEntity> entityClass() {
+				return ContainedEntity.class;
+			}
+
+			@Override
+			public ContainedEntity newInstance(int id) {
+				ContainedEntity entity = new ContainedEntity();
+				entity.setId( id );
+				return entity;
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbedded() {
+				return PropertyAccessor.create( ContainedEntity::setContainingAsIndexedEmbedded,
+						ContainedEntity::getContainingAsIndexedEmbedded );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsNonIndexedEmbedded() {
+				return PropertyAccessor.create( ContainedEntity::setContainingAsNonIndexedEmbedded,
+						ContainedEntity::getContainingAsNonIndexedEmbedded );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate() {
+				return PropertyAccessor.create( ContainedEntity::setContainingAsIndexedEmbeddedShallowReindexOnUpdate,
+						ContainedEntity::getContainingAsIndexedEmbeddedShallowReindexOnUpdate );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate() {
+				return PropertyAccessor.create( ContainedEntity::setContainingAsIndexedEmbeddedNoReindexOnUpdate,
+						ContainedEntity::getContainingAsIndexedEmbeddedNoReindexOnUpdate );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsUsedInCrossEntityDerivedProperty() {
+				return PropertyAccessor.create( ContainedEntity::setContainingAsUsedInCrossEntityDerivedProperty,
+						ContainedEntity::getContainingAsUsedInCrossEntityDerivedProperty );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEmbeddedWithCast() {
+				return PropertyAccessor.create( ContainedEntity::setContainingAsIndexedEmbeddedWithCast );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, String> indexedField() {
+				return PropertyAccessor.create( ContainedEntity::setIndexedField );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, String> nonIndexedField() {
+				return PropertyAccessor.create( ContainedEntity::setNonIndexedField );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainedEntity, String, List<String>> indexedElementCollectionField() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainedEntity::getIndexedElementCollectionField,
+						ContainedEntity::setIndexedElementCollectionField );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainedEntity, String, List<String>> nonIndexedElementCollectionField() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainedEntity::getNonIndexedElementCollectionField,
+						ContainedEntity::setNonIndexedElementCollectionField );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, String> fieldUsedInContainedDerivedField1() {
+				return PropertyAccessor.create( ContainedEntity::setFieldUsedInContainedDerivedField1 );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, String> fieldUsedInContainedDerivedField2() {
+				return PropertyAccessor.create( ContainedEntity::setFieldUsedInContainedDerivedField2 );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField1() {
+				return PropertyAccessor.create( ContainedEntity::setFieldUsedInCrossEntityDerivedField1 );
+			}
+
+			@Override
+			public PropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField2() {
+				return PropertyAccessor.create( ContainedEntity::setFieldUsedInCrossEntityDerivedField2 );
+			}
+		};
 	}
 }
