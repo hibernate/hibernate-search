@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -144,7 +145,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	@Test
 	public void mapping_missing() {
 		assumeTrue(
-				"Skipping this test as there is always a mapping (be it empty) in " + elasticSearchClient.getDialect(),
+				"Skipping this test as there is always a mapping (be it empty) in " + ElasticsearchTestDialect.getActualVersion(),
 				elasticSearchClient.getDialect().isEmptyMappingPossible()
 		);
 

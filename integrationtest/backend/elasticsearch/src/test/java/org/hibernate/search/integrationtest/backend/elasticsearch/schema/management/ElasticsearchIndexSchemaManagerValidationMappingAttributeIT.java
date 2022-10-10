@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -352,7 +353,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		List<String> nextFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats()
 				.stream().skip( 1 ).collect( Collectors.toList() );
 		assumeFalse(
-				"Skipping this test as we don't have a type with multiple default formats in " + elasticSearchClient.getDialect(),
+				"Skipping this test as we don't have a type with multiple default formats in " + ElasticsearchTestDialect.getActualVersion(),
 				nextFormats.isEmpty()
 		);
 
