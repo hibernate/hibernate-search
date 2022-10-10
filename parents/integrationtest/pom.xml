@@ -491,7 +491,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-5.6}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -502,7 +501,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.2}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -513,7 +511,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.3}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch63TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -524,7 +521,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.6}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch64TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -535,7 +531,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.7}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -546,7 +541,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.8}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch68TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -557,7 +551,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.2}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch70TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -568,7 +561,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.6}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch73TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -579,7 +571,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.7}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch77TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -590,7 +581,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.9}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch78TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -601,7 +591,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.10}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -612,7 +601,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.11}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -623,7 +611,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.17}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -640,7 +627,6 @@
                 <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
                 <test.elasticsearch.connection.distribution>elastic</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-8.4}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -651,7 +637,6 @@
                 <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
                 <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.opensearch.latest-1.3}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
@@ -662,7 +647,6 @@
                 <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
                 <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.opensearch.latest-2.0}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
