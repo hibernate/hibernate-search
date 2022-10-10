@@ -18,20 +18,7 @@ import com.google.gson.JsonObject;
 public interface ElasticsearchTestDialect {
 
 	static ElasticsearchTestDialect get() {
-		String dialectClassName = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.testdialect" );
-		try {
-			@SuppressWarnings("unchecked")
-			Class<? extends ElasticsearchTestDialect> dialectClass =
-					(Class<? extends ElasticsearchTestDialect>) Class.forName( dialectClassName );
-			return dialectClass.getConstructor().newInstance();
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(
-					"Unexpected error while initializing the ElasticsearchTestDialect with name '" + dialectClassName + "'."
-							+ " Did you properly set the appropriate elasticsearch-x.x/opensearch-x.x profile?",
-					e
-			);
-		}
+		return new ElasticsearchMergedTestDialect();
 	}
 
 	static ElasticsearchVersion getActualVersion() {
