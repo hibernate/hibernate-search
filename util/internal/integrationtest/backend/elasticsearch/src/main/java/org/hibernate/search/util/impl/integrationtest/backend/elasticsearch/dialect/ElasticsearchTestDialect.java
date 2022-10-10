@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
 public interface ElasticsearchTestDialect {
 
 	static ElasticsearchTestDialect get() {
-		return new ElasticsearchMergedTestDialect();
+		return new ElasticsearchTestDialectImpl();
 	}
 
 	static ElasticsearchVersion getActualVersion() {
