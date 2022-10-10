@@ -18,11 +18,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 
 public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 
-	private final ElasticsearchTckBackendFeatures features = new ElasticsearchTckBackendFeatures( ElasticsearchTestDialect.get() );
+	private final ElasticsearchTckBackendFeatures features = new ElasticsearchTckBackendFeatures();
 
 	@Override
 	public TckBackendFeatures getBackendFeatures() {

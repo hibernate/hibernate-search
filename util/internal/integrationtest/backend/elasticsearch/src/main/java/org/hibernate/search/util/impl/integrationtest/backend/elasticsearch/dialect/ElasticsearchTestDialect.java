@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-
-import com.google.gson.JsonObject;
 
 public interface ElasticsearchTestDialect {
 
@@ -27,15 +24,9 @@ public interface ElasticsearchTestDialect {
 
 	boolean isEmptyMappingPossible();
 
-	URLEncodedString getTypeKeywordForNonMappingApi();
-
 	Optional<URLEncodedString> getTypeNameForMappingAndBulkApi();
 
 	Boolean getIncludeTypeNameParameterForMappingApi();
-
-	ElasticsearchRequest createTemplatePutRequest(String templateName, String pattern, int priority, JsonObject settings);
-
-	ElasticsearchRequest createTemplateDeleteRequest(String templateName);
 
 	List<String> getAllLocalDateDefaultMappingFormats();
 
@@ -47,32 +38,6 @@ public interface ElasticsearchTestDialect {
 		return String.join( "||", getAllLocalDateDefaultMappingFormats() );
 	}
 
-	boolean supportsGeoPointIndexNullAs();
-
-	boolean supportsStrictGreaterThanRangedQueriesOnScaledFloatField();
-
-	boolean zonedDateTimeDocValueHasUTCZoneId();
-
 	boolean supportsIsWriteIndex();
-
-	boolean hasBugForSortMaxOnNegativeFloats();
-
-	boolean hasBugForBigIntegerValuesForDynamicField();
-
-	boolean hasBugForBigDecimalValuesForDynamicField();
-
-	boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField();
-
-	boolean supportsSkipOrLimitingTotalHitCount();
-
-	boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues();
-
-	boolean supportMoreThan1024Terms();
-
-	boolean supportsIgnoreUnmappedForGeoPointField();
-
-	boolean ignoresFieldSortWhenNestedFieldMissing();
-
-	boolean hasBugForDateFormattedAsYear();
 
 }
