@@ -22,8 +22,8 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -169,7 +169,7 @@ public class ElasticsearchSearchQueryIT {
 	public void trackTotalHits_fetch() {
 		assumeTrue(
 				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
-				ElasticsearchTestDialect.get().supportsSkipOrLimitingTotalHitCount()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
 		);
 
 		StubMappingScope scope = index.createScope();
@@ -195,7 +195,7 @@ public class ElasticsearchSearchQueryIT {
 	public void trackTotalHits_fetchHits() {
 		assumeTrue(
 				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
-				ElasticsearchTestDialect.get().supportsSkipOrLimitingTotalHitCount()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
 		);
 
 		StubMappingScope scope = index.createScope();

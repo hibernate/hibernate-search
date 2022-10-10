@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
-final class ElasticsearchVersionUtils {
+public final class ElasticsearchVersionUtils {
 	private ElasticsearchVersionUtils() {
 	}
 
