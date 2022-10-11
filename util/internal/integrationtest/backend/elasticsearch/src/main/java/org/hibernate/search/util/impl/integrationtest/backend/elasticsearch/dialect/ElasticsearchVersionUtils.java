@@ -31,12 +31,12 @@ public final class ElasticsearchVersionUtils {
 				.compare( a, b );
 	}
 
-	public static boolean isOpensearchDistribution(ElasticsearchVersion actual) {
+	public static boolean isOpenSearch(ElasticsearchVersion actual) {
 
-		return isDistributionEquals( actual, ElasticsearchDistributionName.OPENSEARCH );
+		return isDistribution( actual, ElasticsearchDistributionName.OPENSEARCH );
 	}
 
-	private static boolean isDistributionEquals(
+	private static boolean isDistribution(
 			ElasticsearchVersion actual,
 			ElasticsearchDistributionName distribution
 	) {
@@ -44,13 +44,13 @@ public final class ElasticsearchVersionUtils {
 		return actual.distribution().equals( distribution );
 	}
 
-	public static boolean isActualVersionEquals(ElasticsearchVersion actual, String version) {
+	public static boolean isMatching(ElasticsearchVersion actual, String version) {
 		ElasticsearchVersion v = ElasticsearchVersion.of( version );
 
 		return v.matches( actual );
 	}
 
-	public static boolean isActualVersionLessOrEquals(ElasticsearchVersion actual, String version) {
+	public static boolean isAtMost(ElasticsearchVersion actual, String version) {
 		ElasticsearchVersion v = ElasticsearchVersion.of( version );
 
 		return tryOrFalse(
@@ -58,7 +58,7 @@ public final class ElasticsearchVersionUtils {
 		);
 	}
 
-	public static boolean isActualVersionLess(ElasticsearchVersion actual, String version) {
+	public static boolean isLessThan(ElasticsearchVersion actual, String version) {
 		ElasticsearchVersion v = ElasticsearchVersion.of( version );
 
 		return tryOrFalse(
@@ -66,7 +66,7 @@ public final class ElasticsearchVersionUtils {
 		);
 	}
 
-	public static boolean isActualVersionBetween(ElasticsearchVersion actual, String minVersion, String maxVersion) {
+	public static boolean isBetweenExcluded(ElasticsearchVersion actual, String minVersion, String maxVersion) {
 		ElasticsearchVersion min = ElasticsearchVersion.of( minVersion );
 		ElasticsearchVersion max = ElasticsearchVersion.of( maxVersion );
 
@@ -75,8 +75,7 @@ public final class ElasticsearchVersionUtils {
 		);
 	}
 
-	public static boolean isActualVersionBetweenIncluding(ElasticsearchVersion actual, String minVersion,
-			String maxVersion) {
+	public static boolean isBetween(ElasticsearchVersion actual, String minVersion, String maxVersion) {
 		ElasticsearchVersion min = ElasticsearchVersion.of( minVersion );
 		ElasticsearchVersion max = ElasticsearchVersion.of( maxVersion );
 

@@ -15,9 +15,9 @@ import org.junit.Test;
 public class ElasticsearchVersionUtilsTest {
 
 	@Test
-	public void isActualVersionBetween() {
+	public void isBetweenExcluded() {
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetween(
+				ElasticsearchVersionUtils.isBetweenExcluded(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.0.1",
 						"elastic:1.1.2"
@@ -25,7 +25,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetween(
+				ElasticsearchVersionUtils.isBetweenExcluded(
 						ElasticsearchVersion.of( "elastic:2.2.2" ),
 						"elastic:1",
 						"elastic:3"
@@ -33,7 +33,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetween(
+				ElasticsearchVersionUtils.isBetweenExcluded(
 						ElasticsearchVersion.of( "elastic:2.2.2" ),
 						"elastic:1.1",
 						"elastic:3.1"
@@ -41,7 +41,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetween(
+				ElasticsearchVersionUtils.isBetweenExcluded(
 						ElasticsearchVersion.of( "elastic:2.2.2" ),
 						"elastic:1.1",
 						"elastic:2.2"
@@ -49,7 +49,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetween(
+				ElasticsearchVersionUtils.isBetweenExcluded(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1.1",
 						"elastic:1.1.2"
@@ -58,9 +58,9 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isActualVersionBetweenIncluding() {
+	public void isBetween() {
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetweenIncluding(
+				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.0.1",
 						"elastic:1.1.2"
@@ -68,7 +68,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetweenIncluding(
+				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1.1",
 						"elastic:1.1.2"
@@ -76,7 +76,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetweenIncluding(
+				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:1.1.2" ),
 						"elastic:1.1.1",
 						"elastic:1.1.2"
@@ -84,7 +84,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetweenIncluding(
+				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:2.2.2" ),
 						"elastic:1.1",
 						"elastic:2.2"
@@ -92,7 +92,7 @@ public class ElasticsearchVersionUtilsTest {
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionBetweenIncluding(
+				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:2.2.2" ),
 						"elastic:1",
 						"elastic:2"
@@ -101,38 +101,38 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isOpensearchDistribution() {
+	public void isOpenSearch() {
 		assertThat(
-				ElasticsearchVersionUtils.isOpensearchDistribution(
+				ElasticsearchVersionUtils.isOpenSearch(
 						ElasticsearchVersion.of( "elastic:1.1.1" )
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isOpensearchDistribution(
+				ElasticsearchVersionUtils.isOpenSearch(
 						ElasticsearchVersion.of( "opensearch:1.1.1" )
 				)
 		).isTrue();
 	}
 
 	@Test
-	public void isActualVersionEquals() {
+	public void isMatching() {
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionEquals(
+				ElasticsearchVersionUtils.isMatching(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1.2"
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionEquals(
+				ElasticsearchVersionUtils.isMatching(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1.1"
 				)
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionEquals(
+				ElasticsearchVersionUtils.isMatching(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1"
 				)
@@ -140,30 +140,30 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isActualVersionLessOrEquals() {
+	public void isAtMost() {
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLessOrEquals(
+				ElasticsearchVersionUtils.isAtMost(
 						ElasticsearchVersion.of( "elastic:1.1.2" ),
 						"elastic:1.1.1"
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLessOrEquals(
+				ElasticsearchVersionUtils.isAtMost(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"opensearch:1.1.1"
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLessOrEquals(
+				ElasticsearchVersionUtils.isAtMost(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1.1"
 				)
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLessOrEquals(
+				ElasticsearchVersionUtils.isAtMost(
 						ElasticsearchVersion.of( "elastic:1.0.1" ),
 						"elastic:1.1.1"
 				)
@@ -171,37 +171,37 @@ public class ElasticsearchVersionUtilsTest {
 	}
 
 	@Test
-	public void isActualVersionLess() {
+	public void isLessThan() {
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLess(
+				ElasticsearchVersionUtils.isLessThan(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.1.2"
 				)
 		).isTrue();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLess(
+				ElasticsearchVersionUtils.isLessThan(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"opensearch:1.1.1"
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLess(
+				ElasticsearchVersionUtils.isLessThan(
 						ElasticsearchVersion.of( "elastic:1.1" ),
 						"elastic:1.1.0"
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLess(
+				ElasticsearchVersionUtils.isLessThan(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.0.1"
 				)
 		).isFalse();
 
 		assertThat(
-				ElasticsearchVersionUtils.isActualVersionLess(
+				ElasticsearchVersionUtils.isLessThan(
 						ElasticsearchVersion.of( "elastic:1.0.1" ),
 						"elastic:1.1.1"
 				)
