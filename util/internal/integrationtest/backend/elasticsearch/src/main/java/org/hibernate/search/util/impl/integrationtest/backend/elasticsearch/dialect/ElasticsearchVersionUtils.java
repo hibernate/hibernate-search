@@ -66,15 +66,6 @@ public final class ElasticsearchVersionUtils {
 		);
 	}
 
-	public static boolean isBetweenExcluded(ElasticsearchVersion actual, String minVersion, String maxVersion) {
-		ElasticsearchVersion min = ElasticsearchVersion.of( minVersion );
-		ElasticsearchVersion max = ElasticsearchVersion.of( maxVersion );
-
-		return tryOrFalse(
-				() -> compare( max, actual, Integer.MIN_VALUE ) > 0 && compare( min, actual, Integer.MAX_VALUE ) < 0
-		);
-	}
-
 	public static boolean isBetween(ElasticsearchVersion actual, String minVersion, String maxVersion) {
 		ElasticsearchVersion min = ElasticsearchVersion.of( minVersion );
 		ElasticsearchVersion max = ElasticsearchVersion.of( maxVersion );

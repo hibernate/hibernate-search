@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isBetweenExcluded;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isBetween;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isMatching;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isLessThan;
@@ -243,6 +242,6 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// https://github.com/elastic/elasticsearch/issues/90187
 		// Seems like this was fixed in 8.5.1 and they won't backport to 8.4:
 		// https://github.com/elastic/elasticsearch/pull/90458
-		return !isBetweenExcluded( actualVersion, "elastic:8.4.1", "elastic:8.5.1" );
+		return !isBetween( actualVersion, "elastic:8.4.2", "elastic:8.5.0" );
 	}
 }
