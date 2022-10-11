@@ -15,49 +15,6 @@ import org.junit.Test;
 public class ElasticsearchVersionUtilsTest {
 
 	@Test
-	public void isBetweenExcluded() {
-		assertThat(
-				ElasticsearchVersionUtils.isBetweenExcluded(
-						ElasticsearchVersion.of( "elastic:1.1.1" ),
-						"elastic:1.0.1",
-						"elastic:1.1.2"
-				)
-		).isTrue();
-
-		assertThat(
-				ElasticsearchVersionUtils.isBetweenExcluded(
-						ElasticsearchVersion.of( "elastic:2.2.2" ),
-						"elastic:1",
-						"elastic:3"
-				)
-		).isTrue();
-
-		assertThat(
-				ElasticsearchVersionUtils.isBetweenExcluded(
-						ElasticsearchVersion.of( "elastic:2.2.2" ),
-						"elastic:1.1",
-						"elastic:3.1"
-				)
-		).isTrue();
-
-		assertThat(
-				ElasticsearchVersionUtils.isBetweenExcluded(
-						ElasticsearchVersion.of( "elastic:2.2.2" ),
-						"elastic:1.1",
-						"elastic:2.2"
-				)
-		).isFalse();
-
-		assertThat(
-				ElasticsearchVersionUtils.isBetweenExcluded(
-						ElasticsearchVersion.of( "elastic:1.1.1" ),
-						"elastic:1.1.1",
-						"elastic:1.1.2"
-				)
-		).isFalse();
-	}
-
-	@Test
 	public void isBetween() {
 		assertThat(
 				ElasticsearchVersionUtils.isBetween(
