@@ -24,14 +24,15 @@ public class ElasticsearchTestDialect {
 			System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" )
 	);
 
+	private static final ElasticsearchTestDialect INSTANCE = new ElasticsearchTestDialect();
+
 	public static ElasticsearchTestDialect get() {
-		return new ElasticsearchTestDialect();
+		return INSTANCE;
 	}
 
 	public static ElasticsearchVersion getActualVersion() {
 		return ACTUAL_VERSION;
 	}
-
 
 	public boolean isEmptyMappingPossible() {
 		return isActualVersionLess( ACTUAL_VERSION, "elastic:6.9.0" );
