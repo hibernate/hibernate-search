@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect;
 
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isActualVersionBetweenIncluding;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isActualVersionLess;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isBetween;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isLessThan;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,33 +35,33 @@ public class ElasticsearchTestDialect {
 	}
 
 	public boolean isEmptyMappingPossible() {
-		return isActualVersionLess( ACTUAL_VERSION, "elastic:6.9.0" );
+		return isLessThan( ACTUAL_VERSION, "elastic:6.9.0" );
 	}
 
 	@SuppressWarnings("deprecation")
 	public Optional<URLEncodedString> getTypeNameForMappingAndBulkApi() {
-		if ( isActualVersionLess( ACTUAL_VERSION, "elastic:6.9.0" ) ) {
+		if ( isLessThan( ACTUAL_VERSION, "elastic:6.9.0" ) ) {
 			return Optional.of( Paths.DOC );
 		}
 		return Optional.empty();
 	}
 
 	public Boolean getIncludeTypeNameParameterForMappingApi() {
-		if ( isActualVersionBetweenIncluding( ACTUAL_VERSION, "elastic:6.4.0", "elastic:6.9.0" ) ) {
+		if ( isBetween( ACTUAL_VERSION, "elastic:6.4.0", "elastic:6.9.0" ) ) {
 			return Boolean.TRUE;
 		}
 		return null;
 	}
 
 	public List<String> getAllLocalDateDefaultMappingFormats() {
-		if ( isActualVersionLess( ACTUAL_VERSION, "elastic:6.9.0" ) ) {
+		if ( isLessThan( ACTUAL_VERSION, "elastic:6.9.0" ) ) {
 			return Arrays.asList( "yyyy-MM-dd", "yyyyyyyyy-MM-dd" );
 		}
 		return Collections.singletonList( "uuuu-MM-dd" );
 	}
 
 	public boolean supportsIsWriteIndex() {
-		return !isActualVersionLess( ACTUAL_VERSION, "elastic:6.4.0" );
+		return !isLessThan( ACTUAL_VERSION, "elastic:6.4.0" );
 	}
 
 	public String getFirstLocalDateDefaultMappingFormat() {
