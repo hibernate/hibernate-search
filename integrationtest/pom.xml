@@ -41,7 +41,8 @@
                 </property>
             </activation>
             <modules>
-                <module>jdk/java-modules</module>
+                <module>jdk/java-modules/orm-elasticsearch</module>
+                <module>jdk/java-modules/orm-lucene</module>
             </modules>
         </profile>
     </profiles>
