@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype;
 
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.MultiValuedPropertyAccessor;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.PropertyAccessor;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -56,6 +57,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 	@Test
 	public void directMultiValuedAssociationUpdate_indexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -71,10 +76,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -92,10 +97,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -117,8 +122,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 2 );
 
-			_contained().containingAsIndexedEmbedded().clear( contained );
-			_containing().containedIndexedEmbedded().remove( entity1, contained );
+			containedAssociation.clear( contained );
+			containingAssociation.remove( entity1, contained );
 
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -140,14 +145,18 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directMultiValuedAssociationReplace_indexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 			session.persist( entity1 );
@@ -165,14 +174,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedIndexedEmbedded().getContainer( entity1 )
+					containingAssociation.getContainer( entity1 )
 			);
-			_containing().containedIndexedEmbedded().setContainer( entity1, newAssociation );
-			_containing().containedIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.setContainer( entity1, newAssociation );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -197,6 +206,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void directMultiValuedAssociationMultiValuedUpdate_nonIndexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedNonIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsNonIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -212,10 +225,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedNonIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -228,10 +241,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedNonIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -245,8 +258,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 2 );
 
-			_contained().containingAsNonIndexedEmbedded().clear( contained );
-			_containing().containedNonIndexedEmbedded().remove( entity1, contained );
+			containedAssociation.clear( contained );
+			containingAssociation.remove( entity1, contained );
 
 			// Do not expect any work
 		} );
@@ -264,14 +277,18 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void directMultiValuedAssociationReplace_nonIndexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedNonIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsNonIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedNonIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 			session.persist( entity1 );
@@ -285,14 +302,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedNonIndexedEmbedded().getContainer( entity1 )
+					containingAssociation.getContainer( entity1 )
 			);
-			_containing().containedNonIndexedEmbedded().setContainer( entity1, newAssociation );
-			_containing().containedNonIndexedEmbedded().add( entity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, entity1 );
+			containingAssociation.setContainer( entity1, newAssociation );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -311,6 +328,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directMultiValuedAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -326,10 +347,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -347,10 +368,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -372,8 +393,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 2 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().remove( entity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( contained );
+			containingAssociation.remove( entity1, contained );
+			containedAssociation.clear( contained );
 
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -396,14 +417,18 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void directMultiValuedAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 			session.persist( entity1 );
@@ -421,14 +446,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedIndexedEmbeddedShallowReindexOnUpdate().getContainer( entity1 )
+					containingAssociation.getContainer( entity1 )
 			);
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().setContainer( entity1, newAssociation );
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.setContainer( entity1, newAssociation );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -453,6 +478,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void directMultiValuedAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -468,10 +497,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -484,10 +513,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -501,8 +530,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 2 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().remove( entity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().clear( contained );
+			containingAssociation.remove( entity1, contained );
+			containedAssociation.clear( contained );
 
 			// Do not expect any work
 		} );
@@ -520,14 +549,18 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void directMultiValuedAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
 			TContained contained = _contained().newInstance( 2 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 			session.persist( entity1 );
@@ -545,14 +578,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TIndexed entity1 = session.get( _indexed().entityClass(), 1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedIndexedEmbeddedNoReindexOnUpdate().getContainer( entity1 )
+					containingAssociation.getContainer( entity1 )
 			);
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().setContainer( entity1, newAssociation );
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( entity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, entity1 );
+			containingAssociation.setContainer( entity1, newAssociation );
+			containingAssociation.add( entity1, contained );
+			containedAssociation.set( contained, entity1 );
 
 			session.persist( contained );
 
@@ -572,6 +605,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 	@Test
 	public void indirectMultiValuedAssociationUpdate_indexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -599,10 +636,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -622,10 +659,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -648,10 +685,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining deeplyNestedContainingEntity1 = session.get( _containing().entityClass(), 3 );
 
 			TContained contained = _contained().newInstance( 6 );
-			_contained().indexedField().set( contained, "outOfScopeValue" );
+			field.set( contained, "outOfScopeValue" );
 
-			_containing().containedIndexedEmbedded().add( deeplyNestedContainingEntity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, deeplyNestedContainingEntity1 );
+			containingAssociation.add( deeplyNestedContainingEntity1, contained );
+			containedAssociation.set( contained, deeplyNestedContainingEntity1 );
 
 			session.persist( contained );
 
@@ -665,8 +702,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 4 );
 
-			_contained().containingAsIndexedEmbedded().clear( contained );
-			_containing().containedIndexedEmbedded().remove( containingEntity1, contained );
+			containedAssociation.clear( contained );
+			containingAssociation.remove( containingEntity1, contained );
 
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -691,6 +728,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectMultiValuedAssociationReplace_indexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -699,9 +740,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			_containing().parent().set( containingEntity1, entity1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_1 );
-			_containing().containedIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, containingEntity1 );
+			field.set( contained, VALUE_1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 			session.persist( containingEntity1 );
@@ -722,14 +763,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedIndexedEmbedded().getContainer( containingEntity1 )
+					containingAssociation.getContainer( containingEntity1 )
 			);
-			_containing().containedIndexedEmbedded().setContainer( containingEntity1, newAssociation );
-			_containing().containedIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbedded().set( contained, containingEntity1 );
+			containingAssociation.setContainer( containingEntity1, newAssociation );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -756,6 +797,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3199")
 	public void indirectMultiValuedAssociationUpdate_nonIndexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedNonIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsNonIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -778,10 +823,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedNonIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -794,10 +839,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedNonIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -811,8 +856,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 4 );
 
-			_contained().containingAsNonIndexedEmbedded().clear( contained );
-			_containing().containedNonIndexedEmbedded().remove( containingEntity1, contained );
+			containedAssociation.clear( contained );
+			containingAssociation.remove( containingEntity1, contained );
 
 			// Do not expect any work
 		} );
@@ -830,6 +875,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void indirectMultiValuedAssociationReplace_nonIndexedEmbedded() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedNonIndexedEmbedded();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsNonIndexedEmbedded();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -838,9 +887,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			_containing().parent().set( containingEntity1, entity1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_1 );
-			_containing().containedNonIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, containingEntity1 );
+			field.set( contained, VALUE_1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 			session.persist( containingEntity1 );
@@ -857,14 +906,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedNonIndexedEmbedded().getContainer( containingEntity1 )
+					containingAssociation.getContainer( containingEntity1 )
 			);
-			_containing().containedNonIndexedEmbedded().setContainer( containingEntity1, newAssociation );
-			_containing().containedNonIndexedEmbedded().add( containingEntity1, contained );
-			_contained().containingAsNonIndexedEmbedded().set( contained, containingEntity1 );
+			containingAssociation.setContainer( containingEntity1, newAssociation );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -886,6 +935,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectMultiValuedAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -908,10 +961,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -931,10 +984,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -958,8 +1011,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 4 );
 
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().remove( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().clear( contained );
+			containingAssociation.remove( containingEntity1, contained );
+			containedAssociation.clear( contained );
 
 			backendMock.expectWorks( _indexed().indexName() )
 					.addOrUpdate( "1", b -> b
@@ -987,6 +1040,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4001")
 	public void indirectMultiValuedAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedShallowReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -995,9 +1052,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			_containing().parent().set( containingEntity1, entity1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_1 );
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, containingEntity1 );
+			field.set( contained, VALUE_1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 			session.persist( containingEntity1 );
@@ -1018,14 +1075,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedIndexedEmbeddedShallowReindexOnUpdate().getContainer( containingEntity1 )
+					containingAssociation.getContainer( containingEntity1 )
 			);
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().setContainer( containingEntity1, newAssociation );
-			_containing().containedIndexedEmbeddedShallowReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedShallowReindexOnUpdate().set( contained, containingEntity1 );
+			containingAssociation.setContainer( containingEntity1, newAssociation );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1053,6 +1110,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3206")
 	public void indirectMultiValuedAssociationUpdate_indexedEmbeddedNoReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -1075,10 +1136,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_1 );
+			field.set( contained, VALUE_1 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1091,10 +1152,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 5 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, containingEntity1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
@@ -1108,8 +1169,8 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 
 			TContained contained = session.get( _contained().entityClass(), 4 );
 
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().remove( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().clear( contained );
+			containingAssociation.remove( containingEntity1, contained );
+			containedAssociation.clear( contained );
 
 			// Do not expect any work
 		} );
@@ -1128,6 +1189,10 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3204")
 	public void indirectMultiValuedAssociationReplace_indexedEmbeddedNoReindexOnUpdate() {
+		MultiValuedPropertyAccessor<TContaining, TContained, TContainedAssociation> containingAssociation = _containing().containedIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, TContaining> containedAssociation = _contained().containingAsIndexedEmbeddedNoReindexOnUpdate();
+		PropertyAccessor<TContained, String> field = _contained().indexedField();
+
 		setupHolder.runInTransaction( session -> {
 			TIndexed entity1 = _indexed().newInstance( 1 );
 
@@ -1136,9 +1201,9 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			_containing().parent().set( containingEntity1, entity1 );
 
 			TContained contained = _contained().newInstance( 3 );
-			_contained().indexedField().set( contained, VALUE_1 );
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, containingEntity1 );
+			field.set( contained, VALUE_1 );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 			session.persist( containingEntity1 );
@@ -1159,14 +1224,14 @@ public abstract class AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 			TContaining containingEntity1 = session.get( _containing().entityClass(), 2 );
 
 			TContained contained = _contained().newInstance( 4 );
-			_contained().indexedField().set( contained, VALUE_2 );
+			field.set( contained, VALUE_2 );
 
 			TContainedAssociation newAssociation = _containing().newContainedAssociation(
-					_containing().containedIndexedEmbeddedNoReindexOnUpdate().getContainer( containingEntity1 )
+					containingAssociation.getContainer( containingEntity1 )
 			);
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().setContainer( containingEntity1, newAssociation );
-			_containing().containedIndexedEmbeddedNoReindexOnUpdate().add( containingEntity1, contained );
-			_contained().containingAsIndexedEmbeddedNoReindexOnUpdate().set( contained, containingEntity1 );
+			containingAssociation.setContainer( containingEntity1, newAssociation );
+			containingAssociation.add( containingEntity1, contained );
+			containedAssociation.set( contained, containingEntity1 );
 
 			session.persist( contained );
 
