@@ -9,9 +9,11 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -20,6 +22,8 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.StubDocumentWorkAssert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
@@ -41,6 +45,8 @@ public class BackendMock implements TestRule {
 	private volatile boolean started = false;
 
 	private volatile BackendIndexingWorkExpectations indexingWorkExpectations = BackendIndexingWorkExpectations.sync();
+
+	private final Map<String, StubTreeNodeDiffer<StubDocumentNode>> documentDiffers = new ConcurrentHashMap<>();
 
 	@Override
 	public Statement apply(Statement base, Description description) {
@@ -71,6 +77,11 @@ public class BackendMock implements TestRule {
 
 	public BackendMock ignoreSchema() {
 		backendBehavior.ignoreSchema( true );
+		return this;
+	}
+
+	public BackendMock documentDiffer(String indexName, StubTreeNodeDiffer<StubDocumentNode> differ) {
+		documentDiffers.put( indexName, differ );
 		return this;
 	}
 
@@ -432,27 +443,29 @@ public class BackendMock implements TestRule {
 		}
 
 		public DocumentWorkCallListContext work(StubDocumentWork work) {
+			StubTreeNodeDiffer<StubDocumentNode> documentDiffer =
+					documentDiffers.getOrDefault( indexName, StubDocumentWorkAssert.DEFAULT_DOCUMENT_DIFFER );
 			switch ( kind ) {
 				case CREATE:
-					expect( new DocumentWorkCreateCall( indexName, work ) );
+					expect( new DocumentWorkCreateCall( indexName, work, documentDiffer ) );
 					break;
 				case DISCARD:
-					expect( new DocumentWorkDiscardCall( indexName, work ) );
+					expect( new DocumentWorkDiscardCall( indexName, work, documentDiffer ) );
 					break;
 				case EXECUTE:
-					expect( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
+					expect( new DocumentWorkExecuteCall( indexName, work, documentDiffer, executionFuture ) );
 					break;
 				case CREATE_AND_DISCARD:
-					expect( new DocumentWorkCreateCall( indexName, work ) );
-					expect( new DocumentWorkDiscardCall( indexName, work ) );
+					expect( new DocumentWorkCreateCall( indexName, work, documentDiffer ) );
+					expect( new DocumentWorkDiscardCall( indexName, work, documentDiffer ) );
 					break;
 				case CREATE_AND_EXECUTE:
-					expect( new DocumentWorkCreateCall( indexName, work ) );
-					expect( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
+					expect( new DocumentWorkCreateCall( indexName, work, documentDiffer ) );
+					expect( new DocumentWorkExecuteCall( indexName, work, documentDiffer, executionFuture ) );
 					break;
 				case CREATE_AND_EXECUTE_OUT_OF_ORDER:
-					expectOutOfOrder( new DocumentWorkCreateCall( indexName, work ) );
-					expectOutOfOrder( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
+					expectOutOfOrder( new DocumentWorkCreateCall( indexName, work, documentDiffer ) );
+					expectOutOfOrder( new DocumentWorkExecuteCall( indexName, work, documentDiffer, executionFuture ) );
 					break;
 			}
 			return this;
