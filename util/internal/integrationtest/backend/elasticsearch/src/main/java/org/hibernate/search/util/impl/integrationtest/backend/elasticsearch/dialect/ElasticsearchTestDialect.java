@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isBetween;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isLessThan;
 
@@ -35,26 +36,26 @@ public class ElasticsearchTestDialect {
 	}
 
 	public boolean isEmptyMappingPossible() {
-		return isLessThan( ACTUAL_VERSION, "elastic:6.9.0" );
+		return isAtMost( ACTUAL_VERSION, "elastic:6.8" );
 	}
 
 	@SuppressWarnings("deprecation")
 	public Optional<URLEncodedString> getTypeNameForMappingAndBulkApi() {
-		if ( isLessThan( ACTUAL_VERSION, "elastic:6.9.0" ) ) {
+		if ( isAtMost( ACTUAL_VERSION, "elastic:6.8" ) ) {
 			return Optional.of( Paths.DOC );
 		}
 		return Optional.empty();
 	}
 
 	public Boolean getIncludeTypeNameParameterForMappingApi() {
-		if ( isBetween( ACTUAL_VERSION, "elastic:6.4.0", "elastic:6.9.0" ) ) {
+		if ( isBetween( ACTUAL_VERSION, "elastic:6.7", "elastic:6.8" ) ) {
 			return Boolean.TRUE;
 		}
 		return null;
 	}
 
 	public List<String> getAllLocalDateDefaultMappingFormats() {
-		if ( isLessThan( ACTUAL_VERSION, "elastic:6.9.0" ) ) {
+		if ( isAtMost( ACTUAL_VERSION, "elastic:6.8" ) ) {
 			return Arrays.asList( "yyyy-MM-dd", "yyyyyyyyy-MM-dd" );
 		}
 		return Collections.singletonList( "uuuu-MM-dd" );

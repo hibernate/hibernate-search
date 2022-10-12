@@ -65,7 +65,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
-		return isLessThan( actualVersion, "elastic:6.9.0" );
+		return isAtMost( actualVersion, "elastic:6.8" );
 	}
 
 	@Override
@@ -116,7 +116,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			// For some reason, ES 5.6 and 6.x sometimes fails to index BigDecimal values
 			// in dynamic fields.
 			// See https://hibernate.atlassian.net/browse/HSEARCH-4310
-			return !isLessThan( actualVersion, "elastic:6.9.0" );
+			return !isAtMost( actualVersion, "elastic:6.8" );
 		}
 		else {
 			return true;
@@ -130,7 +130,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean supportsTotalHitsThresholdForSearch() {
-		return !isLessThan( actualVersion, "elastic:6.9.0" );
+		return !isAtMost( actualVersion, "elastic:6.8" );
 	}
 
 	@Override
@@ -150,7 +150,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
 		if ( GeoPoint.class.equals( fieldType ) ) {
 			// See https://github.com/elastic/elasticsearch/issues/65306
-			return isLessThan( actualVersion, "elastic:7.9.0" );
+			return isAtMost( actualVersion, "elastic:7.9" );
 		}
 		return true;
 	}
@@ -227,7 +227,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// to their 6.8 branch:
 		// https://github.com/elastic/elasticsearch/pull/42451
 
-		return !isAtMost( actualVersion, "elastic:6.7.0" ) &&
+		return !isAtMost( actualVersion, "elastic:6.7" ) &&
 				( !ElasticsearchTestHostConnectionConfiguration.get().isAws() ||
 						!isMatching( actualVersion, "elastic:6.8" ) );
 	}
