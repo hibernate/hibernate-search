@@ -11,19 +11,24 @@ import static org.junit.Assert.fail;
 import java.util.Map;
 import java.util.Objects;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeCompare;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMismatch;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public class StubDocumentWorkAssert {
 
+	public static final StubTreeNodeDiffer<StubDocumentNode> DEFAULT_DOCUMENT_DIFFER = StubTreeNodeDiffer.<StubDocumentNode>builder().build();
+
 	public static StubDocumentWorkAssert assertThatDocumentWork(StubDocumentWork work) {
 		return new StubDocumentWorkAssert( work );
 	}
 
 	private final StubDocumentWork actual;
+
+	private StubTreeNodeDiffer<StubDocumentNode> documentDiffer = DEFAULT_DOCUMENT_DIFFER;
 
 	private String messageBase = "Document work did not match: ";
 
@@ -33,6 +38,11 @@ public class StubDocumentWorkAssert {
 
 	public StubDocumentWorkAssert as(String messageBase) {
 		this.messageBase = messageBase;
+		return this;
+	}
+
+	public StubDocumentWorkAssert documentDiffer(StubTreeNodeDiffer<StubDocumentNode> differ) {
+		this.documentDiffer = differ;
 		return this;
 	}
 
@@ -58,11 +68,11 @@ public class StubDocumentWorkAssert {
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		Map<String, StubTreeNodeMismatch> documentMismatches =
-				StubTreeNodeCompare.compare( expected.getDocument(), actual.getDocument() );
+				documentDiffer.diff( expected.getDocument(), actual.getDocument() );
 		if ( !documentMismatches.isEmpty() ) {
 			hasAnyMismatch = true;
 			builder.startObject( "document" );
-			StubTreeNodeCompare.appendTo( builder, documentMismatches );
+			StubTreeNodeDiffer.appendTo( builder, documentMismatches );
 			builder.endObject();
 		}
 

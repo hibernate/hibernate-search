@@ -11,7 +11,7 @@ import static org.junit.Assert.fail;
 import java.util.Map;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeCompare;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMismatch;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -23,6 +23,8 @@ public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 	}
 
 	private final T actual;
+
+	private final StubTreeNodeDiffer<T> differ = StubTreeNodeDiffer.<T>builder().build();
 
 	private String messageBase = "StubTreeNode did not match: ";
 
@@ -36,11 +38,11 @@ public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 	}
 
 	public StubTreeNodeAssert<T> matches(T expected) {
-		Map<String, StubTreeNodeMismatch> mismatchesByPath = StubTreeNodeCompare.compare( expected, actual );
+		Map<String, StubTreeNodeMismatch> mismatchesByPath = differ.diff( expected, actual );
 		if ( !mismatchesByPath.isEmpty() ) {
 			ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() );
 			builder.startObject();
-			StubTreeNodeCompare.appendTo( builder, mismatchesByPath );
+			StubTreeNodeDiffer.appendTo( builder, mismatchesByPath );
 			builder.endObject();
 			fail( messageBase + builder.toString() );
 		}
