@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
-public final class StubTreeNodeCompare {
+public final class StubTreeNodeDiffer<N extends StubTreeNode<N>> {
 
 	private static final Object NO_VALUE = new Object() {
 		@Override
@@ -24,10 +25,33 @@ public final class StubTreeNodeCompare {
 		}
 	};
 
-	private StubTreeNodeCompare() {
+	public static <N extends StubTreeNode<N>> Builder<N> builder() {
+		return new Builder<>();
 	}
 
-	public static <N extends StubTreeNode<N>> Map<String, StubTreeNodeMismatch> compare(N expected, N actual) {
+	public static class Builder<N extends StubTreeNode<N>> {
+		private final Set<String> missingEquivalentToEmptyPaths = new HashSet<>();
+
+		private Builder() {
+		}
+
+		public Builder<N> missingEquivalentToEmptyForPath(String path) {
+			missingEquivalentToEmptyPaths.add( path );
+			return this;
+		}
+
+		public StubTreeNodeDiffer<N> build() {
+			return new StubTreeNodeDiffer<>( this );
+		}
+	}
+
+	private final Set<String> missingEquivalentToEmptyPaths;
+
+	private StubTreeNodeDiffer(Builder<N> builder) {
+		this.missingEquivalentToEmptyPaths = new HashSet<>( builder.missingEquivalentToEmptyPaths );
+	}
+
+	public Map<String, StubTreeNodeMismatch> diff(N expected, N actual) {
 		Map<String, StubTreeNodeMismatch> mismatchesByPath = new LinkedHashMap<>();
 		addMismatchesRecursively( mismatchesByPath, null, expected, actual );
 		return mismatchesByPath;
@@ -44,15 +68,14 @@ public final class StubTreeNodeCompare {
 		}
 	}
 
-	private static <N extends StubTreeNode<N>> void addMismatchesRecursively(
-			Map<String, StubTreeNodeMismatch> mismatchesByPath, String path, N expectedNode, N actualNode) {
+	private void addMismatchesRecursively(Map<String, StubTreeNodeMismatch> mismatchesByPath, String path,
+			N expectedNode, N actualNode) {
 		if ( expectedNode == null && actualNode == null ) {
 			return;
 		}
 		else if ( expectedNode == null || actualNode == null ) {
 			// One is null, the other is not
-			StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expectedNode, actualNode );
-			mismatchesByPath.put( path, mismatch );
+			addExtraOrMissingNodeMismatch( mismatchesByPath, path, expectedNode, actualNode );
 			return;
 		}
 		Set<String> attributeKeys = new LinkedHashSet<>( expectedNode.getAttributes().keySet() );
@@ -75,8 +98,7 @@ public final class StubTreeNodeCompare {
 		}
 	}
 
-	private static <N extends StubTreeNode<N>> void addChildrenMismatchesRecursively(
-			Map<String, StubTreeNodeMismatch> mismatchesByPath,
+	private void addChildrenMismatchesRecursively(Map<String, StubTreeNodeMismatch> mismatchesByPath,
 			String path, String childrenKey, List<N> expectedChildren, List<N> actualChildren) {
 		int expectedChildrenSize = expectedChildren == null ? 0 : expectedChildren.size();
 		int actualChildrenSize = actualChildren == null ? 0 : actualChildren.size();
@@ -94,16 +116,29 @@ public final class StubTreeNodeCompare {
 		 */
 		for ( int i = minSize; i < expectedChildrenSize; ++i ) {
 			String childPath = childPath( path, childrenKey, i, maxSize );
-			Object expectedChild = expectedChildren.get( i );
-			StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expectedChild, NO_VALUE );
-			mismatchesByPath.put( childPath, mismatch );
+			N expectedChild = expectedChildren.get( i );
+			addExtraOrMissingNodeMismatch( mismatchesByPath, childPath, expectedChild, null );
 		}
 		for ( int i = minSize; i < actualChildrenSize; ++i ) {
 			String childPath = childPath( path, childrenKey, i, maxSize );
-			Object actualChild = actualChildren.get( i );
-			StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( NO_VALUE, actualChild );
-			mismatchesByPath.put( childPath, mismatch );
+			N actualChild = actualChildren.get( i );
+			addExtraOrMissingNodeMismatch( mismatchesByPath, childPath, null, actualChild );
 		}
+	}
+
+	private void addExtraOrMissingNodeMismatch(Map<String, StubTreeNodeMismatch> mismatchesByPath,
+			String path, N expectedNode, N actualNode) {
+		String pathWithoutArrayIndices = path == null ? null : path.replaceAll( "\\[[^]]*]", "" );
+		if ( missingEquivalentToEmptyPaths.contains( pathWithoutArrayIndices )
+				&& ( expectedNode == null || expectedNode.getChildren().isEmpty() )
+				&& ( actualNode == null || actualNode.getChildren().isEmpty() ) ) {
+			// One is null (missing), the other has no children (empty),
+			// and we were told to consider this as equivalent.
+			return;
+		}
+		StubTreeNodeMismatch mismatch = new StubTreeNodeMismatch( expectedNode == null ? NO_VALUE : expectedNode,
+				actualNode == null ? NO_VALUE : actualNode );
+		mismatchesByPath.put( path, mismatch );
 	}
 
 	private static String attributePath(String parentPath, String key) {
