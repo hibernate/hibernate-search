@@ -18,6 +18,14 @@ public class ElasticsearchVersionUtilsTest {
 	public void isBetween() {
 		assertThat(
 				ElasticsearchVersionUtils.isBetween(
+						ElasticsearchVersion.of( "elastic:6.7.0" ),
+						"elastic:6.7",
+						"elastic:6.9"
+				)
+		).isTrue();
+
+		assertThat(
+				ElasticsearchVersionUtils.isBetween(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
 						"elastic:1.0.1",
 						"elastic:1.1.2"
