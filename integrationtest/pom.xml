@@ -43,6 +43,7 @@
             <modules>
                 <module>jdk/java-modules/orm-elasticsearch</module>
                 <module>jdk/java-modules/orm-lucene</module>
+                <module>jdk/java-modules/orm-coordination-outbox-polling-elasticsearch</module>
             </modules>
         </profile>
     </profiles>
