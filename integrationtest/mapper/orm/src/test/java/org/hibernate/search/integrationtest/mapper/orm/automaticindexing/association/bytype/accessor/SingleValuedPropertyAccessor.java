@@ -24,6 +24,11 @@ final class SingleValuedPropertyAccessor<R, V> implements PropertyAccessor<R, V>
 	}
 
 	@Override
+	public String toString() {
+		return getMethod != null ? getMethod.toString() : setMethod.toString();
+	}
+
+	@Override
 	public void set(R root, V value) {
 		setMethod.accept( root, value );
 	}
