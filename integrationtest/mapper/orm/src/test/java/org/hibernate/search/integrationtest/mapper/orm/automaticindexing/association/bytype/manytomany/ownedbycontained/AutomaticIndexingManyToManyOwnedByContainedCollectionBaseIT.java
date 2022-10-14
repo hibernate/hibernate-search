@@ -15,6 +15,7 @@ import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -46,12 +47,20 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 		extends AbstractAutomaticIndexingMultiValuedAssociationBaseIT<
 						AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT.IndexedEntity,
 						AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT.ContainingEntity,
+						AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT.ContainingEmbeddable,
 						AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT.ContainedEntity,
+						AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT.ContainedEmbeddable,
 						Collection<AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT.ContainedEntity>
 		> {
 
 	public AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT() {
-		super( IndexedEntity.PRIMITIVES, ContainingEntity.PRIMITIVES, ContainedEntity.PRIMITIVES );
+		super( IndexedEntity.PRIMITIVES, ContainingEntity.PRIMITIVES, ContainingEmbeddable.PRIMITIVES,
+				ContainedEntity.PRIMITIVES, ContainedEmbeddable.PRIMITIVES );
+	}
+
+	@Override
+	protected boolean isAssociationMultiValuedOnContainedSide() {
+		return true;
 	}
 
 	@Override
@@ -82,6 +91,9 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
 				"containedIndexedEmbeddedWithCast.indexedField",
+				"embeddedAssociations.containedIndexedEmbedded.indexedField",
+				"embeddedAssociations.containedIndexedEmbedded.indexedElementCollectionField",
+				"embeddedAssociations.containedIndexedEmbedded.containedDerivedField",
 				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
@@ -115,6 +127,10 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		private Collection<Object> containedIndexedEmbeddedWithCast = new ArrayList<>();
+
+		@IndexedEmbedded
+		@Embedded
+		private ContainingEmbeddable embeddedAssociations;
 
 		public Integer getId() {
 			return id;
@@ -195,6 +211,14 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 			return containedIndexedEmbeddedWithCast;
 		}
 
+		public ContainingEmbeddable getEmbeddedAssociations() {
+			return embeddedAssociations;
+		}
+
+		public void setEmbeddedAssociations(ContainingEmbeddable embeddedAssociations) {
+			this.embeddedAssociations = embeddedAssociations;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
@@ -216,7 +240,7 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 			);
 		}
 
-		static final ContainingEntityPrimitives<ContainingEntity, ContainedEntity, Collection<ContainedEntity>> PRIMITIVES = new ContainingEntityPrimitives<ContainingEntity, ContainedEntity, Collection<ContainedEntity>>() {
+		static final ContainingEntityPrimitives<ContainingEntity, ContainingEmbeddable, ContainedEntity, Collection<ContainedEntity>> PRIMITIVES = new ContainingEntityPrimitives<ContainingEntity, ContainingEmbeddable, ContainedEntity, Collection<ContainedEntity>>() {
 			@Override
 			public Class<ContainingEntity> entityClass() {
 				return ContainingEntity.class;
@@ -285,8 +309,60 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 			}
 
 			@Override
+			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
+				return PropertyAccessor.create( ContainingEntity::setEmbeddedAssociations, ContainingEntity::getEmbeddedAssociations );
+			}
+
+			@Override
 			public PropertyAccessor<ContainingEntity, String> nonIndexedField() {
 				return PropertyAccessor.create( ContainingEntity::setNonIndexedField );
+			}
+		};
+	}
+
+	public static class ContainingEmbeddable {
+
+		@ManyToMany(mappedBy = "embeddedAssociations.containingAsIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
+		private Collection<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "embeddedAssociations.containingAsNonIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private Collection<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
+
+		public Collection<ContainedEntity> getContainedIndexedEmbedded() {
+			return containedIndexedEmbedded;
+		}
+
+		public void setContainedIndexedEmbedded(Collection<ContainedEntity> containedIndexedEmbedded) {
+			this.containedIndexedEmbedded = containedIndexedEmbedded;
+		}
+
+		public Collection<ContainedEntity> getContainedNonIndexedEmbedded() {
+			return containedNonIndexedEmbedded;
+		}
+
+		public void setContainedNonIndexedEmbedded(Collection<ContainedEntity> containedNonIndexedEmbedded) {
+			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
+		}
+
+		static final ContainingEmbeddablePrimitives<ContainingEmbeddable, ContainedEntity, Collection<ContainedEntity>> PRIMITIVES = new ContainingEmbeddablePrimitives<ContainingEmbeddable, ContainedEntity, Collection<ContainedEntity>>() {
+			@Override
+			public ContainingEmbeddable newInstance() {
+				return new ContainingEmbeddable();
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEmbeddable, ContainedEntity, Collection<ContainedEntity>> containedIndexedEmbedded() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEmbeddable::getContainedIndexedEmbedded, ContainingEmbeddable::setContainedIndexedEmbedded );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainingEmbeddable, ContainedEntity, Collection<ContainedEntity>> containedNonIndexedEmbedded() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainingEmbeddable::getContainedNonIndexedEmbedded, ContainingEmbeddable::setContainedNonIndexedEmbedded );
 			}
 		};
 	}
@@ -365,6 +441,9 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 		@OrderColumn(name = "idx") // Test list associations, not bags
 		private Collection<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
+		@Embedded
+		private ContainedEmbeddable embeddedAssociations;
+
 		@Basic
 		@GenericField
 		private String indexedField;
@@ -434,6 +513,14 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 
 		public Collection<Object> getContainingAsIndexedEmbeddedWithCast() {
 			return containingAsIndexedEmbeddedWithCast;
+		}
+
+		public ContainedEmbeddable getEmbeddedAssociations() {
+			return embeddedAssociations;
+		}
+
+		public void setEmbeddedAssociations(ContainedEmbeddable embeddedAssociations) {
+			this.embeddedAssociations = embeddedAssociations;
 		}
 
 		public String getIndexedField() {
@@ -510,7 +597,7 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 			return computeDerived( Stream.of( fieldUsedInContainedDerivedField1, fieldUsedInContainedDerivedField2 ) );
 		}
 
-		static ContainedEntityPrimitives<ContainedEntity, ContainingEntity> PRIMITIVES = new ContainedEntityPrimitives<ContainedEntity, ContainingEntity>() {
+		static ContainedEntityPrimitives<ContainedEntity, ContainedEmbeddable, ContainingEntity> PRIMITIVES = new ContainedEntityPrimitives<ContainedEntity, ContainedEmbeddable, ContainingEntity>() {
 			@Override
 			public Class<ContainedEntity> entityClass() {
 				return ContainedEntity.class;
@@ -561,6 +648,11 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 			}
 
 			@Override
+			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
+				return PropertyAccessor.create( ContainedEntity::setEmbeddedAssociations, ContainedEntity::getEmbeddedAssociations );
+			}
+
+			@Override
 			public PropertyAccessor<ContainedEntity, String> indexedField() {
 				return PropertyAccessor.create( ContainedEntity::setIndexedField );
 			}
@@ -602,6 +694,50 @@ public class AutomaticIndexingManyToManyOwnedByContainedCollectionBaseIT
 			@Override
 			public PropertyAccessor<ContainedEntity, String> fieldUsedInCrossEntityDerivedField2() {
 				return PropertyAccessor.create( ContainedEntity::setFieldUsedInCrossEntityDerivedField2 );
+			}
+		};
+	}
+
+	public static class ContainedEmbeddable {
+
+		@ManyToMany
+		@JoinTable(name = "i_emb_containedIdxEmbedded",
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
+		@OrderColumn(name = "idx") // Test list associations, not bags
+		private Collection<ContainingEntity> containingAsIndexedEmbedded = new ArrayList<>();
+
+		@ManyToMany
+		@JoinTable(name = "i_emb_containedNonIdxEmbedded",
+				joinColumns = @JoinColumn(name = "contained"),
+				inverseJoinColumns = @JoinColumn(name = "containing"))
+		@OrderColumn(name = "idx") // Test list associations, not bags
+		private Collection<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
+
+		public Collection<ContainingEntity> getContainingAsIndexedEmbedded() {
+			return containingAsIndexedEmbedded;
+		}
+
+		public Collection<ContainingEntity> getContainingAsNonIndexedEmbedded() {
+			return containingAsNonIndexedEmbedded;
+		}
+
+		static ContainedEmbeddablePrimitives<ContainedEmbeddable, ContainingEntity> PRIMITIVES = new ContainedEmbeddablePrimitives<ContainedEmbeddable, ContainingEntity>() {
+			@Override
+			public ContainedEmbeddable newInstance() {
+				return new ContainedEmbeddable();
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainedEmbeddable, ContainingEntity, Collection<ContainingEntity>> containingAsIndexedEmbedded() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainedEmbeddable::getContainingAsIndexedEmbedded );
+			}
+
+			@Override
+			public MultiValuedPropertyAccessor<ContainedEmbeddable, ContainingEntity, Collection<ContainingEntity>> containingAsNonIndexedEmbedded() {
+				return MultiValuedPropertyAccessor.create( ContainerPrimitives.collection(),
+						ContainedEmbeddable::getContainingAsNonIndexedEmbedded );
 			}
 		};
 	}

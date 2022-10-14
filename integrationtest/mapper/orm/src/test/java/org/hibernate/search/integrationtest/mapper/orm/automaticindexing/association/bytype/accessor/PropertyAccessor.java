@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.associ
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface PropertyAccessor<R, V> {
 
@@ -26,4 +27,11 @@ public interface PropertyAccessor<R, V> {
 
 	void clear(R root);
 
+	default <U> PropertyAccessor<R, U> andThen(Supplier<V> defaultInstanceSupplier, PropertyAccessor<? super V, U> leaf) {
+		return new ComposedPropertyAccessor<>( this, defaultInstanceSupplier, leaf );
+	}
+
+	default <U, C> MultiValuedPropertyAccessor<R, U, C> andThen(Supplier<V> defaultInstanceSupplier, MultiValuedPropertyAccessor<? super V, U, C> leaf) {
+		return new ComposedMultiValuedPropertyAccessor<>( this, defaultInstanceSupplier, leaf );
+	}
 }
