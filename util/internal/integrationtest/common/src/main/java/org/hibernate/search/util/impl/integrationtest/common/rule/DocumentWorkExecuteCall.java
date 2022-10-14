@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.St
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 class DocumentWorkExecuteCall extends Call<DocumentWorkExecuteCall> {
@@ -46,7 +47,13 @@ class DocumentWorkExecuteCall extends Call<DocumentWorkExecuteCall> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "execution of a " + work.getType() + " work on document '" + documentKey + "'";
+	}
+
+	@Override
+	protected void details(ToStringTreeBuilder builder) {
+		builder.attribute( "documentKey", documentKey );
+		builder.attribute( "work", work );
 	}
 }

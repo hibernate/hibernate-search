@@ -57,7 +57,7 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "scroll work execution on indexes '" + indexNames + "'; work = " + work;
 	}
 

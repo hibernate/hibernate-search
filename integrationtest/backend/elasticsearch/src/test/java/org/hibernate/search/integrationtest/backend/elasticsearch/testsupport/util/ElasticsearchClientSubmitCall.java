@@ -37,7 +37,7 @@ class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> 
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return getClass().getSimpleName() + "[" + request + "]";
 	}
 
