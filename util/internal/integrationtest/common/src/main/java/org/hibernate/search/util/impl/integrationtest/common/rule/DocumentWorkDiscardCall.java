@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.St
 
 import java.util.Objects;
 
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 class DocumentWorkDiscardCall extends Call<DocumentWorkDiscardCall> {
@@ -39,7 +40,13 @@ class DocumentWorkDiscardCall extends Call<DocumentWorkDiscardCall> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "discarding of a " + work.getType() + " work on document '" + documentKey + "'";
+	}
+
+	@Override
+	protected void details(ToStringTreeBuilder builder) {
+		builder.attribute( "documentKey", documentKey );
+		builder.attribute( "work", work );
 	}
 }

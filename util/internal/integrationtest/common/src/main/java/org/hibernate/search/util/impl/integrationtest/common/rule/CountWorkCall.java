@@ -37,4 +37,9 @@ public class CountWorkCall extends Call<CountWorkCall> {
 	protected boolean isSimilarTo(CountWorkCall other) {
 		return Objects.equals( indexNames, other.indexNames );
 	}
+
+	@Override
+	protected String summary() {
+		return "search work execution on indexes '" + indexNames + "'";
+	}
 }

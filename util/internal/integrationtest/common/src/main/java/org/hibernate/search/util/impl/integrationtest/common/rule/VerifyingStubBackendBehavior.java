@@ -34,6 +34,8 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringStyle;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
@@ -426,7 +428,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private static <C, T> Function<C, T> strictNoExpectationsBehavior() {
 		return call -> {
-			fail( "No call expected, but got: " + call );
+			fail( "No call expected, but got: " + call + "; details:\n"
+					+ new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).value( call ) );
 			// Dead code, we throw an exception above
 			return null;
 		};

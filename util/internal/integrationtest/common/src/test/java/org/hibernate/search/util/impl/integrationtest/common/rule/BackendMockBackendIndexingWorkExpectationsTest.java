@@ -148,7 +148,7 @@ public class BackendMockBackendIndexingWorkExpectationsTest {
 				} )
 				.isInstanceOf( AssertionError.class )
 				.hasMessageContainingAll( "Name of current thread when executing work",
-						"StubDocumentWork[type=ADD,",
+						"{ class=StubDocumentWork, type=ADD,",
 						"Expecting", "wrongName", "to match pattern", "matching.*" );
 
 		// Just tell backendMock to not fail this test:

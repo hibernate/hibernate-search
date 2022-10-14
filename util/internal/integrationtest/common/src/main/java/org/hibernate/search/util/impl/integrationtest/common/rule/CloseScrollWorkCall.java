@@ -20,7 +20,7 @@ public class CloseScrollWorkCall extends Call<CloseScrollWorkCall> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "scroll.close() work execution on indexes '" + indexNames + "'";
 	}
 
