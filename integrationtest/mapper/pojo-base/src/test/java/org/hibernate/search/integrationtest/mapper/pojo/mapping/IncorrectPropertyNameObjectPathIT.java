@@ -43,7 +43,11 @@ public class IncorrectPropertyNameObjectPathIT {
 					.withAnnotatedEntityType( PhoneNumber.class, PhoneNumber.ENTITY_NAME )
 					.setup();
 		} ).isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Property name '" + BROKEN_PATH_WITH_DOTS + "' is invalid." );
+				.hasMessageContainingAll(
+						"propertyName=\"" + BROKEN_PATH_WITH_DOTS + "\"",
+						"Invalid ObjectPath encountered",
+						"Property name '" + BROKEN_PATH_WITH_DOTS + "' cannot contain dots."
+				);
 	}
 
 
