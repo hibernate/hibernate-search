@@ -60,4 +60,5 @@ public final class Contracts {
 			throw log.collectionMustNotContainNullElement( collectionDescription );
 		}
 	}
+
 }

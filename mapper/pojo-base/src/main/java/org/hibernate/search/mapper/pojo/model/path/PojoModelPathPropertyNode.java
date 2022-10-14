@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.model.path;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A node in a {@link PojoModelPath} representing a property.
@@ -21,12 +24,18 @@ import org.hibernate.search.util.common.impl.Contracts;
  */
 public final class PojoModelPathPropertyNode extends PojoModelPath {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final PojoModelPathValueNode parent;
 	private final String propertyName;
 
 	PojoModelPathPropertyNode(PojoModelPathValueNode parent, String propertyName) {
-		this.parent = parent;
 		Contracts.assertNotNullNorEmpty( propertyName, "propertyName" );
+		if ( DOT_PATTERN.matcher( propertyName ).find() ) {
+			throw log.propertyNameCannotContainDots( propertyName );
+		}
+
+		this.parent = parent;
 		this.propertyName = propertyName;
 	}
 
