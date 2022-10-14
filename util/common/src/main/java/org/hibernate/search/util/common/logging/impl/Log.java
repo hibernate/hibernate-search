@@ -121,4 +121,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 14, value = "Exception while building Jandex index for '%1$s': %2$s")
 	SearchException errorBuildingJandexIndex(Path jarOrDirectoryPath, String message, @Cause Throwable e);
 
+	@Message(id = ID_OFFSET + 15, value = "Property name '%1$s' cannot contain dots.")
+	IllegalArgumentException propertyNameCannotContainDots(String propertyName);
 }

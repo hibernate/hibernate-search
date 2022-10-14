@@ -30,7 +30,7 @@ public abstract class PojoModelPath {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final Pattern DOT_PATTERN = Pattern.compile( "\\." );
+	protected static final Pattern DOT_PATTERN = Pattern.compile( "\\." );
 
 	/**
 	 * @return A builder allowing to create a {@link PojoModelPath}

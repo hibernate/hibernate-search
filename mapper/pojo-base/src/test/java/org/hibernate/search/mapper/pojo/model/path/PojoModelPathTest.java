@@ -36,6 +36,11 @@ public class PojoModelPathTest {
 				() -> PojoModelPath.ofProperty( "" )
 		)
 				.isInstanceOf( IllegalArgumentException.class );
+
+		assertThatThrownBy(
+				() -> PojoModelPath.ofProperty( "foo.bar" )
+		)
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
