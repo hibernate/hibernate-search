@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoConstructorModelFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -738,5 +739,9 @@ public interface Log extends BasicLogger {
 			value = "Both \"dropAndCreateSchemaOnStart()\" and \"purgeAllOnStart()\" are enabled. " +
 					"Consider having just one setting enabled as after the index is recreated there is nothing to purge.")
 	void redundantPurgeAfterDrop();
+
+	@Message(id = ID_OFFSET + 121,
+			value = "Invalid ObjectPath encountered '%1$s': %2$s")
+	SearchException invalidObjectPath(ObjectPath path, String causeMessage, @Cause Exception cause);
 
 }
