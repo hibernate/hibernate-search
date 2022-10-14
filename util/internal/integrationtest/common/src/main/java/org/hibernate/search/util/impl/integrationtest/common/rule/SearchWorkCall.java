@@ -123,7 +123,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "search work execution on indexes '" + indexNames + "'; work = " + work;
 	}
 }

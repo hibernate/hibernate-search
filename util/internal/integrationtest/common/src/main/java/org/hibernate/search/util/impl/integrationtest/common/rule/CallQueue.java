@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.util.common.impl.ToStringStyle;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -117,7 +119,7 @@ public class CallQueue<C extends Call<? super C>> {
 		if ( !matchingErrors.isEmpty() || !duplicateCallsMatchingErrors.isEmpty() ) {
 			// We found similar calls, but they didn't match
 			StringBuilder failureMessage = new StringBuilder(
-					"Unexpected call, see below for details.\nLast matching call was "
+					"Expected call doesn't match expectations, see below for details.\nLast matching call was "
 							+ lastMatchingCall
 			);
 			if ( !matchingErrors.isEmpty() ) {
@@ -140,7 +142,8 @@ public class CallQueue<C extends Call<? super C>> {
 		}
 		else {
 			// We didn't find any similar call
-			throw createFailure( "Unexpected call: " + actualCall );
+			throw createFailure( "Unexpected call: " + actualCall + "; details:\n"
+					+ new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).value( actualCall ) );
 		}
 	}
 
@@ -231,7 +234,8 @@ public class CallQueue<C extends Call<? super C>> {
 		remaining.addAll( callsExpectedInOrder );
 		remaining.addAll( callsExpectedOutOfOrder );
 		if ( !remaining.isEmpty() ) {
-			fail( "Expected " + remaining );
+			fail( "Missing call: expected " + remaining + "; details:\n"
+					+ new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).value( remaining ) );
 		}
 	}
 

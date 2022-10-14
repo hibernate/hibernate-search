@@ -52,7 +52,7 @@ class SchemaManagementWorkCall extends Call<SchemaManagementWorkCall> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "schema management work on index '" + indexName + "'; work = " + work;
 	}
 }

@@ -6,7 +6,20 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-public abstract class Call<S extends Call<S>> {
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+
+public abstract class Call<S extends Call<S>> implements ToStringTreeAppendable {
+
+	@Override
+	public final String toString() {
+		return summary();
+	}
+
+	@Override
+	public final void appendTo(ToStringTreeBuilder builder) {
+		details( builder );
+	}
 
 	/**
 	 * @param other Another call of similar type.
@@ -14,5 +27,11 @@ public abstract class Call<S extends Call<S>> {
 	 * {@code false} if there is no chance it could be identical.
 	 */
 	protected abstract boolean isSimilarTo(S other);
+
+	protected abstract String summary();
+
+	protected void details(ToStringTreeBuilder builder) {
+		// No details by default.
+	}
 
 }

@@ -48,7 +48,7 @@ class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "index-scale work on index '" + indexName + "'; work = " + work;
 	}
 }

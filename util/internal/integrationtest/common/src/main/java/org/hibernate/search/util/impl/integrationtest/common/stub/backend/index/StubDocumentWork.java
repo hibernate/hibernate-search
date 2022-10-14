@@ -8,9 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
-public final class StubDocumentWork {
+public final class StubDocumentWork implements ToStringTreeAppendable {
 
 	public enum Type {
 		ADD, ADD_OR_UPDATE, DELETE
@@ -74,15 +76,19 @@ public final class StubDocumentWork {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "type=" + type
-				+ ", tenantIdentifier=" + tenantIdentifier
-				+ ", identifier=" + identifier
-				+ ", routingKey=" + routingKey
-				+ ", commitStrategy=" + commitStrategy
-				+ ", refreshStrategy=" + refreshStrategy
-				+ ", document=" + document
-				+ "]";
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "type", type );
+		builder.attribute( "tenantIdentifier", tenantIdentifier );
+		builder.attribute( "identifier", identifier );
+		builder.attribute( "routingKey", routingKey );
+		builder.attribute( "commitStrategy", commitStrategy );
+		builder.attribute( "refreshStrategy", refreshStrategy );
+		builder.attribute( "document", document );
 	}
 
 	public static class Builder {
