@@ -57,7 +57,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "scroll.next() work execution on indexes '" + indexNames + "'";
 	}
 

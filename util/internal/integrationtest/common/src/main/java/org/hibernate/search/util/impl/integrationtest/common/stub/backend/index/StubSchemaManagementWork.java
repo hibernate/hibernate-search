@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
-public final class StubSchemaManagementWork {
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+
+public final class StubSchemaManagementWork implements ToStringTreeAppendable {
 
 	public enum Type {
 		CREATE_IF_MISSING,
@@ -33,9 +36,13 @@ public final class StubSchemaManagementWork {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "type=" + type
-				+ "]";
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "type", type );
 	}
 
 	public static class Builder {

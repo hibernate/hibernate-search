@@ -11,7 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public final class StubIndexScaleWork {
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+
+public final class StubIndexScaleWork implements ToStringTreeAppendable {
 
 	public enum Type {
 		MERGE_SEGMENTS, PURGE, FLUSH, REFRESH
@@ -45,10 +48,15 @@ public final class StubIndexScaleWork {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "["
-				+ "type=" + type
-				+ ", tenantIdentifier=" + tenantIdentifier
-				+ "]";
+		return new ToStringTreeBuilder().value( this ).toString();
+	}
+
+	@Override
+	public void appendTo(ToStringTreeBuilder builder) {
+		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "type", type );
+		builder.attribute( "tenantIdentifier", tenantIdentifier );
+		builder.attribute( "routingKeys", routingKeys );
 	}
 
 	public static class Builder {

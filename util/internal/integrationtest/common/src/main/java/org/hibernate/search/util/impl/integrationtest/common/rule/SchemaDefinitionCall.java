@@ -57,7 +57,7 @@ class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 	}
 
 	@Override
-	public String toString() {
+	protected String summary() {
 		return "schema definition for index '" + indexName + "'; schema = " + schemaNode;
 	}
 
