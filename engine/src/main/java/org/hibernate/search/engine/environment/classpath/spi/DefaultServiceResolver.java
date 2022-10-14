@@ -143,7 +143,7 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 			final Set<String> alreadyUsedProviderTypes = new LinkedHashSet<>();
 			final Set<S> services = new LinkedHashSet<>();
 			this.classLoaders.stream()
-					.map( classLpader -> ServiceLoader.load( serviceContract, aggregatedClassLoader ) )
+					.map( classLoader -> ServiceLoader.load( serviceContract, classLoader ) )
 					// Each loader's stream() method returns a stream of service providers: flatten these into a single stream
 					.flatMap( delegate -> {
 						try {
