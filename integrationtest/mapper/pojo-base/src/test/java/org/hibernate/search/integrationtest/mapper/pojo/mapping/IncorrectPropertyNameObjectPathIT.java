@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -43,8 +44,10 @@ public class IncorrectPropertyNameObjectPathIT {
 					.withAnnotatedEntityType( PhoneNumber.class, PhoneNumber.ENTITY_NAME )
 					.setup();
 		} ).isInstanceOf( SearchException.class )
+				.hasMessageFindingMatch( "propertyName=.?" + Pattern.quote( BROKEN_PATH_WITH_DOTS ) + ".?" )
 				.hasMessageContainingAll(
-						"propertyName=\"" + BROKEN_PATH_WITH_DOTS + "\"",
+						ObjectPath.class.getName(),
+						PropertyValue.class.getName(),
 						"Invalid ObjectPath encountered",
 						"Property name '" + BROKEN_PATH_WITH_DOTS + "' cannot contain dots."
 				);
