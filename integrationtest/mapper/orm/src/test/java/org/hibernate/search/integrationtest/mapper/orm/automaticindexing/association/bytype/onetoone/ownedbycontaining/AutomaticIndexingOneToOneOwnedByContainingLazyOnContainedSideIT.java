@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -87,6 +88,57 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 	}
 
 	@Override
+	protected boolean includeEmbeddedAssociationsInSchema() {
+		// See https://hibernate.atlassian.net/browse/HHH-15606
+		return false;
+	}
+
+	@Override
+	public void directAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void directAssociationUpdate_embeddedAssociationsNonIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void directEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void directEmbeddedAssociationReplace_embeddedAssociationsNonIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void indirectAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void indirectAssociationUpdate_embeddedAssociationsNonIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void indirectEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	@Override
+	public void indirectEmbeddedAssociationReplace_embeddedAssociationsNonIndexedEmbedded() {
+		notTestedBecauseOfHHH15606();
+	}
+
+	private void notTestedBecauseOfHHH15606() {
+		assumeTrue( "This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606",
+				false );
+	}
+
+	@Override
 	public void setup(OrmSetupHelper.SetupContext setupContext,
 			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
 		super.setup( setupContext, dataClearConfig );
@@ -136,9 +188,6 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
 				"containedIndexedEmbeddedWithCast.indexedField",
-				"embeddedAssociations.containedIndexedEmbedded.indexedField",
-				"embeddedAssociations.containedIndexedEmbedded.indexedElementCollectionField",
-				"embeddedAssociations.containedIndexedEmbedded.containedDerivedField",
 				"elementCollectionAssociations.containedIndexedEmbedded.indexedField",
 				"elementCollectionAssociations.containedIndexedEmbedded.indexedElementCollectionField",
 				"elementCollectionAssociations.containedIndexedEmbedded.containedDerivedField",
@@ -173,10 +222,6 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 		@JoinColumn(name = "CIndexedEmbeddedCast")
 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
 		private Object containedIndexedEmbeddedWithCast;
-
-		@IndexedEmbedded
-		@Embedded
-		private ContainingEmbeddable embeddedAssociations;
 
 		@IndexedEmbedded
 		@ElementCollection
@@ -268,14 +313,6 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
 		}
 
-		public ContainingEmbeddable getEmbeddedAssociations() {
-			return embeddedAssociations;
-		}
-
-		public void setEmbeddedAssociations(ContainingEmbeddable embeddedAssociations) {
-			this.embeddedAssociations = embeddedAssociations;
-		}
-
 		public List<ContainingEmbeddable> getElementCollectionAssociations() {
 			return elementCollectionAssociations;
 		}
@@ -362,7 +399,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 
 			@Override
 			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
-				return PropertyAccessor.create( ContainingEntity::setEmbeddedAssociations, ContainingEntity::getEmbeddedAssociations );
+				throw primitiveNotSupported();
 			}
 
 			@Override
@@ -484,9 +521,6 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 		@OneToOne(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class, fetch = FetchType.LAZY)
 		@LazyGroup("containingAsIndexedEmbeddedWithCast")
 		private Object containingAsIndexedEmbeddedWithCast;
-
-		@Embedded
-		private ContainedEmbeddable embeddedAssociations;
 
 		/*
 		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
@@ -613,14 +647,6 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 
 		public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmbeddedWithCast) {
 			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
-		}
-
-		public ContainedEmbeddable getEmbeddedAssociations() {
-			return embeddedAssociations;
-		}
-
-		public void setEmbeddedAssociations(ContainedEmbeddable embeddedAssociations) {
-			this.embeddedAssociations = embeddedAssociations;
 		}
 
 		public ContainingEntity getContainingAsElementCollectionAssociationsIndexedEmbedded() {
@@ -765,7 +791,7 @@ public class AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT
 
 			@Override
 			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
-				return PropertyAccessor.create( ContainedEntity::setEmbeddedAssociations, ContainedEntity::getEmbeddedAssociations );
+				throw primitiveNotSupported();
 			}
 
 			@Override

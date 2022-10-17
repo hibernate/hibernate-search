@@ -207,6 +207,10 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 
 	protected abstract boolean isAssociationLazyOnContainingSide();
 
+	protected boolean includeEmbeddedAssociationsInSchema() {
+		return true;
+	}
+
 	protected boolean isEmbeddedAssociationChangeCausingWork() {
 		return !isAssociationOwnedByContainedSide() && !isAssociationMultiValuedOnContainingSide();
 	}
@@ -289,15 +293,17 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 								.field( "indexedField", String.class )
 						)
 				)
-				.objectField( "embeddedAssociations", b2 -> b2
-					.objectField( "containedIndexedEmbedded",
-							associationFieldContributor.andThen( b3 -> b3
-									.field( "indexedField", String.class )
-									.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
-									.field( "containedDerivedField", String.class )
-							)
-					)
-				)
+				.with( includeEmbeddedAssociationsInSchema() ? bWith -> bWith
+						.objectField( "embeddedAssociations", b2 -> b2
+								.objectField( "containedIndexedEmbedded",
+										associationFieldContributor.andThen( b3 -> b3
+												.field( "indexedField", String.class )
+												.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
+												.field( "containedDerivedField", String.class )
+										)
+								)
+						)
+						: bWith -> { } )
 				.with( isElementCollectionAssociationsOnContainingSide() ? bWith -> bWith
 						.objectField( "elementCollectionAssociations", b2 -> b2
 								.multiValued( true )
@@ -347,15 +353,17 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 										.field( "indexedField", String.class )
 								)
 						)
-						.objectField( "embeddedAssociations", b2 -> b2
-								.objectField( "containedIndexedEmbedded",
-										associationFieldContributor.andThen( b3 -> b3
-												.field( "indexedField", String.class )
-												.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
-												.field( "containedDerivedField", String.class )
+						.with( includeEmbeddedAssociationsInSchema() ? bWith -> bWith
+								.objectField( "embeddedAssociations", b2 -> b2
+										.objectField( "containedIndexedEmbedded",
+												associationFieldContributor.andThen( b3 -> b3
+														.field( "indexedField", String.class )
+														.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
+														.field( "containedDerivedField", String.class )
+												)
 										)
 								)
-						)
+								: bWith -> { } )
 						.with( isElementCollectionAssociationsOnContainingSide() ? bWith -> bWith
 								.objectField( "elementCollectionAssociations", b2 -> b2
 										.multiValued( true )
