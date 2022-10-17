@@ -1,8 +1,8 @@
 diff --git a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
-index 03f51ca912..a5780a1192 100644
+index 0d3ea20d95..d9db099561 100644
 --- a/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
 +++ b/main/java/org/hibernate/search/util/impl/integrationtest/mapper/orm/ReusableOrmSetupHolder.java
-@@ -448,7 +448,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
+@@ -450,7 +450,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
  		for ( Class<?> entityClass : config.entityClearOrder ) {
  			EntityType<?> entityType;
  			try {
@@ -11,7 +11,7 @@ index 03f51ca912..a5780a1192 100644
  			}
  			catch (IllegalArgumentException e) {
  				// When using annotatedTypes to infer the clear order,
-@@ -465,7 +465,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
+@@ -467,7 +467,7 @@ private void clearDatabase(SessionFactoryImplementor sessionFactory, HibernateOr
  		// we try to delete all remaining entity types.
  		// Note we're stabilizing the order, because ORM uses a HashSet internally
  		// and the order may change from one execution to the next.
@@ -20,7 +20,7 @@ index 03f51ca912..a5780a1192 100644
  				.sorted( Comparator.comparing( EntityType::getName ) )
  				.collect( Collectors.toList() );
  		for ( EntityType<?> entityType : sortedEntityTypes ) {
-@@ -554,6 +554,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
+@@ -556,6 +556,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
  			builder.append( " where type( e ) in (:type)" );
  			typeArg = entityType.getJavaType();
  		}
@@ -28,7 +28,7 @@ index 03f51ca912..a5780a1192 100644
  		Query<?> query = QueryType.SELECT.equals( queryType )
  				? session.createQuery( builder.toString(), entityType.getJavaType() )
  				: session.createQuery( builder.toString() );
-@@ -564,7 +565,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
+@@ -566,7 +567,7 @@ private static Query<?> createSelectOrDeleteAllOfSpecificTypeQuery(EntityType<?>
  	}
  
  	private static boolean hasEntitySubclass(SessionFactory sessionFactory, EntityType<?> parentEntity) {
@@ -37,7 +37,7 @@ index 03f51ca912..a5780a1192 100644
  		for ( EntityType<?> entity : metamodel.getEntities() ) {
  			if ( parentEntity.equals( entity.getSupertype() ) ) {
  				return true;
-@@ -586,7 +587,7 @@ private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor session
+@@ -588,7 +589,7 @@ private static boolean hasPotentiallyJoinTable(SessionFactoryImplementor session
  				case ELEMENT_COLLECTION:
  					return true;
  				case EMBEDDED:

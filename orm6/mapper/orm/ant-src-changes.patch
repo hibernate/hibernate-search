@@ -90,10 +90,10 @@ index d6ed099098..e3fee26f2c 100644
  			}
  		}
 diff --git a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
-index ca9492a6a8..6875a0c582 100644
+index 128fc8cf1a..ed6a3ca1d1 100644
 --- a/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
 +++ b/main/java/org/hibernate/search/mapper/orm/event/impl/HibernateSearchEventListener.java
-@@ -318,7 +318,7 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
+@@ -344,7 +344,7 @@ private void processCollectionEvent(AbstractCollectionEvent event) {
  	 */
  	@Override
  	@SuppressWarnings("deprecation") // Deprecated but abstract, so we have to implement it...
@@ -223,10 +223,10 @@ index 82c86985ab..3abdf72591 100644
  		}
  		else {
 diff --git a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-index 9f1bcb8256..30de76aa99 100644
+index 00903ee7b9..50009c9e37 100644
 --- a/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
 +++ b/main/java/org/hibernate/search/mapper/orm/logging/impl/Log.java
-@@ -246,14 +246,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
+@@ -254,14 +254,10 @@ SearchException foundMultipleEntitiesForDocumentId(String entityName, String doc
  			+ " Currently configured tenant identifiers: %2$s." )
  	SearchException invalidTenantId(String tenantId, Set<String> allTenantIds, String tenantIdsConfigurationPropertyKey);
  
@@ -242,7 +242,7 @@ index 9f1bcb8256..30de76aa99 100644
  			+ " If you want to define the size of batches for entity loading, set loading options when defining the query instead,"
  			+ " for example with .loading(o -> o.fetchSize(50))."
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
-index 17e33f2c15..565a56d897 100644
+index c09968682b..057510b863 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/AbstractHibernateOrmTypeContext.java
 @@ -10,7 +10,7 @@
@@ -254,7 +254,7 @@ index 17e33f2c15..565a56d897 100644
  import org.hibernate.persister.entity.EntityPersister;
  import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
  import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
-@@ -43,8 +43,8 @@
+@@ -45,8 +45,8 @@
  	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
  		this.typeIdentifier = builder.typeIdentifier;
  		this.jpaEntityName = builder.jpaEntityName;
@@ -266,7 +266,7 @@ index 17e33f2c15..565a56d897 100644
  		this.ascendingSuperTypes = builder.ascendingSuperTypes;
  		if ( builder.documentIdSourcePropertyName != null ) {
 diff --git a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
-index 0318ea858d..b2bf030782 100644
+index b24077bcaf..1bee40f7fd 100644
 --- a/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 +++ b/main/java/org/hibernate/search/mapper/orm/mapping/impl/HibernateOrmMappingConfigurationContributor.java
 @@ -59,9 +59,8 @@ public void configure(MappingBuildContext buildContext, PojoMappingConfiguration
@@ -538,41 +538,50 @@ index 77d7b8f982..d03fcba6e2 100644
  		HibernateOrmBasicTypeMetadataProvider build() {
  			return new HibernateOrmBasicTypeMetadataProvider( this );
  		}
-diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java
-index 355980c45a..6489423a9c 100644
---- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java
-+++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathsDefinition.java
-@@ -16,6 +16,7 @@
+diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathDefinitionProvider.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathDefinitionProvider.java
+index 1e978c8d18..e99b682d70 100644
+--- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathDefinitionProvider.java
++++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathDefinitionProvider.java
+@@ -7,7 +7,6 @@
+ package org.hibernate.search.mapper.orm.model.impl;
+ 
+ import java.util.ArrayList;
+-import java.util.Iterator;
+ import java.util.List;
+ 
+ import org.hibernate.mapping.PersistentClass;
+@@ -38,8 +37,7 @@ public HibernateOrmPathDefinitionProvider(PojoRawTypeModel<?> typeModel, Persist
+ 		this.typeModel = typeModel;
+ 		this.persistentClass = persistentClass;
+ 		this.propertyStringRepresentationByOrdinal = new ArrayList<>();
+-		for ( Iterator<Property> iterator = persistentClass.getPropertyClosureIterator(); iterator.hasNext(); ) {
+-			Property property = iterator.next();
++		for ( Property property : persistentClass.getPropertyClosure() ) {
+ 			propertyStringRepresentationByOrdinal.add( property.getName() );
+ 		}
+ 	}
+diff --git a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java
+index 434c1e7bc3..099cee2604 100644
+--- a/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java
++++ b/main/java/org/hibernate/search/mapper/orm/model/impl/HibernateOrmPathInterpreter.java
+@@ -17,6 +17,7 @@
  import org.hibernate.MappingException;
  import org.hibernate.event.spi.PostUpdateEvent;
  import org.hibernate.mapping.Any;
 +import org.hibernate.mapping.BasicValue;
  import org.hibernate.mapping.Component;
+ import org.hibernate.mapping.ManyToOne;
  import org.hibernate.mapping.OneToMany;
- import org.hibernate.mapping.PersistentClass;
-@@ -166,11 +167,9 @@ public HibernateOrmPathsDefinition(PersistentClass persistentClass) {
- 	}
- 
- 	@Override
--	@SuppressWarnings("unchecked")
- 	public List<String> preDefinedOrdinals() {
- 		List<String> preDefinedOrdinals = new ArrayList<>();
--		for ( Iterator<Property> iterator = persistentClass.getPropertyClosureIterator(); iterator.hasNext(); ) {
--			Property property = iterator.next();
-+		for ( Property property : persistentClass.getPropertyClosure() ) {
- 			preDefinedOrdinals.add( property.getName() );
- 		}
- 		return preDefinedOrdinals;
-@@ -252,7 +251,7 @@ private Optional<Value> resolveValueNode(Set<String> pathsAsStrings, PojoModelPa
- 				return Optional.of( baseValue );
+@@ -351,7 +352,7 @@ public Value value(Context context, Property property, PojoModelPathValueNode pa
+ 				return baseValue;
  			}
  		}
 -		else if ( SimpleValue.class.equals( valueClass ) ) { // equals() and not isAssignableFrom(), we mean it.
 +		else if ( BasicValue.class.isAssignableFrom( valueClass ) ) {
- 			pathsAsStrings.add( propertyNode.toPropertyString() );
- 			// The string representation of the path was added, we can stop here
- 			return Optional.empty();
-@@ -309,7 +308,7 @@ private Optional<Value> resolveExtractorPath(Set<String> pathsAsStrings, PojoMod
+ 			// The path as a whole (and not just a prefix) was resolved to a non-component, non-association value
+ 			context.resolvedStringRepresentation( propertyNode.toPropertyString() );
+ 			// We don't need state extraction in this case
+@@ -413,7 +414,7 @@ private Value resolveExtractorPath(Context context, PojoModelPathValueNode path,
  		if ( !extractorNameIterator.hasNext() ) {
  			// We managed to resolve the whole container value extractor list
  			Class<? extends Value> containedValueClass = containedValue.getClass();
@@ -580,7 +589,7 @@ index 355980c45a..6489423a9c 100644
 +			if ( BasicValue.class.isAssignableFrom( containedValueClass )
  					|| Component.class.isAssignableFrom( containedValueClass )
  					|| isWholePath && isAssociation( containedValueClass ) ) {
- 				pathsAsStrings.add( propertyNode.toPropertyString() );
+ 				String stringRepresentationAsProperty = propertyNode.toPropertyString();
 diff --git a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java b/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
 index c8ca89a1e0..f7140b4d52 100644
 --- a/main/java/org/hibernate/search/mapper/orm/search/query/impl/HibernateOrmSearchQueryAdapter.java
