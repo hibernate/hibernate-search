@@ -1,8 +1,377 @@
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java
+index cbd1ace7ae..193d70675f 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/AbstractAutomaticIndexingAssociationBaseIT.java
+@@ -207,6 +207,10 @@ public AbstractAutomaticIndexingAssociationBaseIT(IndexedEntityPrimitives<TIndex
+
+ 	protected abstract boolean isAssociationLazyOnContainingSide();
+
++	protected boolean includeEmbeddedAssociationsInSchema() {
++		return true;
++	}
++
+ 	private boolean isElementCollectionAssociationsOnContainingSide() {
+ 		return !isAssociationOwnedByContainedSide() && !isAssociationMultiValuedOnContainingSide();
+ 	}
+@@ -285,15 +289,17 @@ public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHold
+ 								.field( "indexedField", String.class )
+ 						)
+ 				)
+-				.objectField( "embeddedAssociations", b2 -> b2
+-					.objectField( "containedIndexedEmbedded",
+-							associationFieldContributor.andThen( b3 -> b3
+-									.field( "indexedField", String.class )
+-									.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
+-									.field( "containedDerivedField", String.class )
+-							)
+-					)
+-				)
++				.with( includeEmbeddedAssociationsInSchema() ? bWith -> bWith
++						.objectField( "embeddedAssociations", b2 -> b2
++								.objectField( "containedIndexedEmbedded",
++										associationFieldContributor.andThen( b3 -> b3
++												.field( "indexedField", String.class )
++												.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
++												.field( "containedDerivedField", String.class )
++										)
++								)
++						)
++						: bWith -> { } )
+ 				.with( isElementCollectionAssociationsOnContainingSide() ? bWith -> bWith
+ 						.objectField( "elementCollectionAssociations", b2 -> b2
+ 								.multiValued( true )
+@@ -343,15 +349,17 @@ public void setup(OrmSetupHelper.SetupContext setupContext, ReusableOrmSetupHold
+ 										.field( "indexedField", String.class )
+ 								)
+ 						)
+-						.objectField( "embeddedAssociations", b2 -> b2
+-								.objectField( "containedIndexedEmbedded",
+-										associationFieldContributor.andThen( b3 -> b3
+-												.field( "indexedField", String.class )
+-												.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
+-												.field( "containedDerivedField", String.class )
++						.with( includeEmbeddedAssociationsInSchema() ? bWith -> bWith
++								.objectField( "embeddedAssociations", b2 -> b2
++										.objectField( "containedIndexedEmbedded",
++												associationFieldContributor.andThen( b3 -> b3
++														.field( "indexedField", String.class )
++														.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
++														.field( "containedDerivedField", String.class )
++												)
+ 										)
+ 								)
+-						)
++								: bWith -> { } )
+ 						.with( isElementCollectionAssociationsOnContainingSide() ? bWith -> bWith
+ 								.objectField( "elementCollectionAssociations", b2 -> b2
+ 										.multiValued( true )
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
+index 0a9b28691d..a8dd3aec0f 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontained/AutomaticIndexingOneToOneOwnedByContainedLazyOnContainingSideIT.java
+@@ -6,6 +6,8 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontained;
+
++import static org.junit.Assume.assumeTrue;
++
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Optional;
+@@ -81,6 +83,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+ 		return true;
+ 	}
+
++	@Override
++	protected boolean includeEmbeddedAssociationsInSchema() {
++		// See https://hibernate.atlassian.net/browse/HHH-15606
++		return false;
++	}
++
++	@Override
++	public void directAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void directAssociationUpdate_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void directEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void directEmbeddedAssociationReplace_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectAssociationUpdate_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectEmbeddedAssociationReplace_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	private void notTestedBecauseOfHHH15606() {
++		assumeTrue( "This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606",
++				false );
++	}
++
+ 	@Override
+ 	public void setup(OrmSetupHelper.SetupContext setupContext,
+ 			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+@@ -119,9 +172,6 @@ public static class ContainingEntity {
+ 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
+ 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+ 				"containedIndexedEmbeddedWithCast.indexedField",
+-				"embeddedAssociations.containedIndexedEmbedded.indexedField",
+-				"embeddedAssociations.containedIndexedEmbedded.indexedElementCollectionField",
+-				"embeddedAssociations.containedIndexedEmbedded.containedDerivedField",
+ 				"containedElementCollectionAssociationsIndexedEmbedded.indexedField",
+ 				"containedElementCollectionAssociationsIndexedEmbedded.indexedElementCollectionField",
+ 				"containedElementCollectionAssociationsIndexedEmbedded.containedDerivedField",
+@@ -153,10 +203,6 @@ public static class ContainingEntity {
+ 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
+ 		private Object containedIndexedEmbeddedWithCast;
+
+-		@IndexedEmbedded
+-		@Embedded
+-		private ContainingEmbeddable embeddedAssociations;
+-
+ 		/*
+ 		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
+ 		 * If they do, Hibernate ORM will fail (throw an exception) while attempting to walk down the mappedBy path,
+@@ -266,14 +312,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
+ 			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
+ 		}
+
+-		public ContainingEmbeddable getEmbeddedAssociations() {
+-			return embeddedAssociations;
+-		}
+-
+-		public void setEmbeddedAssociations(ContainingEmbeddable embeddedAssociations) {
+-			this.embeddedAssociations = embeddedAssociations;
+-		}
+-
+ 		public ContainedEntity getContainedElementCollectionAssociationsIndexedEmbedded() {
+ 			return containedElementCollectionAssociationsIndexedEmbedded;
+ 		}
+@@ -374,7 +412,8 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
+
+ 			@Override
+ 			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
+-				return PropertyAccessor.create( ContainingEntity::setEmbeddedAssociations, ContainingEntity::getEmbeddedAssociations );
++				// See https://hibernate.atlassian.net/browse/HHH-15606
++				throw primitiveNotSupported();
+ 			}
+
+ 			@Override
+@@ -501,9 +540,6 @@ public static class ContainedEntity {
+ 		@JoinColumn(name = "CIndexedEmbeddedCast")
+ 		private Object containingAsIndexedEmbeddedWithCast;
+
+-		@Embedded
+-		private ContainedEmbeddable embeddedAssociations;
+-
+ 		@ElementCollection
+ 		@Embedded
+ 		@OrderColumn(name = "idx")
+@@ -608,14 +644,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
+ 			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
+ 		}
+
+-		public ContainedEmbeddable getEmbeddedAssociations() {
+-			return embeddedAssociations;
+-		}
+-
+-		public void setEmbeddedAssociations(ContainedEmbeddable embeddedAssociations) {
+-			this.embeddedAssociations = embeddedAssociations;
+-		}
+-
+ 		public List<ContainedEmbeddable> getElementCollectionAssociations() {
+ 			return elementCollectionAssociations;
+ 		}
+@@ -744,7 +772,8 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
+
+ 			@Override
+ 			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
+-				return PropertyAccessor.create( ContainedEntity::setEmbeddedAssociations, ContainedEntity::getEmbeddedAssociations );
++				// See https://hibernate.atlassian.net/browse/HHH-15606
++				throw primitiveNotSupported();
+ 			}
+
+ 			@Override
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
+index df817fa9b3..4599ad3369 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/automaticindexing/association/bytype/onetoone/ownedbycontaining/AutomaticIndexingOneToOneOwnedByContainingLazyOnContainedSideIT.java
+@@ -6,6 +6,8 @@
+  */
+ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.onetoone.ownedbycontaining;
+
++import static org.junit.Assume.assumeTrue;
++
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Optional;
+@@ -79,6 +81,57 @@ protected boolean isAssociationLazyOnContainingSide() {
+ 		return false;
+ 	}
+
++	@Override
++	protected boolean includeEmbeddedAssociationsInSchema() {
++		// See https://hibernate.atlassian.net/browse/HHH-15606
++		return false;
++	}
++
++	@Override
++	public void directAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void directAssociationUpdate_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void directEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void directEmbeddedAssociationReplace_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectAssociationUpdate_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectAssociationUpdate_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectEmbeddedAssociationReplace_embeddedAssociationsIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	@Override
++	public void indirectEmbeddedAssociationReplace_embeddedAssociationsNonIndexedEmbedded() {
++		notTestedBecauseOfHHH15606();
++	}
++
++	private void notTestedBecauseOfHHH15606() {
++		assumeTrue( "This test is disabled because of https://hibernate.atlassian.net/browse/HHH-15606",
++				false );
++	}
++
+ 	@Override
+ 	public void setup(OrmSetupHelper.SetupContext setupContext,
+ 			ReusableOrmSetupHolder.DataClearConfig dataClearConfig) {
+@@ -118,9 +171,6 @@ public static class ContainingEntity {
+ 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
+ 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+ 				"containedIndexedEmbeddedWithCast.indexedField",
+-				"embeddedAssociations.containedIndexedEmbedded.indexedField",
+-				"embeddedAssociations.containedIndexedEmbedded.indexedElementCollectionField",
+-				"embeddedAssociations.containedIndexedEmbedded.containedDerivedField",
+ 				"elementCollectionAssociations.containedIndexedEmbedded.indexedField",
+ 				"elementCollectionAssociations.containedIndexedEmbedded.indexedElementCollectionField",
+ 				"elementCollectionAssociations.containedIndexedEmbedded.containedDerivedField",
+@@ -156,10 +206,6 @@ public static class ContainingEntity {
+ 		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
+ 		private Object containedIndexedEmbeddedWithCast;
+
+-		@IndexedEmbedded
+-		@Embedded
+-		private ContainingEmbeddable embeddedAssociations;
+-
+ 		@IndexedEmbedded
+ 		@ElementCollection
+ 		@Embedded
+@@ -250,14 +296,6 @@ public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedW
+ 			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
+ 		}
+
+-		public ContainingEmbeddable getEmbeddedAssociations() {
+-			return embeddedAssociations;
+-		}
+-
+-		public void setEmbeddedAssociations(ContainingEmbeddable embeddedAssociations) {
+-			this.embeddedAssociations = embeddedAssociations;
+-		}
+-
+ 		public List<ContainingEmbeddable> getElementCollectionAssociations() {
+ 			return elementCollectionAssociations;
+ 		}
+@@ -344,7 +382,7 @@ public PropertyAccessor<ContainingEntity, ContainedEntity> containedIndexedEmbed
+
+ 			@Override
+ 			public PropertyAccessor<ContainingEntity, ContainingEmbeddable> embeddedAssociations() {
+-				return PropertyAccessor.create( ContainingEntity::setEmbeddedAssociations, ContainingEntity::getEmbeddedAssociations );
++				throw primitiveNotSupported();
+ 			}
+
+ 			@Override
+@@ -461,9 +499,6 @@ public static class ContainedEntity {
+ 		@OneToOne(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class, fetch = FetchType.LAZY)
+ 		private Object containingAsIndexedEmbeddedWithCast;
+
+-		@Embedded
+-		private ContainedEmbeddable embeddedAssociations;
+-
+ 		/*
+ 		 * No mappedBy here. The inverse side of associations within an element collection cannot use mappedBy.
+ 		 * If they do, Hibernate ORM will fail (throw an exception) while attempting to walk down the mappedBy path,
+@@ -587,14 +622,6 @@ public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmb
+ 			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
+ 		}
+
+-		public ContainedEmbeddable getEmbeddedAssociations() {
+-			return embeddedAssociations;
+-		}
+-
+-		public void setEmbeddedAssociations(ContainedEmbeddable embeddedAssociations) {
+-			this.embeddedAssociations = embeddedAssociations;
+-		}
+-
+ 		public ContainingEntity getContainingAsElementCollectionAssociationsIndexedEmbedded() {
+ 			return containingAsElementCollectionAssociationsIndexedEmbedded;
+ 		}
+@@ -737,7 +764,7 @@ public PropertyAccessor<ContainedEntity, ContainingEntity> containingAsIndexedEm
+
+ 			@Override
+ 			public PropertyAccessor<ContainedEntity, ContainedEmbeddable> embeddedAssociations() {
+-				return PropertyAccessor.create( ContainedEntity::setEmbeddedAssociations, ContainedEntity::getEmbeddedAssociations );
++				throw primitiveNotSupported();
+ 			}
+
+ 			@Override
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
-index 52694f380c..adbce15922 100644
+index 33961f27f1..9b54d34961 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/dynamicmap/DynamicMapBaseIT.java
-@@ -124,7 +124,7 @@ public void simple() {
+@@ -126,7 +126,7 @@ public void simple() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -11,7 +380,7 @@ index 52694f380c..adbce15922 100644
  			);
  		} );
  	}
-@@ -184,7 +184,7 @@ public void searchObject() {
+@@ -211,7 +211,7 @@ public void searchObject() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -20,7 +389,7 @@ index 52694f380c..adbce15922 100644
  			);
  		} );
  	}
-@@ -303,7 +303,7 @@ public void nonEntityIdDocumentId() {
+@@ -330,7 +330,7 @@ public void nonEntityIdDocumentId() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -29,7 +398,7 @@ index 52694f380c..adbce15922 100644
  			);
  		} );
  	}
-@@ -390,8 +390,8 @@ public void inheritance() {
+@@ -417,8 +417,8 @@ public void inheritance() {
  			);
  
  			assertThat( query.fetchAllHits() ).containsExactly(
@@ -902,6 +1271,26 @@ index 798418f3a9..bbfc99e232 100644
  				.contains( "_containing_fk_containingidBackref" )
  				.contains( "_containingIndexBackref" );
  
+diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java
+index 0d83f15961..7a71fb282b 100644
+--- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java
++++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/BytecodeEnhancementIT.java
+@@ -275,11 +275,14 @@ public static class IndexedEntitySuperClass extends IndexedMappedSuperClass {
+ 			extends IndexedEntitySuperClass {
+ 		public static final String INDEX = "IndexedEntity";
+
++		// "containedEntityList" is not listed here,
++		// because collection properties are initialized eagerly
++		// (even if the collection themselves are initialized lazily).
++		// See HHH-15473 / https://github.com/hibernate/hibernate-orm/pull/5252
+ 		private static final String[] LAZY_PROPERTY_NAMES = new String[] {
+ 				"mappedSuperClassText",
+ 				"entitySuperClassText",
+ 				"notIndexedText",
+-				"containedEntityList",
+ 				"text1",
+ 				"text2",
+ 				"primitiveInteger",
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
 index d110dbb171..0796b95350 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/model/GenericPropertyIT.java
