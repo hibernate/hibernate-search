@@ -15,7 +15,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
+import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
@@ -1423,6 +1426,99 @@ public class ProjectionConstructorBaseIT {
 					) );
 		}
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void incompatibleProjectionWithExtraPropertiesMissing() {
+		class Author {
+			private Integer id;
+
+			@FullTextField(analyzer = "name", projectable = Projectable.YES)
+			private String firstName;
+
+			@FullTextField(analyzer = "name", projectable = Projectable.YES)
+			private String lastName;
+
+			public Author() {
+			}
+
+			public Author(Integer id, String firstName, String lastName) {
+				this.id = id;
+				this.firstName = firstName;
+				this.lastName = lastName;
+			}
+
+
+		}
+
+		@Indexed(index = Book.INDEX_NAME)
+		class Book {
+			static final String INDEX_NAME = "Book";
+			@DocumentId
+			public Integer id;
+			@FullTextField
+			public String title;
+			@IndexedEmbedded(structure = ObjectStructure.NESTED)
+			public List<Author> authors;
+
+			public Book() {
+			}
+
+			public Book(Integer id, String title, List<Author> authors) {
+				this.id = id;
+				this.title = title;
+				this.authors = authors;
+			}
+
+		}
+
+		@ProjectionConstructor
+		class MyProjectionAuthor {
+			public final String firstName;
+			public final String lastName;
+			// Extra property that is part of projection but is not present in the index.
+			public final String email;
+
+			MyProjectionAuthor(String firstName, String lastName, String email) {
+				this.firstName = firstName;
+				this.lastName = lastName;
+				this.email = email;
+			}
+		}
+		@ProjectionConstructor
+		class MyProjectionBook {
+			public final String title;
+			public final List<MyProjectionAuthor> authors;
+
+			MyProjectionBook(String title, List<MyProjectionAuthor> authors) {
+				this.title = title;
+				this.authors = authors;
+			}
+		}
+
+		backendMock.expectAnySchema( Book.INDEX_NAME );
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedTypes( MyProjectionBook.class )
+				.setup( Book.class );
+
+		try ( SearchSession session = mapping.createSession() ) {
+			assertThatThrownBy( () -> session.search( Book.class )
+					.select( MyProjectionBook.class )
+					.where( f -> f.matchAll() )
+					.fetchAllHits()
+			).isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"Could not apply projection constructor",
+							"Unknown field 'authors.email'",
+							"for parameter #2 in"
+					).hasMessageFindingMatch(
+							// constructor string as per `PojoConstructorModelFormatter`
+							Pattern.quote( MyProjectionAuthor.class.getName() ) + "\\(.+\\)"
+					).hasMessageFindingMatch(
+							// constructor string as per `PojoConstructorModelFormatter`
+							Pattern.quote( MyProjectionBook.class.getName() ) + "\\(.+\\*java\\.util\\.List\\*\\)"
+					);
+		}
 	}
 
 	private <P> void testSuccessfulRootProjection(SearchMapping mapping, Class<?> indexedType, Class<P> projectionType,

@@ -33,6 +33,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoConstructorModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.search.definition.impl.ConstructorProjectionApplicationException;
 import org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.impl.LinkedNode;
@@ -47,6 +48,8 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+
+import static org.hibernate.search.mapper.pojo.search.definition.impl.PojoConstructorProjectionDefinition.ProjectionConstructorPath;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import org.jboss.logging.annotations.Cause;
@@ -757,4 +760,11 @@ public interface Log extends BasicLogger {
 	void failedToCreateImplicitReindexingAssociationInverseSideResolverNode(
 			Map<PojoRawTypeModel<?>, PojoModelPathValueNode> inversePathByInverseType, @FormatWith(EventContextFormatter.class) EventContext context,
 			String causeMessage, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 123,
+			value = "Could not apply projection constructor: %1$s")
+	ConstructorProjectionApplicationException errorApplyingProjectionConstructor(
+			String causeMessage,
+			@Cause Exception cause,
+			@Param ProjectionConstructorPath path);
 }

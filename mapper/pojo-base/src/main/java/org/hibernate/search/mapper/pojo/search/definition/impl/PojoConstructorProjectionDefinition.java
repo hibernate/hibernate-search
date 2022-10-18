@@ -33,22 +33,28 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoMethodParameterModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoConstructorProjectionDefinitionMessages;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.logging.impl.CommaSeparatedClassesFormatter;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueCreateHandle;
 
 public final class PojoConstructorProjectionDefinition<T>
 		implements CompositeProjectionDefinition<T>, ToStringTreeAppendable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final PojoConstructorProjectionDefinitionMessages MESSAGES = PojoConstructorProjectionDefinitionMessages.INSTANCE;
 
+	private final ConstructorIdentifier constructor;
 	private final ValueCreateHandle<? extends T> valueCreateHandle;
 	private final List<InnerProjectionDefinition> innerDefinitions;
 
-	private PojoConstructorProjectionDefinition(ValueCreateHandle<? extends T> valueCreateHandle,
+	private PojoConstructorProjectionDefinition(PojoConstructorModel<T> constructor,
 			List<InnerProjectionDefinition> innerDefinitions) {
-		this.valueCreateHandle = valueCreateHandle;
+		this.constructor = new ConstructorIdentifier( constructor );
+		this.valueCreateHandle = constructor.handle();
 		this.innerDefinitions = innerDefinitions;
 	}
 
@@ -68,11 +74,26 @@ public final class PojoConstructorProjectionDefinition<T>
 	@Override
 	public CompositeProjectionValueStep<?, T> apply(SearchProjectionFactory<?, ?> projectionFactory,
 			CompositeProjectionInnerStep initialStep) {
-		SearchProjection<?>[] innerProjections = new SearchProjection<?>[innerDefinitions.size()];
-		for ( int i = 0; i < innerDefinitions.size(); i++ ) {
-			innerProjections[i] = innerDefinitions.get( i ).create( projectionFactory );
+		int i = -1;
+		try {
+			SearchProjection<?>[] innerProjections = new SearchProjection<?>[innerDefinitions.size()];
+			for ( i = 0; i < innerDefinitions.size(); i++ ) {
+				innerProjections[i] = innerDefinitions.get( i ).create( projectionFactory );
+			}
+			return initialStep.from( innerProjections ).asArray( valueCreateHandle );
 		}
-		return initialStep.from( innerProjections ).asArray( valueCreateHandle );
+		catch (ConstructorProjectionApplicationException e) {
+			// We already know what prevented from applying a projection constructor correctly,
+			// just add a parent constructor and re-throw:
+			ProjectionConstructorPath path = new ProjectionConstructorPath( e.projectionConstructorPath(), i, constructor );
+			throw log.errorApplyingProjectionConstructor(
+					e.getCause().getMessage(), e, path
+			);
+		}
+		catch (SearchException e) {
+			ProjectionConstructorPath path = new ProjectionConstructorPath( constructor );
+			throw log.errorApplyingProjectionConstructor( e.getMessage(), e, path );
+		}
 	}
 
 	static class ConstructorNode<T> implements PojoSearchMappingCollectorConstructorNode {
@@ -131,7 +152,7 @@ public final class PojoConstructorProjectionDefinition<T>
 						new ConstructorParameterNode<>( mappingHelper, this, parameter );
 				innerDefinitions.add( parameterNode.inferInnerProjection() );
 			}
-			collector.accept( new PojoConstructorProjectionDefinition<>( constructor.handle(), innerDefinitions ) );
+			collector.accept( new PojoConstructorProjectionDefinition<>( constructor, innerDefinitions ) );
 		}
 
 		private String getPathFromSameProjectionConstructor(PojoConstructorModel<?> constructorToMatch) {
@@ -262,4 +283,50 @@ public final class PojoConstructorProjectionDefinition<T>
 		}
 	}
 
+	public static class ConstructorIdentifier {
+		private final String name;
+		private final Class<?>[] parametersJavaTypes;
+
+		public ConstructorIdentifier(PojoConstructorModel<?> constructor) {
+			this.name = constructor.typeModel().name();
+			this.parametersJavaTypes = constructor.parametersJavaTypes();
+		}
+
+		public String toHighlightedString(int position) {
+			return name + "(" + CommaSeparatedClassesFormatter.formatHighlighted( parametersJavaTypes, position ) + ")";
+		}
+
+		@Override
+		public String toString() {
+			return toHighlightedString( -1 );
+		}
+	}
+
+	public static class ProjectionConstructorPath {
+		private final ProjectionConstructorPath child;
+		private final int position;
+		private final ConstructorIdentifier constructor;
+
+		public ProjectionConstructorPath(ProjectionConstructorPath child, int position,
+				ConstructorIdentifier constructor) {
+			this.child = child;
+			this.position = position;
+			this.constructor = constructor;
+		}
+
+		public ProjectionConstructorPath(ConstructorIdentifier constructor) {
+			this( null, -1, constructor );
+		}
+
+		public String toPrefixedString() {
+			return "\n" + MESSAGES.executedConstructorPath() + "\n" + this;
+		}
+
+		@Override
+		public String toString() {
+			return child == null ? constructor.toString() :
+					child + "\n\t\u2937 for parameter #" + position + " in " + constructor.toHighlightedString(
+							position );
+		}
+	}
 }
