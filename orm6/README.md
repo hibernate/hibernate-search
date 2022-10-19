@@ -1,11 +1,11 @@
-== ORM 6 integration
+# ORM 6 integration
 
-=== What is this?
+## What is this?
 
 This directory contains modules that provide integration between Hibernate Search and Hibernate ORM 6,
 as well as their integration tests.
 
-=== Where's the source code?
+## Where's the source code?
 
 Modules in this directory are generated from the source code of the main modules.
 
@@ -16,12 +16,12 @@ During the build:
 * Additional patches are applied to the source code for more complex changes
   that are required because of breaking changes in Hibernate ORM 6.
 
-=== What to do if compilation/tests fail?
+## What to do if compilation/tests fail?
 
 You probably need to update patches.
 
 First, check out the branch where all the changes related to Hibernate ORM 6 live:
-https://github.com/yrodiere/hibernate-search/tree/tracking-orm6.0-main
+https://github.com/hibernate/hibernate-search/tree/wip/main/dependency-update/orm6-in-main-code
 
 Then:
 
@@ -36,5 +36,5 @@ Then:
   to the version of ORM 6 that you want to target.
   Copy their SHA somewhere.
 * Checkout the branch where you originally witnessed the compilation failures.
-* Execute `./orm6/extract-patches <first commit SHA>~1..<last commit SHA> from the root of your local git repository.
+* Execute `./orm6/extract-patches <first commit SHA>~1..<last commit SHA>` from the root of your local git repository.
 * Commit the resulting changes.
