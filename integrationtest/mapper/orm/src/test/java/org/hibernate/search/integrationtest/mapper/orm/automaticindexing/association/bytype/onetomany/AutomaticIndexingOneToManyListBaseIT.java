@@ -22,6 +22,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
@@ -117,26 +118,32 @@ public class AutomaticIndexingOneToManyListBaseIT
 		private ContainingEntity child;
 
 		@OneToMany(mappedBy = "containingAsIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@OneToMany(mappedBy = "containingAsNonIndexedEmbedded")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		@OneToMany(mappedBy = "containingAsIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@OneToMany(mappedBy = "containingAsIndexedEmbeddedNoReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@OneToMany(mappedBy = "containingAsUsedInCrossEntityDerivedProperty")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@OneToMany(mappedBy = "containingAsIndexedEmbeddedWithCast", targetEntity = ContainedEntity.class)
+		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
 		private List<Object> containedIndexedEmbeddedWithCast = new ArrayList<>();
 
