@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.work.execution.spi.WorkQueueFullException;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
@@ -530,4 +531,11 @@ public interface Log extends BasicLogger {
 			value = "Unable to resolve field '%1$s': %2$s")
 	SearchException unableToResolveField(String absolutePath, String causeMessage, @Cause SearchException e,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 116, value = "Failed to submit %1$s to work queue: %2$s")
+	SearchException failedToSubmitToQueue(Object work, String causeMessage, @Cause Exception e);
+
+	@Message(id = ID_OFFSET + 117, value = "Work queue is full. Cannot accept %1$s at the moment: %2$s")
+	WorkQueueFullException cannotAcceptMoreWork(Object work, String causeMessage, @Cause Exception e);
+
 }
