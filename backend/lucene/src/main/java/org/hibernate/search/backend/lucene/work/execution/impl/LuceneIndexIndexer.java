@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 public class LuceneIndexIndexer implements IndexIndexer {
 
@@ -40,7 +41,8 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		String id = referenceProvider.identifier();
 		String routingKey = referenceProvider.routingKey();
 
@@ -53,7 +55,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 						referenceProvider.entityIdentifier(), id,
 						indexEntry
 				),
-				commitStrategy, refreshStrategy
+				commitStrategy, refreshStrategy, operationSubmitter
 		);
 	}
 
@@ -61,7 +63,8 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	public CompletableFuture<?> addOrUpdate(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
 			DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
+			DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		String id = referenceProvider.identifier();
 		String routingKey = referenceProvider.routingKey();
 
@@ -74,13 +77,14 @@ public class LuceneIndexIndexer implements IndexIndexer {
 						referenceProvider.entityIdentifier(), id,
 						indexEntry
 				),
-				commitStrategy, refreshStrategy
+				commitStrategy, refreshStrategy, operationSubmitter
 		);
 	}
 
 	@Override
 	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		String id = referenceProvider.identifier();
 		String routingKey = referenceProvider.routingKey();
 		return submit(
@@ -89,12 +93,13 @@ public class LuceneIndexIndexer implements IndexIndexer {
 						tenantId, indexManagerContext.mappedTypeName(),
 						referenceProvider.entityIdentifier(), id
 				),
-				commitStrategy, refreshStrategy
+				commitStrategy, refreshStrategy, operationSubmitter
 		);
 	}
 
 	private <T> CompletableFuture<T> submit(String documentId, String routingKey, IndexingWork<T> work,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		// Route the work to the appropriate shard
 		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.indexingOrchestrator( documentId, routingKey );
 

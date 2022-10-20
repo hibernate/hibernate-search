@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceP
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
@@ -34,7 +35,8 @@ public class StubIndexIndexer implements IndexIndexer {
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
@@ -53,7 +55,8 @@ public class StubIndexIndexer implements IndexIndexer {
 	@Override
 	public CompletableFuture<?> addOrUpdate(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
@@ -71,7 +74,8 @@ public class StubIndexIndexer implements IndexIndexer {
 
 	@Override
 	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.DELETE )
 				.tenantIdentifier( sessionContext.tenantIdentifier() )
 				.identifier( referenceProvider.identifier() )

@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
@@ -47,7 +48,8 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 	}
 
 	CompletableFuture<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
@@ -65,11 +67,13 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 				currentRoute.routingKey(), identifier );
 		return delegate.add( referenceProvider,
 				typeContext.toDocumentContributor( sessionContext, this, identifier, entitySupplier ),
-				commitStrategy, refreshStrategy );
+				commitStrategy, refreshStrategy, operationSubmitter
+		);
 	}
 
 	CompletableFuture<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
@@ -100,7 +104,8 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 	}
 
 	CompletableFuture<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
@@ -124,7 +129,8 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 	}
 
 	CompletableFuture<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter) {
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, null );
 
 		// Purge: entity is not available and we can't route according to its state.

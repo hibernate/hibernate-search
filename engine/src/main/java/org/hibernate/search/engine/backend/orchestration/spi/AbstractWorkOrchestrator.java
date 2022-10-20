@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -116,13 +117,13 @@ public abstract class AbstractWorkOrchestrator<W> {
 
 	protected abstract void doStart(ConfigurationPropertySource propertySource);
 
-	protected abstract void doSubmit(W work) throws InterruptedException;
+	protected abstract void doSubmit(W work, OperationSubmitter operationSubmitter) throws InterruptedException;
 
 	protected abstract CompletableFuture<?> completion();
 
 	protected abstract void doStop();
 
-	public final void submit(W work) {
+	public final void submit(W work, OperationSubmitter operationSubmitter) {
 		if ( !lifecycleLock.readLock().tryLock() ) {
 			// The orchestrator is starting, pre-stopping or stopping: abort.
 			throw log.submittedWorkToStoppedOrchestrator( name );
@@ -132,7 +133,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 				// The orchestrator is stopping or stopped: abort.
 				throw log.submittedWorkToStoppedOrchestrator( name );
 			}
-			doSubmit( work );
+			doSubmit( work, operationSubmitter );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();

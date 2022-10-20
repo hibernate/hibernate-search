@@ -50,7 +50,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 		return Futures.create( () -> beforeExecute( executionContext, request ) )
 				.thenCompose( ignored -> executionContext.getClient().submit( request ) )
 				.exceptionally( Futures.handler( throwable -> {
-					// if we already have a SearchExececption, throw that,
+					// if we already have a SearchException, throw that,
 					// since it will be more specific
 					if ( throwable instanceof SearchException ) {
 						throw (SearchException) throwable;

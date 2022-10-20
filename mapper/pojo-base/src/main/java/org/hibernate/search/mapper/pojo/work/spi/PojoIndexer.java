@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 
@@ -40,11 +41,28 @@ public interface PojoIndexer {
 	 * @param entity The entity to add to the index.
 	 * @param commitStrategy How to handle the commit.
 	 * @param refreshStrategy How to handle the refresh.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
 	CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
+
+	/**
+	 * @see #add(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)
+	 * @deprecated Use {@link #add(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
+	 * instead.
+	 */
+	@Deprecated
+	default CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return add(
+				typeIdentifier, providedId, providedRoutes, entity, commitStrategy, refreshStrategy,
+				OperationSubmitter.DEFAULT
+		);
+	}
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -61,11 +79,28 @@ public interface PojoIndexer {
 	 * @param entity The entity to update in the index.
 	 * @param commitStrategy How to handle the commit.
 	 * @param refreshStrategy How to handle the refresh.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
 	CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
+
+	/**
+	 * @see #addOrUpdate(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)
+	 * @deprecated Use {@link #addOrUpdate(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
+	 * instead.
+	 */
+	@Deprecated
+	default CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return addOrUpdate(
+				typeIdentifier, providedId, providedRoutes, entity, commitStrategy, refreshStrategy,
+				OperationSubmitter.DEFAULT
+		);
+	}
 
 	/**
 	 * Delete an entity from the index.
@@ -84,11 +119,28 @@ public interface PojoIndexer {
 	 * @param entity The entity to delete from the index.
 	 * @param commitStrategy How to handle the commit.
 	 * @param refreshStrategy How to handle the refresh.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
 	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes, Object entity,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
+
+	/**
+	 * @see #delete(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)
+	 * @deprecated Use {@link #delete(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
+	 * instead.
+	 */
+	@Deprecated
+	default CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return delete(
+				typeIdentifier, providedId, providedRoutes, entity, commitStrategy, refreshStrategy,
+				OperationSubmitter.DEFAULT
+		);
+	}
 
 	/**
 	 * Purge an entity from the index.
@@ -104,10 +156,28 @@ public interface PojoIndexer {
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param commitStrategy How to handle the commit.
 	 * @param refreshStrategy How to handle the refresh.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
 	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			DocumentRoutesDescriptor providedRoutes,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			OperationSubmitter operationSubmitter);
+
+	/**
+	 * @see #delete(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)
+	 * @deprecated Use {@link #delete(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, DocumentCommitStrategy, DocumentRefreshStrategy, OperationSubmitter)}
+	 * instead.
+	 */
+	@Deprecated
+	default CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy
+	) {
+		return delete(
+				typeIdentifier, providedId, providedRoutes, commitStrategy, refreshStrategy,
+				OperationSubmitter.DEFAULT
+		);
+	}
 
 }

@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -101,19 +102,27 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	}
 
 	/**
+	 * @deprecated Use {@link #submit(BatchedWork, OperationSubmitter)} instead.
+	 */
+	@Deprecated
+	public void submit(BatchedWork<? super P> work) throws InterruptedException {
+		submit( work, OperationSubmitter.DEFAULT );
+	}
+
+	/**
 	 * Submit a work for execution.
 	 * <p>
 	 * Must not be called when the executor is stopped.
 	 * @param work A work to execute.
 	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
-	public void submit(BatchedWork<? super P> work) throws InterruptedException {
+	public void submit(BatchedWork<? super P> work, OperationSubmitter operationSubmitter) throws InterruptedException {
 		if ( processingTask == null ) {
 			throw new AssertionFailure(
 					"Attempt to submit a work to executor '" + name + "', which is stopped."
 			);
 		}
-		workQueue.put( work );
+		operationSubmitter.submitToQueue( workQueue, work );
 		processingTask.ensureScheduled();
 	}
 
