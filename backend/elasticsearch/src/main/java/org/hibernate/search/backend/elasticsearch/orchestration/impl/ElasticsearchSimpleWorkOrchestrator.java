@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 public class ElasticsearchSimpleWorkOrchestrator
@@ -36,7 +37,7 @@ public class ElasticsearchSimpleWorkOrchestrator
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> work) {
+	protected void doSubmit(WorkExecution<?> work, OperationSubmitter ignore) {
 		work.execute( executionContext );
 	}
 

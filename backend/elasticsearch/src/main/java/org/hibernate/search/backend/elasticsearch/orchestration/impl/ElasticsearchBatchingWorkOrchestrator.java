@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -106,8 +107,8 @@ public class ElasticsearchBatchingWorkOrchestrator
 	}
 
 	@Override
-	protected void doSubmit(ElasticsearchBatchedWork<?> work) throws InterruptedException {
-		executors.get( work.getQueuingKey() ).submit( work );
+	protected void doSubmit(ElasticsearchBatchedWork<?> work, OperationSubmitter operationSubmitter) throws InterruptedException {
+		executors.get( work.getQueuingKey() ).submit( work, operationSubmitter );
 	}
 
 	@Override

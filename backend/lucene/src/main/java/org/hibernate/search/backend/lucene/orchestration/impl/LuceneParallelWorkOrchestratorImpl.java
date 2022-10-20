@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -58,7 +59,7 @@ public class LuceneParallelWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> workExecution) {
+	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter ignore) {
 		executor.submit( workExecution );
 	}
 

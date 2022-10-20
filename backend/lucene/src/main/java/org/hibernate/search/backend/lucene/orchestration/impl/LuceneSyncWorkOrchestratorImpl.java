@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManager
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.backend.lucene.work.impl.ReadWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -82,7 +83,7 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> work) {
+	protected void doSubmit(WorkExecution<?> work, OperationSubmitter ignore) {
 		work.execute();
 	}
 
