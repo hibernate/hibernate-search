@@ -9,14 +9,36 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+
 public interface PojoScopeWorkspace {
 
-	CompletableFuture<?> mergeSegments();
+	@Deprecated
+	default CompletableFuture<?> mergeSegments() {
+		return mergeSegments( OperationSubmitter.DEFAULT );
+	}
 
-	CompletableFuture<?> purge(Set<String> routingKeys);
+	CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> flush();
+	@Deprecated
+	default CompletableFuture<?> purge(Set<String> routingKeys) {
+		return purge( routingKeys, OperationSubmitter.DEFAULT );
+	}
 
-	CompletableFuture<?> refresh();
+	CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter);
+
+	@Deprecated
+	default CompletableFuture<?> flush() {
+		return flush( OperationSubmitter.DEFAULT );
+	}
+
+	CompletableFuture<?> flush(OperationSubmitter operationSubmitter);
+
+	@Deprecated
+	default CompletableFuture<?> refresh() {
+		return refresh( OperationSubmitter.DEFAULT );
+	}
+
+	CompletableFuture<?> refresh(OperationSubmitter operationSubmitter);
 
 }

@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
@@ -28,31 +29,34 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> mergeSegments() {
-		return doOperationOnTypes( IndexWorkspace::mergeSegments );
+	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter) {
+		return doOperationOnTypes( IndexWorkspace::mergeSegments, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Set<String> routingKeys) {
-		return doOperationOnTypes( indexWorkspace -> indexWorkspace.purge( routingKeys ) );
+	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypes( (indexWorkspace, submitter) -> indexWorkspace.purge( routingKeys, submitter ), operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> flush() {
-		return doOperationOnTypes( IndexWorkspace::flush );
+	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter) {
+		return doOperationOnTypes( IndexWorkspace::flush, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> refresh() {
-		return doOperationOnTypes( IndexWorkspace::refresh );
+	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter) {
+		return doOperationOnTypes( IndexWorkspace::refresh, operationSubmitter );
 	}
 
-	private CompletableFuture<?> doOperationOnTypes(Function<IndexWorkspace, CompletableFuture<?>> operation) {
+	private CompletableFuture<?> doOperationOnTypes(
+			BiFunction<IndexWorkspace, OperationSubmitter,
+			CompletableFuture<?>> operation,
+			OperationSubmitter operationSubmitter) {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[delegates.size()];
 		int typeCounter = 0;
 
 		for ( IndexWorkspace delegate : delegates ) {
-			futures[typeCounter++] = operation.apply( delegate );
+			futures[typeCounter++] = operation.apply( delegate, operationSubmitter );
 		}
 
 		// TODO HSEARCH-3110 use a FailureHandler here?
