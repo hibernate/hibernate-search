@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -28,7 +29,7 @@ public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperati
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.refresh();
+		return workspace.refresh( OperationSubmitterType.REJECTING_EXECUTION_EXCEPTION );
 	}
 
 	@Override

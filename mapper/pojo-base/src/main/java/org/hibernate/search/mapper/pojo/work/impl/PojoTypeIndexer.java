@@ -83,7 +83,7 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
 		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),
-				identifier, commitStrategy, refreshStrategy );
+				identifier, commitStrategy, refreshStrategy, operationSubmitter );
 
 		if ( routes.currentRoute() == null ) {
 			// The routing bridge decided the entity should not be indexed.
@@ -99,7 +99,7 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		return deletePreviousFuture.thenCombine(
 				delegate.addOrUpdate( referenceProvider,
 						typeContext.toDocumentContributor( sessionContext, this, identifier, entitySupplier ),
-						commitStrategy, refreshStrategy ),
+						commitStrategy, refreshStrategy, operationSubmitter ),
 				(deletePreviousResult, updateResult) -> updateResult );
 	}
 
@@ -115,7 +115,7 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
 		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),
-				identifier, commitStrategy, refreshStrategy );
+				identifier, commitStrategy, refreshStrategy, operationSubmitter );
 
 		if ( routes.currentRoute() == null ) {
 			// The routing bridge decided the entity should not be indexed.
@@ -124,7 +124,7 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		}
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				routes.currentRoute().routingKey(), identifier );
-		return deletePreviousFuture.thenCombine( delegate.delete( referenceProvider, commitStrategy, refreshStrategy ),
+		return deletePreviousFuture.thenCombine( delegate.delete( referenceProvider, commitStrategy, refreshStrategy, operationSubmitter ),
 				(deletePreviousResult, deleteResult) -> deleteResult );
 	}
 
@@ -140,16 +140,16 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
 		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),
-				identifier, commitStrategy, refreshStrategy );
+				identifier, commitStrategy, refreshStrategy, operationSubmitter );
 
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				routes.currentRoute().routingKey(), identifier );
-		return deletePreviousFuture.thenCombine( delegate.delete( referenceProvider, commitStrategy, refreshStrategy ),
+		return deletePreviousFuture.thenCombine( delegate.delete( referenceProvider, commitStrategy, refreshStrategy, operationSubmitter ),
 				(deletePreviousResult, deleteResult) -> deleteResult );
 	}
 
 	private CompletableFuture<?> deletePrevious(String documentIdentifier, Collection<DocumentRouteDescriptor> previousRoutes,
-			I identifier, DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			I identifier, DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, OperationSubmitter operationSubmitter) {
 		if ( previousRoutes.isEmpty() ) {
 			return CompletableFuture.completedFuture( null );
 		}
@@ -158,7 +158,7 @@ public class PojoTypeIndexer<I, E> implements PojoIndexingProcessorRootContext {
 		for ( DocumentRouteDescriptor route : previousRoutes ) {
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 					route.routingKey(), identifier );
-			futures[i++] = delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
+			futures[i++] = delegate.delete( referenceProvider, commitStrategy, refreshStrategy, operationSubmitter );
 		}
 		return CompletableFuture.allOf( futures );
 	}

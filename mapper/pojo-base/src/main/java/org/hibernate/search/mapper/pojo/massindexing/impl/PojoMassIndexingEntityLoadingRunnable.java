@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -207,7 +208,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 				PojoRawTypeIdentifier<?> typeIdentifier = detectTypeIdentifier( sessionContext, entity );
 				future = indexer.add( typeIdentifier, null, null, entity,
 						// Commit and refresh are handled globally after all documents are indexed.
-						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitterType.BLOCKING
+				);
 			}
 			catch (RuntimeException e) {
 				future = new CompletableFuture<>();

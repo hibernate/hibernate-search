@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
@@ -99,7 +100,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.addOrUpdate( referenceProvider( "1" ), document -> {
@@ -115,7 +116,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.delete( referenceProvider( "1" ) );
@@ -128,7 +129,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 		clientSpy.verifyExpectationsMet();
 	}
 
@@ -153,7 +154,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.addOrUpdate( referenceProvider( "1", routingKey ), document -> {
@@ -170,7 +171,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 		clientSpy.verifyExpectationsMet();
 
 		plan.delete( referenceProvider( "1", routingKey ) );
@@ -184,7 +185,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 		clientSpy.verifyExpectationsMet();
 	}
 

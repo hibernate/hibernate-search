@@ -195,7 +195,7 @@ public interface PojoIndexingPlan {
 	 */
 	@Deprecated
 	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory){
+			EntityReferenceFactory<R> entityReferenceFactory) {
 		return executeAndReport( entityReferenceFactory, OperationSubmitter.DEFAULT );
 	}
 

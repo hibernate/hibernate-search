@@ -14,15 +14,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexerAgent;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContextMessages;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)
@@ -111,9 +112,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		}
 
 		if ( purgeAtStart ) {
-			Futures.unwrappedExceptionGet( scopeWorkspace.purge( Collections.emptySet() ) );
+			Futures.unwrappedExceptionGet( scopeWorkspace.purge( Collections.emptySet(), OperationSubmitterType.BLOCKING ) );
 			if ( mergeSegmentsAfterPurge ) {
-				Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
+				Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments( OperationSubmitterType.BLOCKING ) );
 			}
 		}
 	}
@@ -153,7 +154,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	 */
 	private void afterBatch() throws InterruptedException {
 		if ( mergeSegmentsOnFinish ) {
-			Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
+			Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments( OperationSubmitterType.BLOCKING ) );
 		}
 		flushAndRefresh();
 		Futures.unwrappedExceptionGet( agent.preStop() );
@@ -162,8 +163,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	}
 
 	private void flushAndRefresh() throws InterruptedException {
-		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
-		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
+		Futures.unwrappedExceptionGet( scopeWorkspace.flush( OperationSubmitterType.BLOCKING ) );
+		Futures.unwrappedExceptionGet( scopeWorkspace.refresh( OperationSubmitterType.BLOCKING ) );
 	}
 
 	@Override

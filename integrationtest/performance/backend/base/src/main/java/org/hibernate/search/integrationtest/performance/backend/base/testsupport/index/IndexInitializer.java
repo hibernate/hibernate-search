@@ -16,6 +16,7 @@ import java.util.stream.LongStream;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
@@ -73,12 +74,13 @@ public class IndexInitializer {
 			CompletableFuture<?> future = indexer.add(
 					StubMapperUtils.referenceProvider( String.valueOf( id ) ),
 					document -> dataset.populate( index, document, id, 0L ),
-					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+					OperationSubmitterType.BLOCKING
 			);
 			futures.add( future );
 		} );
 		CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
-		workspace.flush().join();
+		workspace.flush( OperationSubmitterType.BLOCKING ).join();
 
 		log( index, " ... added " + futures.size() + " documents to the index." );
 	}
@@ -87,7 +89,7 @@ public class IndexInitializer {
 		log( index, "Starting index initialization..." );
 		log( index, "Purging..." );
 		IndexWorkspace workspace = index.createWorkspace();
-		workspace.purge( Collections.emptySet() ).join();
+		workspace.purge( Collections.emptySet(), OperationSubmitterType.BLOCKING ).join();
 		log( index, "Finished purge." );
 
 		addToIndex( index, idStream );

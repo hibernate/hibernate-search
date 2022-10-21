@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -258,7 +259,7 @@ public class FieldTemplateIT {
 				document -> initDocument( document, "parent.foo",
 						"matchedValue", "notMatchedValue1", "notMatchedValue2"
 				),
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, OperationSubmitterType.BLOCKING
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

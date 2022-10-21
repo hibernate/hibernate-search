@@ -14,7 +14,9 @@ import java.util.Collections;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -27,7 +29,7 @@ import org.junit.Test;
 
 /**
  * Verify that the work executor operations:
- * {@link IndexWorkspace#mergeSegments()}, {@link IndexWorkspace#purge(java.util.Set)}, {@link IndexWorkspace#flush()}, {@link IndexWorkspace#refresh()}
+ * {@link IndexWorkspace#mergeSegments(OperationSubmitter)}, {@link IndexWorkspace#purge(java.util.Set, OperationSubmitter)}, {@link IndexWorkspace#flush(OperationSubmitter)}, {@link IndexWorkspace#refresh(OperationSubmitter)}
  * work properly, in every backends.
  */
 public class IndexWorkspaceIT {
@@ -58,16 +60,16 @@ public class IndexWorkspaceIT {
 		IndexWorkspace workspace = index.createWorkspace();
 		createBookIndexes( noTenantSessionContext );
 
-		workspace.refresh().join();
+		workspace.refresh( OperationSubmitterType.BLOCKING ).join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
-		workspace.mergeSegments().join();
+		workspace.mergeSegments( OperationSubmitterType.BLOCKING ).join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		// purge without providing a tenant
-		workspace.purge( Collections.emptySet() ).join();
-		workspace.flush().join();
-		workspace.refresh().join();
+		workspace.purge( Collections.emptySet(), OperationSubmitterType.BLOCKING ).join();
+		workspace.flush( OperationSubmitterType.BLOCKING ).join();
+		workspace.refresh( OperationSubmitterType.BLOCKING ).join();
 
 		assertBookNumberIsEqualsTo( 0, noTenantSessionContext );
 	}
@@ -83,18 +85,18 @@ public class IndexWorkspaceIT {
 
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
-		workspace.refresh().join();
+		workspace.refresh( OperationSubmitterType.BLOCKING ).join();
 
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workspace.mergeSegments().join();
+		workspace.mergeSegments( OperationSubmitterType.BLOCKING ).join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workspace.purge( Collections.emptySet() ).join();
-		workspace.flush().join();
-		workspace.refresh().join();
+		workspace.purge( Collections.emptySet(), OperationSubmitterType.BLOCKING ).join();
+		workspace.flush( OperationSubmitterType.BLOCKING ).join();
+		workspace.refresh( OperationSubmitterType.BLOCKING ).join();
 
 		// check that only TENANT_1 is affected by the purge
 		assertBookNumberIsEqualsTo( 0, tenant1SessionContext );

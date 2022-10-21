@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -21,7 +22,7 @@ public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleO
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.mergeSegments();
+		return workspace.mergeSegments( OperationSubmitterType.REJECTING_EXECUTION_EXCEPTION );
 	}
 
 	@Override

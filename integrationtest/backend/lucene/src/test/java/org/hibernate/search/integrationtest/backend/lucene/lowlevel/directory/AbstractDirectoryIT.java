@@ -14,6 +14,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -52,7 +53,7 @@ public abstract class AbstractDirectoryIT {
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( index.binding().string, "text 3" );
 		} );
-		plan.execute().join();
+		plan.execute( OperationSubmitterType.BLOCKING ).join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

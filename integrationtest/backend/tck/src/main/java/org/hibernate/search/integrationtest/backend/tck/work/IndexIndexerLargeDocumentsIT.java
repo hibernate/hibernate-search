@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -97,7 +98,7 @@ public class IndexIndexerLargeDocumentsIT {
 
 		indexAndWait( count, valueProvider, operation );
 
-		index.createWorkspace().refresh().join();
+		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
 
 		assertThatQuery( index.query()
 				.where( f -> f.matchAll() ) )
@@ -152,7 +153,7 @@ public class IndexIndexerLargeDocumentsIT {
 			public CompletableFuture<?> apply(IndexIndexer indexer, DocumentReferenceProvider referenceProvider,
 					DocumentContributor documentContributor) {
 				return indexer.add( referenceProvider, documentContributor,
-						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitterType.BLOCKING );
 			}
 		},
 		ADD_OR_UPDATE {
@@ -160,7 +161,7 @@ public class IndexIndexerLargeDocumentsIT {
 			public CompletableFuture<?> apply(IndexIndexer indexer, DocumentReferenceProvider referenceProvider,
 					DocumentContributor documentContributor) {
 				return indexer.addOrUpdate( referenceProvider, documentContributor,
-						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, OperationSubmitterType.BLOCKING
 				);
 			}
 		};

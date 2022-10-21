@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
@@ -142,7 +143,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		}
 
 		// Do not return until works are *actually* executed
-		Futures.unwrappedExceptionJoin( indexingPlan.execute() );
+		Futures.unwrappedExceptionJoin( indexingPlan.execute( OperationSubmitterType.BLOCKING ) );
 
 		counters.write += 3 * worksPerTypePerWritePlan;
 
