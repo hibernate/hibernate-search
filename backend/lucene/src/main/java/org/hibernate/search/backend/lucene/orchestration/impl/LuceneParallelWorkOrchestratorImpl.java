@@ -38,8 +38,8 @@ public class LuceneParallelWorkOrchestratorImpl
 	}
 
 	@Override
-	public <T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work) {
-		submit( new WorkExecution<>( future, work, context ) );
+	public <T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work, OperationSubmitter operationSubmitter) {
+		submit( new WorkExecution<>( future, work, context ), operationSubmitter );
 	}
 
 	@Override

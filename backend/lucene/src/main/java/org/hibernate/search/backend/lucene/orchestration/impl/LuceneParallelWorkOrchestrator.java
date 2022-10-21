@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 /**
  * A thread-safe component planning the execution of works
@@ -26,13 +27,13 @@ import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
  */
 public interface LuceneParallelWorkOrchestrator {
 
-	default <T> CompletableFuture<T> submit(IndexManagementWork<T> work) {
+	default <T> CompletableFuture<T> submit(IndexManagementWork<T> work, OperationSubmitter operationSubmitter) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( future, work );
+		submit( future, work, operationSubmitter );
 		return future;
 	}
 
-	<T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work);
+	<T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work, OperationSubmitter operationSubmitter);
 
 	/**
 	 * Force a commit immediately.

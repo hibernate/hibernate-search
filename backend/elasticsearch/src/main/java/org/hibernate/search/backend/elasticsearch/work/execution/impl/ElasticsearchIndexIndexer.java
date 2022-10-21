@@ -70,7 +70,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 				// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 				.refresh( refreshStrategy )
 				.build();
-		return orchestrator.submit( work );
+		return orchestrator.submit( work, operationSubmitter );
 	}
 
 	private CompletableFuture<?> index(DocumentReferenceProvider referenceProvider,
@@ -91,6 +91,6 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 				// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 				.refresh( refreshStrategy )
 				.build();
-		return orchestrator.submit( work );
+		return orchestrator.submit( work, operationSubmitter );
 	}
 }

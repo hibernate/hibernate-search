@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
@@ -28,7 +29,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> mergeSegments() {
+	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.MERGE_SEGMENTS )
 				// In a real-world backend the operation would cross tenants,
 				// because that doesn't matter,
@@ -40,7 +41,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Set<String> routingKeys) {
+	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.PURGE )
 				.tenantIdentifier( sessionContext.tenantIdentifier() )
 				.routingKeys( routingKeys )
@@ -49,7 +50,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> flush() {
+	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.FLUSH )
 				// In a real-world backend the operation would cross tenants,
 				// because that doesn't matter,
@@ -61,7 +62,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> refresh() {
+	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.REFRESH )
 				// In a real-world backend the operation would cross tenants,
 				// because that doesn't matter,

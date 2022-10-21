@@ -127,7 +127,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 			futureForCaller = futureForOrchestrator;
 		}
 
-		orchestrator.submit( futureForOrchestrator, work );
+		orchestrator.submit( futureForOrchestrator, work, operationSubmitter );
 
 		return futureForCaller;
 	}
