@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -61,9 +62,10 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().text, "text1" ),
 				DocumentCommitStrategy.NONE,
-				DocumentRefreshStrategy.NONE
+				DocumentRefreshStrategy.NONE,
+				OperationSubmitterType.BLOCKING
 		).join();
-		workspace.refresh().join();
+		workspace.refresh( OperationSubmitterType.BLOCKING ).join();
 
 		SearchQuery<DocumentReference> text1Query = index
 				.createScope().query()
@@ -97,9 +99,10 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().text, "text2" ),
 				DocumentCommitStrategy.NONE,
-				DocumentRefreshStrategy.NONE
+				DocumentRefreshStrategy.NONE,
+				OperationSubmitterType.BLOCKING
 		).join();
-		workspace.refresh().join();
+		workspace.refresh( OperationSubmitterType.BLOCKING ).join();
 
 		// Search queries are unaffected: text == "text1"
 		assertThatQuery( text1Query ).hasTotalHitCount( 1 );

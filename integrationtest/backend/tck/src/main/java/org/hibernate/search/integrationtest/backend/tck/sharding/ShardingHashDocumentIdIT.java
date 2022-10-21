@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -104,10 +105,10 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 		Iterator<String> iterator = docIds.iterator();
 		String someDocumentId = iterator.next();
 
-		index.createWorkspace().purge( Collections.singleton( someDocumentId ) ).join();
+		index.createWorkspace().purge( Collections.singleton( someDocumentId ), OperationSubmitterType.BLOCKING ).join();
 
 		// One or more explicit routing key => no document should be purged, since no documents was indexed with that routing key.
-		index.createWorkspace().refresh().join();
+		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.hasSize( TOTAL_DOCUMENT_COUNT )

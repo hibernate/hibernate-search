@@ -25,6 +25,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
@@ -92,7 +93,7 @@ public class BatchingExecutorTest {
 		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock );
+		executor.submit( work1Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -114,7 +115,7 @@ public class BatchingExecutorTest {
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock );
+		executor.submit( work1Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -127,8 +128,8 @@ public class BatchingExecutorTest {
 		// Submit other works before the first batch ends
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work2Mock );
-		executor.submit( work3Mock );
+		executor.submit( work2Mock, OperationSubmitterType.BLOCKING );
+		executor.submit( work3Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -172,7 +173,7 @@ public class BatchingExecutorTest {
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock );
+		executor.submit( work1Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -203,7 +204,7 @@ public class BatchingExecutorTest {
 		Runnable unblockExecutorSwitch = blockExecutor();
 
 		StubWork work1Mock = workMock( 1 );
-		executor.submit( work1Mock );
+		executor.submit( work1Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -243,9 +244,9 @@ public class BatchingExecutorTest {
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work1Mock );
-		executor.submit( work2Mock );
-		executor.submit( work3Mock );
+		executor.submit( work1Mock, OperationSubmitterType.BLOCKING );
+		executor.submit( work2Mock, OperationSubmitterType.BLOCKING );
+		executor.submit( work3Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -283,8 +284,8 @@ public class BatchingExecutorTest {
 
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
-		executor.submit( work1Mock );
-		executor.submit( work2Mock );
+		executor.submit( work1Mock, OperationSubmitterType.BLOCKING );
+		executor.submit( work2Mock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -333,7 +334,7 @@ public class BatchingExecutorTest {
 		StubWork blockingWorkMock = workMock( 0 );
 		CompletableFuture<Object> blockingBatchFuture = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) blockingBatchFuture );
-		executor.submit( blockingWorkMock );
+		executor.submit( blockingWorkMock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( blockingWorkMock ).submitTo( processorMock );
@@ -393,7 +394,7 @@ public class BatchingExecutorTest {
 		StubWork workMock = workMock( 42 );
 		CompletableFuture<Object> batchFuture = CompletableFuture.completedFuture( null );
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batchFuture );
-		executor.submit( workMock );
+		executor.submit( workMock, OperationSubmitterType.BLOCKING );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( workMock ).submitTo( processorMock );

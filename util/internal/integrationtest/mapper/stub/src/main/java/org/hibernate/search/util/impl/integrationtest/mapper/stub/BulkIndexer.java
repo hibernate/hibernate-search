@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -117,7 +118,7 @@ public class BulkIndexer {
 		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
 		if ( refresh ) {
 			IndexWorkspace workspace = indexManager.createWorkspace( sessionContext );
-			future = future.thenCompose( ignored -> workspace.refresh() );
+			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitterType.BLOCKING ) );
 		}
 		return future;
 	}
@@ -144,7 +145,8 @@ public class BulkIndexer {
 					StubDocumentProvider documentProvider = batch.get( i );
 					batchFutures[i] = indexer.add(
 							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
-							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+							OperationSubmitterType.BLOCKING
 					);
 				}
 				return CompletableFuture.allOf( batchFutures );
