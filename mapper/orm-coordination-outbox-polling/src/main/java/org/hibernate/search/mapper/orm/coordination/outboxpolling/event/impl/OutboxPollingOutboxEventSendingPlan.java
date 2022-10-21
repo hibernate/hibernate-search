@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.avro.impl.EventPayloadSerializationUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -54,7 +55,7 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter ignore) {
 		if ( session.isOpen() ) {
 			return sendAndReportOnSession( session, entityReferenceFactory );
 		}

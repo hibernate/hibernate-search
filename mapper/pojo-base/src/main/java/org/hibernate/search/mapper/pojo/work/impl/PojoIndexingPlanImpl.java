@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingAssociationInverseSideCollector;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
@@ -154,10 +155,15 @@ public class PojoIndexingPlanImpl
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		try {
 			process();
-			return strategy.doExecuteAndReport( indexedTypeDelegates.values(), this, entityReferenceFactory );
+			return strategy.doExecuteAndReport(
+					indexedTypeDelegates.values(),
+					this,
+					entityReferenceFactory,
+					operationSubmitter
+			);
 		}
 		finally {
 			indexedTypeDelegates.clear();

@@ -51,7 +51,7 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 	 * @return A future that completes when all works and optionally commit/refresh have completed,
 	 * holding an execution report.
 	 */
-	CompletableFuture<MultiEntityOperationExecutionReport<R>> execute() {
+	CompletableFuture<MultiEntityOperationExecutionReport<R>> execute(OperationSubmitter operationSubmitter) {
 		// Add the handler to the future *before* submitting the works,
 		// so as to be sure that onAllWorksFinished is executed in the background,
 		// not in the current thread.
@@ -63,7 +63,7 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 		for ( int i = 0; i < works.size(); i++ ) {
 			CompletableFuture<Void> future = futures[i];
 			SingleDocumentIndexingWork work = works.get( i );
-			orchestrator.submit( future, work, OperationSubmitter.DEFAULT );
+			orchestrator.submit( future, work, operationSubmitter );
 		}
 
 		return reportFuture;

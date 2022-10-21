@@ -111,10 +111,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -166,10 +166,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -224,11 +224,11 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -289,11 +289,11 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -363,10 +363,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );
@@ -421,10 +421,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );
@@ -481,10 +481,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );
@@ -540,10 +540,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute();
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), OperationSubmitter.DEFAULT );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), OperationSubmitter.DEFAULT );
+		planExecutionFuture = execution.execute( OperationSubmitter.DEFAULT );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.DEFAULT ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.DEFAULT ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );

@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingAssociationInverseSideResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingAssociationInverseSideCollector;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
@@ -133,8 +134,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	}
 
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
-		return delegate.executeAndReport( entityReferenceFactory );
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+		return delegate.executeAndReport( entityReferenceFactory, operationSubmitter );
 	}
 
 	abstract PojoWorkTypeContext<I, E> typeContext();

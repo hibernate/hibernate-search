@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 /**
  * A set of indexing events to be sent to an external queue.
@@ -20,7 +21,7 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 public interface PojoIndexingQueueEventSendingPlan {
 
 	/**
-	 * Appends an event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
+	 * Appends an event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory, OperationSubmitter) later}
 	 * and ultimately added to a {@link PojoIndexingQueueEventProcessingPlan}.
 	 *
 	 * @param entityName The name of the entity type.
@@ -44,11 +45,22 @@ public interface PojoIndexingQueueEventSendingPlan {
 	 *
 	 * @param <R> The type of entity references in the returned execution report.
 	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @return A {@link CompletableFuture} that will hold an execution report when all the events are sent.
 	 * If sending an event failed, the future will be completed normally,
 	 * but the report will contain an exception.
 	 */
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory);
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
+
+	/**
+	 * @see #sendAndReport(EntityReferenceFactory, OperationSubmitter)
+	 * @deprecated Use {@link #sendAndReport(EntityReferenceFactory, OperationSubmitter)} instead.
+	 */
+	@Deprecated
+	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
+		return sendAndReport( entityReferenceFactory, OperationSubmitter.DEFAULT );
+	}
 
 }

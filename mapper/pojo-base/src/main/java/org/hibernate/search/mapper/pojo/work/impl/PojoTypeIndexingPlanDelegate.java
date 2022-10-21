@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 
@@ -40,6 +41,6 @@ interface PojoTypeIndexingPlanDelegate<I, E> {
 	void discard();
 
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory);
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 }

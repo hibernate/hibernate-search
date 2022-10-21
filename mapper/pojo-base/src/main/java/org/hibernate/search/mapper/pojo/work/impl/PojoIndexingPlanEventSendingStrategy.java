@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -37,9 +38,11 @@ public class PojoIndexingPlanEventSendingStrategy implements PojoIndexingPlanStr
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
-			PojoLoadingPlanProvider loadingPlanProvider, EntityReferenceFactory<R> entityReferenceFactory) {
+			PojoLoadingPlanProvider loadingPlanProvider, EntityReferenceFactory<R> entityReferenceFactory,
+			OperationSubmitter operationSubmitter) {
+
 		// No need to go through every single type: the state is global.
-		return sendingPlan.sendAndReport( entityReferenceFactory );
+		return sendingPlan.sendAndReport( entityReferenceFactory, operationSubmitter );
 	}
 
 	@Override

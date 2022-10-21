@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 import com.google.gson.JsonObject;
 
@@ -77,13 +78,13 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		try {
 			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 					orchestrator, entityReferenceFactory,
 					new ArrayList<>( works ) // Copy the list, as we're going to clear it below
 			);
-			return execution.execute();
+			return execution.execute( operationSubmitter );
 		}
 		finally {
 			works.clear();

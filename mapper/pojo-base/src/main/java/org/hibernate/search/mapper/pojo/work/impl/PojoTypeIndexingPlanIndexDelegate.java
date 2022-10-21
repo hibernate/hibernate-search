@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
@@ -102,8 +103,8 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
-		return indexPlan.executeAndReport( entityReferenceFactory );
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+		return indexPlan.executeAndReport( entityReferenceFactory, operationSubmitter );
 	}
 
 	private void delegateDeletePrevious(I identifier, String documentIdentifier,

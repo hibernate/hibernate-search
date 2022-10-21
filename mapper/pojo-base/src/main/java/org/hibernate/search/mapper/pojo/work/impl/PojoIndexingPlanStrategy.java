@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorRootContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -24,7 +25,7 @@ interface PojoIndexingPlanStrategy {
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> doExecuteAndReport(
 			Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates,
 			PojoLoadingPlanProvider loadingPlanProvider,
-			EntityReferenceFactory<R> entityReferenceFactory);
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter);
 
 	void doDiscard(Collection<PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates);
 

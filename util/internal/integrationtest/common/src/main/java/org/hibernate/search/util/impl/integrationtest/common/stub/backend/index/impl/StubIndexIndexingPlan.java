@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
@@ -85,7 +86,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
 		CompletableFuture<?>[] workFutures = worksToExecute.stream()
