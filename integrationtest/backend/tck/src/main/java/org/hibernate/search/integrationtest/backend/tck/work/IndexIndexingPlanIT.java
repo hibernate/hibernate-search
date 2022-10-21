@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -247,7 +248,7 @@ public class IndexIndexingPlanIT {
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> future =
-				plan.executeAndReport( StubEntityReference.FACTORY );
+				plan.executeAndReport( StubEntityReference.FACTORY, OperationSubmitter.DEFAULT );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should succeed, but the report should indicate a failure.

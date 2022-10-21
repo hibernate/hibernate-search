@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 
@@ -91,7 +92,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
 		try {
 			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> shardReportFutures = new ArrayList<>();
 			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {
@@ -102,7 +103,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 						commitStrategy, refreshStrategy,
 						works
 				);
-				shardReportFutures.add( execution.execute() );
+				shardReportFutures.add( execution.execute( operationSubmitter ) );
 			}
 			return MultiEntityOperationExecutionReport.allOf( shardReportFutures );
 		}

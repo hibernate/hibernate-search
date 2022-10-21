@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.work.factory.impl.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -45,7 +46,12 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	@Override
 	public void close() {
 		if ( scrollId != null ) {
-			Futures.unwrappedExceptionJoin( queryOrchestrator.submit( workFactory.clearScroll( scrollId ).build() ) );
+			Futures.unwrappedExceptionJoin(
+					queryOrchestrator.submit(
+							workFactory.clearScroll( scrollId ).build(),
+							OperationSubmitterType.BLOCKING
+					)
+			);
 		}
 	}
 
@@ -58,7 +64,12 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 						.deadline( timeoutManager.deadlineOrNull(), timeoutManager.hasHardTimeout() )
 						.build();
 
-		ElasticsearchLoadableSearchResult<H> loadableSearchResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( scroll ) );
+		ElasticsearchLoadableSearchResult<H> loadableSearchResult = Futures.unwrappedExceptionJoin(
+				queryOrchestrator.submit(
+						scroll,
+						OperationSubmitterType.BLOCKING
+				)
+		);
 		ElasticsearchSearchResultImpl<H> searchResult = loadableSearchResult.loadBlocking();
 
 		scrollId = searchResult.scrollId();

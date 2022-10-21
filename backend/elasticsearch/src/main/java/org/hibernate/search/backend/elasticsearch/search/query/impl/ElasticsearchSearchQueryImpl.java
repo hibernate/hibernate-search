@@ -32,6 +32,7 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -121,7 +122,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.build();
 
 		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( work ) )
+				queryOrchestrator.submit( work, OperationSubmitterType.BLOCKING ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async query execution, we will have to add a loadAsync method here,
@@ -149,7 +150,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.build();
 
 		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(
-				queryOrchestrator.submit( work ) )
+				queryOrchestrator.submit( work, OperationSubmitterType.BLOCKING ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async query execution, we will have to add a loadAsync method here,
@@ -189,7 +190,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);
 		NonBulkableWork<Long> work = builder.build();
-		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
+		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitterType.BLOCKING ) );
 		timeoutManager.stop();
 		return result;
 	}
@@ -283,7 +284,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				)
 				.build();
 
-		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
+		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work, OperationSubmitterType.BLOCKING ) );
 		return explainResult.getJsonObject();
 	}
 
