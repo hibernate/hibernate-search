@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.common.impl.Futures;
 
 /**
@@ -71,7 +72,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 		for ( int i = 0; i < works.size(); i++ ) {
 			CompletableFuture<Long> future = futures[i];
 			SingleDocumentIndexingWork work = works.get( i );
-			orchestrator.submit( future, work );
+			orchestrator.submit( future, work, OperationSubmitter.DEFAULT );
 		}
 
 		return reportFuture;

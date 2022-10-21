@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -40,12 +41,12 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> mergeSegments() {
-		return orchestrator.submit( workFactory.mergeSegments().index( indexName ).build() );
+	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter) {
+		return orchestrator.submit( workFactory.mergeSegments().index( indexName ).build(), operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Set<String> routingKeys) {
+	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
 		JsonArray filters = new JsonArray();
 		JsonObject filter = multiTenancyStrategy.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
@@ -64,17 +65,18 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 		return orchestrator.submit(
 				workFactory.deleteByQuery( indexName, payload )
 						.routingKeys( routingKeys )
-						.build()
+						.build(),
+				operationSubmitter
 		);
 	}
 
 	@Override
-	public CompletableFuture<?> flush() {
-		return orchestrator.submit( workFactory.flush().index( indexName ).build() );
+	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter) {
+		return orchestrator.submit( workFactory.flush().index( indexName ).build(), operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> refresh() {
-		return orchestrator.submit( workFactory.refresh().index( indexName ).build() );
+	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter) {
+		return orchestrator.submit( workFactory.refresh().index( indexName ).build(), operationSubmitter );
 	}
 }

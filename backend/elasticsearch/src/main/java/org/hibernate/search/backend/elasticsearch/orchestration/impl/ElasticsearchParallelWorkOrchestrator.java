@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 /**
  * A thread-safe component planning the execution of works
@@ -27,6 +28,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
  */
 public interface ElasticsearchParallelWorkOrchestrator {
 
-	<T> CompletableFuture<T> submit(NonBulkableWork<T> work);
+	<T> CompletableFuture<T> submit(NonBulkableWork<T> work, OperationSubmitter operationSubmitter);
 
 }

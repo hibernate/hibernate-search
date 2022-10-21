@@ -74,9 +74,9 @@ public class ElasticsearchBatchingWorkOrchestrator
 	}
 
 	@Override
-	public <T> CompletableFuture<T> submit(IndexingWork<T> work) {
+	public <T> CompletableFuture<T> submit(IndexingWork<T> work, OperationSubmitter operationSubmitter) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new ElasticsearchBatchedWork<>( work, future ) );
+		submit( new ElasticsearchBatchedWork<>( work, future ), operationSubmitter );
 		return future;
 	}
 

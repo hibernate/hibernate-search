@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 public class LuceneIndexWorkspace implements IndexWorkspace {
 
@@ -31,31 +32,31 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> mergeSegments() {
-		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.mergeSegments(), false );
+	public CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter) {
+		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.mergeSegments(), false, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Set<String> routingKeys) {
+	public CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter) {
 		return doSubmit(
 				indexManagerContext.managementOrchestrators( routingKeys ),
 				factory.deleteAll( sessionContext.tenantIdentifier(), routingKeys ),
-				true
+				true, operationSubmitter
 		);
 	}
 
 	@Override
-	public CompletableFuture<?> flush() {
-		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.flush(), false );
+	public CompletableFuture<?> flush(OperationSubmitter operationSubmitter) {
+		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.flush(), false, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> refresh() {
-		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.refresh(), false );
+	public CompletableFuture<?> refresh(OperationSubmitter operationSubmitter) {
+		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.refresh(), false, operationSubmitter );
 	}
 
 	private <T> CompletableFuture<?> doSubmit(List<LuceneParallelWorkOrchestrator> orchestrators,
-			IndexManagementWork<T> work, boolean commit) {
+			IndexManagementWork<T> work, boolean commit, OperationSubmitter operationSubmitter) {
 		CompletableFuture<?>[] writeFutures = new CompletableFuture[orchestrators.size()];
 		CompletableFuture<?>[] writeAndCommitFutures = new CompletableFuture[orchestrators.size()];
 		for ( int i = 0; i < writeFutures.length; i++ ) {
@@ -74,7 +75,7 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 				writeAndCommitFutures[i] = writeFuture;
 			}
 
-			orchestrator.submit( writeFuture, work );
+			orchestrator.submit( writeFuture, work, operationSubmitter );
 		}
 		return CompletableFuture.allOf( writeAndCommitFutures );
 	}

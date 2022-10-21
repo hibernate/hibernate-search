@@ -14,12 +14,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IndexWorkspace {
 
-	CompletableFuture<?> mergeSegments();
+	CompletableFuture<?> mergeSegments(OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> purge(Set<String> routingKeys);
+	CompletableFuture<?> purge(Set<String> routingKeys, OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> flush();
+	CompletableFuture<?> flush(OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> refresh();
+	CompletableFuture<?> refresh(OperationSubmitter operationSubmitter);
 
 }

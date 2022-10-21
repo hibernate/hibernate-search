@@ -25,9 +25,9 @@ public class ElasticsearchSimpleWorkOrchestrator
 	}
 
 	@Override
-	public <T> CompletableFuture<T> submit(NonBulkableWork<T> work) {
+	public <T> CompletableFuture<T> submit(NonBulkableWork<T> work, OperationSubmitter operationSubmitter) {
 		WorkExecution<T> workExecution = new WorkExecution<>( work );
-		submit( workExecution );
+		submit( workExecution, operationSubmitter );
 		return workExecution.getResult();
 	}
 
