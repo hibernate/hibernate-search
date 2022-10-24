@@ -10,8 +10,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.DatasetHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
@@ -71,7 +71,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 			futures[i] = indexer.add(
 					StubMapperUtils.referenceProvider( String.valueOf( documentId ) ),
 					document -> dataset.populate( index, document, documentId, 0L ),
-					commitStrategy, DocumentRefreshStrategy.NONE, OperationSubmitterType.BLOCKING
+					commitStrategy, DocumentRefreshStrategy.NONE, OperationSubmitter.BLOCKING
 			);
 		}
 

@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -83,7 +83,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );
@@ -104,7 +104,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );
@@ -125,7 +125,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // This means no refresh will take place until after the refresh interval
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Readers should *not* be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasNoHits();
@@ -149,7 +149,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.FORCE // This will force a refresh before the end of the refresh interval
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );
@@ -170,7 +170,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().textField, "text1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Readers should be up-to-date immediately after indexing finishes
 		assertThatQuery( query ).hasTotalHitCount( 1 );

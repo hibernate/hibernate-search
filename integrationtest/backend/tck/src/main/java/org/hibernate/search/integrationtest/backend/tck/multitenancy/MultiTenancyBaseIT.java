@@ -20,8 +20,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -190,7 +190,7 @@ public class MultiTenancyBaseIT {
 
 		plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_2 );
@@ -234,7 +234,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// The tenant 2 has been updated properly.
 
@@ -343,7 +343,7 @@ public class MultiTenancyBaseIT {
 				nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_5 );
 			} );
 
-			plan.execute( OperationSubmitterType.BLOCKING ).join();
+			plan.execute( OperationSubmitter.BLOCKING ).join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
@@ -364,7 +364,7 @@ public class MultiTenancyBaseIT {
 				nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
 			} );
 
-			plan.execute( OperationSubmitterType.BLOCKING ).join();
+			plan.execute( OperationSubmitter.BLOCKING ).join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
@@ -376,7 +376,7 @@ public class MultiTenancyBaseIT {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
-			plan.execute( OperationSubmitterType.BLOCKING ).join();
+			plan.execute( OperationSubmitter.BLOCKING ).join();
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Missing tenant identifier",
@@ -403,7 +403,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_2 );
 		} );
 
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		plan = index.createIndexingPlan( tenant2SessionContext );
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
@@ -424,7 +424,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

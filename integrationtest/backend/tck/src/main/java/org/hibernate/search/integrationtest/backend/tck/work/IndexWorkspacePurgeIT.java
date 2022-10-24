@@ -11,8 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
@@ -25,19 +25,19 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.purge( Collections.emptySet(), OperationSubmitterType.REJECTING_EXECUTION_EXCEPTION );
+		return workspace.purge( Collections.emptySet(), OperationSubmitter.REJECTING_EXECUTION_EXCEPTION );
 	}
 
 	@Override
 	protected void afterInitData(StubMappedIndex index) {
 		// Make sure to flush the index, otherwise the test won't fail as expected with Lucene,
 		// probably because the index writer optimizes purges when changes are not committed yet.
-		index.createWorkspace().flush( OperationSubmitterType.BLOCKING );
+		index.createWorkspace().flush( OperationSubmitter.BLOCKING );
 	}
 
 	@Override
 	protected void assertPreconditions(StubMappedIndex index) {
-		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isGreaterThan( 0 );
@@ -45,7 +45,7 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected void assertSuccess(StubMappedIndex index) {
-		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isEqualTo( 0 );

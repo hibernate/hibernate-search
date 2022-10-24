@@ -106,7 +106,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 */
 	@Deprecated
 	public void submit(BatchedWork<? super P> work) throws InterruptedException {
-		submit( work, OperationSubmitter.DEFAULT );
+		submit( work, OperationSubmitter.BLOCKING );
 	}
 
 	/**

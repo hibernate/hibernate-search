@@ -10,7 +10,7 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -36,37 +36,37 @@ public class SearchIndexerImpl implements SearchIndexer {
 	@Override
 	public CompletionStage<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		return delegate.add( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
 	}
 
 	@Override
 	public CompletionStage<?> add(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		return delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutes, null,
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
 	}
 
 	@Override
 	public CompletionStage<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		return delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
 	}
 
 	@Override
 	public CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		return delegate.addOrUpdate( getTypeIdentifier( entityClass ), providedId, providedRoutes, null,
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
 	}
 
 	@Override
 	public CompletionStage<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		return delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
 	}
 
 	@Override
 	public CompletionStage<?> delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		return delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes,
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING );
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING );
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {

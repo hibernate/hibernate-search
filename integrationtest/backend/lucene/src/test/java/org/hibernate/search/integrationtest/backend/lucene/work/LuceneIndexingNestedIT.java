@@ -20,8 +20,8 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -63,7 +63,7 @@ public class LuceneIndexingNestedIT {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field2, "value" );
 		} );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		assertThat( countWithField( "nestedObject.field2" ) ).isEqualTo( 1 );
 		// This used to fail before HSEARCH-3834, because the nested document was left in the index.
@@ -81,7 +81,7 @@ public class LuceneIndexingNestedIT {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field2, "value" );
 		} );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		assertThat( countWithField( "nestedObject.field2" ) ).isEqualTo( 1 );
 		// This used to fail before HSEARCH-3834, because the nested document was left in the index.
@@ -95,7 +95,7 @@ public class LuceneIndexingNestedIT {
 
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// This used to fail before HSEARCH-3834, because the nested document was left in the index.
 		assertThat( countWithField( "nestedObject.field1" ) ).isEqualTo( 0 );
@@ -108,7 +108,7 @@ public class LuceneIndexingNestedIT {
 
 		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// This used to fail before HSEARCH-3834, because the nested document was left in the index.
 		assertThat( countWithField( "nestedObject.field1" ) ).isEqualTo( 0 );
@@ -118,8 +118,8 @@ public class LuceneIndexingNestedIT {
 	public void purge() throws IOException {
 		setup( MultiTenancyStrategyName.NONE );
 
-		index.createWorkspace( sessionContext ).purge( Collections.emptySet(), OperationSubmitterType.BLOCKING ).join();
-		index.createWorkspace( sessionContext ).refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace( sessionContext ).purge( Collections.emptySet(), OperationSubmitter.BLOCKING ).join();
+		index.createWorkspace( sessionContext ).refresh( OperationSubmitter.BLOCKING ).join();
 
 		assertThat( countWithField( "nestedObject.field1" ) ).isEqualTo( 0 );
 	}
@@ -150,7 +150,7 @@ public class LuceneIndexingNestedIT {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field1, "value" );
 		} );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 	}
 
 	private int countWithField(String absoluteFieldPath) throws IOException {

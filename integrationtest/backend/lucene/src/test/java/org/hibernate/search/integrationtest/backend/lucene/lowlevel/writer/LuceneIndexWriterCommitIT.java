@@ -16,8 +16,8 @@ import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
@@ -81,7 +81,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Commit will happen some time after indexing finished
 		Awaitility.await().untilAsserted( () -> {
@@ -108,7 +108,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentRefreshStrategy.NONE // This is irrelevant
 		);
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Commit should have happened before indexing finished
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
@@ -130,7 +130,7 @@ public class LuceneIndexWriterCommitIT {
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Stop Hibernate Search
 		mapping.close();

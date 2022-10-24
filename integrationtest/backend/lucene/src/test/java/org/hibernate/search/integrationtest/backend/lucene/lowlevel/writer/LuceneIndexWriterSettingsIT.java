@@ -20,8 +20,8 @@ import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.LoggerInfoStream;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -88,7 +88,7 @@ public class LuceneIndexWriterSettingsIT {
 		// Add a document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Check that writing succeeded
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
@@ -151,7 +151,7 @@ public class LuceneIndexWriterSettingsIT {
 		// Add a document to the index
 		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// Check that writing succeeded
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )

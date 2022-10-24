@@ -10,7 +10,7 @@ import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.pojo.standalone.common.EntityReference;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -115,7 +115,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	public CompletableFuture<?> execute() {
-		return delegate.executeAndReport( entityReferenceFactory, OperationSubmitterType.BLOCKING ).thenApply( report -> {
+		return delegate.executeAndReport( entityReferenceFactory, OperationSubmitter.BLOCKING ).thenApply( report -> {
 			report.throwable().ifPresent( t -> {
 				throw Throwables.toRuntimeException( t );
 			} );

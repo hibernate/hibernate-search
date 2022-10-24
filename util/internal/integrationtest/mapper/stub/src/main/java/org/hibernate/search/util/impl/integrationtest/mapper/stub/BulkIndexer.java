@@ -19,10 +19,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -118,7 +118,7 @@ public class BulkIndexer {
 		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
 		if ( refresh ) {
 			IndexWorkspace workspace = indexManager.createWorkspace( sessionContext );
-			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitterType.BLOCKING ) );
+			future = future.thenCompose( ignored -> workspace.refresh( OperationSubmitter.BLOCKING ) );
 		}
 		return future;
 	}
@@ -146,7 +146,7 @@ public class BulkIndexer {
 					batchFutures[i] = indexer.add(
 							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
 							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-							OperationSubmitterType.BLOCKING
+							OperationSubmitter.BLOCKING
 					);
 				}
 				return CompletableFuture.allOf( batchFutures );

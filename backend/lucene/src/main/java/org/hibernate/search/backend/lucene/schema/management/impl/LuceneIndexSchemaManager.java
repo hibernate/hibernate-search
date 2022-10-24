@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWork
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 public class LuceneIndexSchemaManager implements IndexSchemaManager {
@@ -68,7 +68,7 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 
 		CompletableFuture<Long> totalSizeFuture = CompletableFuture.completedFuture( 0L );
 		for ( LuceneParallelWorkOrchestrator orchestrator : indexManagerContext.allManagementOrchestrators() ) {
-			CompletableFuture<Long> shardSizeFuture = orchestrator.submit( computeSizeWork, OperationSubmitterType.BLOCKING );
+			CompletableFuture<Long> shardSizeFuture = orchestrator.submit( computeSizeWork, OperationSubmitter.BLOCKING );
 			totalSizeFuture = totalSizeFuture.thenCombine( shardSizeFuture, add );
 		}
 		return totalSizeFuture;
@@ -80,7 +80,7 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
 		int i = 0;
 		for ( LuceneParallelWorkOrchestrator orchestrator : orchestrators ) {
-			futures[i] = orchestrator.submit( work, OperationSubmitterType.BLOCKING );
+			futures[i] = orchestrator.submit( work, OperationSubmitter.BLOCKING );
 			++i;
 		}
 		return CompletableFuture.allOf( futures );
