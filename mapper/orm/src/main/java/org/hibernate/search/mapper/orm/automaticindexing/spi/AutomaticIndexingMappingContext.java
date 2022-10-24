@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -28,7 +29,7 @@ public interface AutomaticIndexingMappingContext {
 	/**
 	 * @param session A Hibernate ORM {@link Session} created from the same {@link #sessionFactory()} as this mapping.
 	 * @return An event processing plan for the given session.
-	 * It will not get executed automatically: you need to call {@link AutomaticIndexingQueueEventProcessingPlan#executeAndReport()},
+	 * It will not get executed automatically: you need to call {@link AutomaticIndexingQueueEventProcessingPlan#executeAndReport(OperationSubmitter)},
 	 * which is asynchronous and returns a future.
 	 */
 	AutomaticIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(Session session);

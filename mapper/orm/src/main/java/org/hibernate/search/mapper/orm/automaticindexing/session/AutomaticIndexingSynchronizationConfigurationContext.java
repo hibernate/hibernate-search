@@ -11,8 +11,10 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 public interface AutomaticIndexingSynchronizationConfigurationContext {
 
@@ -49,5 +51,16 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 * Use this to report failures that cannot be propagated by the {@link #indexingFutureHandler(Consumer)}.
 	 */
 	FailureHandler failureHandler();
+
+	/**
+	 * Set operation submitter to be applied while executing underlying plans.
+	 *
+	 * Using {@link OperationSubmitter#BLOCKING} by default.
+	 *
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
+	 * @see OperationSubmitter
+	 */
+	@Incubating
+	void operationSubmitter(OperationSubmitter operationSubmitter);
 
 }
