@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.automaticindexing.spi;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 
@@ -28,9 +29,12 @@ public interface AutomaticIndexingQueueEventProcessingPlan {
 	 * Writes all pending changes to the index now,
 	 * and clears the plan so that it can be re-used.
 	 *
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
+	 *
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	CompletableFuture<MultiEntityOperationExecutionReport<EntityReference>> executeAndReport();
+	CompletableFuture<MultiEntityOperationExecutionReport<EntityReference>> executeAndReport(
+			OperationSubmitter operationSubmitter);
 
 	/**
 	 * Convert the identifier to its serialized form.
