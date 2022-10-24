@@ -59,7 +59,14 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"        <property name=\"entityName\" type=\"string\" length=\"256\" nullable=\"false\" />\n" +
 			"        <property name=\"entityId\" type=\"string\" length=\"256\" nullable=\"false\" />\n" +
 			"        <property name=\"entityIdHash\" type=\"integer\" index=\"entityIdHash\" nullable=\"false\" />\n" +
-			"        <property name=\"payload\" type=\"materialized_blob\" nullable=\"false\" />\n" +
+			"        <property name=\"payload\" type=\"materialized_blob\" nullable=\"false\">\n" +
+			// HSEARCH-4727: this column length will be ignored in most dialects, since the blob type is normally unbounded,
+			// but it will force Hibernate ORM to simulate an unbounded BLOB type with DB2.
+			// Using 2147483647 as it's the documented maximum length of BLOBs in DB2:
+			// https://www.ibm.com/docs/en/db2-for-zos/11?topic=types-large-objects-lobs
+			// TODO HSEARCH-4395/HSEARCH-4532 drop this length definition with ORM 6, because ORM 6 will ignore it.
+			"                <column length=\"2147483647\" />\n" +
+			"        </property>\n" +
 			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
 			"        <property name=\"processAfter\" type=\"Instant\" index=\"processAfter\" nullable=\"true\" />\n" +
 			"        <property name=\"status\" index=\"status\" nullable=\"false\">\n" +
