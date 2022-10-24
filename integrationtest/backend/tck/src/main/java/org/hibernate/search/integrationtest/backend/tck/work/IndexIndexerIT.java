@@ -21,9 +21,9 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -89,7 +89,7 @@ public class IndexIndexerIT {
 			tasks[i] = indexer.add(
 					referenceProvider( id ),
 					document -> document.addValue( index.binding().title, "The Lord of the Rings chap. " + id ),
-					commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING
+					commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
 			);
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
@@ -114,7 +114,7 @@ public class IndexIndexerIT {
 			tasks[i] = indexer.addOrUpdate(
 					referenceProvider( id ),
 					document -> document.addValue( index.binding().title, "The Boss of the Rings chap. " + id ),
-					commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING
+					commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
 			);
 		}
 		future = CompletableFuture.allOf( tasks );
@@ -138,7 +138,7 @@ public class IndexIndexerIT {
 			final String id = String.valueOf( i + booksToUpdate );
 			tasks[i] = indexer.delete(
 					referenceProvider( id ),
-					commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING
+					commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
 			);
 		}
 		future = CompletableFuture.allOf( tasks );
@@ -166,7 +166,7 @@ public class IndexIndexerIT {
 		CompletableFuture<?> future = indexer.add(
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().title, "Document #1" ),
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
 		);
 		Awaitility.await().until( future::isDone );
 
@@ -192,7 +192,7 @@ public class IndexIndexerIT {
 		CompletableFuture<?> future = indexer.addOrUpdate(
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().title, "Document #1" ),
-				commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING
+				commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
 		);
 		Awaitility.await().until( future::isDone );
 
@@ -216,7 +216,7 @@ public class IndexIndexerIT {
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = indexer.delete(
-				referenceProvider( "1" ), commitStrategy, refreshStrategy, OperationSubmitterType.BLOCKING
+				referenceProvider( "1" ), commitStrategy, refreshStrategy, OperationSubmitter.BLOCKING
 		);
 		Awaitility.await().until( future::isDone );
 
@@ -235,7 +235,7 @@ public class IndexIndexerIT {
 	private void refreshIfNecessary() {
 		if ( DocumentRefreshStrategy.NONE.equals( refreshStrategy ) ) {
 			IndexWorkspace workspace = index.createWorkspace();
-			workspace.refresh( OperationSubmitterType.BLOCKING ).join();
+			workspace.refresh( OperationSubmitter.BLOCKING ).join();
 		}
 	}
 

@@ -16,8 +16,8 @@ import java.util.Objects;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
@@ -83,7 +83,7 @@ public class IndexingFieldTypesIT<F> {
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
@@ -122,7 +122,7 @@ public class IndexingFieldTypesIT<F> {
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
@@ -168,7 +168,7 @@ public class IndexingFieldTypesIT<F> {
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		plan.execute( OperationSubmitterType.BLOCKING ).join();
+		plan.execute( OperationSubmitter.BLOCKING ).join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.

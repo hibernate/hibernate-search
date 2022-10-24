@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.work.factory.impl.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -49,7 +49,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 			Futures.unwrappedExceptionJoin(
 					queryOrchestrator.submit(
 							workFactory.clearScroll( scrollId ).build(),
-							OperationSubmitterType.BLOCKING
+							OperationSubmitter.BLOCKING
 					)
 			);
 		}
@@ -67,7 +67,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 		ElasticsearchLoadableSearchResult<H> loadableSearchResult = Futures.unwrappedExceptionJoin(
 				queryOrchestrator.submit(
 						scroll,
-						OperationSubmitterType.BLOCKING
+						OperationSubmitter.BLOCKING
 				)
 		);
 		ElasticsearchSearchResultImpl<H> searchResult = loadableSearchResult.loadBlocking();

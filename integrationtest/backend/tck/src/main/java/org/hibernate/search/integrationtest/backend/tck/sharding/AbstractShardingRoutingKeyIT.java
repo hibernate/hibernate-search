@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -134,10 +134,10 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_noRoutingKey() {
-		index.createWorkspace().purge( Collections.emptySet(), OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().purge( Collections.emptySet(), OperationSubmitter.BLOCKING ).join();
 
 		// No routing key => all documents should be purged
-		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasNoHits();
 	}
@@ -151,13 +151,13 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
 		otherRoutingKeys.remove( someRoutingKey );
 
-		index.createWorkspace().purge( Collections.singleton( someRoutingKey ), OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().purge( Collections.singleton( someRoutingKey ), OperationSubmitter.BLOCKING ).join();
 
 		/*
 		 * One routing key => all documents indexed with that routing key should be purged,
 		 * and only those documents.
 		 */
-		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
@@ -172,13 +172,13 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
 		otherRoutingKeys.removeAll( twoRoutingKeys );
 
-		index.createWorkspace().purge( twoRoutingKeys, OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().purge( twoRoutingKeys, OperationSubmitter.BLOCKING ).join();
 
 		/*
 		 * Two routing keys => all documents indexed with these routing keys should be returned,
 		 * and only those documents.
 		 */
-		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
@@ -187,10 +187,10 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_allRoutingKeys() {
-		index.createWorkspace().purge( routingKeys, OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().purge( routingKeys, OperationSubmitter.BLOCKING ).join();
 
 		// All routing keys => all documents should be purged
-		index.createWorkspace().refresh( OperationSubmitterType.BLOCKING ).join();
+		index.createWorkspace().refresh( OperationSubmitter.BLOCKING ).join();
 		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasNoHits();
 	}

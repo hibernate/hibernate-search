@@ -31,7 +31,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
-import org.hibernate.search.engine.backend.work.execution.impl.OperationSubmitterType;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -111,10 +111,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -166,10 +166,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -224,11 +224,11 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -289,11 +289,11 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
@@ -363,10 +363,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );
@@ -421,10 +421,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );
@@ -481,10 +481,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );
@@ -540,10 +540,10 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		);
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		planExecutionFuture = execution.execute( OperationSubmitterType.BLOCKING );
-		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitterType.BLOCKING ) );
-		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitterType.BLOCKING ) );
+		planExecutionFuture = execution.execute( OperationSubmitter.BLOCKING );
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ), eq( OperationSubmitter.BLOCKING ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ), eq( OperationSubmitter.BLOCKING ) );
 		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		work2FutureCaptor.getValue().complete( work2Result );

@@ -60,7 +60,7 @@ public interface PojoIndexingQueueEventSendingPlan {
 	@Deprecated
 	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
-		return sendAndReport( entityReferenceFactory, OperationSubmitter.DEFAULT );
+		return sendAndReport( entityReferenceFactory, OperationSubmitter.BLOCKING );
 	}
 
 }
