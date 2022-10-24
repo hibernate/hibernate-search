@@ -55,7 +55,11 @@ public final class OutboxPollingOutboxEventSendingPlan implements AutomaticIndex
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter ignore) {
+			EntityReferenceFactory<R> entityReferenceFactory, OperationSubmitter operationSubmitter) {
+		if ( !OperationSubmitter.BLOCKING.equals( operationSubmitter ) ) {
+			throw log.nonblockingOperationSubmitterNotSupported();
+		}
+
 		if ( session.isOpen() ) {
 			return sendAndReportOnSession( session, entityReferenceFactory );
 		}

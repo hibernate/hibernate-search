@@ -173,4 +173,6 @@ public interface Log extends BasicLogger {
 			+ " Either this problem is a rare occurrence, or the pulse expiration delay is too short.")
 	SearchException agentRegistrationIneffective(AgentReference agentReference);
 
+	@Message(id = ID_OFFSET + 29, value = "Nonblocking operation submitter is not supported.")
+	SearchException nonblockingOperationSubmitterNotSupported();
 }

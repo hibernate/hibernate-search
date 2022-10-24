@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
@@ -16,11 +18,14 @@ import org.hibernate.search.backend.lucene.work.impl.IndexManagementWorkExecutio
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class LuceneParallelWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneParallelWorkOrchestratorImpl.WorkExecution<?>>
 		implements LuceneParallelWorkOrchestrator {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexAccessor indexAccessor;
 	private final IndexAccessorWorkExecutionContext context;
@@ -60,6 +65,9 @@ public class LuceneParallelWorkOrchestratorImpl
 
 	@Override
 	protected void doSubmit(WorkExecution<?> workExecution, OperationSubmitter ignore) {
+		if ( !OperationSubmitter.BLOCKING.equals( ignore ) ) {
+			log.nonblockingOperationSubmitterNotSupported();
+		}
 		executor.submit( workExecution );
 	}
 
