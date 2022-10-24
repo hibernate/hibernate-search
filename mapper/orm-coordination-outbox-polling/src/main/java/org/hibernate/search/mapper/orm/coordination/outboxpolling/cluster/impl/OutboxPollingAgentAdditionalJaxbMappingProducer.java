@@ -71,7 +71,14 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 			"        <property name=\"totalShardCount\" nullable=\"true\" />\n" +
 			"        <property name=\"assignedShardIndex\" nullable=\"true\" />\n" +
 			// Reserved for future use
-			"        <property name=\"payload\" nullable=\"true\" type=\"materialized_blob\" />\n" +
+			"        <property name=\"payload\" nullable=\"true\" type=\"materialized_blob\">\n" +
+			// HSEARCH-4727: this column length will be ignored in most dialects, since the blob type is normally unbounded,
+			// but it will force Hibernate ORM to simulate an unbounded BLOB type with DB2.
+			// Using 2147483647 as it's the documented maximum length of BLOBs in DB2:
+			// https://www.ibm.com/docs/en/db2-for-zos/11?topic=types-large-objects-lobs
+			// TODO HSEARCH-4395/HSEARCH-4532 drop this length definition with ORM 6, because ORM 6 will ignore it.
+			"                <column length=\"2147483647\" />\n" +
+			"        </property>\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 
