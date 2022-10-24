@@ -528,7 +528,8 @@ stage('Non-default environments') {
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
-			runBuildOnNode(NODE_PATTERN_BASE) {
+			// Some databases, e.g. DB2 or CockroachDB, can be really slow, so we need to raise the timeout.
+			runBuildOnNode(NODE_PATTERN_BASE, [time: 2, unit: 'HOURS']) {
 				withMavenWorkspace {
 					String mavenBuildAdditionalArgs = ""
 					String mavenDockerArgs = ""
