@@ -25,7 +25,7 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.purge( Collections.emptySet(), OperationSubmitter.REJECTING_EXECUTION_EXCEPTION );
+		return workspace.purge( Collections.emptySet(), OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
 	}
 
 	@Override

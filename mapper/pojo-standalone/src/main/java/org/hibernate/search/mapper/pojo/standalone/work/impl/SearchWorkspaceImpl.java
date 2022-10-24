@@ -29,7 +29,7 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegmentsAsync() {
-		return delegate.mergeSegments( OperationSubmitter.REJECTING_EXECUTION_EXCEPTION );
+		return delegate.mergeSegments( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> purgeAsync(Set<String> routingKeys) {
-		return delegate.purge( routingKeys, OperationSubmitter.REJECTING_EXECUTION_EXCEPTION );
+		return delegate.purge( routingKeys, OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> flushAsync() {
-		return delegate.flush( OperationSubmitter.REJECTING_EXECUTION_EXCEPTION );
+		return delegate.flush( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
 	}
 
 	@Override
@@ -69,6 +69,6 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> refreshAsync() {
-		return delegate.refresh( OperationSubmitter.REJECTING_EXECUTION_EXCEPTION );
+		return delegate.refresh( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
 	}
 }

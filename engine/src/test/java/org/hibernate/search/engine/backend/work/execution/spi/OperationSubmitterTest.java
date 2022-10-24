@@ -14,6 +14,7 @@ import static org.awaitility.Awaitility.await;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -34,7 +35,12 @@ public class OperationSubmitterTest {
 	@Test
 	public void blockingOperationSubmitterBlocksTheOperation() throws InterruptedException {
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
-			OperationSubmitter.BLOCKING.submitToQueue( queue, 3 );
+			try {
+				OperationSubmitter.BLOCKING.submitToQueue( queue, 3 );
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 			return true;
 		} );
 
@@ -53,12 +59,7 @@ public class OperationSubmitterTest {
 	@Test
 	public void nonBlockingOperationSubmitterThrowsException() {
 		Integer element = 3;
-		assertThatThrownBy( () -> OperationSubmitter.REJECTING_EXECUTION_EXCEPTION.submitToQueue( queue, element ) )
-				.isInstanceOf( WorkQueueFullException.class )
-				.hasMessageContainingAll(
-						"Work queue is full. Cannot accept", element.toString(), "at the moment:",
-						//reason:
-						"Queue full"
-				);
+		assertThatThrownBy( () -> OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.submitToQueue( queue, element ) )
+				.isInstanceOf( RejectedExecutionException.class );
 	}
 }
