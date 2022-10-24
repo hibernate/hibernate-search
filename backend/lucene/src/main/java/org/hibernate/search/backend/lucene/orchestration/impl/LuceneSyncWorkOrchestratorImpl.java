@@ -84,6 +84,9 @@ public class LuceneSyncWorkOrchestratorImpl
 
 	@Override
 	protected void doSubmit(WorkExecution<?> work, OperationSubmitter ignore) {
+		if ( !OperationSubmitter.BLOCKING.equals( ignore ) ) {
+			log.nonblockingOperationSubmitterNotSupported();
+		}
 		work.execute();
 	}
 
