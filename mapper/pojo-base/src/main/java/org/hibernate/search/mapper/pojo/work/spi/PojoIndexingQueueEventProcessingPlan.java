@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 
 public interface PojoIndexingQueueEventProcessingPlan {
 
@@ -29,10 +30,22 @@ public interface PojoIndexingQueueEventProcessingPlan {
 	 *
 	 * @param <R> The type of entity references in the returned execution report.
 	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory);
+			EntityReferenceFactory<R> entityReferenceFactory,
+			OperationSubmitter operationSubmitter);
+
+	/**
+	 * @see #executeAndReport(EntityReferenceFactory, OperationSubmitter)
+	 * @deprecated Use {@link #executeAndReport(EntityReferenceFactory, OperationSubmitter)} instead.
+	 */
+	@Deprecated
+	default <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
+		return executeAndReport( entityReferenceFactory, OperationSubmitter.BLOCKING );
+	}
 
 	/**
 	 * Convert the identifier to its serialized form.
