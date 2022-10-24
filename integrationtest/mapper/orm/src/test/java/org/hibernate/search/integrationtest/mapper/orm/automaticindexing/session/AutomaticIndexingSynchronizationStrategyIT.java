@@ -27,6 +27,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
@@ -220,10 +221,34 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_custom() throws InterruptedException, TimeoutException, ExecutionException {
+	public void success_custom_blocking_submitter() throws InterruptedException, TimeoutException, ExecutionException {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
-		SessionFactory sessionFactory = setup( new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ) );
+		SessionFactory sessionFactory = setup(
+				new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong, OperationSubmitter.BLOCKING )
+		);
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
+		);
+
+		// The transaction should be complete, because the indexing work took too long to execute
+		// (this is how the custom automatic indexing strategy is implemented)
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
+
+		// Upon timing out, the strategy should have set this reference
+		assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
+	}
+
+	@Test
+	public void success_custom_rejected_submitter() throws InterruptedException, TimeoutException, ExecutionException {
+		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
+
+		SessionFactory sessionFactory = setup(
+				new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong, OperationSubmitter.REJECTED_EXECUTION_EXCEPTION )
+		);
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
@@ -624,19 +649,28 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	}
 
-	private static class CustomAutomaticIndexingSynchronizationStrategy implements AutomaticIndexingSynchronizationStrategy {
+	private class CustomAutomaticIndexingSynchronizationStrategy implements AutomaticIndexingSynchronizationStrategy {
 
 		private final AtomicReference<CompletableFuture<?>> futureThatTookTooLong;
 
+		private final OperationSubmitter operationSubmitter;
+
+		private CustomAutomaticIndexingSynchronizationStrategy(AtomicReference<CompletableFuture<?>> futureThatTookTooLong) {
+			this( futureThatTookTooLong, OperationSubmitter.BLOCKING );
+		}
+
 		private CustomAutomaticIndexingSynchronizationStrategy(
-				AtomicReference<CompletableFuture<?>> futureThatTookTooLong) {
+				AtomicReference<CompletableFuture<?>> futureThatTookTooLong,
+				OperationSubmitter operationSubmitter) {
 			this.futureThatTookTooLong = futureThatTookTooLong;
+			this.operationSubmitter = operationSubmitter;
 		}
 
 		@Override
 		public void apply(AutomaticIndexingSynchronizationConfigurationContext context) {
 			context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
 			context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
+			context.operationSubmitter( operationSubmitter );
 			context.indexingFutureHandler( future -> {
 				// try to wait for the future to complete for a small duration...
 				try {
