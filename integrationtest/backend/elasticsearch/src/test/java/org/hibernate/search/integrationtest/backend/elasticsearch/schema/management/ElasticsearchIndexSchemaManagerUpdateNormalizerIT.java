@@ -10,10 +10,11 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.junit.Assume.assumeFalse;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -319,7 +320,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 				.withIndex( index )
 				.setup();
 
-		index.schemaManager().createOrUpdate().join();
+		index.schemaManager().createOrUpdate( OperationSubmitter.BLOCKING ).join();
 	}
 
 }

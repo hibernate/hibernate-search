@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubUnusedContextualFailureCollector;
 
 /**
@@ -23,37 +24,37 @@ enum ElasticsearchIndexSchemaManagerOperation {
 	CREATE_IF_MISSING {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.createIfMissing();
+			return schemaManager.createIfMissing( OperationSubmitter.BLOCKING );
 		}
 	},
 	DROP_AND_CREATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.dropAndCreate();
+			return schemaManager.dropAndCreate( OperationSubmitter.BLOCKING );
 		}
 	},
 	CREATE_OR_VALIDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.createOrValidate( new StubUnusedContextualFailureCollector() );
+			return schemaManager.createOrValidate( new StubUnusedContextualFailureCollector(), OperationSubmitter.BLOCKING );
 		}
 	},
 	CREATE_OR_UPDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.createOrUpdate();
+			return schemaManager.createOrUpdate( OperationSubmitter.BLOCKING );
 		}
 	},
 	DROP_IF_EXISTING {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.dropIfExisting();
+			return schemaManager.dropIfExisting( OperationSubmitter.BLOCKING );
 		}
 	},
 	VALIDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
-			return schemaManager.validate( new StubUnusedContextualFailureCollector() );
+			return schemaManager.validate( new StubUnusedContextualFailureCollector(), OperationSubmitter.BLOCKING );
 		}
 	};
 

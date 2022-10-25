@@ -29,6 +29,7 @@ import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaMana
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.common.resources.spi.SavedState;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -207,7 +208,12 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public CompletableFuture<Long> computeSizeInBytesAsync() {
-		return schemaManager.computeSizeInBytes();
+		return computeSizeInBytesAsync( OperationSubmitter.REJECTED_EXECUTION_EXCEPTION );
+	}
+
+	@Override
+	public CompletableFuture<Long> computeSizeInBytesAsync(OperationSubmitter operationSubmitter) {
+		return schemaManager.computeSizeInBytes( operationSubmitter );
 	}
 
 	@Override

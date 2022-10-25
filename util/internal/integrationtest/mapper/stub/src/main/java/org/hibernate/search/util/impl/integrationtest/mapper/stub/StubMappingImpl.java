@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.reporting.spi.BackendMappingHints;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
@@ -98,7 +99,7 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 			case DROP_AND_CREATE_AND_DROP:
 			case DROP_AND_CREATE_ON_STARTUP_ONLY:
 				return doSchemaManagementOperation(
-						IndexSchemaManager::dropAndCreate,
+						indexSchemaManager -> indexSchemaManager.dropAndCreate( OperationSubmitter.BLOCKING ),
 						context.failureCollector()
 				);
 			case DROP_ON_SHUTDOWN_ONLY:
@@ -115,7 +116,7 @@ public class StubMappingImpl implements StubMapping, MappingImplementor<StubMapp
 			case DROP_AND_CREATE_AND_DROP:
 			case DROP_ON_SHUTDOWN_ONLY:
 				return doSchemaManagementOperation(
-						IndexSchemaManager::dropIfExisting,
+						indexSchemaManager -> indexSchemaManager.dropIfExisting( OperationSubmitter.BLOCKING ),
 						context.failureCollector()
 				);
 			case DROP_AND_CREATE_ON_STARTUP_ONLY:

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -30,11 +31,12 @@ final class ElasticsearchSchemaDropper {
 	 * <p>This method will skip operations silently if the index does not exist.
 	 *
 	 * @param indexNames The names of the index to drop.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full
 	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	public CompletableFuture<?> dropIfExisting(IndexNames indexNames) {
-		return schemaAccessor.getCurrentIndexMetadataOrNull( indexNames )
+	public CompletableFuture<?> dropIfExisting(IndexNames indexNames, OperationSubmitter operationSubmitter) {
+		return schemaAccessor.getCurrentIndexMetadataOrNull( indexNames, operationSubmitter )
 				.thenCompose( existingIndexMetadata -> {
 					if ( existingIndexMetadata == null ) {
 						// Index does not exist: nothing to do.
@@ -44,7 +46,8 @@ final class ElasticsearchSchemaDropper {
 						// Index exists: delete.
 						// We need to use the primary name of the index: passing an alias to the drop-index call won't work.
 						return schemaAccessor.dropIndexIfExisting(
-								URLEncodedString.fromString( existingIndexMetadata.getPrimaryName() )
+								URLEncodedString.fromString( existingIndexMetadata.getPrimaryName() ),
+								operationSubmitter
 						);
 					}
 				} );

@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.schema.management.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.SearchException;
 
@@ -29,9 +30,10 @@ public interface IndexSchemaManager {
 	 * <p>
 	 * Does not change or validate anything if the schema already exists.
 	 *
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @return A future.
 	 */
-	CompletableFuture<?> createIfMissing();
+	CompletableFuture<?> createIfMissing(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Creates the schema if it doesn't already exist,
@@ -41,9 +43,11 @@ public interface IndexSchemaManager {
 	 * but instead are pushed to the given collector.
 	 *
 	 * @param failureCollector A collector for validation failures.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @return A future.
 	 */
-	CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector);
+	CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter);
 
 	/**
 	 * Creates the schema if it doesn't already exist,
@@ -52,26 +56,31 @@ public interface IndexSchemaManager {
 	 * Updating the schema may be impossible (for example if the type of a field changed).
 	 * In this case, the future will ultimately be completed with a {@link SearchException}.
 	 *
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @return A future.
 	 */
-	CompletableFuture<?> createOrUpdate();
+	CompletableFuture<?> createOrUpdate(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Drops the schema and all indexed data if it exists.
 	 * <p>
-	 * Does not change anything if the schema does not exists.
+	 * Does not change anything if the schema does not exist.
+	 *
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 *
 	 * @return A future.
 	 */
-	CompletableFuture<?> dropIfExisting();
+	CompletableFuture<?> dropIfExisting(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Drops the schema and all indexed data if it exists,
 	 * then creates the schema.
 	 *
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
+	 *
 	 * @return A future.
 	 */
-	CompletableFuture<?> dropAndCreate();
+	CompletableFuture<?> dropAndCreate(OperationSubmitter operationSubmitter);
 
 	/**
 	 * Validates the existing schema against requirements expressed by the mapper.
@@ -82,8 +91,10 @@ public interface IndexSchemaManager {
 	 * but instead are pushed to the given collector.
 	 *
 	 * @param failureCollector A collector for validation failures.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
+	 *
 	 * @return A future.
 	 */
-	CompletableFuture<?> validate(ContextualFailureCollector failureCollector);
+	CompletableFuture<?> validate(ContextualFailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
 }

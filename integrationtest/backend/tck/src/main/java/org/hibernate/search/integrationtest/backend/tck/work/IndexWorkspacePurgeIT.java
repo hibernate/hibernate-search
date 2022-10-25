@@ -32,7 +32,7 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	protected void afterInitData(StubMappedIndex index) {
 		// Make sure to flush the index, otherwise the test won't fail as expected with Lucene,
 		// probably because the index writer optimizes purges when changes are not committed yet.
-		index.createWorkspace().flush( OperationSubmitter.BLOCKING );
+		index.createWorkspace().flush( OperationSubmitter.BLOCKING ).join();
 	}
 
 	@Override

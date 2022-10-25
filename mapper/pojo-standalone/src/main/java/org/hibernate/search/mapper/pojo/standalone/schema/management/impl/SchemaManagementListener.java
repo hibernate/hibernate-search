@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.standalone.schema.management.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -27,16 +28,16 @@ public class SchemaManagementListener {
 		ContextualFailureCollector failureCollector = context.failureCollector();
 		switch ( strategyName ) {
 			case CREATE:
-				return manager.createIfMissing( failureCollector );
+				return manager.createIfMissing( failureCollector, OperationSubmitter.BLOCKING );
 			case DROP_AND_CREATE:
 			case DROP_AND_CREATE_AND_DROP:
-				return manager.dropAndCreate( failureCollector );
+				return manager.dropAndCreate( failureCollector, OperationSubmitter.BLOCKING );
 			case CREATE_OR_UPDATE:
-				return manager.createOrUpdate( failureCollector );
+				return manager.createOrUpdate( failureCollector, OperationSubmitter.BLOCKING );
 			case CREATE_OR_VALIDATE:
-				return manager.createOrValidate( failureCollector );
+				return manager.createOrValidate( failureCollector, OperationSubmitter.BLOCKING );
 			case VALIDATE:
-				return manager.validate( failureCollector );
+				return manager.validate( failureCollector, OperationSubmitter.BLOCKING );
 			case NONE:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );
@@ -49,7 +50,7 @@ public class SchemaManagementListener {
 		ContextualFailureCollector failureCollector = context.failureCollector();
 		switch ( strategyName ) {
 			case DROP_AND_CREATE_AND_DROP:
-				return manager.dropIfExisting( failureCollector );
+				return manager.dropIfExisting( failureCollector, OperationSubmitter.BLOCKING );
 			case CREATE:
 			case DROP_AND_CREATE:
 			case CREATE_OR_UPDATE:

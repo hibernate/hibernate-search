@@ -10,6 +10,8 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 import org.apache.lucene.analysis.Analyzer;
 
@@ -41,5 +43,12 @@ public interface LuceneIndexManager extends IndexManager {
 	 * @return A future that will ultimately provide the size of the index on its storage support, in bytes.
 	 */
 	CompletionStage<Long> computeSizeInBytesAsync();
+
+	/**
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
+	 * @return A future that will ultimately provide the size of the index on its storage support, in bytes.
+	 */
+	@Incubating
+	CompletionStage<Long> computeSizeInBytesAsync(OperationSubmitter operationSubmitter);
 
 }

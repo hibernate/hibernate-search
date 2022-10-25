@@ -29,58 +29,60 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
-	public CompletableFuture<?> createIfMissing() {
-		return doSubmit( luceneWorkFactory.createIndexIfMissing() );
+	public CompletableFuture<?> createIfMissing(OperationSubmitter operationSubmitter) {
+		return doSubmit( luceneWorkFactory.createIndexIfMissing(), operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector) {
+	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
 		// We don't perform any validation whatsoever.
-		return createIfMissing();
+		return createIfMissing( operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrUpdate() {
+	public CompletableFuture<?> createOrUpdate(OperationSubmitter operationSubmitter) {
 		// We don't perform any update whatsoever.
-		return createIfMissing();
+		return createIfMissing( operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> dropIfExisting() {
-		return doSubmit( luceneWorkFactory.dropIndexIfExisting() );
+	public CompletableFuture<?> dropIfExisting(OperationSubmitter operationSubmitter) {
+		return doSubmit( luceneWorkFactory.dropIndexIfExisting(), operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> dropAndCreate() {
-		return doSubmit( luceneWorkFactory.dropIndexIfExisting() )
-				.thenCompose( ignored -> doSubmit( luceneWorkFactory.createIndexIfMissing() ) );
+	public CompletableFuture<?> dropAndCreate(OperationSubmitter operationSubmitter) {
+		return doSubmit( luceneWorkFactory.dropIndexIfExisting(), operationSubmitter )
+				.thenCompose( ignored -> doSubmit( luceneWorkFactory.createIndexIfMissing(), operationSubmitter ) );
 	}
 
 	@Override
-	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector) {
+	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
 		// We only check that the index exists, and we throw an exception if it doesn't.
-		return doSubmit( luceneWorkFactory.validateIndexExists() );
+		return doSubmit( luceneWorkFactory.validateIndexExists(), operationSubmitter );
 	}
 
-	public CompletableFuture<Long> computeSizeInBytes() {
+	public CompletableFuture<Long> computeSizeInBytes(OperationSubmitter operationSubmitter) {
 		IndexManagementWork<Long> computeSizeWork = luceneWorkFactory.computeSizeInBytes();
 		BinaryOperator<Long> add = Math::addExact;
 
 		CompletableFuture<Long> totalSizeFuture = CompletableFuture.completedFuture( 0L );
 		for ( LuceneParallelWorkOrchestrator orchestrator : indexManagerContext.allManagementOrchestrators() ) {
-			CompletableFuture<Long> shardSizeFuture = orchestrator.submit( computeSizeWork, OperationSubmitter.BLOCKING );
+			CompletableFuture<Long> shardSizeFuture = orchestrator.submit( computeSizeWork, operationSubmitter );
 			totalSizeFuture = totalSizeFuture.thenCombine( shardSizeFuture, add );
 		}
 		return totalSizeFuture;
 	}
 
-	private CompletableFuture<?> doSubmit(IndexManagementWork<?> work) {
+	private CompletableFuture<?> doSubmit(IndexManagementWork<?> work, OperationSubmitter operationSubmitter) {
 		Collection<LuceneParallelWorkOrchestrator> orchestrators =
 				indexManagerContext.allManagementOrchestrators();
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
 		int i = 0;
 		for ( LuceneParallelWorkOrchestrator orchestrator : orchestrators ) {
-			futures[i] = orchestrator.submit( work, OperationSubmitter.BLOCKING );
+			futures[i] = orchestrator.submit( work, operationSubmitter );
 			++i;
 		}
 		return CompletableFuture.allOf( futures );

@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -225,7 +226,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 				.withIndex( index )
 				.setup();
 
-		index.schemaManager().createOrUpdate().join();
+		index.schemaManager().createOrUpdate( OperationSubmitter.BLOCKING ).join();
 	}
 
 }
