@@ -1,6 +1,32 @@
 [[further-reading]]
 = [[_further_reading]] Further reading
 
+[[further-reading-hibernate-search]]
+== Hibernate Search
+
+The https://hibernate.org/search[Hibernate Search website] is a good first stop when looking
+for information about Hibernate Search,
+be it to know more about https://hibernate.org/search/releases/[releases],
+https://hibernate.org/search/documentation/[documentation for all versions],
+https://hibernate.org/search/documentation/migrate/[migration guides],
+https://hibernate.org/search/roadmap/[the roadmap],
+or simply getting links to the source code and issue tracker.
+
+The Hibernate Search website also includes links to https://hibernate.org/search/more-resources/[various external resources]
+such as blog posts and talks.
+
+To contribute to, or ask questions about, Hibernate Search or any Hibernate projects,
+start from the https://hibernate.org/community/[community] page on the same website.
+
+Finally, for examples of using Hibernate Search in applications, see:
+
+* The https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-search-orm-elasticsearch-quickstart[Quarkus quickstart],
+a sample application using Hibernate Search with the <<compatibility-framework-quarkus,Quarkus>> framework.
+* The https://github.com/hibernate/hibernate-search/tree/main/integrationtest/showcase/library["Library" showcase],
+a sample application using Hibernate Search with the <<compatibility-framework-spring-boot,Spring Boot>> framework.
+* The https://hibernate.org/search/more-resources/[blog posts and talks] mentioned above,
+most of which include tutorials and/or simple applications.
+
 [[further-reading-elasticsearch]]
 == Elasticsearch
 
