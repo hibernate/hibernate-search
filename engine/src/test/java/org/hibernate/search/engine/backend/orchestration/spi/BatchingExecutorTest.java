@@ -7,8 +7,10 @@
 package org.hibernate.search.engine.backend.orchestration.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -19,10 +21,13 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
@@ -36,6 +41,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -45,9 +52,17 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+@RunWith(Parameterized.class)
 public class BatchingExecutorTest {
 
 	private static final String NAME = "executor-name";
+
+	@Parameterized.Parameters(name = "operation submitter = {0}")
+	public static Object[][] params() {
+		return Arrays.stream( OperationSubmitter.values() )
+				.map( value -> new Object[] { value } )
+				.toArray( Object[][]::new );
+	}
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -67,6 +82,12 @@ public class BatchingExecutorTest {
 
 	private ScheduledExecutorService executorService;
 	private BatchingExecutor<StubWorkProcessor> executor;
+
+	private final OperationSubmitter operationSubmitter;
+
+	public BatchingExecutorTest(OperationSubmitter operationSubmitter) {
+		this.operationSubmitter = operationSubmitter;
+	}
 
 	@Before
 	public void setup() {
@@ -93,7 +114,7 @@ public class BatchingExecutorTest {
 		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -115,7 +136,7 @@ public class BatchingExecutorTest {
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -128,8 +149,8 @@ public class BatchingExecutorTest {
 		// Submit other works before the first batch ends
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work2Mock, OperationSubmitter.BLOCKING );
-		executor.submit( work3Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work2Mock, operationSubmitter );
+		executor.submit( work3Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -173,7 +194,7 @@ public class BatchingExecutorTest {
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batch1Future );
-		executor.submit( work1Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( work1Mock ).submitTo( processorMock );
@@ -204,7 +225,7 @@ public class BatchingExecutorTest {
 		Runnable unblockExecutorSwitch = blockExecutor();
 
 		StubWork work1Mock = workMock( 1 );
-		executor.submit( work1Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work1Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -244,9 +265,9 @@ public class BatchingExecutorTest {
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
 		StubWork work3Mock = workMock( 3 );
-		executor.submit( work1Mock, OperationSubmitter.BLOCKING );
-		executor.submit( work2Mock, OperationSubmitter.BLOCKING );
-		executor.submit( work3Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
+		executor.submit( work3Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -284,8 +305,8 @@ public class BatchingExecutorTest {
 
 		StubWork work1Mock = workMock( 1 );
 		StubWork work2Mock = workMock( 2 );
-		executor.submit( work1Mock, OperationSubmitter.BLOCKING );
-		executor.submit( work2Mock, OperationSubmitter.BLOCKING );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			// No calls expected yet
 		} );
@@ -316,6 +337,95 @@ public class BatchingExecutorTest {
 		checkPostExecution();
 	}
 
+	@Test
+	public void simple_newTasksBlockedException() throws InterruptedException {
+		createAndStartExecutor( 2, true );
+
+		assumeTrue(
+				"This test only makes sense for nonblocking submitter",
+				OperationSubmitter.REJECTED_EXECUTION_EXCEPTION.equals( operationSubmitter )
+		);
+
+		Runnable unblockExecutorSwitch = blockExecutor();
+
+		StubWork work1Mock = workMock( 1 );
+		StubWork work2Mock = workMock( 2 );
+		StubWork work3Mock = workMock( 3 );
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
+
+		assertThatThrownBy( () -> executor.submit( work3Mock, operationSubmitter ) )
+				.isInstanceOf( RejectedExecutionException.class );
+
+		when( processorMock.endBatch() ).thenReturn( CompletableFuture.completedFuture( null ) );
+		unblockExecutorSwitch.run();
+
+		ArgumentCaptor<FailureContext> failureContextCaptor = ArgumentCaptor.forClass( FailureContext.class );
+		verifyAsynchronouslyAndReset( inOrder -> {
+			inOrder.verify( processorMock ).beginBatch();
+			inOrder.verify( work1Mock ).submitTo( processorMock );
+			inOrder.verify( work2Mock ).submitTo( processorMock );
+			inOrder.verify( processorMock ).endBatch();
+			inOrder.verify( processorMock ).complete();
+		} );
+
+		// Submitting other works should start the executor/processor again
+		checkPostExecution();
+	}
+
+	@Test
+	public void simple_newTasksBlockedWaitAndCompletes() throws InterruptedException {
+		createAndStartExecutor( 2, true );
+
+		assumeTrue(
+				"This test only makes sense for blocking submitter",
+				OperationSubmitter.BLOCKING.equals( operationSubmitter )
+		);
+
+		Runnable unblockExecutorSwitch = blockExecutor();
+
+		StubWork work1Mock = workMock( 1 );
+		StubWork work2Mock = workMock( 2 );
+		StubWork work3Mock = workMock( 3 );
+
+		executor.submit( work1Mock, operationSubmitter );
+		executor.submit( work2Mock, operationSubmitter );
+
+		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> {
+			try {
+				executor.submit( work3Mock, operationSubmitter );
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			return true;
+		} );
+
+		// wait to give some time for the above future to actually block
+		TimeUnit.SECONDS.sleep( 2 );
+
+		//queue is full so future won't complete.
+		assertThat( future.isDone() ).isFalse();
+
+		when( processorMock.endBatch() ).thenReturn( CompletableFuture.completedFuture( null ) );
+
+		unblockExecutorSwitch.run();
+
+		verifyAsynchronouslyAndReset( inOrder -> {
+			inOrder.verify( processorMock ).beginBatch();
+			inOrder.verify( work1Mock ).submitTo( processorMock );
+			inOrder.verify( work2Mock ).submitTo( processorMock );
+			inOrder.verify( processorMock ).endBatch();
+			inOrder.verify( processorMock ).beginBatch();
+			inOrder.verify( work3Mock ).submitTo( processorMock );
+			inOrder.verify( processorMock ).endBatch();
+			inOrder.verify( processorMock ).complete();
+		} );
+
+		// Submitting other works should start the executor/processor again
+		checkPostExecution();
+	}
+
 	private void verifyAsynchronouslyAndReset(Consumer<InOrder> verify) {
 		await().untilAsserted( () -> {
 			InOrder inOrder = inOrder( mocks.toArray() );
@@ -334,7 +444,7 @@ public class BatchingExecutorTest {
 		StubWork blockingWorkMock = workMock( 0 );
 		CompletableFuture<Object> blockingBatchFuture = new CompletableFuture<>();
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) blockingBatchFuture );
-		executor.submit( blockingWorkMock, OperationSubmitter.BLOCKING );
+		executor.submit( blockingWorkMock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( blockingWorkMock ).submitTo( processorMock );
@@ -394,7 +504,7 @@ public class BatchingExecutorTest {
 		StubWork workMock = workMock( 42 );
 		CompletableFuture<Object> batchFuture = CompletableFuture.completedFuture( null );
 		when( processorMock.endBatch() ).thenReturn( (CompletableFuture) batchFuture );
-		executor.submit( workMock, OperationSubmitter.BLOCKING );
+		executor.submit( workMock, operationSubmitter );
 		verifyAsynchronouslyAndReset( inOrder -> {
 			inOrder.verify( processorMock ).beginBatch();
 			inOrder.verify( workMock ).submitTo( processorMock );
