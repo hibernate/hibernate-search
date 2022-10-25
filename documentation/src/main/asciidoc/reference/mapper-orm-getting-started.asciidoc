@@ -504,7 +504,7 @@ The above paragraphs gave you an overview of Hibernate Search.
 
 The next step after this tutorial is to get more familiar
 with the overall architecture of Hibernate Search (<<architecture>>)
-and review the <<architecture-examples>> to pick the most appropriate for your use case;
+and review the <<architecture-examples,examples of architecture>> to pick the most appropriate for your use case;
 distributed applications in particular require a specific setup involving a <<coordination,coordination strategy>>.
 
 You may also want to explore the basic features in more detail.
@@ -521,10 +521,7 @@ When querying, you will probably want to know more about
 <<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>,
 <<search-dsl-aggregation,aggregations>>.
 
-You can also have a look at sample applications:
-
-* The <<architecture-examples>> give an idea of how data flows inside and outside a Hibernate Search application.
-* The link:https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-search-orm-elasticsearch-quickstart[Quarkus quickstart],
-a sample application using Hibernate Search with the link:https://quarkus.io/[Quarkus] framework.
-* The link:https://github.com/hibernate/hibernate-search/tree/main/integrationtest/showcase/library["Library" showcase],
-a sample application using Hibernate Search with the link:https://spring.io/projects/spring-boot[Spring Boot] framework.
+And if the reference documentation is not enough,
+you can find pointers to external resources for Hibernate Search as well as related software
+in the <<further-reading,Further reading>> section,
+including examples of applications using Hibernate Search.
