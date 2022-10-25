@@ -82,6 +82,13 @@ public class ThreadPoolProviderImpl implements ThreadPoolProvider {
 		return result;
 	}
 
+	@Override
+	public boolean isScheduledExecutorBlocking() {
+		// a ScheduledExecutorService returned by this provider is using an unlimited BlockingQueue underneath.
+		// Hence, it'll accept all the tasks and will sooner produce OOM rather than block.
+		return false;
+	}
+
 	/**
 	 * A handler for rejected tasks that will have the caller block until space is available.
 	 */
