@@ -9,13 +9,14 @@ package org.hibernate.search.mapper.pojo.schema.management.impl;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.reporting.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
+import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 
@@ -28,50 +29,54 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 	}
 
 	@Override
-	public CompletableFuture<?> createIfMissing(FailureCollector failureCollector) {
-		return doOperationOnTypes( IndexSchemaManager::createIfMissing, failureCollector );
+	public CompletableFuture<?> createIfMissing(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesBiFunction( IndexSchemaManager::createIfMissing, failureCollector, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrValidate(FailureCollector failureCollector) {
-		return doOperationOnTypes( IndexSchemaManager::createOrValidate, failureCollector );
+	public CompletableFuture<?> createOrValidate(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesTriFunction( IndexSchemaManager::createOrValidate, failureCollector, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrUpdate(FailureCollector failureCollector) {
-		return doOperationOnTypes( IndexSchemaManager::createOrUpdate, failureCollector );
+	public CompletableFuture<?> createOrUpdate(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesBiFunction( IndexSchemaManager::createOrUpdate, failureCollector, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> dropAndCreate(FailureCollector failureCollector) {
-		return doOperationOnTypes(
+	public CompletableFuture<?> dropAndCreate(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesBiFunction(
 				IndexSchemaManager::dropAndCreate,
-				failureCollector
+				failureCollector,
+				operationSubmitter
 		);
 	}
 
 	@Override
-	public CompletableFuture<?> dropIfExisting(FailureCollector failureCollector) {
-		return doOperationOnTypes( IndexSchemaManager::dropIfExisting, failureCollector );
+	public CompletableFuture<?> dropIfExisting(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesBiFunction( IndexSchemaManager::dropIfExisting, failureCollector, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> validate(FailureCollector failureCollector) {
-		return doOperationOnTypes( IndexSchemaManager::validate, failureCollector );
+	public CompletableFuture<?> validate(FailureCollector failureCollector, OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesTriFunction( IndexSchemaManager::validate, failureCollector, operationSubmitter );
 	}
 
-	private CompletableFuture<?> doOperationOnTypes(
-			Function<IndexSchemaManager, CompletableFuture<?>> operation,
-			FailureCollector failureCollector) {
-		return doOperationOnTypes(
-				(schemaManager, typeFailureCollector) -> operation.apply( schemaManager ),
-				failureCollector
+	private CompletableFuture<?> doOperationOnTypesBiFunction(
+			BiFunction<IndexSchemaManager, OperationSubmitter, CompletableFuture<?>> operation,
+			FailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
+		return doOperationOnTypesTriFunction(
+				(schemaManager, typeFailureCollector, submitter) -> operation.apply( schemaManager, submitter ),
+				failureCollector,
+				operationSubmitter
 		);
 	}
 
-	private CompletableFuture<?> doOperationOnTypes(
-			BiFunction<IndexSchemaManager, ContextualFailureCollector, CompletableFuture<?>> operation,
-			FailureCollector failureCollector) {
+	private CompletableFuture<?> doOperationOnTypesTriFunction(
+			TriFunction<IndexSchemaManager, ContextualFailureCollector, OperationSubmitter, CompletableFuture<?>> operation,
+			FailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[targetedTypeContexts.size()];
 		int typeCounter = 0;
 
@@ -79,7 +84,7 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 			IndexSchemaManager delegate = typeContext.schemaManager();
 			ContextualFailureCollector typeFailureCollector =
 					failureCollector.withContext( PojoEventContexts.fromType( typeContext.typeIdentifier() ) );
-			futures[typeCounter++] = operation.apply( delegate, typeFailureCollector )
+			futures[typeCounter++] = operation.apply( delegate, typeFailureCollector, operationSubmitter )
 					.exceptionally( Futures.handler( e -> {
 						typeFailureCollector.add( Throwables.expectException( e ) );
 						return null;
@@ -88,4 +93,5 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 
 		return CompletableFuture.allOf( futures );
 	}
+
 }

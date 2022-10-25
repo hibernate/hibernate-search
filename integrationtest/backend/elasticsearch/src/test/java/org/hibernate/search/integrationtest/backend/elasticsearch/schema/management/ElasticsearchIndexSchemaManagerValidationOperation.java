@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.impl.Futures;
@@ -27,13 +28,13 @@ enum ElasticsearchIndexSchemaManagerValidationOperation {
 	CREATE_OR_VALIDATE {
 		@Override
 		protected CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector) {
-			return schemaManager.createOrValidate( failureCollector );
+			return schemaManager.createOrValidate( failureCollector, OperationSubmitter.BLOCKING );
 		}
 	},
 	VALIDATE {
 		@Override
 		protected CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector) {
-			return schemaManager.validate( failureCollector );
+			return schemaManager.validate( failureCollector, OperationSubmitter.BLOCKING );
 		}
 	};
 

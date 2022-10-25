@@ -12,6 +12,7 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -86,7 +87,7 @@ public class ElasticsearchIndexSchemaManagerDropIfExistingIT {
 				)
 				.setup();
 
-		Futures.unwrappedExceptionJoin( index.schemaManager().dropIfExisting() );
+		Futures.unwrappedExceptionJoin( index.schemaManager().dropIfExisting( OperationSubmitter.BLOCKING ) );
 	}
 
 }

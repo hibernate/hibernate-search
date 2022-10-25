@@ -21,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
@@ -338,7 +339,7 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	private void checkBackendWorks() {
-		index.schemaManager().createIfMissing().join();
+		index.schemaManager().createIfMissing( OperationSubmitter.BLOCKING ).join();
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasNoHits();
 		index.index( "1", document -> { } );
 		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasDocRefHitsAnyOrder( index.typeName(), "1" );

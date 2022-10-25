@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
@@ -24,37 +25,39 @@ public class StubIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
-	public CompletableFuture<?> createIfMissing() {
+	public CompletableFuture<?> createIfMissing(OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_IF_MISSING ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector) {
+	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, failureCollector );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrUpdate() {
+	public CompletableFuture<?> createOrUpdate(OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_UPDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
-	public CompletableFuture<?> dropIfExisting() {
+	public CompletableFuture<?> dropIfExisting(OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.DROP_IF_EXISTING ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
-	public CompletableFuture<?> dropAndCreate() {
+	public CompletableFuture<?> dropAndCreate(OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.DROP_AND_CREATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );
 	}
 
 	@Override
-	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector) {
+	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.VALIDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, failureCollector );
 	}

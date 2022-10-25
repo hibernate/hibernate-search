@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrate
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -36,15 +37,17 @@ final class ElasticsearchSchemaCreator {
 	 *
 	 * @param indexNames The index names.
 	 * @param indexMetadata The expected index metadata.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	public CompletableFuture<?> createIndexAssumeNonExisting(IndexNames indexNames, IndexMetadata indexMetadata) {
+	public CompletableFuture<?> createIndexAssumeNonExisting(IndexNames indexNames, IndexMetadata indexMetadata, OperationSubmitter operationSubmitter) {
 		return schemaAccessor.createIndexAssumeNonExisting(
 				createPrimaryIndexName( indexNames ),
 				indexMetadata.getAliases(),
 				indexMetadata.getSettings(),
-				indexMetadata.getMapping()
+				indexMetadata.getMapping(),
+				operationSubmitter
 		);
 	}
 
@@ -53,11 +56,12 @@ final class ElasticsearchSchemaCreator {
 	 *
 	 * @param indexNames The index names.
 	 * @param indexMetadata The expected index metadata.
+	 * @param operationSubmitter How to handle request to submit operation when the queue is full.
 	 * @return A future holding the metadata of the pre-existing index, or null if the index had to be created.
 	 * @throws SearchException If an error occurs.
 	 */
-	public CompletableFuture<ExistingIndexMetadata> createIndexIfAbsent(IndexNames indexNames, IndexMetadata indexMetadata) {
-		return schemaAccessor.getCurrentIndexMetadataOrNull( indexNames )
+	public CompletableFuture<ExistingIndexMetadata> createIndexIfAbsent(IndexNames indexNames, IndexMetadata indexMetadata, OperationSubmitter operationSubmitter) {
+		return schemaAccessor.getCurrentIndexMetadataOrNull( indexNames, operationSubmitter )
 				.thenCompose( existingIndexMetadata -> {
 					if ( existingIndexMetadata != null ) {
 						return CompletableFuture.completedFuture( existingIndexMetadata );
@@ -67,7 +71,8 @@ final class ElasticsearchSchemaCreator {
 								createPrimaryIndexName( indexNames ),
 								indexMetadata.getAliases(),
 								indexMetadata.getSettings(),
-								indexMetadata.getMapping()
+								indexMetadata.getMapping(),
+								operationSubmitter
 						)
 								.thenApply( ignored -> null );
 					}

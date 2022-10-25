@@ -42,13 +42,17 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 		// The setup currently creates the index: work around that.
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
+						OperationSubmitter.BLOCKING
+				)
 		);
 
 		assertThat( indexExists() ).isFalse();
 
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
+						OperationSubmitter.BLOCKING
+				)
 		);
 
 		// No exception was thrown and the index still doesn't exist.
@@ -62,7 +66,9 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 		setup();
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.CREATE_IF_MISSING.apply( index.schemaManager() )
+				LuceneIndexSchemaManagerOperation.CREATE_IF_MISSING.apply( index.schemaManager(),
+						OperationSubmitter.BLOCKING
+				)
 		);
 
 		assertThat( indexExists() ).isTrue();
@@ -75,7 +81,9 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
 
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
+						OperationSubmitter.BLOCKING
+				)
 		);
 
 		assertThat( indexExists() ).isFalse();

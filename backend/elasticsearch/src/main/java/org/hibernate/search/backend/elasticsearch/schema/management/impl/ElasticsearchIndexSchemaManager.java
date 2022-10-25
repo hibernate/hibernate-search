@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.factory.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
@@ -47,14 +48,16 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
-	public CompletableFuture<?> createIfMissing() {
-		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
-				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
+	public CompletableFuture<?> createIfMissing(OperationSubmitter operationSubmitter) {
+		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata, operationSubmitter )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions,
+						operationSubmitter ) );
 	}
 
 	@Override
-	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector) {
-		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
+	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
+		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata, operationSubmitter )
 				.thenAccept( preExistingIndexMetadata -> {
 					if ( preExistingIndexMetadata != null ) {
 						schemaValidator.validate(
@@ -65,49 +68,54 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 				} )
 				.thenCompose( ignored -> failureCollector.hasFailure()
 						? CompletableFuture.completedFuture( null )
-						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions )
+						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions, operationSubmitter )
 				);
 	}
 
 	@Override
-	public CompletableFuture<?> createOrUpdate() {
-		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
+	public CompletableFuture<?> createOrUpdate(OperationSubmitter operationSubmitter) {
+		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata, operationSubmitter )
 				.thenCompose( existingIndexMetadata -> {
 					if ( existingIndexMetadata != null ) {
 						return schemaMigrator.migrate(
 								URLEncodedString.fromString( existingIndexMetadata.getPrimaryName() ),
-								expectedMetadata, existingIndexMetadata.getMetadata()
+								expectedMetadata, existingIndexMetadata.getMetadata(),
+								operationSubmitter
 						);
 					}
 					else {
 						return CompletableFuture.completedFuture( null );
 					}
 				} )
-				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions,
+						operationSubmitter ) );
 	}
 
 	@Override
-	public CompletableFuture<?> dropIfExisting() {
-		return schemaDropper.dropIfExisting( indexNames );
+	public CompletableFuture<?> dropIfExisting(OperationSubmitter operationSubmitter) {
+		return schemaDropper.dropIfExisting( indexNames, operationSubmitter );
 	}
 
 	@Override
-	public CompletableFuture<?> dropAndCreate() {
-		return schemaDropper.dropIfExisting( indexNames )
-				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( indexNames, expectedMetadata ) )
-				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
+	public CompletableFuture<?> dropAndCreate(OperationSubmitter operationSubmitter) {
+		return schemaDropper.dropIfExisting( indexNames, operationSubmitter )
+				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( indexNames, expectedMetadata,
+						operationSubmitter ) )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions,
+						operationSubmitter ) );
 	}
 
 	@Override
-	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector) {
-		return schemaAccessor.getCurrentIndexMetadata( indexNames )
+	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector,
+			OperationSubmitter operationSubmitter) {
+		return schemaAccessor.getCurrentIndexMetadata( indexNames, operationSubmitter )
 				.thenAccept( actualIndexMetadata -> schemaValidator.validate(
 						expectedMetadata, actualIndexMetadata.getMetadata(),
 						failureCollector
 				) )
 				.thenCompose( ignored -> failureCollector.hasFailure()
 						? CompletableFuture.completedFuture( null )
-						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions )
+						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions, operationSubmitter )
 				);
 	}
 }

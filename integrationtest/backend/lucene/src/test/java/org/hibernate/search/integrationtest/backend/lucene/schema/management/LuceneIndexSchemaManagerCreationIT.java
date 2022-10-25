@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.EnumSet;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
@@ -60,7 +61,7 @@ public class LuceneIndexSchemaManagerCreationIT {
 	}
 
 	private void create() {
-		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager(), OperationSubmitter.BLOCKING ) );
 	}
 
 	private void setup() {

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.schema.management.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 /**
@@ -18,16 +19,47 @@ import org.hibernate.search.engine.reporting.spi.FailureCollector;
  */
 public interface PojoScopeSchemaManager {
 
-	CompletableFuture<?> createIfMissing(FailureCollector failureCollector);
+	CompletableFuture<?> createIfMissing(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> createOrValidate(FailureCollector failureCollector);
+	@Deprecated
+	default CompletableFuture<?> createIfMissing(FailureCollector failureCollector) {
+		return createIfMissing( failureCollector, OperationSubmitter.BLOCKING );
+	}
 
-	CompletableFuture<?> createOrUpdate(FailureCollector failureCollector);
+	CompletableFuture<?> createOrValidate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> dropAndCreate(FailureCollector failureCollector);
+	@Deprecated
+	default CompletableFuture<?> createOrValidate(FailureCollector failureCollector) {
+		return createOrValidate( failureCollector, OperationSubmitter.BLOCKING );
+	}
 
-	CompletableFuture<?> dropIfExisting(FailureCollector failureCollector);
+	CompletableFuture<?> createOrUpdate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
 
-	CompletableFuture<?> validate(FailureCollector failureCollector);
+	@Deprecated
+	default CompletableFuture<?> createOrUpdate(FailureCollector failureCollector) {
+		return createOrUpdate( failureCollector, OperationSubmitter.BLOCKING );
+	}
+
+	CompletableFuture<?> dropAndCreate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
+
+	@Deprecated
+	default CompletableFuture<?> dropAndCreate(FailureCollector failureCollector) {
+		return dropAndCreate( failureCollector, OperationSubmitter.BLOCKING );
+	}
+
+	CompletableFuture<?> dropIfExisting(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
+
+	@Deprecated
+	default CompletableFuture<?> dropIfExisting(FailureCollector failureCollector) {
+		return dropIfExisting( failureCollector, OperationSubmitter.BLOCKING );
+	}
+
+	CompletableFuture<?> validate(FailureCollector failureCollector, OperationSubmitter operationSubmitter);
+
+	@Deprecated
+	default CompletableFuture<?> validate(FailureCollector failureCollector) {
+		return validate( failureCollector, OperationSubmitter.BLOCKING );
+	}
+
 
 }

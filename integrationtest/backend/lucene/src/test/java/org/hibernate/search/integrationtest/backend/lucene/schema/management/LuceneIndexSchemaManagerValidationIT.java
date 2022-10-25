@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 
+import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -37,7 +38,9 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 		// The setup currently creates the index: work around that.
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager(),
+						OperationSubmitter.BLOCKING
+				)
 		);
 
 		assertThat( indexExists() ).isFalse();
@@ -70,7 +73,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 	private void validate() {
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.VALIDATE.apply( index.schemaManager() )
+				LuceneIndexSchemaManagerOperation.VALIDATE.apply( index.schemaManager(), OperationSubmitter.BLOCKING )
 		);
 	}
 
