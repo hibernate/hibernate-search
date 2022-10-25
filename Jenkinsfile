@@ -259,6 +259,12 @@ stage('Configure') {
 					new OpenSearchLocalBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE),
 					new OpenSearchLocalBuildEnvironment(version: '2.0', mavenProfile: 'opensearch-2.0',
+							condition: TestCondition.AFTER_MERGE),
+					new OpenSearchLocalBuildEnvironment(version: '2.1', mavenProfile: 'opensearch-2.1',
+							condition: TestCondition.AFTER_MERGE),
+					new OpenSearchLocalBuildEnvironment(version: '2.2', mavenProfile: 'opensearch-2.2',
+							condition: TestCondition.AFTER_MERGE),
+					new OpenSearchLocalBuildEnvironment(version: '2.3', mavenProfile: 'opensearch-2.3',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			esAws: [
