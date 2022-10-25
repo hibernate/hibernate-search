@@ -263,7 +263,7 @@ stage('Configure') {
 					// --------------------------------------------
 					// OpenSearch
 					new OpenSearchEsLocalBuildEnvironment(version: '1.0', mavenProfile: 'opensearch-1.0',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new OpenSearchEsLocalBuildEnvironment(version: '1.2', mavenProfile: 'opensearch-1.2',
 							condition: TestCondition.AFTER_MERGE)
 			],
