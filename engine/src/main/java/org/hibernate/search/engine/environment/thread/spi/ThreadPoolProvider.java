@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.environment.thread.spi;
 
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -55,5 +56,11 @@ public interface ThreadPoolProvider {
 	 * @return the new ExecutorService
 	 */
 	ScheduledExecutorService newScheduledExecutor(int threads, String threadNamePrefix);
+
+	/**
+	 *  @return {@code true} if the executors returned by {@link #newScheduledExecutor} may block when submitting a task;
+	 *  {@code false} if they never block (e.g. they throw an {@link RejectedExecutionException}).
+	 */
+	boolean isScheduledExecutorBlocking();
 
 }

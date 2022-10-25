@@ -620,7 +620,6 @@ public interface Log extends BasicLogger {
 			+ " Try setting the field structure to 'NESTED' and reindexing all your data.")
 	String missingSupportHintForObjectProjectionOnMultiValuedFlattenedObjectNode();
 
-	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 156, value = "Nonblocking operation submitter is not supported.")
-	void nonblockingOperationSubmitterNotSupported();
+	SearchException nonblockingOperationSubmitterNotSupported();
 }

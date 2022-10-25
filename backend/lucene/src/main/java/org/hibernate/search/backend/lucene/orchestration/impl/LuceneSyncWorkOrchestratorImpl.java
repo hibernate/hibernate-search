@@ -56,7 +56,7 @@ public class LuceneSyncWorkOrchestratorImpl
 		);
 		Throwable throwable = null;
 		try {
-			submit( workExecution );
+			submit( workExecution, OperationSubmitter.BLOCKING );
 			// If we get there, the task succeeded and we are sure there is a result.
 			return workExecution.getResult();
 		}
@@ -83,9 +83,9 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(WorkExecution<?> work, OperationSubmitter ignore) {
-		if ( !OperationSubmitter.BLOCKING.equals( ignore ) ) {
-			log.nonblockingOperationSubmitterNotSupported();
+	protected void doSubmit(WorkExecution<?> work, OperationSubmitter operationSubmitter) {
+		if ( !OperationSubmitter.BLOCKING.equals( operationSubmitter ) ) {
+			throw log.nonblockingOperationSubmitterNotSupported();
 		}
 		work.execute();
 	}
