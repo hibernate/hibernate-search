@@ -640,13 +640,43 @@
             </properties>
         </profile>
 
-        <!-- OpenSearch 2.0+ test environment -->
+        <!-- OpenSearch 2.0 test environment -->
         <profile>
             <id>opensearch-2.0</id>
             <properties>
                 <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
                 <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
                 <test.elasticsearch.connection.version>${version.org.opensearch.latest-2.0}</test.elasticsearch.connection.version>
+            </properties>
+        </profile>
+
+        <!-- OpenSearch 2.1 test environment -->
+        <profile>
+            <id>opensearch-2.1</id>
+            <properties>
+                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
+                <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
+                <test.elasticsearch.connection.version>${version.org.opensearch.latest-2.1}</test.elasticsearch.connection.version>
+            </properties>
+        </profile>
+
+        <!-- OpenSearch 2.2 test environment -->
+        <profile>
+            <id>opensearch-2.2</id>
+            <properties>
+                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
+                <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
+                <test.elasticsearch.connection.version>${version.org.opensearch.latest-2.2}</test.elasticsearch.connection.version>
+            </properties>
+        </profile>
+
+        <!-- OpenSearch 2.3+ test environment -->
+        <profile>
+            <id>opensearch-2.3</id>
+            <properties>
+                <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
+                <test.elasticsearch.connection.distribution>opensearch</test.elasticsearch.connection.distribution>
+                <test.elasticsearch.connection.version>${version.org.opensearch.latest-2.3}</test.elasticsearch.connection.version>
             </properties>
         </profile>
 
