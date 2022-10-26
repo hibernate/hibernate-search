@@ -7,25 +7,25 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
+import static org.junit.Assume.assumeFalse;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * Tests related to analyzers when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionMigrationIT")
-@Category(RequiresIndexOpenClose.class)
 public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 
 	@Rule
@@ -35,6 +35,15 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
+
+	@Before
+	public void checkAssumption() {
+		assumeFalse(
+				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes." +
+						" These operations are not available on AWS in particular.",
+				ElasticsearchTestHostConnectionConfiguration.get().isAws()
+		);
+	}
 
 	@Test
 	public void nothingToDo() throws Exception {
