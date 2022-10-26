@@ -21,7 +21,7 @@
         <failsafe.excludedGroups.elasticsearch.version />
         <!-- By default AWS is not enabled, which means we need to exclude these categories -->
         <failsafe.excludedGroups.elasticsearch.aws>
-            org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing
+            <!-- Nothing here -->
         </failsafe.excludedGroups.elasticsearch.aws>
     </properties>
 
@@ -110,9 +110,7 @@
             </activation>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.aws>
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoAutomaticAuthenticationHeader
+                    <!-- Nothing here -->
                 </failsafe.excludedGroups.elasticsearch.aws>
                 <test.elasticsearch.connection.aws.signing.enabled>true</test.elasticsearch.connection.aws.signing.enabled>
             </properties>
