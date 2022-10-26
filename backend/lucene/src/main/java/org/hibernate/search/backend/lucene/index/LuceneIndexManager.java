@@ -10,7 +10,7 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 import org.apache.lucene.analysis.Analyzer;

@@ -4,15 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.work.execution.spi;
+package org.hibernate.search.engine.backend.work.execution;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+
+import org.hibernate.search.util.common.annotation.Incubating;
 
 
 /**
  * Interface defining how operation should be submitted to the queue.
  */
+@Incubating
 public enum OperationSubmitter {
 
 	/**

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrate
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
-import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.common.SearchException;
 
 /**

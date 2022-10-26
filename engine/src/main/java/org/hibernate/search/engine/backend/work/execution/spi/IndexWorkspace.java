@@ -9,6 +9,8 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+
 /**
  * The entry point for explicit index operations on a single index.
  */
