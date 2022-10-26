@@ -596,10 +596,10 @@
 
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
         <test.elasticsearch.run.elastic.image.name>elastic/elasticsearch</test.elasticsearch.run.elastic.image.name>
-        <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
+        <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.elastic.image.tag>
         <test.elasticsearch.run.opensearch.skip>true</test.elasticsearch.run.opensearch.skip>
         <test.elasticsearch.run.opensearch.image.name>opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
-        <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.opensearch.image.tag>
+        <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.version}</test.elasticsearch.run.opensearch.image.tag>
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:
@@ -608,9 +608,9 @@
              because we will be able to change the configuration without re-compiling the configuration file
              (which is located in a dependency of the integration tests modules).
          -->
+        <test.elasticsearch.distribution></test.elasticsearch.distribution>
+        <test.elasticsearch.version></test.elasticsearch.version>
         <test.elasticsearch.connection.uris></test.elasticsearch.connection.uris>
-        <test.elasticsearch.connection.distribution></test.elasticsearch.connection.distribution>
-        <test.elasticsearch.connection.version></test.elasticsearch.connection.version>
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
         <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>
@@ -2225,7 +2225,7 @@
                             <org.hibernate.search.version>${project.version}</org.hibernate.search.version>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.connection.distribution}:${test.elasticsearch.connection.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.distribution}:${test.elasticsearch.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
                         </systemPropertyVariables>
                         <jvm>${java-version.test.launcher}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
