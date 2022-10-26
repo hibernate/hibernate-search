@@ -130,9 +130,7 @@
             <id>elasticsearch-5.6</id>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
-                    ,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresSingleModelDialectForMajorVersion
+                    <!-- Nothing here -->
                 </failsafe.excludedGroups.elasticsearch.version>
             </properties>
         </profile>
@@ -142,8 +140,7 @@
             <id>elasticsearch-6.0</id>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
-                    ,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex
+                    <!-- Nothing here -->
                 </failsafe.excludedGroups.elasticsearch.version>
             </properties>
         </profile>
@@ -153,8 +150,7 @@
             <id>elasticsearch-6.3</id>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
-                    ,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex
+                    <!-- Nothing here -->
                 </failsafe.excludedGroups.elasticsearch.version>
             </properties>
         </profile>
