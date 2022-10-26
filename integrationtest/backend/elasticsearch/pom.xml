@@ -16,13 +16,6 @@
         <surefire.module>elasticsearch</surefire.module>
 
         <test.elasticsearch.run.skip>${test.elasticsearch.connection.uris.defined}</test.elasticsearch.run.skip>
-
-        <!-- By default we don't exclude tests because of the version, but profiles override this -->
-        <failsafe.excludedGroups.elasticsearch.version />
-        <!-- By default AWS is not enabled, which means we need to exclude these categories -->
-        <failsafe.excludedGroups.elasticsearch.aws>
-            <!-- Nothing here -->
-        </failsafe.excludedGroups.elasticsearch.aws>
     </properties>
 
     <dependencies>
@@ -83,11 +76,6 @@
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
-                            <!-- Note trailing commas are ignored. -->
-                            <excludedGroups>
-                                ${failsafe.excludedGroups.elasticsearch.aws}
-                                ${failsafe.excludedGroups.elasticsearch.version}
-                            </excludedGroups>
                         </configuration>
                     </execution>
                 </executions>
@@ -108,12 +96,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.aws>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.aws>
-                <test.elasticsearch.connection.aws.signing.enabled>true</test.elasticsearch.connection.aws.signing.enabled>
-            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate.search</groupId>
@@ -121,173 +103,6 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
-        </profile>
-
-        <!-- Elasticsearch 5.6 test environment -->
-        <profile>
-            <id>elasticsearch-5.6</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 6.0 to 6.2 test environment -->
-        <profile>
-            <id>elasticsearch-6.0</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 6.3 test environment -->
-        <profile>
-            <id>elasticsearch-6.3</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 6.4 to 6.6 test environment -->
-        <profile>
-            <id>elasticsearch-6.4</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 6.7 test environment -->
-        <profile>
-            <id>elasticsearch-6.7</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 6.8 test environment -->
-        <profile>
-            <id>elasticsearch-6.8</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.0 to 7.2 test environment -->
-        <profile>
-            <id>elasticsearch-7.0</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.3 to 7.6 test environment -->
-        <profile>
-            <id>elasticsearch-7.3</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.7 test environment -->
-        <profile>
-            <id>elasticsearch-7.7</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.8 to 7.9 test environment -->
-        <profile>
-            <id>elasticsearch-7.8</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.10 test environment (default) -->
-        <profile>
-            <id>elasticsearch-7.10</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.11 test environment -->
-        <profile>
-            <id>elasticsearch-7.11</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 7.12 to 7.17 test environment -->
-        <profile>
-            <id>elasticsearch-7.12</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 8.0+ test environment -->
-        <profile>
-            <id>elasticsearch-8.0</id>
-            <activation>
-                <!-- This must be re-defined here: the activation defined in the parent pom is not enough -->
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.version</name>
-                </property>
-            </activation>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- OpenSearch 1.0 to 1.3 test environment -->
-        <profile>
-            <id>opensearch-1.0</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
-        </profile>
-
-        <!-- OpenSearch 2.0+ test environment -->
-        <profile>
-            <id>opensearch-2.0</id>
-            <properties>
-                <failsafe.excludedGroups.elasticsearch.version>
-                    <!-- Nothing here -->
-                </failsafe.excludedGroups.elasticsearch.version>
-            </properties>
         </profile>
     </profiles>
 
