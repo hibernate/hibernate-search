@@ -540,8 +540,8 @@ stage('Non-default environments') {
 			runBuildOnNode {
 				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
-							-Dtest.elasticsearch.connection.distribution=$buildEnv.distribution \
-							-Dtest.elasticsearch.connection.version=$buildEnv.version \
+							-Dtest.elasticsearch.distribution=$buildEnv.distribution \
+							-Dtest.elasticsearch.version=$buildEnv.version \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
 								'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
@@ -588,8 +588,8 @@ stage('Non-default environments') {
 											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
 											'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
 											 ].join(',')} \
-										-Dtest.elasticsearch.connection.distribution=$buildEnv.distribution \
-										-Dtest.elasticsearch.connection.version=$buildEnv.version \
+										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
+										-Dtest.elasticsearch.version=$buildEnv.version \
 										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
@@ -624,8 +624,8 @@ stage('Non-default environments') {
 									mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-										-Dtest.elasticsearch.connection.distribution=$buildEnv.distribution \
-										-Dtest.elasticsearch.connection.version=$buildEnv.version \
+										-Dtest.elasticsearch.distribution=$buildEnv.distribution \
+										-Dtest.elasticsearch.version=$buildEnv.version \
 										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \

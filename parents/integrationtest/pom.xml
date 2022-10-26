@@ -488,7 +488,7 @@
             <id>elasticsearch</id>
             <activation>
                 <property>
-                    <name>test.elasticsearch.connection.distribution</name>
+                    <name>test.elasticsearch.distribution</name>
                     <value>elastic</value>
                 </property>
             </activation>
@@ -501,7 +501,7 @@
             <id>opensearch</id>
             <activation>
                 <property>
-                    <name>test.elasticsearch.connection.distribution</name>
+                    <name>test.elasticsearch.distribution</name>
                     <value>opensearch</value>
                 </property>
             </activation>
