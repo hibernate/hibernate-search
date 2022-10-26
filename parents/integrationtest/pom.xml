@@ -734,7 +734,7 @@
                 <db.dialect>org.hibernate.dialect.DB297Dialect</db.dialect>
                 <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
-                <jdbc.driver.version>11.5.5.0</jdbc.driver.version>
+                <jdbc.driver.version>11.5.8.0</jdbc.driver.version>
                 <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
                 <jdbc.url>jdbc:db2://localhost:50005/hreact</jdbc.url>
                 <jdbc.user>hreact</jdbc.user>

@@ -599,7 +599,7 @@
         <!-- DB2 -->
         <test.database.run.db2.skip>true</test.database.run.db2.skip>
         <test.database.run.db2.image.name>ibmcom/db2</test.database.run.db2.image.name>
-        <test.database.run.db2.image.tag>11.5.5.0</test.database.run.db2.image.tag>
+        <test.database.run.db2.image.tag>11.5.8.0</test.database.run.db2.image.tag>
         <!-- Oracle -->
         <test.database.run.oracle.skip>true</test.database.run.oracle.skip>
         <!-- See https://hub.docker.com/r/gvenzl/oracle-xe -->
