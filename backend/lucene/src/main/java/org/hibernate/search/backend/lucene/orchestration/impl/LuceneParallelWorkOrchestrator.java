@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
-import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 
 /**
  * A thread-safe component planning the execution of works

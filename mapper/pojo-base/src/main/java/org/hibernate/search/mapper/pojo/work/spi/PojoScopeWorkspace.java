@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 
 public interface PojoScopeWorkspace {
 

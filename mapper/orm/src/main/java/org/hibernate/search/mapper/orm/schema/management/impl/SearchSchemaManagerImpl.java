@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.schema.management.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.spi.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
