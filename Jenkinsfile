@@ -205,110 +205,85 @@ stage('Configure') {
 			esLocal: [
 					// --------------------------------------------
 					// Elasticsearch distribution from Elastic
-					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
-							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '5.6.16', condition: TestCondition.AFTER_MERGE),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
 					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
-					new EsLocalBuildEnvironment(versionRange: '[6.0,6.2)', mavenProfile: 'elasticsearch-6.0',
-							condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '6.2.4', condition: TestCondition.ON_DEMAND),
 					// ES 6.3 has a bug that prevents IndexingIT from passing.
 					// See https://github.com/elastic/elasticsearch/issues/32395
-					new EsLocalBuildEnvironment(versionRange: '[6.3,6.4)', mavenProfile: 'elasticsearch-6.3',
-							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[6.4,6.7)', mavenProfile: 'elasticsearch-6.4',
-							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '6.3.2', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '6.6.2', condition: TestCondition.AFTER_MERGE),
 					// Not testing 6.7 to make the build quicker.
 					// The only difference with 6.8+ is a bug in field sorts that is already present in earlier versions.
-					new EsLocalBuildEnvironment(versionRange: '[6.7,6.8)', mavenProfile: 'elasticsearch-6.7',
-							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[6.8,7.0)', mavenProfile: 'elasticsearch-6.8',
-							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '6.7.2', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '6.8.22', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.0/7.1/7.2 to make the build quicker.
 					// The only difference with 7.3+ is they have a bug in their BigInteger support.
-					new EsLocalBuildEnvironment(versionRange: '[7.0,7.3)', mavenProfile: 'elasticsearch-7.0',
-							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[7.3,7.7)', mavenProfile: 'elasticsearch-7.3',
-							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '7.2.1', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '7.6.2', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.7 to make the build quicker.
 					// The only difference with 7.7+ is how we create templates for tests.
-					new EsLocalBuildEnvironment(versionRange: '[7.7,7.8)', mavenProfile: 'elasticsearch-7.7',
-							condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '7.7.1', condition: TestCondition.ON_DEMAND),
 					// Not testing 7.9 to make the build quicker.
 					// The only difference with 7.10+ is an additional test for exists on null values,
 					// which is disabled on 7.10 but enabled on all older versions (not just 7.9).
-					new EsLocalBuildEnvironment(versionRange: '[7.8,7.10)', mavenProfile: 'elasticsearch-7.8',
-							condition: TestCondition.AFTER_MERGE),
-					new EsLocalBuildEnvironment(versionRange: '[7.10,7.11)', mavenProfile: 'elasticsearch-7.10',
-							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '7.9.3', condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '7.10.1', condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.11 to make the build quicker.
 					// The only difference with 7.12+ is that wildcard predicates on analyzed fields get their pattern normalized,
 					// and that was deemed a bug: https://github.com/elastic/elasticsearch/pull/53127
-					new EsLocalBuildEnvironment(versionRange: '[7.11,7.12)', mavenProfile: 'elasticsearch-7.11',
-							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[7.12,8.0)', mavenProfile: 'elasticsearch-7.12',
-							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(version: '7.11.2', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '7.12.1', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '7.13.2', condition: TestCondition.ON_DEMAND),
+					// 7.14 and 7.15 have annoying bugs that make almost all of our test suite fail,
+					// so we don't test them
+					// See https://hibernate.atlassian.net/browse/HSEARCH-4340
+					new EsLocalBuildEnvironment(version: '7.16.3', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '7.17.0', condition: TestCondition.AFTER_MERGE),
 					// Not testing 8.0 because we know there are problems in 8.0.1 (see https://hibernate.atlassian.net/browse/HSEARCH-4497)
 					// Not testing 8.1 to make the build quicker.
-					new EsLocalBuildEnvironment(versionRange: '[8.2,8.x)', mavenProfile: 'elasticsearch-8.0',
-							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
+					new EsLocalBuildEnvironment(version: '8.1.3', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '8.2.3', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '8.3.3', condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(version: '8.4.3', condition: TestCondition.BEFORE_MERGE, isDefault: true),
 
 					// --------------------------------------------
 					// OpenSearch
 					// Not testing 1.0 - 1.2 to make the build quicker.
-					new OpenSearchLocalBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
-							condition: TestCondition.AFTER_MERGE),
-					new OpenSearchLocalBuildEnvironment(version: '2.0', mavenProfile: 'opensearch-2.0',
-							condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.1', mavenProfile: 'opensearch-2.1',
-							condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.2', mavenProfile: 'opensearch-2.2',
-							condition: TestCondition.ON_DEMAND),
-					new OpenSearchLocalBuildEnvironment(version: '2.3', mavenProfile: 'opensearch-2.3',
-							condition: TestCondition.AFTER_MERGE)
+					new OpenSearchLocalBuildEnvironment(version: '1.3.6', condition: TestCondition.AFTER_MERGE),
+					// See https://opensearch.org/lines/1x.html for a list of all 1.x versions
+					new OpenSearchLocalBuildEnvironment(version: '2.0.1', condition: TestCondition.ON_DEMAND),
+					new OpenSearchLocalBuildEnvironment(version: '2.1.0', condition: TestCondition.ON_DEMAND),
+					new OpenSearchLocalBuildEnvironment(version: '2.2.1', condition: TestCondition.ON_DEMAND),
+					new OpenSearchLocalBuildEnvironment(version: '2.3.0', condition: TestCondition.AFTER_MERGE)
+					// See https://opensearch.org/lines/2x.html for a list of all 2.x versions
 			],
 			esAws: [
 					// --------------------------------------------
 					// AWS Elasticsearch service (OpenDistro)
-					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0',
-							condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '5.6', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.0', condition: TestCondition.ON_DEMAND),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
 					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
-					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0',
-							condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.2', condition: TestCondition.ON_DEMAND),
 					// ES 6.3 has a bug that prevents IndexingIT from passing.
 					// See https://github.com/elastic/elasticsearch/issues/32395
-					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.3',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.4',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.4',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.8',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.8',
-							condition: TestCondition.ON_DEMAND),
-					new EsAwsBuildEnvironment(version: '7.10', mavenProfile: 'elasticsearch-7.10',
-							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '6.3', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.4', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.5', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.7', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.8', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '7.1', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '7.4', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '7.7', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '7.8', condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '7.10', condition: TestCondition.AFTER_MERGE),
 
 					// --------------------------------------------
 					// AWS OpenSearch service
-					new OpenSearchAwsBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
-							condition: TestCondition.AFTER_MERGE),
+					new OpenSearchAwsBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE),
 					// Also test static credentials, but only for the latest version
-					new OpenSearchAwsBuildEnvironment(version: '1.3', mavenProfile: 'opensearch-1.0',
-							staticCredentials: true,
-							condition: TestCondition.AFTER_MERGE)
+					new OpenSearchAwsBuildEnvironment(version: '1.3', condition: TestCondition.AFTER_MERGE, staticCredentials: true)
 			]
 	])
 
@@ -565,12 +540,13 @@ stage('Non-default environments') {
 			runBuildOnNode {
 				withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
+							-Dtest.elasticsearch.connection.distribution=$buildEnv.distribution \
+							-Dtest.elasticsearch.connection.version=$buildEnv.version \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
 								'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
 								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-realbackend'
 								 ].join(',')} \
-							${toElasticsearchVersionArgs(buildEnv.mavenProfile, null)} \
 					"""
 				}
 			}
@@ -612,7 +588,8 @@ stage('Non-default environments') {
 											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
 											'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
 											 ].join(',')} \
-										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
+										-Dtest.elasticsearch.connection.distribution=$buildEnv.distribution \
+										-Dtest.elasticsearch.connection.version=$buildEnv.version \
 										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
@@ -647,7 +624,8 @@ stage('Non-default environments') {
 									mavenNonDefaultBuild buildEnv, """ \
 										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
+										-Dtest.elasticsearch.connection.distribution=$buildEnv.distribution \
+										-Dtest.elasticsearch.connection.version=$buildEnv.version \
 										-Dtest.elasticsearch.connection.uris=$env.LOCKED_RESOURCE_URI \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$env.ES_AWS_REGION \
@@ -730,21 +708,21 @@ class DatabaseBuildEnvironment extends BuildEnvironment {
 }
 
 class EsLocalBuildEnvironment extends BuildEnvironment {
-	String versionRange
-	String mavenProfile
+	String version
 	@Override
-	String getTag() { "elasticsearch-local-$versionRange" }
+    String getTag() { "elasticsearch-local-$version" }
+    String getDistribution() { "elastic" }
 }
 
 class OpenSearchLocalBuildEnvironment extends EsLocalBuildEnvironment {
 	String version
 	@Override
 	String getTag() { "opensearch-local-$version" }
+	@Override
+	String getDistribution() { "opensearch" }
 }
 
-class EsAwsBuildEnvironment extends BuildEnvironment {
-	String version
-	String mavenProfile
+class EsAwsBuildEnvironment extends EsLocalBuildEnvironment {
 	boolean staticCredentials = false
 	@Override
 	String getTag() { "elasticsearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
@@ -759,6 +737,8 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 class OpenSearchAwsBuildEnvironment extends EsAwsBuildEnvironment {
 	@Override
 	String getTag() { "opensearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
+	@Override
+	String getDistribution() { "opensearch" }
 	@Override
 	String getLockedResourcesLabel() {
 		"opensearch-aws-${nameEmbeddableVersion}"
@@ -899,24 +879,6 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 						--fail-at-end \
 						$args \
 		"""
-	}
-}
-
-String toElasticsearchVersionArgs(String mavenEsProfile, String version) {
-	String defaultEsProfile = environments.content.esLocal.default.mavenProfile
-	if ( version ) {
-		// The default profile is disabled, because a version is passed explicitly
-		// We just need to set the correct profile and pass the version
-		"-P$mavenEsProfile -Dtest.elasticsearch.connection.version=$version"
-	}
-	else if ( mavenEsProfile != defaultEsProfile) {
-		// Disable the default profile to avoid conflicting configurations
-		"-P!$defaultEsProfile,$mavenEsProfile"
-	}
-	else {
-		// Do not do as above, as we would tell Maven "disable the default profile, but enable it"
-		// and Maven would end up disabling it.
-		''
 	}
 }
 
