@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-parent</artifactId>
-        <version>5.11.11-SNAPSHOT</version>
+        <version>5.11.11.Final</version>
     </parent>
     <artifactId>hibernate-search-sharedtestresources</artifactId>
     <packaging>pom</packaging>

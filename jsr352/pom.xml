@@ -12,7 +12,7 @@
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.11.11-SNAPSHOT</version>
+        <version>5.11.11.Final</version>
     </parent>
 
     <artifactId>hibernate-search-jsr352-parent</artifactId>
