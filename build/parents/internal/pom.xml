@@ -12,7 +12,7 @@
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent</artifactId>
         <version>6.2.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../..</relativePath>
     </parent>
     <artifactId>hibernate-search-parent-internal</artifactId>
     <packaging>pom</packaging>

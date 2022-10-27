@@ -21,8 +21,8 @@
     <description>Hibernate Search Aggregator POM for ORM6 Artifacts</description>
 
     <modules>
-        <module>parents/public</module>
-        <module>parents/internal</module>
+        <module>build/parents/public</module>
+        <module>build/parents/internal</module>
         <module>util/internal/test/orm</module>
         <module>mapper/orm</module>
         <module>mapper/orm-coordination-outbox-polling</module>
@@ -30,7 +30,7 @@
         <module>mapper/orm-batch-jsr352/jberet</module>
         <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>
-        <module>parents/integrationtest</module>
+        <module>build/parents/integrationtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
     </modules>
