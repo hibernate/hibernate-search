@@ -48,6 +48,11 @@
              and Spring Boot ITs fail to detect configuration defined in the main (non-test) code.
              So, disable the modulepath explicitly. -->
         <failsafe.useModulePath>false</failsafe.useModulePath>
+        <!--
+            Enable elastic distribution container by default. If a simple `mvn clean install` is executed without any
+            additional parameters it will start ES container.
+        -->
+        <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
     </properties>
 
     <dependencyManagement>
@@ -434,7 +439,7 @@
              Different profiles are needed to handle the environment setup (which is handled in Maven,
              on contrary to the various database profiles).
 
-             To run tests against a different version of Elasticsearch, see README.md.
+             To run tests against a different version of Elasticsearch, see CONTRIBUTING.md.
           -->
 
         <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
@@ -485,19 +490,6 @@
         </profile>
 
         <profile>
-            <id>elasticsearch</id>
-            <activation>
-                <property>
-                    <name>test.elasticsearch.distribution</name>
-                    <value>elastic</value>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.elastic.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.elastic.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>opensearch</id>
             <activation>
                 <property>
@@ -507,6 +499,8 @@
             </activation>
             <properties>
                 <test.elasticsearch.run.opensearch.skip>${test.elasticsearch.run.skip}</test.elasticsearch.run.opensearch.skip>
+                <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
+                <test.elasticsearch.version>${version.org.opensearch.latest}</test.elasticsearch.version>
             </properties>
         </profile>
 
