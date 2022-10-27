@@ -99,7 +99,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingCollectionBaseIT
 		private ContainingEntity child;
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_containedIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -107,14 +107,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingCollectionBaseIT
 		private Collection<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_containedNonIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
 		private Collection<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_indexedEmbeddedShallow",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -123,7 +123,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingCollectionBaseIT
 		private Collection<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_indexedEmbeddedNoReindex",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -132,14 +132,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingCollectionBaseIT
 		private Collection<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_containedCrossEntityDP",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
 		private Collection<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_containedIndexedEmbeddedCast",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -341,7 +341,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingCollectionBaseIT
 	public static class ContainingEmbeddable {
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_emb_containedIdxEmbedded",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -349,7 +349,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingCollectionBaseIT
 		private Collection<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
-		@OrderColumn(name = "idx") // Test list associations, not bags
+		@OrderBy("id asc") // Test bag associations, not lists, but still make sure the iteration order is predictable
 		@JoinTable(name = "i_emb_containedNonIdxEmbedded",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
