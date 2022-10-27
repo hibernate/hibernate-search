@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.13.Final (2022-10-27)
+-------------------------
+
+** Bug
+    * HSEARCH-4107 Session cast fails when creating a FullTextSession with Spring 2.4.0
+
+** Improvement
+    * HSEARCH-4671 Upgrade to Hibernate ORM 5.3.28.Final
+    * HSEARCH-4605 Upgrade to Hibernate ORM 5.3.27.Final
+    * HSEARCH-4557 Upgrade to Hibernate ORM 5.3.26.Final
+    * HSEARCH-4431 Upgrade to Hibernate ORM 5.3.25.Final
+
+** Task
+    * HSEARCH-4717 Upgrade to Byteman 4.0.20
+    * HSEARCH-4696 Move all Jenkins-related config to ci/
+    * HSEARCH-4695 Add Jenkins jobs to test component upgrades
+    * HSEARCH-4595 Upgrade to Byteman 4.0.19
+    * HSEARCH-4472 Move the release job to a separate Jenkinsfile
+    * HSEARCH-4459 Stop testing Hibernate Search against JDK 12 -> 16
+    * HSEARCH-4434 Avoid unnecessary synchronization in ExpectedLog4jLog
+    * HSEARCH-4433 Upgrade to Log4j 2 in Hibernate Search 5.x tests
+    * HSEARCH-4415 Sign published artifacts
+    * HSEARCH-4371 Upgrade to Byteman 4.0.18
+    * HSEARCH-3244 Simplify configuration of AWS Elasticsearch endpoints in the Jenkins CI
+
 5.10.12.Final (2021-10-18)
 -------------------------
 
