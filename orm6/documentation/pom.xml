@@ -11,7 +11,7 @@
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-integrationtest-orm6</artifactId>
         <version>6.2.0-SNAPSHOT</version>
-        <relativePath>../parents/integrationtest</relativePath>
+        <relativePath>../build/parents/integrationtest</relativePath>
     </parent>
     <artifactId>hibernate-search-documentation-orm6</artifactId>
     <packaging>jar</packaging>

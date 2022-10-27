@@ -12,25 +12,21 @@
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent-integrationtest</artifactId>
         <version>6.2.0-SNAPSHOT</version>
-        <relativePath>../../../parents/integrationtest</relativePath>
+        <relativePath>../../../../build/parents/integrationtest</relativePath>
     </parent>
-    <artifactId>hibernate-search-parent-integrationtest-orm6</artifactId>
+    <artifactId>hibernate-search-parent-integrationtest-jakarta</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Parent POM for Integration Test Artifacts - ORM6</name>
-    <description>Common build configuration for all ORM6 integration test artifacts (including documentation)</description>
+    <name>Hibernate Search Parent POM for Integration Test Artifacts - Jakarta EE</name>
+    <description>Common build configuration for all Jakarta EE integration test artifacts (including documentation)</description>
 
     <properties>
-        <surefire.integration>orm6</surefire.integration>
+        <surefire.integration>jakarta</surefire.integration>
 
         <!-- JQAssistant does not seem to work correctly on these artifacts for some reason -->
         <jqassistant.skip>true</jqassistant.skip>
-        <!-- Forbiddenapis fails when some forbidden methods are not found, and some forbidden methods were removed in ORM 6 -->
-        <forbiddenapis.skip>true</forbiddenapis.skip>
         <!-- Prevent these modules from artificially affecting Sonar metrics -->
         <sonar.skip>true</sonar.skip>
-
-        <version.net.bytebuddy>${version.net.bytebuddy.orm6}</version.net.bytebuddy>
 
         <!-- To be set by child modules -->
         <transform.original.pathFromRoot></transform.original.pathFromRoot>
@@ -40,39 +36,37 @@
         <transform.output.main.resources.path>${transform.output.root.path}/main/resources</transform.output.main.resources.path>
         <transform.output.test.sources.path>${transform.output.root.path}/test/java</transform.output.test.sources.path>
         <transform.output.test.resources.path>${transform.output.root.path}/test/resources</transform.output.test.resources.path>
-        <transform.patch.path>${project.basedir}/ant-src-changes.patch</transform.patch.path>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!-- Solve dependency convergence issues through exclusions for transitive-only dependencies -->
             <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-pojo-base</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
                 <exclusions>
                     <!-- Also imported by Hibernate ORM -->
                     <exclusion>
-                        <groupId>org.hibernate.common</groupId>
-                        <artifactId>hibernate-commons-annotations</artifactId>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                    </exclusion>
+                    <!-- Also imported by jakarta.xml.bind-api -->
+                    <exclusion>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-test-common</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <!-- DO NOT MANAGE the version of this dependency. -->
                 <exclusions>
-                    <!-- Trust the ORM 6 dependency to bring in the correct version of Jandex and Bytebuddy
-                         (which, unfortunately, might be different from the version used in ORM 5.x
-                         on which our utils are aligned) -->
+                    <!-- Also imported by jakarta.xml.bind-api -->
                     <exclusion>
-                        <groupId>org.jboss</groupId>
-                        <artifactId>jandex</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.bytebuddy</groupId>
-                        <artifactId>byte-buddy</artifactId>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -111,22 +105,22 @@
 
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm-orm6</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-v5migrationhelper-orm6</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-v5migrationhelper-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime-orm6</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-jberet-se-orm6</artifactId>
+                <artifactId>hibernate-search-util-internal-integrationtest-jberet-se-jakarta</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
@@ -148,10 +142,9 @@
                             <configuration>
                                 <!-- WARNING: if you update this, make sure to update the "public" and "internal" parent POMs, too -->
                                 <target>
-                                    <ant dir="${rootProject.directory}/orm6/" antfile="ant-copy-and-transform-sources.xml">
+                                    <ant dir="${rootProject.directory}/jakarta/" antfile="ant-copy-and-transform-sources.xml">
                                         <target name="copy"/>
                                         <target name="transform"/>
-                                        <target name="patch"/>
                                     </ant>
                                 </target>
                             </configuration>

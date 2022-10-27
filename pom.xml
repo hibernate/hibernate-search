@@ -152,10 +152,10 @@
 
     <modules>
         <module>build/config</module>
-        <module>parents/internal</module>
+        <module>build/parents/internal</module>
         <module>util/internal/test/common</module>
         <module>util/internal/test/orm</module>
-        <module>parents/public</module>
+        <module>build/parents/public</module>
         <module>util/common</module>
         <module>engine</module>
         <module>backend/lucene</module>
@@ -170,7 +170,7 @@
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>
-        <module>parents/integrationtest</module>
+        <module>build/parents/integrationtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
     </modules>
