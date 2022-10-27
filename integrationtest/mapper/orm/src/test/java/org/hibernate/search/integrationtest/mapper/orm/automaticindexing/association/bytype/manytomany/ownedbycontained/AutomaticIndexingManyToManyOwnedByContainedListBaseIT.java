@@ -448,6 +448,7 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		private String indexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "contained_IElementCF")
 		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
@@ -458,6 +459,7 @@ public class AutomaticIndexingManyToManyOwnedByContainedListBaseIT
 		private String nonIndexedField;
 
 		@ElementCollection
+		@OrderColumn(name = "idx")
 		@CollectionTable(name = "nonIndexedECF")
 		@Column(name = "nonIndexed")
 		@GenericField

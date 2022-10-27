@@ -98,6 +98,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 		private ContainingEntity child;
 
 		@ManyToMany
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@JoinTable(name = "i_containedIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -105,12 +106,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@JoinTable(name = "i_containedNonIndexedEmbedded",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
 
 		@ManyToMany
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@JoinTable(name = "i_indexedEmbeddedShallow",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -119,6 +122,7 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 		private List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@JoinTable(name = "i_indexedEmbeddedNoReindex",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
@@ -127,12 +131,14 @@ public class AutomaticIndexingManyToManyOwnedByContainingListBaseIT
 		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@JoinTable(name = "i_containedCrossEntityDP",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
 		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
 		@ManyToMany(targetEntity = ContainedEntity.class)
+		@OrderColumn(name = "idx") // Test list associations, not bags
 		@JoinTable(name = "i_containedIndexedEmbeddedCast",
 				joinColumns = @JoinColumn(name = "containing"),
 				inverseJoinColumns = @JoinColumn(name = "contained"))
