@@ -31,6 +31,13 @@ Map settings() {
 					""",
 					updateProperties: ['version.org.hibernate.orm']
 			]
+		case 'orm6.2':
+			return [
+					mavenArgs: """ \
+							-pl orm6/mapper/orm -amd \
+					""",
+					updateProperties: ['version.org.hibernate.orm']
+			]
 		default:
 			return [:]
 	}
@@ -89,7 +96,7 @@ pipeline {
 					axis {
 						name 'DEPENDENCY_UPDATE_NAME'
 						// NOTE: Remember to update the settings() method above when changing this.
-						values 'orm5.6', 'orm6.0', 'orm6.1'
+						values 'orm5.6', 'orm6.0', 'orm6.1', 'orm6.2'
 					}
 				}
 				stages {
