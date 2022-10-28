@@ -33,9 +33,10 @@ import org.junit.Test;
 
 /**
  * Check that we correctly populate the metamodel when ORM generates a {@link org.hibernate.mapping.SyntheticProperty},
- * which happens in particular when there is a many-to-one whose referenced column is not the entity ID.
+ * which happens in particular when there is a many-to-one whose referenced column is not the entity ID
+ * (and, in ORM 6.2+, there are at least two referenced columns).
  */
-@TestForIssue(jiraKey = "HSEARCH-4156")
+@TestForIssue(jiraKey = { "HSEARCH-4156", "HSEARCH-4733" })
 public class SyntheticPropertyIT {
 
 	@Rule
@@ -48,7 +49,8 @@ public class SyntheticPropertyIT {
 	public void test() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.objectField( "contained", b2 -> b2
-						.field( "ref", String.class, b3 -> { } ) ) );
+						.field( "ref1", String.class, b3 -> { } )
+						.field( "ref2", String.class, b3 -> { } ) ) );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity.class, ContainedEntity.class );
@@ -69,7 +71,8 @@ public class SyntheticPropertyIT {
 			containing2.setId( 1 );
 			ContainedEntity contained1 = new ContainedEntity();
 			contained1.setId( 2 );
-			contained1.setRef( "theRef" );
+			contained1.setRef1( "theRef1" );
+			contained1.setRef2( "theRef2" );
 			containing1.setContained( contained1 );
 			contained1.getContaining().add( containing1 );
 			containing2.setContained( contained1 );
@@ -82,10 +85,12 @@ public class SyntheticPropertyIT {
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "0", b -> b
 							.objectField( "contained", b2 -> b2
-									.field( "ref", "theRef" ) ) )
+									.field( "ref1", "theRef1" )
+									.field( "ref2", "theRef2" ) ) )
 					.add( "1", b -> b
 							.objectField( "contained", b2 -> b2
-									.field( "ref", "theRef" ) ) );
+									.field( "ref1", "theRef1" )
+									.field( "ref2", "theRef2" ) ) );
 		} );
 	}
 
@@ -99,7 +104,8 @@ public class SyntheticPropertyIT {
 
 		@ManyToOne
 		@IndexedEmbedded
-		@JoinColumn(name = "ref", referencedColumnName = "ref")
+		@JoinColumn(name = "ref1", referencedColumnName = "ref1")
+		@JoinColumn(name = "ref2", referencedColumnName = "ref2")
 		private ContainedEntity contained;
 
 		public Integer getId() {
@@ -128,7 +134,10 @@ public class SyntheticPropertyIT {
 		private Integer id;
 
 		@GenericField
-		private String ref;
+		private String ref1;
+
+		@GenericField
+		private String ref2;
 
 		@OneToMany(mappedBy = "contained")
 		private List<IndexedEntity> containing = new ArrayList<>();
@@ -141,12 +150,20 @@ public class SyntheticPropertyIT {
 			this.id = id;
 		}
 
-		public String getRef() {
-			return ref;
+		public String getRef1() {
+			return ref1;
 		}
 
-		public void setRef(String ref) {
-			this.ref = ref;
+		public void setRef1(String ref1) {
+			this.ref1 = ref1;
+		}
+
+		public String getRef2() {
+			return ref2;
+		}
+
+		public void setRef2(String ref2) {
+			this.ref2 = ref2;
 		}
 
 		public List<IndexedEntity> getContaining() {
