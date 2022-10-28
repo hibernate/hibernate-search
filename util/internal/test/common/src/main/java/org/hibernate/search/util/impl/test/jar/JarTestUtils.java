@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.util.impl.test.file.FileUtils;
@@ -39,6 +40,10 @@ public final class JarTestUtils {
 	}
 
 	public static Path toJar(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath) {
+		return toJar( temporaryFolder, jarOrDirectoryPath, null );
+	}
+
+	public static Path toJar(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath, Map<String, String> additionalZipFsEnv) {
 		if ( Files.isRegularFile( jarOrDirectoryPath ) ) {
 			return jarOrDirectoryPath;
 		}
@@ -46,7 +51,11 @@ public final class JarTestUtils {
 			Path tempDir = temporaryFolder.newFolder().toPath();
 			Path jarPath = tempDir.resolve( jarOrDirectoryPath.getFileName() + ".jar" ).toAbsolutePath();
 			URI jarUri = new URI( "jar:file", null, jarPath.toUri().getPath(), null );
-			Map<String, String> zipFsEnv = Collections.singletonMap( "create", "true" );
+			Map<String, String> zipFsEnv = new HashMap<>();
+			zipFsEnv.put( "create", "true" );
+			if ( additionalZipFsEnv != null ) {
+				zipFsEnv.putAll( additionalZipFsEnv );
+			}
 			try ( FileSystem jarFs = FileSystems.newFileSystem( jarUri, zipFsEnv ) ) {
 				FileUtils.copyRecursively( jarOrDirectoryPath, jarFs.getRootDirectories().iterator().next() );
 			}
