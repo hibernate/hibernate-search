@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.util.impl.test.logging.Log;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.runners.model.Statement;
 
@@ -64,6 +65,11 @@ public final class Retry implements TestRule {
 					try {
 						finalDelegate.evaluate();
 						return; // Test succeeded
+					}
+					catch (AssumptionViolatedException e) {
+						// if we caught an `AssumptionViolatedException` it means the test should be skipped and we just
+						// need to rethrow an exception.
+						throw e;
 					}
 					catch (AssertionError | Exception e) {
 						String failureMessage = "Attempt #" + ( i + 1 ) + " failed: " + e.getMessage();
