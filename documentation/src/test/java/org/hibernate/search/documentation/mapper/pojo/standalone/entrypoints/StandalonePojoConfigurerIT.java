@@ -38,7 +38,7 @@ public class StandalonePojoConfigurerIT {
 				.property(
 						"hibernate.search.backend.hosts", // <3>
 						"elasticsearch.mycompany.com"
-				)
+				).property( "hibernate.search.mapping.multi_tenancy.enabled", true )
 				// end::setup[]
 				.properties( TestConfiguration.standalonePojoMapperProperties(
 						configurationProvider,

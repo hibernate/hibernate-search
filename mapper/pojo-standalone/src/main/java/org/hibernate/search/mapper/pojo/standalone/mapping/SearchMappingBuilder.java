@@ -22,7 +22,6 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperSpiSettings;
 import org.hibernate.search.mapper.pojo.standalone.impl.StandalonePojoMappingInitiator;
@@ -169,19 +168,6 @@ public final class SearchMappingBuilder {
 	 */
 	public <E> SearchMappingBuilder addEntityType(Class<E> type, String entityName, EntityConfigurer<E> configurer) {
 		mappingInitiator.addEntityType( type, entityName, configurer );
-		return this;
-	}
-
-	/**
-	 * Enables or disables multi-tenancy.
-	 * <p>
-	 * If multi-tenancy is enabled, every {@link SearchMapping#createSession() session} will need to be assigned a tenant identifier.
-	 *
-	 * @param multiTenancyEnabled {@code true} to enable multi-tenancy, {@code false} to disable it (the default).
-	 * @return {@code this}, for call chaining.
-	 */
-	public SearchMappingBuilder multiTenancyEnabled(boolean multiTenancyEnabled) {
-		mappingInitiator.tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
 		return this;
 	}
 

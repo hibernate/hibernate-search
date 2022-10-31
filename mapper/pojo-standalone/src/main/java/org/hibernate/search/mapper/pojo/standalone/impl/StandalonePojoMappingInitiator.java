@@ -15,6 +15,9 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.tenancy.spi.TenancyMode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
@@ -25,9 +28,6 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.metadata.impl.Standal
 import org.hibernate.search.mapper.pojo.standalone.model.impl.StandalonePojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.impl.SchemaManagementListener;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 
 public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator<StandalonePojoMappingPartialBuildState>
 		implements StandalonePojoMappingConfigurationContext {
@@ -44,6 +44,12 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 					.multivalued()
 					.build();
 
+	private static final ConfigurationProperty<Boolean> MULTI_TENANCY_ENABLED =
+			ConfigurationProperty.forKey( StandalonePojoMapperSettings.Radicals.MULTI_TENANCY_ENABLED )
+					.asBoolean()
+					.withDefault( StandalonePojoMapperSettings.Defaults.MULTI_TENANCY_ENABLED )
+					.build();
+
 	private final StandalonePojoEntityTypeMetadataProvider.Builder entityTypeMetadataProviderBuilder;
 
 	private StandalonePojoEntityTypeMetadataProvider entityTypeMetadataProvider;
@@ -54,7 +60,8 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 		entityTypeMetadataProviderBuilder = new StandalonePojoEntityTypeMetadataProvider.Builder( introspector );
 	}
 
-	public <E> StandalonePojoMappingInitiator addEntityType(Class<E> clazz, String entityName, EntityConfigurer<E> configurerOrNull) {
+	public <E> StandalonePojoMappingInitiator addEntityType(Class<E> clazz, String entityName,
+			EntityConfigurer<E> configurerOrNull) {
 		entityTypeMetadataProviderBuilder.addEntityType( clazz, entityName, configurerOrNull );
 
 		return this;
@@ -63,6 +70,10 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		this.tenancyMode(
+				MULTI_TENANCY_ENABLED.get( buildContext.configurationPropertySource() ) ?
+						TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY
+		);
 		// Apply the user-provided mapping configurer if necessary.
 		// Has to happen before building entityTypeMetadataProvider as configurers can add more entities.
 		MAPPING_CONFIGURER.getAndMap( buildContext.configurationPropertySource(), buildContext.beanResolver()::resolve )
@@ -88,10 +99,5 @@ public class StandalonePojoMappingInitiator extends AbstractPojoMappingInitiator
 	@Override
 	protected PojoMapperDelegate<StandalonePojoMappingPartialBuildState> createMapperDelegate() {
 		return new StandalonePojoMapperDelegate( entityTypeMetadataProvider, schemaManagementListener );
-	}
-
-	@Override
-	public void multiTenancyEnabled(boolean multiTenancyEnabled) {
-		this.tenancyMode( multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY );
 	}
 }
