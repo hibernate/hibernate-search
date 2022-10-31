@@ -501,7 +501,7 @@ stage('Non-default environments') {
 						// based on the Maven GAV coordinates of the Maven project that started that container,
 						// which are attached to the container thanks to a container label).
 						mavenDockerArgs = """ \
-								-pl parents/integrationtest \
+								-pl build/parents/integrationtest \
 								-P$buildEnv.mavenProfile \
 								-Dtest.database.run.db2.skip=false \
 						"""
