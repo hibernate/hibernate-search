@@ -46,6 +46,25 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/e
 <4> Build the `SearchMapping`.
 ====
 
+Alternatively a configurer class implementing `StandalonePojoMappingConfigurer` can be provided.
+
+.Starting up Hibernate Search with the Standalone POJO Mapper and Configurer
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoConfigurer.java[tags=configurer]
+----
+<1> Declare *all* entity types that Hibernate Search may need to work with.
+<2> Set additional configuration exposed through the context.
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/pojo/standalone/entrypoints/StandalonePojoConfigurerIT.java[tags=setup]
+----
+<1> Create a builder.
+<2> Set configurer.
+<3> Set additional configuration properties (see also <<configuration>>).
+<4> Build the `SearchMapping`.
+====
+
 [[mapper-pojo-standalone-shutdown]]
 == Shutdown
 

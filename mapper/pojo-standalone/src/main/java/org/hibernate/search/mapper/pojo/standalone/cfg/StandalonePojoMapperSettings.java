@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.cfg;
 
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -29,12 +30,26 @@ public final class StandalonePojoMapperSettings {
 	 */
 	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
 
+	/**
+	 * The mapping configurer to use.
+	 * <p>
+	 * Expects a single-valued or multi-valued reference to beans of type {@link StandalonePojoMappingConfigurer}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "multi-valued bean reference" properties and accepted values.
+	 */
+	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
+
+
 	public static class Radicals {
 
 		private Radicals() {
 		}
 
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
+		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 	}
 
 	/**
