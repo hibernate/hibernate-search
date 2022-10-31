@@ -2928,7 +2928,7 @@
 
         <!--
             A profile executing jqassistant scanning and analysis for all relevant modules.
-            Our rules are in jqassistant/rules.xml.
+            Our rules are in build/jqassistant/rules.xml.
             See CONTRIBUTING.md for usage.
         -->
         <profile>
@@ -2939,16 +2939,17 @@
                         <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
                         <version>${version.com.buschmais.jqassistant.plugin}</version>
+                        <configuration>
+                            <rulesDirectory>build/jqassistant</rulesDirectory>
+                            <warnOnSeverity>INFO</warnOnSeverity>
+                            <failOnSeverity>MAJOR</failOnSeverity>
+                        </configuration>
                         <executions>
                             <execution>
                                 <goals>
                                     <goal>scan</goal>
                                     <goal>analyze</goal>
                                 </goals>
-                                <configuration>
-                                    <warnOnSeverity>INFO</warnOnSeverity>
-                                    <failOnSeverity>MAJOR</failOnSeverity>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
