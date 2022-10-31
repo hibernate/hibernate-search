@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.cfg;
 
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -42,6 +43,17 @@ public final class StandalonePojoMapperSettings {
 	 */
 	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
 
+	/**
+	 * Enables or disables multi-tenancy.
+	 * <p>
+	 * If multi-tenancy is enabled, every {@link SearchMapping#createSession() session} will need to be assigned a tenant identifier.
+	 * <p>
+	 * Expects a boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#MULTI_TENANCY_ENABLED}.
+	 */
+	public static final String MULTI_TENANCY_ENABLED = PREFIX + Radicals.MULTI_TENANCY_ENABLED;
+
 
 	public static class Radicals {
 
@@ -50,6 +62,7 @@ public final class StandalonePojoMapperSettings {
 
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
+		public static final String MULTI_TENANCY_ENABLED = "mapping.multi_tenancy.enabled";
 	}
 
 	/**
@@ -61,6 +74,7 @@ public final class StandalonePojoMapperSettings {
 		}
 
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
+		public static final Boolean MULTI_TENANCY_ENABLED = Boolean.FALSE;
 	}
 
 }

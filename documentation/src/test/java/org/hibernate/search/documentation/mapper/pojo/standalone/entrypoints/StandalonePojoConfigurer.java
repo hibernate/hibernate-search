@@ -18,7 +18,6 @@ public class StandalonePojoConfigurer implements StandalonePojoMappingConfigurer
 		context.addEntityTypes( Book.class, Associate.class, Manager.class );// <1>
 
 		context.defaultReindexOnUpdate( ReindexOnUpdate.SHALLOW ); // <2>
-		context.multiTenancyEnabled( true );
 	}
 }
 // end::configurer[]

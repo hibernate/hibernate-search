@@ -32,7 +32,7 @@ public class StandalonePojoMultiTenancyIT {
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
 				.addEntityType( Book.class )
-				.multiTenancyEnabled( true ) // <2>
+				.property( "hibernate.search.mapping.multi_tenancy.enabled", true ) // <2>
 				// end::setup[]
 				.properties( TestConfiguration.standalonePojoMapperProperties( configurationProvider,
 						BackendConfigurations.simple() ) )

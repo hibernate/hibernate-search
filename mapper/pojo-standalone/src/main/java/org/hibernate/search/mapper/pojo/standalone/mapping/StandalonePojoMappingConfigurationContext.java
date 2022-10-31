@@ -120,15 +120,6 @@ public interface StandalonePojoMappingConfigurationContext {
 	<E> StandalonePojoMappingConfigurationContext addEntityType(Class<E> type, String entityName, EntityConfigurer<E> configurer);
 
 	/**
-	 * Enables or disables multi-tenancy.
-	 * <p>
-	 * If multi-tenancy is enabled, every {@link SearchMapping#createSession() session} will need to be assigned a tenant identifier.
-	 *
-	 * @param multiTenancyEnabled {@code true} to enable multi-tenancy, {@code false} to disable it (the default).
-	 */
-	void multiTenancyEnabled(boolean multiTenancyEnabled);
-
-	/**
 	 * Defines the default depth of automatic reindexing.
 	 * <p>
 	 * Keep the default value ({@link ReindexOnUpdate#DEFAULT} if your entity model is a graph (normalized model, e.g. in ORMs);
