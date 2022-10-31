@@ -174,6 +174,7 @@ the created pull request.
 
 The project is split in several Maven modules:
 
+* `build`: Various modules that are mostly useful for the build itself.
 * `backend`: The backends, i.e. the modules that provide integration to actual indexing services.
   * `elasticsearch`: A backend that connects to a remote Elasticsearch cluster.
   * `elasticsearch-aws`: Implementation of AWS authentication using request signing for the Elasticsearch backend.
@@ -204,7 +205,6 @@ and do the work of converting between user entities and documents to be indexed.
     Currently incubating, i.e. backwards-incompatible changes in APIs may happen.
 * `orm6`: Modules that take the source code of other modules (e.g. mapper/orm)
 and transform it to use Hibernate ORM 6 instead of Hibernate ORM 5.x.
-* `reports`: Module built last, producing reports related to test coverage in particular.
 * `util`: Various modules containing util classes, both for runtime and for tests.
 
 ## <a id="building-from-source"></a> Building from source

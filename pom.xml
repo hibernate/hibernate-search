@@ -676,7 +676,7 @@
              - https://www.eclemma.org/jacoco/trunk/doc/report-aggregate-mojo.html
              - Not relevant anymore, but we used to merge *.exec files: https://www.eclemma.org/jacoco/trunk/doc/merge-mojo.html
          -->
-        <sonar.coverage.jacoco.xmlReportPaths>${rootProject.directory}/reports/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>${rootProject.directory}/build/reports/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <!--
             Exclude build code and integration tests defined in the main source (utils, Showcases, Backend TCK)
             from coverage computation.
@@ -2981,17 +2981,17 @@
              WARNING: this MUST be the very last profile,
              so that the "report" module is the very last module,
              in particular when deploying artifacts to a Nexus repository.
-             See the "reports" module POM for more information.
+             See the "build/reports" module POM for more information.
          -->
         <profile>
-            <id>report-as-last-module</id>
+            <id>build-reports-as-last-module</id>
             <activation>
                 <property>
                     <name>!some.property.that.will.never.exist</name>
                 </property>
             </activation>
             <modules>
-                <module>reports</module>
+                <module>build/reports</module>
             </modules>
         </profile>
 
