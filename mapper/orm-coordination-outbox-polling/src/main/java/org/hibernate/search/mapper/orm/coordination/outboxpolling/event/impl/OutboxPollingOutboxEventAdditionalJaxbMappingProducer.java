@@ -50,8 +50,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"%3$s\">\n" +
 			"        <id name=\"id\" type=\"long\">\n" +
 			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
-			"                <param name=\"sequence_name\">%4$s</param>\n" +
-			"                <param name=\"table_name\">%4$s</param>\n" +
+			"                <param name=\"sequence_name\">OUTBOX_EVENT_GENERATOR</param>\n" +
+			"                <param name=\"table_name\">OUTBOX_EVENT_GENERATOR</param>\n" +
 			"                <param name=\"initial_value\">1</param>\n" +
 			"                <param name=\"increment_size\">1</param>\n" +
 			"            </generator>\n" +
@@ -79,8 +79,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 
 	public static final String ENTITY_DEFINITION = String.format(
 			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "",
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE,
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE
 	);
 
 	private static final OptionalConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
@@ -107,12 +106,6 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 					.asString()
 					.build();
 
-	private static final OptionalConfigurationProperty<String> ENTITY_MAPPING_OUTBOXEVENT_GENERATOR =
-			ConfigurationProperty.forKey(
-							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_GENERATOR )
-					.asString()
-					.build();
-
 	@Override
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
@@ -123,17 +116,15 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 		Optional<String> schema = ENTITY_MAPPING_OUTBOXEVENT_SCHEMA.get( propertySource );
 		Optional<String> catalog = ENTITY_MAPPING_OUTBOXEVENT_CATALOG.get( propertySource );
 		Optional<String> table = ENTITY_MAPPING_OUTBOXEVENT_TABLE.get( propertySource );
-		Optional<String> generator = ENTITY_MAPPING_OUTBOXEVENT_GENERATOR.get( propertySource );
 
 		// only allow configuring the entire mapping or table/catalog/schema/generator names
-		if ( mapping.isPresent() && ( schema.isPresent() || catalog.isPresent() || table.isPresent() || generator.isPresent() ) ) {
+		if ( mapping.isPresent() && ( schema.isPresent() || catalog.isPresent() || table.isPresent() ) ) {
 			throw log.outboxEventConfigurationPropertyConflict(
 					OUTBOXEVENT_ENTITY_MAPPING.resolveOrRaw( propertySource ),
 					new String[] {
 							ENTITY_MAPPING_OUTBOXEVENT_SCHEMA.resolveOrRaw( propertySource ),
 							ENTITY_MAPPING_OUTBOXEVENT_CATALOG.resolveOrRaw( propertySource ),
-							ENTITY_MAPPING_OUTBOXEVENT_TABLE.resolveOrRaw( propertySource ),
-							ENTITY_MAPPING_OUTBOXEVENT_GENERATOR.resolveOrRaw( propertySource )
+							ENTITY_MAPPING_OUTBOXEVENT_TABLE.resolveOrRaw( propertySource )
 					}
 			);
 		}
@@ -144,8 +135,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 						ENTITY_DEFINITION_TEMPLATE,
 						schema.orElse( "" ),
 						catalog.orElse( "" ),
-						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE ),
-						generator.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_GENERATOR )
+						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE )
 
 				)
 		);
