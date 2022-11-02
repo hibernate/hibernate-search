@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.coordination.outboxpolling.FilteringOutboxEventFinder;
@@ -69,7 +70,7 @@ public class OutboxPollingAutomaticIndexingRoutingIT {
 		} );
 
 		// Remember the events at this point
-		List<Long> eventIdsAtSecondStatus = new ArrayList<>();
+		List<UUID> eventIdsAtSecondStatus = new ArrayList<>();
 		with( sessionFactory ).runInTransaction( session -> {
 			eventIdsAtSecondStatus.addAll( outboxEventFinder.findOutboxEventIdsNoFilter( session ) );
 		} );

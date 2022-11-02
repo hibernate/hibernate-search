@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -161,9 +162,9 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 		} );
 
 		// Make events visible one by one, so that they are processed in separate batches.
-		List<Long> eventIds = setupHolder.applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
+		List<UUID> eventIds = setupHolder.applyInTransaction( outboxEventFinder::findOutboxEventIdsNoFilter );
 		assertThat( eventIds ).hasSize( 2 );
-		for ( Long eventId : eventIds ) {
+		for ( UUID eventId : eventIds ) {
 			outboxEventFinder.showOnlyEvents( Collections.singletonList( eventId ) );
 			outboxEventFinder.awaitUntilNoMoreVisibleEvents( setupHolder.sessionFactory() );
 		}
