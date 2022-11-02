@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.LockMode;
@@ -40,7 +41,7 @@ abstract class OutboxEventLoader {
 	OutboxEventLoader() {
 	}
 
-	List<OutboxEvent> loadLocking(Session session, Set<Long> ids, String processorName) {
+	List<OutboxEvent> loadLocking(Session session, Set<UUID> ids, String processorName) {
 		try {
 			return tryLoadLocking( session, ids );
 		}
@@ -55,7 +56,7 @@ abstract class OutboxEventLoader {
 		}
 	}
 
-	protected abstract List<OutboxEvent> tryLoadLocking(Session session, Set<Long> ids);
+	protected abstract List<OutboxEvent> tryLoadLocking(Session session, Set<UUID> ids);
 
 	// HSEARCH-4289: some databases encounter deadlocks when multiple processors query or delete events
 	// in concurrent transactions.
@@ -73,7 +74,7 @@ abstract class OutboxEventLoader {
 	// and process them later when they are no longer locked.
 	private static class SkipLockedOutboxEventLoader extends OutboxEventLoader {
 		@Override
-		protected List<OutboxEvent> tryLoadLocking(Session session, Set<Long> ids) {
+		protected List<OutboxEvent> tryLoadLocking(Session session, Set<UUID> ids) {
 			Query<OutboxEvent> query = session.createQuery( LOAD_QUERY, OutboxEvent.class );
 			query.setParameter( "ids", ids );
 
@@ -89,7 +90,7 @@ abstract class OutboxEventLoader {
 	// locking shouldn't trigger any deadlocks.
 	private static class LockAllOutboxEventLoader extends OutboxEventLoader {
 		@Override
-		protected List<OutboxEvent> tryLoadLocking(Session session, Set<Long> ids) {
+		protected List<OutboxEvent> tryLoadLocking(Session session, Set<UUID> ids) {
 			Query<OutboxEvent> query = session.createQuery( LOAD_QUERY, OutboxEvent.class );
 			query.setParameter( "ids", ids );
 

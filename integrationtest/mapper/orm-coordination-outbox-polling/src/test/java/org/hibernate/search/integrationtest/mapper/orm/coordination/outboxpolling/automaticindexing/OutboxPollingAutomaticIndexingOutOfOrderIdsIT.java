@@ -12,8 +12,11 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import static org.junit.Assume.assumeTrue;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -40,6 +43,8 @@ import org.junit.Test;
 public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 	private static final String OUTBOX_EVENT_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ? WHERE ID = ?";
+
+	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS = "SELECT ID FROM HSEARCH_OUTBOX_EVENT ORDER BY ID";
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
@@ -100,9 +105,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 1 (add) and 3 (delete)
-			updateOutboxTableRow( session, 1, 4 );
-			updateOutboxTableRow( session, 3, 1 );
-			updateOutboxTableRow( session, 4, 3 );
+			swapOutboxTableRowIds( session, 0, 2 );
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -209,9 +212,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 2 (delete) and 3 (add)
-			updateOutboxTableRow( session, 2, 4 );
-			updateOutboxTableRow( session, 3, 2 );
-			updateOutboxTableRow( session, 4, 3 );
+			swapOutboxTableRowIds( session, 0, 1 );
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -325,9 +326,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 2 (update routing key from "FIRST" to "SECOND") and
 			// 3 (update routing key from "SECOND" to "THIRD")
-			updateOutboxTableRow( session, 2, 4 );
-			updateOutboxTableRow( session, 3, 2 );
-			updateOutboxTableRow( session, 4, 3 );
+			swapOutboxTableRowIds( session, 0, 1 );
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -357,7 +356,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	private void updateOutboxTableRow(Session session, Integer oldId, Integer newId) {
+	private void swapOutboxTableRowIds(Session session, int row1, int row2) {
 		try {
 			SharedSessionContractImplementor implementor = session.unwrap( SharedSessionContractImplementor.class );
 
@@ -370,13 +369,36 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 				assumeTrue(
 						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. " +
 								"Higher precision is not available before Java 9.",
-						!(oldJavaVersion && env.getDialect() instanceof H2Dialect)
+						!( oldJavaVersion && env.getDialect() instanceof H2Dialect )
 				);
 			}
 
+			List<String> uuids = new ArrayList<>();
+			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement(
+					OUTBOX_EVENT_SELECT_ORDERED_IDS ) ) {
+				ResultSet resultSet = statement.executeQuery();
+				while ( resultSet.next() ) {
+					uuids.add( resultSet.getString( 1 ) );
+				}
+			}
+
 			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
-				ps.setInt( 1, newId );
-				ps.setInt( 2, oldId );
+				ps.setString( 1, UUID.randomUUID().toString() );
+				ps.setString( 2, uuids.get( row2 ) );
+
+				jdbc.getResultSetReturn().executeUpdate( ps );
+			}
+
+			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
+				ps.setString( 1, uuids.get( row2 ) );
+				ps.setString( 2, uuids.get( row1 ) );
+
+				jdbc.getResultSetReturn().executeUpdate( ps );
+			}
+
+			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
+				ps.setString( 1, uuids.get( row1 ) );
+				ps.setString( 2, uuids.get( row2 ) );
 
 				jdbc.getResultSetReturn().executeUpdate( ps );
 			}
