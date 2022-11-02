@@ -229,11 +229,11 @@
         <version.com.fasterxml.jackson>2.13.4</version.com.fasterxml.jackson>
         <!--
              In the past, there has been jackson-databind bugfix releases without any jackson-core release,
-             so we had to use different versions, e.g. jackson-core 2.9.9 and jackson-databind 2.9.9.3.
+             so we had to use different versions, e.g. jackson-core 2.13.4 and jackson-databind 2.13.4.2.
              That's why we have two separate properties for jackson versions,
              even though they may have the same value from time to time.
          -->
-        <version.com.fasterxml.jackson.databind>2.13.4</version.com.fasterxml.jackson.databind>
+        <version.com.fasterxml.jackson.databind>2.13.4.2</version.com.fasterxml.jackson.databind>
         <!-- Reactive-streams: used by the AWS SDK -->
         <version.org.reactivestreams.reactive-streams>1.0.4</version.org.reactivestreams.reactive-streams>
         <!-- slf4j: used by the AWS SDK -->
