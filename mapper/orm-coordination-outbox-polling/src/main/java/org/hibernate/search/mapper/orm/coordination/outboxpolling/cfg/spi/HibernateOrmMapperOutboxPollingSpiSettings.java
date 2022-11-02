@@ -42,7 +42,6 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_GENERATOR}).
 	 * An exception ({@link org.hibernate.search.util.common.SearchException} will be thrown in case of such misconfiguration.
 	 */
 	public static final String OUTBOXEVENT_ENTITY_MAPPING = PREFIX + Radicals.OUTBOXEVENT_ENTITY_MAPPING;

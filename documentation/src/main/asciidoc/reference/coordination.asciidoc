@@ -311,7 +311,6 @@ hibernate.search.coordination.entity.mapping.agent.table=CUSTOM_AGENT_TABLE
 # Configure the outbox event mapping:
 hibernate.search.coordination.entity.mapping.outboxevent.catalog=CUSTOM_CATALOG
 hibernate.search.coordination.entity.mapping.outboxevent.schema=CUSTOM_SCHEMA
-hibernate.search.coordination.entity.mapping.outboxevent.generator=CUSTOM_OUTBOX_GENERATOR
 hibernate.search.coordination.entity.mapping.outboxevent.table=CUSTOM_OUTBOX_TABLE
 ----
 
@@ -337,9 +336,6 @@ Defaults to the default schema configured in Hibernate ORM.
 * `outboxevent.table` defines the name of the outbox events table.
 +
 Defaults to `HSEARCH_OUTBOX_EVENT`.
-* `outboxevent.generator` defines the name of the identifier generator used for the outbox event table.
-+
-Defaults to `HSEARCH_OUTBOX_EVENT_GENERATOR`.
 
 [TIP]
 ====
