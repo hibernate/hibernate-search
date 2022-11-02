@@ -8,7 +8,9 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecimal> {
 
@@ -87,17 +90,23 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 
 	@Override
 	protected List<BigDecimal> createUniquelyMatchableValues() {
-		return Arrays.asList(
+		List<BigDecimal> list = new ArrayList<>( Arrays.asList(
 				BigDecimal.ZERO,
 				BigDecimal.ONE,
 				BigDecimal.TEN,
 				nextUp( BigDecimal.ONE ),
 				nextDown( BigDecimal.ONE ),
 				BigDecimal.valueOf( 42.42 ),
-				BigDecimal.valueOf( 1584514514.000000184 ),
-				scaled( Long.MAX_VALUE ),
-				scaled( Long.MIN_VALUE )
-		);
+				BigDecimal.valueOf( 1584514514.000000184 )
+		) );
+		if ( TckConfiguration.get().getBackendFeatures().supportsMatchOnScaledNumericLossOfPrecision() ) {
+			Collections.addAll(
+					list,
+					scaled( Long.MAX_VALUE ),
+					scaled( Long.MIN_VALUE )
+			);
+		}
+		return list;
 	}
 
 	@Override
