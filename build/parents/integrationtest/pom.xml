@@ -111,6 +111,12 @@
                                              leaving too little for filesystem caches and resulting in freezes.
                                          -->
                                         <ES_JAVA_OPTS>-Xms1g -Xmx1g</ES_JAVA_OPTS>
+                                        <!-- Disable disk-based shard allocation thresholds: on large, relatively full disks (>90% used),
+                                             it will lead to index creation to get stuck waiting for other nodes to join the cluster,
+                                             which will never happen since we only have one node.
+                                             See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cluster.html#disk-based-shard-allocation
+                                         -->
+                                        <cluster.routing.allocation.disk.threshold_enabled>false</cluster.routing.allocation.disk.threshold_enabled>
                                     </env>
                                     <ports>
                                         <port>9200:9200</port>
@@ -148,6 +154,13 @@
                                              See https://docs-beta.opensearch.org/im-plugin/ism/settings/
                                          -->
                                         <plugins.index_state_management.enabled>false</plugins.index_state_management.enabled>
+                                        <!-- Disable disk-based shard allocation thresholds: on large, relatively full disks (>90% used),
+                                             it will lead to index creation to get stuck waiting for other nodes to join the cluster,
+                                             which will never happen since we only have one node.
+                                             See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cluster.html#disk-based-shard-allocation
+                                             See https://opensearch.org/docs/latest/opensearch/popular-api/#change-disk-watermarks-or-other-cluster-settings
+                                         -->
+                                        <cluster.routing.allocation.disk.threshold_enabled>false</cluster.routing.allocation.disk.threshold_enabled>
                                     </env>
                                     <ports>
                                         <port>9200:9200</port>
