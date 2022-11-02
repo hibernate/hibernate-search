@@ -120,4 +120,8 @@ public abstract class TckBackendFeatures {
 		return true;
 	}
 
+	public boolean supportsMatchOnScaledNumericLossOfPrecision() {
+		return true;
+	}
+
 }
