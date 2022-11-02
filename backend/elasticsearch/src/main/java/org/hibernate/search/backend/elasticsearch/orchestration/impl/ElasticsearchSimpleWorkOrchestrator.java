@@ -6,22 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchSimpleWorkOrchestrator
 		extends AbstractElasticsearchWorkOrchestrator<ElasticsearchSimpleWorkOrchestrator.WorkExecution<?>>
 		implements ElasticsearchParallelWorkOrchestrator {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private ElasticsearchWorkExecutionContext executionContext;
 
