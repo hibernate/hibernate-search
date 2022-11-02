@@ -8,7 +8,11 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 
 import static java.lang.String.join;
 
+import org.hibernate.id.UUIDGenerator;
+import org.hibernate.id.uuid.CustomVersionOneStrategy;
+import org.hibernate.id.uuid.StandardRandomStrategy;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.UuidGenerationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
@@ -383,6 +387,21 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
 
 	/**
+	 * The name of UUID generator strategy to be used by {@link UUIDGenerator}.
+	 * <p>
+	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+	 * <p>
+	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY}.
+	 *
+	 * @see UUIDGenerator
+	 * @see CustomVersionOneStrategy
+	 * @see StandardRandomStrategy
+	 */
+	public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY =
+			PREFIX + Radicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY;
+
+	/**
 	 * The database catalog to use for the agent table.
 	 * <p>
 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
@@ -451,6 +470,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_CATALOG;
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_SCHEMA;
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_TABLE;
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_CATALOG = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_CATALOG;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_SCHEMA;
 		public static final String COORDINATION_ENTITY_MAPPING_AGENT_TABLE = COORDINATION_PREFIX + CoordinationRadicals.ENTITY_MAPPING_AGENT_TABLE;
@@ -491,6 +511,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_TABLE = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "table";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_SCHEMA = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "schema";
 		public static final String ENTITY_MAPPING_OUTBOXEVENT_CATALOG = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "catalog";
+		public static final String ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY = ENTITY_MAPPING_OUTBOXEVENT_PREFIX + "uuid_gen_strategy";
 	}
 
 	/**
@@ -521,6 +542,7 @@ public final class HibernateOrmMapperOutboxPollingSettings {
 
 		// Must not be longer than 20 characters, so that the generator does not exceed the 30 characters for Oracle11g
 		public static final String COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE = HSEARCH_PREFIX + "OUTBOX_EVENT";
+		public static final UuidGenerationStrategy COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY = UuidGenerationStrategy.AUTO;
 	}
 
 	/**

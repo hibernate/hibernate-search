@@ -176,4 +176,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 29, value = "Nonblocking operation submitter is not supported.")
 	SearchException nonblockingOperationSubmitterNotSupported();
+
+	@Message(id = ID_OFFSET + 30, value = "Invalid name for the UUID generation strategy: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidUuidGenerationStrategyName(String name, List<String> values);
 }
