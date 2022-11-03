@@ -78,6 +78,8 @@ public class OutboxPollingAutomaticIndexingEventSendingIT {
 		);
 
 		setupContext.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				// use timebase uuids to get predictable sorting order
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
 				.withAnnotatedTypes( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
 						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class );
 

@@ -100,7 +100,7 @@ public class FilteringOutboxEventFinder {
 	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from " + ENTITY_NAME + " e order by e.id", OutboxEvent.class );
+				"select e from " + ENTITY_NAME + " e order by e.created, e.id", OutboxEvent.class );
 		avoidLockingConflicts( query );
 		return query.list();
 	}
@@ -108,7 +108,7 @@ public class FilteringOutboxEventFinder {
 	public List<UUID> findOutboxEventIdsNoFilter(Session session) {
 		checkFiltering();
 		Query<UUID> query = session.createQuery(
-				"select e.id from " + ENTITY_NAME + " e order by e.id", UUID.class );
+				"select e.id from " + ENTITY_NAME + " e order by e.created, e.id", UUID.class );
 		return query.list();
 	}
 

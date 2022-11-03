@@ -32,7 +32,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 				OutboxEventAndPredicate.of( predicate.get(), basePredicateFilter ) :
 				basePredicateFilter;
 
-		return "select e from " + ENTITY_NAME + " e where " + combined.queryPart( "e" ) + " order by e.id";
+		return "select e from " + ENTITY_NAME + " e where " + combined.queryPart( "e" ) + " order by e.created, e.id";
 	}
 
 	public static Query<OutboxEvent> createQuery(Session session, int maxResults,
