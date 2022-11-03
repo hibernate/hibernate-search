@@ -41,6 +41,208 @@ To address that, either:
 * Revert to the previous defaults by adding `projectable = Projectable.NO` to the mapping annotation of relevant `GeoPoint` fields.
 * Or recreate your Elasticsearch indexes and reindex your database. The easiest way to do so is to use link:{hibernateSearchDocUrl}#indexing-massindexer[the the `MassIndexer`] with link:{hibernateSearchDocUrl}#indexing-massindexer-parameters-drop-and-create-schema[`dropAndCreateSchemaOnStart(true)`].
 
+[[outboxpolling]]
+=== Outbox polling system tables
+
+If you use the incubating link:{hibernateSearchDocUrl}#coordination-outbox-polling[`outbox-polling` coordination strategy],
+you will be impacted by changes to the entity that represents the outbox event,
+requiring database schema changes.
+A new column -  `created::timestamp` is introduced, `id` column changes the type from integer to varchar.
+You can find suggested migration scripts for the tested databases below:
+
+.Postgresql:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add column created timestamp;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = now() - make_interval(secs => (select max(id) from hsearch_outbox_event) - id)
+where 1 = 1;
+alter table hsearch_outbox_event
+    alter column created set not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    alter column id TYPE varchar(36) USING gen_random_uuid();
+----
+
+.CockroachDB:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add column created timestamp;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = now() - cast(((select max(id) from hsearch_outbox_event) - id) || ' SECOND' as interval)
+where 1 = 1;
+alter table hsearch_outbox_event
+    alter column created set not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+-- altering type directly is not supported: https://go.crdb.dev/issue-v/47636/v22.1
+alter table hsearch_outbox_event
+    add tmp varchar(36) default cast(gen_random_uuid() as varchar) not null;
+alter table hsearch_outbox_event
+    alter primary key using columns (tmp);
+alter table hsearch_outbox_event
+    drop column id;
+alter table hsearch_outbox_event
+    rename column tmp to id;
+----
+
+.MySQL:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add column created datetime;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+with max_id as (
+    select max(id) as id from hsearch_outbox_event
+)
+update hsearch_outbox_event
+set created = subtime(now(), sec_to_time((select id from max_id) - id))
+where 1 = 1;
+alter table hsearch_outbox_event
+    modify column created datetime not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    modify column id varchar(36);
+update hsearch_outbox_event
+set id = uuid()
+where 1 = 1;
+----
+
+.MariaDB:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add column created datetime;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = subtime(now(), sec_to_time((select max(id) as id from hsearch_outbox_event) - id))
+where 1 = 1;
+alter table hsearch_outbox_event
+    modify column created datetime not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    modify column id varchar(36);
+update hsearch_outbox_event
+set id = uuid()
+where 1 = 1;
+----
+
+.DB2:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add created timestamp;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = current_timestamp - ((select max(id) from hsearch_outbox_event) - id) seconds
+where 1 = 1;
+alter table hsearch_outbox_event
+    alter column created set not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    drop primary key;
+alter table hsearch_outbox_event
+    alter column id set data type varchar(36);
+-- make this call if the adding constraint fails:
+call sysproc.admin_cmd('reorg table HSEARCH_OUTBOX_EVENT');
+alter table hsearch_outbox_event
+    add constraint hsearch_outbox_event_pkey primary key (id);
+update hsearch_outbox_event
+set id = regexp_replace(concat(rawtohex(generate_unique()), 'AAAAAA'), '([A-F0-9]{8})([A-F0-9]{4})([A-F0-9]{4})([A-F0-9]{4})([A-F0-9]{12})', '\1-\2-\3-\4-\5')
+where 1 = 1;
+----
+
+.Oracle:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add created timestamp;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = current_timestamp - numToDSInterval( (select max(id) from hsearch_outbox_event) - id, 'second' )
+where 1 = 1;
+alter table hsearch_outbox_event
+    modify (created not null);
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    add tmp varchar(36) default REGEXP_REPLACE(RAWTOHEX(SYS_GUID()), '([A-F0-9]{8})([A-F0-9]{4})([A-F0-9]{4})([A-F0-9]{4})([A-F0-9]{12})', '\1-\2-\3-\4-\5') not null;
+alter table hsearch_outbox_event
+    drop column id;
+alter table hsearch_outbox_event
+    rename column tmp to id;
+alter table hsearch_outbox_event
+    add constraint hsearch_outbox_event_pkey primary key (id);
+----
+
+.MSSQL:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add created datetime;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = dateadd(ss, -(select max(id) from hsearch_outbox_event) + id, current_timestamp)
+where 1 = 1;
+alter table hsearch_outbox_event
+    alter column created datetime not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    drop constraint if exists hsearch_outbox_event_pkey;
+alter table hsearch_outbox_event
+    alter column id varchar(36) not null;
+alter table hsearch_outbox_event
+    add constraint hsearch_outbox_event_pkey primary key (id);
+update hsearch_outbox_event
+set id = newid()
+where 1 = 1;
+----
+
+.H2:
+[,sql]
+----
+-- add `created` column that will be used for sorting of events:
+alter table hsearch_outbox_event
+    add created datetime;
+
+-- adjust `created` values for existing events so that older events (i.e. ones with smaller ID) will have older timestamp:
+update hsearch_outbox_event
+set created = dateadd(ss, -(select max(id) from hsearch_outbox_event) + id, current_timestamp)
+where 1 = 1;
+alter table hsearch_outbox_event
+    alter column created set not null;
+
+-- change `id` column type to varchar and generate uuids to replace previous int values:
+alter table hsearch_outbox_event
+    alter column id varchar(36) not null;
+update hsearch_outbox_event
+set id = random_uuid()
+where 1 = 1;
+----
+
 [[configuration]]
 == Configuration changes
 
