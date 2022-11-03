@@ -42,9 +42,9 @@ import org.junit.Test;
 
 public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
-	private static final String OUTBOX_EVENT_UPDATE_ID = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ? WHERE ID = ?";
+	private static final String OUTBOX_EVENT_UPDATE_ID_AND_TIME = "UPDATE HSEARCH_OUTBOX_EVENT SET ID = ?, CREATED = ? WHERE ID = ?";
 
-	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS = "SELECT ID FROM HSEARCH_OUTBOX_EVENT ORDER BY ID";
+	private static final String OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME = "SELECT ID, CREATED FROM HSEARCH_OUTBOX_EVENT ORDER BY CREATED, ID";
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
@@ -63,6 +63,8 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 				.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
+				// use timebase uuids to get predictable sorting order
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
 				.setup( IndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -105,7 +107,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 1 (add) and 3 (delete)
-			swapOutboxTableRowIds( session, 0, 2 );
+			swapOutboxTableRowIdAndCreatedValues( session, 0, 2 );
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -212,7 +214,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 
 		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 2 (delete) and 3 (add)
-			swapOutboxTableRowIds( session, 0, 1 );
+			swapOutboxTableRowIdAndCreatedValues( session, 0, 1 );
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -326,7 +328,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		with( sessionFactory ).runInTransaction( session -> {
 			// Swap the IDs of event 2 (update routing key from "FIRST" to "SECOND") and
 			// 3 (update routing key from "SECOND" to "THIRD")
-			swapOutboxTableRowIds( session, 0, 1 );
+			swapOutboxTableRowIdAndCreatedValues( session, 0, 1 );
 		} );
 
 		with( sessionFactory ).runNoTransaction( session -> {
@@ -356,7 +358,7 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	private void swapOutboxTableRowIds(Session session, int row1, int row2) {
+	private void swapOutboxTableRowIdAndCreatedValues(Session session, int row1, int row2) {
 		try {
 			SharedSessionContractImplementor implementor = session.unwrap( SharedSessionContractImplementor.class );
 
@@ -374,37 +376,33 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 			}
 
 			List<String> uuids = new ArrayList<>();
-			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement(
-					OUTBOX_EVENT_SELECT_ORDERED_IDS ) ) {
+			List<java.sql.Timestamp> times = new ArrayList<>();
+			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME ) ) {
 				ResultSet resultSet = statement.executeQuery();
 				while ( resultSet.next() ) {
 					uuids.add( resultSet.getString( 1 ) );
+					times.add( resultSet.getTimestamp( 2 ) );
 				}
 			}
 
-			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
-				ps.setString( 1, UUID.randomUUID().toString() );
-				ps.setString( 2, uuids.get( row2 ) );
-
-				jdbc.getResultSetReturn().executeUpdate( ps );
-			}
-
-			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
-				ps.setString( 1, uuids.get( row2 ) );
-				ps.setString( 2, uuids.get( row1 ) );
-
-				jdbc.getResultSetReturn().executeUpdate( ps );
-			}
-
-			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID ) ) {
-				ps.setString( 1, uuids.get( row1 ) );
-				ps.setString( 2, uuids.get( row2 ) );
-
-				jdbc.getResultSetReturn().executeUpdate( ps );
-			}
+			String temporaryUuid = UUID.randomUUID().toString();
+			updateOutboxTableRow( jdbc, temporaryUuid, uuids.get( row2 ), times.get( row1 ) );
+			updateOutboxTableRow( jdbc, uuids.get( row2 ), uuids.get( row1 ), times.get( row2 ) );
+			updateOutboxTableRow( jdbc, uuids.get( row1 ), temporaryUuid, times.get( row1 ) );
 		}
 		catch (SQLException exception) {
 			fail( "Unexpected SQL exception: " + exception );
+		}
+	}
+
+	private void updateOutboxTableRow(JdbcCoordinator jdbc, String newId, String rowToUpdateId,
+			java.sql.Timestamp newCreated) throws SQLException {
+		try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID_AND_TIME ) ) {
+			ps.setString( 1, newId );
+			ps.setTimestamp( 2, newCreated );
+			ps.setString( 3, rowToUpdateId );
+
+			jdbc.getResultSetReturn().executeUpdate( ps );
 		}
 	}
 

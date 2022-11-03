@@ -71,6 +71,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			"                <param name=\"enumClass\">" + OutboxEvent.Status.class.getName() + "</param>\n" +
 			"            </type>\n" +
 			"        </property>\n" +
+			"        <property name=\"created\" type=\"Instant\" index=\"created\" nullable=\"false\" />\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 

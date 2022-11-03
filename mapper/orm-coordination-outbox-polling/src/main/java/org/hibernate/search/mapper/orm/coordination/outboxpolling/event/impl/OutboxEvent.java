@@ -25,6 +25,7 @@ public final class OutboxEvent {
 	private int retries = 0;
 	private Instant processAfter;
 	private Status status = Status.PENDING;
+	private Instant created = Instant.now();
 
 	@Transient
 	private Object originalEntityId;
@@ -52,6 +53,7 @@ public final class OutboxEvent {
 				", processAfter=" + processAfter +
 				", status=" + status +
 				", originalEntityId=" + originalEntityId +
+				", created=" + created +
 				'}';
 	}
 
@@ -125,6 +127,14 @@ public final class OutboxEvent {
 
 	public void setOriginalEntityId(Object originalEntityId) {
 		this.originalEntityId = originalEntityId;
+	}
+
+	public Instant getCreated() {
+		return created;
+	}
+
+	public void setCreated(Instant created) {
+		this.created = created;
 	}
 
 	OutboxEventReference getReference() {
