@@ -163,26 +163,46 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 
 		if ( discoverJandexIndexesFromAddedTypes ) {
 			IndexView compositeOfExplicitJandexIndexes = JandexUtils.compositeIndex( jandexIndexes );
-			Set<URL> discoveredCodeSourceLocations = new LinkedHashSet<>();
+			Set<URL> discoveredBuildingAllowedCodeSourceLocations = new LinkedHashSet<>();
+			Set<URL> discoveredBuildingForbiddenCodeSourceLocations = new LinkedHashSet<>();
 			for ( Class<?> annotatedType : explicitAnnotatedTypes ) {
 				DotName dotName = DotName.createSimple( annotatedType.getName() );
 				// Optimization: if a class is already in the Jandex index,
 				// there's no need to discover the Jandex index of its JAR.
 				if ( compositeOfExplicitJandexIndexes.getClassByName( dotName ) == null ) {
-					JarUtils.codeSourceLocation( annotatedType ).ifPresent( discoveredCodeSourceLocations::add );
+					Set<URL> targetSet = isJandexBuildingAllowed( annotatedType )
+							? discoveredBuildingAllowedCodeSourceLocations
+							: discoveredBuildingForbiddenCodeSourceLocations;
+					JarUtils.codeSourceLocation( annotatedType ).ifPresent( targetSet::add );
 				}
 			}
-			for ( URL codeSourceLocation : discoveredCodeSourceLocations ) {
-				jandexIndexForCodeSourceLocation( codeSourceLocation ).ifPresent( jandexIndexes::add );
+			for ( URL codeSourceLocation : discoveredBuildingAllowedCodeSourceLocations ) {
+				jandexIndexForCodeSourceLocation( codeSourceLocation, true ).ifPresent( jandexIndexes::add );
+			}
+			for ( URL codeSourceLocation : discoveredBuildingForbiddenCodeSourceLocations ) {
+				jandexIndexForCodeSourceLocation( codeSourceLocation, false ).ifPresent( jandexIndexes::add );
 			}
 		}
 
 		return jandexIndexes.isEmpty() ? null : JandexUtils.compositeIndex( jandexIndexes );
 	}
 
-	private Optional<Index> jandexIndexForCodeSourceLocation(URL codeSourceLocation) {
+	private boolean isJandexBuildingAllowed(Class<?> annotatedType) {
+		if ( buildMissingJandexIndexes ) {
+			Package pakkage = annotatedType.getPackage();
+			// We expect Hibernate projects to always provide a Jandex index if one is needed.
+			return pakkage != null
+					&& !pakkage.getName().equals( "org.hibernate" )
+					&& !pakkage.getName().startsWith( "org.hibernate." );
+		}
+		else {
+			return false;
+		}
+	}
+
+	private static Optional<Index> jandexIndexForCodeSourceLocation(URL codeSourceLocation, boolean buildIfMissing) {
 		try {
-			if ( buildMissingJandexIndexes ) {
+			if ( buildIfMissing ) {
 				return Optional.of( JandexUtils.readOrBuildIndex( codeSourceLocation ) );
 			}
 			else {
