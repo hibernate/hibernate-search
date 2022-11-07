@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
+package org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg;
 
 import java.lang.invoke.MethodHandles;
 import java.util.UUID;
@@ -13,15 +13,17 @@ import org.hibernate.id.uuid.CustomVersionOneStrategy;
 import org.hibernate.id.uuid.StandardRandomStrategy;
 import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+@Incubating
 public enum UuidGenerationStrategy {
 	/**
 	 * Defaults to {@link #RANDOM}
 	 */
 	AUTO( "auto" ) {
 		@Override
-		String strategy() {
+		public String strategy() {
 			return RANDOM.strategy();
 		}
 	},
@@ -30,7 +32,7 @@ public enum UuidGenerationStrategy {
 	 */
 	RANDOM( "random" ) {
 		@Override
-		String strategy() {
+		public String strategy() {
 			return StandardRandomStrategy.class.getName();
 		}
 	},
@@ -43,7 +45,7 @@ public enum UuidGenerationStrategy {
 	 */
 	TIME( "time" ) {
 		@Override
-		String strategy() {
+		public String strategy() {
 			return CustomVersionOneStrategy.class.getName();
 		}
 	};
@@ -58,7 +60,7 @@ public enum UuidGenerationStrategy {
 		return externalRepresentation;
 	}
 
-	abstract String strategy();
+	public abstract String strategy();
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
