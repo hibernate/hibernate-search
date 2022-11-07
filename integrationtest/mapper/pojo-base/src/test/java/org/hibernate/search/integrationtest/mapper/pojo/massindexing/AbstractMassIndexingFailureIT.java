@@ -55,6 +55,7 @@ import org.awaitility.Awaitility;
 
 public abstract class AbstractMassIndexingFailureIT {
 
+	private static final int COUNT = 1500;
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
 	public static final String TITLE_2 = "Ulysses";
@@ -116,9 +117,9 @@ public abstract class AbstractMassIndexingFailureIT {
 		String failingOperationAsString = "Loading and extracting entity data for entity '"
 				+ Book.NAME + "' during mass indexing";
 
-		expectMassIndexerOperationFailureHandling(
+		expectMassIndexerLoadingOperationFailureHandling(
 				SimulatedFailure.class, exceptionMessage,
-				failingOperationAsString
+				failingOperationAsString, COUNT
 		);
 
 		doMassIndexingWithFailure(
@@ -128,19 +129,21 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"1 failure(s) occurred during mass indexing",
+								"failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								"First failure: ",
 								exceptionMessage
 						)
 						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
-		assertMassIndexerOperationFailureHandling(
+		assertMassIndexerLoadingOperationFailureHandling(
 				SimulatedFailure.class, exceptionMessage,
-				failingOperationAsString
+				failingOperationAsString, COUNT
 		);
 	}
 
@@ -562,6 +565,13 @@ public abstract class AbstractMassIndexingFailureIT {
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString);
 
+	protected abstract void expectMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage, String failingOperationAsString, int count);
+
+	protected abstract void assertMassIndexerLoadingOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString, int count);
+
 	protected abstract void expectEntityIndexingAndMassIndexerOperationFailureHandling(
 			String entityName, String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
@@ -800,7 +810,7 @@ public abstract class AbstractMassIndexingFailureIT {
 						// We need more than 1000 batches in order to reproduce HSEARCH-4236.
 						// That's because of the size of the queue:
 						// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
-						return 1500;
+						return COUNT;
 					}
 
 					@Override

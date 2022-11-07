@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -151,6 +152,29 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 				.hasMessageContaining( exceptionMessage );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
+	}
+
+	@Override
+	protected void expectMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage, String failingOperationAsString, int count) {
+		// We'll check in the assert*() method, see below.
+	}
+
+	@Override
+	protected void assertMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage, String failingOperationAsString, int count) {
+		verify( failureHandler, times( count ) ).handle( entityFailureContextCapture.capture() );
+
+		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
+		assertThat( context.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessageContainingAll( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+		assertThat( context.entityReferences() )
+				.hasSize( 1 );
+
+		verifyNoMoreInteractions( failureHandler );
 	}
 
 	@Override
