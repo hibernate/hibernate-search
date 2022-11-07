@@ -26,17 +26,17 @@ public final class JarTestUtils {
 	private JarTestUtils() {
 	}
 
-	public static Path determineJarOrDirectoryLocation(Class<?> classFromJar, String jarName) {
-		URL url = classFromJar.getProtectionDomain().getCodeSource().getLocation();
-		if ( !url.getProtocol().equals( "file" ) ) {
-			throw new IllegalStateException( jarName + " JAR is not a local file? " + url );
-		}
+	private static Path toPath(URL codeSourceLocation) {
 		try {
-			return Paths.get( url.toURI() );
+			return Paths.get( codeSourceLocation.toURI() );
 		}
 		catch (URISyntaxException e) {
-			throw new IllegalStateException( e );
+			throw new RuntimeException( "Cannot convert URL '" + codeSourceLocation + "' to Path", e );
 		}
+	}
+
+	public static Path toJar(TemporaryFolder temporaryFolder, URL codeSourceLocation) {
+			return toJar( temporaryFolder, toPath( codeSourceLocation ) );
 	}
 
 	public static Path toJar(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath) {
@@ -65,6 +65,10 @@ public final class JarTestUtils {
 			throw new IllegalStateException(
 					"Exception turning " + jarOrDirectoryPath + " into a JAR: " + e.getMessage(), e );
 		}
+	}
+
+	public static Path toDirectory(TemporaryFolder temporaryFolder, URL codeSourceLocation) {
+		return toDirectory( temporaryFolder, toPath( codeSourceLocation ) );
 	}
 
 	public static Path toDirectory(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath) {

@@ -7,10 +7,10 @@
 package org.hibernate.search.util.common.jar.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.common.jar.impl.JarUtils.jarOrDirectoryPath;
 import static org.hibernate.search.util.impl.test.jar.JarTestUtils.toDirectory;
 import static org.hibernate.search.util.impl.test.jar.JarTestUtils.toJar;
 
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -30,10 +30,10 @@ import org.jboss.jandex.Index;
 public class JandexUtilsTest {
 	private static final String META_INF_JANDEX_INDEX = "META-INF/jandex.idx";
 
-	private static final Path PATH_TO_JUNIT_JAR = jarOrDirectoryPath( Test.class )
+	private static final URL JUNIT_JAR_URL = JarUtils.codeSourceLocation( Test.class )
 			.orElseThrow( () -> new AssertionFailure( "Could not find JUnit JAR?" ) );
-	private static final Path PATH_TO_UTIL_INTERNAL_TEST_COMMON_JAR =
-			jarOrDirectoryPath( HibernateSearchUtilInternalTestCommonClass.class )
+	private static final URL UTIL_INTERNAL_TEST_COMMON_JAR_URL =
+			JarUtils.codeSourceLocation( HibernateSearchUtilInternalTestCommonClass.class )
 					.orElseThrow( () -> new AssertionFailure(
 							"Could not find hibernate-search-util-internal-test-common JAR?" ) );
 
@@ -41,29 +41,29 @@ public class JandexUtilsTest {
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Test
-	public void readIndex_fromJar_indexAbsent() {
-		Path jarPath = toJar( temporaryFolder, PATH_TO_JUNIT_JAR );
+	public void readIndex_fromJar_indexAbsent() throws Exception {
+		Path jarPath = toJar( temporaryFolder, JUNIT_JAR_URL );
 		checkJarPreconditions( jarPath, false );
 
-		Optional<Index> indexOptional = JandexUtils.readIndex( jarPath );
+		Optional<Index> indexOptional = JandexUtils.readIndex( jarPath.toUri().toURL() );
 		assertThat( indexOptional ).isEmpty();
 	}
 
 	@Test
-	public void readIndex_fromDirectory_indexAbsent() {
-		Path dirPath = toDirectory( temporaryFolder, PATH_TO_JUNIT_JAR );
+	public void readIndex_fromDirectory_indexAbsent() throws Exception {
+		Path dirPath = toDirectory( temporaryFolder, JUNIT_JAR_URL );
 		checkDirectoryPreconditions( dirPath, false );
 
-		Optional<Index> indexOptional = JandexUtils.readIndex( dirPath );
+		Optional<Index> indexOptional = JandexUtils.readIndex( dirPath.toUri().toURL() );
 		assertThat( indexOptional ).isEmpty();
 	}
 
 	@Test
-	public void readIndex_fromJar_indexPresent() {
-		Path jarPath = toJar( temporaryFolder, PATH_TO_UTIL_INTERNAL_TEST_COMMON_JAR );
+	public void readIndex_fromJar_indexPresent() throws Exception {
+		Path jarPath = toJar( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkJarPreconditions( jarPath, true );
 
-		Optional<Index> indexOptional = JandexUtils.readIndex( jarPath );
+		Optional<Index> indexOptional = JandexUtils.readIndex( jarPath.toUri().toURL() );
 		assertThat( indexOptional ).isNotEmpty();
 		Index index = indexOptional.get();
 		ClassInfo someClassInfo = index.getClassByName(
@@ -73,11 +73,11 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readIndex_fromDirectory_indexPresent() {
-		Path dirPath = toDirectory( temporaryFolder, PATH_TO_UTIL_INTERNAL_TEST_COMMON_JAR );
+	public void readIndex_fromDirectory_indexPresent() throws Exception {
+		Path dirPath = toDirectory( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkDirectoryPreconditions( dirPath, true );
 
-		Optional<Index> indexOptional = JandexUtils.readIndex( dirPath );
+		Optional<Index> indexOptional = JandexUtils.readIndex( dirPath.toUri().toURL() );
 		assertThat( indexOptional ).isNotEmpty();
 		Index index = indexOptional.get();
 		ClassInfo someClassInfo = index.getClassByName(
@@ -87,33 +87,33 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readOrBuildIndex_fromJar_indexAbsent() {
-		Path jarPath = toJar( temporaryFolder, PATH_TO_JUNIT_JAR );
+	public void readOrBuildIndex_fromJar_indexAbsent() throws Exception {
+		Path jarPath = toJar( temporaryFolder, JUNIT_JAR_URL );
 		checkJarPreconditions( jarPath, false );
 
-		Index index = JandexUtils.readOrBuildIndex( jarPath );
+		Index index = JandexUtils.readOrBuildIndex( jarPath.toUri().toURL() );
 		ClassInfo someClassInfo = index.getClassByName( DotName.createSimple( Test.class.getName() ) );
 		assertThat( someClassInfo ).isNotNull()
 				.returns( Test.class.getName(), ci -> ci.name().toString() );
 	}
 
 	@Test
-	public void readOrBuildIndex_fromDirectory_indexAbsent() {
-		Path dirPath = toDirectory( temporaryFolder, PATH_TO_JUNIT_JAR );
+	public void readOrBuildIndex_fromDirectory_indexAbsent() throws Exception {
+		Path dirPath = toDirectory( temporaryFolder, JUNIT_JAR_URL );
 		checkDirectoryPreconditions( dirPath, false );
 
-		Index index = JandexUtils.readOrBuildIndex( dirPath );
+		Index index = JandexUtils.readOrBuildIndex( dirPath.toUri().toURL() );
 		ClassInfo someClassInfo = index.getClassByName( DotName.createSimple( Test.class.getName() ) );
 		assertThat( someClassInfo ).isNotNull()
 				.returns( Test.class.getName(), ci -> ci.name().toString() );
 	}
 
 	@Test
-	public void readOrBuildIndex_fromJar_indexPresent() {
-		Path jarPath = toJar( temporaryFolder, PATH_TO_UTIL_INTERNAL_TEST_COMMON_JAR );
+	public void readOrBuildIndex_fromJar_indexPresent() throws Exception {
+		Path jarPath = toJar( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkJarPreconditions( jarPath, true );
 
-		Index index = JandexUtils.readOrBuildIndex( jarPath );
+		Index index = JandexUtils.readOrBuildIndex( jarPath.toUri().toURL() );
 		ClassInfo someClassInfo = index.getClassByName(
 				DotName.createSimple( HibernateSearchUtilInternalTestCommonClass.class.getName() ) );
 		assertThat( someClassInfo ).isNotNull()
@@ -121,11 +121,11 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readOrBuildIndex_fromDirectory_indexPresent() {
-		Path dirPath = toDirectory( temporaryFolder, PATH_TO_UTIL_INTERNAL_TEST_COMMON_JAR );
+	public void readOrBuildIndex_fromDirectory_indexPresent() throws Exception {
+		Path dirPath = toDirectory( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkDirectoryPreconditions( dirPath, true );
 
-		Index index = JandexUtils.readOrBuildIndex( dirPath );
+		Index index = JandexUtils.readOrBuildIndex( dirPath.toUri().toURL() );
 		ClassInfo someClassInfo = index.getClassByName(
 				DotName.createSimple( HibernateSearchUtilInternalTestCommonClass.class.getName() ) );
 		assertThat( someClassInfo ).isNotNull()

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.common.jar.impl.JandexUtils.readOrBuildIndex;
-import static org.hibernate.search.util.common.jar.impl.JarUtils.jarOrDirectoryPath;
+import static org.hibernate.search.util.common.jar.impl.JarUtils.codeSourceLocation;
 
 import java.io.IOException;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class BuiltinAnnotationsTest {
 	@BeforeClass
 	public static void index() throws IOException {
 		pojoMapperBaseIndex = readOrBuildIndex(
-				jarOrDirectoryPath( BuiltinAnnotations.class )
+				codeSourceLocation( BuiltinAnnotations.class )
 						.orElseThrow( () -> new AssertionFailure( "Could not find hibernate-search-mapper-pojo-base JAR?" ) )
 		);
 	}
