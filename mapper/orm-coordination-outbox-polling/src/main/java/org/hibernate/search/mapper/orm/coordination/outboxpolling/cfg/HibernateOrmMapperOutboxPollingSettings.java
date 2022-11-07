@@ -12,7 +12,6 @@ import org.hibernate.id.UUIDGenerator;
 import org.hibernate.id.uuid.CustomVersionOneStrategy;
 import org.hibernate.id.uuid.StandardRandomStrategy;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.UuidGenerationStrategy;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating

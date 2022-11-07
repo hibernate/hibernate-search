@@ -26,6 +26,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
