@@ -113,8 +113,9 @@ public abstract class AbstractMassIndexingFailureIT {
 		// We need more than 1000 batches in order to reproduce HSEARCH-4236.
 		// That's because of the size of the queue:
 		// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
+		int count = 1500;
 		with( sessionFactory ).runInTransaction( session -> {
-			for ( int i = 4; i < 1500; i++ ) {
+			for ( int i = 4; i <= count; i++ ) {
 				session.persist( new Book( i, "title " + i, "author " + i ) );
 			}
 		} );
@@ -123,7 +124,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		String failingOperationAsString = "Loading and extracting entity data for entity '"
 				+ Book.NAME + "' during mass indexing";
 
-		expectMassIndexerOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString );
+		expectMassIndexerLoadingOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString, count );
 
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
@@ -140,10 +141,13 @@ public abstract class AbstractMassIndexingFailureIT {
 						)
 						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
-		assertMassIndexerOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString );
+		assertMassIndexerLoadingOperationFailureHandling(
+				SimulatedFailure.class, exceptionMessage, failingOperationAsString, count );
 	}
 
 	@Test
@@ -562,6 +566,13 @@ public abstract class AbstractMassIndexingFailureIT {
 	protected abstract void assertMassIndexerOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString);
+
+	protected abstract void expectMassIndexerLoadingOperationFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage, String failingOperationAsString, int count);
+
+	protected abstract void assertMassIndexerLoadingOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString, int count);
 
 	protected abstract void expectEntityIndexingAndMassIndexerOperationFailureHandling(
 			String entityName, String entityReferenceAsString,

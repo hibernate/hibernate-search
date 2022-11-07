@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -97,6 +98,26 @@ public class PojoMassIndexingNotifier {
 		if ( entityReference != null ) {
 			contextBuilder.entityReference( entityReference );
 			recordedFailure.entityReference = entityReference;
+		}
+		failureHandler.handle( contextBuilder.build() );
+	}
+
+	void reportEntitiesLoadingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup, List<?> idList, Exception exception) {
+		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
+		recordFailure( exception, false );
+
+		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
+		contextBuilder.throwable( exception );
+		// Add minimal information here, but information we're sure we can get
+		contextBuilder.failingOperation( log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() ) );
+		// Add more information here:
+		for ( Object id : idList ) {
+			try {
+				contextBuilder.entityReference( typeGroup.makeSuperTypeReference( id ) );
+			}
+			catch (Exception e) {
+				exception.addSuppressed( e );
+			}
 		}
 		failureHandler.handle( contextBuilder.build() );
 	}

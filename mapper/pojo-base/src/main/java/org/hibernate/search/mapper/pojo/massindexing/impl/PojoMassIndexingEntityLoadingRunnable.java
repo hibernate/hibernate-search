@@ -61,7 +61,12 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 				if ( idList != null ) {
 					log.tracef( "received list of ids %s", idList );
 					// This will pass the loaded entities to the sink, which will trigger indexing for those entities.
-					entityLoader.load( idList );
+					try {
+						entityLoader.load( idList );
+					}
+					catch (RuntimeException e) {
+						getNotifier().reportEntitiesLoadingFailure( typeGroup, idList, e );
+					}
 				}
 			}
 			while ( idList != null );
