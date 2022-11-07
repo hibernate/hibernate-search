@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Path;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -163,34 +163,34 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 
 		if ( discoverJandexIndexesFromAddedTypes ) {
 			IndexView compositeOfExplicitJandexIndexes = JandexUtils.compositeIndex( jandexIndexes );
-			Set<Path> discoveredJarPaths = new LinkedHashSet<>();
+			Set<URL> discoveredCodeSourceLocations = new LinkedHashSet<>();
 			for ( Class<?> annotatedType : explicitAnnotatedTypes ) {
 				DotName dotName = DotName.createSimple( annotatedType.getName() );
 				// Optimization: if a class is already in the Jandex index,
 				// there's no need to discover the Jandex index of its JAR.
 				if ( compositeOfExplicitJandexIndexes.getClassByName( dotName ) == null ) {
-					JarUtils.jarOrDirectoryPath( annotatedType ).ifPresent( discoveredJarPaths::add );
+					JarUtils.codeSourceLocation( annotatedType ).ifPresent( discoveredCodeSourceLocations::add );
 				}
 			}
-			for ( Path path : discoveredJarPaths ) {
-				jandexIndexForJar( path ).ifPresent( jandexIndexes::add );
+			for ( URL codeSourceLocation : discoveredCodeSourceLocations ) {
+				jandexIndexForCodeSourceLocation( codeSourceLocation ).ifPresent( jandexIndexes::add );
 			}
 		}
 
 		return jandexIndexes.isEmpty() ? null : JandexUtils.compositeIndex( jandexIndexes );
 	}
 
-	private Optional<Index> jandexIndexForJar(Path path) {
+	private Optional<Index> jandexIndexForCodeSourceLocation(URL codeSourceLocation) {
 		try {
 			if ( buildMissingJandexIndexes ) {
-				return Optional.of( JandexUtils.readOrBuildIndex( path ) );
+				return Optional.of( JandexUtils.readOrBuildIndex( codeSourceLocation ) );
 			}
 			else {
-				return JandexUtils.readIndex( path );
+				return JandexUtils.readIndex( codeSourceLocation );
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.errorDiscoveringJandexIndex( path, e.getMessage(), e );
+			throw log.errorDiscoveringJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 

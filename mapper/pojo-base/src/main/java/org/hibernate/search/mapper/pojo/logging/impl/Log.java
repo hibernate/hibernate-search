@@ -12,7 +12,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -736,8 +736,8 @@ public interface Log extends BasicLogger {
 			String fieldPath);
 
 	@Message(id = ID_OFFSET + 119,
-			value = "Exception while retrieving the Jandex index for JAR '%1$s': %2$s")
-	SearchException errorDiscoveringJandexIndex(Path jarPath, String causeMessage, @Cause Exception cause);
+			value = "Exception while retrieving the Jandex index for code source location '%1$s': %2$s")
+	SearchException errorDiscoveringJandexIndex(URL codeSourceLocation, String causeMessage, @Cause Exception cause);
 
 	@LogMessage(level = Logger.Level.WARN)
 	@Message(id = ID_OFFSET + 120,

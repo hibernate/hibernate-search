@@ -9,9 +9,11 @@ package org.hibernate.search.util.common.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 
+import java.io.IOException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
+import java.net.URI;
+import java.net.URL;
 
 import org.hibernate.search.util.common.SearchException;
 
@@ -116,11 +118,21 @@ public interface Log extends BasicLogger {
 	SearchException errorInvokingStaticMember(Member member, String argumentsAsString, @Cause Throwable cause, String causeMessage);
 
 	@Message(id = ID_OFFSET + 13, value = "Exception while accessing Jandex index for '%1$s': %2$s")
-	SearchException errorAccessingJandexIndex(Path jarOrDirectoryPath, String message, @Cause Throwable e);
+	SearchException errorAccessingJandexIndex(URL codeSourceLocation, String message, @Cause Throwable e);
 
 	@Message(id = ID_OFFSET + 14, value = "Exception while building Jandex index for '%1$s': %2$s")
-	SearchException errorBuildingJandexIndex(Path jarOrDirectoryPath, String message, @Cause Throwable e);
+	SearchException errorBuildingJandexIndex(URL codeSourceLocation, String message, @Cause Throwable e);
 
 	@Message(id = ID_OFFSET + 15, value = "Property name '%1$s' cannot contain dots.")
 	IllegalArgumentException propertyNameCannotContainDots(String propertyName);
+
+	@Message(id = ID_OFFSET + 16, value = "Cannot open filesystem for code source at '%1$s': %2$s")
+	IOException cannotOpenCodeSourceFileSystem(URL url, String causeMessage, @Cause Throwable e);
+
+	@Message(id = ID_OFFSET + 17, value = "Cannot interpret '%1$s' as a local directory or JAR.")
+	IOException cannotInterpretCodeSourceUrl(URL url);
+
+	@Message(id = ID_OFFSET + 18, value = "Cannot open a ZIP filesystem for code source at '%1$s', because the URI points to content inside a nested JAR.")
+	IOException cannotOpenNestedJar(URI uri);
+
 }

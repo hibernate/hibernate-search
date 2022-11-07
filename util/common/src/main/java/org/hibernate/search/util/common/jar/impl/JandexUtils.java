@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Repeatable;
 import java.lang.invoke.MethodHandles;
-import java.net.URISyntaxException;
-import java.nio.file.FileSystem;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -97,41 +96,38 @@ public final class JandexUtils {
 		}
 	}
 
-	public static Index readOrBuildIndex(Path jarOrDirectoryPath) {
-		try ( FileSystem jarFs = JarUtils.openJarOrDirectory( jarOrDirectoryPath ) ) {
-			Path jarRoot = jarFs == null ? jarOrDirectoryPath : jarFs.getRootDirectories().iterator().next();
-			Optional<Index> readIndex = doReadIndex( jarRoot );
+	public static Index readOrBuildIndex(URL codeSourceLocation) {
+		try ( CodeSource codeSource = new CodeSource( codeSourceLocation ) ) {
+			Optional<Index> readIndex = doReadIndex( codeSource );
 			if ( readIndex.isPresent() ) {
 				return readIndex.get();
 			}
 			try {
-				return doBuildJandexIndex( jarRoot );
+				return doBuildJandexIndex( codeSource.classesPathOrFail() );
 			}
 			catch (IOException | RuntimeException e) {
-				throw log.errorBuildingJandexIndex( jarOrDirectoryPath, e.getMessage(), e );
+				throw log.errorBuildingJandexIndex( codeSourceLocation, e.getMessage(), e );
 			}
 		}
-		catch (IOException | URISyntaxException | RuntimeException e) {
-			throw log.errorAccessingJandexIndex( jarOrDirectoryPath, e.getMessage(), e );
+		catch (IOException | RuntimeException e) {
+			throw log.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 
-	public static Optional<Index> readIndex(Path jarOrDirectoryPath) {
-		try ( FileSystem jarFs = JarUtils.openJarOrDirectory( jarOrDirectoryPath ) ) {
-			Path jarRoot = jarFs == null ? jarOrDirectoryPath : jarFs.getRootDirectories().iterator().next();
-			return doReadIndex( jarRoot );
+	public static Optional<Index> readIndex(URL codeSourceLocation) {
+		try ( CodeSource codeSource = new CodeSource( codeSourceLocation ) ) {
+			return doReadIndex( codeSource );
 		}
-		catch (IOException | URISyntaxException | RuntimeException e) {
-			throw log.errorAccessingJandexIndex( jarOrDirectoryPath, e.getMessage(), e );
+		catch (IOException | RuntimeException e) {
+			throw log.errorAccessingJandexIndex( codeSourceLocation, e.getMessage(), e );
 		}
 	}
 
-	private static Optional<Index> doReadIndex(Path jarRoot) throws IOException {
-		Path jandexIndexPath = jarRoot.resolve( META_INF_JANDEX_INDEX );
-		if ( !Files.exists( jandexIndexPath ) ) {
-			return Optional.empty();
-		}
-		try ( InputStream in = Files.newInputStream( jandexIndexPath ) ) {
+	private static Optional<Index> doReadIndex(CodeSource codeSource) throws IOException {
+		try ( InputStream in = codeSource.readOrNull( META_INF_JANDEX_INDEX ) ) {
+			if ( in == null ) {
+				return Optional.empty();
+			}
 			IndexReader reader = new IndexReader( in );
 			return Optional.of( reader.read() );
 		}
@@ -142,11 +138,11 @@ public final class JandexUtils {
 	 * <p>
 	 * Original code: https://github.com/quarkusio/quarkus/blob/8d4d3459b01203d2ce35d7847874a88941960443/core/deployment/src/main/java/io/quarkus/deployment/index/IndexingUtil.java
 	 */
-	private static Index doBuildJandexIndex(Path jarRoot) throws IOException {
+	private static Index doBuildJandexIndex(Path classesPath) throws IOException {
 		Indexer indexer = new Indexer();
-		boolean multiRelease = JarUtils.isMultiRelease( jarRoot );
-		Path metaInfVersions = jarRoot.resolve( META_INF_VERSIONS );
-		try ( Stream<Path> stream = Files.walk( jarRoot ) ) {
+		boolean multiRelease = JarUtils.isMultiRelease( classesPath );
+		Path metaInfVersions = classesPath.resolve( META_INF_VERSIONS );
+		try ( Stream<Path> stream = Files.walk( classesPath ) ) {
 			for ( Iterator<Path> it = stream.iterator(); it.hasNext(); ) {
 				Path path = it.next();
 				if ( path.getFileName() == null || !path.getFileName().toString().endsWith( ".class" ) ) {

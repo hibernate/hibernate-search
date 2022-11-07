@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.gson.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.common.jar.impl.JandexUtils.extractDeclaringClass;
 import static org.hibernate.search.util.common.jar.impl.JandexUtils.readOrBuildIndex;
-import static org.hibernate.search.util.common.jar.impl.JarUtils.jarOrDirectoryPath;
+import static org.hibernate.search.util.common.jar.impl.JarUtils.codeSourceLocation;
 import static org.hibernate.search.util.impl.test.jar.JandexTestUtils.findRuntimeAnnotations;
 
 import java.io.IOException;
@@ -42,9 +42,9 @@ public class GsonClassesTest {
 
 	@BeforeClass
 	public static void index() throws IOException {
-		gsonIndex = readOrBuildIndex( jarOrDirectoryPath( Gson.class )
+		gsonIndex = readOrBuildIndex( codeSourceLocation( Gson.class )
 				.orElseThrow( () -> new AssertionFailure( "Could not find Gson JAR?" ) ) );
-		backendElasticsearchIndex = readOrBuildIndex( jarOrDirectoryPath( ElasticsearchExtension.class )
+		backendElasticsearchIndex = readOrBuildIndex( codeSourceLocation( ElasticsearchExtension.class )
 				.orElseThrow( () -> new AssertionFailure( "Could not find hibernate-search-backend-elasticsearch JAR?" ) ) );
 	}
 

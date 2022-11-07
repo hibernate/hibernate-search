@@ -9,22 +9,12 @@ package org.hibernate.search.util.common.jar.impl;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.CodeSource;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.jar.Manifest;
-
-import org.hibernate.search.util.common.AssertionFailure;
 
 public final class JarUtils {
 	private JarUtils() {
@@ -60,38 +50,16 @@ public final class JarUtils {
 		return JAVA_VERSION;
 	}
 
-	public static Optional<Path> jarOrDirectoryPath(Class<?> classFromJar) {
-		CodeSource codeSource = classFromJar.getProtectionDomain().getCodeSource();
+	public static Optional<URL> codeSourceLocation(Class<?> classFromJar) {
+		java.security.CodeSource codeSource = classFromJar.getProtectionDomain().getCodeSource();
 		if ( codeSource == null ) {
 			return Optional.empty();
 		}
 		URL url = codeSource.getLocation();
-		if ( url == null || !url.getProtocol().equals( "file" ) ) {
+		if ( url == null ) {
 			return Optional.empty();
 		}
-		try {
-			Path path = Paths.get( url.toURI() );
-			return Optional.of( path );
-		}
-		catch (URISyntaxException e) {
-			throw new AssertionFailure( "Unexpected failure while accessing JAR", e );
-		}
-	}
-
-	public static FileSystem openJarOrDirectory(Path jarOrDirectoryPath) throws IOException, URISyntaxException {
-		if ( Files.isDirectory( jarOrDirectoryPath ) ) {
-			// The JAR is a directory, e.g. target/classes in Maven builds.
-			// This may happens when running tests with maven-surefire-plugin, in particular.
-			// We'll use the directory as-is.
-			return null;
-		}
-		else {
-			// This is a regular file, so hopefully an actual JAR file.
-			// We'll open a ZIP filesystem to work on the contents of the JAR file.
-			URI jarUri = new URI( "jar:file", null, jarOrDirectoryPath.toUri().getPath(), null );
-			Map<String, String> zipFsEnv = Collections.emptyMap();
-			return FileSystems.newFileSystem( jarUri, zipFsEnv );
-		}
+		return Optional.of( url );
 	}
 
 	/**

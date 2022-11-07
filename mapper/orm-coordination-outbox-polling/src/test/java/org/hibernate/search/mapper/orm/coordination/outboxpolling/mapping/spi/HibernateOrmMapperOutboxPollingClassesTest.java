@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.mapping.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.common.jar.impl.JandexUtils.readOrBuildIndex;
+import static org.hibernate.search.util.common.jar.impl.JarUtils.codeSourceLocation;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +20,6 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
-import org.hibernate.search.util.common.jar.impl.JarUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,9 +42,9 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 	private static Index outboxPollingIndex;
 
 	@BeforeClass
-	public static void index() throws IOException {
+	public static void index() {
 		outboxPollingIndex = readOrBuildIndex(
-				JarUtils.jarOrDirectoryPath( HibernateOrmMapperOutboxPollingSettings.class )
+				codeSourceLocation( HibernateOrmMapperOutboxPollingSettings.class )
 						.orElseThrow( () -> new AssertionFailure(
 								"Could not find hibernate-search-mapper-orm-coordination-outbox-polling JAR?" ) )
 		);
