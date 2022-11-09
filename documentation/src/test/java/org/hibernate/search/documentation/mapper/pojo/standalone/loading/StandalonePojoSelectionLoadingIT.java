@@ -21,6 +21,7 @@ import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -52,10 +53,15 @@ public class StandalonePojoSelectionLoadingIT {
 
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
-				.addEntityType( Book.class, context -> // <2>
-						context.selectionLoadingStrategy(
-								new MySelectionLoadingStrategy<>( Book.class )
-						) )
+				.property(
+						"hibernate.search.mapping.configurer",
+						(StandalonePojoMappingConfigurer) c -> {
+							c.addEntityType( Book.class, context -> // <2>
+									context.selectionLoadingStrategy(
+											new MySelectionLoadingStrategy<>( Book.class )
+									) );
+						}
+				)
 				// end::setup[]
 				.properties( TestConfiguration.standalonePojoMapperProperties(
 						configurationProvider,

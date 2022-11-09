@@ -59,7 +59,7 @@ public abstract class BackendConfiguration {
 		return Optional.empty();
 	}
 
-	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+	public <C extends MappingSetupHelper<C, ?, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 			String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 		setupContext = setupContext
 				.withBackendProperties( backendNameOrNull, backendProperties( configurationProvider ) );

@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -38,21 +39,28 @@ public class MappingConfigurationIT {
 		// tag::setup[]
 		SearchMappingBuilder builder = SearchMapping.builder()
 				// end::setup[]
-				.properties( TestConfiguration.standalonePojoMapperProperties( configurationProvider,
-						BackendConfigurations.simple() ) )
+				.properties( TestConfiguration.standalonePojoMapperProperties(
+						configurationProvider,
+						BackendConfigurations.simple()
+				) )
 				// tag::setup[]
-				.addEntityType( Book.class ); // <1>
+				.property(
+						"hibernate.search.mapping.configurer",
+						(StandalonePojoMappingConfigurer) context -> {
+							context.addEntityType( Book.class ); // <1>
 
-		builder.annotationMapping() // <2>
-				.discoverAnnotationsFromReferencedTypes( false )
-				.discoverAnnotatedTypesFromRootMappingAnnotations( false );
+							context.annotationMapping() // <2>
+									.discoverAnnotationsFromReferencedTypes( false )
+									.discoverAnnotatedTypesFromRootMappingAnnotations( false );
 
-		ProgrammaticMappingConfigurationContext mappingContext = builder.programmaticMapping(); // <3>
-		TypeMappingStep bookMapping = mappingContext.type( Book.class );
-		bookMapping.indexed();
-		bookMapping.property( "id" ).documentId();
-		bookMapping.property( "title" )
-				.fullTextField().analyzer( "english" );
+							ProgrammaticMappingConfigurationContext mappingContext = context.programmaticMapping(); // <3>
+							TypeMappingStep bookMapping = mappingContext.type( Book.class );
+							bookMapping.indexed();
+							bookMapping.property( "id" ).documentId();
+							bookMapping.property( "title" )
+									.fullTextField().analyzer( "english" );
+						}
+				);
 
 		CloseableSearchMapping searchMapping = builder.build();
 		// end::setup[]

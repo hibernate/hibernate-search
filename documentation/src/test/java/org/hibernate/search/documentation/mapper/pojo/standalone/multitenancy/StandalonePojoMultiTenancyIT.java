@@ -12,6 +12,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -31,11 +32,14 @@ public class StandalonePojoMultiTenancyIT {
 	public void setup() {
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
-				.addEntityType( Book.class )
+				// ...
 				.property( "hibernate.search.mapping.multi_tenancy.enabled", true ) // <2>
 				// end::setup[]
 				.properties( TestConfiguration.standalonePojoMapperProperties( configurationProvider,
 						BackendConfigurations.simple() ) )
+				.property( "hibernate.search.mapping.configurer",
+						(StandalonePojoMappingConfigurer) context -> context.addEntityTypes( Book.class )
+				)
 				// tag::setup[]
 				.build(); // <3>
 		// end::setup[]

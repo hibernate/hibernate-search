@@ -18,6 +18,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -51,10 +52,15 @@ public class StandalonePojoMassLoadingIT {
 				new MyDatastore( entities );
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <2>
-				.addEntityType( Book.class, context -> // <3>
-						context.massLoadingStrategy(
-								new MyMassLoadingStrategy<>( datastore, Book.class )
-						) )
+				.property(
+						"hibernate.search.mapping.configurer",
+						(StandalonePojoMappingConfigurer) configurerContext -> {
+							configurerContext.addEntityType( Book.class, context -> // <3>
+									context.massLoadingStrategy(
+											new MyMassLoadingStrategy<>( datastore, Book.class )
+									) );
+						}
+				)
 				// end::setup[]
 				.properties( TestConfiguration.standalonePojoMapperProperties(
 						configurationProvider,

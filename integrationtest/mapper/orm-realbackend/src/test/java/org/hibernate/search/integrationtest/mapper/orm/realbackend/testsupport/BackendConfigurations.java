@@ -37,7 +37,7 @@ public class BackendConfigurations {
 			case "lucene":
 				return new LuceneBackendConfiguration() {
 					@Override
-					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+					public <C extends MappingSetupHelper<C, ?, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 						return super.setup( setupContext, backendNameOrNull, configurationProvider )
 								.withBackendProperty(
@@ -51,7 +51,7 @@ public class BackendConfigurations {
 			case "elasticsearch":
 				return new ElasticsearchBackendConfiguration() {
 					@Override
-					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+					public <C extends MappingSetupHelper<C, ?, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 						return super.setup( setupContext, backendNameOrNull, configurationProvider )
 								.withBackendProperty( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,

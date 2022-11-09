@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
@@ -31,7 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.Backen
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
 public final class OrmSetupHelper
-		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
+		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory> {
 
 	private static final CoordinationStrategyExpectations DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 	private static final Map<String, Object> DEFAULT_PROPERTIES;
@@ -138,7 +139,7 @@ public final class OrmSetupHelper
 	}
 
 	public final class SetupContext
-			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
+			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
@@ -199,6 +200,12 @@ public final class OrmSetupHelper
 		@Override
 		protected SimpleSessionFactoryBuilder createBuilder() {
 			return new SimpleSessionFactoryBuilder();
+		}
+
+		@Override
+		protected void consumeBeforeBuildConfigurations(SimpleSessionFactoryBuilder builder,
+				List<Consumer<SimpleSessionFactoryBuilder>> consumers) {
+			consumers.forEach( c -> c.accept( builder ) );
 		}
 
 		@Override

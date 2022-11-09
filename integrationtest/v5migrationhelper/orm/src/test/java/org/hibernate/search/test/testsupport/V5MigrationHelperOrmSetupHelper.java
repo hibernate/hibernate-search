@@ -8,7 +8,9 @@ package org.hibernate.search.test.testsupport;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
@@ -26,7 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFa
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
 public final class V5MigrationHelperOrmSetupHelper
-		extends MappingSetupHelper<V5MigrationHelperOrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
+		extends MappingSetupHelper<V5MigrationHelperOrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory> {
 
 	public static V5MigrationHelperOrmSetupHelper create() {
 		return new V5MigrationHelperOrmSetupHelper(
@@ -49,7 +51,7 @@ public final class V5MigrationHelperOrmSetupHelper
 	}
 
 	public final class SetupContext
-			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
+			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
@@ -92,6 +94,11 @@ public final class V5MigrationHelperOrmSetupHelper
 			return new SimpleSessionFactoryBuilder();
 		}
 
+		@Override
+		protected void consumeBeforeBuildConfigurations(SimpleSessionFactoryBuilder builder,
+				List<Consumer<SimpleSessionFactoryBuilder>> consumers) {
+			consumers.forEach( c -> c.accept( builder ) );
+		}
 		@Override
 		protected SessionFactory build(SimpleSessionFactoryBuilder builder) {
 			return builder.build();

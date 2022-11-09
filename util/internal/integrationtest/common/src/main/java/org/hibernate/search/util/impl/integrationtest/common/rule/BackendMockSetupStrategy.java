@@ -22,7 +22,7 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
-	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
+	public <C extends MappingSetupHelper<C, ?, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise) {
 		if ( defaultBackendMock != null ) {

@@ -58,7 +58,7 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
-	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
+	public <C extends MappingSetupHelper<C, ?, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider,
 			// The mapping handle is not used by actual backends (only by BackendMock).
 			CompletionStage<BackendMappingHandle> mappingHandlePromise) {
