@@ -16,6 +16,7 @@ import org.hibernate.search.documentation.testsupport.TestConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -38,8 +39,13 @@ public class GettingStartedDefaultAnalysisIT {
 		if ( BackendConfiguration.isLucene() ) {
 			// tag::setup-lucene[]
 			CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
-					.addEntityType( Book.class ) // <2>
-					.addEntityType( Author.class )
+					.property(
+							"hibernate.search.mapping.configurer",
+							(StandalonePojoMappingConfigurer) context -> {
+								context.addEntityType( Book.class ) // <2>
+										.addEntityType( Author.class );
+							}
+					)
 					.property( "hibernate.search.backend.directory.root",
 							"some/filesystem/path" ) // <3>
 					// end::setup-lucene[]
@@ -53,8 +59,13 @@ public class GettingStartedDefaultAnalysisIT {
 		else if ( BackendConfiguration.isElasticsearch() ) {
 			// tag::setup-elasticsearch[]
 			CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
-					.addEntityType( Book.class ) // <2>
-					.addEntityType( Author.class )
+					.property(
+							"hibernate.search.mapping.configurer",
+							(StandalonePojoMappingConfigurer) context -> {
+								context.addEntityType( Book.class ) // <2>
+										.addEntityType( Author.class );
+							}
+					)
 					.property( "hibernate.search.backend.hosts",
 							"elasticsearch.mycompany.com" ) // <3>
 					.property( "hibernate.search.backend.protocol",

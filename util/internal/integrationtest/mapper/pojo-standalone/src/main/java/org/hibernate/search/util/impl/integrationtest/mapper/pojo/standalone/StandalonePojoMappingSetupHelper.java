@@ -8,8 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
@@ -17,6 +20,8 @@ import org.hibernate.search.mapper.pojo.standalone.cfg.spi.StandalonePojoMapperS
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
@@ -27,7 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.Backen
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class StandalonePojoMappingSetupHelper
-		extends MappingSetupHelper<StandalonePojoMappingSetupHelper.SetupContext, SearchMappingBuilder, CloseableSearchMapping> {
+		extends MappingSetupHelper<StandalonePojoMappingSetupHelper.SetupContext, SearchMappingBuilder, StandalonePojoMappingConfigurationContext, CloseableSearchMapping> {
 
 	/**
 	 * @param lookup A {@link MethodHandles.Lookup} with private access to the test method,
@@ -82,7 +87,7 @@ public final class StandalonePojoMappingSetupHelper
 	}
 
 	public final class SetupContext
-			extends MappingSetupHelper<SetupContext, SearchMappingBuilder, CloseableSearchMapping>.AbstractSetupContext {
+			extends MappingSetupHelper<SetupContext, SearchMappingBuilder, StandalonePojoMappingConfigurationContext, CloseableSearchMapping>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> properties = new LinkedHashMap<>();
@@ -97,8 +102,6 @@ public final class StandalonePojoMappingSetupHelper
 			// Ensure we don't build Jandex indexes needlessly:
 			// discovery based on Jandex ought to be tested in real projects that don't use this setup helper.
 			withConfiguration( builder -> builder.annotationMapping().buildMissingDiscoveredJandexIndexes( false ) );
-			// Ensure overridden properties will be applied
-			withConfiguration( builder -> properties.forEach( builder::property ) );
 		}
 
 		@Override
@@ -152,6 +155,28 @@ public final class StandalonePojoMappingSetupHelper
 			return SearchMapping.builder( lookup )
 					.property( StandalonePojoMapperSpiSettings.BEAN_PROVIDER, beanManagerBeanProvider )
 					.properties( properties );
+		}
+
+		@Override
+		protected void consumeBeforeBuildConfigurations(SearchMappingBuilder builder, List<Consumer<StandalonePojoMappingConfigurationContext>> consumers) {
+			List<Object> configurers = consumers.stream()
+					.map( c -> (StandalonePojoMappingConfigurer) c::accept )
+					.collect( Collectors.toList() );
+			Object userConfigurers = properties.get( StandalonePojoMapperSettings.MAPPING_CONFIGURER );
+			if ( userConfigurers != null ) {
+				if ( userConfigurers instanceof Iterable ) {
+					for ( Object userConfigurer : (Iterable<?>) userConfigurers ) {
+						configurers.add( userConfigurer );
+					}
+				}
+				else {
+					configurers.add( userConfigurers );
+				}
+			}
+			builder.property(
+					StandalonePojoMapperSettings.MAPPING_CONFIGURER,
+					configurers
+			);
 		}
 
 		@Override

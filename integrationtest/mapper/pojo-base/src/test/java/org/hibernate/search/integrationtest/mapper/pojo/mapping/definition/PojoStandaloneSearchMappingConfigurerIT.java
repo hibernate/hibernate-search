@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -75,8 +76,10 @@ public class PojoStandaloneSearchMappingConfigurerIT {
 
 		setupHelper.start()
 				.expectCustomBeans()
-				.withProperty( StandalonePojoMapperSettings.MAPPING_CONFIGURER,
-						MappingConfigurer1.class.getName() + "," + MappingConfigurer2.class.getName() )
+				.withProperty(
+						StandalonePojoMapperSettings.MAPPING_CONFIGURER,
+						Arrays.asList( MappingConfigurer1.class.getName(), MappingConfigurer2.class.getName() )
+				)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}

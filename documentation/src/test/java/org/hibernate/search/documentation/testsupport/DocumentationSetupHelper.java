@@ -29,7 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMap
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
 public final class DocumentationSetupHelper
-		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
+		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory> {
 
 	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
 			BackendConfiguration backendConfiguration,
@@ -130,7 +130,7 @@ public final class DocumentationSetupHelper
 	}
 
 	public final class SetupContext
-			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
+			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
@@ -170,6 +170,11 @@ public final class DocumentationSetupHelper
 		@Override
 		protected SimpleSessionFactoryBuilder createBuilder() {
 			return new SimpleSessionFactoryBuilder();
+		}
+
+		@Override
+		protected void consumeBeforeBuildConfigurations(SimpleSessionFactoryBuilder builder, List<Consumer<SimpleSessionFactoryBuilder>> consumers) {
+			consumers.forEach( c -> c.accept( builder ) );
 		}
 
 		@Override

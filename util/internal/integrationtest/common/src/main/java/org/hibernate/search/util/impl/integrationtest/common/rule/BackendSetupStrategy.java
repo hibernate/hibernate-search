@@ -22,7 +22,7 @@ public interface BackendSetupStrategy {
 		return Optional.empty();
 	}
 
-	<C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
+	<C extends MappingSetupHelper<C, ?, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider,
 			CompletionStage<BackendMappingHandle> mappingHandlePromise);
 

@@ -37,14 +37,19 @@ public class StandalonePojoEntryPointsIT {
 	public void setup() {
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
-				.addEntityType( Book.class ) // <2>
-				.addEntityType( Associate.class )
-				.addEntityType( Manager.class )
-				.property( "hibernate.search.backend.hosts", // <3>
-						"elasticsearch.mycompany.com" )
+				.property(
+						"hibernate.search.mapping.configurer", // <2>
+						"class:org.hibernate.search.documentation.mapper.pojo.standalone.entrypoints.StandalonePojoConfigurer"
+				)
+				.property(
+						"hibernate.search.backend.hosts", // <3>
+						"elasticsearch.mycompany.com"
+				)
 				// end::setup[]
-				.properties( TestConfiguration.standalonePojoMapperProperties( configurationProvider,
-						BackendConfigurations.simple() ) )
+				.properties( TestConfiguration.standalonePojoMapperProperties(
+						configurationProvider,
+						BackendConfigurations.simple()
+				) )
 				// tag::setup[]
 				.build(); // <4>
 		// end::setup[]
@@ -62,6 +67,14 @@ public class StandalonePojoEntryPointsIT {
 			searchMapping.close(); // <2>
 			// end::shutdown[]
 		}
+	}
+
+	@Test
+	public void mappingContainsExpectedEntities() {
+		assertThat( theSearchMapping.allIndexedEntities() )
+				.extracting( SearchIndexedEntity::name )
+				.contains( "Book", "Associate", "Manager" )
+		;
 	}
 
 	@Test

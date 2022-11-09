@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.Closer;
@@ -25,7 +26,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule {
+public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, BC, R>.AbstractSetupContext, B, BC, R> implements TestRule {
 
 	private final TestConfigurationProvider configurationProvider;
 	private final BackendSetupStrategy backendSetupStrategy;
@@ -91,7 +92,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 	public abstract class AbstractSetupContext {
 
-		private final List<Configuration<B, R>> configurations = new ArrayList<>();
+		private final List<Configuration<BC, R>> configurations = new ArrayList<>();
 		final CompletableFuture<BackendMappingHandle> backendMappingHandlePromise = new CompletableFuture<>();
 
 		private boolean setupCalled;
@@ -142,7 +143,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		 * @param afterBuild A consumer called after Hibernate Search is bootstrapped. Gets passed the result of the builder.
 		 * @return The setup context, for method chaining.
 		 */
-		public final C withConfiguration(Consumer<B> beforeBuild, Consumer<R> afterBuild) {
+		public final C withConfiguration(Consumer<BC> beforeBuild, Consumer<R> afterBuild) {
 			configurations.add( new Configuration<>( beforeBuild, afterBuild ) );
 			return thisAsC();
 		}
@@ -152,7 +153,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		 * @param beforeBuild A consumer called before Hibernate Search is bootstrapped.
 		 * @return The setup context, for method chaining.
 		 */
-		public final C withConfiguration(Consumer<B> beforeBuild) {
+		public final C withConfiguration(Consumer<BC> beforeBuild) {
 			return withConfiguration( beforeBuild, ignored -> { } );
 		}
 
@@ -167,8 +168,11 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			setupCalled = true;
 
 			B builder = createBuilder();
-
-			configurations.forEach( c -> c.beforeBuild( builder ) );
+			consumeBeforeBuildConfigurations(
+					builder,
+					configurations.stream().map( c -> c.beforeBuild )
+							.collect( Collectors.toList() )
+			);
 
 			try {
 				R result = build( builder );
@@ -189,6 +193,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 		protected abstract B createBuilder();
 
+		protected abstract void consumeBeforeBuildConfigurations(B builder, List<Consumer<BC>> consumers);
+
 		protected abstract R build(B builder);
 
 		protected abstract BackendMappingHandle toBackendMappingHandle(R result);
@@ -196,16 +202,16 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		protected abstract C thisAsC();
 	}
 
-	private static class Configuration<B, R> {
-		private final Consumer<B> beforeBuild;
+	private static class Configuration<BC, R> {
+		private final Consumer<BC> beforeBuild;
 		private final Consumer<R> afterBuild;
 
-		private Configuration(Consumer<B> beforeBuild, Consumer<R> afterBuild) {
+		private Configuration(Consumer<BC> beforeBuild, Consumer<R> afterBuild) {
 			this.beforeBuild = beforeBuild;
 			this.afterBuild = afterBuild;
 		}
 
-		void beforeBuild(B builder) {
+		void beforeBuild(BC builder) {
 			beforeBuild.accept( builder );
 		}
 

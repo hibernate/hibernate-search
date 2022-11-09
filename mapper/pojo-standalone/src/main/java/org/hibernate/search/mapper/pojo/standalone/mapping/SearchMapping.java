@@ -73,7 +73,7 @@ public interface SearchMapping {
 	<E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType);
 
 	/**
-	 * @param entityName The name of an indexed entity. See {@link SearchMappingBuilder#addEntityType(Class, String)}.
+	 * @param entityName The name of an indexed entity. See {@link StandalonePojoMappingConfigurationContext#addEntityType(Class, String)}.
 	 * @return A {@link SearchIndexedEntity} for the indexed entity with the given name.
 	 * @throws org.hibernate.search.util.common.SearchException If the name does not match any indexed entity.
 	 */

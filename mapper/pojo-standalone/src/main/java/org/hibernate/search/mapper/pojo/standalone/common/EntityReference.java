@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.standalone.common;
 
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -22,7 +22,7 @@ public interface EntityReference {
 
 	/**
 	 * @return The name of the referenced entity in the Hibernate Search mapping.
-	 * @see SearchMappingBuilder#addEntityType(Class, String)
+	 * @see StandalonePojoMappingConfigurationContext#addEntityType(Class, String)
 	 */
 	String name();
 
