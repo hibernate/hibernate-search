@@ -184,7 +184,8 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	private void doCommit() {
 		commitLock.lock();
 		try {
-			// NOTE: underlying Lucene code is using same pattern to sync on object block:
+			// NOTE: underlying Lucene code is using this pattern to sync on object block,
+			// which could be a problem with Loom:
 			// synchronized(commitLock)
 			delegate.commit();
 			updateCommitExpiration();
