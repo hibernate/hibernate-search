@@ -42,7 +42,8 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_CATALOG},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_SCHEMA},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_GEN_STRATEGY},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE},
 	 * An exception ({@link org.hibernate.search.util.common.SearchException} will be thrown in case of such misconfiguration.
 	 */
 	public static final String OUTBOXEVENT_ENTITY_MAPPING = PREFIX + Radicals.OUTBOXEVENT_ENTITY_MAPPING;
@@ -62,6 +63,8 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_CATALOG},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_TABLE},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY},
+	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_UUID_DATA_TYPE},
 	 * An exception ({@link org.hibernate.search.util.common.SearchException} will be thrown in case of such misconfiguration.
 	 */
 	public static final String AGENT_ENTITY_MAPPING = PREFIX + Radicals.AGENT_ENTITY_MAPPING;

@@ -308,6 +308,8 @@ for outbox event and agent tables:
 hibernate.search.coordination.entity.mapping.agent.catalog=CUSTOM_CATALOG
 hibernate.search.coordination.entity.mapping.agent.schema=CUSTOM_SCHEMA
 hibernate.search.coordination.entity.mapping.agent.table=CUSTOM_AGENT_TABLE
+hibernate.search.coordination.entity.mapping.agent.uuid_gen_strategy=time
+hibernate.search.coordination.entity.mapping.agent.uuid_jdbc_type=uuid-binary
 # Configure the outbox event mapping:
 hibernate.search.coordination.entity.mapping.outboxevent.catalog=CUSTOM_CATALOG
 hibernate.search.coordination.entity.mapping.outboxevent.schema=CUSTOM_SCHEMA
@@ -325,6 +327,18 @@ Defaults to the default schema configured in Hibernate ORM.
 * `agent.table` defines the name of the agent table.
 +
 Defaults to `HSEARCH_AGENT`.
+* `agent.uuid_gen_strategy` defines name of the UUID generator strategy used for the agent table. Available
+options are `auto`/`random`/`time`. `auto` is a default and is the same as `random` which uses `UUID#randomUUID()`.
+`time` is an IP based strategy consistent with IETF RFC 4122.
++
+Defaults to `auto`.
+* `agent.uuid_jdbc_type` defines the database type used for representing an UUID
+in the agent table. Hibernate Search provides a special `default` option that is going to be used by default
+and will result into one of `uuid`/`uuid-binary`/`uuid-char` depending on the database in use.
+Please refer to link:{hibernateDocUrl}#basic-provided[Hibernate-provided BasicTypes] to see
+the list of available UUID representations provided by Hibernate ORM. A user defined type can also be supplied.
++
+Defaults to `default`.
 
 * `outboxevent.catalog` defines the database catalog to use for the outbox event table.
 +
