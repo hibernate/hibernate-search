@@ -8,11 +8,12 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class ClusterDescriptor {
-	public final List<Long> memberIdsInShardOrder;
+	public final List<UUID> memberIdsInShardOrder;
 
-	public ClusterDescriptor(List<Long> memberIdsInShardOrder) {
+	public ClusterDescriptor(List<UUID> memberIdsInShardOrder) {
 		this.memberIdsInShardOrder = memberIdsInShardOrder;
 	}
 

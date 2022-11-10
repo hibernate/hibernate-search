@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractEventProcessorClusterLinkTest.toUUID;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentRepository;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
@@ -35,7 +37,7 @@ import org.junit.Test;
  */
 abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassIndexerAgentClusterLinkTest {
 
-	private static final long MASS_INDEXING_ID = 4353L;
+	private static final UUID MASS_INDEXING_ID = toUUID( 4353L );
 
 	OutboxPollingMassIndexerAgentClusterLink link;
 
@@ -90,9 +92,9 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 				.build();
 	}
 
-	protected abstract long other1Id();
-	protected abstract long other2Id();
-	protected abstract long other3Id();
+	protected abstract UUID other1Id();
+	protected abstract UUID other2Id();
+	protected abstract UUID other3Id();
 
 	protected abstract AgentType otherType();
 

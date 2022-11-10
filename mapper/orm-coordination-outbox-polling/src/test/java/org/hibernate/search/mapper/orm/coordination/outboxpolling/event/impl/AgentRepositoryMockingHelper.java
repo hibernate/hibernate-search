@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ class AgentRepositoryMockingHelper {
 		this.repositoryMock = repositoryMock;
 	}
 
-	void defineSelfCreatedByPulse(long selfId) {
+	void defineSelfCreatedByPulse(UUID selfId) {
 		ArgumentCaptor<Agent> selfCaptor = ArgumentCaptor.forClass( Agent.class );
 		selfSupplier = selfCaptor::getValue;
 		selfExists = () -> !selfCaptor.getAllValues().isEmpty();
@@ -93,8 +94,8 @@ class AgentRepositoryMockingHelper {
 				.collect( Collectors.toList() );
 	}
 
-	List<Agent> agentsInIdOrder(Long ... ids) {
-		Set<Long> idSet = new HashSet<>( Arrays.asList( ids ) );
+	List<Agent> agentsInIdOrder(UUID ... ids) {
+		Set<UUID> idSet = new HashSet<>( Arrays.asList( ids ) );
 		return allAgentsInIdOrder().stream()
 				.filter( agent -> idSet.contains( agent.getId() ) )
 				.collect( Collectors.toList() );
@@ -113,11 +114,11 @@ class AgentRepositoryMockingHelper {
 	}
 
 	class AllAgentsDefinition {
-		AllAgentsDefinition other(Long id, AgentType type, Instant expiration, AgentState state) {
+		AllAgentsDefinition other(UUID id, AgentType type, Instant expiration, AgentState state) {
 			return other( id, type, expiration, state, null );
 		}
 
-		AllAgentsDefinition other(Long id, AgentType type, Instant expiration, AgentState state,
+		AllAgentsDefinition other(UUID id, AgentType type, Instant expiration, AgentState state,
 				ShardAssignmentDescriptor shardAssignment) {
 			Agent agent = new Agent( type, "other agent", expiration, state, shardAssignment );
 			agent.setId( id );

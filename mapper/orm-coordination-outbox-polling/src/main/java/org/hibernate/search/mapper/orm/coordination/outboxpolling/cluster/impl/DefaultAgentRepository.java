@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_NAME;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.Session;
 
@@ -27,7 +28,7 @@ public class DefaultAgentRepository implements AgentRepository {
 	}
 
 	@Override
-	public Agent find(Long id) {
+	public Agent find(UUID id) {
 		return session.find( Agent.class, id );
 	}
 

@@ -17,7 +17,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
@@ -50,7 +52,9 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	static final Duration PULSE_EXPIRATION = Duration.ofMillis(
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_EVENT_PROCESSOR_PULSE_EXPIRATION );
 
-	static final long SELF_ID = 42L;
+	static final long SELF_ID_ORDINAL = 42;
+
+	static final UUID SELF_ID = toUUID( SELF_ID_ORDINAL );
 	static final AgentReference SELF_REF = AgentReference.of( SELF_ID, "Self Agent Name" );
 
 	@Rule
@@ -123,6 +127,10 @@ abstract class AbstractEventProcessorClusterLinkTest {
 	protected final EventProcessorClusterLinkPulseExpectations.InstructionsStep expect(ShardAssignmentDescriptor selfStaticShardAssignment,
 			OutboxPollingEventProcessorClusterLink link) {
 		return EventProcessorClusterLinkPulseExpectations.expect( repositoryMockHelper, eventFinderMock, selfStaticShardAssignment, link );
+	}
+
+	public static UUID toUUID(long id) {
+		return UUID.fromString( String.format( Locale.ROOT, "97b5e073-0e1f-43e9-bc84-%1$12s", id ).replace( ' ', '0' ) );
 	}
 
 }

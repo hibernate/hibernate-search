@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import java.util.UUID;
+
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
@@ -26,18 +28,18 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 		// Define IDs in ascending order, because IDs matter when using dynamic sharding.
 
 		@Override
-		protected long other1Id() {
-			return AbstractEventProcessorClusterLinkTest.SELF_ID - 1;
+		protected UUID other1Id() {
+			return toUUID( AbstractEventProcessorClusterLinkTest.SELF_ID_ORDINAL - 1 );
 		}
 
 		@Override
-		protected long other2Id() {
-			return AbstractEventProcessorClusterLinkTest.SELF_ID + 1;
+		protected UUID other2Id() {
+			return toUUID( AbstractEventProcessorClusterLinkTest.SELF_ID_ORDINAL + 1 );
 		}
 
 		@Override
-		protected long other3Id() {
-			return AbstractEventProcessorClusterLinkTest.SELF_ID + 2;
+		protected UUID other3Id() {
+			return toUUID( AbstractEventProcessorClusterLinkTest.SELF_ID_ORDINAL + 2 );
 		}
 
 		@Override

@@ -7,10 +7,11 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 
 import java.time.Instant;
+import java.util.UUID;
 import javax.persistence.Transient;
 
 public class Agent {
-	private Long id;
+	private UUID id;
 	private AgentType type;
 	private String name;
 	private Instant expiration;
@@ -45,12 +46,12 @@ public class Agent {
 				'}';
 	}
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 
 	// For tests only
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

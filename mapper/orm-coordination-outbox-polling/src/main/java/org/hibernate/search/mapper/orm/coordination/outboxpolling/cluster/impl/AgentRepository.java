@@ -7,10 +7,11 @@
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AgentRepository {
 
-	Agent find(Long id);
+	Agent find(UUID id);
 
 	List<Agent> findAllOrderById();
 

@@ -12,6 +12,7 @@ import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.i
 import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractMassIndexerAgentClusterLinkTest.PULSE_INTERVAL;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
@@ -29,7 +30,7 @@ public class MassIndexerAgentClusterLinkPulseExpectations {
 	private final Instant expectedInstructionsExpiration;
 	private final boolean expectedInstructionsConsiderEventProcessingSuspended;
 
-	private final Long expectedSelfAgentId;
+	private final UUID expectedSelfAgentId;
 	private final Instant expectedSelfAgentExpiration;
 	private final AgentState expectedSelfAgentCurrentState;
 
@@ -86,7 +87,7 @@ public class MassIndexerAgentClusterLinkPulseExpectations {
 	}
 
 	public interface AgentMainStateStep {
-		AgentOptionsStep agent(long expectedId, AgentState expectedCurrentState);
+		AgentOptionsStep agent(UUID expectedId, AgentState expectedCurrentState);
 	}
 
 	public interface AgentOptionsStep {
@@ -102,7 +103,7 @@ public class MassIndexerAgentClusterLinkPulseExpectations {
 		private Instant expectedInstructionsExpiration;
 		private boolean expectedInstructionsConsiderEventProcessingSuspended;
 
-		private Long expectedSelfAgentId;
+		private UUID expectedSelfAgentId;
 		private Instant expectedSelfAgentExpiration;
 		private AgentState expectedSelfAgentCurrentState;
 
@@ -127,7 +128,7 @@ public class MassIndexerAgentClusterLinkPulseExpectations {
 		}
 
 		@Override
-		public AgentOptionsStep agent(long expectedId, AgentState expectedCurrentState) {
+		public AgentOptionsStep agent(UUID expectedId, AgentState expectedCurrentState) {
 			this.expectedSelfAgentId = expectedId;
 			this.expectedSelfAgentCurrentState = expectedCurrentState;
 			this.expectedSelfAgentExpiration = NOW.plus( PULSE_EXPIRATION );

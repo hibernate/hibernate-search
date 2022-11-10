@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractEventProcessorClusterLinkTest.toUUID;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -17,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
@@ -48,7 +50,8 @@ abstract class AbstractMassIndexerAgentClusterLinkTest {
 	static final Duration PULSE_EXPIRATION = Duration.ofMillis(
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_MASS_INDEXER_PULSE_EXPIRATION );
 
-	static final long SELF_ID = 42L;
+	static final long SELF_ID_ORDINAL = 42L;
+	static final UUID SELF_ID = toUUID( SELF_ID_ORDINAL );
 	static final AgentReference SELF_REF = AgentReference.of( SELF_ID, "Self Agent Name" );
 
 	@Rule
