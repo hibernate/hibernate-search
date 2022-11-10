@@ -299,15 +299,14 @@ Identity generator names used for these tables are prefixed with `HSEARCH_` and 
 Sometimes there are specific naming conventions for database objects, or a need to separate the domain
 and technical tables.
 To allow some flexibility in this area, Hibernate Search provides a set of configuration properties
-to specify catalog/schema/table names for outbox event and agent tables,
-as well as an identity generator name for the agent table and a custom UUID generator strategy/data type for the outbox event table:
+to specify catalog/schema/table names and a custom UUID generator strategy/data type
+for outbox event and agent tables:
 
 [source]
 ----
 # Configure the agent mapping:
 hibernate.search.coordination.entity.mapping.agent.catalog=CUSTOM_CATALOG
 hibernate.search.coordination.entity.mapping.agent.schema=CUSTOM_SCHEMA
-hibernate.search.coordination.entity.mapping.agent.generator=CUSTOM_AGENT_GENERATOR
 hibernate.search.coordination.entity.mapping.agent.table=CUSTOM_AGENT_TABLE
 # Configure the outbox event mapping:
 hibernate.search.coordination.entity.mapping.outboxevent.catalog=CUSTOM_CATALOG
@@ -326,9 +325,6 @@ Defaults to the default schema configured in Hibernate ORM.
 * `agent.table` defines the name of the agent table.
 +
 Defaults to `HSEARCH_AGENT`.
-* `agent.generator` defines the name of the identifier generator used for the agent table .
-+
-Defaults to `HSEARCH_AGENT_GENERATOR`.
 
 * `outboxevent.catalog` defines the database catalog to use for the outbox event table.
 +

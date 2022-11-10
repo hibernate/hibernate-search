@@ -62,7 +62,6 @@ public final class HibernateOrmMapperOutboxPollingSpiSettings {
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_CATALOG},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_SCHEMA},
 	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_TABLE},
-	 * {@link HibernateOrmMapperOutboxPollingSettings#COORDINATION_ENTITY_MAPPING_AGENT_GENERATOR}).
 	 * An exception ({@link org.hibernate.search.util.common.SearchException} will be thrown in case of such misconfiguration.
 	 */
 	public static final String AGENT_ENTITY_MAPPING = PREFIX + Radicals.AGENT_ENTITY_MAPPING;
