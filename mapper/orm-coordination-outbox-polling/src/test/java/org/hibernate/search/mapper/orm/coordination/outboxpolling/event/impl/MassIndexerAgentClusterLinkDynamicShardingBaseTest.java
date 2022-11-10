@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.AbstractEventProcessorClusterLinkTest.toUUID;
+
+import java.util.UUID;
+
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
@@ -26,18 +30,18 @@ public class MassIndexerAgentClusterLinkDynamicShardingBaseTest {
 		// to demonstrate that the ID order doesn't matter when using static sharding:
 
 		@Override
-		protected long other1Id() {
-			return AbstractMassIndexerAgentClusterLinkTest.SELF_ID + 1;
+		protected UUID other1Id() {
+			return toUUID( AbstractMassIndexerAgentClusterLinkTest.SELF_ID_ORDINAL + 1 );
 		}
 
 		@Override
-		protected long other2Id() {
-			return AbstractMassIndexerAgentClusterLinkTest.SELF_ID - 1;
+		protected UUID other2Id() {
+			return toUUID( AbstractMassIndexerAgentClusterLinkTest.SELF_ID_ORDINAL - 1 );
 		}
 
 		@Override
-		protected long other3Id() {
-			return AbstractMassIndexerAgentClusterLinkTest.SELF_ID - 2;
+		protected UUID other3Id() {
+			return toUUID( AbstractMassIndexerAgentClusterLinkTest.SELF_ID_ORDINAL - 2 );
 		}
 
 		@Override

@@ -25,7 +25,6 @@ import javax.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MappingException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.engine.jdbc.env.spi.NameQualifierSupport;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.jdbc.spi.StatementInspector;

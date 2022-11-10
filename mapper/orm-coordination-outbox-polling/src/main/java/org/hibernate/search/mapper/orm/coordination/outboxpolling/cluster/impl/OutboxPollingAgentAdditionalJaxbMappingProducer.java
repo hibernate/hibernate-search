@@ -49,12 +49,9 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 	private static final String ENTITY_DEFINITION_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping schema=\"%1$s\" catalog=\"%2$s\">\n" +
 			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"%3$s\">\n" +
-			"        <id name=\"id\">\n" +
-			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
-			"                <param name=\"sequence_name\">AGENT_GENERATOR</param>\n" +
-			"                <param name=\"table_name\">AGENT_GENERATOR</param>\n" +
-			"                <param name=\"initial_value\">1</param>\n" +
-			"                <param name=\"increment_size\">1</param>\n" +
+			"        <id name=\"id\" type=\"uuid-char\">\n" +
+			"            <generator class=\"org.hibernate.id.UUIDGenerator\">\n" +
+			"                <param name=\"uuid_gen_strategy_class\">org.hibernate.id.uuid.CustomVersionOneStrategy</param>\n" +
 			"            </generator>\n" +
 			"        </id>\n" +
 			"        <property name=\"type\" nullable=\"false\">\n" +

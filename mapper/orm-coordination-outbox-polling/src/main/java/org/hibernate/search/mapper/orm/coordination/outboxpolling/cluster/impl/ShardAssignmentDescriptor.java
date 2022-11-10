@@ -9,9 +9,10 @@ package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ShardAssignmentDescriptor {
-	public static Optional<ShardAssignmentDescriptor> fromClusterMemberList(List<Long> clusterMembersInShardOrder, Long selfId) {
+	public static Optional<ShardAssignmentDescriptor> fromClusterMemberList(List<UUID> clusterMembersInShardOrder, UUID selfId) {
 		int totalShardCount = clusterMembersInShardOrder.size();
 		int assignedShard = clusterMembersInShardOrder.indexOf( selfId );
 		if ( assignedShard < 0 ) {

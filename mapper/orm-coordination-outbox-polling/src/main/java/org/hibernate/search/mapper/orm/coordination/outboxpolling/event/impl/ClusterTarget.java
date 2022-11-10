@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
@@ -100,7 +101,7 @@ class ClusterTarget {
 	private ClusterTarget(List<Agent> membersInShardOrder, List<Agent> excluded) {
 		this.membersInShardOrder = Collections.unmodifiableList( membersInShardOrder );
 		this.excluded = Collections.unmodifiableList( excluded );
-		List<Long> memberIdsInShardOrder = new ArrayList<>( membersInShardOrder.size() );
+		List<UUID> memberIdsInShardOrder = new ArrayList<>( membersInShardOrder.size() );
 		for ( Agent member : membersInShardOrder ) {
 			memberIdsInShardOrder.add( member == null ? null : member.getId() );
 		}

@@ -6,15 +6,17 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl;
 
+import java.util.UUID;
+
 public class AgentReference {
-	public static AgentReference of(Long id, String name) {
+	public static AgentReference of(UUID id, String name) {
 		return new AgentReference( id, name );
 	}
 
-	public final Long id;
+	public final UUID id;
 	public final String name;
 
-	private AgentReference(Long id, String name) {
+	private AgentReference(UUID id, String name) {
 		this.id = id;
 		this.name = name;
 	}

@@ -13,6 +13,7 @@ import static org.hibernate.search.mapper.orm.coordination.outboxpolling.event.i
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.Agent;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
@@ -35,7 +36,7 @@ public class EventProcessorClusterLinkPulseExpectations {
 	private final Instant expectedInstructionsExpiration;
 	private final Optional<OutboxEventFinder> expectedInstructionsEventFinder;
 
-	private final Long expectedSelfAgentId;
+	private final UUID expectedSelfAgentId;
 	private final Instant expectedSelfAgentExpiration;
 	private final AgentState expectedSelfAgentCurrentState;
 	private final ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
@@ -106,7 +107,7 @@ public class EventProcessorClusterLinkPulseExpectations {
 	}
 
 	public interface AgentMainStateStep {
-		AgentOptionsStep agent(long expectedId, AgentState expectedCurrentState);
+		AgentOptionsStep agent(UUID expectedId, AgentState expectedCurrentState);
 	}
 
 	public interface AgentOptionsStep {
@@ -127,7 +128,7 @@ public class EventProcessorClusterLinkPulseExpectations {
 		private Instant expectedInstructionsExpiration;
 		private Optional<OutboxEventFinder> expectedInstructionsEventFinder;
 
-		private Long expectedSelfAgentId;
+		private UUID expectedSelfAgentId;
 		private Instant expectedSelfAgentExpiration;
 		private AgentState expectedSelfAgentCurrentState;
 		private ShardAssignmentDescriptor expectedSelfAgentShardAssignment;
@@ -158,7 +159,7 @@ public class EventProcessorClusterLinkPulseExpectations {
 		}
 
 		@Override
-		public AgentOptionsStep agent(long expectedId, AgentState expectedCurrentState) {
+		public AgentOptionsStep agent(UUID expectedId, AgentState expectedCurrentState) {
 			this.expectedSelfAgentId = expectedId;
 			this.expectedSelfAgentCurrentState = expectedCurrentState;
 			this.expectedSelfAgentExpiration = NOW.plus( PULSE_EXPIRATION );

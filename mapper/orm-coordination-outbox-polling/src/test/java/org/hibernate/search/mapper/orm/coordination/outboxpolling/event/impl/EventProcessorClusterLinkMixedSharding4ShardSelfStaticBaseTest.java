@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl;
 
+import java.util.UUID;
+
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
@@ -28,22 +30,22 @@ public class EventProcessorClusterLinkMixedSharding4ShardSelfStaticBaseTest {
 		// to demonstrate that the ID order doesn't matter when using static sharding:
 
 		@Override
-		protected long other1Id() {
+		protected UUID other1Id() {
 			// Dynamically sharded
 			// Make sure to use an ID that is correctly ordered relative to other dynamically sharded agents
-			return AbstractEventProcessorClusterLinkTest.SELF_ID + 89;
+			return toUUID( AbstractEventProcessorClusterLinkTest.SELF_ID_ORDINAL + 89 );
 		}
 
 		@Override
-		protected long other2Id() {
+		protected UUID other2Id() {
 			// Dynamically sharded
 			// Make sure to use an ID that is correctly ordered relative to other dynamically sharded agents
-			return other1Id() + 1;
+			return toUUID( AbstractEventProcessorClusterLinkTest.SELF_ID_ORDINAL + 90 );
 		}
 
 		@Override
-		protected long other3Id() {
-			return AbstractEventProcessorClusterLinkTest.SELF_ID - 2;
+		protected UUID other3Id() {
+			return toUUID( AbstractEventProcessorClusterLinkTest.SELF_ID_ORDINAL - 2 );
 		}
 
 		@Override
