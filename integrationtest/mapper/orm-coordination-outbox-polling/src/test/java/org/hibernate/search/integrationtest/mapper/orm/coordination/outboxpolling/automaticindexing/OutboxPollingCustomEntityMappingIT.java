@@ -52,9 +52,6 @@ public class OutboxPollingCustomEntityMappingIT {
 
 	private static final String ORIGINAL_AGENT_TABLE_NAME = HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
 	private static final String CUSTOM_AGENT_TABLE_NAME = "CUSTOM_AGENT";
-	private static final String ORIGINAL_AGENT_GENERATOR_NAME = ORIGINAL_AGENT_TABLE_NAME + "_GENERATOR";
-	private static final String CUSTOM_AGENT_GENERATOR_NAME = CUSTOM_AGENT_TABLE_NAME + "_GENERATOR";
-
 	private static final String VALID_OUTBOX_EVENT_MAPPING;
 	private static final String VALID_AGENT_EVENT_MAPPING;
 
@@ -65,13 +62,11 @@ public class OutboxPollingCustomEntityMappingIT {
 				.replace( ORIGINAL_OUTBOX_EVENT_TABLE_NAME, CUSTOM_OUTBOX_EVENT_TABLE_NAME );
 
 		VALID_AGENT_EVENT_MAPPING = OutboxPollingAgentAdditionalJaxbMappingProducer.ENTITY_DEFINITION
-				.replace( ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME )
-				.replace( ORIGINAL_AGENT_GENERATOR_NAME, CUSTOM_AGENT_GENERATOR_NAME );
+				.replace( ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME );
 
 		SQL_KEYS = new String[] {
 				ORIGINAL_OUTBOX_EVENT_TABLE_NAME, CUSTOM_OUTBOX_EVENT_TABLE_NAME,
 				ORIGINAL_AGENT_TABLE_NAME, CUSTOM_AGENT_TABLE_NAME,
-				ORIGINAL_AGENT_GENERATOR_NAME, CUSTOM_AGENT_GENERATOR_NAME,
 				CUSTOM_SCHEMA,
 		};
 	}
@@ -133,14 +128,6 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_TABLE_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isZero();
-
-		if ( getDialect() instanceof MySQLDialect ) {
-			// statements for sequences are not reported to the interceptor with this dialect
-			return;
-		}
-
-		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isPositive();
-		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isZero();
 	}
 
 	@Test
@@ -171,14 +158,6 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_TABLE_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isPositive();
-
-		if ( getDialect() instanceof MySQLDialect ) {
-			// statements for sequences are not reported to the interceptor with this dialect
-			return;
-		}
-
-		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isZero();
-		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isPositive();
 	}
 
 	@Test
@@ -207,7 +186,6 @@ public class OutboxPollingCustomEntityMappingIT {
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.coordination.entity.mapping.agent.generator", CUSTOM_AGENT_GENERATOR_NAME )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", CUSTOM_AGENT_TABLE_NAME )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", CUSTOM_OUTBOX_EVENT_TABLE_NAME )
 				.withProperty( "hibernate.session_factory.statement_inspector", statementInspector )
@@ -230,14 +208,6 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThat( statementInspector.countByKey( CUSTOM_OUTBOX_EVENT_TABLE_NAME ) ).isPositive();
 		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_TABLE_NAME ) ).isZero();
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isPositive();
-
-		if ( getDialect() instanceof MySQLDialect ) {
-			// statements for sequences are not reported to the interceptor with this dialect
-			return;
-		}
-
-		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isZero();
-		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isPositive();
 	}
 
 	@Test
@@ -250,7 +220,6 @@ public class OutboxPollingCustomEntityMappingIT {
 				// Allow ORM to create schema as we want to use non-default for this testcase:
 				.withProperty( "javax.persistence.create-database-schemas", true )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.schema", CUSTOM_SCHEMA )
-				.withProperty( "hibernate.search.coordination.entity.mapping.agent.generator", CUSTOM_AGENT_GENERATOR_NAME )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", CUSTOM_AGENT_TABLE_NAME )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.schema", CUSTOM_SCHEMA )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", CUSTOM_OUTBOX_EVENT_TABLE_NAME )
@@ -297,14 +266,6 @@ public class OutboxPollingCustomEntityMappingIT {
 		assertThat( statementInspector.countByKey( CUSTOM_AGENT_TABLE_NAME ) ).isPositive();
 
 		assertThat( statementInspector.countByKey( CUSTOM_SCHEMA ) ).isPositive();
-
-		if ( getDialect() instanceof MySQLDialect ) {
-			// statements for sequences are not reported to the interceptor with this dialect
-			return;
-		}
-
-		assertThat( statementInspector.countByKey( ORIGINAL_AGENT_GENERATOR_NAME ) ).isZero();
-		assertThat( statementInspector.countByKey( CUSTOM_AGENT_GENERATOR_NAME ) ).isPositive();
 	}
 
 	@Test
