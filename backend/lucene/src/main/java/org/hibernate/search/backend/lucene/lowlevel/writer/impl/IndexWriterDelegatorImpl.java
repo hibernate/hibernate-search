@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
@@ -42,7 +43,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	private final FailureHandler failureHandler;
 
 	private final SingletonTask delayedCommitTask;
-	private final Object commitLock = new Object();
+	private final ReentrantLock commitLock = new ReentrantLock();
 
 	private long commitExpiration;
 
@@ -114,7 +115,8 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		// Synchronize in order to prevent a scenario where two threads call commitOrDelay() concurrently,
 		// both notice the previous commit has expired, and both trigger a commit,
 		// resulting in two commits where one would have been enough.
-		synchronized (commitLock) {
+		commitLock.lock();
+		try {
 			if ( delayCommit() ) {
 				// The commit was delayed
 				return;
@@ -122,6 +124,9 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
 			// The previous commit has expired
 			doCommit();
+		}
+		finally {
+			commitLock.unlock();
 		}
 	}
 
@@ -142,8 +147,12 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			closer.push( SingletonTask::stop, delayedCommitTask );
 			// Avoid problems with closing while a (delayed) commit is in progress:
 			// Lucene throws an exception in that case.
-			synchronized (commitLock) {
+			commitLock.lock();
+			try {
 				closer.push( IndexWriter::close, delegate );
+			}
+			finally {
+				commitLock.unlock();
 			}
 			log.trace( "IndexWriter closed" );
 		}
@@ -173,14 +182,18 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	private void doCommit() {
+		commitLock.lock();
 		try {
-			synchronized (commitLock) {
-				delegate.commit();
-				updateCommitExpiration();
-			}
+			// NOTE: underlying Lucene code is using same pattern to sync on object block:
+			// synchronized(commitLock)
+			delegate.commit();
+			updateCommitExpiration();
 		}
 		catch (RuntimeException | IOException e) {
 			throw log.unableToCommitIndex( e.getMessage(), eventContext, e );
+		}
+		finally {
+			commitLock.unlock();
 		}
 	}
 
