@@ -49,7 +49,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	public static final String ENTITY_DEFINITION_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping schema=\"%1$s\" catalog=\"%2$s\">\n" +
 			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"%3$s\">\n" +
-			"        <id name=\"id\" type=\"uuid-char\">\n" +
+			"        <id name=\"id\" type=\"uuid-binary\">\n" +
 			"            <generator class=\"org.hibernate.id.UUIDGenerator\">\n" +
 			"                <param name=\"uuid_gen_strategy_class\">%4$s</param>\n" +
 			"            </generator>\n" +

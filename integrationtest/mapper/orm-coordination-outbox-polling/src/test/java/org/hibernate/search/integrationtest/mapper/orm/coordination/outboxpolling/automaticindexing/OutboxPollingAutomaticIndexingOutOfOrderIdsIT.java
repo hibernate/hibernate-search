@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assume.assumeTrue;
 
+import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -375,17 +376,17 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 				);
 			}
 
-			List<String> uuids = new ArrayList<>();
+			List<byte[]> uuids = new ArrayList<>();
 			List<java.sql.Timestamp> times = new ArrayList<>();
 			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME ) ) {
 				ResultSet resultSet = statement.executeQuery();
 				while ( resultSet.next() ) {
-					uuids.add( resultSet.getString( 1 ) );
+					uuids.add( resultSet.getBytes( 1 ) );
 					times.add( resultSet.getTimestamp( 2 ) );
 				}
 			}
 
-			String temporaryUuid = UUID.randomUUID().toString();
+			byte[] temporaryUuid = UUID.randomUUID().toString().getBytes( Charset.defaultCharset() );
 			updateOutboxTableRow( jdbc, temporaryUuid, uuids.get( row2 ), times.get( row1 ) );
 			updateOutboxTableRow( jdbc, uuids.get( row2 ), uuids.get( row1 ), times.get( row2 ) );
 			updateOutboxTableRow( jdbc, uuids.get( row1 ), temporaryUuid, times.get( row1 ) );
@@ -395,12 +396,12 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		}
 	}
 
-	private void updateOutboxTableRow(JdbcCoordinator jdbc, String newId, String rowToUpdateId,
+	private void updateOutboxTableRow(JdbcCoordinator jdbc, byte[] newId, byte[] rowToUpdateId,
 			java.sql.Timestamp newCreated) throws SQLException {
 		try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID_AND_TIME ) ) {
-			ps.setString( 1, newId );
+			ps.setBytes( 1, newId );
 			ps.setTimestamp( 2, newCreated );
-			ps.setString( 3, rowToUpdateId );
+			ps.setBytes( 3, rowToUpdateId );
 
 			jdbc.getResultSetReturn().executeUpdate( ps );
 		}
