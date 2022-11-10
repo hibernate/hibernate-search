@@ -33,6 +33,9 @@ public class EngineThreads {
 		if ( executor != null ) {
 			return executor;
 		}
+		// this sync block shouldn't be a problem for Loom:
+		// - sync happens only once on init ?
+		// - no I/O and simple in-memory operations
 		synchronized (this) {
 			if ( timingExecutor != null ) {
 				return timingExecutor;

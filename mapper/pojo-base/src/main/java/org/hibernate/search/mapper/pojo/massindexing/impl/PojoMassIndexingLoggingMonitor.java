@@ -53,6 +53,9 @@ public class PojoMassIndexingLoggingMonitor implements MassIndexingMonitor {
 	@Override
 	public void documentsAdded(long increment) {
 		if ( startTime == 0 ) {
+			// this sync block doesn't seem to be a problem for Loom:
+			// - always executed in MassIndexer threads, which are not virtual threads
+			// - no I/O and simple in-memory operations
 			synchronized (this) {
 				if ( startTime == 0 ) {
 					long theStartTime = System.nanoTime();
