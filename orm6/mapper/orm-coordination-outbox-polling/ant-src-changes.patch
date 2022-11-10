@@ -1,5 +1,5 @@
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
-index 64c5bf036e..5451d2e446 100644
+index cdf909316e..1ccf82d265 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cfg/HibernateOrmMapperOutboxPollingSettings.java
 @@ -8,9 +8,9 @@
@@ -11,14 +11,14 @@ index 64c5bf036e..5451d2e446 100644
  import org.hibernate.id.uuid.StandardRandomStrategy;
 +import org.hibernate.id.uuid.UuidGenerator;
  import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
- import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.UuidGenerationStrategy;
  import org.hibernate.search.util.common.annotation.Incubating;
-@@ -387,14 +387,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
+ 
+@@ -386,14 +386,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
  			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_OUTBOXEVENT_TABLE;
  
  	/**
--	 * The name of UUID generator strategy to be used by {@link UUIDGenerator}.
-+	 * The name of UUID generator strategy to be used by {@link UuidGenerator}.
+-	 * The name of UUID generator strategy to be used by {@link UUIDGenerator} for the outbox event table.
++	 * The name of UUID generator strategy to be used by {@link UuidGenerator} for the outbox event table.
  	 * <p>
  	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
  	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
@@ -31,20 +31,38 @@ index 64c5bf036e..5451d2e446 100644
  	 * @see CustomVersionOneStrategy
  	 * @see StandardRandomStrategy
  	 */
+@@ -445,14 +446,15 @@ private HibernateOrmMapperOutboxPollingSettings() {
+ 			PREFIX + Radicals.COORDINATION_ENTITY_MAPPING_AGENT_TABLE;
+ 
+ 	/**
+-	 * The name of UUID generator strategy to be used by {@link UUIDGenerator} for the agent table.
++	 * The name of UUID generator strategy to be used by {@link UuidGenerator} for the agent table.
+ 	 * <p>
+ 	 * Only available when {@value HibernateOrmMapperSettings#COORDINATION_STRATEGY} is
+ 	 * {@value HibernateOrmMapperOutboxPollingSettings#COORDINATION_STRATEGY_NAME}.
+ 	 * <p>
+ 	 * The default for this value is {@link  Defaults#COORDINATION_ENTITY_MAPPING_AGENT_UUID_GEN_STRATEGY}.
+ 	 *
+-	 * @see UUIDGenerator
++	 * @see UuidGenerator
++	 * @see org.hibernate.annotations.UuidGenerator
+ 	 * @see CustomVersionOneStrategy
+ 	 * @see StandardRandomStrategy
+ 	 */
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
-index 2a4019245f..a69de72e43 100644
+index 2f5402d464..36c120231e 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/cluster/impl/OutboxPollingAgentAdditionalJaxbMappingProducer.java
-@@ -36,6 +36,8 @@
+@@ -39,6 +39,8 @@
  
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
 +	public static final String HIBERNATE_SEARCH = "hibernate-search";
 +
- 	private static final String CLASS_NAME = Agent.class.getName();
+ 	public static final String CLASS_NAME = Agent.class.getName();
  
  	// Setting both the JPA entity name and the native entity name to the FQCN so that:
-@@ -164,7 +166,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -175,7 +177,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  
  		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
  
@@ -54,18 +72,18 @@ index 2a4019245f..a69de72e43 100644
  	}
  }
 diff --git a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
-index d90cd8ece3..1da14f6c8f 100644
+index eef4e98f1b..f5394cd491 100644
 --- a/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
 +++ b/main/java/org/hibernate/search/mapper/orm/coordination/outboxpolling/event/impl/OutboxPollingOutboxEventAdditionalJaxbMappingProducer.java
-@@ -27,6 +27,7 @@
- import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
- import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
+@@ -30,6 +30,7 @@
+ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.impl.UuidDataTypeUtils;
+ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
  import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 +import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.OutboxPollingAgentAdditionalJaxbMappingProducer;
  import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
  import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
  import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-@@ -36,6 +37,8 @@
+@@ -39,6 +40,8 @@
  
  	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
  
@@ -74,7 +92,7 @@ index d90cd8ece3..1da14f6c8f 100644
  	private static final String CLASS_NAME = OutboxEvent.class.getName();
  
  	// Setting both the JPA entity name and the native entity name to the FQCN so that:
-@@ -65,13 +68,13 @@
+@@ -68,13 +71,13 @@
  			"                <column length=\"2147483647\" />\n" +
  			"        </property>\n" +
  			"        <property name=\"retries\" type=\"integer\" nullable=\"false\" />\n" +
@@ -90,7 +108,7 @@ index d90cd8ece3..1da14f6c8f 100644
  			"    </class>\n" +
  			"</hibernate-mapping>\n";
  
-@@ -148,7 +151,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -163,7 +166,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  		);
  
  		log.outboxEventGeneratedEntityMapping( entityDefinition );
@@ -99,7 +117,7 @@ index d90cd8ece3..1da14f6c8f 100644
  
  		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( entityDefinition.getBytes() );
  		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
-@@ -156,7 +159,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
+@@ -171,7 +174,7 @@ public Collection<MappingDocument> produceMappings(ConfigurationPropertySource p
  
  		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
  
