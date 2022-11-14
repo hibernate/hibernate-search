@@ -48,8 +48,8 @@ public class HibernateSearchCompositeMappingProducer implements org.hibernate.bo
 				.withMask( HibernateOrmMapperSettings.Radicals.COORDINATION );
 		for ( HibernateSearchOrmMappingProducer mappingProducer : preIntegrationService
 				.coordinationStrategyConfiguration().mappingProducers() ) {
-			mappings.addAll( mappingProducer.produceMappings( propertySource, mappingBinder,
-					buildingContext ) );
+			mappings.addAll( mappingProducer.produceMappings( propertySource, metadata.getDatabase().getDialect(),
+					mappingBinder, buildingContext ) );
 		}
 		return mappings;
 	}

@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 import static org.junit.Assume.assumeTrue;
 
-import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,6 +65,9 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 				.withProperty( "hibernate.search.coordination.outbox_event_finder.provider", outboxEventFinder.provider() )
 				// use timebase uuids to get predictable sorting order
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.uuid_gen_strategy", "time" )
+				// see HSEARCH-4749, as some DBs (MSSQL) might use a nonstring representation of UUID we want to force it
+				// in this case to make row manipulation easier:
+				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.preferred_uuid_jdbc_type", "uuid-char" )
 				.setup( IndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -376,17 +378,17 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 				);
 			}
 
-			List<byte[]> uuids = new ArrayList<>();
+			List<String> uuids = new ArrayList<>();
 			List<java.sql.Timestamp> times = new ArrayList<>();
 			try ( PreparedStatement statement = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_SELECT_ORDERED_IDS_AND_CREATED_TIME ) ) {
 				ResultSet resultSet = statement.executeQuery();
 				while ( resultSet.next() ) {
-					uuids.add( resultSet.getBytes( 1 ) );
+					uuids.add( resultSet.getString( 1 ) );
 					times.add( resultSet.getTimestamp( 2 ) );
 				}
 			}
 
-			byte[] temporaryUuid = UUID.randomUUID().toString().getBytes( Charset.defaultCharset() );
+			String temporaryUuid = UUID.randomUUID().toString();
 			updateOutboxTableRow( jdbc, temporaryUuid, uuids.get( row2 ), times.get( row1 ) );
 			updateOutboxTableRow( jdbc, uuids.get( row2 ), uuids.get( row1 ), times.get( row2 ) );
 			updateOutboxTableRow( jdbc, uuids.get( row1 ), temporaryUuid, times.get( row1 ) );
@@ -396,12 +398,12 @@ public class OutboxPollingAutomaticIndexingOutOfOrderIdsIT {
 		}
 	}
 
-	private void updateOutboxTableRow(JdbcCoordinator jdbc, byte[] newId, byte[] rowToUpdateId,
+	private void updateOutboxTableRow(JdbcCoordinator jdbc, String newId, String rowToUpdateId,
 			java.sql.Timestamp newCreated) throws SQLException {
 		try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_EVENT_UPDATE_ID_AND_TIME ) ) {
-			ps.setBytes( 1, newId );
+			ps.setString( 1, newId );
 			ps.setTimestamp( 2, newCreated );
-			ps.setBytes( 3, rowToUpdateId );
+			ps.setString( 3, rowToUpdateId );
 
 			jdbc.getResultSetReturn().executeUpdate( ps );
 		}

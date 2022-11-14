@@ -21,6 +21,7 @@ import org.hibernate.boot.jaxb.internal.MappingBinder;
 import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -121,7 +122,7 @@ public class OutboxPollingAgentAdditionalJaxbMappingProducer
 	@Override
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
-	public Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource,
+	public Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource, Dialect dialect,
 			MappingBinder mappingBinder, MetadataBuildingContext buildingContext) {
 
 		Optional<String> mapping = AGENT_ENTITY_MAPPING.get( propertySource );

@@ -11,6 +11,7 @@ import java.util.Collection;
 import org.hibernate.boot.jaxb.internal.MappingBinder;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.annotation.impl.SuppressForbiddenApis;
 
@@ -19,6 +20,6 @@ public interface HibernateSearchOrmMappingProducer {
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
 	Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource,
-			MappingBinder mappingBinder, MetadataBuildingContext buildingContext);
+			Dialect dialect, MappingBinder mappingBinder, MetadataBuildingContext buildingContext);
 
 }
