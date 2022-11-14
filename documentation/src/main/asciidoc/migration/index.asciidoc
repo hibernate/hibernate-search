@@ -213,11 +213,11 @@ alter table hsearch_outbox_event
 alter table hsearch_outbox_event
     drop constraint if exists hsearch_outbox_event_pkey;
 alter table hsearch_outbox_event
-    alter column id varchar(36) not null;
+    alter column id binary(255) not null;
 alter table hsearch_outbox_event
     add constraint hsearch_outbox_event_pkey primary key (id);
 update hsearch_outbox_event
-set id = newid()
+set id = convert(binary, newid())
 where 1 = 1;
 ----
 
