@@ -21,11 +21,13 @@ import org.hibernate.boot.jaxb.internal.MappingBinder;
 import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateSearchOrmMappingProducer;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.HibernateOrmMapperOutboxPollingSettings;
+import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidDataType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.UuidGenerationStrategy;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cfg.spi.HibernateOrmMapperOutboxPollingSpiSettings;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.logging.impl.Log;
@@ -49,7 +51,7 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	public static final String ENTITY_DEFINITION_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 			"<hibernate-mapping schema=\"%1$s\" catalog=\"%2$s\">\n" +
 			"    <class name=\"" + CLASS_NAME + "\" entity-name=\"" + ENTITY_NAME + "\" table=\"%3$s\">\n" +
-			"        <id name=\"id\" type=\"uuid-binary\">\n" +
+			"        <id name=\"id\" type=\"%5$s\">\n" +
 			"            <generator class=\"org.hibernate.id.UUIDGenerator\">\n" +
 			"                <param name=\"uuid_gen_strategy_class\">%4$s</param>\n" +
 			"            </generator>\n" +
@@ -79,7 +81,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 	public static final String ENTITY_DEFINITION = String.format(
 			Locale.ROOT, ENTITY_DEFINITION_TEMPLATE, "", "",
 			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE,
-			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY
+			HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY,
+			UuidDataType.CHAR.externalRepresentation()
 	);
 
 	private static final OptionalConfigurationProperty<String> OUTBOXEVENT_ENTITY_MAPPING =
@@ -112,10 +115,17 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 					.as( UuidGenerationStrategy.class, UuidGenerationStrategy::of )
 					.build();
 
+	private static final ConfigurationProperty<String> ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE =
+			ConfigurationProperty.forKey(
+							HibernateOrmMapperOutboxPollingSettings.CoordinationRadicals.ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE )
+					.asString()
+					.withDefault( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_DATA_TYPE.externalRepresentation() )
+					.build();
+
 	@Override
 	@SuppressForbiddenApis(reason = "Strangely, this SPI involves the internal MappingBinder class,"
 			+ " and there's nothing we can do about it")
-	public Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource,
+	public Collection<MappingDocument> produceMappings(ConfigurationPropertySource propertySource, Dialect dialect,
 			MappingBinder mappingBinder, MetadataBuildingContext buildingContext) {
 
 		Optional<String> mapping = OUTBOXEVENT_ENTITY_MAPPING.get( propertySource );
@@ -137,6 +147,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 			);
 		}
 
+		String uuidDataType = UuidDataType.uuidType( ENTITY_MAPPING_OUTBOXEVENT_UUID_DATA_TYPE.get( propertySource ), dialect );
+
 		String entityDefinition = mapping.orElseGet( () ->
 				String.format(
 						Locale.ROOT,
@@ -144,7 +156,8 @@ public final class OutboxPollingOutboxEventAdditionalJaxbMappingProducer
 						schema.orElse( "" ),
 						catalog.orElse( "" ),
 						table.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_TABLE ),
-						uuidStrategy.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY ).strategy()
+						uuidStrategy.orElse( HibernateOrmMapperOutboxPollingSettings.Defaults.COORDINATION_ENTITY_MAPPING_OUTBOX_EVENT_UUID_GEN_STRATEGY ).strategy(),
+						uuidDataType
 				)
 		);
 
