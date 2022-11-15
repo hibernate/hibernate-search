@@ -199,6 +199,7 @@
                                         <color>blue</color>
                                     </log>
                                     <wait>
+                                        <time>20000</time>
                                         <!-- For some reason, Postgres will tell us it's ready *twice*,
                                              and that's the truth the second time only.
                                              See https://github.com/fabric8io/docker-maven-plugin/issues/628 -->
