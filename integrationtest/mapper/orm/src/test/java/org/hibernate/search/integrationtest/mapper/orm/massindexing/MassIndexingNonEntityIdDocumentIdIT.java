@@ -23,18 +23,18 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test mass indexing of an entity type whose document ID is not the entity ID.
  */
-public class MassIndexingNonEntityIdDocumentIdIT {
+class MassIndexingNonEntityIdDocumentIdIT {
 
 	private static final String TITLE_1 = "Oliver Twist";
 	private static final String AUTHOR_1 = "Charles Dickens";
@@ -43,16 +43,16 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 	private static final String TITLE_3 = "Frankenstein";
 	private static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		sessionFactory = ormSetupHelper.start()
@@ -66,7 +66,7 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3203")
-	public void defaultMassIndexerStartAndWait() {
+	void defaultMassIndexerStartAndWait() {
 		with( sessionFactory ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();

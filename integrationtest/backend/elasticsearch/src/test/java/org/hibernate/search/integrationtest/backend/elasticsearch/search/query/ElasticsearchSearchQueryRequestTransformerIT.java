@@ -23,13 +23,13 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -40,19 +40,19 @@ import com.google.gson.JsonObject;
  * {@link ElasticsearchSearchRequestTransformer}
  * is used.
  */
-public class ElasticsearchSearchQueryRequestTransformerIT {
+class ElasticsearchSearchQueryRequestTransformerIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 	private final SimpleMappedIndex<IndexBinding> otherIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
@@ -62,7 +62,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@Test
-	public void path() {
+	void path() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -89,7 +89,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@Test
-	public void queryParameters() {
+	void queryParameters() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -118,7 +118,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@Test
-	public void body() {
+	void body() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )

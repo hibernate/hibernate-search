@@ -24,26 +24,26 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmIndexingPlanFilterIT {
+class HibernateOrmIndexingPlanFilterIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
 			BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		this.entityManagerFactory = setupHelper.start()
 				.setup( EntityA.class, EntityExtendsA1.class, EntityExtendsA2.class );
 	}
 
 	@Test
-	public void applicationFilterOnly() {
+	void applicationFilterOnly() {
 		// tag::application-filter[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::application-filter[]
@@ -71,7 +71,7 @@ public class HibernateOrmIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void sessionFilterOnly() {
+	void sessionFilterOnly() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::session-filter[]
 			SearchSession session = /* ... */ // <1>
@@ -100,7 +100,7 @@ public class HibernateOrmIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void disableAll() {
+	void disableAll() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::session-filter-exclude-all[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -128,7 +128,7 @@ public class HibernateOrmIndexingPlanFilterIT {
 	}
 
 	@Test
-	public void disableAllApplicationEnableSession() {
+	void disableAllApplicationEnableSession() {
 		// tag::session-filter-exclude-include-all-application[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::session-filter-exclude-include-all-application[]

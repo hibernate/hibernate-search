@@ -23,14 +23,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ObsoletePropertiesIT {
+class ObsoletePropertiesIT {
 
 	private static final List<String> OBSOLETE_ROOT_LEVEL_PROPERTY_KEYS = CollectionHelper.asImmutableList(
 			"hibernate.search.query.object_lookup_method",
@@ -103,14 +103,14 @@ public class ObsoletePropertiesIT {
 			"elasticsearch.dynamic_mapping"
 	);
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void obsoleteProperty() {
+	void obsoleteProperty() {
 		// Generate a list of all invalid property keys we can think of
 		List<String> obsoletePropertyKeys = new ArrayList<>();
 		obsoletePropertyKeys.addAll( OBSOLETE_ROOT_LEVEL_PROPERTY_KEYS );

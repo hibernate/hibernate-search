@@ -509,7 +509,7 @@
                 <!-- Tests may fail unexpectedly with AWS Elasticsearch.
                      In particular, we sometimes get timeouts, seemingly for no particular reason.
                      Thus we need to retry tests when they fail, to be sure it's not just a transient failure.
-                     Note that this will not re-run tests when they fail in @BeforeClass/@AfterClass in particular,
+                     Note that this will not re-run tests when they fail in @BeforeAll/@AfterAll in particular,
                      so we also have retry steps in the Jenkinsfile.
                  -->
                 <failsafe.rerunFailingTestsCount>4</failsafe.rerunFailingTestsCount>

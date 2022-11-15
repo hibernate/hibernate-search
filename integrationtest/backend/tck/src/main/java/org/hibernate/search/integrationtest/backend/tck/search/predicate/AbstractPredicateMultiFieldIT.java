@@ -19,87 +19,94 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateMultiFieldIT<V extends AbstractPredicateTestValues<?>> {
 
-	private final SimpleMappedIndex<IndexBinding> index;
-	protected final DataSet<?, V> dataSet;
-
-	protected AbstractPredicateMultiFieldIT(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
-		this.index = index;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void fieldAndField() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void fieldAndField(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicateOnFieldAndField( f, field0Path(), field1Path(),
-						0 ) )
+				.where( f -> predicateOnFieldAndField( f, field0Path( index, dataSet ), field1Path( index, dataSet ),
+						0, dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
-				.where( f -> predicateOnFieldAndField( f, field0Path(), field1Path(),
-						1 ) )
+				.where( f -> predicateOnFieldAndField( f, field0Path( index, dataSet ), field1Path( index, dataSet ),
+						1, dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void fields() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void fields(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> predicateOnFields( f,
-						new String[] { field0Path(), field1Path() }, 0 ) )
+						new String[] { field0Path( index, dataSet ), field1Path( index, dataSet ) }, 0, dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
 				.where( f -> predicateOnFields( f,
-						new String[] { field0Path(), field1Path() }, 1 ) )
+						new String[] { field0Path( index, dataSet ), field1Path( index, dataSet ) }, 1, dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void fieldAndFields() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void fieldAndFields(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicateOnFieldAndFields( f, field0Path(),
-						new String[] { field1Path(), field2Path() },
-						0 ) )
+				.where( f -> predicateOnFieldAndFields( f, field0Path( index, dataSet ),
+						new String[] { field1Path( index, dataSet ), field2Path( index, dataSet ) },
+						0, dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
-				.where( f -> predicateOnFieldAndFields( f, field0Path(), new String[] { field1Path(), field2Path() },
-						1 ) )
+				.where( f -> predicateOnFieldAndFields( f, field0Path( index, dataSet ), new String[] {
+						field1Path(
+								index, dataSet ),
+						field2Path( index, dataSet ) },
+						1, dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 		if ( dataSet.hasMoreThanTwoValues() ) {
 			// Booleans have only two values...
 			assertThatQuery( index.query()
-					.where( f -> predicateOnFieldAndFields( f, field0Path(),
-							new String[] { field1Path(), field2Path() }, 2 ) )
+					.where( f -> predicateOnFieldAndFields( f, field0Path( index, dataSet ),
+							new String[] { field1Path( index, dataSet ), field2Path( index, dataSet ) }, 2, dataSet
+					) )
 					.routing( dataSet.routingKey ) )
 					.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 2 ) );
 		}
 	}
 
 	protected abstract PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
-			String otherFieldPath, int matchingDocOrdinal);
+			String otherFieldPath, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	protected abstract PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths,
-			int matchingDocOrdinal);
+			int matchingDocOrdinal,
+			DataSet<?, V> dataSet);
 
 	protected abstract PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
-			String[] fieldPaths, int matchingDocOrdinal);
+			String[] fieldPaths, int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	private String field0Path() {
+	private String field0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().field0.get( dataSet.fieldType ).relativeFieldName;
 	}
 
-	private String field1Path() {
+	private String field1Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().field1.get( dataSet.fieldType ).relativeFieldName;
 	}
 
-	private String field2Path() {
+	private String field2Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().field2.get( dataSet.fieldType ).relativeFieldName;
 	}
 

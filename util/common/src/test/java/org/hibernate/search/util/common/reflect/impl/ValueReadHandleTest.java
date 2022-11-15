@@ -9,7 +9,7 @@ package org.hibernate.search.util.common.reflect.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -25,92 +25,97 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
-@RunWith(Parameterized.class)
-public class ValueReadHandleTest {
+class ValueReadHandleTest {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> params() {
+	public static List<? extends Arguments> params() {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
-		return Arrays.asList( new Object[][] {
-				{ ValueHandleFactory.usingMethodHandle( lookup ) },
-				{ ValueHandleFactory.usingJavaLangReflect() }
-		} );
+		return Arrays.asList(
+				Arguments.of( ValueHandleFactory.usingMethodHandle( lookup ) ),
+				Arguments.of( ValueHandleFactory.usingJavaLangReflect() )
+		);
 	}
 
-	private final ValueHandleFactory factory;
-
-	public ValueReadHandleTest(ValueHandleFactory factory) {
-		this.factory = factory;
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void privateField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "privateField" );
 	}
 
-	@Test
-	public void privateField() throws Exception {
-		testFieldValueReadHandleSuccess( "privateField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void privateFinalField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "privateFinalField" );
 	}
 
-	@Test
-	public void privateFinalField() throws Exception {
-		testFieldValueReadHandleSuccess( "privateFinalField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void packagePrivateField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "packagePrivateField" );
 	}
 
-	@Test
-	public void packagePrivateField() throws Exception {
-		testFieldValueReadHandleSuccess( "packagePrivateField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void packagePrivateFinalField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "packagePrivateFinalField" );
 	}
 
-	@Test
-	public void packagePrivateFinalField() throws Exception {
-		testFieldValueReadHandleSuccess( "packagePrivateFinalField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void protectedField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "protectedField" );
 	}
 
-	@Test
-	public void protectedField() throws Exception {
-		testFieldValueReadHandleSuccess( "protectedField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void protectedFinalField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "protectedFinalField" );
 	}
 
-	@Test
-	public void protectedFinalField() throws Exception {
-		testFieldValueReadHandleSuccess( "protectedFinalField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void publicField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "publicField" );
 	}
 
-	@Test
-	public void publicField() throws Exception {
-		testFieldValueReadHandleSuccess( "publicField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void publicFinalField(ValueHandleFactory factory) throws Exception {
+		testFieldValueReadHandleSuccess( factory, "publicFinalField" );
 	}
 
-	@Test
-	public void publicFinalField() throws Exception {
-		testFieldValueReadHandleSuccess( "publicFinalField" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void privateMethod(ValueHandleFactory factory) throws Exception {
+		testMethodValueReadHandleSuccess( factory, "privateMethod" );
 	}
 
-	@Test
-	public void privateMethod() throws Exception {
-		testMethodValueReadHandleSuccess( "privateMethod" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void packagePrivateMethod(ValueHandleFactory factory) throws Exception {
+		testMethodValueReadHandleSuccess( factory, "packagePrivateMethod" );
 	}
 
-	@Test
-	public void packagePrivateMethod() throws Exception {
-		testMethodValueReadHandleSuccess( "packagePrivateMethod" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void protectedMethod(ValueHandleFactory factory) throws Exception {
+		testMethodValueReadHandleSuccess( factory, "protectedMethod" );
 	}
 
-	@Test
-	public void protectedMethod() throws Exception {
-		testMethodValueReadHandleSuccess( "protectedMethod" );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void publicMethod(ValueHandleFactory factory) throws Exception {
+		testMethodValueReadHandleSuccess( factory, "publicMethod" );
 	}
 
-	@Test
-	public void publicMethod() throws Exception {
-		testMethodValueReadHandleSuccess( "publicMethod" );
-	}
-
-	@Test
-	public void failure_method_error() throws Exception {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void failure_method_error(ValueHandleFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "errorThrowingMethod" );
 		setAccessible( method );
 
@@ -122,8 +127,9 @@ public class ValueReadHandleTest {
 				.hasMessageContaining( "errorThrowingMethod" );
 	}
 
-	@Test
-	public void failure_method_runtimeException() throws Exception {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void failure_method_runtimeException(ValueHandleFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
 		setAccessible( method );
 
@@ -140,13 +146,14 @@ public class ValueReadHandleTest {
 				.hasMessageContaining( "runtimeExceptionThrowingMethod" );
 	}
 
-	@Test
-	public void failure_method_illegalAccessException() throws Exception {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void failure_method_illegalAccessException(ValueHandleFactory factory) throws Exception {
 		assumeFalse(
+				factory.getClass().getSimpleName().contains( "MethodHandle" ),
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
-						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
-				factory.getClass().getSimpleName().contains( "MethodHandle" )
+						+ " and if we do use setAccessible(true), the handle has full access to the field/method."
 		);
 
 		Method method = EntityType.class.getDeclaredMethod( "illegalAccessExceptionThrowingMethod" );
@@ -162,13 +169,14 @@ public class ValueReadHandleTest {
 				.extracting( Throwable::getCause ).isInstanceOf( IllegalAccessException.class );
 	}
 
-	@Test
-	public void failure_field_illegalAccessException() throws Exception {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void failure_field_illegalAccessException(ValueHandleFactory factory) throws Exception {
 		assumeFalse(
+				factory.getClass().getSimpleName().contains( "MethodHandle" ),
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
-						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
-				factory.getClass().getSimpleName().contains( "MethodHandle" )
+						+ " and if we do use setAccessible(true), the handle has full access to the field/method."
 		);
 
 		Field field = EntityType.class.getDeclaredField( "illegalAccessExceptionThrowingField" );
@@ -184,15 +192,18 @@ public class ValueReadHandleTest {
 				.extracting( Throwable::getCause ).isInstanceOf( IllegalAccessException.class );
 	}
 
-	@Test
-	public void failure_method_secondFailureInToString_runtimeException() throws Exception {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void failure_method_secondFailureInToString_runtimeException(ValueHandleFactory factory) throws Exception {
 		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
 		setAccessible( method );
 
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		SimulatedRuntimeException toStringRuntimeException = new SimulatedRuntimeException( "toString" );
-		EntityType entity = new EntityType( () -> { throw toStringRuntimeException; } );
+		EntityType entity = new EntityType( () -> {
+			throw toStringRuntimeException;
+		} );
 		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
@@ -205,7 +216,8 @@ public class ValueReadHandleTest {
 				.hasSuppressedException( toStringRuntimeException );
 	}
 
-	private void testFieldValueReadHandleSuccess(String fieldName) throws IllegalAccessException, NoSuchFieldException {
+	private void testFieldValueReadHandleSuccess(ValueHandleFactory factory, String fieldName)
+			throws IllegalAccessException, NoSuchFieldException {
 		String expectedValue = fieldName + "Value";
 		Field field = EntityType.class.getDeclaredField( fieldName );
 		setAccessible( field );
@@ -223,11 +235,12 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> equalValueReadHandle = factory.createForField( field );
 		ValueReadHandle<?> differentFieldValueReadHandle = factory.createForField( otherField );
 		assertThat( valueReadHandle ).isEqualTo( equalValueReadHandle );
-		assertThat( valueReadHandle.hashCode() ).isEqualTo( equalValueReadHandle.hashCode() );
+		assertThat( valueReadHandle ).hasSameHashCodeAs( equalValueReadHandle );
 		assertThat( valueReadHandle ).isNotEqualTo( differentFieldValueReadHandle );
 	}
 
-	private void testMethodValueReadHandleSuccess(String methodName) throws IllegalAccessException, NoSuchMethodException {
+	private void testMethodValueReadHandleSuccess(ValueHandleFactory factory, String methodName)
+			throws IllegalAccessException, NoSuchMethodException {
 		String expectedValue = methodName + "Value";
 		Method method = EntityType.class.getDeclaredMethod( methodName );
 		setAccessible( method );
@@ -244,7 +257,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> equalValueReadHandle = factory.createForMethod( method );
 		ValueReadHandle<?> differentMethodValueReadHandle = factory.createForMethod( otherMethod );
 		assertThat( valueReadHandle ).isEqualTo( equalValueReadHandle );
-		assertThat( valueReadHandle.hashCode() ).isEqualTo( equalValueReadHandle.hashCode() );
+		assertThat( valueReadHandle ).hasSameHashCodeAs( equalValueReadHandle );
 		assertThat( valueReadHandle ).isNotEqualTo( differentMethodValueReadHandle );
 	}
 

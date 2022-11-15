@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class RootFailureCollectorTest {
+class RootFailureCollectorTest {
 
 	/**
 	 * Triggers many more failures than the failure limit.
@@ -27,7 +27,7 @@ public class RootFailureCollectorTest {
 	 * Only the first {@value RootFailureCollector#FAILURE_LIMIT} failures should be reported.
 	 */
 	@Test
-	public void failureLimit() {
+	void failureLimit() {
 		RootFailureCollector rootFailureCollector = new RootFailureCollector( "RootName" );
 		for ( int i = 0; i < RootFailureCollector.FAILURE_LIMIT; i++ ) {
 			ContextualFailureCollector failureCollector = rootFailureCollector.withContext(
@@ -67,7 +67,7 @@ public class RootFailureCollectorTest {
 	 * Do that concurrently from two different children, and you're likely to end up with a deadlock.
 	 */
 	@Test
-	public void failureLimit_concurrency() {
+	void failureLimit_concurrency() {
 		RootFailureCollector rootFailureCollector = new RootFailureCollector( "RootName" );
 		List<Runnable> runnables = IntStream.range( 0, RootFailureCollector.FAILURE_LIMIT + 1000 )
 				.mapToObj( i -> (Runnable) () -> {

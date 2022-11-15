@@ -20,10 +20,10 @@ import java.util.stream.Stream;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.MultiValuedPropertyAccessor;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.PropertyAccessor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeDiffer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -174,7 +174,7 @@ public abstract class AbstractAutomaticIndexingAssociationBaseIT<
 	}
 
 	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

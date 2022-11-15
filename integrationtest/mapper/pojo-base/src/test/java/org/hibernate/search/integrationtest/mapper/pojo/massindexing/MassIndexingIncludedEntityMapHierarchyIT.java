@@ -25,16 +25,15 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 /**
@@ -43,22 +42,20 @@ import org.mockito.quality.Strictness;
  * It also tests {@link LoadingTypeGroup#includedTypesMap()},
  * and the position of the first item for the group super type.
  */
-public class MassIndexingIncludedEntityMapHierarchyIT {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class MassIndexingIncludedEntityMapHierarchyIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
@@ -82,7 +79,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
@@ -107,7 +104,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
@@ -132,7 +129,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
@@ -166,7 +163,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 

@@ -20,27 +20,27 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchFieldAttributesIT {
+class ElasticsearchFieldAttributesIT {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
 	@Test
-	public void verifyNorms() {
+	void verifyNorms() {
 		JsonObject properties = new JsonObject();
 		properties.add( "keyword", fieldWithNorms( "keyword", false ) );
 		properties.add( "text", fieldWithNorms( "text", true ) );
@@ -56,7 +56,7 @@ public class ElasticsearchFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyTermVector() {
+	void verifyTermVector() {
 		JsonObject properties = new JsonObject();
 		properties.add( "no", fieldWithTermVector( "no" ) );
 		properties.add( "yes", fieldWithTermVector( "yes" ) );
@@ -74,7 +74,7 @@ public class ElasticsearchFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyNative() {
+	void verifyNative() {
 		JsonObject nativeField = new JsonObject();
 		nativeField.addProperty( "type", "half_float" );
 		nativeField.addProperty( "ignore_malformed", true );

@@ -19,15 +19,14 @@ import java.util.jar.JarFile;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.HibernateSearchUtilInternalTestCommonClass;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 
-public class JandexUtilsTest {
+class JandexUtilsTest {
 	private static final String META_INF_JANDEX_INDEX = "META-INF/jandex.idx";
 
 	private static final URL JUNIT_JAR_URL = JarUtils.codeSourceLocation( Test.class )
@@ -37,11 +36,11 @@ public class JandexUtilsTest {
 					.orElseThrow( () -> new AssertionFailure(
 							"Could not find hibernate-search-util-internal-test-common JAR?" ) );
 
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@TempDir
+	public Path temporaryFolder;
 
 	@Test
-	public void readIndex_fromJar_indexAbsent() throws Exception {
+	void readIndex_fromJar_indexAbsent() throws Exception {
 		Path jarPath = toJar( temporaryFolder, JUNIT_JAR_URL );
 		checkJarPreconditions( jarPath, false );
 
@@ -50,7 +49,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readIndex_fromDirectory_indexAbsent() throws Exception {
+	void readIndex_fromDirectory_indexAbsent() throws Exception {
 		Path dirPath = toDirectory( temporaryFolder, JUNIT_JAR_URL );
 		checkDirectoryPreconditions( dirPath, false );
 
@@ -59,7 +58,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readIndex_fromJar_indexPresent() throws Exception {
+	void readIndex_fromJar_indexPresent() throws Exception {
 		Path jarPath = toJar( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkJarPreconditions( jarPath, true );
 
@@ -73,7 +72,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readIndex_fromDirectory_indexPresent() throws Exception {
+	void readIndex_fromDirectory_indexPresent() throws Exception {
 		Path dirPath = toDirectory( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkDirectoryPreconditions( dirPath, true );
 
@@ -87,7 +86,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readOrBuildIndex_fromJar_indexAbsent() throws Exception {
+	void readOrBuildIndex_fromJar_indexAbsent() throws Exception {
 		Path jarPath = toJar( temporaryFolder, JUNIT_JAR_URL );
 		checkJarPreconditions( jarPath, false );
 
@@ -98,7 +97,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readOrBuildIndex_fromDirectory_indexAbsent() throws Exception {
+	void readOrBuildIndex_fromDirectory_indexAbsent() throws Exception {
 		Path dirPath = toDirectory( temporaryFolder, JUNIT_JAR_URL );
 		checkDirectoryPreconditions( dirPath, false );
 
@@ -109,7 +108,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readOrBuildIndex_fromJar_indexPresent() throws Exception {
+	void readOrBuildIndex_fromJar_indexPresent() throws Exception {
 		Path jarPath = toJar( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkJarPreconditions( jarPath, true );
 
@@ -121,7 +120,7 @@ public class JandexUtilsTest {
 	}
 
 	@Test
-	public void readOrBuildIndex_fromDirectory_indexPresent() throws Exception {
+	void readOrBuildIndex_fromDirectory_indexPresent() throws Exception {
 		Path dirPath = toDirectory( temporaryFolder, UTIL_INTERNAL_TEST_COMMON_JAR_URL );
 		checkDirectoryPreconditions( dirPath, true );
 

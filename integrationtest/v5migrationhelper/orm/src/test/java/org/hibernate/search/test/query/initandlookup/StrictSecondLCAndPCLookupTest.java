@@ -21,7 +21,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
+import org.hibernate.search.test.testsupport.StaticIndexingSwitch;
 import org.hibernate.stat.Statistics;
 
 import org.hibernate.testing.cache.CachingRegionFactory;

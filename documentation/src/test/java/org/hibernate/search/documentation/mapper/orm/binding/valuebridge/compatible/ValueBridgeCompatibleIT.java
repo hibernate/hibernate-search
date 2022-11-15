@@ -20,23 +20,23 @@ import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ValueBridgeCompatibleIT {
-	@Rule
+class ValueBridgeCompatibleIT {
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book1.class, Book2.class );
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book1 book1 = new Book1();
 			book1.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );

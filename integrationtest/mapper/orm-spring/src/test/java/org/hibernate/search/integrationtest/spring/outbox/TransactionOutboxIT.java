@@ -12,12 +12,12 @@ import jakarta.persistence.Id;
 
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractSpringITConfig;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -27,15 +27,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ActiveProfiles(profiles = { "outbox" })
-public class TransactionOutboxIT {
+class TransactionOutboxIT {
 
 	@Configuration
 	@EntityScan
@@ -51,14 +51,14 @@ public class TransactionOutboxIT {
 	}
 
 	@Autowired
-	@Rule
+	@RegisterExtension
 	public BackendMock backendMock;
 
 	@Autowired
 	private HelperService helperService;
 
 	@Test
-	public void persist() {
+	void persist() {
 		Integer id = 1;
 
 		backendMock.expectWorks( IndexedEntity.NAME )

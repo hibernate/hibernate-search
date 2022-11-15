@@ -29,24 +29,24 @@ import org.hibernate.search.mapper.orm.outboxpolling.cfg.impl.HibernateOrmMapper
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.awaitility.core.ThrowingRunnable;
 
 /**
  * Extensive tests of backend failures for automatic indexing with outbox-polling.
  */
-public class OutboxPollingAutomaticIndexingBackendFailureIT {
+class OutboxPollingAutomaticIndexingBackendFailureIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
@@ -58,7 +58,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	private TestFailureHandler failureHandler;
 
 	@Test
-	public void backendFailure() {
+	void backendFailure() {
 		setup( 0 );
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -110,7 +110,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	}
 
 	@Test
-	public void backendFailure_retryAfter() {
+	void backendFailure_retryAfter() {
 		setup( 3 );
 		AtomicLong timeOfTheException = new AtomicLong();
 		with( sessionFactory ).runInTransaction( session -> {
@@ -166,7 +166,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	}
 
 	@Test
-	public void backendFailure_twoFailuresOfTheSameIndexingWork() {
+	void backendFailure_twoFailuresOfTheSameIndexingWork() {
 		setup( 0 );
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -225,7 +225,7 @@ public class OutboxPollingAutomaticIndexingBackendFailureIT {
 	}
 
 	@Test
-	public void backendFailure_numberOfTrialsExhausted() {
+	void backendFailure_numberOfTrialsExhausted() {
 		setup( 0 );
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();

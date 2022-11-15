@@ -35,21 +35,18 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class BeanResolutionIT {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class BeanResolutionIT {
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock
 	private BeanContainer beanContainerMock;
@@ -62,7 +59,7 @@ public class BeanResolutionIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4096")
-	public void noExplicitBean_noCallToBeanContainer() {
+	void noExplicitBean_noCallToBeanContainer() {
 		setupHelper.start()
 				.withProperty( AvailableSettings.BEAN_CONTAINER, beanContainerMock )
 				.setup( IndexedEntity.class );
@@ -73,7 +70,7 @@ public class BeanResolutionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4096")
-	public void explicitBean_callToBeanContainer() {
+	void explicitBean_callToBeanContainer() {
 		when( beanContainerMock
 				.getBean( eq( "myConfigurer" ), eq( HibernateOrmSearchMappingConfigurer.class ), any(), any() ) )
 				.thenReturn( new StubContainedBean<>( new HibernateOrmSearchMappingConfigurer() {

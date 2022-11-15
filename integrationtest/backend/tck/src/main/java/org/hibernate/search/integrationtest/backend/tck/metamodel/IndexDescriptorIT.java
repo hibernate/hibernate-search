@@ -15,42 +15,42 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests for basic index descriptor features that are not tested elsewhere.
  */
 @TestForIssue(jiraKey = "HSEARCH-3589")
-public class IndexDescriptorIT {
+class IndexDescriptorIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
 	}
 
 	@Test
-	public void name() {
+	void name() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		assertThat( indexDescriptor.hibernateSearchName() ).isEqualTo( index.name() );
 	}
 
 	@Test
-	public void root() {
+	void root() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		assertThat( indexDescriptor.root() ).isNotNull()
@@ -59,7 +59,7 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void staticFields() {
+	void staticFields() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		Optional<IndexFieldDescriptor> valueFieldDescriptorOptional = indexDescriptor.field( "myValueField" );
@@ -76,7 +76,7 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void dynamicFields() {
+	void dynamicFields() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 
 		Optional<IndexFieldDescriptor> valueFieldDescriptorOptional = indexDescriptor.field( "myDynamicField_txt" );
@@ -92,7 +92,7 @@ public class IndexDescriptorIT {
 	}
 
 	@Test
-	public void missingField() {
+	void missingField() {
 		IndexDescriptor indexDescriptor = index.toApi().descriptor();
 		Optional<IndexFieldDescriptor> fieldDescriptorOptional = indexDescriptor.field( "unknownField" );
 		assertThat( fieldDescriptorOptional ).isEmpty();

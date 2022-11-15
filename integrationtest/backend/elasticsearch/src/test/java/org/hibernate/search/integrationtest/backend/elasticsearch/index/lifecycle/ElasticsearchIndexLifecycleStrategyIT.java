@@ -8,25 +8,25 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.index.lifecyc
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests that setting the obsolete index lifecycle strategy property fails.
  */
-public class ElasticsearchIndexLifecycleStrategyIT {
+class ElasticsearchIndexLifecycleStrategyIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3540")
-	public void noCall() {
+	void noCall() {
 		StubMappedIndex index = StubMappedIndex.withoutFields();
 		assertThatThrownBy(
 				() -> setupHelper.start()

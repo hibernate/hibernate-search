@@ -16,15 +16,15 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchImplicitFieldsIT {
+class ElasticsearchImplicitFieldsIT {
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -33,20 +33,20 @@ public class ElasticsearchImplicitFieldsIT {
 	private static final String FIFTH_ID = "5";
 	private static final String EMPTY_ID = "empty";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndexes( mainIndex ).setup().integration();
 
 		initData();
 	}
 
 	@Test
-	public void implicit_fields_aggregation_entity_type() {
+	void implicit_fields_aggregation_entity_type() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<Map<String, Long>> countsByEntityKey = AggregationKey.of( "countsByEntity" );
@@ -61,7 +61,7 @@ public class ElasticsearchImplicitFieldsIT {
 	}
 
 	@Test
-	public void implicit_fields_id() {
+	void implicit_fields_id() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.terms().field( "_id" ).matchingAny( "4" ) )
@@ -71,7 +71,7 @@ public class ElasticsearchImplicitFieldsIT {
 	}
 
 	@Test
-	public void implicit_fields_index() {
+	void implicit_fields_index() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "_index" ).matching( "main-000001" ) )

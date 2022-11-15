@@ -10,6 +10,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +22,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -44,14 +49,19 @@ import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
 import org.hibernate.testing.junit4.CustomParameterized;
 
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExecutableInvoker;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstances;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -159,7 +169,7 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 	}
 
 	public static ReusableOrmSetupHolder withBackendMock(BackendMock backendMock) {
-		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMock( backendMock ),
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMockGlobal( backendMock ),
 				Collections.singletonList( backendMock ), IndexDataClearStrategy.NONE );
 	}
 
@@ -170,12 +180,12 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 			allBackendMocks.add( defaultBackendMock );
 		}
 		allBackendMocks.addAll( namedBackendMocks.values() );
-		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks ),
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withBackendMocksGlobal( defaultBackendMock, namedBackendMocks ),
 				allBackendMocks, IndexDataClearStrategy.NONE );
 	}
 
 	public static ReusableOrmSetupHolder withSingleBackend(BackendConfiguration backendConfiguration) {
-		return new ReusableOrmSetupHolder( OrmSetupHelper.withSingleBackend( backendConfiguration ),
+		return new ReusableOrmSetupHolder( OrmSetupHelper.withSingleBackendGlobal( backendConfiguration ),
 				Collections.emptyList(), IndexDataClearStrategy.DROP_AND_CREATE_SCHEMA );
 	}
 
@@ -287,7 +297,19 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 				}
 			}
 		};
-		return setupHelper.apply( wrapped, description );
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				TestRuleExtensionContext context = new TestRuleExtensionContext( description );
+				try {
+					setupHelper.beforeAll( context );
+					wrapped.evaluate();
+				}
+				finally {
+					setupHelper.afterAll( context );
+				}
+			}
+		};
 	}
 
 	private Statement methodStatement(Statement base, Object testInstance) {
@@ -685,4 +707,101 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 		DROP_AND_CREATE_SCHEMA
 	}
 
+	static class TestRuleExtensionContext implements ExtensionContext {
+		private final Description description;
+
+		public TestRuleExtensionContext(Description description) {
+			this.description = description;
+		}
+
+		@Override
+		public Optional<ExtensionContext> getParent() {
+			return Optional.empty();
+		}
+
+		@Override
+		public ExtensionContext getRoot() {
+			return this;
+		}
+
+		@Override
+		public String getUniqueId() {
+			return UUID.randomUUID().toString();
+		}
+
+		@Override
+		public String getDisplayName() {
+			return description.getDisplayName();
+		}
+
+		@Override
+		public Set<String> getTags() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Optional<AnnotatedElement> getElement() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<Class<?>> getTestClass() {
+			return Optional.of( description.getTestClass() );
+		}
+
+		@Override
+		public Optional<TestInstance.Lifecycle> getTestInstanceLifecycle() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<Object> getTestInstance() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<TestInstances> getTestInstances() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<Method> getTestMethod() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<Throwable> getExecutionException() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<String> getConfigurationParameter(String s) {
+			return Optional.empty();
+		}
+
+		@Override
+		public <T> Optional<T> getConfigurationParameter(String s, Function<String, T> function) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void publishReportEntry(Map<String, String> map) {
+
+		}
+
+		@Override
+		public Store getStore(Namespace namespace) {
+			return null;
+		}
+
+		@Override
+		public ExecutionMode getExecutionMode() {
+			return null;
+		}
+
+		@Override
+		public ExecutableInvoker getExecutableInvoker() {
+			return null;
+		}
+	}
 }

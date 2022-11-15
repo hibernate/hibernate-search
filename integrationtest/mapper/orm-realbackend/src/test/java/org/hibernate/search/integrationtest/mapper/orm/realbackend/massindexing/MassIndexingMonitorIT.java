@@ -19,15 +19,15 @@ import org.hibernate.search.integrationtest.mapper.orm.realbackend.util.BookCrea
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class MassIndexingMonitorIT {
+class MassIndexingMonitorIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
@@ -46,16 +46,16 @@ public class MassIndexingMonitorIT {
 		}
 	}
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( "hibernate.search.indexing.listeners.enabled", false )
 				.setup( Book.class );
@@ -64,7 +64,7 @@ public class MassIndexingMonitorIT {
 	}
 
 	@Test
-	public void testMassIndexingMonitor() {
+	void testMassIndexingMonitor() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			assertThat( BookCreatorUtils.documentsCount( entityManagerFactory ) ).isZero();
 

@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.function.Predicate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class LinkedNodeTest {
+class LinkedNodeTest {
 
 	@Test
-	public void testToString() {
+	void testToString() {
 		assertThat( LinkedNode.of( 42 ).toString() )
 				.isEqualTo( "[42]" );
 		assertThat( LinkedNode.of( 42, 1, 2, 3 ).toString() )
@@ -23,7 +23,7 @@ public class LinkedNodeTest {
 	}
 
 	@Test
-	public void testEqualsAndHashCode() {
+	void testEqualsAndHashCode() {
 		assertThat( LinkedNode.of( 42 ) )
 				.isEqualTo( LinkedNode.of( 42 ) );
 		assertThat( LinkedNode.of( 42 ).hashCode() )
@@ -43,7 +43,7 @@ public class LinkedNodeTest {
 	}
 
 	@Test
-	public void findAndReverse() {
+	void findAndReverse() {
 		Predicate<Integer> is42 = Predicate.isEqual( 42 );
 
 		// First matching is first element

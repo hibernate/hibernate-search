@@ -19,20 +19,20 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 abstract class AbstractHibernateOrmMassIndexingIT {
 
 	protected static final int NUMBER_OF_BOOKS = 1000;
 	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	protected EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )

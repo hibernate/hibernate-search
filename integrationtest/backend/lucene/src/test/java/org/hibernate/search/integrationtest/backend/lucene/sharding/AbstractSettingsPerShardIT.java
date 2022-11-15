@@ -7,62 +7,62 @@
 package org.hibernate.search.integrationtest.backend.lucene.sharding;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Rule;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 
 /**
  * A basic test for explicit sharding with explicit routing keys.
  */
-@RunWith(Parameterized.class)
 public abstract class AbstractSettingsPerShardIT {
 
-	@Parameterized.Parameters(name = "{0} - {2}")
-	public static Object[][] params() {
+	public static List<? extends Arguments> params() {
 		Set<String> hashShardIds = CollectionHelper.asImmutableSet( "0", "1", "2", "3" );
 		Set<String> explicitShardIds = CollectionHelper.asImmutableSet( "first", "second", "other", "yetanother" );
 
-		return new Object[][] {
-				{
-						"hash",
-						new SearchSetupHelper( helper -> helper.createHashBasedShardingBackendSetupStrategy( 4 ) ),
-						new ArrayList<>( hashShardIds ) },
-				{
+		return Arrays.asList(
+				Arguments.of( "hash",
+						(Function<TckBackendHelper,
+								TckBackendSetupStrategy<
+										?>>) ( helper -> helper.createHashBasedShardingBackendSetupStrategy( 4 ) ),
+						new ArrayList<>( hashShardIds )
+				),
+				Arguments.of(
 						"explicit",
-						new SearchSetupHelper(
-								ignored -> ShardingExplicitIT.explicitShardingBackendSetupStrategy( explicitShardIds ) ),
-						new ArrayList<>( explicitShardIds ) }
-		};
+						(Function<TckBackendHelper,
+								TckBackendSetupStrategy<
+										?>>) ( ignored -> ShardingExplicitIT.explicitShardingBackendSetupStrategy(
+												explicitShardIds ) ),
+						new ArrayList<>( explicitShardIds )
+				)
+		);
 	}
 
 	protected final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.ofAdvanced( IndexBinding::new );
 
-	public final String strategy;
+	public String strategy;
 
-	public final SearchSetupHelper setupHelper;
+	@RegisterExtension
+	public SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	public List<String> shardIds;
 
-	@Rule
-	public final RuleChain rules;
-
-	public final List<String> shardIds;
-
-	protected AbstractSettingsPerShardIT(String strategy, SearchSetupHelper setupHelper, List<String> shardIds) {
+	protected void init(String strategy, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
+			List<String> shardIds) {
 		this.strategy = strategy;
-		this.setupHelper = setupHelper;
+		this.setupHelper.with( setupStrategyFunction );
 		this.shardIds = shardIds;
-		this.rules = RuleChain.outerRule( temporaryFolder ).around( setupHelper );
 	}
 
 	protected final String routingKey(int i) {

@@ -32,8 +32,8 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -41,8 +41,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFa
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.reflect.RuntimeHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -56,14 +56,14 @@ public abstract class AbstractMassIndexingErrorIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public ThreadSpy threadSpy = new ThreadSpy();
+	@RegisterExtension
+	public ThreadSpy threadSpy = ThreadSpy.create();
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-4218", "HSEARCH-4236" })
@@ -123,7 +123,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void indexing() {
+	void indexing() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "Indexing error";
@@ -144,7 +144,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getId() {
+	void getId() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "getId error";
@@ -167,7 +167,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getTitle() {
+	void getTitle() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "getTitle error";
@@ -189,7 +189,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void dropAndCreateSchema_exception() {
+	void dropAndCreateSchema_exception() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "DROP_AND_CREATE error";
@@ -208,7 +208,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void purge() {
+	void purge() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "PURGE error";
@@ -227,7 +227,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsBefore() {
+	void mergeSegmentsBefore() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -247,7 +247,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsAfter() {
+	void mergeSegmentsAfter() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -270,7 +270,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void flush() {
+	void flush() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "FLUSH error";
@@ -292,7 +292,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void refresh() {
+	void refresh() {
 		SessionFactory sessionFactory = setup();
 
 		String errorMessage = "REFRESH error";

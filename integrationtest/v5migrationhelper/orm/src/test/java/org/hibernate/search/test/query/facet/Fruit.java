@@ -21,7 +21,7 @@ import org.hibernate.search.annotations.Indexed;
  */
 @Entity
 @Indexed
-public class Fruit {
+class Fruit {
 	@Id
 	@GeneratedValue
 	private int id;

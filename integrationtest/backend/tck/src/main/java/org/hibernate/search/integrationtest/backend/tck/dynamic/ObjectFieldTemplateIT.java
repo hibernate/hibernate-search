@@ -21,19 +21,19 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests for object fields defined through field templates.
  */
-public class ObjectFieldTemplateIT {
+class ObjectFieldTemplateIT {
 
 	private static final String DOCUMENT_MATCHING_FOR_NESTED = "matchingNested";
 	private static final String DOCUMENT_MATCHING_FOR_ALL = "matchingForAll";
@@ -49,14 +49,14 @@ public class ObjectFieldTemplateIT {
 	private static final String FIRSTNAME_2 = "ty";
 	private static final String LASTNAME_2 = "frank";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private SimpleMappedIndex<IndexBinding> index;
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void simple() {
+	void simple() {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -104,7 +104,7 @@ public class ObjectFieldTemplateIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void inherited() {
+	void inherited() {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -153,7 +153,7 @@ public class ObjectFieldTemplateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void matchingPathGlob() {
+	void matchingPathGlob() {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -218,7 +218,7 @@ public class ObjectFieldTemplateIT {
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-4048" })
-	public void matchingPathGlob_precedence_firstDeclared() {
+	void matchingPathGlob_precedence_firstDeclared() {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -287,7 +287,7 @@ public class ObjectFieldTemplateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
-	public void matchingPathGlob_precedence_deepestDeclared() {
+	void matchingPathGlob_precedence_deepestDeclared() {
 		Consumer<IndexSchemaElement> rootTemplatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -362,7 +362,7 @@ public class ObjectFieldTemplateIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
-	public void exists_staticObjectField() {
+	void exists_staticObjectField() {
 		Consumer<IndexSchemaElement> rootTemplatesBinder = root -> {};
 		Consumer<IndexSchemaElement> staticObjectTemplatesBinder = staticObject -> {
 			staticObject.fieldTemplate( "fieldTemplate", f -> f.asString() )
@@ -425,7 +425,7 @@ public class ObjectFieldTemplateIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
-	public void exists_dynamicObjectField() {
+	void exists_dynamicObjectField() {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );

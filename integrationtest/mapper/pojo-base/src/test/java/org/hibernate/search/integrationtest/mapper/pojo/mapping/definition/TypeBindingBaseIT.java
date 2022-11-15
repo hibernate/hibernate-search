@@ -27,27 +27,27 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of the {@link TypeBinding} annotation.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3135")
-public class TypeBindingBaseIT {
+class TypeBindingBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(), backendMock );
 
@@ -55,7 +55,7 @@ public class TypeBindingBaseIT {
 	 * Basic test checking that a simple type binding will be applied as expected.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "myText", String.class )
 		);
 
@@ -89,7 +89,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void missingBinderReference() {
+	void missingBinderReference() {
 		@Indexed
 		@TypeBinding(binder = @TypeBinderRef)
 		class IndexedEntity {
@@ -108,7 +108,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_annotationMapping() {
+	void customBridge_withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "quotient", Integer.class );
 			b.field( "reminder", Integer.class );
@@ -135,7 +135,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_paramNotDefined() {
+	void customBridge_withParams_paramNotDefined() {
 		assertThatThrownBy(
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedNoParamEntity.class )
 		)
@@ -147,7 +147,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_paramDefinedTwice() {
+	void customBridge_withParams_paramDefinedTwice() {
 		assertThatThrownBy(
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedSameParamTwiceEntity.class )
 		)
@@ -161,7 +161,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParams_programmaticMapping() {
+	void customBridge_withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "quotient", Integer.class );
 			b.field( "reminder", Integer.class );

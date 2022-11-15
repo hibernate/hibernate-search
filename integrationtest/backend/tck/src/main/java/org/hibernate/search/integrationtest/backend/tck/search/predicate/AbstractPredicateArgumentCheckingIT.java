@@ -16,31 +16,24 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateArgumentCheckingIT {
 
-	private final SimpleMappedIndex<IndexBinding> index;
-	private final FieldTypeDescriptor<?> fieldType;
-
-	protected AbstractPredicateArgumentCheckingIT(SimpleMappedIndex<IndexBinding> index,
-			FieldTypeDescriptor<?> fieldType) {
-		this.index = index;
-		this.fieldType = fieldType;
-	}
-
-	@Test
-	public void nullMatchingParam() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void nullMatchingParam(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 		SearchPredicateFactory f = index.createScope().predicate();
 
-		assertThatThrownBy( () -> tryPredicateWithNullMatchingParam( f, fieldPath() ) )
+		assertThatThrownBy( () -> tryPredicateWithNullMatchingParam( f, fieldPath( index, fieldType ) ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContainingAll( "must not be null" );
 	}
 
 	protected abstract void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath);
 
-	protected String fieldPath() {
+	protected String fieldPath(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 		return index.binding().field.get( fieldType ).relativeFieldName;
 	}
 

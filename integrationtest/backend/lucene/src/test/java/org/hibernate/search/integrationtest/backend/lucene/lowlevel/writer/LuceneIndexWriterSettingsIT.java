@@ -22,13 +22,13 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.LoggerInfoStream;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -36,16 +36,16 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.util.InfoStream;
 
-public class LuceneIndexWriterSettingsIT {
+class LuceneIndexWriterSettingsIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3776")
-	public void defaults() {
+	void defaults() {
 		setup( properties -> {} );
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
@@ -100,7 +100,7 @@ public class LuceneIndexWriterSettingsIT {
 	@TestForIssue(jiraKey = "HSEARCH-3776")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.configuration.LuceneIndexingParametersTest.testSpecificTypeParametersOverride")
-	public void custom() {
+	void custom() {
 		setup( properties -> {
 			properties.accept( LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" );
 			properties.accept( LuceneIndexSettings.IO_WRITER_RAM_BUFFER_SIZE, "420" );

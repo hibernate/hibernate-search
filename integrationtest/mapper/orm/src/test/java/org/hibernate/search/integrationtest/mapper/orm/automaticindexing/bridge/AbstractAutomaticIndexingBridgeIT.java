@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +30,12 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * An abstract base for tests dealing with automatic indexing based on Hibernate ORM entity events when
@@ -43,14 +43,14 @@ import org.junit.Test;
  */
 public abstract class AbstractAutomaticIndexingBridgeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void directPersistUpdateDelete() {
+	void directPersistUpdateDelete() {
 		SessionFactory sessionFactory = setupWithTypeBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -100,7 +100,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_typeBridge() {
+	void indirectAssociationUpdate_typeBridge() {
 		SessionFactory sessionFactory = setupWithTypeBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -218,7 +218,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectValueUpdate_typeBridge() {
+	void indirectValueUpdate_typeBridge() {
 		SessionFactory sessionFactory = setupWithTypeBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -302,7 +302,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	@Test
-	public void indirectAssociationUpdate_singleValuedPropertyBridge() {
+	void indirectAssociationUpdate_singleValuedPropertyBridge() {
 		SessionFactory sessionFactory = setupWithSingleValuedPropertyBridge();
 
 		with( sessionFactory ).runInTransaction( session -> {
@@ -677,8 +677,8 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		PropertyBinder binder = createContainingEntityMultiValuedPropertyBinder();
 
 		assumeTrue(
-				"Multi-valued property bridges must be supported",
-				binder != null
+				binder != null,
+				"Multi-valued property bridges must be supported"
 		);
 
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b

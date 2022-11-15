@@ -11,15 +11,15 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class NotPredicateSpecificsIT {
+class NotPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -49,27 +49,27 @@ public class NotPredicateSpecificsIT {
 	private static final Integer FIELD4_VALUE3 = 42_000; // Different from document 1
 	private static final Integer FIELD5_VALUE3 = 142_000; // Different from document 1
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void notMatchAll() {
+	void notMatchAll() {
 		assertThatQuery( index.query()
 				.where( f -> f.not( f.matchAll() ) ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void notMatchNone() {
+	void notMatchNone() {
 		assertThatQuery( index.query()
 				.where( f -> f.not( f.matchNone() ) ) )
 				.hasTotalHitCount( 3 )
@@ -77,7 +77,7 @@ public class NotPredicateSpecificsIT {
 	}
 
 	@Test
-	public void notMatchSpecificValue() {
+	void notMatchSpecificValue() {
 		assertThatQuery( index.query()
 				.where( f -> f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) )
 				.hasTotalHitCount( 2 )
@@ -85,7 +85,7 @@ public class NotPredicateSpecificsIT {
 	}
 
 	@Test
-	public void mustWithNotInside() {
+	void mustWithNotInside() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool().must( f.not( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) ) ) ) )
 				.hasTotalHitCount( 2 )
@@ -93,7 +93,7 @@ public class NotPredicateSpecificsIT {
 	}
 
 	@Test
-	public void manyNestedNot() {
+	void manyNestedNot() {
 		SearchPredicateFactory f = index.createScope().predicate();
 
 		assertThatQuery( index.query()
@@ -115,7 +115,7 @@ public class NotPredicateSpecificsIT {
 	}
 
 	@Test
-	public void combinationOfMustMustNotAndNestedNot() {
+	void combinationOfMustMustNotAndNestedNot() {
 		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						.must( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )

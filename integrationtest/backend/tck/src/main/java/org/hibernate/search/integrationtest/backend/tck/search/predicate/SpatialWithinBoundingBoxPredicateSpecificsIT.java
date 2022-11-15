@@ -11,9 +11,9 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SpatialWithinBoundingBoxPredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
+class SpatialWithinBoundingBoxPredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final GeoBoundingBox BOUNDING_BOX_1 = GeoBoundingBox.of(
 			GeoPoint.of( 45.785889, 4.819749 ),
@@ -32,7 +32,7 @@ public class SpatialWithinBoundingBoxPredicateSpecificsIT extends AbstractSpatia
 	private static final GeoPoint ADDITIONAL_POINT_2_GEO_POINT = GeoPoint.of( 24.5, 23.5 );
 
 	@Test
-	public void matchMultipleDocuments() {
+	void matchMultipleDocuments() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -55,7 +55,7 @@ public class SpatialWithinBoundingBoxPredicateSpecificsIT extends AbstractSpatia
 	}
 
 	@Test
-	public void consistency() {
+	void consistency() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.spatial().within().field( "geoPoint" )
 						.boundingBox( GeoBoundingBox.of( GeoPoint.of( 25, 23 ), GeoPoint.of( 24, 26 ) ) ) ) )

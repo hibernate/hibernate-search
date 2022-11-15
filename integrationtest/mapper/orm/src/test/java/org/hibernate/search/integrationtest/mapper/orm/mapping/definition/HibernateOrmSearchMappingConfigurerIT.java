@@ -14,23 +14,23 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmSearchMappingConfigurerIT {
+class HibernateOrmSearchMappingConfigurerIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void none() {
+	void none() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 		);
@@ -41,7 +41,7 @@ public class HibernateOrmSearchMappingConfigurerIT {
 	}
 
 	@Test
-	public void single() {
+	void single() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 				.field( "nonAnnotationMapped1", String.class )
@@ -65,7 +65,7 @@ public class HibernateOrmSearchMappingConfigurerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4594")
-	public void multiple() {
+	void multiple() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 				.field( "nonAnnotationMapped1", String.class )

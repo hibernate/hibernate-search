@@ -28,13 +28,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test everything related to the search query itself.
@@ -42,19 +42,19 @@ import org.junit.Test;
  * Does not test sorts and predicates, or other features that only involve the backend.
  * Those should be tested in the backend integration tests.
  */
-public class SearchQueryBaseIT {
+class SearchQueryBaseIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Book.NAME );
 		backendMock.expectAnySchema( Author.NAME );
 
@@ -66,7 +66,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_singleType() {
+	void target_byClass_singleType() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = searchSession.search( Book.class )
 					.selectEntityReference()
@@ -93,7 +93,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_multipleTypes() {
+	void target_byClass_multipleTypes() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
 					.selectEntityReference()
@@ -118,7 +118,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_invalidClass() {
+	void target_byClass_invalidClass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			Class<?> invalidClass = String.class;
 

@@ -28,14 +28,14 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of (custom) routing bridges.
@@ -45,19 +45,19 @@ import org.junit.Test;
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3108")
-public class RoutingBridgeBaseIT {
+class RoutingBridgeBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void invalidTypeForRoutingBridge() {
+	void invalidTypeForRoutingBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -80,7 +80,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void currentRoute_missing() {
+	void currentRoute_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -140,7 +140,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void previousRoutes_missing() {
+	void previousRoutes_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -215,7 +215,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void currentRoute_multiple() {
+	void currentRoute_multiple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -275,7 +275,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void accessors() {
+	void accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -354,7 +354,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void accessors_incompatibleRequestedType() {
+	void accessors_incompatibleRequestedType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -385,7 +385,7 @@ public class RoutingBridgeBaseIT {
 	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
 	 */
 	@Test
-	public void explicitDependencies() {
+	void explicitDependencies() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -463,7 +463,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void explicitDependencies_error_invalidProperty() {
+	void explicitDependencies_error_invalidProperty() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -488,7 +488,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void missingDependencyDeclaration() {
+	void missingDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -515,7 +515,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void inconsistentDependencyDeclaration() {
+	void inconsistentDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -544,7 +544,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void useRootOnly() {
+	void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -640,7 +640,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_annotationMapping() {
+	void params_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -657,7 +657,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_paramNotDefined() {
+	void params_paramNotDefined() {
 		assertThatThrownBy(
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedNoParamEntity.class )
 		)
@@ -669,7 +669,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_paramDefinedTwice() {
+	void params_paramDefinedTwice() {
 		assertThatThrownBy(
 				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedSameParamTwiceEntity.class )
 		)
@@ -683,7 +683,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void params_programmaticMapping() {
+	void params_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {} );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.withConfiguration( builder -> {

@@ -12,86 +12,87 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateScoreIT {
-	private final StubMappedIndex index;
-	private final AbstractPredicateDataSet dataSet;
 
-	public AbstractPredicateScoreIT(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
-		this.index = index;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void predicateLevelBoost() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void predicateLevelBoost(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
 		assertThatQuery( index.query()
 				.where( f -> f.or(
-						predicate( f, 0 ),
-						predicateWithBoost( f, 1, 7f ) ) )
+						predicate( f, 0, dataSet, index ),
+						predicateWithBoost( f, 1, 7f, dataSet, index ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
 				.where( f -> f.or(
-						predicateWithBoost( f, 0, 39f ),
-						predicate( f, 1 ) ) )
+						predicateWithBoost( f, 0, 39f, dataSet, index ),
+						predicate( f, 1, dataSet, index ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void constantScore() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void constantScore(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
 		assumeConstantScoreSupported();
 
 		assertThatQuery( index.query()
 				.where( f -> f.or(
 						// Very low boost, so score << 1
-						predicateWithBoost( f, 0, 0.01f ),
+						predicateWithBoost( f, 0, 0.01f, dataSet, index ),
 						// Constant score, so score = 1
-						predicateWithConstantScore( f, 1 ) ) )
+						predicateWithConstantScore( f, 1, dataSet, index ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
 				.where( f -> f.or(
 						// Constant score, so score = 1
-						predicateWithConstantScore( f, 0 ),
+						predicateWithConstantScore( f, 0, dataSet, index ),
 						// Very low boost, so score << 1
-						predicateWithBoost( f, 1, 0.01f ) ) )
+						predicateWithBoost( f, 1, 0.01f, dataSet, index ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void constantScore_predicateLevelBoost() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void constantScore_predicateLevelBoost(StubMappedIndex index, AbstractPredicateDataSet dataSet) {
 		assumeConstantScoreSupported();
 
 		assertThatQuery( index.query()
 				.where( f -> f.or(
-						predicateWithConstantScoreAndBoost( f, 0, 7f ),
-						predicateWithConstantScoreAndBoost( f, 1, 39f ) ) )
+						predicateWithConstantScoreAndBoost( f, 0, 7f, dataSet, index ),
+						predicateWithConstantScoreAndBoost( f, 1, 39f, dataSet, index ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 1 ), dataSet.docId( 0 ) );
 
 		assertThatQuery( index.query()
 				.where( f -> f.or(
-						predicateWithConstantScoreAndBoost( f, 0, 39f ),
-						predicateWithConstantScoreAndBoost( f, 1, 7f ) ) )
+						predicateWithConstantScoreAndBoost( f, 0, 39f, dataSet, index ),
+						predicateWithConstantScoreAndBoost( f, 1, 7f, dataSet, index ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal);
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+			AbstractPredicateDataSet dataSet, StubMappedIndex index);
 
 	protected abstract PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
-			float boost);
+			float boost, AbstractPredicateDataSet dataSet,
+			StubMappedIndex index);
 
 	protected abstract PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f,
-			int matchingDocOrdinal);
+			int matchingDocOrdinal, AbstractPredicateDataSet dataSet,
+			StubMappedIndex index);
 
 	protected abstract PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
-			int matchingDocOrdinal, float boost);
+			int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
+			StubMappedIndex index);
 
 	protected void assumeConstantScoreSupported() {
 		// By default we assume constant score IS supported.

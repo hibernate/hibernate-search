@@ -18,15 +18,15 @@ import org.hibernate.search.engine.Version;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.SystemHelper;
 import org.hibernate.search.util.impl.test.SystemHelper.SystemPropertyRestorer;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -40,7 +40,7 @@ import org.hamcrest.TypeSafeMatcher;
  * but at least we will be aware if a warning or error is logged on every boot.
  */
 @TestForIssue(jiraKey = "HSEARCH-3644")
-public class BootstrapLogsIT {
+class BootstrapLogsIT {
 
 	private static final Pattern CONNECTION_POOL_WARNING_PATTERN = Pattern.compile(
 			"CachingRegionFactory should be only used for testing"
@@ -53,17 +53,17 @@ public class BootstrapLogsIT {
 					+ "||^GenerationTarget encountered exception accepting command:.*"
 	);
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void noSuspiciousLogEvents() {
+	void noSuspiciousLogEvents() {
 		logged.expectEvent( suspiciousLogEventMatcher() )
 				.never(); // Also fails if a higher severity event (e.g. error) is logged
 
@@ -75,7 +75,7 @@ public class BootstrapLogsIT {
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void version() {
+	void version() {
 		if ( Version.versionString().equals( "UNKNOWN" ) ) {
 			throw new IllegalStateException( "Tests seem to be running from an IDE,"
 					+ " or the code was compiled by an IDE."
@@ -106,7 +106,7 @@ public class BootstrapLogsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4503")
-	public void versionLoggingDisabled() {
+	void versionLoggingDisabled() {
 		String propertyKey = "org.hibernate.search.version";
 		String expectedHibernateSearchVersion = System.getProperty( propertyKey );
 		if ( expectedHibernateSearchVersion == null ) {

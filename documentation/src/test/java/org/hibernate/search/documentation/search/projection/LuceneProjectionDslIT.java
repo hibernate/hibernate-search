@@ -20,14 +20,14 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
-public class LuceneProjectionDslIT {
+class LuceneProjectionDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -38,19 +38,19 @@ public class LuceneProjectionDslIT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
 
 	@Test
-	public void document() {
+	void document() {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-document[]
 			List<Document> hits = searchSession.search( Book.class )
@@ -64,7 +64,7 @@ public class LuceneProjectionDslIT {
 	}
 
 	@Test
-	public void explanation() {
+	void explanation() {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-explanation[]
 			List<Explanation> hits = searchSession.search( Book.class )

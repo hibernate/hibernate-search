@@ -89,8 +89,9 @@
                                 <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
                             <excludes>
-                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.ElasticsearchSchemaManagerExporterIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.ElasticsearchBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.LuceneBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -109,8 +110,9 @@
                                 <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
                             <excludes>
-                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
                                 <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.schema.management.LuceneSchemaManagerExporterIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.ElasticsearchBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.LuceneBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -123,7 +125,8 @@
                             <skip>${test.multiplebackends.skip}</skip>
                             <reportNameSuffix>${surefire.reportNameSuffix}-multiplebackends</reportNameSuffix>
                             <includes>
-                                <include>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.BackendTypeAutoDetectMultipleBackendTypesInClasspathIT</include>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.ElasticsearchBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
+                                <exclude>org.hibernate.search.integrationtest.mapper.orm.realbackend.bootstrap.LuceneBackendTypeAutoDetectMultipleBackendTypesInClasspathIT</exclude>
                             </includes>
                         </configuration>
                     </execution>

@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.schema.management.strat
 
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 
-public class SchemaManagementStrategyDefaultIT extends SchemaManagementStrategyCreateOrValidateIT {
+class SchemaManagementStrategyDefaultIT extends SchemaManagementStrategyCreateOrValidateIT {
 
 	@Override
 	protected SchemaManagementStrategyName getStrategyName() {

@@ -10,23 +10,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to field templates when validating indexes,
@@ -35,29 +36,23 @@ import org.junit.runners.Parameterized;
  * These tests are more specific than {@link ElasticsearchIndexSchemaManagerValidationMappingBaseIT}
  * and focus on field templates.
  */
-@RunWith(Parameterized.class)
-public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
+class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
-		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
-
-	public ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT(
-			ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
 					.matchingPathGlob( "*_t1" );
@@ -96,11 +91,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		setupAndValidate( index );
+		setupAndValidate( index, operation );
 	}
 
-	@Test
-	public void missing() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -126,15 +122,16 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate2" )
 						.failure( "Missing dynamic field template" ) );
 	}
 
-	@Test
-	public void extra() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -168,15 +165,16 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "extraTemplate" )
 						.failure( "Unexpected dynamic field template" ) );
 	}
 
-	@Test
-	public void wrongOrder() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void wrongOrder(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
@@ -206,7 +204,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.failure(
@@ -216,8 +214,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						) );
 	}
 
-	@Test
-	public void duplicate() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void duplicate(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
 		} );
@@ -241,7 +240,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate1" )
@@ -251,8 +250,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						) );
 	}
 
-	@Test
-	public void attribute_pathMatch_missing() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_pathMatch_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
@@ -273,7 +273,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -281,8 +281,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected '*_suffix', actual is 'null'" ) );
 	}
 
-	@Test
-	public void attribute_pathMatch_invalid() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_pathMatch_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
@@ -304,7 +305,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -312,8 +313,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected '*_suffix', actual is '*_suffix2'" ) );
 	}
 
-	@Test
-	public void attribute_pathMatch_extra() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_pathMatch_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -333,7 +335,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -341,8 +343,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected '*', actual is '*_suffix'" ) );
 	}
 
-	@Test
-	public void attribute_matchMappingType_missing() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_matchMappingType_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
@@ -362,7 +365,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -370,8 +373,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected 'object', actual is 'null'" ) );
 	}
 
-	@Test
-	public void attribute_matchMappingType_invalid() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_matchMappingType_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
@@ -392,7 +396,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -400,8 +404,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected 'object', actual is 'long'" ) );
 	}
 
-	@Test
-	public void attribute_matchMappingType_extra() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_matchMappingType_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -422,7 +427,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -430,8 +435,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected 'null', actual is 'long'" ) );
 	}
 
-	@Test
-	public void attribute_extra() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void attribute_extra(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -452,7 +458,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -460,8 +466,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected 'null', actual is '\"*_suffix\"'" ) );
 	}
 
-	@Test
-	public void mapping_invalid() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void mapping_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.fieldTemplate( "myTemplate", f -> f.asString() );
 		} );
@@ -481,7 +488,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( index ) )
+		assertThatThrownBy( () -> setupAndValidate( index, operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldTemplateContext( "myTemplate" )
@@ -490,7 +497,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.failure( "Invalid value. Expected 'keyword', actual is 'integer'" ) );
 	}
 
-	private void setupAndValidate(StubMappedIndex index) {
+	private void setupAndValidate(StubMappedIndex index, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

@@ -15,20 +15,20 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Highlightable;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IncompatibleCombinationHighlighterIT {
+class IncompatibleCombinationHighlighterIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
-	public void incompatibleHighlightableConfiguration() {
+	void incompatibleHighlightableConfiguration() {
 		class IncompatibleTypeIndexBinding {
 			final IndexFieldReference<String> stringField;
 
@@ -52,7 +52,7 @@ public class IncompatibleCombinationHighlighterIT {
 	}
 
 	@Test
-	public void incompatibleHighlighter() {
+	void incompatibleHighlighter() {
 		class IncompatibleTypeIndexBinding {
 			final IndexFieldReference<String> stringField;
 

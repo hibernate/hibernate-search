@@ -12,14 +12,14 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MatchNonePredicateSpecificsIT {
+class MatchNonePredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String STRING_1 = "aaa";
@@ -30,27 +30,27 @@ public class MatchNonePredicateSpecificsIT {
 	private static final String DOCUMENT_3 = "3";
 	private static final String STRING_3 = "ccc";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void matchNone() {
+	void matchNone() {
 		assertThatQuery( index.query()
 				.where( SearchPredicateFactory::matchNone ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void matchNoneWithinBoolPredicate() {
+	void matchNoneWithinBoolPredicate() {
 		//check that we will find something with a single match predicate
 		assertThatQuery( index.query()
 				.where(

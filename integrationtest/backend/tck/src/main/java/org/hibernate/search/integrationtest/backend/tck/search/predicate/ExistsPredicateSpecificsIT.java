@@ -7,8 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,23 +26,22 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class ExistsPredicateSpecificsIT<F> {
+class ExistsPredicateSpecificsIT<F> {
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypesWithDocValues = new ArrayList<>();
 	private static final List<DataSet<?>> dataSets = new ArrayList<>();
-	private static final List<Object[]> parameters = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 	static {
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 			if ( fieldType.isFieldSortSupported() ) {
@@ -50,25 +49,24 @@ public class ExistsPredicateSpecificsIT<F> {
 			}
 			DataSet<?> dataSet = new DataSet<>( fieldType );
 			dataSets.add( dataSet );
-			parameters.add( new Object[] { dataSet } );
+			parameters.add( Arguments.of( dataSet ) );
 		}
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> parameters() {
+	public static List<? extends Arguments> params() {
 		return parameters;
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new )
 			.name( "main" );
 	private static final SimpleMappedIndex<DifferentTypeIndexBinding> differentFieldTypeIndex =
 			SimpleMappedIndex.of( DifferentTypeIndexBinding::new ).name( "differentFieldType" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( mainIndex, differentFieldTypeIndex ).setup();
 
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer();
@@ -77,18 +75,13 @@ public class ExistsPredicateSpecificsIT<F> {
 		mainIndexer.join( differentFieldTypeIndexer );
 	}
 
-	private final DataSet<F> dataSet;
-
-	public ExistsPredicateSpecificsIT(DataSet<F> dataSet) {
-		this.dataSet = dataSet;
-	}
-
 	/**
 	 * There's no such thing as a "missing" predicate,
 	 * but let's check that negating the "exists" predicate works as intended.
 	 */
-	@Test
-	public void missing() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void missing(DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
 		assertThatQuery( mainIndex.query()
@@ -101,9 +94,10 @@ public class ExistsPredicateSpecificsIT<F> {
 	 * Fields with docvalues may be optimized and use a different Lucene query.
 	 * Make sure to test the optimization as well.
 	 */
-	@Test
-	public void withDocValues() {
-		assumeDocValuesAllowed();
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withDocValues(DataSet<F> dataSet) {
+		assumeDocValuesAllowed( dataSet );
 
 		String fieldPath = mainIndex.binding().fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
 
@@ -113,9 +107,10 @@ public class ExistsPredicateSpecificsIT<F> {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void inFlattenedObject_withDocValues() {
-		assumeDocValuesAllowed();
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void inFlattenedObject_withDocValues(DataSet<F> dataSet) {
+		assumeDocValuesAllowed( dataSet );
 
 		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "."
 				+ mainIndex.binding().flattenedObject.fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
@@ -126,9 +121,10 @@ public class ExistsPredicateSpecificsIT<F> {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void inNestedObject_withDocValues() {
-		assumeDocValuesAllowed();
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void inNestedObject_withDocValues(DataSet<F> dataSet) {
+		assumeDocValuesAllowed( dataSet );
 
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
 				+ mainIndex.binding().nestedObject.fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
@@ -143,8 +139,9 @@ public class ExistsPredicateSpecificsIT<F> {
 	 * If we require a field not to exist in a nested object,
 	 * a document will match if *any* of its nested objects lacks the field.
 	 */
-	@Test
-	public void inNestedPredicate_missing() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void inNestedPredicate_missing(DataSet<F> dataSet) {
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
 				+ mainIndex.binding().nestedObject.fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
@@ -160,10 +157,13 @@ public class ExistsPredicateSpecificsIT<F> {
 	 * The "exists" predicate can work with indexes whose underlying field has a different type,
 	 * provided the implementation of the exists predicate is the same (i.e. docValues, norms, ...).
 	 */
-	@Test
-	public void multiIndex_differentFieldType() {
-		assumeFalse( "This test is only relevant if the field type does not use norms",
-				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE ) );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_differentFieldType(DataSet<F> dataSet) {
+		assumeFalse(
+				dataSet.fieldType.equals( AnalyzedStringFieldTypeDescriptor.INSTANCE ),
+				"This test is only relevant if the field type does not use norms"
+		);
 
 		StubMappingScope scope = mainIndex.createScope( differentFieldTypeIndex );
 
@@ -183,9 +183,10 @@ public class ExistsPredicateSpecificsIT<F> {
 	 * The "exists" predicate can work with indexes whose underlying field has a different type,
 	 * provided the implementation of the exists predicate is the same (i.e. docValues, norms, ...).
 	 */
-	@Test
-	public void multiIndex_differentFieldType_withDocValues() {
-		assumeDocValuesAllowed();
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_differentFieldType_withDocValues(DataSet<F> dataSet) {
+		assumeDocValuesAllowed( dataSet );
 
 		StubMappingScope scope = mainIndex.createScope( differentFieldTypeIndex );
 
@@ -201,9 +202,11 @@ public class ExistsPredicateSpecificsIT<F> {
 				} );
 	}
 
-	private void assumeDocValuesAllowed() {
-		assumeTrue( "This test is only relevant if the field type supports doc values",
-				supportedFieldTypesWithDocValues.contains( dataSet.fieldType ) );
+	private void assumeDocValuesAllowed(DataSet<F> dataSet) {
+		assumeTrue(
+				supportedFieldTypesWithDocValues.contains( dataSet.fieldType ),
+				"This test is only relevant if the field type supports doc values"
+		);
 	}
 
 	private static class IndexBinding {

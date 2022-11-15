@@ -8,8 +8,8 @@ package org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone;
 
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.MappingAssertionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
 
 public class StandalonePojoAssertionHelper extends MappingAssertionHelper<SearchMapping> {
 	public StandalonePojoAssertionHelper(BackendConfiguration backendConfiguration) {

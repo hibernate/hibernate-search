@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.integrationtest.jakarta.batch.component;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -124,13 +123,13 @@ public class HibernateSearchPartitionMapperComponentIT {
 			 * since the value of rowsPerPartition is lower than the static default for checkpoint interval.
 			 */
 			String checkpointInterval = p.getProperty( MassIndexingPartitionProperties.CHECKPOINT_INTERVAL );
-			assertNotNull( checkpointInterval );
-			assertEquals( "3", checkpointInterval );
+			assertThat( checkpointInterval ).isNotNull();
+			assertThat( checkpointInterval ).isEqualTo( "3" );
 		}
 
 		// nbPartitions = rows / rowsPerPartition
-		assertEquals( 1, compPartitions ); // 3 / 3 => 1 partition
-		assertEquals( 3, persPartitions ); // 8 / 3 => 3 partitions
+		assertThat( compPartitions ).isEqualTo( 1 ); // 3 / 3 => 1 partition
+		assertThat( persPartitions ).isEqualTo( 3 ); // 8 / 3 => 3 partitions
 	}
 
 	@Test

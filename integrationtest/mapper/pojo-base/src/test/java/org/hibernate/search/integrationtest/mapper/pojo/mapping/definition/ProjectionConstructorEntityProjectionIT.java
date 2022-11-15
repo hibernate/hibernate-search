@@ -28,21 +28,21 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorEntityProjectionIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	protected final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
-	public void persistEntities() {
+	@BeforeEach
+	void persistEntities() {
 		loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY )
 				.put( 1, new IndexedEntity( 1, new Contained( 11 ) ) );
 		loadingContext.persistenceMap( IndexedEntity.PERSISTENCE_KEY )
@@ -52,7 +52,7 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void noArg() {
+	void noArg() {
 		class MyProjection {
 			public final IndexedEntity entity;
 
@@ -88,7 +88,7 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void supertype() {
+	void supertype() {
 		class MyProjection {
 			public final Object entity;
 
@@ -124,7 +124,7 @@ public class ProjectionConstructorEntityProjectionIT extends AbstractProjectionC
 	}
 
 	@Test
-	public void invalidType() {
+	void invalidType() {
 		class MyProjection {
 			public final Integer entity;
 

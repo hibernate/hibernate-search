@@ -42,16 +42,16 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -68,15 +68,15 @@ public abstract class AbstractMassIndexingFailureIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public ThreadSpy threadSpy = new ThreadSpy();
+	@RegisterExtension
+	public ThreadSpy threadSpy = ThreadSpy.create();
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
@@ -86,7 +86,7 @@ public abstract class AbstractMassIndexingFailureIT {
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-4218", "HSEARCH-4236" })
-	public void identifierLoading() {
+	void identifierLoading() {
 		String exceptionMessage = "ID loading error";
 
 		SearchMapping mapping = setupWithThrowingIdentifierLoading( exceptionMessage );
@@ -119,13 +119,13 @@ public abstract class AbstractMassIndexingFailureIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4236")
-	public void entityLoading() {
+	void entityLoading() {
 		entityLoading( Optional.empty() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4236")
-	public void entityLoadingWithFailureFloodingThreshold() {
+	void entityLoadingWithFailureFloodingThreshold() {
 		entityLoading( Optional.of( FAILURE_FLOODING_THRESHOLD ) );
 	}
 
@@ -186,7 +186,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void indexing() {
+	void indexing() {
 		SearchMapping mapping = setup();
 
 		String entityName = Book.NAME;
@@ -224,7 +224,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void getId() {
+	void getId() {
 		SearchMapping mapping = setup();
 
 		String entityName = Book.NAME;
@@ -265,7 +265,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void getTitle() {
+	void getTitle() {
 		SearchMapping mapping = setup();
 
 		String entityName = Book.NAME;
@@ -306,7 +306,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void dropAndCreateSchema_exception() {
+	void dropAndCreateSchema_exception() {
 		SearchMapping mapping = setup();
 
 		String exceptionMessage = "DROP_AND_CREATE failure";
@@ -329,7 +329,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void purge() {
+	void purge() {
 		SearchMapping mapping = setup();
 
 		String exceptionMessage = "PURGE failure";
@@ -355,7 +355,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void mergeSegmentsBefore() {
+	void mergeSegmentsBefore() {
 		SearchMapping mapping = setup();
 
 		String exceptionMessage = "MERGE_SEGMENTS failure";
@@ -382,7 +382,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void mergeSegmentsAfter() {
+	void mergeSegmentsAfter() {
 		SearchMapping mapping = setup();
 
 		String exceptionMessage = "MERGE_SEGMENTS failure";
@@ -412,7 +412,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void flush() {
+	void flush() {
 		SearchMapping mapping = setup();
 
 		String exceptionMessage = "FLUSH failure";
@@ -441,7 +441,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void refresh() {
+	void refresh() {
 		SearchMapping mapping = setup();
 
 		String exceptionMessage = "REFRESH failure";
@@ -471,7 +471,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void indexingAndFlush() {
+	void indexingAndFlush() {
 		SearchMapping mapping = setup();
 
 		String entityName = Book.NAME;
@@ -519,7 +519,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
-	public void indexingAndRefresh() {
+	void indexingAndRefresh() {
 		SearchMapping mapping = setup();
 
 		String entityName = Book.NAME;

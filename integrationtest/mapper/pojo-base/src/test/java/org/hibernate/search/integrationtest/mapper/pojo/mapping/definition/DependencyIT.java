@@ -22,26 +22,26 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @SuppressWarnings("unused")
-public class DependencyIT {
+class DependencyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void associationInverseSide_error_missingInversePath() {
+	void associationInverseSide_error_missingInversePath() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -67,7 +67,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void derivedFrom() {
+	void derivedFrom() {
 		final String indexName = "index1";
 		@Indexed(index = indexName)
 		class IndexedEntity {
@@ -129,7 +129,7 @@ public class DependencyIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4148")
-	public void derivedFrom_polymorphism() {
+	void derivedFrom_polymorphism() {
 		final String index1Name = "index1Name";
 		final String index2Name = "index2Name";
 		@Indexed
@@ -274,7 +274,7 @@ public class DependencyIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4148")
-	public void derivedFrom_nonRoot_polymorphism() {
+	void derivedFrom_nonRoot_polymorphism() {
 		final String indexName = "indexName";
 		class Model {
 			@Indexed(index = indexName)
@@ -443,7 +443,7 @@ public class DependencyIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4148")
-	public void derivedFrom_nonRoot_polymorphism_prevervesGenerics() {
+	void derivedFrom_nonRoot_polymorphism_prevervesGenerics() {
 		final String indexName = "indexName";
 		class Model {
 			@Indexed(index = indexName)
@@ -591,7 +591,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void derivedFrom_error_missingPath() {
+	void derivedFrom_error_missingPath() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -618,7 +618,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void derivedFrom_error_invalidPath() {
+	void derivedFrom_error_invalidPath() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -642,7 +642,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void derivedFrom_error_cycle() {
+	void derivedFrom_error_cycle() {
 		class DerivedFromCycle {
 			@Indexed
 			class A {
@@ -713,7 +713,7 @@ public class DependencyIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4565")
-	public void derivedFrom_error_cycle_buried() {
+	void derivedFrom_error_cycle_buried() {
 		class DerivedFromCycle {
 			@Indexed
 			class Zero {
@@ -798,7 +798,7 @@ public class DependencyIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4423")
-	public void derivedFrom_cycleFalsePositive() {
+	void derivedFrom_cycleFalsePositive() {
 		final String indexName = "myindex";
 		class DerivedFromCycle {
 			@Indexed(index = indexName)
@@ -846,7 +846,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void error_cannotInvertAssociation() {
+	void error_cannotInvertAssociation() {
 		class CannotInvertAssociation {
 			@Indexed
 			class A {
@@ -894,7 +894,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void error_cannotApplyInvertAssociationPath_propertyNotFound() {
+	void error_cannotApplyInvertAssociationPath_propertyNotFound() {
 		class CannotApplyInvertAssociationPath {
 			@Indexed
 			class A {
@@ -935,7 +935,7 @@ public class DependencyIT {
 	}
 
 	@Test
-	public void error_cannotApplyInvertAssociationPath_incorrectTargetTypeForInverseAssociation() {
+	void error_cannotApplyInvertAssociationPath_incorrectTargetTypeForInverseAssociation() {
 		class CannotApplyInvertAssociationPath {
 			@Indexed
 			class A {

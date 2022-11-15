@@ -22,28 +22,28 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IndexNullAsValueIT {
+class IndexNullAsValueIT {
 
 	private static final String DOCUMENT_WITH_INDEX_NULL_AS_VALUES = "documentWithIndexNullAsValues";
 	private static final String DOCUMENT_WITH_DIFFERENT_VALUES = "documentWithDifferentValues";
 	private static final String DOCUMENT_WITH_NULL_VALUES = "documentWithNullValues";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void indexNullAsValue_match() {
+	void indexNullAsValue_match() {
 		setUp();
 		StubMappingScope scope = index.createScope();
 
@@ -61,7 +61,7 @@ public class IndexNullAsValueIT {
 	}
 
 	@Test
-	public void indexNullAsValue_spatial() {
+	void indexNullAsValue_spatial() {
 		setUp();
 		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.spatial().within().field( "geoPointField" ).circle( GeoPoint.of( 0.0, 0.0 ), 1 ) )
@@ -72,7 +72,7 @@ public class IndexNullAsValueIT {
 	}
 
 	@Test
-	public void indexNullAsValue_fullText() {
+	void indexNullAsValue_fullText() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( StubMappedIndex.ofNonRetrievable(
 						root -> root.field(

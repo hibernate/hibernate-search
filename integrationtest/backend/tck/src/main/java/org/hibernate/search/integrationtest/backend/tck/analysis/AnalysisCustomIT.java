@@ -20,14 +20,14 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test indexing and searching with custom analyzer definitions.
@@ -83,14 +83,14 @@ public class AnalysisCustomIT {
 		}
 	}
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper =
-			new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
+			SearchSetupHelper.create( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
 
 	private SimpleMappedIndex<IndexBinding> index;
 
 	@Test
-	public void normalizer_keyword() {
+	void normalizer_keyword() {
 		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_NOOP );
 		initData( b -> {
 			b.emptyDocument( "empty" );
@@ -113,7 +113,7 @@ public class AnalysisCustomIT {
 	}
 
 	@Test
-	public void normalizer_lowercase() {
+	void normalizer_lowercase() {
 		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_LOWERCASE );
 		initData( b -> {
 			b.emptyDocument( "empty" );
@@ -138,7 +138,7 @@ public class AnalysisCustomIT {
 	}
 
 	@Test
-	public void normalizer_pattern_replacing() {
+	void normalizer_pattern_replacing() {
 		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING );
 		initData( b -> {
 			b.emptyDocument( "empty" );
@@ -161,7 +161,7 @@ public class AnalysisCustomIT {
 	}
 
 	@Test
-	public void analyzer_keyword() {
+	void analyzer_keyword() {
 		setupWithAnalyzer( AnalysisDefinitions.ANALYZER_NOOP );
 		initData( b -> {
 			b.emptyDocument( "empty" );
@@ -184,7 +184,7 @@ public class AnalysisCustomIT {
 	}
 
 	@Test
-	public void analyzer_whitespace_lowercase() {
+	void analyzer_whitespace_lowercase() {
 		setupWithAnalyzer( AnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE );
 		initData( b -> {
 			b.emptyDocument( "empty" );
@@ -211,7 +211,7 @@ public class AnalysisCustomIT {
 	}
 
 	@Test
-	public void analyzer_patterns_stopword() {
+	void analyzer_patterns_stopword() {
 		setupWithAnalyzer( AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD );
 		initData( b -> {
 			b.emptyDocument( "empty" );

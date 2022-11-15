@@ -29,12 +29,12 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test default value bridges for the {@code @GenericField} annotation.
@@ -50,10 +50,10 @@ public abstract class AbstractFieldContainerExtractorIT {
 	static final String STRING_VALUE_5 = "5 - Let's stop strings?";
 	static final String STRING_VALUE_6 = "6 - The last string";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -64,7 +64,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void objectArray() {
+	void objectArray() {
 		doTest(
 				testModelProvider.objectArray(),
 				String.class, true,
@@ -75,7 +75,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void booleanArray() {
+	void booleanArray() {
 		doTest(
 				testModelProvider.booleanArray(),
 				Boolean.class, true,
@@ -86,7 +86,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void charArray() {
+	void charArray() {
 		doTest(
 				testModelProvider.charArray(),
 				String.class, true, // The Character bridge maps them as Strings
@@ -97,7 +97,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void byteArray() {
+	void byteArray() {
 		doTest(
 				testModelProvider.byteArray(),
 				Byte.class, true,
@@ -108,7 +108,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void shortArray() {
+	void shortArray() {
 		doTest(
 				testModelProvider.shortArray(),
 				Short.class, true,
@@ -119,7 +119,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void intArray() {
+	void intArray() {
 		doTest(
 				testModelProvider.intArray(),
 				Integer.class, true,
@@ -130,7 +130,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void longArray() {
+	void longArray() {
 		doTest(
 				testModelProvider.longArray(),
 				Long.class, true,
@@ -141,7 +141,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void floatArray() {
+	void floatArray() {
 		doTest(
 				testModelProvider.floatArray(),
 				Float.class, true,
@@ -152,7 +152,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3997")
-	public void doubleArray() {
+	void doubleArray() {
 		doTest(
 				testModelProvider.doubleArray(),
 				Double.class, true,
@@ -162,7 +162,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void iterable() {
+	void iterable() {
 		doTest(
 				testModelProvider.iterable(),
 				String.class, true,
@@ -172,7 +172,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void collection() {
+	void collection() {
 		doTest(
 				testModelProvider.collection(),
 				String.class, true,
@@ -182,7 +182,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void list() {
+	void list() {
 		doTest(
 				testModelProvider.list(),
 				String.class, true,
@@ -192,7 +192,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void set() {
+	void set() {
 		doTest(
 				testModelProvider.set(),
 				String.class, true,
@@ -203,7 +203,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2490")
-	public void sortedSet() {
+	void sortedSet() {
 		SortedSet<String> set = new TreeSet<>();
 		// Do not add the strings in order, so as to really rely on the "sort" feature of the set
 		Collections.addAll( set, STRING_VALUE_2, STRING_VALUE_1, STRING_VALUE_3 );
@@ -216,7 +216,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void mapValues() {
+	void mapValues() {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put( STRING_VALUE_1, STRING_VALUE_4 );
 		map.put( STRING_VALUE_2, STRING_VALUE_5 );
@@ -231,7 +231,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2490")
-	public void sortedMapValues() {
+	void sortedMapValues() {
 		SortedMap<String, String> map = new TreeMap<>();
 		// Do not add the strings in order, so as to really rely on the "sort" feature of the map
 		map.put( STRING_VALUE_2, STRING_VALUE_5 );
@@ -246,7 +246,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void chain_mapListValues() {
+	void chain_mapListValues() {
 		Map<String, List<String>> map = new LinkedHashMap<>();
 		map.put( STRING_VALUE_1, CollectionHelper.asList( STRING_VALUE_2, STRING_VALUE_3 ) );
 		map.put( STRING_VALUE_4, CollectionHelper.asList( STRING_VALUE_5, STRING_VALUE_6 ) );
@@ -259,7 +259,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optional_nonEmpty() {
+	void optional_nonEmpty() {
 		doTest(
 				testModelProvider.optional(),
 				String.class, false,
@@ -269,7 +269,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optional_empty() {
+	void optional_empty() {
 		doTestExpectMissing(
 				testModelProvider.optional(),
 				String.class, false,
@@ -278,7 +278,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optionalDouble_nonEmpty() {
+	void optionalDouble_nonEmpty() {
 		doTest(
 				testModelProvider.optionalDouble(),
 				Double.class, false,
@@ -288,7 +288,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optionalDouble_empty() {
+	void optionalDouble_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalDouble(),
 				Double.class, false,
@@ -297,7 +297,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optionalInt_nonEmpty() {
+	void optionalInt_nonEmpty() {
 		doTest(
 				testModelProvider.optionalInt(),
 				Integer.class, false,
@@ -307,7 +307,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optionalInt_empty() {
+	void optionalInt_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalInt(),
 				Integer.class, false,
@@ -316,7 +316,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optionalLong_nonEmpty() {
+	void optionalLong_nonEmpty() {
 		doTest(
 				testModelProvider.optionalLong(),
 				Long.class, false,
@@ -326,7 +326,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
-	public void optionalLong_empty() {
+	void optionalLong_empty() {
 		doTestExpectMissing(
 				testModelProvider.optionalLong(),
 				Long.class, false,
@@ -338,7 +338,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	 * Test that value bridges are actually applied to each element.
 	 */
 	@Test
-	public void list_nonPassThroughBridge() {
+	void list_nonPassThroughBridge() {
 		doTest(
 				testModelProvider.list_implicitEnumBridge(),
 				String.class, true,
@@ -352,7 +352,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	 * even when using a container value extractor.
 	 */
 	@Test
-	public void list_customBridge() {
+	void list_customBridge() {
 		doTest(
 				() -> setupHelper.start().expectCustomBeans(),
 				testModelProvider.list_explicitPrefixedStringBridge(),

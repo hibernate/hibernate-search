@@ -20,17 +20,17 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchCustomIndexSettingsIT {
+class ElasticsearchCustomIndexSettingsIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
 			BackendConfigurations.simple() );
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,

@@ -18,27 +18,27 @@ import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4140")
-public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
+class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	@Test
-	public void pulseInterval_negative() {
+	void pulseInterval_negative() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -49,7 +49,7 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	}
 
 	@Test
-	public void pulseInterval_zero() {
+	void pulseInterval_zero() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "0" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -60,7 +60,7 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	}
 
 	@Test
-	public void pulseInterval_lowerThanPollingInterval() {
+	void pulseInterval_lowerThanPollingInterval() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "40" )
 				.withProperty( "hibernate.search.coordination.event_processor.polling_interval", "50" ) ) )
@@ -73,7 +73,7 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	}
 
 	@Test
-	public void pulseExpiration_negative() {
+	void pulseExpiration_negative() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -84,7 +84,7 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	}
 
 	@Test
-	public void pulseExpiration_zero() {
+	void pulseExpiration_zero() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "0" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -95,7 +95,7 @@ public class OutboxPollingAutomaticIndexingInvalidConfigurationIT {
 	}
 
 	@Test
-	public void pulseExpiration_lowerThan3TimesPollingInterval() {
+	void pulseExpiration_lowerThan3TimesPollingInterval() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_expiration", "599" )
 				.withProperty( "hibernate.search.coordination.event_processor.pulse_interval", "200" ) ) )

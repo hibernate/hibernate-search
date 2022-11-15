@@ -23,11 +23,12 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ExpectedLog4jLogTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.stat.Statistics;
 
 import org.junit.ClassRule;
@@ -59,7 +60,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	}
 
 	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
@@ -68,7 +69,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
 	@Rule
-	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
+	public final ExpectedLog4jLogTestRule logged = ExpectedLog4jLogTestRule.create();
 
 	private final EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy;
 

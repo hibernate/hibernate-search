@@ -9,7 +9,9 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
@@ -22,56 +24,44 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test overriding default value bridges for the {@code @GenericField} annotation,
  * for example assigning a different default value bridge for properties of type {@link String}.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3096")
-public class FieldDefaultBridgeOverridingIT<V, F> {
+class FieldDefaultBridgeOverridingIT<V, F> {
 	private static final String FIELD_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_NAME;
 	private static final String FIELD_INDEXNULLAS_NAME =
 			DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[] types() {
+	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
-				.map( type -> new Object[] { type, type.getDefaultValueBridgeExpectations() } )
-				.toArray();
+				.map( type -> Arguments.of( type, type.getDefaultValueBridgeExpectations() ) )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<V, F> typeDescriptor;
-	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
 	private StubIndexNode indexField;
 
-	public FieldDefaultBridgeOverridingIT(PropertyTypeDescriptor<V, F> typeDescriptor,
-			DefaultValueBridgeExpectations<V, F> expectations) {
-		this.typeDescriptor = typeDescriptor;
-		this.expectations = expectations;
-	}
-
-	@Before
-	public void setup() {
+	public void setup(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
 					b.field( FIELD_NAME, FieldTypeForOverridingDefaultBridge.class );
@@ -93,15 +83,17 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void indexing() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void indexing(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
-			Object entity = expectations.instantiateTypeWithValueBridge1( 1, getPropertyValue() );
+			Object entity = expectations.instantiateTypeWithValueBridge1( 1, getPropertyValue( typeDescriptor ) );
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME )
 					.add( "1", b -> {
-						b.field( FIELD_NAME, getFieldValue() );
+						b.field( FIELD_NAME, getFieldValue( typeDescriptor ) );
 
 						if ( typeDescriptor.isNullable() ) {
 							// The stub backend does not implement the 'indexNullAs' option
@@ -112,8 +104,10 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void projection() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projection(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<V> query = session.search( expectations.getTypeWithValueBridge1() )
 					.select( f -> f.field( FIELD_NAME, typeDescriptor.getBoxedJavaType() ) )
@@ -124,16 +118,18 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME,
 					StubSearchWorkBehavior.of(
 							1L,
-							getFieldValue()
+							getFieldValue( typeDescriptor )
 					)
 			);
 
-			assertThat( query.fetchAll().hits() ).containsExactly( getPropertyValue() );
+			assertThat( query.fetchAll().hits() ).containsExactly( getPropertyValue( typeDescriptor ) );
 		}
 	}
 
-	@Test
-	public void dslConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dslConverter(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
+		setup( typeDescriptor, expectations );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
@@ -142,18 +138,18 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// The overriden default bridge must be used by the DSL converter
-		assertThat( dslConverter.toDocumentValue( getPropertyValue(), toDocumentConvertContext ) )
-				.isEqualTo( getFieldValue() );
-		assertThat( dslConverter.unknownTypeToDocumentValue( getPropertyValue(), toDocumentConvertContext ) )
-				.isEqualTo( getFieldValue() );
+		assertThat( dslConverter.toDocumentValue( getPropertyValue( typeDescriptor ), toDocumentConvertContext ) )
+				.isEqualTo( getFieldValue( typeDescriptor ) );
+		assertThat( dslConverter.unknownTypeToDocumentValue( getPropertyValue( typeDescriptor ), toDocumentConvertContext ) )
+				.isEqualTo( getFieldValue( typeDescriptor ) );
 	}
 
-	private V getPropertyValue() {
+	private V getPropertyValue(PropertyTypeDescriptor<V, F> typeDescriptor) {
 		return typeDescriptor.values().entityModelValues.get( 0 );
 	}
 
-	private FieldTypeForOverridingDefaultBridge getFieldValue() {
-		return new FieldTypeForOverridingDefaultBridge( getPropertyValue() );
+	private FieldTypeForOverridingDefaultBridge getFieldValue(PropertyTypeDescriptor<V, F> typeDescriptor) {
+		return new FieldTypeForOverridingDefaultBridge( getPropertyValue( typeDescriptor ) );
 	}
 
 	private static class FieldTypeForOverridingDefaultBridge {

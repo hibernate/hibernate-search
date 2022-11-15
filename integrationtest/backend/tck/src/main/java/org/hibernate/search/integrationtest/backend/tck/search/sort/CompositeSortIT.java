@@ -24,35 +24,35 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class CompositeSortIT {
+class CompositeSortIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void byComposite() {
+	void byComposite() {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f.composite( c -> {
@@ -85,7 +85,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void byComposite_separateSort() {
+	void byComposite_separateSort() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 
@@ -131,7 +131,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void byComposite_empty() {
+	void byComposite_empty() {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f.composite() );
@@ -142,7 +142,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then() {
+	void then() {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f
@@ -175,7 +175,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then_flattened_nested() {
+	void then_flattened_nested() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
@@ -197,7 +197,7 @@ public class CompositeSortIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2254")
-	public void then_nested_normal_limit1() {
+	void then_nested_normal_limit1() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForLastTwo.relativeFieldName;
@@ -219,7 +219,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then_flattened_nested_limit2() {
+	void then_flattened_nested_limit2() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
@@ -240,7 +240,7 @@ public class CompositeSortIT {
 	}
 
 	@Test
-	public void then_flattened_nested_filterByPredicate() {
+	void then_flattened_nested_filterByPredicate() {
 		SearchQuery<DocumentReference> query;
 
 		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;

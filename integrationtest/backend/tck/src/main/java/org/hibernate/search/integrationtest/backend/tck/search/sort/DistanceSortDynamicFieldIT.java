@@ -20,17 +20,17 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class DistanceSortDynamicFieldIT {
+class DistanceSortDynamicFieldIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 
@@ -44,14 +44,14 @@ public class DistanceSortDynamicFieldIT {
 	private static final int DOCUMENT_2_ORDINAL = 3;
 	private static final int DOCUMENT_3_ORDINAL = 5;
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( mainIndex )
 				.setup();
@@ -60,7 +60,7 @@ public class DistanceSortDynamicFieldIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		String fieldPath = mainFieldPath();
 
 		assertThatQuery( matchNonEmptyQuery( f -> f.distance( fieldPath, CENTER_POINT ).asc() ) )
@@ -71,7 +71,7 @@ public class DistanceSortDynamicFieldIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4531")
-	public void neverPopulated() {
+	void neverPopulated() {
 		String neverPopulatedFieldPath = neverPopulatedFieldPath();
 		String mainFieldPath = mainFieldPath();
 

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -19,71 +20,67 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test the behavior of implementations of {@link DocumentElement}
  * when it comes to multi-valued fields.
  */
-@RunWith(Parameterized.class)
-public class DocumentElementMultiValuedIT<F> {
+class DocumentElementMultiValuedIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll();
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<FieldTypeDescriptor<?>> parameters() {
-		return supportedTypeDescriptors();
+	public static List<? extends Arguments> params() {
+		return supportedTypeDescriptors().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private final FieldTypeDescriptor<F> fieldType;
-
-	public DocumentElementMultiValuedIT(FieldTypeDescriptor<F> fieldType) {
-		this.fieldType = fieldType;
-	}
-
-	@Test
-	public void addValue_root() {
-		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding() );
-		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding() );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_root(FieldTypeDescriptor<F> fieldType) {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding(), fieldType );
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding(), fieldType );
 		expectSuccess( "1", document -> {
-			document.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			document.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSingleValuedException( "2", singleValuedFieldModel.relativeFieldName, document -> {
-			document.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-			document.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+			document.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
+			document.addValue( singleValuedFieldModel.reference, getValue( 1, fieldType ) );
 		} );
 		expectSuccess( "3", document -> {
-			document.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			document.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSuccess( "4", document -> {
-			document.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
-			document.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
-			document.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			document.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
+			document.addValue( multiValuedFieldModel.reference, getValue( 1, fieldType ) );
+			document.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 	}
 
-	@Test
-	public void addObject_flattened() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addObject_flattened(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
@@ -101,8 +98,9 @@ public class DocumentElementMultiValuedIT<F> {
 		} );
 	}
 
-	@Test
-	public void addObject_nested() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addObject_nested(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
@@ -120,8 +118,9 @@ public class DocumentElementMultiValuedIT<F> {
 		} );
 	}
 
-	@Test
-	public void addNullObject_flattened() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addNullObject_flattened(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
@@ -157,8 +156,9 @@ public class DocumentElementMultiValuedIT<F> {
 		} );
 	}
 
-	@Test
-	public void addNullObject_nested() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addNullObject_nested(FieldTypeDescriptor<F> fieldType) {
 		expectSuccess( "1", document -> {
 			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
@@ -194,105 +194,125 @@ public class DocumentElementMultiValuedIT<F> {
 		} );
 	}
 
-	@Test
-	public void addValue_inSingleValuedFlattenedObject() {
-		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedFlattenedObject );
-		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().singleValuedFlattenedObject );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_inSingleValuedFlattenedObject(FieldTypeDescriptor<F> fieldType) {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedFlattenedObject,
+				fieldType
+		);
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().singleValuedFlattenedObject,
+				fieldType
+		);
 		expectSuccess( "1", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSingleValuedException( "2", "singleValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName,
 				document -> {
 					DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
-					level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-					level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 1, fieldType ) );
 				} );
 		expectSuccess( "3", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSuccess( "4", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 	}
 
-	@Test
-	public void addValue_inMultiValuedFlattenedObject() {
-		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedFlattenedObject );
-		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().multiValuedFlattenedObject );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_inMultiValuedFlattenedObject(FieldTypeDescriptor<F> fieldType) {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedFlattenedObject,
+				fieldType
+		);
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().multiValuedFlattenedObject,
+				fieldType
+		);
 		expectSuccess( "1", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSingleValuedException( "2", "multiValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName,
 				document -> {
 					DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
-					level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-					level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
+					level1.addValue( singleValuedFieldModel.reference, getValue( 1, fieldType ) );
 				} );
 		expectSuccess( "3", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSuccess( "4", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 	}
 
-	@Test
-	public void addValue_inSingleValuedNestedObject() {
-		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedNestedObject );
-		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().singleValuedNestedObject );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_inSingleValuedNestedObject(FieldTypeDescriptor<F> fieldType) {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedNestedObject,
+				fieldType
+		);
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().singleValuedNestedObject,
+				fieldType
+		);
 		expectSuccess( "1", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSingleValuedException( "2", "singleValuedNestedObject." + singleValuedFieldModel.relativeFieldName, document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 1, fieldType ) );
 		} );
 		expectSuccess( "3", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSuccess( "4", document -> {
 			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 	}
 
-	@Test
-	public void addValue_inMultiValuedNestedObject() {
-		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedNestedObject );
-		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().multiValuedNestedObject );
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_inMultiValuedNestedObject(FieldTypeDescriptor<F> fieldType) {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedNestedObject,
+				fieldType
+		);
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().multiValuedNestedObject,
+				fieldType
+		);
 		expectSuccess( "1", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSingleValuedException( "2", "multiValuedNestedObject." + singleValuedFieldModel.relativeFieldName, document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0, fieldType ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 1, fieldType ) );
 		} );
 		expectSuccess( "3", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 		expectSuccess( "4", document -> {
 			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
-			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1, fieldType ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0, fieldType ) );
 		} );
 	}
 
@@ -318,15 +338,15 @@ public class DocumentElementMultiValuedIT<F> {
 		index.index( id, documentContributor::accept );
 	}
 
-	private F getValue(int ordinal) {
+	private F getValue(int ordinal, FieldTypeDescriptor<F> fieldType) {
 		return fieldType.getIndexableValues().getSingle().get( ordinal );
 	}
 
-	private SimpleFieldModel<F> getSingleValuedField(AbstractObjectBinding binding) {
+	private SimpleFieldModel<F> getSingleValuedField(AbstractObjectBinding binding, FieldTypeDescriptor<F> fieldType) {
 		return binding.singleValuedFieldModels.get( fieldType );
 	}
 
-	private SimpleFieldModel<F> getMultiValuedField(AbstractObjectBinding binding) {
+	private SimpleFieldModel<F> getMultiValuedField(AbstractObjectBinding binding, FieldTypeDescriptor<F> fieldType) {
 		return binding.multiValuedFieldModels.get( fieldType );
 	}
 

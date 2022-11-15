@@ -17,16 +17,20 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
+class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 		extends AbstractHibernateOrmBootstrapIntrospectorPerReflectionStrategyTest {
 
-	@Test
-	public void singleAnnotation() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithSingleFieldAnnotation.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void singleAnnotation(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
+				valueHandleFactory, EntityWithSingleFieldAnnotation.class );
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
 
 		PojoRawTypeModel<EntityWithSingleFieldAnnotation> typeModel =
@@ -44,10 +48,12 @@ public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3614")
-	public void repeatedAnnotation() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithRepeatedFieldAnnotation.class );
+	void repeatedAnnotation(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
+				valueHandleFactory, EntityWithRepeatedFieldAnnotation.class );
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueHandleFactory() );
 
 		PojoRawTypeModel<EntityWithRepeatedFieldAnnotation> typeModel =

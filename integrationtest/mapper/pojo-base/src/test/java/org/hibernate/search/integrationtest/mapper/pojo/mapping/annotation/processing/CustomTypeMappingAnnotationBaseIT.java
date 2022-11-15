@@ -28,27 +28,27 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of (custom) type mapping annotations.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3135")
-public class CustomTypeMappingAnnotationBaseIT {
+class CustomTypeMappingAnnotationBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -56,7 +56,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	 * Basic test checking that a simple type mapping will be applied as expected.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		@Indexed(index = INDEX_NAME)
 		@WorkingAnnotation
 		class IndexedEntity {
@@ -88,7 +88,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void missingBinderReference() {
+	void missingBinderReference() {
 		@Indexed
 		@AnnotationWithEmptyProcessorRef
 		class IndexedEntity {
@@ -112,7 +112,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void invalidAnnotationType() {
+	void invalidAnnotationType() {
 		@Indexed
 		@AnnotationWithProcessorWithDifferentAnnotationType
 		class IndexedEntity {
@@ -154,7 +154,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void annotatedElement() {
+	void annotatedElement() {
 		final String index1Name = "index1";
 		final String index2Name = "index2";
 		final String index3Name = "index3";
@@ -292,7 +292,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void eventContext() {
+	void eventContext() {
 		@Indexed(index = INDEX_NAME)
 		@EventContextAwareAnnotation
 		class IndexedEntityType {

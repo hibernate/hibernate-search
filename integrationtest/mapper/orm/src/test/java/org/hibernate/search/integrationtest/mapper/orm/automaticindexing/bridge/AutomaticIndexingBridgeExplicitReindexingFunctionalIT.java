@@ -30,13 +30,13 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test an actual use case of explicit reindexing declaration,
@@ -46,18 +46,18 @@ import org.junit.Test;
  * tests the feature works correctly but in a setup that wouldn't require this feature.
  */
 @TestForIssue(jiraKey = "HSEARCH-3297")
-public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
+class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "typeBridge", b2 -> b2
 						.field( "includedInTypeBridge", String.class )
@@ -83,7 +83,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		// Init
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();

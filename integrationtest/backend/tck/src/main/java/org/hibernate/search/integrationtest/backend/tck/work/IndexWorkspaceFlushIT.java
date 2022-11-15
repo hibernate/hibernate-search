@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -17,14 +17,15 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
-public class IndexWorkspaceFlushIT extends AbstractIndexWorkspaceSimpleOperationIT {
-	@Before
+class IndexWorkspaceFlushIT extends AbstractIndexWorkspaceSimpleOperationIT {
+
+	@BeforeEach
 	public void checkAssumptions() {
 		assumeTrue(
-				"This test only makes sense if the backend supports explicit flush",
-				TckConfiguration.get().getBackendFeatures().supportsExplicitFlush()
+				TckConfiguration.get().getBackendFeatures().supportsExplicitFlush(),
+				"This test only makes sense if the backend supports explicit flush"
 		);
 	}
 

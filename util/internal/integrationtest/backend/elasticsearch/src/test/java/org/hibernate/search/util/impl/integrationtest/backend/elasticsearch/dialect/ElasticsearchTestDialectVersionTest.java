@@ -11,12 +11,12 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ElasticsearchTestDialectVersionTest {
+class ElasticsearchTestDialectVersionTest {
 
 	@Test
-	public void isBetween() {
+	void isBetween() {
 		assertThat(
 				isVersion(
 						ElasticsearchVersion.of( "elastic:6.7.0" ),
@@ -73,7 +73,7 @@ public class ElasticsearchTestDialectVersionTest {
 	}
 
 	@Test
-	public void anyNone() {
+	void anyNone() {
 		assertThat(
 				isVersion(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
@@ -130,7 +130,7 @@ public class ElasticsearchTestDialectVersionTest {
 	}
 
 	@Test
-	public void isMatching() {
+	void isMatching() {
 		assertThat(
 				isVersion(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
@@ -160,7 +160,7 @@ public class ElasticsearchTestDialectVersionTest {
 	}
 
 	@Test
-	public void isAtMost() {
+	void isAtMost() {
 		assertThat(
 				isVersion(
 						ElasticsearchVersion.of( "elastic:1.1.2" ),
@@ -199,7 +199,7 @@ public class ElasticsearchTestDialectVersionTest {
 	}
 
 	@Test
-	public void isLessThan() {
+	void isLessThan() {
 		assertThat(
 				isVersion(
 						ElasticsearchVersion.of( "elastic:1.1.1" ),
@@ -247,7 +247,7 @@ public class ElasticsearchTestDialectVersionTest {
 	}
 
 	@Test
-	public void amazonOpenSearchServerless_defaultToOpenSearchPredicate() {
+	void amazonOpenSearchServerless_defaultToOpenSearchPredicate() {
 		ElasticsearchVersion version = ElasticsearchVersion.of( "amazon-opensearch-serverless" );
 		assertThat( isVersion(
 				version,

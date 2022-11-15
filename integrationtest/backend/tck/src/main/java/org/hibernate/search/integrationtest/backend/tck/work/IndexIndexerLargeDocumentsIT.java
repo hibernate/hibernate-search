@@ -26,14 +26,14 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.data.TextContent;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.awaitility.Awaitility;
 
@@ -45,7 +45,7 @@ import org.awaitility.Awaitility;
  * and AWS request signing is sensitive to the content length.
  */
 @TestForIssue(jiraKey = "HSEARCH-4239")
-public class IndexIndexerLargeDocumentsIT {
+class IndexIndexerLargeDocumentsIT {
 
 	// This must be high, otherwise the bug won't be reproduced.
 	private static final int MANY_LARGE_DOCUMENTS_COUNT = 2000;
@@ -60,8 +60,8 @@ public class IndexIndexerLargeDocumentsIT {
 		}
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
@@ -74,28 +74,28 @@ public class IndexIndexerLargeDocumentsIT {
 				: DocumentRefreshStrategy.FORCE;
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void manyLargeDocuments_add() {
+	void manyLargeDocuments_add() {
 		doTest( MANY_LARGE_DOCUMENTS_COUNT, this::largeValue, Operation.ADD );
 	}
 
 	@Test
-	public void manyLargeDocuments_addOrUpdate() {
+	void manyLargeDocuments_addOrUpdate() {
 		doTest( MANY_LARGE_DOCUMENTS_COUNT, this::largeValue, Operation.ADD_OR_UPDATE );
 	}
 
 	@Test
-	public void oneVeryLargeDocuments_add() {
+	void oneVeryLargeDocuments_add() {
 		doTest( 1, this::veryLargeValue, Operation.ADD );
 	}
 
 	@Test
-	public void oneVeryLargeDocuments_addOrUpdate() {
+	void oneVeryLargeDocuments_addOrUpdate() {
 		doTest( 1, this::veryLargeValue, Operation.ADD_OR_UPDATE );
 	}
 

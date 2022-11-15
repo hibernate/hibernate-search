@@ -14,13 +14,13 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unchecked")
-public class MapConfigurationPropertySourceTest extends AbstractAllAwareConfigurationPropertySourceTest {
+class MapConfigurationPropertySourceTest extends AbstractAllAwareConfigurationPropertySourceTest {
 
 	@Test
-	public void to_string() {
+	void to_string() {
 		ConfigurationPropertySource propertySource = createPropertySource( "someKey", "foo" );
 		assertThat( propertySource ).asString()
 				.contains( "Map" )
@@ -28,7 +28,7 @@ public class MapConfigurationPropertySourceTest extends AbstractAllAwareConfigur
 	}
 
 	@Test
-	public void get_integer() {
+	void get_integer() {
 		ConfigurationPropertySource propertySource = AllAwareConfigurationPropertySource.fromMap(
 				Collections.singletonMap( "someKey", 42 )
 		);

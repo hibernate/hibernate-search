@@ -18,18 +18,18 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentVal
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MatchIdPredicateSpecificsIT {
+class MatchIdPredicateSpecificsIT {
 
 	// it should be more than the default max clause count of the boolean queries
 	private static final int LOT_OF_TERMS_SIZE = 2000;
@@ -40,8 +40,8 @@ public class MatchIdPredicateSpecificsIT {
 	private static final String COMPATIBLE_ID_CONVERTER_DOCUMENT_1 = "compatibleIdConverter_document1";
 	private static final String INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 = "incompatibleIdConverter_document1";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final StubMappedIndex mainIndex =
 			StubMappedIndex.withoutFields().name( "main" );
@@ -55,8 +55,8 @@ public class MatchIdPredicateSpecificsIT {
 	// only one of which is matching
 	private static final List<String> lotsOfTerms = new ArrayList<>();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( mainIndex, compatibleIdConverterIndex, incompatibleIdConverterIndex ).setup();
 
 		for ( int i = 1; i <= LOT_OF_TERMS_SIZE; i++ ) {
@@ -70,14 +70,14 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matching() {
+	void matching() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id().matching( DOCUMENT_1 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
-	public void matching_then_matching() {
+	void matching_then_matching() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matching( DOCUMENT_1 )
@@ -86,7 +86,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matching_then_matchingAny() {
+	void matching_then_matchingAny() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matching( DOCUMENT_2 )
@@ -95,7 +95,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchingAny_singleElement() {
+	void matchingAny_singleElement() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1 ) ) ) )
@@ -103,7 +103,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchingAny_multipleElements() {
+	void matchingAny_multipleElements() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) ) ) )
@@ -111,7 +111,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void matchingAny_lotsOfTerms() {
+	void matchingAny_lotsOfTerms() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matchingAny( lotsOfTerms ) ) )
@@ -119,7 +119,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIdConverterIndexManager_dslConverterEnabled() {
+	void multiIndex_withCompatibleIdConverterIndexManager_dslConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIdConverterIndex );
 
 		assertThatQuery( scope.query()
@@ -131,7 +131,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
+	void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
 		SearchPredicateFactory f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
 
 		assertThatThrownBy( () -> f.id().matching( new Object() /* Value does not matter */ ) )
@@ -146,7 +146,7 @@ public class MatchIdPredicateSpecificsIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterDisabled() {
+	void multiIndex_withIncompatibleIdConverterIndex_dslConverterDisabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
 
 		assertThatQuery( scope.query()

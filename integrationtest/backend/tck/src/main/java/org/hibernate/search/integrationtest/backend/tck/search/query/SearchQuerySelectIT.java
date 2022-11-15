@@ -11,23 +11,22 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.search.projection.AbstractEntityProjectionIT;
 import org.hibernate.search.integrationtest.backend.tck.search.projection.AbstractEntityReferenceProjectionIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-@RunWith(NestedRunner.class)
-public class SearchQuerySelectIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class SearchQuerySelectIT {
+	//CHECKSTYLE:ON
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<AbstractEntityProjectionIT.IndexBinding> selectEntityMainIndex =
 			SimpleMappedIndex.of( AbstractEntityProjectionIT.IndexBinding::new ).name( "entityMain" );
@@ -42,8 +41,8 @@ public class SearchQuerySelectIT {
 	private static final StubMappedIndex selectEntityReferenceIndex = StubMappedIndex.withoutFields()
 			.name( "entityref" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( selectEntityMainIndex, selectEntityMultiIndex1, selectEntityMultiIndex2,
 						selectEntityMultiIndex3, selectEntityMultiIndex4 )
@@ -68,13 +67,8 @@ public class SearchQuerySelectIT {
 				selectEntityReferenceIndexer );
 	}
 
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
-	}
-
 	@Nested
-	public static class SelectDefaultIT extends AbstractEntityProjectionIT {
+	class SelectDefaultIT extends AbstractEntityProjectionIT {
 		public SelectDefaultIT() {
 			super( selectEntityMainIndex,
 					selectEntityMultiIndex1, selectEntityMultiIndex2,
@@ -88,7 +82,7 @@ public class SearchQuerySelectIT {
 	}
 
 	@Nested
-	public static class SelectEntityIT extends AbstractEntityProjectionIT {
+	class SelectEntityIT extends AbstractEntityProjectionIT {
 		public SelectEntityIT() {
 			super( selectEntityMainIndex, selectEntityMultiIndex1, selectEntityMultiIndex2, selectEntityMultiIndex3,
 					selectEntityMultiIndex4
@@ -102,7 +96,7 @@ public class SearchQuerySelectIT {
 	}
 
 	@Nested
-	public static class SelectEntityReferenceIT extends AbstractEntityReferenceProjectionIT {
+	class SelectEntityReferenceIT extends AbstractEntityReferenceProjectionIT {
 		public SelectEntityReferenceIT() {
 			super( selectEntityReferenceIndex );
 		}
@@ -118,7 +112,7 @@ public class SearchQuerySelectIT {
 	// so we need to test them separately.
 
 	@Nested
-	public static class SelectDefaultWithExtensionIT extends AbstractEntityProjectionIT {
+	class SelectDefaultWithExtensionIT extends AbstractEntityProjectionIT {
 		public SelectDefaultWithExtensionIT() {
 			super( selectEntityMainIndex, selectEntityMultiIndex1, selectEntityMultiIndex2, selectEntityMultiIndex3,
 					selectEntityMultiIndex4
@@ -132,7 +126,7 @@ public class SearchQuerySelectIT {
 	}
 
 	@Nested
-	public static class SelectEntityWithExtensionIT extends AbstractEntityProjectionIT {
+	class SelectEntityWithExtensionIT extends AbstractEntityProjectionIT {
 		public SelectEntityWithExtensionIT() {
 			super( selectEntityMainIndex, selectEntityMultiIndex1, selectEntityMultiIndex2, selectEntityMultiIndex3,
 					selectEntityMultiIndex4
@@ -147,7 +141,7 @@ public class SearchQuerySelectIT {
 	}
 
 	@Nested
-	public static class SelectEntityReferenceWithExtensionIT extends AbstractEntityReferenceProjectionIT {
+	class SelectEntityReferenceWithExtensionIT extends AbstractEntityReferenceProjectionIT {
 		public SelectEntityReferenceWithExtensionIT() {
 			super( selectEntityReferenceIndex );
 		}

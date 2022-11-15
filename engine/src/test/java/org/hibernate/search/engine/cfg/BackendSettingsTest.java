@@ -8,12 +8,12 @@ package org.hibernate.search.engine.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class BackendSettingsTest {
+class BackendSettingsTest {
 
 	@Test
-	public void backendKey() {
+	void backendKey() {
 		assertThat( BackendSettings.backendKey( "foo.bar" ) )
 				.isEqualTo( "hibernate.search.backend.foo.bar" );
 

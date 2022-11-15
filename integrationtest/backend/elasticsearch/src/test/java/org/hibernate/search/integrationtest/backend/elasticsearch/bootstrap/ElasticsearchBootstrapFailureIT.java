@@ -7,37 +7,39 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchBootstrapFailureIT {
+class ElasticsearchBootstrapFailureIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public ElasticsearchClientSpy elasticsearchClientSpy = ElasticsearchClientSpy.create();
 
 	/**
 	 * Check the reported failure when we fail to connect to the Elasticsearch cluster.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3621")
-	public void cannotConnect() {
-		assumeTrue( "This test only works if the very first request to Elasticsearch"
-				+ " is a version check, i.e. if version checks are supported",
-				ElasticsearchTckBackendFeatures.supportsVersionCheck() );
+	void cannotConnect() {
+		assumeTrue(
+				ElasticsearchTckBackendFeatures.supportsVersionCheck(),
+				"This test only works if the very first request to Elasticsearch"
+						+ " is a version check, i.e. if version checks are supported"
+		);
 
 		assertThatThrownBy(
 				() -> setupHelper.start()

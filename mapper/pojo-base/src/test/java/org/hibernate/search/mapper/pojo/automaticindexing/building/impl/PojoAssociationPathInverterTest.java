@@ -29,20 +29,16 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class PojoAssociationPathInverterTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+class PojoAssociationPathInverterTest {
 
 	@Mock
 	private PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock;
@@ -50,7 +46,7 @@ public class PojoAssociationPathInverterTest {
 	private ContainerExtractorBinder extractorBinderMock;
 
 	@Test
-	public void detectInfiniteRecursion() {
+	void detectInfiniteRecursion() {
 		String originalSidePropertyName = "originalSideProperty";
 		String inverseSideProperty1Name = "inverseSideProperty1";
 		String inverseSideProperty2Name = "inverseSideProperty2";

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Objects;
 

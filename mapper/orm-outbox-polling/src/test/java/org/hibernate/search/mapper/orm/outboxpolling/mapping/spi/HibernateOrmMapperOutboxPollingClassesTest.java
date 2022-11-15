@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.orm.outboxpolling.event.impl.OutboxEvent;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
@@ -37,12 +37,12 @@ import org.apache.avro.specific.AvroGenerated;
 /**
  * Tests that hardcoded lists of classes stay up-to-date.
  */
-public class HibernateOrmMapperOutboxPollingClassesTest {
+class HibernateOrmMapperOutboxPollingClassesTest {
 
 	private static Index outboxPollingIndex;
 
-	@BeforeClass
-	public static void index() {
+	@BeforeAll
+	static void index() {
 		outboxPollingIndex = readOrBuildIndex(
 				codeSourceLocation( HibernateOrmMapperOutboxPollingSettings.class )
 						.orElseThrow( () -> new AssertionFailure(
@@ -51,7 +51,7 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 	}
 
 	@Test
-	public void testNoMissingAvroGeneratedClass() {
+	void testNoMissingAvroGeneratedClass() {
 		Set<String> annotatedClasses = new HashSet<>();
 		for ( AnnotationInstance annotationInstance : outboxPollingIndex
 				.getAnnotations( DotName.createSimple( AvroGenerated.class.getName() ) ) ) {
@@ -65,7 +65,7 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 	}
 
 	@Test
-	public void testNoMissingJpaModelClass() {
+	void testNoMissingJpaModelClass() {
 		Set<DotName> modelClasses = collectModelClassesRecursively( outboxPollingIndex, new HashSet<>( Arrays.asList(
 				DotName.createSimple( OutboxEvent.class.getName() ),
 				DotName.createSimple( Agent.class.getName() )

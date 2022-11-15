@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -17,50 +17,50 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ObjectProjectionSpecificsIT {
+class ObjectProjectionSpecificsIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( index )
 				.setup();
 	}
 
 	@Test
-	public void nullFieldPath() {
+	void nullFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'objectFieldPath' must not be null" );
 	}
 
 	@Test
-	public void unknownFieldPath() {
+	void unknownFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( "unknownField" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unknown field 'unknownField'" );
 	}
 
 	@Test
-	public void nonObjectFieldPath() {
+	void nonObjectFieldPath() {
 		assertThatThrownBy( () -> index.createScope().projection().object( "level1.field1" ) )
 				.hasMessageContainingAll( "Cannot use 'projection:object' on field 'level1.field1'" );
 	}
 
 	@Test
-	public void innerObjectProjectionOnFieldOutsideOuterObjectProjectionFieldTree() {
+	void innerObjectProjectionOnFieldOutsideOuterObjectProjectionFieldTree() {
 		assertThatThrownBy( () -> index.query()
 				.select( f -> f.object( "level1.level2" )
 						.from(
@@ -85,10 +85,10 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void multiValuedObjectField_flattened_unsupported() {
+	void multiValuedObjectField_flattened_unsupported() {
 		assumeTrue(
-				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields",
-				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
+				TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection(),
+				"This test is only relevant if the backend relies on nested documents to implement object projections on multi-valued fields"
 		);
 		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "flattenedLevel1" ) )
@@ -101,7 +101,7 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void multiValuedObjectField_singleValuedObjectProjection() {
+	void multiValuedObjectField_singleValuedObjectProjection() {
 		SearchProjectionFactory<?, ?> f = index.createScope().projection();
 		assertThatThrownBy( () -> f.object( "level1" )
 				.from( f.field( "level1.field1" ) )
@@ -118,7 +118,7 @@ public class ObjectProjectionSpecificsIT {
 	}
 
 	@Test
-	public void singleValuedObjectField_effectivelyMultiValuedInContext() {
+	void singleValuedObjectField_effectivelyMultiValuedInContext() {
 		assertThatThrownBy( () -> index.query()
 				.select( f -> f.object( "level1WithSingleValuedLevel2.level2" )
 						.from( f.field( "level1WithSingleValuedLevel2.level2.field1" ) )

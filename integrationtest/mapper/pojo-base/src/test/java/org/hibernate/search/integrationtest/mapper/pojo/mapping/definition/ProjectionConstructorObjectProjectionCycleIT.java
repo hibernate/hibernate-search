@@ -23,20 +23,20 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4725")
-public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock )
 					// We don't care about reindexing here and don't want to configure association inverse sides
 					.disableAssociationReindexing();
 
 	@Test
-	public void actualCycle_direct() {
+	void actualCycle_direct() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -103,7 +103,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	}
 
 	@Test
-	public void brokenCycle_includePaths() {
+	void brokenCycle_includePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -177,7 +177,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	}
 
 	@Test
-	public void brokenCycle_excludePaths() {
+	void brokenCycle_excludePaths() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -251,7 +251,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	}
 
 	@Test
-	public void brokenCycle_includeDepth() {
+	void brokenCycle_includeDepth() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -325,7 +325,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	}
 
 	@Test
-	public void actualCycle_indirect_noFilter() {
+	void actualCycle_indirect_noFilter() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {
@@ -415,7 +415,7 @@ public class ProjectionConstructorObjectProjectionCycleIT extends AbstractProjec
 	}
 
 	@Test
-	public void actualCycle_buried_noFilter() {
+	void actualCycle_buried_noFilter() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class Level1 {

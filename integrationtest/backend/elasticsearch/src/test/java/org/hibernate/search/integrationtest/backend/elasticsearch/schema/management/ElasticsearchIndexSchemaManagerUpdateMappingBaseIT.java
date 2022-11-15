@@ -16,35 +16,35 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to the mapping when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaMigrationIT")
-public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
+class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 
 	private static final String UPDATE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
 	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	@Test
-	public void nothingToDo_1() {
+	void nothingToDo_1() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asLocalDate() )
 				.toReference()
 		);
@@ -89,7 +89,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void nothingToDo_2() {
+	void nothingToDo_2() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asBoolean() )
 				.toReference()
 		);
@@ -127,7 +127,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void nothingToDo_3() {
+	void nothingToDo_3() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field(
 					"defaultAnalyzer",
@@ -188,7 +188,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void mapping_missing() throws Exception {
+	void mapping_missing() throws Exception {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asBoolean() )
 				.toReference()
 		);
@@ -209,7 +209,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void rootMapping_attribute_missing() throws Exception {
+	void rootMapping_attribute_missing() throws Exception {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asBoolean() )
 				.toReference()
 		);
@@ -251,7 +251,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void property_missing() throws Exception {
+	void property_missing() throws Exception {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asLocalDate() )
 				.toReference()
 		);
@@ -286,7 +286,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void property_attribute_invalid() {
+	void property_attribute_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field( "myField", f -> f.asLocalDate() )
 				.toReference()
 		);
@@ -315,7 +315,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void property_attribute_invalid_conflictingAnalyzer() {
+	void property_attribute_invalid_conflictingAnalyzer() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field(
 				"analyzer",
 				f -> f.asString().analyzer( "customAnalyzer" )
@@ -346,7 +346,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	@Test
-	public void property_attribute_invalid_conflictingNormalizer() {
+	void property_attribute_invalid_conflictingNormalizer() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> root.field(
 				"normalizer",
 				f -> f.asString().normalizer( "customNormalizer" )

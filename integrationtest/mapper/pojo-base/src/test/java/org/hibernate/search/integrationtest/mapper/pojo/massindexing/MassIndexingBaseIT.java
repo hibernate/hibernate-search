@@ -23,18 +23,18 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
-public class MassIndexingBaseIT {
+class MassIndexingBaseIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -43,10 +43,10 @@ public class MassIndexingBaseIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -54,8 +54,8 @@ public class MassIndexingBaseIT {
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		mapping = setupHelper.start()
@@ -71,7 +71,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void defaultMassIndexerStartAndWait() throws Exception {
+	void defaultMassIndexerStartAndWait() throws Exception {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer()
 					// Simulate passing information to connect to a DB, ...
@@ -116,7 +116,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void dropAndCreateSchemaOnStart() {
+	void dropAndCreateSchemaOnStart() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer()
 					// Simulate passing information to connect to a DB, ...
@@ -163,7 +163,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void mergeSegmentsOnFinish() {
+	void mergeSegmentsOnFinish() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer()
 					// Simulate passing information to connect to a DB, ...
@@ -211,7 +211,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void dropAndCreateSchemaOnStartAndPurgeBothEnabled() {
+	void dropAndCreateSchemaOnStartAndPurgeBothEnabled() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer()
 					// Simulate passing information to connect to a DB, ...
@@ -261,7 +261,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void fromMappingWithoutSession() {
+	void fromMappingWithoutSession() {
 		MassIndexer indexer = mapping.scope( Object.class ).massIndexer()
 				// Simulate passing information to connect to a DB, ...
 				.context( StubLoadingContext.class, loadingContext );
@@ -303,7 +303,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void reuseSearchSessionAfterSearchSessionIsClosed_createMassIndexer() {
+	void reuseSearchSessionAfterSearchSessionIsClosed_createMassIndexer() {
 		SearchSession searchSession = mapping.createSession();
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
@@ -318,7 +318,7 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void lazyCreateSearchSessionAfterSearchSessionIsClosed_createMassIndexer() {
+	void lazyCreateSearchSessionAfterSearchSessionIsClosed_createMassIndexer() {
 		// Search session is not created, since we don't use it
 		SearchSession searchSession = mapping.createSession();
 		searchSession.close();

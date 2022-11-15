@@ -24,38 +24,38 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test indexing, and more importantly updates and deletions,
  * when nested documents are involved.
  */
 @TestForIssue(jiraKey = "HSEARCH-3834")
-public class LuceneIndexingNestedIT {
+class LuceneIndexingNestedIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private StubSession sessionContext;
 
 	@Test
-	public void add() throws IOException {
+	void add() throws IOException {
 		setup( MultiTenancyStrategyName.NONE );
 
 		assertThat( countWithField( "nestedObject.field1" ) ).isEqualTo( 1 );
 	}
 
 	@Test
-	public void update_byTerm() throws IOException {
+	void update_byTerm() throws IOException {
 		// No multitenancy, which means the backend will use indexWriter.updateDocuments(Term, Iterable) for updates
 		setup( MultiTenancyStrategyName.NONE );
 
@@ -72,7 +72,7 @@ public class LuceneIndexingNestedIT {
 	}
 
 	@Test
-	public void update_byQuery() throws IOException {
+	void update_byQuery() throws IOException {
 		// Multitenancy enabled, which means the backend will use
 		// indexWriter.deleteDocuments(Query) then indexWriter.addDocument for updates
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
@@ -90,7 +90,7 @@ public class LuceneIndexingNestedIT {
 	}
 
 	@Test
-	public void delete_byTerm() throws IOException {
+	void delete_byTerm() throws IOException {
 		// No multitenancy, which means the backend will use indexWriter.deleteDocuments(Term) for deletion
 		setup( MultiTenancyStrategyName.NONE );
 
@@ -103,7 +103,7 @@ public class LuceneIndexingNestedIT {
 	}
 
 	@Test
-	public void delete_byQuery() throws IOException {
+	void delete_byQuery() throws IOException {
 		// Multitenancy enabled, which means the backend will use indexWriter.deleteDocuments(Query) for deletion
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
 
@@ -116,7 +116,7 @@ public class LuceneIndexingNestedIT {
 	}
 
 	@Test
-	public void purge() throws IOException {
+	void purge() throws IOException {
 		setup( MultiTenancyStrategyName.NONE );
 
 		index.createWorkspace( sessionContext )

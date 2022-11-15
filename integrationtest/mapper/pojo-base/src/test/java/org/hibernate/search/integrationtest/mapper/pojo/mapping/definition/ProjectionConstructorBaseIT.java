@@ -27,23 +27,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Projection
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-3927")
-public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void typeLevelAnnotation() {
+	void typeLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -85,7 +85,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void typeLevelAnnotation_multipleConstructors() {
+	void typeLevelAnnotation_multipleConstructors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -123,7 +123,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void constructorLevelAnnotation() {
+	void constructorLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -175,7 +175,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void abstractType() {
+	void abstractType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -214,7 +214,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void entityAndProjection() {
+	void entityAndProjection() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -253,7 +253,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void noArgConstructor() {
+	void noArgConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -300,7 +300,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void noProjectionConstructor() {
+	void noProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -343,7 +343,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 
 	// This can happen if the class is not included in any Jandex index on startup.
 	@Test
-	public void annotationNotProcessed() {
+	void annotationNotProcessed() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -389,7 +389,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructor() {
+	void inheritance_sameConstructorParameters_subclassOnlyWithProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -462,7 +462,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructor() {
+	void inheritance_sameConstructorParameters_superclassOnlyWithProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -535,7 +535,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void inheritance_sameConstructorParameters_bothClassesWithProjectionConstructor() {
+	void inheritance_sameConstructorParameters_bothClassesWithProjectionConstructor() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -620,7 +620,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	// to the object field, while usually projection factories expect absolute paths
 	// (if everything works correctly they don't in this case, though).
 	@Test
-	public void nonRoot() {
+	void nonRoot() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -676,7 +676,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void incompatibleProjectionWithExtraPropertiesMissing() {
+	void incompatibleProjectionWithExtraPropertiesMissing() {
 		class Author {
 			private Integer id;
 
@@ -767,7 +767,7 @@ public class ProjectionConstructorBaseIT extends AbstractProjectionConstructorIT
 	}
 
 	@Test
-	public void multipleParameterProjectionAnnotations() {
+	void multipleParameterProjectionAnnotations() {
 		class Model {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {

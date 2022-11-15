@@ -14,24 +14,21 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class FailSafeFailureHandlerWrapperTest {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class FailSafeFailureHandlerWrapperTest {
 
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Mock
@@ -39,13 +36,13 @@ public class FailSafeFailureHandlerWrapperTest {
 
 	private FailSafeFailureHandlerWrapper wrapper;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		wrapper = new FailSafeFailureHandlerWrapper( failureHandlerMock );
 	}
 
 	@Test
-	public void genericContext_runtimeException() {
+	void genericContext_runtimeException() {
 		RuntimeException runtimeException = new SimulatedRuntimeException();
 
 		logged.expectEvent(
@@ -58,7 +55,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void genericContext_error() {
+	void genericContext_error() {
 		Error error = new SimulatedError();
 
 		logged.expectEvent(
@@ -71,7 +68,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void entityIndexingContext_runtimeException() {
+	void entityIndexingContext_runtimeException() {
 		RuntimeException runtimeException = new SimulatedRuntimeException();
 
 		logged.expectEvent(
@@ -84,7 +81,7 @@ public class FailSafeFailureHandlerWrapperTest {
 	}
 
 	@Test
-	public void entityIndexingContext_error() {
+	void entityIndexingContext_error() {
 		Error error = new SimulatedError();
 
 		logged.expectEvent(

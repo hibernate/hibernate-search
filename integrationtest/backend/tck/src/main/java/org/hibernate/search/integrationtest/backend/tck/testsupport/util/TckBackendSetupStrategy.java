@@ -10,11 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
-import org.junit.rules.TestRule;
+import org.junit.jupiter.api.extension.Extension;
 
 public abstract class TckBackendSetupStrategy<C extends BackendConfiguration> {
 
@@ -28,8 +28,8 @@ public abstract class TckBackendSetupStrategy<C extends BackendConfiguration> {
 		properties.putAll( backendConfiguration.rawBackendProperties() );
 	}
 
-	public final Optional<TestRule> testRule() {
-		return useConfigurationTestRule ? backendConfiguration.testRule() : Optional.empty();
+	public final Optional<Extension> extension() {
+		return useConfigurationTestRule ? backendConfiguration.extension() : Optional.empty();
 	}
 
 	public Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider) {

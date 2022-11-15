@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -30,7 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -38,15 +38,15 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests behavior related to type checking and type conversion of
  * projections on the distance between a field value and a given point.
  */
-public class DistanceProjectionTypeCheckingAndConversionIT {
+class DistanceProjectionTypeCheckingAndConversionIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 
@@ -59,8 +59,8 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missing_field_1";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -73,8 +73,8 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex )
 				.setup();
@@ -83,7 +83,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void nonProjectable() {
+	void nonProjectable() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getNonProjectableFieldPath();
@@ -98,10 +98,10 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void projectableDefault() {
+	void projectableDefault() {
 		assumeFalse(
-				"Skipping this test as the backend makes fields projectable by default.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping this test as the backend makes fields projectable by default."
 		);
 		StubMappingScope scope = mainIndex.createScope();
 
@@ -118,7 +118,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void multiValuedField_singleValuedProjection() {
+	void multiValuedField_singleValuedProjection() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = mainIndex.binding().fieldWithMultipleValuesModel.relativeFieldName;
@@ -135,7 +135,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void singleValuedFieldInMultiValuedObjectField_flattened_singleValuedProjection() {
+	void singleValuedFieldInMultiValuedObjectField_flattened_singleValuedProjection() {
 		String fieldPath = mainIndex.binding().flattenedObjectWithMultipleValues.relativeFieldName
 				+ "." + mainIndex.binding().flattenedObjectWithMultipleValues.fieldModel.relativeFieldName;
 
@@ -153,7 +153,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void singleValuedFieldInMultiValuedObjectField_nested_singleValuedProjection() {
+	void singleValuedFieldInMultiValuedObjectField_nested_singleValuedProjection() {
 		String fieldPath = mainIndex.binding().nestedObjectWithMultipleValues.relativeFieldName
 				+ "." + mainIndex.binding().nestedObjectWithMultipleValues.fieldModel.relativeFieldName;
 
@@ -170,7 +170,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void withProjectionConverters() {
+	void withProjectionConverters() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = getFieldWithConverterPath();
@@ -190,7 +190,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -209,7 +209,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndex() {
+	void multiIndex_withRawFieldCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		assertThatQuery( scope.query()
@@ -229,7 +229,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex() {
+	void multiIndex_withMissingFieldIndex() {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		assertThatQuery( scope.query()
@@ -248,7 +248,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
@@ -262,7 +262,7 @@ public class DistanceProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex_inNestedObject() {
+	void multiIndex_withIncompatibleIndex_inNestedObject() {
 		StubMappingScope scope = incompatibleIndex.createScope( mainIndex );
 
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."

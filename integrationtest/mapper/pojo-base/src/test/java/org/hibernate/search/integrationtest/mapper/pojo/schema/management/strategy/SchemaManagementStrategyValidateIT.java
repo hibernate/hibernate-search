@@ -7,10 +7,10 @@
 package org.hibernate.search.integrationtest.mapper.pojo.schema.management.strategy;
 
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
-public class SchemaManagementStrategyValidateIT extends AbstractSchemaManagementStrategyValidatingIT {
+class SchemaManagementStrategyValidateIT extends AbstractSchemaManagementStrategyValidatingIT {
 
 	@Override
 	protected SchemaManagementStrategyName getStrategyName() {

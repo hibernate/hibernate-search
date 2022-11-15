@@ -24,11 +24,11 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SortDslIT {
+class SortDslIT {
 
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
@@ -38,19 +38,19 @@ public class SortDslIT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();
 	}
 
 	@Test
-	public void entryPoint() {
+	void entryPoint() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			// tag::entryPoint-lambdas[]
 			SearchSession searchSession = /* ... */ // <1>
@@ -93,7 +93,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void score() {
+	void score() {
 		withinSearchSession( searchSession -> {
 			// tag::score[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -109,7 +109,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void indexOrder() {
+	void indexOrder() {
 		withinSearchSession( searchSession -> {
 			// tag::indexOrder[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -125,7 +125,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void stabilization() {
+	void stabilization() {
 		withinSearchSession( searchSession -> {
 			// tag::stabilization[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -140,7 +140,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void field() {
+	void field() {
 		withinSearchSession( searchSession -> {
 			// tag::field[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -155,7 +155,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void order() {
+	void order() {
 		withinSearchSession( searchSession -> {
 			// tag::order-asc[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -194,7 +194,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void missing() {
+	void missing() {
 		withinSearchSession( searchSession -> {
 			// tag::missing-first[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -233,7 +233,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void mode() {
+	void mode() {
 		withinSearchSession( searchSession -> {
 			// tag::mode-avg[]
 			List<Author> hits = searchSession.search( Author.class )
@@ -248,7 +248,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void filter() {
+	void filter() {
 		withinSearchSession( searchSession -> {
 			// tag::filter[]
 			List<Author> hits = searchSession.search( Author.class )
@@ -266,7 +266,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void composite() {
+	void composite() {
 		withinSearchSession( searchSession -> {
 			// tag::composite[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -310,7 +310,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void then() {
+	void then() {
 		withinSearchSession( searchSession -> {
 			// tag::then[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -326,7 +326,7 @@ public class SortDslIT {
 	}
 
 	@Test
-	public void distance() {
+	void distance() {
 		withinSearchSession( searchSession -> {
 			// tag::distance[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );

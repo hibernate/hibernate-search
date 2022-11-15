@@ -13,12 +13,12 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
+class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
 
 	@Override
 	protected SchemaManagementStrategyName getStrategyName() {
@@ -43,7 +43,7 @@ public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSche
 	}
 
 	@Test
-	public void close_drop_exception_single() {
+	void close_drop_exception_single() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 		CloseableSearchMapping mapping = setup();
@@ -61,7 +61,7 @@ public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSche
 	}
 
 	@Test
-	public void close_drop_exception_multiple() {
+	void close_drop_exception_multiple() {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 		CloseableSearchMapping mapping = setup();

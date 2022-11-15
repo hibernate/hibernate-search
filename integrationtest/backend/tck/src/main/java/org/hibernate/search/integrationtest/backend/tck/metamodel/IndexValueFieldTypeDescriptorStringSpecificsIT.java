@@ -13,36 +13,36 @@ import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests for value field type descriptor features that are specific to String field types
  * and are not already tested in {@link IndexValueFieldTypeDescriptorBaseIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-3589")
-public class IndexValueFieldTypeDescriptorStringSpecificsIT {
+class IndexValueFieldTypeDescriptorStringSpecificsIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
 	}
 
 	@Test
-	public void analyzerName() {
+	void analyzerName() {
 		assertThat( getTypeDescriptor( "noSearchAnalyzer" ).analyzerName() )
 				.contains( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name );
 		assertThat( getTypeDescriptor( "searchAnalyzer" ).analyzerName() )
@@ -50,7 +50,7 @@ public class IndexValueFieldTypeDescriptorStringSpecificsIT {
 	}
 
 	@Test
-	public void searchAnalyzerName() {
+	void searchAnalyzerName() {
 		assertThat( getTypeDescriptor( "noSearchAnalyzer" ).searchAnalyzerName() )
 				.contains( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name );
 		assertThat( getTypeDescriptor( "searchAnalyzer" ).searchAnalyzerName() )

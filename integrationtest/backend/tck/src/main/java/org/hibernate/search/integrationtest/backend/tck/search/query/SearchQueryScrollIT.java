@@ -10,9 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.List;
 import java.util.Locale;
@@ -26,34 +24,34 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchQueryScrollIT {
+class SearchQueryScrollIT {
 
 	private static final int DOCUMENT_COUNT = 2000;
 	private static final int CHUNK_SIZE = 30;
 	private static final int EXACT_DIVISOR_CHUNK_SIZE = 25;
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void none() {
+	void none() {
 		try ( SearchScroll<DocumentReference> scroll = matchNoneQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isFalse();
@@ -63,7 +61,7 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void one() {
+	void one() {
 		try ( SearchScroll<DocumentReference> scroll = matchOneQuery( 4 ).scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isTrue();
@@ -77,52 +75,52 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void all() {
+	void all() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT, CHUNK_SIZE );
 		}
 	}
 
 	@Test
-	public void all_exactDivisorPageSize() {
+	void all_exactDivisorPageSize() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( EXACT_DIVISOR_CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT, EXACT_DIVISOR_CHUNK_SIZE );
 		}
 	}
 
 	@Test
-	public void firstHalf() {
+	void firstHalf() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, CHUNK_SIZE );
 		}
 	}
 
 	@Test
-	public void firstHalf_onePage() {
+	void firstHalf_onePage() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( DOCUMENT_COUNT / 2 ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, DOCUMENT_COUNT / 2 );
 		}
 	}
 
 	@Test
-	public void firstHalf_largerPage() {
+	void firstHalf_largerPage() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( DOCUMENT_COUNT / 2 + 10 ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, DOCUMENT_COUNT / 2 );
 		}
 	}
 
 	@Test
-	public void tookAndTimedOut() {
+	void tookAndTimedOut() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> result = scroll.next();
 
-			assertNotNull( result.took() );
-			assertFalse( result.timedOut() );
+			assertThat( result.took() ).isNotNull();
+			assertThat( result.timedOut() ).isFalse();
 		}
 	}
 
 	@Test
-	public void resultTotal() {
+	void resultTotal() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
 				.scroll( CHUNK_SIZE ) ) {
 			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
@@ -138,10 +136,10 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold() {
+	void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
-				"This backend doesn't take totalHitsThreshold() into account for scrolls.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll(),
+				"This backend doesn't take totalHitsThreshold() into account for scrolls."
 		);
 
 		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
@@ -200,10 +198,10 @@ public class SearchQueryScrollIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold_veryHigh() {
+	void resultTotal_totalHitCountThreshold_veryHigh() {
 		assumeTrue(
-				"This backend doesn't take totalHitsThreshold() into account for scrolls.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll(),
+				"This backend doesn't take totalHitsThreshold() into account for scrolls."
 		);
 
 		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()

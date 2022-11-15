@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
-import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyGroup;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -39,30 +37,33 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
 
-import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 
 @RunWith(BytecodeEnhancerRunner.class)
 public class BytecodeEnhancementIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@ClassRule
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
+
+	@ClassRule
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 
-	private SessionFactory sessionFactory;
-
-	@Before
-	public void setup() {
+	@ReusableOrmSetupHolder.Setup
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "mappedSuperClassText", String.class )
 				.field( "entitySuperClassText", String.class )
@@ -84,21 +85,20 @@ public class BytecodeEnhancementIT {
 				.field( "transientText", String.class )
 		);
 
-		sessionFactory = ormSetupHelper.start()
+		setupContext
 				/*
 				 * This is necessary in order for the BytecodeEnhancerRunner to work correctly.
 				 * Otherwise classes can be successfully loaded from the application classloader
 				 * and the "bytecode-enhancing" TCCL won't even be tried.
 				 */
 				.withTcclLookupPrecedenceBefore()
-				.setup(
+				.withAnnotatedTypes(
 						IndexedMappedSuperClass.class,
 						IndexedEntitySuperClass.class,
 						IndexedEntity.class,
 						ContainedEntity.class,
 						ContainedEmbeddable.class
 				);
-		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class BytecodeEnhancementIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3581")
 	public void test() {
-		with( sessionFactory ).runInTransaction( session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity();
 			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006
 			( (IndexedEntitySuperClass) entity1 ).id = 1;
@@ -176,7 +176,7 @@ public class BytecodeEnhancementIT {
 
 		AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
 
-		with( sessionFactory ).runInTransaction( session -> {
+		setupHolder.runInTransaction( session -> {
 			IndexedEntity entity = session.getReference( IndexedEntity.class, 1 );
 			entityFromTransaction.set( entity );
 

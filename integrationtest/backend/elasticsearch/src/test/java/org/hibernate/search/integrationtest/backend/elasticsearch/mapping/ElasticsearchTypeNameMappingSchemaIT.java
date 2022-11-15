@@ -12,6 +12,9 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithDiscriminatorProperty;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithoutAnyProperty;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -21,49 +24,40 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.JsonObject;
 
 /**
  * Test the schema produced by type name mapping strategies.
  */
-@RunWith(Parameterized.class)
-public class ElasticsearchTypeNameMappingSchemaIT {
+class ElasticsearchTypeNameMappingSchemaIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] configurations() {
-		return new Object[][] {
-				{ null, mappingWithDiscriminatorProperty( "_entity_type" ) },
-				{ "index-name", mappingWithoutAnyProperty() },
-				{ "discriminator", mappingWithDiscriminatorProperty( "_entity_type" ) }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( null, mappingWithDiscriminatorProperty( "_entity_type" ) ),
+				Arguments.of( "index-name", mappingWithoutAnyProperty() ),
+				Arguments.of( "discriminator", mappingWithDiscriminatorProperty( "_entity_type" ) )
+		);
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
+	@RegisterExtension
+	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private final String strategyName;
-	private final JsonObject expectedMappingContent;
-
-	public ElasticsearchTypeNameMappingSchemaIT(String strategyName, JsonObject expectedMappingContent) {
-		this.strategyName = strategyName;
-		this.expectedMappingContent = expectedMappingContent;
-	}
-
-	@Test
-	public void schema() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void schema(String strategyName, JsonObject expectedMappingContent) {
 		if ( ElasticsearchTckBackendFeatures.supportsVersionCheck() ) {
 			clientSpy.expectNext(
 					ElasticsearchRequest.get().build(),
@@ -77,7 +71,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 		clientSpy.expectNext(
-				indexCreationRequest(),
+				indexCreationRequest( expectedMappingContent ),
 				ElasticsearchRequestAssertionMode.STRICT
 		);
 
@@ -100,15 +94,15 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 		clientSpy.verifyExpectationsMet();
 	}
 
-	private ElasticsearchRequest indexCreationRequest() {
+	private ElasticsearchRequest indexCreationRequest(JsonObject expectedMappingContent) {
 		ElasticsearchRequest.Builder schemaRequestBuilder = ElasticsearchRequest.put()
 				.pathComponent( defaultPrimaryName( index.name() ) )
-				.body( indexCreationPayload() );
+				.body( indexCreationPayload( expectedMappingContent ) );
 
 		return schemaRequestBuilder.build();
 	}
 
-	private JsonObject indexCreationPayload() {
+	private JsonObject indexCreationPayload(JsonObject expectedMappingContent) {
 		JsonObject payload = new JsonObject();
 
 		payload.add( "aliases", defaultAliasDefinitions( index.name() ) );

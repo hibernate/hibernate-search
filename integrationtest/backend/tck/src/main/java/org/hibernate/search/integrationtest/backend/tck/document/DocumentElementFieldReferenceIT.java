@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -23,66 +24,62 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBi
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingElement;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test the basic behavior of implementations of {@link DocumentElement}
  * when referencing fields using a {@link IndexFieldReference}.
  */
-@RunWith(Parameterized.class)
-public class DocumentElementFieldReferenceIT<F> {
+class DocumentElementFieldReferenceIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll();
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<FieldTypeDescriptor<?>> parameters() {
-		return supportedTypeDescriptors();
+	public static List<? extends Arguments> params() {
+		return supportedTypeDescriptors().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.ofAdvanced( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
-	}
-
-	private final FieldTypeDescriptor<F> fieldType;
-
-	public DocumentElementFieldReferenceIT(FieldTypeDescriptor<F> fieldType) {
-		this.fieldType = fieldType;
 	}
 
 	/**
 	 * Test that DocumentElement.addValue does not throw any exception when passing a non-null value.
 	 */
-	@Test
-	public void addValue_nonNull() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_nonNull(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNonNullValue( index.binding(), document );
+			setNonNullValue( index.binding(), document, fieldType );
 		} );
 	}
 
 	/**
 	 * Test that DocumentElement.addValue does not throw any exception when passing a null value.
 	 */
-	@Test
-	public void addValue_null() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_null(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNullValue( index.binding(), document );
+			setNullValue( index.binding(), document, fieldType );
 		} );
 	}
 
@@ -90,40 +87,44 @@ public class DocumentElementFieldReferenceIT<F> {
 	 * Test that DocumentElement.addObject does not throw any exception,
 	 * add that DocumentElement.addValue does not throw an exception for returned objects.
 	 */
-	@Test
-	public void addObject() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addObject(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNullValue( index.binding(), document );
+			setNullValue( index.binding(), document, fieldType );
 
 			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			setNonNullValue( index.binding().flattenedObject, flattenedObject );
+			setNonNullValue( index.binding().flattenedObject, flattenedObject, fieldType );
 			flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			setNullValue( index.binding().flattenedObject, flattenedObject );
+			setNullValue( index.binding().flattenedObject, flattenedObject, fieldType );
 			DocumentElement flattenedObjectSecondLevelObject =
 					flattenedObject.addObject( index.binding().flattenedObject.flattenedObject.self );
-			setNonNullValue( index.binding().flattenedObject.flattenedObject, flattenedObjectSecondLevelObject );
+			setNonNullValue( index.binding().flattenedObject.flattenedObject, flattenedObjectSecondLevelObject,
+					fieldType
+			);
 			flattenedObjectSecondLevelObject = flattenedObject.addObject( index.binding().flattenedObject.nestedObject.self );
-			setNullValue( index.binding().flattenedObject.nestedObject, flattenedObjectSecondLevelObject );
+			setNullValue( index.binding().flattenedObject.nestedObject, flattenedObjectSecondLevelObject, fieldType );
 
 			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-			setNonNullValue( index.binding().nestedObject, nestedObject );
+			setNonNullValue( index.binding().nestedObject, nestedObject, fieldType );
 			nestedObject = document.addObject( index.binding().nestedObject.self );
-			setNullValue( index.binding().nestedObject, nestedObject );
+			setNullValue( index.binding().nestedObject, nestedObject, fieldType );
 			DocumentElement nestedObjectSecondLevelObject =
 					nestedObject.addObject( index.binding().nestedObject.flattenedObject.self );
-			setNonNullValue( index.binding().nestedObject.flattenedObject, nestedObjectSecondLevelObject );
+			setNonNullValue( index.binding().nestedObject.flattenedObject, nestedObjectSecondLevelObject, fieldType );
 			nestedObjectSecondLevelObject = nestedObject.addObject( index.binding().nestedObject.nestedObject.self );
-			setNullValue( index.binding().nestedObject.nestedObject, nestedObjectSecondLevelObject );
+			setNullValue( index.binding().nestedObject.nestedObject, nestedObjectSecondLevelObject, fieldType );
 		} );
 	}
 
 	/**
 	 * Test that DocumentElement.addNullObject does not throw any exception.
 	 */
-	@Test
-	public void addNullObject() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addNullObject(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
-			setNullValue( index.binding(), document );
+			setNullValue( index.binding(), document, fieldType );
 
 			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
 			document.addNullObject( index.binding().flattenedObject.self );
@@ -146,30 +147,32 @@ public class DocumentElementFieldReferenceIT<F> {
 	 * adding a value to a static field on an object field that excludes all static children
 	 * (due to IndexedEmbedded filters).
 	 */
-	@Test
-	public void addValue_excludedFields() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void addValue_excludedFields(FieldTypeDescriptor<F> fieldType) {
 		executeAdd( "1", document -> {
 			DocumentElement excludingObject = document.addObject( index.binding().excludingObject.self );
-			setNonNullValue( index.binding().excludingObject, excludingObject );
+			setNonNullValue( index.binding().excludingObject, excludingObject, fieldType );
 			excludingObject = document.addObject( index.binding().excludingObject.self );
-			setNullValue( index.binding().excludingObject, excludingObject );
+			setNullValue( index.binding().excludingObject, excludingObject, fieldType );
 
 			DocumentElement flattenedSecondLevelObject =
 					excludingObject.addObject( index.binding().excludingObject.flattenedObject.self );
-			setNonNullValue( index.binding().excludingObject.flattenedObject, flattenedSecondLevelObject );
+			setNonNullValue( index.binding().excludingObject.flattenedObject, flattenedSecondLevelObject, fieldType );
 			flattenedSecondLevelObject = excludingObject.addObject( index.binding().excludingObject.flattenedObject.self );
-			setNullValue( index.binding().excludingObject.flattenedObject, flattenedSecondLevelObject );
+			setNullValue( index.binding().excludingObject.flattenedObject, flattenedSecondLevelObject, fieldType );
 
 			DocumentElement nestedSecondLevelObject =
 					excludingObject.addObject( index.binding().excludingObject.nestedObject.self );
-			setNullValue( index.binding().excludingObject.nestedObject, nestedSecondLevelObject );
+			setNullValue( index.binding().excludingObject.nestedObject, nestedSecondLevelObject, fieldType );
 			nestedSecondLevelObject = excludingObject.addObject( index.binding().excludingObject.nestedObject.self );
-			setNullValue( index.binding().excludingObject.nestedObject, nestedSecondLevelObject );
+			setNullValue( index.binding().excludingObject.nestedObject, nestedSecondLevelObject, fieldType );
 		} );
 	}
 
-	@Test
-	public void invalidFieldForDocumentElement_flattenedObjectChild() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidFieldForDocumentElement_flattenedObjectChild(FieldTypeDescriptor<F> fieldType) {
 		IndexFieldReference<F> reference = index.binding().flattenedObject.fieldModels.get( fieldType ).reference;
 		assertThatThrownBy(
 				() -> executeAdd( "1", document -> {
@@ -183,8 +186,9 @@ public class DocumentElementFieldReferenceIT<F> {
 				.hasMessageContaining( "but the referenced field has a parent with path 'null'" );
 	}
 
-	@Test
-	public void invalidFieldForDocumentElement_nestedObjectChild() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidFieldForDocumentElement_nestedObjectChild(FieldTypeDescriptor<F> fieldType) {
 		IndexFieldReference<F> reference = index.binding().nestedObject.fieldModels.get( fieldType ).reference;
 		assertThatThrownBy(
 				() -> executeAdd( "1", document -> {
@@ -198,8 +202,9 @@ public class DocumentElementFieldReferenceIT<F> {
 				.hasMessageContaining( "but the referenced field has a parent with path 'null'" );
 	}
 
-	@Test
-	public void invalidFieldForDocumentElement_rootChild() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidFieldForDocumentElement_rootChild(FieldTypeDescriptor<F> fieldType) {
 		IndexFieldReference<F> reference = index.binding().fieldModels.get( fieldType ).reference;
 		assertThatThrownBy(
 				() -> executeAdd( "1", document -> {
@@ -214,12 +219,14 @@ public class DocumentElementFieldReferenceIT<F> {
 				.hasMessageContaining( "but the referenced field has a parent with path 'flattenedObject'" );
 	}
 
-	private void setNonNullValue(AbstractObjectBinding binding, DocumentElement document) {
+	private void setNonNullValue(AbstractObjectBinding binding, DocumentElement document,
+			FieldTypeDescriptor<F> fieldType) {
 		document.addValue( binding.fieldModels.get( fieldType ).reference,
 				fieldType.getIndexableValues().getSingle().get( 0 ) );
 	}
 
-	private void setNullValue(AbstractObjectBinding binding, DocumentElement document) {
+	private void setNullValue(AbstractObjectBinding binding, DocumentElement document,
+			FieldTypeDescriptor<F> fieldType) {
 		document.addValue( binding.fieldModels.get( fieldType ).reference, null );
 	}
 

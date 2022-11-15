@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.outboxpolling.automaticindexing;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
@@ -31,7 +31,7 @@ import org.junit.rules.MethodRule;
 public class OutboxPollingIndexingPlanFilterIT {
 
 	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );

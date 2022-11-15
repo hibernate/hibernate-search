@@ -9,27 +9,30 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection;
-import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FieldProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConstructorRecordIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorRecordIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void typeLevelAnnotation() {
+	void typeLevelAnnotation() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -40,7 +43,8 @@ public class ProjectionConstructorRecordIT extends AbstractProjectionConstructor
 			public Integer integer;
 		}
 		@ProjectionConstructor
-		record MyProjection(String text, Integer integer) { }
+		record MyProjection(String text, Integer integer) {
+		}
 
 		backendMock.expectAnySchema( INDEX_NAME );
 		SearchMapping mapping = setupHelper.start()
@@ -69,7 +73,7 @@ public class ProjectionConstructorRecordIT extends AbstractProjectionConstructor
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4853")
-	public void constructorLevelAnnotation_canonical() {
+	void constructorLevelAnnotation_canonical() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -115,7 +119,7 @@ public class ProjectionConstructorRecordIT extends AbstractProjectionConstructor
 	}
 
 	@Test
-	public void constructorLevelAnnotation_nonCanonical() {
+	void constructorLevelAnnotation_nonCanonical() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -164,7 +168,7 @@ public class ProjectionConstructorRecordIT extends AbstractProjectionConstructor
 	}
 
 	@Test
-	public void innerExplicit() {
+	void innerExplicit() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

@@ -20,20 +20,20 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IdentifierProjectionBaseIT {
+class IdentifierProjectionBaseIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 			.name( "my-index" );
@@ -56,14 +56,14 @@ public class IdentifierProjectionBaseIT {
 		initValues();
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndexes( index, compatibleIndex, incompatibleIndex ).setup();
 		initData();
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<String> query = scope.query()
 				.select( f -> f.id( String.class ) )
@@ -75,7 +75,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void noClass() {
+	void noClass() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<Object> query = scope.query()
 				.select( f -> f.id() )
@@ -87,7 +87,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void duplicated() {
+	void duplicated() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
@@ -100,7 +100,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void validSuperClass() {
+	void validSuperClass() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<CharSequence> query = scope.query()
 				.select( f -> f.id( CharSequence.class ) )
@@ -112,7 +112,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void invalidProjectionType() {
+	void invalidProjectionType() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection().id( Integer.class ) )
@@ -123,7 +123,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = index.createScope( compatibleIndex );
 		SearchQuery<String> query = scope.query()
 				.select( f -> f.id( String.class ) )
@@ -139,7 +139,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
 		assertThatThrownBy( () -> scope.projection().id() )
@@ -151,7 +151,7 @@ public class IdentifierProjectionBaseIT {
 	}
 
 	@Test
-	public void nullClass() {
+	void nullClass() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection().id( (Class<?>) null ) )

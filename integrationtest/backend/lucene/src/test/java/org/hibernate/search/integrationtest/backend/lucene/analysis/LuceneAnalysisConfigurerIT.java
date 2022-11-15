@@ -18,15 +18,15 @@ import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneAnalysisUtils;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
@@ -34,16 +34,16 @@ import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
 
-public class LuceneAnalysisConfigurerIT {
+class LuceneAnalysisConfigurerIT {
 
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Unable to apply analysis configuration";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4404")
-	public void availableComponents() {
+	void availableComponents() {
 		assertThat( CollectingConfigurer.TOKENIZERS ).isEmpty();
 		assertThat( CollectingConfigurer.CHAR_FILTERS ).isEmpty();
 		assertThat( CollectingConfigurer.TOKEN_FILTERS ).isEmpty();
@@ -70,7 +70,7 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4404")
-	public void byName() throws IOException {
+	void byName() throws IOException {
 		LuceneBackend backend = setup( ByNameConfigurer.class.getName() );
 
 		Optional<? extends Analyzer> analyzer = backend.analyzer( "analyzer" );
@@ -99,7 +99,7 @@ public class LuceneAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void byClass() throws IOException {
+	void byClass() throws IOException {
 		LuceneBackend backend = setup( ByClassConfigurer.class.getName() );
 
 		Optional<? extends Analyzer> analyzer = backend.analyzer( "analyzer" );
@@ -128,7 +128,7 @@ public class LuceneAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_invalidReference() {
+	void error_invalidReference() {
 		assertThatThrownBy(
 				() -> setup( "foobar" )
 		)
@@ -145,7 +145,7 @@ public class LuceneAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_failingConfigurer() {
+	void error_failingConfigurer() {
 		assertThatThrownBy(
 				() -> setup( FailingConfigurer.class.getName() )
 		)
@@ -175,7 +175,7 @@ public class LuceneAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_parameter_namingConflict() {
+	void error_parameter_namingConflict() {
 		assertThatThrownBy(
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
@@ -204,7 +204,7 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4594")
-	public void multipleConfigurers() {
+	void multipleConfigurers() {
 		LuceneBackend backend = setup( MultipleConfigurers1.class.getName() + "," + MultipleConfigurers2.class.getName() );
 
 		assertThat( backend.analyzer( "analyzer1" ) ).isPresent();

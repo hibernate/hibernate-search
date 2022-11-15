@@ -31,7 +31,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -40,25 +40,24 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.data.Pair;
 import org.hibernate.search.util.impl.test.data.Triplet;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.assertj.core.api.ListAssert;
 
 /**
  * Tests basic behavior of projections on the distance between a given point and the value of a multi-valued field.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3391")
-public class DistanceProjectionMultiValuedBaseIT {
+class DistanceProjectionMultiValuedBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
-	private static List<DataSet> dataSets;
-
+	private static final List<DataSet> dataSets = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 	private static final Comparator<Iterable<Double>> APPROX_M_COMPARATOR =
 			TestComparators.lexicographic( TestComparators.APPROX_M_COMPARATOR );
 	private static final Comparator<Iterable<Double>> APPROX_KM_COMPARATOR =
@@ -66,23 +65,23 @@ public class DistanceProjectionMultiValuedBaseIT {
 	private static final Comparator<Iterable<Double>> APPROX_MILES_COMPARATOR =
 			TestComparators.lexicographic( TestComparators.APPROX_MILES_COMPARATOR );
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
 			if ( fieldStructure.isSingleValued() ) {
 				continue;
 			}
 			DataSet dataSet = new DataSet( fieldStructure );
 			dataSets.add( dataSet );
-			parameters.add( new Object[] { fieldStructure, dataSet } );
+			parameters.add( Arguments.of( fieldStructure, dataSet ) );
 		}
-		return parameters.toArray( new Object[0][] );
 	}
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public static List<? extends Arguments> params() {
+		return parameters;
+	}
+
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of(
@@ -107,8 +106,8 @@ public class DistanceProjectionMultiValuedBaseIT {
 			)
 					.name( "sortable" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( mainIndex, sortableIndex ).setup();
 
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer();
@@ -119,19 +118,12 @@ public class DistanceProjectionMultiValuedBaseIT {
 		mainIndexer.join( sortableIndexer );
 	}
 
-	private final TestedFieldStructure fieldStructure;
-	private final DataSet dataSet;
-
-	public DistanceProjectionMultiValuedBaseIT(TestedFieldStructure fieldStructure, DataSet dataSet) {
-		this.fieldStructure = fieldStructure;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void simple(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
 		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
@@ -153,11 +145,12 @@ public class DistanceProjectionMultiValuedBaseIT {
 	 * Test that mentioning the same projection twice works as expected.
 	 */
 	@SuppressWarnings("unchecked")
-	@Test
-	public void duplicated() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void duplicated(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
 		ListAssert<Pair<List<Double>, List<Double>>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite()
@@ -187,9 +180,10 @@ public class DistanceProjectionMultiValuedBaseIT {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3618")
-	public void sortable_withoutSort() {
+	void sortable_withoutSort(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = sortableIndex.createScope();
 
 		String fieldPath = sortableIndex.binding().getFieldPath( fieldStructure, fieldType );
@@ -213,9 +207,10 @@ public class DistanceProjectionMultiValuedBaseIT {
 	 * This is relevant because projections on the distance can
 	 * be optimized when also sorting by distance to the same point.
 	 */
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3618")
-	public void sortable_withSort() {
+	void sortable_withSort(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = sortableIndex.createScope();
 
 		String fieldPath = sortableIndex.binding().getFieldPath( fieldStructure, fieldType );
@@ -236,12 +231,13 @@ public class DistanceProjectionMultiValuedBaseIT {
 				);
 	}
 
-	@Test
-	public void unit_km() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void unit_km(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 ).multi()
+				.select( f -> f.distance( getFieldPath( fieldStructure ), CENTER_POINT_1 ).multi()
 						.unit( DistanceUnit.KILOMETERS ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -256,12 +252,13 @@ public class DistanceProjectionMultiValuedBaseIT {
 				);
 	}
 
-	@Test
-	public void unit_miles() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void unit_miles(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()
-				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 ).multi()
+				.select( f -> f.distance( getFieldPath( fieldStructure ), CENTER_POINT_1 ).multi()
 						.unit( DistanceUnit.MILES ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -276,15 +273,17 @@ public class DistanceProjectionMultiValuedBaseIT {
 				);
 	}
 
-	@Test
-	public void several() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void several(TestedFieldStructure fieldStructure, DataSet dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ListAssert<Triplet<List<Double>, List<Double>, List<Double>>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite()
-						.from( f.distance( getFieldPath(), CENTER_POINT_1 ).multi(),
-								f.distance( getFieldPath(), CENTER_POINT_2 ).multi(),
-								f.distance( getFieldPath(), CENTER_POINT_1 ).multi().unit( DistanceUnit.KILOMETERS ) )
+						.from( f.distance( getFieldPath( fieldStructure ), CENTER_POINT_1 ).multi(),
+								f.distance( getFieldPath( fieldStructure ), CENTER_POINT_2 ).multi(),
+								f.distance( getFieldPath( fieldStructure ), CENTER_POINT_1 ).multi()
+										.unit( DistanceUnit.KILOMETERS ) )
 						.as( Triplet::new ) )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -317,7 +316,7 @@ public class DistanceProjectionMultiValuedBaseIT {
 				);
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(TestedFieldStructure fieldStructure) {
 		return mainIndex.binding().getFieldPath( fieldStructure, fieldType );
 	}
 

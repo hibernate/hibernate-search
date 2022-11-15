@@ -16,20 +16,20 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.outboxpolling.OutboxPollingExtension;
 import org.hibernate.search.mapper.orm.outboxpolling.mapping.OutboxPollingSearchMapping;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingSearchMappingIT {
+class OutboxPollingSearchMappingIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
@@ -37,8 +37,8 @@ public class OutboxPollingSearchMappingIT {
 	private OutboxPollingSearchMapping searchMapping;
 	private AbortedEventsGenerator abortedEventsGenerator;
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.event_processor.retry_delay", 0 )
@@ -49,7 +49,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void countAbortedEvents_tenantIdSpecified() {
+	void countAbortedEvents_tenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.countAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -59,7 +59,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents_tenantIdSpecified() {
+	void reprocessAbortedEvents_tenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.reprocessAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -69,7 +69,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents_tenantIdSpecified() {
+	void clearAllAbortedEvents_tenantIdSpecified() {
 		assertThatThrownBy( () -> searchMapping.clearAllAbortedEvents( "tenantX" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -79,7 +79,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void clearAllAbortedEvents() {
+	void clearAllAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
 
 		abortedEventsGenerator.generateThreeAbortedEvents();
@@ -92,7 +92,7 @@ public class OutboxPollingSearchMappingIT {
 	}
 
 	@Test
-	public void reprocessAbortedEvents() {
+	void reprocessAbortedEvents() {
 		assertThat( searchMapping.countAbortedEvents() ).isZero();
 
 		List<Integer> generatedIDs = abortedEventsGenerator.generateThreeAbortedEvents();

@@ -32,31 +32,31 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSearchLoadingContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchQueryBaseIT {
+class SearchQueryBaseIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void getQueryString() {
+	void getQueryString() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -68,7 +68,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4183")
-	public void tookAndTimedOut() {
+	void tookAndTimedOut() {
 		SearchQuery<DocumentReference> query = matchAllSortedByScoreQuery()
 				.toQuery();
 
@@ -79,7 +79,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal() {
+	void resultTotal() {
 		initData( 5000 );
 
 		SearchResult<DocumentReference> fetch = matchAllSortedByScoreQuery()
@@ -93,7 +93,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold() {
+	void resultTotal_totalHitCountThreshold() {
 		initData( 5000 );
 
 		SearchResult<DocumentReference> fetch = matchAllWithConditionSortedByScoreQuery()
@@ -116,7 +116,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitCountThreshold_veryHigh() {
+	void resultTotal_totalHitCountThreshold_veryHigh() {
 		initData( 5000 );
 
 		SearchResult<DocumentReference> fetch = matchAllWithConditionSortedByScoreQuery()
@@ -132,7 +132,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		initData( 2 );
 
 		SearchQuery<DocumentReference> query = matchAllSortedByScoreQuery().toQuery();
@@ -150,7 +150,7 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void context_extension() {
+	void context_extension() {
 		initData( 5 );
 
 		StubMappingScope scope = index.createScope();

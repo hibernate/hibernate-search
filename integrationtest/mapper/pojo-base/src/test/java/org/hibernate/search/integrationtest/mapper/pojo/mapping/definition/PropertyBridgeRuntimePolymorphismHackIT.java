@@ -27,30 +27,30 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * See https://discourse.hibernate.org/t/propertybinder-for-base-type-reports-no-children-property-found-in-parent-class/5493/2
  */
 @TestForIssue(jiraKey = "HSEARCH-4491")
-public class PropertyBridgeRuntimePolymorphismHackIT {
+class PropertyBridgeRuntimePolymorphismHackIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock(
 			MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void explicitReindexing_hack_runtimePolymorphism() {
+	void explicitReindexing_hack_runtimePolymorphism() {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
 
 		SearchMapping mapping = setupHelper.start()

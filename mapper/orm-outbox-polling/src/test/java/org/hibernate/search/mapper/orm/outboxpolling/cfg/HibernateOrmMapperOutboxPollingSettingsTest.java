@@ -8,12 +8,12 @@ package org.hibernate.search.mapper.orm.outboxpolling.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class HibernateOrmMapperOutboxPollingSettingsTest {
+class HibernateOrmMapperOutboxPollingSettingsTest {
 
 	@Test
-	public void coordinationKey() {
+	void coordinationKey() {
 		assertThat( HibernateOrmMapperOutboxPollingSettings.coordinationKey( "foo.bar" ) )
 				.isEqualTo( "hibernate.search.coordination.foo.bar" );
 		assertThat( HibernateOrmMapperOutboxPollingSettings.coordinationKey( "myTenant", "foo.bar" ) )

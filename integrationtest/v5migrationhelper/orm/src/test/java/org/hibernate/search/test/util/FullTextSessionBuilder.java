@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.util;
 
+import static org.hibernate.search.test.util.impl.JunitJupiterContextHelper.extensionContext;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ import org.hibernate.search.impl.ImplementationFactory;
 import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -122,19 +125,23 @@ public class FullTextSessionBuilder implements TestRule {
 
 	@Override
 	public Statement apply(final Statement base, Description description) {
+		ExtensionContext context = extensionContext( description );
+
 		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
+				setupHelper.beforeAll( context );
 				build();
 				try {
 					base.evaluate();
 				}
 				finally {
 					sessionFactory = null;
+					setupHelper.afterAll( context );
 				}
 			}
 		};
-		return setupHelper.apply( wrapped, description );
+		return wrapped;
 	}
 
 }

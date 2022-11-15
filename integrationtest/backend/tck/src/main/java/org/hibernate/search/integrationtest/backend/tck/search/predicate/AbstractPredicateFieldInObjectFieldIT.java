@@ -15,76 +15,89 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPredicateTestValues<?>>
 		extends AbstractPredicateInObjectFieldIT {
 
-	protected final DataSet<?, V> dataSet;
-
-	public AbstractPredicateFieldInObjectFieldIT(SimpleMappedIndex<IndexBinding> mainIndex,
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	void factoryWithRoot_nested(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, DataSet<?, V> dataSet) {
-		super( mainIndex, missingFieldIndex, dataSet );
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void factoryWithRoot_nested() {
 		assertThatQuery( mainIndex.query()
-				.where( f -> predicateWithRelativePath( f.withRoot( binding.nested.absolutePath ), binding.nested, 0 ) )
+				.where( f -> predicateWithRelativePath( f.withRoot( mainIndex.binding().nested.absolutePath ),
+						mainIndex.binding().nested, 0,
+						dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void factoryWithRoot_flattened() {
+	void factoryWithRoot_flattened(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, DataSet<?, V> dataSet) {
 		assertThatQuery( mainIndex.query()
-				.where( f -> predicateWithRelativePath( f.withRoot( binding.flattened.absolutePath ), binding.flattened, 0 ) )
+				.where( f -> predicateWithRelativePath( f.withRoot( mainIndex.binding().flattened.absolutePath ),
+						mainIndex.binding().flattened, 0,
+						dataSet
+				) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void inNamedPredicate_nested() {
+	void inNamedPredicate_nested(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, DataSet<?, V> dataSet) {
 		assertThatQuery( mainIndex.query()
-				.where( f -> f.named( binding.nested.absolutePath + "." + StubPredicateDefinition.NAME )
+				.where( f -> f.named( mainIndex.binding().nested.absolutePath + "." + StubPredicateDefinition.NAME )
 						.param( StubPredicateDefinition.IMPL_PARAM_NAME,
-								(PredicateDefinition) context -> predicateWithRelativePath( context.predicate(), binding.nested,
-										0 )
+								(PredicateDefinition) context -> predicateWithRelativePath( context.predicate(),
+										mainIndex.binding().nested, 0, dataSet )
 										.toPredicate() ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void inNamedPredicate_flattened() {
+	void inNamedPredicate_flattened(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, DataSet<?, V> dataSet) {
 		assertThatQuery( mainIndex.query()
-				.where( f -> f.named( binding.flattened.absolutePath + "." + StubPredicateDefinition.NAME )
+				.where( f -> f.named( mainIndex.binding().flattened.absolutePath + "." + StubPredicateDefinition.NAME )
 						.param( StubPredicateDefinition.IMPL_PARAM_NAME,
 								(PredicateDefinition) context -> predicateWithRelativePath( context.predicate(),
-										binding.flattened, 0 )
+										mainIndex.binding().flattened, 0,
+										dataSet
+								)
 										.toPredicate() ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected final PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
-			int matchingDocOrdinal) {
-		return predicate( f, objectFieldBinding.absoluteFieldPath( dataSet.fieldType ), matchingDocOrdinal );
+			int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
+		return predicate( f, objectFieldBinding.absoluteFieldPath( ( (DataSet<?, V>) dataSet ).fieldType ), matchingDocOrdinal,
+				(DataSet<?, V>) dataSet
+		);
 	}
 
 	protected final PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f,
 			ObjectFieldBinding objectFieldBinding,
-			int matchingDocOrdinal) {
-		return predicate( f, objectFieldBinding.relativeFieldPath( dataSet.fieldType ), matchingDocOrdinal );
+			int matchingDocOrdinal, DataSet<?, V> dataSet) {
+		return predicate( f, objectFieldBinding.relativeFieldPath( dataSet.fieldType ), matchingDocOrdinal, dataSet );
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal);
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+			DataSet<?, V> dataSet);
 
 	public static final class DataSet<F, V extends AbstractPredicateTestValues<F>>
 			extends AbstractPerFieldTypePredicateDataSet<F, V> {

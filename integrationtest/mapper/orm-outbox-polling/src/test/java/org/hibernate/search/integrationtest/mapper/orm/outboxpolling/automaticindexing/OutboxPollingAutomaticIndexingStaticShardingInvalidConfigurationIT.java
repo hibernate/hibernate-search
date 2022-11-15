@@ -17,27 +17,27 @@ import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4141")
-public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT {
+class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
 	@Test
-	public void totalCount_missing() {
+	void totalCount_missing() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "0" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -49,7 +49,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void totalCount_zero() {
+	void totalCount_zero() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "0" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -60,7 +60,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void totalCount_negative() {
+	void totalCount_negative() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "-1" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -71,7 +71,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_missing() {
+	void assigned_missing() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" ) ) )
 				.isInstanceOf( SearchException.class )
@@ -83,7 +83,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_negative() {
+	void assigned_negative() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "-1" ) ) )
@@ -96,7 +96,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_equalToTotalCount() {
+	void assigned_equalToTotalCount() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "10" ) ) )
@@ -110,7 +110,7 @@ public class OutboxPollingAutomaticIndexingStaticShardingInvalidConfigurationIT 
 	}
 
 	@Test
-	public void assigned_greaterThanTotalCount() {
+	void assigned_greaterThanTotalCount() {
 		assertThatThrownBy( () -> setup( context -> context
 				.withProperty( "hibernate.search.coordination.event_processor.shards.total_count", "10" )
 				.withProperty( "hibernate.search.coordination.event_processor.shards.assigned", "11" ) ) )

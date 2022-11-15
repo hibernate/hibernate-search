@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
@@ -24,54 +26,42 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test overriding default identifier bridges for the {@code @DocumentId} annotation,
  * for example assigning a different default identifier bridge for properties of type {@link String}.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3096")
-public class DocumentIdDefaultBridgeOverridingIT<I> {
+class DocumentIdDefaultBridgeOverridingIT<I> {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[] types() {
+	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
-				.map( type -> new Object[] { type, type.getDefaultIdentifierBridgeExpectations() } )
-				.toArray();
+				.map( type -> Arguments.of( type, type.getDefaultIdentifierBridgeExpectations() ) )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
-	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
 	private StubIndexModel indexModel;
 
-	public DocumentIdDefaultBridgeOverridingIT(PropertyTypeDescriptor<I, ?> typeDescriptor,
-			DefaultIdentifierBridgeExpectations<I> expectations) {
-		this.typeDescriptor = typeDescriptor;
-		this.expectations = expectations;
-	}
-
-	@Before
-	public void setup() {
+	public void setup(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> {},
@@ -82,15 +72,18 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 						DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
 				// HERE we override the default bridge for the type being tested.
 				.withConfiguration( builder -> builder.bridges().exactType( typeDescriptor.getJavaType() )
-						.identifierBridge( new OverridingDefaultBridge() ) )
+						.identifierBridge( new OverridingDefaultBridge( typeDescriptor ) ) )
 				.setup();
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void indexing() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void indexing(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
-			Object entity = expectations.instantiateTypeWithIdentifierBridge1( getEntityIdentifierValue() );
+			Object entity = expectations.instantiateTypeWithIdentifierBridge1( getEntityIdentifierValue(
+					typeDescriptor ) );
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
@@ -99,8 +92,11 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void projection_entityReference() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projection_entityReference(PropertyTypeDescriptor<I, ?> typeDescriptor,
+			DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchReferences(
 					Collections.singletonList( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
@@ -122,14 +118,16 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 					.containsExactly( PojoEntityReference.withName(
 							expectations.getTypeWithIdentifierBridge1(),
 							DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
-							getEntityIdentifierValue()
+							getEntityIdentifierValue( typeDescriptor )
 					) );
 			backendMock.verifyExpectationsMet();
 		}
 	}
 
-	@Test
-	public void projection_id() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projection_id(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchIds(
 					Collections.singletonList( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
@@ -146,14 +144,16 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 					.toQuery();
 
 			assertThat( query.fetchAll().hits() )
-					.containsExactly( getEntityIdentifierValue() );
+					.containsExactly( getEntityIdentifierValue( typeDescriptor ) );
 			backendMock.verifyExpectationsMet();
 		}
 	}
 
 	// Test behavior that backends expect from our bridges when using the DSLs
-	@Test
-	public void dslToIndexConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dslToIndexConverter(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<I, ?> dslConverter =
@@ -162,13 +162,13 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// The overriden default bridge must be used by the DSL converter
-		assertThat( dslConverter.toDocumentValue( getEntityIdentifierValue(), convertContext ) )
+		assertThat( dslConverter.toDocumentValue( getEntityIdentifierValue( typeDescriptor ), convertContext ) )
 				.isEqualTo( getDocumentIdentifierValue() );
-		assertThat( dslConverter.unknownTypeToDocumentValue( getEntityIdentifierValue(), convertContext ) )
+		assertThat( dslConverter.unknownTypeToDocumentValue( getEntityIdentifierValue( typeDescriptor ), convertContext ) )
 				.isEqualTo( getDocumentIdentifierValue() );
 	}
 
-	private I getEntityIdentifierValue() {
+	private I getEntityIdentifierValue(PropertyTypeDescriptor<I, ?> typeDescriptor) {
 		return typeDescriptor.values().entityModelValues.get( 0 );
 	}
 
@@ -179,12 +179,17 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 
 	private class OverridingDefaultBridge implements IdentifierBridge<I> {
 		private static final String DOCUMENT_ID = "OVERRIDDEN_ID";
+		private final PropertyTypeDescriptor<I, ?> typeDescriptor;
+
+		private OverridingDefaultBridge(PropertyTypeDescriptor<I, ?> typeDescriptor) {
+			this.typeDescriptor = typeDescriptor;
+		}
 
 		@Override
 		public I fromDocumentIdentifier(String documentIdentifier,
 				IdentifierBridgeFromDocumentIdentifierContext context) {
 			// We only support one ID value: this is just a stub
-			return getEntityIdentifierValue();
+			return getEntityIdentifierValue( typeDescriptor );
 		}
 
 		@Override

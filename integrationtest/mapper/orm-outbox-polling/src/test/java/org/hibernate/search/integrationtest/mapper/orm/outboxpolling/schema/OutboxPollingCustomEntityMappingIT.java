@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,15 +42,15 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class OutboxPollingCustomEntityMappingIT {
+class OutboxPollingCustomEntityMappingIT {
 
 	private static final String CUSTOM_SCHEMA = "CUSTOM_SCHEMA";
 	private static final String ORIGINAL_OUTBOX_EVENT_TABLE_NAME =
@@ -81,13 +81,13 @@ public class OutboxPollingCustomEntityMappingIT {
 		};
 	}
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
@@ -96,7 +96,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	private final OutboxEventFilter eventFilter = new OutboxEventFilter();
 
 	@Test
-	public void wrongOutboxEventMapping() {
+	void wrongOutboxEventMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping",
 						"<entity-mappings><ciao></ciao></entity-mappings>" )
@@ -106,7 +106,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void wrongAgentMapping() {
+	void wrongAgentMapping() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.agent.entity.mapping",
 						"<entity-mappings><ciao></ciao></entity-mappings>" )
@@ -116,7 +116,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validOutboxEventMapping() {
+	void validOutboxEventMapping() {
 		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
@@ -146,7 +146,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validAgentMapping() {
+	void validAgentMapping() {
 		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
@@ -176,7 +176,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void conflictingAgentMappingConfiguration() {
+	void conflictingAgentMappingConfiguration() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.agent.entity.mapping", VALID_AGENT_EVENT_MAPPING )
 				.withProperty( "hibernate.search.coordination.entity.mapping.agent.table", "break_it_all" )
@@ -186,7 +186,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void conflictingOutboxeventMappingConfiguration() {
+	void conflictingOutboxeventMappingConfiguration() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withProperty( "hibernate.search.coordination.outboxevent.entity.mapping", VALID_OUTBOX_EVENT_MAPPING )
 				.withProperty( "hibernate.search.coordination.entity.mapping.outboxevent.table", "break_it_all" )
@@ -196,7 +196,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validMappingWithCustomNames() {
+	void validMappingWithCustomNames() {
 		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
@@ -227,7 +227,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validMappingWithCustomNamesAndSchema() {
+	void validMappingWithCustomNamesAndSchema() {
 		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
@@ -245,10 +245,14 @@ public class OutboxPollingCustomEntityMappingIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		assumeTrue( "This test only makes sense if the database supports schemas",
-				getNameQualifierSupport().supportsSchemas() );
-		assumeTrue( "This test only makes sense if the dialect supports creating schemas",
-				getDialect().canCreateSchema() );
+		assumeTrue(
+				getNameQualifierSupport().supportsSchemas(),
+				"This test only makes sense if the database supports schemas"
+		);
+		assumeTrue(
+				getDialect().canCreateSchema(),
+				"This test only makes sense if the dialect supports creating schemas"
+		);
 
 		int id = 1;
 		with( sessionFactory ).runInTransaction( session -> {
@@ -283,7 +287,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validMappingWithCustomUuidGenerator() {
+	void validMappingWithCustomUuidGenerator() {
 		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
@@ -328,7 +332,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validMappingWithCustomUuidDataType() {
+	void validMappingWithCustomUuidDataType() {
 		KeysStatementInspector statementInspector = new KeysStatementInspector();
 
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
@@ -373,7 +377,7 @@ public class OutboxPollingCustomEntityMappingIT {
 	}
 
 	@Test
-	public void validMappingWithCustomFailingUuidGenerator() {
+	void validMappingWithCustomFailingUuidGenerator() {
 		assertThatThrownBy(
 				() -> ormSetupHelper.start()
 						.withProperty(

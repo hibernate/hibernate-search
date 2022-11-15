@@ -28,23 +28,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class TransientPropertyIT {
+class TransientPropertyIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void withoutDerivedFrom() {
+	void withoutDerivedFrom() {
 		assertThatThrownBy(
 				() -> ormSetupHelper.start().setup( EntityWithoutDerivedFrom.class )
 		)
@@ -59,7 +59,7 @@ public class TransientPropertyIT {
 	}
 
 	@Test
-	public void withDerivedFrom() {
+	void withDerivedFrom() {
 		backendMock.expectSchema( EntityWithDerivedFrom.INDEX, b -> b
 				.field( "APlusB", Integer.class )
 		);
@@ -108,7 +108,7 @@ public class TransientPropertyIT {
 	}
 
 	@Test
-	public void withDerivedFromAndBridge() {
+	void withDerivedFromAndBridge() {
 		backendMock.expectSchema( EntityWithDerivedFromAndBridge.INDEX, b -> b
 				.field( "APlusB", Integer.class )
 		);

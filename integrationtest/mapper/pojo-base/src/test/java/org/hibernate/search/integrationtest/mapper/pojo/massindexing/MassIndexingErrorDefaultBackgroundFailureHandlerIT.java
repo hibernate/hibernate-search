@@ -8,15 +8,15 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public class MassIndexingErrorDefaultBackgroundFailureHandlerIT extends AbstractMassIndexingErrorIT {
+class MassIndexingErrorDefaultBackgroundFailureHandlerIT extends AbstractMassIndexingErrorIT {
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Override

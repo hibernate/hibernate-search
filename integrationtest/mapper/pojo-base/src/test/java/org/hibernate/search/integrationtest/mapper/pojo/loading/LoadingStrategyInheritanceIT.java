@@ -23,29 +23,29 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4203") // See https://github.com/hibernate/hibernate-search/pull/2564#issuecomment-833808403
-public class LoadingStrategyInheritanceIT {
+class LoadingStrategyInheritanceIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private final Map<Integer, RootEntity> entityMap = new HashMap<>();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		RootEntity root1 = new RootEntity();
 		root1.id = 1;
 		root1.name = "name1";
@@ -57,7 +57,7 @@ public class LoadingStrategyInheritanceIT {
 	}
 
 	@Test
-	public void addEntity_configurer_inheritance() throws InterruptedException {
+	void addEntity_configurer_inheritance() throws InterruptedException {
 		String rootEntityName = RootEntity.class.getSimpleName();
 		String derivedEntityName = DerivedEntity.class.getSimpleName();
 
@@ -111,7 +111,7 @@ public class LoadingStrategyInheritanceIT {
 
 	// Same as the test above, but with explicit names
 	@Test
-	public void addEntity_name_configurer_inheritance() throws InterruptedException {
+	void addEntity_name_configurer_inheritance() throws InterruptedException {
 		String rootEntityName = "customRootName";
 		String derivedEntityName = "customDerivedName";
 

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 

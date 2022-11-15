@@ -12,12 +12,12 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Reproducer for HSEARCH-3725,
@@ -39,7 +39,7 @@ import org.junit.Test;
  * will see a null adapter and throw an exception.
  */
 @TestForIssue(jiraKey = "HSEARCH-3725")
-public class ElasticsearchGsonConcurrencyIT {
+class ElasticsearchGsonConcurrencyIT {
 
 	/*
 	 * Please keep these constants reasonably low so that routine builds don't take forever:
@@ -51,11 +51,11 @@ public class ElasticsearchGsonConcurrencyIT {
 	// This must be at least 2, but you don't need more than the number of CPU cores.
 	private static final int INDEX_COUNT_PER_ATTEMPT = 4;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
-	public void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {
+	void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {
 		for ( int i = 0; i < REPRODUCER_ATTEMPTS; i++ ) {
 			startMultipleIndexesSerializingWithGsonInParallel();
 			setupHelper.cleanUp();

@@ -26,17 +26,17 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
@@ -45,29 +45,29 @@ import org.apache.logging.log4j.Level;
  * when using an {@link org.hibernate.resource.beans.container.spi.ExtendedBeanManager} in Hibernate ORM.
  */
 @TestForIssue(jiraKey = { "HSEARCH-3938" })
-public class CdiExtendedBeanManagerBootstrapShutdownIT {
+class CdiExtendedBeanManagerBootstrapShutdownIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public final StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public final StaticCounters counters = StaticCounters.create();
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final StubExtendedBeanManager extendedBeanManager = new StubExtendedBeanManager();
 
-	@After
-	public void tearDown() {
+	@AfterEach
+	void tearDown() {
 		extendedBeanManager.cleanUp();
 	}
 
 	@Test
-	public void successfulBoot() {
+	void successfulBoot() {
 		List<BeanHolder<DependentBean>> retrievedBeans = new ArrayList<>();
 
 		backendMock.onCreate( context -> {
@@ -120,7 +120,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 	}
 
 	@Test
-	public void failedBoot() {
+	void failedBoot() {
 		List<BeanHolder<DependentBean>> retrievedBeans = new ArrayList<>();
 
 		SearchException bootFailedException = new SearchException( "Simulated boot failure" );
@@ -178,7 +178,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 	}
 
 	@Test
-	public void cancelledBoot() {
+	void cancelledBoot() {
 		List<BeanHolder<DependentBean>> retrievedBeans = new ArrayList<>();
 
 		backendMock.onCreate( context -> {
@@ -217,7 +217,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 	}
 
 	@Test
-	public void failedShutdown() {
+	void failedShutdown() {
 		List<BeanHolder<DependentBean>> retrievedBeans = new ArrayList<>();
 
 		SearchException bootFailedException = new SearchException( "Simulated shutdown failure" );

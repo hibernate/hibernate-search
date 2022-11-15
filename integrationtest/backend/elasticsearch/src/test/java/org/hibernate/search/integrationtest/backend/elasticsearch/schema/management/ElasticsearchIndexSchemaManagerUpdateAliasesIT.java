@@ -16,31 +16,31 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to aliases when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
+class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
-	public void nothingToDo_defaultLayoutStrategy() {
+	void nothingToDo_defaultLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -65,7 +65,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void nothingToDo_noAliasLayoutStrategy() {
+	void nothingToDo_noAliasLayoutStrategy() {
 		elasticsearchClient.indexNoAlias( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -84,7 +84,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void writeAlias_missing() {
+	void writeAlias_missing() {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), null, defaultReadAlias( index.name() ) )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -109,7 +109,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void writeAlias_invalid_filter() {
+	void writeAlias_invalid_filter() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -135,7 +135,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void writeAlias_invalid_isWriteIndex() {
+	void writeAlias_invalid_isWriteIndex() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -162,7 +162,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void readAlias_missing() {
+	void readAlias_missing() {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), defaultWriteAlias( index.name() ), null )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -186,7 +186,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	@Test
-	public void readAlias_invalid_filter() {
+	void readAlias_invalid_filter() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );

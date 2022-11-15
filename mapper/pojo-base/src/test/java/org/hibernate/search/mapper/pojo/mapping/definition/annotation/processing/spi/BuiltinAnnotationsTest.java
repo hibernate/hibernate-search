@@ -17,18 +17,18 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.impl.test.jar.JandexTestUtils;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
 
-public class BuiltinAnnotationsTest {
+class BuiltinAnnotationsTest {
 
 	private static Index pojoMapperBaseIndex;
 
-	@BeforeClass
-	public static void index() throws IOException {
+	@BeforeAll
+	static void index() throws IOException {
 		pojoMapperBaseIndex = readOrBuildIndex(
 				codeSourceLocation( BuiltinAnnotations.class )
 						.orElseThrow( () -> new AssertionFailure( "Could not find hibernate-search-mapper-pojo-base JAR?" ) )
@@ -36,12 +36,12 @@ public class BuiltinAnnotationsTest {
 	}
 
 	@Test
-	public void testRootMapping() {
+	void testRootMapping() {
 		assertThat( pojoMapperBaseIndex.getClassByName( BuiltinAnnotations.ROOT_MAPPING ) ).isNotNull();
 	}
 
 	@Test
-	public void testNoMissingRootMappingAnnotation() {
+	void testNoMissingRootMappingAnnotation() {
 		Set<DotName> rootMappingAnnotatedAnnotations = JandexUtils.findAnnotatedAnnotationsAndContaining(
 				pojoMapperBaseIndex, BuiltinAnnotations.ROOT_MAPPING );
 

@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.hibernate.search.util.impl.test.file.FileUtils;
 
-import org.junit.rules.TemporaryFolder;
-
 public final class JarTestUtils {
 	private JarTestUtils() {
 	}
@@ -35,20 +33,20 @@ public final class JarTestUtils {
 		}
 	}
 
-	public static Path toJar(TemporaryFolder temporaryFolder, URL codeSourceLocation) {
+	public static Path toJar(Path temporaryFolder, URL codeSourceLocation) {
 		return toJar( temporaryFolder, toPath( codeSourceLocation ) );
 	}
 
-	public static Path toJar(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath) {
+	public static Path toJar(Path temporaryFolder, Path jarOrDirectoryPath) {
 		return toJar( temporaryFolder, jarOrDirectoryPath, null );
 	}
 
-	public static Path toJar(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath, Map<String, String> additionalZipFsEnv) {
+	public static Path toJar(Path temporaryFolder, Path jarOrDirectoryPath, Map<String, String> additionalZipFsEnv) {
 		if ( Files.isRegularFile( jarOrDirectoryPath ) ) {
 			return jarOrDirectoryPath;
 		}
 		try {
-			Path tempDir = temporaryFolder.newFolder().toPath();
+			Path tempDir = Files.createTempDirectory( temporaryFolder, "hsearch" );
 			Path jarPath = tempDir.resolve( jarOrDirectoryPath.getFileName() + ".jar" ).toAbsolutePath();
 			URI jarUri = new URI( "jar:file", null, jarPath.toUri().getPath(), null );
 			Map<String, String> zipFsEnv = new HashMap<>();
@@ -72,16 +70,16 @@ public final class JarTestUtils {
 		}
 	}
 
-	public static Path toDirectory(TemporaryFolder temporaryFolder, URL codeSourceLocation) {
+	public static Path toDirectory(Path temporaryFolder, URL codeSourceLocation) {
 		return toDirectory( temporaryFolder, toPath( codeSourceLocation ) );
 	}
 
-	public static Path toDirectory(TemporaryFolder temporaryFolder, Path jarOrDirectoryPath) {
+	public static Path toDirectory(Path temporaryFolder, Path jarOrDirectoryPath) {
 		if ( Files.isDirectory( jarOrDirectoryPath ) ) {
 			return jarOrDirectoryPath;
 		}
 		try {
-			Path tempDir = temporaryFolder.newFolder().toPath();
+			Path tempDir = Files.createTempDirectory( temporaryFolder, "hsearch" );
 			URI jarUri = new URI( "jar:file", null, jarOrDirectoryPath.toUri().getPath(), null );
 			Map<String, String> zipFsEnv = Collections.emptyMap();
 			try ( FileSystem jarFs = FileSystems.newFileSystem( jarUri, zipFsEnv ) ) {

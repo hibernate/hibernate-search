@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.jakarta.batch.util;
 
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
 /**
  * @author Yoann Rodiere

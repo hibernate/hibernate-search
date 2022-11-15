@@ -16,23 +16,23 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchCustomIndexSettingsIT {
+class ElasticsearchCustomIndexSettingsIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void valid() {
+	void valid() {
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/valid.json"
@@ -47,7 +47,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 	}
 
 	@Test
-	public void notExisting() {
+	void notExisting() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/not-existing.json"
@@ -61,7 +61,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4438")
-	public void notParsable() {
+	void notParsable() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/not-parsable.json"
@@ -75,7 +75,7 @@ public class ElasticsearchCustomIndexSettingsIT {
 	}
 
 	@Test
-	public void unknownSetting() {
+	void unknownSetting() {
 		assertThatThrownBy( () -> setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
 						"custom-index-settings/unknown-setting.json"

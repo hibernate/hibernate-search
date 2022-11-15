@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.util.impl.integrationtest.common.rule.Call;
+import org.hibernate.search.util.impl.integrationtest.common.extension.Call;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

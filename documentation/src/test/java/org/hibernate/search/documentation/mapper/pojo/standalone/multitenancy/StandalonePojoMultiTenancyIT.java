@@ -16,20 +16,20 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class StandalonePojoMultiTenancyIT {
+class StandalonePojoMultiTenancyIT {
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private CloseableSearchMapping theSearchMapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
 				// ...
@@ -46,15 +46,15 @@ public class StandalonePojoMultiTenancyIT {
 		this.theSearchMapping = searchMapping;
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( theSearchMapping != null ) {
 			theSearchMapping.close();
 		}
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		// tag::searchSession[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::searchSession[]

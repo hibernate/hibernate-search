@@ -15,18 +15,18 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class LuceneIndexSchemaManagerDropAndCreateIT {
+class LuceneIndexSchemaManagerDropAndCreateIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 			root -> root.field( "field", f -> f.asString() )
@@ -35,7 +35,7 @@ public class LuceneIndexSchemaManagerDropAndCreateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
-	public void test() throws IOException {
+	void test() throws IOException {
 		assertThat( indexExists() ).isFalse();
 
 		setup();

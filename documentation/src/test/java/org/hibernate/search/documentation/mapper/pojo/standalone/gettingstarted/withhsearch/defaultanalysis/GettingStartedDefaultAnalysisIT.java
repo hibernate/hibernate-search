@@ -7,7 +7,6 @@
 package org.hibernate.search.documentation.mapper.pojo.standalone.gettingstarted.withhsearch.defaultanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -20,22 +19,22 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GettingStartedDefaultAnalysisIT {
+class GettingStartedDefaultAnalysisIT {
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private CloseableSearchMapping searchMapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		if ( BackendConfiguration.isLucene() ) {
 			// tag::setup-lucene[]
 			CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
@@ -84,15 +83,15 @@ public class GettingStartedDefaultAnalysisIT {
 		}
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( searchMapping != null ) {
 			searchMapping.close();
 		}
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		// tag::indexing[]
 		try ( SearchSession session = searchMapping.createSession() ) { // <1>
 			Author author = new Author(); // <2>
@@ -192,7 +191,7 @@ public class GettingStartedDefaultAnalysisIT {
 					.fetchTotalHitCount(); // <1>
 			// end::counting[]
 
-			assertEquals( 1L, totalHitCount );
+			assertThat( totalHitCount ).isEqualTo( 1L );
 			// tag::counting[]
 		}
 		// end::counting[]

@@ -14,12 +14,12 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class InsertionOrderTest {
+class InsertionOrderTest {
 
 	@Test
-	public void stableGet() {
+	void stableGet() {
 		InsertionOrder<MyKey> insertionOrder = new InsertionOrder<>();
 
 		MyKey key1 = new MyKey( 42 );
@@ -35,7 +35,7 @@ public class InsertionOrderTest {
 	}
 
 	@Test
-	public void concurrentSkipListMap() {
+	void concurrentSkipListMap() {
 		InsertionOrder<MyKey> insertionOrder = new InsertionOrder<>();
 
 		ConcurrentSkipListMap<InsertionOrder.Key<MyKey>, Integer> map = new ConcurrentSkipListMap<>();

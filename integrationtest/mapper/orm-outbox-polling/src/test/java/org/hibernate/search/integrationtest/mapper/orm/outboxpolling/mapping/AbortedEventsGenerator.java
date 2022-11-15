@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 
 public class AbortedEventsGenerator {
 	private static final AtomicInteger ID_GENERATOR = new AtomicInteger( 1 );

@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -27,25 +28,20 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.rules.MethodRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractIndexingPlanFilterIT {
 
-	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public static BackendMock backendMock = BackendMock.createGlobal();
 
-	@ClassRule
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	@RegisterExtension
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public MethodRule setupHolderMethodRule = setupHolder.methodRule();
 	protected static final String DYNAMIC_BASE_TYPE_A = "DynamicA";
 	protected static final String DYNAMIC_SUBTYPE_B = "DynamicA_B";
 	protected static final String DYNAMIC_SUBTYPE_C = "DynamicA_C";
@@ -54,10 +50,9 @@ public abstract class AbstractIndexingPlanFilterIT {
 
 	protected static final String DYNAMIC_NOT_INDEXED_BASE_TYPE_B = "DynamicNotIndexedB";
 	protected static final String DYNAMIC_NOT_INDEXED_SUBTYPE_B_B = "DynamicNotIndexedSubTypeB_B";
+	protected SessionFactory sessionFactory;
 
-
-	@ReusableOrmSetupHolder.Setup
-	public void setup(OrmSetupHelper.SetupContext setupContext) {
+	public SessionFactory setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "indexedField", String.class )
 				.objectField(
@@ -78,8 +73,10 @@ public abstract class AbstractIndexingPlanFilterIT {
 				.expectSchema( EntityFromSuperclass.INDEX, b -> b.field( "indexedField", String.class ) )
 				.expectSchema( IndexedSubtypeOfNotIndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
 
-		setupContext.withAnnotatedTypes( IndexedEntity.class, OtherIndexedEntity.class, ContainedEntity.class,
-				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class, EntityFromSuperclass.class, SuperClass.class,
+		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start().withAnnotatedTypes( IndexedEntity.class,
+				OtherIndexedEntity.class, ContainedEntity.class,
+				EntityA.class, Entity1A.class, Entity1B.class, Entity2A.class, EntityFromSuperclass.class,
+				SuperClass.class,
 				SimpleNotIndexedEntity.class, NotIndexedEntityFromSuperclass.class,
 				NotIndexedEntity.class, IndexedSubtypeOfNotIndexedEntity.class
 		);
@@ -119,11 +116,15 @@ public abstract class AbstractIndexingPlanFilterIT {
 						.field( "propertyOfC", LocalDate.class ) )
 				.expectSchema( DYNAMIC_INDEXED_SUBTYPE_A_B, b -> b
 						.field( "propertyOfB", Integer.class ) );
+
+		return setupContext.setup();
 	}
 
-	@Before
-	public void clearFilter() throws Exception {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	@BeforeEach
+	void clearFilter() throws Exception {
+		sessionFactory = setup();
+
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> { /*clear out any settings from tests*/ }
 		);
 	}

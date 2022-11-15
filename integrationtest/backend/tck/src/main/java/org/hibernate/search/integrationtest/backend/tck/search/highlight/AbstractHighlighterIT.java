@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -31,25 +31,24 @@ import org.hibernate.search.engine.search.highlighter.dsl.SearchHighlighterFacto
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
-public abstract class AbstractHighlighterIT {
+abstract class AbstractHighlighterIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@Rule
+	@RegisterExtension
 	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
@@ -61,8 +60,8 @@ public abstract class AbstractHighlighterIT {
 	protected static final SimpleMappedIndex<NestedIndexBinding> nestedIndex = SimpleMappedIndex.of( NestedIndexBinding::new )
 			.name( "nestedIndex" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index )
 				.withIndex( matchingIndex )
 				.withIndex( notMatchingTypeIndex )
@@ -129,7 +128,7 @@ public abstract class AbstractHighlighterIT {
 	abstract HighlighterOptionsStep<?> highlighter(SearchHighlighterFactory factory);
 
 	@Test
-	public void highlighterNoConfigurationAtAll() {
+	void highlighterNoConfigurationAtAll() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -146,7 +145,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void highlighterNoSettings() {
+	void highlighterNoSettings() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -164,7 +163,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void highlighterNoSettingsMultipleOccurrencesWithinSameLine() {
+	void highlighterNoSettingsMultipleOccurrencesWithinSameLine() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -181,7 +180,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void customTagGlobal() {
+	void customTagGlobal() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -199,7 +198,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void customTagField() {
+	void customTagField() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -217,7 +216,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void customTagOverride() {
+	void customTagOverride() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -236,7 +235,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void lastTagWins() {
+	void lastTagWins() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -258,7 +257,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void encoderGlobalHtml() {
+	void encoderGlobalHtml() {
 		encoderGlobal(
 				HighlighterEncoder.HTML,
 				"&lt;body&gt;&lt;h1&gt;This is a <em>Heading</em>&lt;&#x2F;h1&gt;&lt;p&gt;This is a paragraph&lt;&#x2F;p&gt;&lt;&#x2F;body&gt;"
@@ -266,7 +265,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void encoderGlobalDefault() {
+	void encoderGlobalDefault() {
 		encoderGlobal(
 				HighlighterEncoder.DEFAULT,
 				"<body><h1>This is a <em>Heading</em></h1><p>This is a paragraph</p></body>"
@@ -290,7 +289,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void encoderFieldHtml() {
+	void encoderFieldHtml() {
 		encoderField(
 				HighlighterEncoder.HTML,
 				"&lt;body&gt;&lt;h1&gt;This is a <em>Heading</em>&lt;&#x2F;h1&gt;&lt;p&gt;This is a paragraph&lt;&#x2F;p&gt;&lt;&#x2F;body&gt;"
@@ -298,17 +297,17 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void encoderFieldDefault() {
+	void encoderFieldDefault() {
 		encoderField(
 				HighlighterEncoder.DEFAULT,
 				"<body><h1>This is a <em>Heading</em></h1><p>This is a paragraph</p></body>"
 		);
 	}
 
-	public void encoderField(HighlighterEncoder encoder, String result) {
+	void encoderField(HighlighterEncoder encoder, String result) {
 		assumeTrue(
-				"This test only make sense for backends that support encoder override at field level.",
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterEncoderAtFieldLevel()
+				TckConfiguration.get().getBackendFeatures().supportsHighlighterEncoderAtFieldLevel(),
+				"This test only make sense for backends that support encoder override at field level."
 		);
 		StubMappingScope scope = index.createScope();
 
@@ -326,7 +325,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void encoderOverrideHtml() {
+	void encoderOverrideHtml() {
 		encoderOverride(
 				HighlighterEncoder.DEFAULT,
 				HighlighterEncoder.HTML,
@@ -335,7 +334,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void encoderOverrideDefault() {
+	void encoderOverrideDefault() {
 		encoderOverride(
 				HighlighterEncoder.HTML,
 				HighlighterEncoder.DEFAULT,
@@ -343,10 +342,10 @@ public abstract class AbstractHighlighterIT {
 		);
 	}
 
-	public void encoderOverride(HighlighterEncoder globalEncoder, HighlighterEncoder encoder, String result) {
+	void encoderOverride(HighlighterEncoder globalEncoder, HighlighterEncoder encoder, String result) {
 		assumeTrue(
-				"This test only make sense for backends that support encoder override at field level.",
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterEncoderAtFieldLevel()
+				TckConfiguration.get().getBackendFeatures().supportsHighlighterEncoderAtFieldLevel(),
+				"This test only make sense for backends that support encoder override at field level."
 		);
 		StubMappingScope scope = index.createScope();
 
@@ -365,7 +364,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void fragmentSize() {
+	void fragmentSize() {
 		assumeTrue( supportsFragmentSize() );
 		StubMappingScope scope = index.createScope();
 
@@ -383,7 +382,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void fragmentSizeNotSupported() {
+	void fragmentSizeNotSupported() {
 		assumeFalse( supportsFragmentSize() );
 
 		assertThatThrownBy(
@@ -407,7 +406,7 @@ public abstract class AbstractHighlighterIT {
 	protected abstract List<String> fragmentSizeResult();
 
 	@Test
-	public void numberOfFragments() {
+	void numberOfFragments() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -430,7 +429,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void defaultNoMatchSize() {
+	void defaultNoMatchSize() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -448,7 +447,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void noMatchSize() {
+	void noMatchSize() {
 		assumeTrue( supportsNoMatchSize() );
 		StubMappingScope scope = index.createScope();
 
@@ -466,7 +465,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void noMatchSizeNotSupported() {
+	void noMatchSizeNotSupported() {
 		assumeFalse( supportsNoMatchSize() );
 		StubMappingScope scope = index.createScope();
 
@@ -489,7 +488,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void noMatchSizeMultiField() {
+	void noMatchSizeMultiField() {
 		assumeTrue( supportsNoMatchSizeOnMultivaluedFields() );
 
 		StubMappingScope scope = index.createScope();
@@ -514,7 +513,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void compositeHighlight() {
+	void compositeHighlight() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> highlights = scope.query().select(
@@ -550,7 +549,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void compositeHighlightMultipleConfigurations() {
+	void compositeHighlightMultipleConfigurations() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> highlights = scope.query().select(
@@ -588,7 +587,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void multivaluedField() {
+	void multivaluedField() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -603,7 +602,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void multivaluedFieldDuplicated() {
+	void multivaluedFieldDuplicated() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> highlights = scope.query().select(
@@ -635,7 +634,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void nestedField() {
+	void nestedField() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -654,7 +653,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void nestedFieldWildcard() {
+	void nestedFieldWildcard() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -673,7 +672,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void simpleFieldWildcard() {
+	void simpleFieldWildcard() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -692,10 +691,10 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void orderByScore() {
+	void orderByScore() {
 		assumeTrue(
-				"Some versions of the backend have a bug that prevents them from correctly sorting the results.",
-				supportsOrderByScoreMultivaluedField()
+				supportsOrderByScoreMultivaluedField(),
+				"Some versions of the backend have a bug that prevents them from correctly sorting the results."
 		);
 		StubMappingScope scope = index.createScope();
 
@@ -727,7 +726,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void unknownNamedHighlighter() {
+	void unknownNamedHighlighter() {
 		assertThatThrownBy(
 				() -> index.createScope().query().select(
 						f -> f.highlight( "string" ).highlighter( "not-configured-highlighter" )
@@ -744,7 +743,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void highlightNonAnalyzedField() {
+	void highlightNonAnalyzedField() {
 		assertThatThrownBy(
 				() -> index.createScope().query().select(
 						f -> f.highlight( "notAnalyzedString" )
@@ -759,7 +758,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void multipleIndexesScopeIncompatibleTypes() {
+	void multipleIndexesScopeIncompatibleTypes() {
 		assertThatThrownBy(
 				() -> index.createScope( notMatchingTypeIndex ).query().select(
 						f -> f.highlight( "string" )
@@ -774,7 +773,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void multipleIndexesScopeIncompatibleTypesNested() {
+	void multipleIndexesScopeIncompatibleTypesNested() {
 		assertThatThrownBy(
 				() -> index.createScope( notMatchingTypeIndex ).query().select(
 						f -> f.highlight( "nested.nestedString" )
@@ -789,7 +788,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void multipleIndexesScopeCompatibleTypes() {
+	void multipleIndexesScopeCompatibleTypes() {
 		SearchQuery<List<String>> highlights = index.createScope( matchingIndex ).query().select(
 				f -> f.highlight( "string" )
 		).where( f -> f.match().field( "string" ).matching( "dog" ) )
@@ -805,7 +804,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void prebuiltHighlighter() {
+	void prebuiltHighlighter() {
 		SearchHighlighter highlighter = highlighter( index.createScope().highlighter() ).tag( "---", "---" )
 				.toHighlighter();
 
@@ -825,7 +824,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void prebuiltNamedHighlighter() {
+	void prebuiltNamedHighlighter() {
 		SearchHighlighter highlighter = highlighter( index.createScope().highlighter() ).tag( "---", "---" )
 				.toHighlighter();
 
@@ -845,7 +844,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void prebuiltHighlighterWrongScope() {
+	void prebuiltHighlighterWrongScope() {
 		SearchHighlighter highlighter = highlighter( notMatchingTypeIndex.createScope().highlighter() ).tag( "---", "---" )
 				.toHighlighter();
 
@@ -862,7 +861,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void highlightInNestedContextNotAllowed() {
+	void highlightInNestedContextNotAllowed() {
 		List<String> objects = Arrays.asList( "objectDefault", "objectFlattened" );
 		for ( String object : objects ) {
 			for ( String level2 : objects ) {
@@ -892,7 +891,7 @@ public abstract class AbstractHighlighterIT {
 	}
 
 	@Test
-	public void phraseMatching() {
+	void phraseMatching() {
 		SearchQuery<List<String>> highlights = index.createScope().query().select(
 				f -> f.highlight( "multiValuedString" )
 		).where( f -> f.phrase().field( "multiValuedString" ).matching( "brown fox" ) )

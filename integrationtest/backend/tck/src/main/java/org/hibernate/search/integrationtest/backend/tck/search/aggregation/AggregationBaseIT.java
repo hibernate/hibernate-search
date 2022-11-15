@@ -26,17 +26,17 @@ import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AggregationBaseIT {
+class AggregationBaseIT {
 
 	private static final String DOCUMENT_1 = "doc1";
 	private static final String DOCUMENT_2 = "doc2";
@@ -46,20 +46,20 @@ public class AggregationBaseIT {
 	private static final String STRING_1 = "Irving";
 	private static final String STRING_2 = "Auster";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void extension() {
+	void extension() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
@@ -86,21 +86,21 @@ public class AggregationBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath() {
+	void toAbsolutePath() {
 		assertThat( index.createScope().aggregation().toAbsolutePath( "string" ) )
 				.isEqualTo( "string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot() {
+	void toAbsolutePath_withRoot() {
 		assertThat( index.createScope().aggregation().withRoot( "flattened" ).toAbsolutePath( "string" ) )
 				.isEqualTo( "flattened.string" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_null() {
+	void toAbsolutePath_null() {
 		assertThatThrownBy( () -> index.createScope().aggregation().toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );
@@ -108,7 +108,7 @@ public class AggregationBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void toAbsolutePath_withRoot_null() {
+	void toAbsolutePath_withRoot_null() {
 		assertThatThrownBy( () -> index.createScope().aggregation().withRoot( "flattened" ).toAbsolutePath( null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'relativeFieldPath' must not be null" );

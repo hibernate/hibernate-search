@@ -21,27 +21,27 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneGetAnalyzerIT {
+class LuceneGetAnalyzerIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper =
 			DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}
 
 	@Test
-	public void fromBackend() {
+	void fromBackend() {
 		//tag::fromBackend[]
 		SearchMapping mapping = /* ... */ // <1>
 				//end::fromBackend[]
@@ -57,7 +57,7 @@ public class LuceneGetAnalyzerIT {
 	}
 
 	@Test
-	public void fromIndexManager() {
+	void fromIndexManager() {
 		//tag::fromIndexManager[]
 		SearchMapping mapping = /* ... */ // <1>
 				//end::fromIndexManager[]

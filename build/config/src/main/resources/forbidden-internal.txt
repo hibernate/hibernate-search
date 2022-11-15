@@ -35,6 +35,8 @@ org.jboss.logging.processor.util.Objects
 org.assertj.core.api.Assumptions @ Use JUnit's Assume instead of AssertJ's Assumptions, because the latter use dark reflection magic and do not work with JDK11 as of 2018-12-14
 org.skyscreamer.jsonassert.JSONAssert @ Use JsonHelper.assertJsonEquals to avoid the checked exception and get clearer assertion errors
 org.junit.experimental.runners.Enclosed @ Use NestedRunner instead of Enclosed and annotate inner classes with @Nested
+org.junit.Assert @ Use AssertJ assertions instead
+org.junit.jupiter.api.Assertions @ Use AssertJ assertions instead
 
 ################################################################################################################
 # Unsafe API/SPI from Hibernate ORM

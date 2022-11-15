@@ -10,55 +10,50 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportChecker;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to analyzers when validating indexes,
  * for all index-validating schema management operations.
  */
-@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionValidationIT")
-public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
+class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
-		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
-
-	public ElasticsearchIndexSchemaManagerValidationAnalyzerIT(
-			ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success_simple() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success_simple(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -109,13 +104,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 		putMapping();
 
-		setupAndValidate();
+		setupAndValidate( operation );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
-	@Test
-	public void analyzer_missing() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void analyzer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -152,12 +148,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		setupAndValidateExpectingFailure(
 				hasValidationFailureReport()
 						.analyzerContext( "custom-analyzer" )
-						.failure( "Missing analyzer" )
+						.failure( "Missing analyzer" ),
+				operation
 		);
 	}
 
-	@Test
-	public void analyzer_charFilters_invalid() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void analyzer_charFilters_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -204,12 +202,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.failure(
 								"Invalid char filters. Expected '[custom-pattern-replace]',"
 										+ " actual is '[html_strip]'"
-						)
+						),
+				operation
 		);
 	}
 
-	@Test
-	public void analyzer_tokenizer_invalid() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void analyzer_tokenizer_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -256,12 +256,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.failure(
 								"Invalid tokenizer. Expected 'custom-edgeNGram',"
 										+ " actual is 'whitespace'"
-						)
+						),
+				operation
 		);
 	}
 
-	@Test
-	public void analyzer_tokenFilters_invalid() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void analyzer_tokenFilters_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -308,12 +310,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.failure(
 								"Invalid token filters. Expected '[custom-keep-types, custom-word-delimiter]',"
 										+ " actual is '[lowercase, custom-word-delimiter]'"
-						)
+						),
+				operation
 		);
 	}
 
-	@Test
-	public void charFilter_missing() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void charFilter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -344,12 +348,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.charFilterContext( "custom-pattern-replace" )
-						.failure( "Missing char filter" )
+						.failure( "Missing char filter" ),
+				operation
 		);
 	}
 
-	@Test
-	public void tokenizer_missing() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void tokenizer_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -381,12 +387,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.tokenizerContext( "custom-edgeNGram" )
-						.failure( "Missing tokenizer" )
+						.failure( "Missing tokenizer" ),
+				operation
 		);
 	}
 
-	@Test
-	public void tokenFilter_missing() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void tokenFilter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -415,12 +423,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.tokenFilterContext( "custom-keep-types" )
-						.failure( "Missing token filter" )
+						.failure( "Missing token filter" ),
+				operation
 		);
 	}
 
-	@Test
-	public void charFilter_type_invalid() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void charFilter_type_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -466,12 +476,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.charFilterContext( "custom-pattern-replace" )
 						.failure(
 								"Invalid type. Expected 'pattern_replace', actual is 'html_strip'"
-						)
+						),
+				operation
 		);
 	}
 
-	@Test
-	public void charFilter_parameter_invalid() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void charFilter_parameter_invalid(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -518,12 +530,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.analysisDefinitionParameterContext( "pattern" )
 						.failure(
 								"Invalid value. Expected '\"[^0-9]\"', actual is '\"[^a-z]\"'"
-						)
+						),
+				operation
 		);
 	}
 
-	@Test
-	public void charFilter_parameter_missing() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void charFilter_parameter_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -570,12 +584,15 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.analysisDefinitionParameterContext( "tags" )
 						.failure(
 								"Invalid value. Expected '\"CASE_INSENSITIVE|COMMENTS\"', actual is 'null'"
-						)
+						),
+				operation
 		);
 	}
 
-	@Test
-	public void tokenFilter_parameter_unexpected() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void tokenFilter_parameter_unexpected(ElasticsearchIndexSchemaManagerValidationOperation operation)
+			throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -623,17 +640,19 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						.analysisDefinitionParameterContext( "generate_number_parts" )
 						.failure(
 								"Invalid value. Expected 'null', actual is '\"false\"'"
-						)
+						),
+				operation
 		);
 	}
 
-	private void setupAndValidateExpectingFailure(FailureReportChecker failureReportChecker) {
-		assertThatThrownBy( this::setupAndValidate )
+	private void setupAndValidateExpectingFailure(FailureReportChecker failureReportChecker,
+			ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( failureReportChecker );
 	}
 
-	private void setupAndValidate() {
+	private void setupAndValidate(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

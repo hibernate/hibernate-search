@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -16,20 +17,21 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(NestedRunner.class)
-public class SpatialWithinCirclePredicateBaseIT {
+//CHECKSTYLE:OFF HideUtilityClassConstructor ignore the rule since it is a class with nested test classes.
+// cannot make a private constructor.
+class SpatialWithinCirclePredicateBaseIT {
+	//CHECKSTYLE:ON
 
 	private static final GeoPointFieldTypeDescriptor supportedFieldType;
 	private static final List<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = new ArrayList<>();
@@ -44,11 +46,11 @@ public class SpatialWithinCirclePredicateBaseIT {
 		}
 	}
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
@@ -99,69 +101,66 @@ public class SpatialWithinCirclePredicateBaseIT {
 		return new SpatialWithinCirclePredicateTestValues();
 	}
 
-	@Test
-	public void takariCpSuiteWorkaround() {
-		// Workaround to get Takari-CPSuite to run this test.
-	}
-
 	@Nested
-	public static class SingleFieldIT extends AbstractPredicateSingleFieldIT<SpatialWithinCirclePredicateTestValues> {
+	class SingleFieldIT extends AbstractPredicateSingleFieldIT<SpatialWithinCirclePredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet = new DataSet<>( testValues() );
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "singleField" );
 
-		public SingleFieldIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( SingleFieldIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							SingleFieldIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	public static class MultiFieldIT extends AbstractPredicateMultiFieldIT<SpatialWithinCirclePredicateTestValues> {
+	class MultiFieldIT extends AbstractPredicateMultiFieldIT<SpatialWithinCirclePredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet = new DataSet<>( testValues() );
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "multiField" );
 
-		public MultiFieldIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
-				String otherFieldPath, int matchingDocOrdinal) {
+				String otherFieldPath, int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).field( otherFieldPath )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( MultiFieldIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							MultiFieldIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( MultiFieldIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							MultiFieldIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
-				String[] fieldPaths, int matchingDocOrdinal) {
+				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).fields( fieldPaths )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( MultiFieldIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							MultiFieldIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	public static class InObjectFieldIT
+	class InObjectFieldIT
 			extends AbstractPredicateFieldInObjectFieldIT<SpatialWithinCirclePredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
@@ -174,93 +173,98 @@ public class SpatialWithinCirclePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting_missingField" );
 
-		public InObjectFieldIT() {
-			super( mainIndex, missingFieldIndex, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( InObjectFieldIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							InObjectFieldIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	public static class ScoreIT extends AbstractPredicateFieldScoreIT<SpatialWithinCirclePredicateTestValues> {
+	class ScoreIT extends AbstractPredicateFieldScoreIT<SpatialWithinCirclePredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet = new DataSet<>( testValues() );
 
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "score" );
 
-		public ScoreIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal) {
+				int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) )
 					.constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal, float predicateBoost) {
+				int matchingDocOrdinal, float predicateBoost, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) )
 					.boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
-				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost) {
+				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().fields( fieldPaths )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) )
 					.constantScore().boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
-				float fieldBoost, int matchingDocOrdinal) {
+				float fieldBoost, int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
-				String fieldPath, float fieldBoost, int matchingDocOrdinal) {
+				String fieldPath, float fieldBoost, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) )
 					.constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
-				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost) {
+				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.circle( ScoreIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							ScoreIT.dataSet.values.matchingRadius( matchingDocOrdinal ) )
 					.boost( predicateBoost );
 		}
 	}
 
 	@Nested
-	public static class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
+	class InvalidFieldIT extends AbstractPredicateInvalidFieldIT {
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
 				.name( "invalidField" );
 
@@ -282,26 +286,20 @@ public class SpatialWithinCirclePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
-	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
-				parameters.add( new Object[] { fieldType } );
-			}
-		}
-
+	class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, unsupportedFieldTypes ) )
 						.name( "unsupportedType" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+				parameters.add( Arguments.of( index, fieldType ) );
+			}
 		}
 
-		public UnsupportedTypeIT(FieldTypeDescriptor<?> fieldType) {
-			super( index, fieldType );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -318,7 +316,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 	}
 
 	@Nested
-	public static class SearchableIT extends AbstractPredicateSearchableIT {
+	class SearchableIT extends AbstractPredicateSearchableIT {
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -327,8 +325,8 @@ public class SpatialWithinCirclePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new SearchableNoIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableNo" );
 
-		public SearchableIT() {
-			super( searchableYesIndex, searchableNoIndex, supportedFieldType );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( searchableYesIndex, searchableNoIndex, supportedFieldType ) );
 		}
 
 		@Override
@@ -345,20 +343,22 @@ public class SpatialWithinCirclePredicateBaseIT {
 	}
 
 	@Nested
-	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
+	class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "argumentChecking" );
 
-		public ArgumentCheckingIT() {
-			super( index, supportedFieldType );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, supportedFieldType ) );
 		}
 
-		@Test
-		public void nullUnit() {
+		@ParameterizedTest(name = "{1}")
+		@MethodSource("params")
+		void nullUnit(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 			SearchPredicateFactory f = index.createScope().predicate();
 
-			assertThatThrownBy( () -> f.spatial().within().field( fieldPath() ).circle( 0.0, 0.0, 10.0, null ) )
+			assertThatThrownBy(
+					() -> f.spatial().within().field( fieldPath( index, fieldType ) ).circle( 0.0, 0.0, 10.0, null ) )
 					.isInstanceOf( IllegalArgumentException.class )
 					.hasMessageContainingAll( "must not be null" );
 		}
@@ -370,7 +370,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 	}
 
 	@Nested
-	public static class TypeCheckingNoConversionIT
+	class TypeCheckingNoConversionIT
 			extends AbstractPredicateTypeCheckingNoConversionIT<SpatialWithinCirclePredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet = new DataSet<>( testValues() );
 
@@ -390,23 +390,27 @@ public class SpatialWithinCirclePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
 
-		public TypeCheckingNoConversionIT() {
-			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList(
+					Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex,
+							dataSet )
+			);
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( fieldPath )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( TypeCheckingNoConversionIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							TypeCheckingNoConversionIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				int matchingDocOrdinal) {
+				int matchingDocOrdinal, DataSet<?, SpatialWithinCirclePredicateTestValues> dataSet) {
 			return f.spatial().within().field( field0Path ).field( field1Path )
-					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
-							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+					.circle( TypeCheckingNoConversionIT.dataSet.values.matchingCenter( matchingDocOrdinal ),
+							TypeCheckingNoConversionIT.dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 
 		@Override

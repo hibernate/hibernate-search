@@ -20,22 +20,19 @@ import org.hibernate.search.integrationtest.showcase.library.service.Java17Servi
 import org.hibernate.search.integrationtest.showcase.library.service.LibraryService;
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class Java17IT {
+class Java17IT {
 
 	private static boolean needsInit;
 
@@ -48,13 +45,13 @@ public class Java17IT {
 	@Autowired
 	private TestDataService testDataService;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@BeforeAll
+	static void beforeClass() {
 		needsInit = true;
 	}
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		if ( needsInit ) {
 			testDataService.initDefaultDataSet();
 			needsInit = false;
@@ -63,7 +60,7 @@ public class Java17IT {
 
 	// This checks that top-level records get automatically indexed by Hibernate Search with Jandex, in particular.
 	@Test
-	public void searchAndProject() {
+	void searchAndProject() {
 		List<LibrarySimpleProjectionRecord> libraries = java17Service.searchAndProjectToRecord( "library", 0, 10 );
 		assertThat( libraries ).extracting( LibrarySimpleProjectionRecord::name ).containsExactly(
 				libraryService.getById( CITY_CENTER_ID, Library::getName ),
@@ -95,7 +92,7 @@ public class Java17IT {
 
 	// This checks that method-local records get automatically indexed by Hibernate Search with Jandex, in particular.
 	@Test
-	public void searchAndProjectToMethodLocalClass() {
+	void searchAndProjectToMethodLocalClass() {
 		List<LibrarySimpleProjectionRecord> libraries = java17Service.searchAndProjectToMethodLocalRecord( "library", 0, 10 );
 		assertThat( libraries ).extracting( LibrarySimpleProjectionRecord::name ).containsExactly(
 				libraryService.getById( CITY_CENTER_ID, Library::getName ),

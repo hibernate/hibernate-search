@@ -28,19 +28,19 @@ import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MassIndexingEnvironmentIT {
+class MassIndexingEnvironmentIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -48,8 +48,8 @@ public class MassIndexingEnvironmentIT {
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( Entity.INDEX );
 
 		mapping = setupHelper.start()
@@ -65,7 +65,7 @@ public class MassIndexingEnvironmentIT {
 	}
 
 	@Test
-	public void success() throws InterruptedException {
+	void success() throws InterruptedException {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			Queue<String> before = new ArrayBlockingQueue<>( 10 );
 			Queue<String> after = new ArrayBlockingQueue<>( 10 );
@@ -118,7 +118,7 @@ public class MassIndexingEnvironmentIT {
 	}
 
 	@Test
-	public void testFailingEntityLoading() {
+	void testFailingEntityLoading() {
 		testFailingBeforeHook(
 				MassIndexingEnvironment.EntityLoadingContext.class,
 				"don't call me in entity loading."
@@ -126,7 +126,7 @@ public class MassIndexingEnvironmentIT {
 	}
 
 	@Test
-	public void testFailingEntityIdentifierLoading() {
+	void testFailingEntityIdentifierLoading() {
 		testFailingBeforeHook(
 				MassIndexingEnvironment.EntityIdentifierLoadingContext.class,
 				"don't call me in identifier loading."

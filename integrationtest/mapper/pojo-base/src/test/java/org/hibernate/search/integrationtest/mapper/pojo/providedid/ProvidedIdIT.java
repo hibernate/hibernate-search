@@ -31,28 +31,28 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProvidedIdIT {
+class ProvidedIdIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private StubIndexModel indexModel;
 
 	@Test
-	public void converters() {
+	void converters() {
 		final String entityAndIndexName = "indexed";
 		@Indexed
 		class IndexedEntity {
@@ -90,7 +90,7 @@ public class ProvidedIdIT {
 	}
 
 	@Test
-	public void indexAndSearch() {
+	void indexAndSearch() {
 		final String entityAndIndexName = "indexed";
 		@Indexed
 		class IndexedEntity {
@@ -147,7 +147,7 @@ public class ProvidedIdIT {
 	}
 
 	@Test
-	public void error_nullProvidedId() {
+	void error_nullProvidedId() {
 		final String entityAndIndexName = "indexed";
 		@Indexed
 		class IndexedEntity {

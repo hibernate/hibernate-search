@@ -17,15 +17,15 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test indexing and searching with built-in analyzer definitions overridden by the user
@@ -34,46 +34,46 @@ import org.junit.Test;
  * Analyzers are expected to be overridden in such a way that they replace any text with their own name,
  * so that we can easily identify whether the override works or not.
  */
-public class AnalysisBuiltinOverrideIT {
+class AnalysisBuiltinOverrideIT {
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper =
-			new SearchSetupHelper( TckBackendHelper::createAnalysisBuiltinOverridesBackendSetupStrategy );
+			SearchSetupHelper.create( TckBackendHelper::createAnalysisBuiltinOverridesBackendSetupStrategy );
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void analyzer_default() {
+	void analyzer_default() {
 		verifyOverride( index.binding().defaultAnalyzer );
 	}
 
 	@Test
-	public void analyzer_standard() {
+	void analyzer_standard() {
 		verifyOverride( index.binding().standardAnalyzer );
 	}
 
 	@Test
-	public void analyzer_simple() {
+	void analyzer_simple() {
 		verifyOverride( index.binding().simpleAnalyzer );
 	}
 
 	@Test
-	public void analyzer_whitespace() {
+	void analyzer_whitespace() {
 		verifyOverride( index.binding().whitespaceAnalyzer );
 	}
 
 	@Test
-	public void analyzer_stop() {
+	void analyzer_stop() {
 		verifyOverride( index.binding().stopAnalyzer );
 	}
 
 	@Test
-	public void analyzer_keyword() {
+	void analyzer_keyword() {
 		verifyOverride( index.binding().keywordAnalyzer );
 	}
 

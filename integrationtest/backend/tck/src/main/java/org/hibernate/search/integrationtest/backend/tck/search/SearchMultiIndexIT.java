@@ -20,7 +20,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -28,11 +28,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchMultiIndexIT {
+class SearchMultiIndexIT {
 
 	private static final String BACKEND_1 = "backend_1";
 	private static final String BACKEND_2 = "backend_2";
@@ -64,8 +64,8 @@ public class SearchMultiIndexIT {
 
 	private static final String DOCUMENT_2_1_2 = "2_1_2";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding_1_1> index_1_1 =
 			SimpleMappedIndex.of( IndexBinding_1_1::new ).backendName( BACKEND_1 ).name( "index_1_1" );
@@ -74,8 +74,8 @@ public class SearchMultiIndexIT {
 	private final SimpleMappedIndex<IndexBinding_2_1> index_2_1 =
 			SimpleMappedIndex.of( IndexBinding_2_1::new ).backendName( BACKEND_2 ).name( "index_2_1" );;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start( BACKEND_1 ).withIndexes( index_1_1, index_1_2 ).setup();
 		setupHelper.start( BACKEND_2 ).withIndexes( index_2_1 ).setup();
 
@@ -89,7 +89,7 @@ public class SearchMultiIndexIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3977")
-	public void search_singleIndex() {
+	void search_singleIndex() {
 		SearchQuery<DocumentReference> query = index_1_1.query()
 				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
@@ -107,7 +107,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void search_across_multiple_indexes() {
+	void search_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -121,7 +121,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void sort_across_multiple_indexes() {
+	void sort_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -148,7 +148,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void projection_across_multiple_indexes() {
+	void projection_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<String> query = scope.query()
@@ -164,7 +164,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void field_in_one_index_only_is_supported() {
+	void field_in_one_index_only_is_supported() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
@@ -195,7 +195,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void unknown_field_throws_exception() {
+	void unknown_field_throws_exception() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
@@ -245,7 +245,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void search_with_incompatible_types_throws_exception() {
+	void search_with_incompatible_types_throws_exception() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		assertThatThrownBy(
@@ -272,7 +272,7 @@ public class SearchMultiIndexIT {
 	}
 
 	@Test
-	public void search_across_backends_throws_exception() {
+	void search_across_backends_throws_exception() {
 		assertThatThrownBy(
 				() -> index_1_1.createScope( index_2_1 ),
 				"search across multiple backends"

@@ -22,23 +22,23 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
  * where superclasses are indexed but not all of their subclasses, and vice-versa.
  */
-public class MassIndexingComplexHierarchyIT {
+class MassIndexingComplexHierarchyIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
@@ -46,8 +46,8 @@ public class MassIndexingComplexHierarchyIT {
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
@@ -82,7 +82,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class )
 					// Simulate passing information to connect to a DB, ...
@@ -110,7 +110,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class )
 					// Simulate passing information to connect to a DB, ...
@@ -138,7 +138,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class )
 					// Simulate passing information to connect to a DB, ...
@@ -182,7 +182,7 @@ public class MassIndexingComplexHierarchyIT {
 	}
 
 	@Test
-	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
+	void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class )
 					// Simulate passing information to connect to a DB, ...

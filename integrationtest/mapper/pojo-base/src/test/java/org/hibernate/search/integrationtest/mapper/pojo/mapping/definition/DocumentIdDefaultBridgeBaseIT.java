@@ -33,52 +33,41 @@ import org.hibernate.search.mapper.pojo.common.spi.PojoEntityReference;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test default identifier bridges for the {@code @DocumentId} annotation.
  */
-@RunWith(Parameterized.class)
-public class DocumentIdDefaultBridgeBaseIT<I> {
+class DocumentIdDefaultBridgeBaseIT<I> {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[] types() {
+	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
-				.map( type -> new Object[] { type, type.getDefaultIdentifierBridgeExpectations() } )
-				.toArray();
+				.map( type -> Arguments.of( type, type.getDefaultIdentifierBridgeExpectations() ) )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final PropertyTypeDescriptor<I, ?> typeDescriptor;
-	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
 	private StubIndexModel index1Model;
 	private StubIndexModel index2Model;
 
-	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I, ?> typeDescriptor,
-			DefaultIdentifierBridgeExpectations<I> expectations) {
-		this.typeDescriptor = typeDescriptor;
-		this.expectations = expectations;
-	}
 
-	@Before
-	public void setup() {
+	void setup(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> {},
@@ -98,8 +87,10 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void indexing() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void indexing(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		Iterator<String> documentIdentifierIterator = typeDescriptor.values().documentIdentifierValues.iterator();
 		for ( I entityIdentifierValue : typeDescriptor.values().entityModelValues ) {
 			try ( SearchSession session = mapping.createSession() ) {
@@ -113,10 +104,13 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void projection_entityReference() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projection_entityReference(PropertyTypeDescriptor<I, ?> typeDescriptor,
+			DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = getProjectionValues().iterator();
+			Iterator<I> entityIdentifierIterator = getProjectionValues( typeDescriptor ).iterator();
 			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchReferences(
@@ -147,10 +141,12 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		}
 	}
 
-	@Test
-	public void projection_id() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projection_id(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		try ( SearchSession session = mapping.createSession() ) {
-			Iterator<I> entityIdentifierIterator = getProjectionValues().iterator();
+			Iterator<I> entityIdentifierIterator = getProjectionValues( typeDescriptor ).iterator();
 			for ( String documentIdentifierValue : typeDescriptor.values().documentIdentifierValues ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchIds(
@@ -176,8 +172,10 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	}
 
 	// Test behavior that backends expect from our bridges when using the DSLs
-	@Test
-	public void dslConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dslConverter(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<I, ?> dslConverter =
@@ -217,8 +215,10 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	}
 
 	// Test behavior that backends expect from our bridges when using the identifier projections
-	@Test
-	public void projectionConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void projectionConverter(PropertyTypeDescriptor<I, ?> typeDescriptor, DefaultIdentifierBridgeExpectations<I> expectations) {
+		setup( typeDescriptor, expectations );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ProjectionConverter<String, I> projectionConverter =
@@ -267,7 +267,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		}
 	}
 
-	private List<I> getProjectionValues() {
+	private List<I> getProjectionValues(PropertyTypeDescriptor<I, ?> typeDescriptor) {
 		return typeDescriptor.values().entityModelValues.stream()
 				.map( typeDescriptor::toProjectedValue )
 				.collect( Collectors.toList() );

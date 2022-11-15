@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.util;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
 public class CloseCountingBeanHolder<T> implements BeanHolder<T> {
 	private final T bean;

@@ -17,24 +17,21 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class AssociationInverseSideIT {
+class AssociationInverseSideIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				BackendConfigurations.simple(),
 				mapping -> {
 				// @formatter:off
 					//tag::programmatic[]
@@ -53,19 +50,21 @@ public class AssociationInverseSideIT {
 				} );
 	}
 
-	@Parameterized.Parameter
-	@Rule
-	public DocumentationSetupHelper setupHelper;
-
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.simple() );
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Book.class, BookEdition.class );
 	}
 
-	@Test
-	public void smoke() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void smoke(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Book book = new Book();
 			book.setTitle( "The Caves Of Steel" );

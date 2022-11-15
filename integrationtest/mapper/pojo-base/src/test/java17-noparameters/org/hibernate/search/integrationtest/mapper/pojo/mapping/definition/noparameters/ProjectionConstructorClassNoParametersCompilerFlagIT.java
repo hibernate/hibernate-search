@@ -29,17 +29,18 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+class ProjectionConstructorClassNoParametersCompilerFlagIT extends AbstractProjectionConstructorIT {
+
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper = StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Before
-	public void sourcesCompiledWithoutParametersFlag() {
+	@BeforeEach
+	void sourcesCompiledWithoutParametersFlag() {
 		assertThat( ConstructorWithParameters.class.getDeclaredConstructors()[0].getParameters() )
 				.withFailMessage( "This test only works if compiled *without* the '-parameters' compiler flag." )
 				.extracting( Parameter::isNamePresent )
@@ -47,7 +48,7 @@ public class ProjectionConstructorClassNoParametersCompilerFlagIT extends Abstra
 	}
 
 	@Test
-	public void implicitInnerMapping() {
+	void implicitInnerMapping() {
 		@ProjectionConstructor
 		class MyProjection {
 			private final String someText;
@@ -97,7 +98,7 @@ public class ProjectionConstructorClassNoParametersCompilerFlagIT extends Abstra
 	}
 
 	@Test
-	public void explicitInnerMapping_implicitPath() {
+	void explicitInnerMapping_implicitPath() {
 		@ProjectionConstructor
 		class MyProjection {
 			private final String someText;
@@ -150,7 +151,7 @@ public class ProjectionConstructorClassNoParametersCompilerFlagIT extends Abstra
 	}
 
 	@Test
-	public void explicitInnerMapping_explicitPath() {
+	void explicitInnerMapping_explicitPath() {
 		@ProjectionConstructor
 		class MyProjection {
 			private final String someText;

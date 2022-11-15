@@ -30,26 +30,26 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.schema.management.SearchSchemaCollector;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 
-public class HibernateOrmSchemaManagerIT {
+class HibernateOrmSchemaManagerIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int INIT_DATA_TRANSACTION_SIZE = 100;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
-	@Rule
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@TempDir
+	public Path temporaryFolder;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 						SchemaManagementStrategyName.NONE )
@@ -59,7 +59,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
@@ -82,7 +82,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void selectType() {
+	void selectType() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );
@@ -102,7 +102,7 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void walkingTheSchema() {
+	void walkingTheSchema() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			List<String> indexNames = new ArrayList<>();
@@ -126,10 +126,10 @@ public class HibernateOrmSchemaManagerIT {
 	}
 
 	@Test
-	public void exportSchemaToFiles() throws IOException {
+	void exportSchemaToFiles() throws IOException {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
-			Path targetDirectory = temporaryFolder.newFolder().toPath();
+			Path targetDirectory = temporaryFolder;
 
 			// tag::schema-export[]
 			SearchSchemaManager schemaManager = searchSession.schemaManager(); // <1>

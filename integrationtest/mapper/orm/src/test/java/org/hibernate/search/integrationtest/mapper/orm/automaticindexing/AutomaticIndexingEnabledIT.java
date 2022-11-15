@@ -21,30 +21,28 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test enabling/disabling automatic indexing.
  */
 @TestForIssue(jiraKey = { "HSEARCH-4268", "HSEARCH-4616" })
-@RunWith(Parameterized.class)
-public class AutomaticIndexingEnabledIT {
+class AutomaticIndexingEnabledIT {
 
-	@Parameterized.Parameters(name = "Configuration Setting = {0}")
 	@SuppressWarnings("deprecation")
-	public static List<Object[]> data() {
-		return Arrays.asList( new Object[][] {
-				{ HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED },
-				{ HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED }
-		} );
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED ),
+				Arguments.of( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED )
+		);
 	}
 
 	private static final String DEPRECATED_STRATEGY_PROPERTY_MESSAGE = "Configuration property "
@@ -55,20 +53,17 @@ public class AutomaticIndexingEnabledIT {
 			+ "'hibernate.search.automatic_indexing.enabled' is deprecated;"
 			+ " use 'hibernate.search.indexing.listeners.enabled' instead";
 
-	@Parameterized.Parameter
-	public String configurationSetting;
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
-
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@SuppressWarnings("deprecation") // because of HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED
-	private SessionFactory setup(Boolean enabled, String strategyName) {
+	private SessionFactory setup(Boolean enabled, String strategyName, String configurationSetting) {
 		if ( enabled != null && HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED.equals( configurationSetting ) ) {
 			logged.expectMessage( DEPRECATED_AUTOMATIC_INDEXING_ENABLED_PROPERTY_MESSAGE ).once();
 		}
@@ -85,11 +80,12 @@ public class AutomaticIndexingEnabledIT {
 		return sessionFactory;
 	}
 
-	@Test
-	public void enabled_default() {
+	@ParameterizedTest(name = "Configuration Setting = {0}")
+	@MethodSource("params")
+	void enabled_default(String configurationSetting) {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).never();
 
-		SessionFactory sessionFactory = setup( null, null );
+		SessionFactory sessionFactory = setup( null, null, configurationSetting );
 
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
@@ -104,11 +100,12 @@ public class AutomaticIndexingEnabledIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void enabled_explicit() {
+	@ParameterizedTest(name = "Configuration Setting = {0}")
+	@MethodSource("params")
+	void enabled_explicit(String configurationSetting) {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).never();
 
-		SessionFactory sessionFactory = setup( true, null );
+		SessionFactory sessionFactory = setup( true, null, configurationSetting );
 
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
@@ -123,11 +120,12 @@ public class AutomaticIndexingEnabledIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void disabled() {
+	@ParameterizedTest(name = "Configuration Setting = {0}")
+	@MethodSource("params")
+	void disabled(String configurationSetting) {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).never();
 
-		SessionFactory sessionFactory = setup( false, null );
+		SessionFactory sessionFactory = setup( false, null, configurationSetting );
 
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
@@ -139,11 +137,12 @@ public class AutomaticIndexingEnabledIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void legacy_strategy_none() {
+	@ParameterizedTest(name = "Configuration Setting = {0}")
+	@MethodSource("params")
+	void legacy_strategy_none(String configurationSetting) {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).once();
 
-		SessionFactory sessionFactory = setup( null, "none" );
+		SessionFactory sessionFactory = setup( null, "none", configurationSetting );
 
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
@@ -155,11 +154,12 @@ public class AutomaticIndexingEnabledIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void legacy_strategy_session() {
+	@ParameterizedTest(name = "Configuration Setting = {0}")
+	@MethodSource("params")
+	void legacy_strategy_session(String configurationSetting) {
 		logged.expectMessage( DEPRECATED_STRATEGY_PROPERTY_MESSAGE ).once();
 
-		SessionFactory sessionFactory = setup( null, "session" );
+		SessionFactory sessionFactory = setup( null, "session", configurationSetting );
 
 		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = new IndexedEntity( 1, "initialValue" );
@@ -174,9 +174,10 @@ public class AutomaticIndexingEnabledIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
 	@SuppressWarnings("deprecation")
-	public void conflictingSettingsUsed() {
+	@ParameterizedTest(name = "Configuration Setting = {0}")
+	@MethodSource("params")
+	void conflictingSettingsUsed(String configurationSetting) {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class )
 		);

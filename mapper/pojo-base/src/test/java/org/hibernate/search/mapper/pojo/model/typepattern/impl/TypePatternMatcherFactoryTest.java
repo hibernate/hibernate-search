@@ -24,17 +24,17 @@ import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
-public class TypePatternMatcherFactoryTest {
+class TypePatternMatcherFactoryTest {
 
 	private final PojoBootstrapIntrospector introspectorMock = mock( PojoBootstrapIntrospector.class );
 
 	private final TypePatternMatcherFactory factory = new TypePatternMatcherFactory( introspectorMock );
 
 	@Test
-	public void exactType() {
+	void exactType() {
 		PojoRawTypeModel typeToMatchMock = mock( PojoRawTypeModel.class );
 		PojoTypeModel typeToInspectMock = mock( PojoTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
@@ -81,7 +81,7 @@ public class TypePatternMatcherFactoryTest {
 	 * Useful for bridge mapping in particular.
 	 */
 	@Test
-	public void concreteEnumType() {
+	void concreteEnumType() {
 		PojoRawTypeModel enumTypeMock = mock( PojoRawTypeModel.class );
 		PojoTypeModel typeToInspectMock = mock( PojoTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = mock( PojoRawTypeModel.class );
@@ -124,7 +124,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public void wildcardType() {
+	void wildcardType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new WildcardTypeCapture<Of<?>>() {}.getType(),
 				String.class
@@ -133,7 +133,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void typeVariable() {
+	<T> void typeVariable() {
 		// Must put this here, not in the lambda, otherwise the generated type is a bit different.
 		Type type = new TypeCapture<T>() {}.getType();
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
@@ -144,7 +144,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public void rawSuperType() {
+	void rawSuperType() {
 		PojoRawTypeModel<String> typeToMatchMock = mock( PojoRawTypeModel.class );
 		PojoRawTypeModel<Integer> resultTypeMock = mock( PojoRawTypeModel.class );
 		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
@@ -183,7 +183,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void rawSuperType_resultIsTypeVariable() {
+	<T> void rawSuperType_resultIsTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
 				new TypeCapture<T>() {}.getType()
@@ -192,7 +192,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void rawSuperType_resultIsWildcard() {
+	<T> void rawSuperType_resultIsWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
 				new WildcardTypeCapture<Of<?>>() {}.getType()
@@ -201,7 +201,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public void rawSuperType_resultIsParameterized() {
+	void rawSuperType_resultIsParameterized() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				String.class,
 				new TypeCapture<List<String>>() {}.getType()
@@ -210,7 +210,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public void nonGenericArrayElement() {
+	void nonGenericArrayElement() {
 		PojoRawTypeModel<String[]> typeToMatchMock = mock( PojoRawTypeModel.class );
 		PojoRawTypeModel<Integer> resultTypeMock = mock( PojoRawTypeModel.class );
 		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
@@ -243,7 +243,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void genericArrayElement() {
+	<T> void genericArrayElement() {
 		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
 		PojoTypeModel<T> resultTypeMock = mock( PojoTypeModel.class );
 
@@ -272,7 +272,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T extends Iterable<?>> void genericArrayElement_boundedTypeVariable() {
+	<T extends Iterable<?>> void genericArrayElement_boundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<T[]>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -281,7 +281,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T extends Object & Serializable> void genericArrayElement_multiBoundedTypeVariable() {
+	<T extends Object & Serializable> void genericArrayElement_multiBoundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<T[]>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -290,7 +290,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void genericArrayElement_resultIsRawType() {
+	<T> void genericArrayElement_resultIsRawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<T[]>() {}.getType(),
 				Object.class
@@ -299,7 +299,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T, U> void genericArrayElement_resultIsDifferentTypeArgument() {
+	<T, U> void genericArrayElement_resultIsDifferentTypeArgument() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<T[]>() {}.getType(),
 				new TypeCapture<U>() {}.getType()
@@ -308,7 +308,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void parameterizedType() {
+	<T> void parameterizedType() {
 		PojoTypeModel<?> typeToInspectMock = mock( PojoTypeModel.class );
 		PojoTypeModel<Integer> resultTypeMock = mock( PojoTypeModel.class );
 
@@ -337,7 +337,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void parameterizedType_upperBoundedWildcard() {
+	<T> void parameterizedType_upperBoundedWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<? extends Long, T>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -346,7 +346,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void parameterizedType_lowerBoundedWildcard() {
+	<T> void parameterizedType_lowerBoundedWildcard() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<? super Long, T>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -355,7 +355,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void parameterizedType_onlyWildcards() {
+	<T> void parameterizedType_onlyWildcards() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, ?>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -364,7 +364,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T> void parameterizedType_rawType() {
+	<T> void parameterizedType_rawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, String>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -373,7 +373,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T extends Iterable<?>> void parameterizedType_boundedTypeVariable() {
+	<T extends Iterable<?>> void parameterizedType_boundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -382,7 +382,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T extends Object & Serializable> void parameterizedType_multiBoundedTypeVariable() {
+	<T extends Object & Serializable> void parameterizedType_multiBoundedTypeVariable() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -391,7 +391,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T, U> void parameterizedType_multipleTypeVariables() {
+	<T, U> void parameterizedType_multipleTypeVariables() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<T, U>>() {}.getType(),
 				new TypeCapture<T>() {}.getType()
@@ -400,7 +400,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T, U> void parameterizedType_resultIsRawType() {
+	<T, U> void parameterizedType_resultIsRawType() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() {}.getType(),
 				Object.class
@@ -409,7 +409,7 @@ public class TypePatternMatcherFactoryTest {
 	}
 
 	@Test
-	public <T, U> void parameterizedType_resultIsDifferentTypeArgument() {
+	<T, U> void parameterizedType_resultIsDifferentTypeArgument() {
 		assertThatThrownBy( () -> factory.createExtractingMatcher(
 				new TypeCapture<Map<?, T>>() {}.getType(),
 				new TypeCapture<U>() {}.getType()

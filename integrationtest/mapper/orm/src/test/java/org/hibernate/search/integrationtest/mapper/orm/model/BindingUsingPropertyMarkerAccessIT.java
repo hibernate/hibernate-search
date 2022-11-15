@@ -8,6 +8,9 @@ package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
+import java.util.Arrays;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -20,15 +23,14 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that a binding using markers to retrieve and access properties
@@ -39,41 +41,38 @@ import org.junit.runners.Parameterized;
  *
  * @param <TIndexed> The entity class under test.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = { "HSEARCH-2759", "HSEARCH-2847" })
 @SuppressWarnings("unused")
 public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 
 	private static final String INDEX_NAME = "IndexedEntity";
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		return new Object[][] {
-				{ PrivateFieldAccessEntity.PRIMITIVES },
-				{ ProtectedFieldAccessEntity.PRIMITIVES },
-				{ PublicFieldAccessEntity.PRIMITIVES },
-				{ PublicMethodAccessEntity.PRIMITIVES },
-				{ ProtectedMethodAccessEntity.PRIMITIVES },
-				{ PrivateMethodAccessEntity.PRIMITIVES }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( PrivateFieldAccessEntity.PRIMITIVES ),
+				Arguments.of( ProtectedFieldAccessEntity.PRIMITIVES ),
+				Arguments.of( PublicFieldAccessEntity.PRIMITIVES ),
+				Arguments.of( PublicMethodAccessEntity.PRIMITIVES ),
+				Arguments.of( ProtectedMethodAccessEntity.PRIMITIVES ),
+				Arguments.of( PrivateMethodAccessEntity.PRIMITIVES )
+		);
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	private ModelPrimitives<TIndexed> modelPrimitives;
 
 	private SessionFactory sessionFactory;
 
-	public BindingUsingPropertyMarkerAccessIT(ModelPrimitives<TIndexed> modelPrimitives) {
-		this.modelPrimitives = modelPrimitives;
-	}
-
-	@Before
-	public void setup() {
+	/**
+	 * This just tests that Hibernate Search manages to extract data from the entity.
+	 * This used to fail when the only way to extract latitude was a private field, for example.
+	 */
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void indexing(ModelPrimitives<TIndexed> modelPrimitives) {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "location", GeoPoint.class,
 						b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
@@ -81,14 +80,6 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		sessionFactory = ormSetupHelper.start()
 				.setup( modelPrimitives.getModelClass() );
 		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * This just tests that Hibernate Search manages to extract data from the entity.
-	 * This used to fail when the only way to extract latitude was a private field, for example.
-	 */
-	@Test
-	public void indexing() {
 		with( sessionFactory ).runInTransaction( session -> {
 			TIndexed entity1 = modelPrimitives.create( 1, 42.0, 42.0 );
 

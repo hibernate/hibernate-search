@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -36,7 +36,7 @@ import org.junit.rules.MethodRule;
 public class AutomaticIndexingSessionFlushIT {
 
 	@ClassRule
-	public static BackendMock backendMock = new BackendMock();
+	public static BackendMockTestRule backendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
@@ -95,7 +95,7 @@ public class AutomaticIndexingSessionFlushIT {
 				backendMock.verifyExpectationsMet();
 			}
 
-			assertEquals( 1, resultList.size() );
+			assertThat( resultList ).hasSize( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.executeFollowingWorks()

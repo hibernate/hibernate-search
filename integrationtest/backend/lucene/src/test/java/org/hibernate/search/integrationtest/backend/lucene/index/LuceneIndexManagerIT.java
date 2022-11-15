@@ -19,29 +19,29 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperationBehavior;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneAnalysisUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneIndexManagerIT {
+class LuceneIndexManagerIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static LuceneIndexManager indexApi;
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
@@ -50,7 +50,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void indexingAnalyzer() throws IOException {
+	void indexingAnalyzer() throws IOException {
 		Analyzer analyzer = indexApi.indexingAnalyzer();
 		assertThat( LuceneAnalysisUtils.analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
@@ -67,7 +67,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void searchAnalyzer() throws IOException {
+	void searchAnalyzer() throws IOException {
 		Analyzer analyzer = indexApi.searchAnalyzer();
 		assertThat( LuceneAnalysisUtils.analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
@@ -84,7 +84,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void computeSizeInBytes() {
+	void computeSizeInBytes() {
 		long initialSize = indexApi.computeSizeInBytes();
 		assertThat( initialSize ).isGreaterThanOrEqualTo( 0L );
 
@@ -105,7 +105,7 @@ public class LuceneIndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void computeSizeInBytesAsync() {
+	void computeSizeInBytesAsync() {
 		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytesAsync().toCompletableFuture();
 		await().untilAsserted( () -> assertThat( initialSizeFuture ).isCompleted() );
 		long initialSize = initialSizeFuture.join();

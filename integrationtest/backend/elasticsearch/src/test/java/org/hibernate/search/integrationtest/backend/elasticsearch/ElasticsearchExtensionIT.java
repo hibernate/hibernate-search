@@ -53,16 +53,16 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -77,7 +77,7 @@ import org.elasticsearch.client.RestClient;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public class ElasticsearchExtensionIT {
+class ElasticsearchExtensionIT {
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -86,8 +86,8 @@ public class ElasticsearchExtensionIT {
 	private static final String FIFTH_ID = "5";
 	private static final String EMPTY_ID = "empty";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 	private final SimpleMappedIndex<IndexBinding> otherIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
@@ -96,8 +96,8 @@ public class ElasticsearchExtensionIT {
 
 	private SearchIntegration integration;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup().integration();
 
 		initData();
@@ -105,7 +105,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	@SuppressWarnings("unused")
-	public void queryContext() {
+	void queryContext() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
@@ -148,7 +148,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query() {
+	void query() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
@@ -171,7 +171,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_gsonResponseBody() {
+	void query_gsonResponseBody() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ElasticsearchSearchResult<DocumentReference> result = scope.query().extension( ElasticsearchExtension.get() )
@@ -184,7 +184,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_explain_singleIndex() {
+	void query_explain_singleIndex() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -206,7 +206,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3783")
-	public void query_explain_projection() {
+	void query_explain_projection() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ElasticsearchSearchQuery<String> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -228,7 +228,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_explain_singleIndex_invalidId() {
+	void query_explain_singleIndex_invalidId() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -245,7 +245,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes() {
+	void query_explain_multipleIndexes() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -266,7 +266,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes_missingTypeName() {
+	void query_explain_multipleIndexes_missingTypeName() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -282,7 +282,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes_invalidIndexName() {
+	void query_explain_multipleIndexes_invalidIndexName() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -300,7 +300,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3974")
-	public void scroll_onFetchable() {
+	void scroll_onFetchable() {
 		// Check the scroll has the extended type and works correctly
 		try ( ElasticsearchSearchScroll<DocumentReference> scroll = mainIndex.query()
 				.extension( ElasticsearchExtension.get() ) // Call extension() on the DSL step
@@ -321,7 +321,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3974")
-	public void scroll_onQuery() {
+	void scroll_onQuery() {
 		// Check the scroll has the extended type and works correctly
 		try ( ElasticsearchSearchScroll<DocumentReference> scroll = mainIndex.query()
 				.where( f -> f.matchAll() )
@@ -342,7 +342,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField() {
+	void predicate_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -355,7 +355,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_withDslConverter_enabled() {
+	void predicate_nativeField_withDslConverter_enabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -368,7 +368,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_withDslConverter_disabled() {
+	void predicate_nativeField_withDslConverter_disabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -381,7 +381,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromJson_jsonObject() {
+	void predicate_nativeField_fromJson_jsonObject() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -413,7 +413,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromJson_jsonObject_separatePredicate() {
+	void predicate_nativeField_fromJson_jsonObject_separatePredicate() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
@@ -449,7 +449,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromJson_string() {
+	void predicate_nativeField_fromJson_string() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -479,7 +479,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromJson_string_separatePredicate() {
+	void predicate_nativeField_fromJson_string_separatePredicate() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
@@ -514,7 +514,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField() {
+	void sort_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -547,7 +547,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField_jsonObject() {
+	void sort_nativeField_jsonObject() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -602,7 +602,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField_fromJson_jsonObject_separateSort() {
+	void sort_nativeField_fromJson_jsonObject_separateSort() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() ).fromJson( gson.fromJson(
@@ -663,7 +663,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField_fromJson_string() {
+	void sort_nativeField_fromJson_string() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -708,7 +708,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField_fromJson_string_separateSort() {
+	void sort_nativeField_fromJson_string_separateSort() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() )
@@ -759,7 +759,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_filter_fromJson() {
+	void sort_filter_fromJson() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -799,7 +799,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void projection_nativeField() {
+	void projection_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<JsonElement> query = scope.query()
@@ -812,7 +812,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void projection_nativeField_withProjectionConverters_enabled() {
+	void projection_nativeField_withProjectionConverters_enabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<ValueWrapper> query = scope.query()
@@ -824,7 +824,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void projection_nativeField_withProjectionConverters_disabled() {
+	void projection_nativeField_withProjectionConverters_disabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<JsonElement> query = scope.query()
@@ -836,7 +836,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void projection_document() throws JSONException {
+	void projection_document() throws JSONException {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<JsonObject> query = scope.query()
@@ -868,7 +868,7 @@ public class ElasticsearchExtensionIT {
 	 * even if there is a field projection, which would usually trigger source filtering.
 	 */
 	@Test
-	public void projection_documentAndField() {
+	void projection_documentAndField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
@@ -900,7 +900,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void projection_explanation() {
+	void projection_explanation() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<JsonObject> query = scope.query()
@@ -917,7 +917,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void projection_jsonHit() {
+	void projection_jsonHit() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<JsonObject> query = scope.query()
@@ -938,7 +938,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void aggregation_nativeField() {
+	void aggregation_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<Map<JsonElement, Long>> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
@@ -957,7 +957,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void aggregation_nativeField_fromJson_jsonObject() {
+	void aggregation_nativeField_fromJson_jsonObject() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<JsonObject> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
@@ -985,7 +985,7 @@ public class ElasticsearchExtensionIT {
 
 
 	@Test
-	public void aggregation_nativeField_fromJson_string() {
+	void aggregation_nativeField_fromJson_string() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<JsonObject> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
@@ -1012,7 +1012,7 @@ public class ElasticsearchExtensionIT {
 
 
 	@Test
-	public void aggregation_filter_fromLuceneQuery() {
+	void aggregation_filter_fromLuceneQuery() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "agg" );
@@ -1040,14 +1040,14 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void backend_unwrap() {
+	void backend_unwrap() {
 		Backend backend = integration.backend();
 		assertThat( backend.unwrap( ElasticsearchBackend.class ) )
 				.isNotNull();
 	}
 
 	@Test
-	public void backend_unwrap_error_unknownType() {
+	void backend_unwrap_error_unknownType() {
 		Backend backend = integration.backend();
 
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
@@ -1059,7 +1059,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void backend_getClient() throws Exception {
+	void backend_getClient() throws Exception {
 		Backend backend = integration.backend();
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 		RestClient restClient = elasticsearchBackend.client( RestClient.class );
@@ -1070,7 +1070,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void backend_getClient_error_invalidClass() {
+	void backend_getClient_error_invalidClass() {
 		Backend backend = integration.backend();
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 
@@ -1085,14 +1085,14 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void mainIndex_unwrap() {
+	void mainIndex_unwrap() {
 		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
 		assertThat( mainIndexFromIntegration.unwrap( ElasticsearchIndexManager.class ) )
 				.isNotNull();
 	}
 
 	@Test
-	public void mainIndex_unwrap_error_unknownType() {
+	void mainIndex_unwrap_error_unknownType() {
 		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
 
 		assertThatThrownBy( () -> mainIndexFromIntegration.unwrap( String.class ) )
@@ -1105,7 +1105,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void jsonHitProjectionInsideNested() {
+	void jsonHitProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( ElasticsearchExtension.get() ).jsonHit()
@@ -1121,7 +1121,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sourceProjectionInsideNested() {
+	void sourceProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( ElasticsearchExtension.get() ).source()
@@ -1137,7 +1137,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void explanationProjectionInsideNested() {
+	void explanationProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( ElasticsearchExtension.get() ).explanation()

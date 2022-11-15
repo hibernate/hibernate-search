@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding.NO_ADDITIONAL_CONFIGURATION;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,33 +24,30 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.model.single
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests basic behavior of projections on a single-valued field, common to all supported types.
  * <p>
  * See {@link FieldProjectionMultiValuedBaseIT} for multi-valued fields.
  */
-@RunWith(Parameterized.class)
-public class FieldProjectionSingleValuedBaseIT<F> {
+class FieldProjectionSingleValuedBaseIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
-	private static List<DataSet<?>> dataSets;
+	private static final List<DataSet<?>> dataSets = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0} - {1}")
-	public static Object[][] parameters() {
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 			for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
 				if ( fieldStructure.isMultiValued() ) {
@@ -58,14 +55,17 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 				}
 				DataSet<?> dataSet = new DataSet<>( fieldStructure, fieldType );
 				dataSets.add( dataSet );
-				parameters.add( new Object[] { fieldStructure, fieldType, dataSet } );
+				parameters.add( Arguments.of( fieldStructure, fieldType, dataSet ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
 	}
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public static List<? extends Arguments> params() {
+		return parameters;
+	}
+
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
 			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields(
@@ -78,8 +78,8 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -89,22 +89,13 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 		indexer.join();
 	}
 
-	private final TestedFieldStructure fieldStructure;
-	private final FieldTypeDescriptor<F> fieldType;
-	private final DataSet<F> dataSet;
-
-	public FieldProjectionSingleValuedBaseIT(TestedFieldStructure fieldStructure,
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void simple(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
-		this.fieldStructure = fieldStructure;
-		this.fieldType = fieldType;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void simple() {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType() ) )
@@ -119,11 +110,13 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 				);
 	}
 
-	@Test
-	public void noClass() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void noClass(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath ) )
@@ -141,12 +134,14 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 	/**
 	 * Test requesting a multi-valued projection on a single-valued field.
 	 */
-	@Test
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3391")
-	public void multi() {
+	void multi(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
@@ -167,11 +162,13 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 	/**
 	 * Test that mentioning the same projection twice works as expected.
 	 */
-	@Test
-	public void duplicated() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void duplicated(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.composite(
@@ -190,13 +187,17 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void factoryWithRoot() {
+	void factoryWithRoot(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
 
-		assumeTrue( "This test is only relevant when the field is located on an object field",
-				parentObjectBinding.absolutePath != null );
+		assumeTrue(
+				parentObjectBinding.absolutePath != null,
+				"This test is only relevant when the field is located on an object field"
+		);
 
 		assertThatQuery( index.query()
 				.select( f -> f.withRoot( parentObjectBinding.absolutePath )
@@ -213,7 +214,7 @@ public class FieldProjectionSingleValuedBaseIT<F> {
 				);
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType) {
 		return index.binding().getFieldPath( fieldStructure, fieldType );
 	}
 

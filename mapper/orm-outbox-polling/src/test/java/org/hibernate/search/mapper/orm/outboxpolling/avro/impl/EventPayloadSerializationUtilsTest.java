@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
@@ -25,19 +26,22 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.DirtinessDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.apache.avro.Protocol;
 
-public class EventPayloadSerializationUtilsTest {
+class EventPayloadSerializationUtilsTest {
 
 	private static final Set<String> DIRTY_PATHS = Set.of( "a", "b", "c" );
 	private static final String ROUTING_KEY = "key1";
 
 	@Test
-	@Ignore("Enable this test, or just run it from an IDE once you need to create a new payload for a newer version of Avro.")
-	public void createNewAvroPayloadFile() throws IOException, URISyntaxException {
+	@Disabled("Enable this test, or just run it from an IDE once you need to create a new payload for a newer version of Avro.")
+	void createNewAvroPayloadFile() throws IOException, URISyntaxException {
 		PojoIndexingQueueEventPayload payload = new PojoIndexingQueueEventPayload(
 				new DocumentRoutesDescriptor(
 						DocumentRouteDescriptor.of( ROUTING_KEY ),
@@ -63,28 +67,30 @@ public class EventPayloadSerializationUtilsTest {
 		}
 	}
 
-	@Test
-	public void canDeserializePreviousPayloads() throws IOException, URISyntaxException {
+	public static List<? extends Arguments> params() throws IOException, URISyntaxException {
 		try ( Stream<Path> payloads = Files.list( payloadTestResourceLocation() ) ) {
-			payloads.forEach( payload -> {
-				try ( InputStream inputStream = Files.newInputStream( payload ) ) {
-					PojoIndexingQueueEventPayload deserialized =
-							EventPayloadSerializationUtils.deserialize( inputStream.readAllBytes() );
-					assertThat( deserialized )
-							.as( payload.toString() )
-							.isNotNull();
-					assertThat( deserialized.routes.currentRoute().routingKey() )
-							.as( payload.toString() )
-							.isEqualTo( ROUTING_KEY );
-					assertThat( deserialized.dirtiness.dirtyPaths() )
-							.as( payload.toString() )
-							.containsAll( DIRTY_PATHS );
-				}
-				catch (IOException e) {
-					fail( "Cannot read payload from " + payload + ". Reason: " + e );
-				}
+			return payloads.map( Arguments::of ).collect( Collectors.toList() );
+		}
+	}
 
-			} );
+	@ParameterizedTest
+	@MethodSource("params")
+	void canDeserializePreviousPayloads(Path payload) {
+		try ( InputStream inputStream = Files.newInputStream( payload ) ) {
+			PojoIndexingQueueEventPayload deserialized =
+					EventPayloadSerializationUtils.deserialize( inputStream.readAllBytes() );
+			assertThat( deserialized )
+					.as( payload.toString() )
+					.isNotNull();
+			assertThat( deserialized.routes.currentRoute().routingKey() )
+					.as( payload.toString() )
+					.isEqualTo( ROUTING_KEY );
+			assertThat( deserialized.dirtiness.dirtyPaths() )
+					.as( payload.toString() )
+					.containsAll( DIRTY_PATHS );
+		}
+		catch (IOException e) {
+			fail( "Cannot read payload from " + payload + ". Reason: " + e );
 		}
 	}
 

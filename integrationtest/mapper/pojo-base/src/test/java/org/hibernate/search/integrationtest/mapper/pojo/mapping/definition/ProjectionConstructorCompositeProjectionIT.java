@@ -25,18 +25,18 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorCompositeProjectionIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void noArg() {
+	void noArg() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -101,7 +101,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void invalidType() {
+	void invalidType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -149,7 +149,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void inObjectField() {
+	void inObjectField() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -242,7 +242,7 @@ public class ProjectionConstructorCompositeProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void multiValued() {
+	void multiValued() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

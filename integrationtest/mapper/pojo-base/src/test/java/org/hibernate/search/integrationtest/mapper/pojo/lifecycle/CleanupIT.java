@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.lifecycle;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -36,19 +35,19 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.standalone.mapping.CloseableSearchMapping;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test that all resources are closed as expected upon shutdown, or when startup fails.
  */
-public class CleanupIT {
+class CleanupIT {
 	private static final StartupStubBridge.CounterKeys IDENTIFIER_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys ROUTING_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys TYPE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
@@ -57,20 +56,20 @@ public class CleanupIT {
 			StartupStubContainerExtractor.createKeys();
 	private static final StartupStubBridge.CounterKeys VALUE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	private CloseableSearchMapping mapping;
 
 	@Test
-	public void successfulBuilding() {
+	void successfulBuilding() {
 		backendMock.expectAnySchema( IndexedEntity.INDEX );
 		backendMock.expectAnySchema( OtherIndexedEntity.INDEX );
 
@@ -93,36 +92,36 @@ public class CleanupIT {
 		backendMock.verifyExpectationsMet();
 
 		// Exactly 2 index managers are expected
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
-		assertEquals( 2, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( StubIndexManager.STOP_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( StubIndexManager.STOP_COUNTER_KEY ) ).isZero();
 
-		assertEquals( 2, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertEquals( 2, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isEqualTo( 2 );
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isEqualTo( 2 );
 
 		// Extra type and property bridges should have been created...
-		assertEquals( 2 + 1, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertEquals( 2 + 1, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isEqualTo( 2 + 1 );
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isEqualTo( 2 + 1 );
 		// ... but closed immediately because they were only contributing fields that were filtered out
-		assertEquals( 1, counters.get( TYPE_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 1, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.close ) );
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.close ) ).isEqualTo( 1 );
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.close ) ).isEqualTo( 1 );
 
-		assertEquals( 3, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertEquals( 4, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isEqualTo( 3 );
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isEqualTo( 4 );
 
 		mapping.close();
 		mapping = null;
 
 		// Index manager builders must not have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 
 		// All other instantiated objects must have been closed.
 		assertRuntimeComponentsClosed();
 	}
 
 	@Test
-	public void failingRoutingBinding() {
+	void failingRoutingBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
@@ -140,24 +139,24 @@ public class CleanupIT {
 		} );
 
 		// We must have instantiated objects...
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isNotZero();
 		// ... except index managers...
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isZero();
 
 		// ... and all instantiated objects must have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 		assertRuntimeComponentsClosed();
 	}
 
 	@Test
-	public void failingTypeBinding() {
+	void failingTypeBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -175,24 +174,24 @@ public class CleanupIT {
 		} );
 
 		// We must have instantiated objects...
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isNotZero();
 		// ... except index managers...
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isZero();
 
 		// ... and all instantiated objects must have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 		assertRuntimeComponentsClosed();
 	}
 
 	@Test
-	public void failingIdentifierBinding() {
+	void failingIdentifierBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -210,24 +209,24 @@ public class CleanupIT {
 		} );
 
 		// We must have instantiated objects...
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isNotZero();
 		// ... except index managers...
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isZero();
 
 		// ... and all instantiated objects must have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 		assertRuntimeComponentsClosed();
 	}
 
 	@Test
-	public void failingPropertyBinding() {
+	void failingPropertyBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -245,24 +244,24 @@ public class CleanupIT {
 		} );
 
 		// We must have instantiated objects...
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isNotZero();
 		// ... except index managers...
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isZero();
 
 		// ... and all instantiated objects must have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 		assertRuntimeComponentsClosed();
 	}
 
 	@Test
-	public void failingValueBinding() {
+	void failingValueBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -283,24 +282,24 @@ public class CleanupIT {
 
 
 		// We must have instantiated objects...
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isNotZero();
 		// ... except index managers...
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isZero();
 
 		// ... and all instantiated objects must have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 		assertRuntimeComponentsClosed();
 	}
 
 	@Test
-	public void failingContainerExtractorBuilding() {
+	void failingContainerExtractorBuilding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
@@ -325,19 +324,19 @@ public class CleanupIT {
 
 
 		// We must have instantiated objects...
-		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
-		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) ).isEqualTo( 2 );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) ).isNotZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) ).isNotZero();
 		// ... except index managers...
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) ).isZero();
 
 		// ... and all instantiated objects must have been closed.
-		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertThat( counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) ).isZero();
 		assertRuntimeComponentsClosed();
 	}
 
@@ -410,30 +409,30 @@ public class CleanupIT {
 	}
 
 	private void assertRuntimeComponentsClosed() {
-		assertEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( ROUTING_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( ROUTING_BRIDGE_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( TYPE_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( TYPE_BRIDGE_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( VALUE_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( VALUE_BRIDGE_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance )
-				- counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManager.STOP_COUNTER_KEY ) );
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.close ) ).isZero();
+		assertThat( counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.holderClose ) ).isZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( ROUTING_BRIDGE_COUNTER_KEYS.close ) ).isZero();
+		assertThat( counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( ROUTING_BRIDGE_COUNTER_KEYS.holderClose ) ).isZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( TYPE_BRIDGE_COUNTER_KEYS.close ) ).isZero();
+		assertThat( counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( TYPE_BRIDGE_COUNTER_KEYS.holderClose ) ).isZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.close ) ).isZero();
+		assertThat( counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.holderClose ) ).isZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( VALUE_BRIDGE_COUNTER_KEYS.close ) ).isZero();
+		assertThat( counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( VALUE_BRIDGE_COUNTER_KEYS.holderClose ) ).isZero();
+		assertThat( counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance )
+				- counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.holderClose ) ).isZero();
+		assertThat( counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManager.STOP_COUNTER_KEY ) ).isZero();
 	}
 
 	public static class IndexedEntity {

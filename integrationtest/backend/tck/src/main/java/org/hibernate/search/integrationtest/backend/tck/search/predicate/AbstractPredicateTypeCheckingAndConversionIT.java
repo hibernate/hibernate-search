@@ -33,200 +33,278 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends AbstractPredicateTestValues<?>, P> {
 
-	private final SimpleMappedIndex<IndexBinding> index;
-	private final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex;
-	private final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex;
-	private final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex;
-	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex;
-	protected final DataSet<?, V> dataSet;
-
-	protected AbstractPredicateTypeCheckingAndConversionIT(SimpleMappedIndex<IndexBinding> index,
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertDefault_validType(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
-		this.index = index;
-		this.compatibleIndex = compatibleIndex;
-		this.rawFieldCompatibleIndex = rawFieldCompatibleIndex;
-		this.missingFieldIndex = missingFieldIndex;
-		this.incompatibleIndex = incompatibleIndex;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void defaultDslConverter_valueConvertDefault_validType() {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(),
-						unwrappedMatchingParam( 0 ) ) )
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
+						unwrappedMatchingParam( 0, dataSet ) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
-	public void defaultDslConverter_valueConvertDefault_invalidType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertDefault_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(), invalidTypeParam() ) )
+		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam() ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path() )
+						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path( index, dataSet ) )
 				) );
 	}
 
-	@Test
-	public void customDslConverter_valueConvertDefault_validType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertDefault_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(), wrappedMatchingParam( 0 ) ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), wrappedMatchingParam( 0,
+						dataSet
+				) ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
-	public void customDslConverter_valueConvertDefault_invalidType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertDefault_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path(), invalidTypeParam() ) )
+		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam() ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path() )
+						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path( index, dataSet ) )
 				) );
 	}
 
-	@Test
-	public void defaultDslConverter_valueConvertYes_validType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(),
-						unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
+						unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
-	public void defaultDslConverter_valueConvertYes_invalidType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(), invalidTypeParam(),
+		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path() )
+						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path( index, dataSet ) )
 				) );
 	}
 
-	@Test
-	public void customDslConverter_valueConvertYes_validType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertYes_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(),
-						wrappedMatchingParam( 0 ), ValueConvert.YES ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
+						wrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
-	public void customDslConverter_valueConvertYes_invalidType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertYes_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path(), invalidTypeParam(),
+		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path() )
+						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path( index, dataSet ) )
 				) );
 	}
 
-	@Test
-	public void defaultDslConverter_valueConvertNo_validType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(),
-						unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
+						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
-	public void defaultDslConverter_valueConvertNo_invalidType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void defaultDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(), invalidTypeParam(),
+		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path() )
+						EventContexts.fromIndexFieldAbsolutePath( defaultDslConverterField0Path( index, dataSet ) )
 				) );
 	}
 
-	@Test
-	public void customDslConverter_valueConvertNo_validType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertNo_validType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(),
-						unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ),
+						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 	}
 
-	@Test
-	public void customDslConverter_valueConvertNo_invalidType() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void customDslConverter_valueConvertNo_invalidType(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		SearchPredicateFactory f = index.createScope().predicate();
-		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path(), invalidTypeParam(),
+		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path( index, dataSet ), invalidTypeParam(),
 				ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path() )
+						EventContexts.fromIndexFieldAbsolutePath( customDslConverterField0Path( index, dataSet ) )
 				) );
 	}
 
-	@Test
-	public void multiFields_customDslConverter_valueConvertYes() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiFields_customDslConverter_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(), customDslConverterField1Path(),
-						wrappedMatchingParam( 0 ), ValueConvert.YES ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
+						index, dataSet ),
+						wrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(), customDslConverterField1Path(),
-						wrappedMatchingParam( 1 ), ValueConvert.YES ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
+						index, dataSet ),
+						wrappedMatchingParam( 1, dataSet ), ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void multiFields_customDslConverter_valueConvertNo() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiFields_customDslConverter_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(), customDslConverterField1Path(),
-						unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
+						index, dataSet ),
+						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, customDslConverterField0Path(), customDslConverterField1Path(),
-						unwrappedMatchingParam( 1 ), ValueConvert.NO ) )
+				.where( f -> predicate( f, customDslConverterField0Path( index, dataSet ), customDslConverterField1Path(
+						index, dataSet ),
+						unwrappedMatchingParam( 1, dataSet ), ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 1 ) );
 	}
 
-	@Test
-	public void multiIndex_withCompatibleIndex_valueConvertYes() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiIndex_withCompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( compatibleIndex );
 
 		assertThatQuery( scope.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ),
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0,
+						dataSet
+				),
 						ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
@@ -235,14 +313,20 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				} );
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_valueConvertYes() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = defaultDslConverterField0Path();
+		String fieldPath = defaultDslConverterField0Path( index, dataSet );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
-				unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
+				unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -253,13 +337,19 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_valueConvertNo() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( rawFieldCompatibleIndex );
 
 		assertThatQuery( scope.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(),
-						unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ),
+						unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
 					b.doc( index.typeName(), dataSet.docId( 0 ) );
@@ -271,14 +361,22 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	 * Test that no failure occurs when a predicate targets a field
 	 * that only exists in one of the targeted indexes.
 	 */
-	@Test
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_valueConvertYes() {
+	void multiIndex_withMissingFieldIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( missingFieldIndex );
 
 		// The predicate should not match anything in missingFieldIndex
 		assertThatQuery( scope.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ),
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0,
+						dataSet
+				),
 						ValueConvert.YES ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
@@ -289,7 +387,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		// if the predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( scope.query()
 				.where( f -> f.or(
-						predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ), ValueConvert.YES ),
+						predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0, dataSet ),
+								ValueConvert.YES ),
 						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
@@ -301,14 +400,22 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	 * Test that no failure occurs when a predicate targets a field
 	 * that only exists in one of the targeted indexes.
 	 */
-	@Test
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_valueConvertNo() {
+	void multiIndex_withMissingFieldIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( missingFieldIndex );
 
 		// The predicate should not match anything in missingFieldIndex
 		assertThatQuery( scope.query()
-				.where( f -> predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ),
+				.where( f -> predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0,
+						dataSet
+				),
 						ValueConvert.NO ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( b -> {
@@ -319,7 +426,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		// if the predicate is optional, it should be ignored for missingFieldIndex.
 		assertThatQuery( scope.query()
 				.where( f -> f.or(
-						predicate( f, defaultDslConverterField0Path(), unwrappedMatchingParam( 0 ), ValueConvert.NO ),
+						predicate( f, defaultDslConverterField0Path( index, dataSet ), unwrappedMatchingParam( 0, dataSet ),
+								ValueConvert.NO ),
 						f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index.typeName(), dataSet.docId( 0 ) )
@@ -327,14 +435,20 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				.hasTotalHitCount( 2 );
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_valueConvertYes() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_valueConvertYes(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
-		String fieldPath = defaultDslConverterField0Path();
+		String fieldPath = defaultDslConverterField0Path( index, dataSet );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
-				unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
+				unwrappedMatchingParam( 0, dataSet ), ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -345,14 +459,20 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 				) );
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_valueConvertNo() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_valueConvertNo(SimpleMappedIndex<IndexBinding> index,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
+			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
+			DataSet<?, V> dataSet) {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
-		String fieldPath = defaultDslConverterField0Path();
+		String fieldPath = defaultDslConverterField0Path( index, dataSet );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
-				unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
+				unwrappedMatchingParam( 0, dataSet ), ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
@@ -373,21 +493,21 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 	protected abstract P invalidTypeParam();
 
-	protected abstract P unwrappedMatchingParam(int matchingDocOrdinal);
+	protected abstract P unwrappedMatchingParam(int matchingDocOrdinal, DataSet<?, V> dataSet);
 
-	protected abstract P wrappedMatchingParam(int matchingDocOrdinal);
+	protected abstract P wrappedMatchingParam(int matchingDocOrdinal, DataSet<?, V> dataSet);
 
 	protected abstract String predicateNameInErrorMessage();
 
-	private String defaultDslConverterField0Path() {
+	private String defaultDslConverterField0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().defaultDslConverterField0.get( dataSet.fieldType ).relativeFieldName;
 	}
 
-	private String customDslConverterField0Path() {
+	private String customDslConverterField0Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().customDslConverterField0.get( dataSet.fieldType ).relativeFieldName;
 	}
 
-	private String customDslConverterField1Path() {
+	private String customDslConverterField1Path(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().customDslConverterField1.get( dataSet.fieldType ).relativeFieldName;
 	}
 

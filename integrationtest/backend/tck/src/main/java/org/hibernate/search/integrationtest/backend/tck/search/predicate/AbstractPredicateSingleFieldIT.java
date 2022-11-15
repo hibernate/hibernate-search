@@ -19,34 +19,29 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 // TODO HSEARCH-3593 test multiple field structures (in nested, ...)
 public abstract class AbstractPredicateSingleFieldIT<V extends AbstractPredicateTestValues<?>> {
 
-	private final SimpleMappedIndex<IndexBinding> index;
-	protected final DataSet<?, V> dataSet;
-
-	protected AbstractPredicateSingleFieldIT(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
-		this.index = index;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void match() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void match(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		int valueCount = dataSet.values.size();
 		for ( int i = 0; i < valueCount; i++ ) {
 			int matchingDocOrdinal = i;
 			assertThatQuery( index.query()
-					.where( f -> predicate( f, fieldPath(), matchingDocOrdinal ) )
+					.where( f -> predicate( f, fieldPath( index, dataSet ), matchingDocOrdinal, dataSet ) )
 					.routing( dataSet.routingKey ) )
 					.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( i ) );
 		}
 	}
 
-	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal);
+	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+			DataSet<?, V> dataSet);
 
-	private String fieldPath() {
+	private String fieldPath(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
 		return index.binding().field.get( dataSet.fieldType ).relativeFieldName;
 	}
 

@@ -22,11 +22,11 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class HibernateOrmMassIndexerMultiTenancyIT {
+class HibernateOrmMassIndexerMultiTenancyIT {
 
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
@@ -35,13 +35,13 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 	private static final int NUMBER_OF_BOOKS = 1000;
 	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		this.sessionFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.INDEXING_LISTENERS_ENABLED, false )
 				.tenants( TENANT_1_ID, TENANT_2_ID, TENANT_3_ID )
@@ -63,7 +63,7 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 	}
 
 	@Test
-	public void explicitTenant() throws InterruptedException {
+	void explicitTenant() throws InterruptedException {
 		// tag::explicitTenants[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::explicitTenants[]
@@ -88,7 +88,7 @@ public class HibernateOrmMassIndexerMultiTenancyIT {
 	}
 
 	@Test
-	public void implicitTenants() throws InterruptedException {
+	void implicitTenants() throws InterruptedException {
 		// tag::implicitTenants[]
 		SearchMapping searchMapping = /* ... */ // <1>
 				// end::implicitTenants[]

@@ -15,13 +15,13 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test the behavior of implementations of {@link IndexSchemaElement} when defining field types.
@@ -30,15 +30,15 @@ import org.junit.Test;
  * since this would require backend-specific code to inspect that schema.
  * However, in search and projection tests, we check that defined fields behave correctly at runtime.
  */
-public class IndexSchemaElementTypeIT {
+class IndexSchemaElementTypeIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private StubMappedIndex index;
 
 	@Test
-	public void analyzerOnSortableField() {
+	void analyzerOnSortableField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -70,7 +70,7 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	@Test
-	public void analyzerOnAggregableField() {
+	void analyzerOnAggregableField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -103,7 +103,7 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	@Test
-	public void analyzerAndNormalizer() {
+	void analyzerAndNormalizer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();
@@ -130,7 +130,7 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	@Test
-	public void searchAnalyzerWithoutAnalyzer() {
+	void searchAnalyzerWithoutAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.schemaElement();

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,27 +28,27 @@ import jakarta.persistence.Table;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-1350")
-public class FlushClearEvictAllIT {
+class FlushClearEvictAllIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		backendMock.expectAnySchema( Post.NAME );
 		backendMock.expectAnySchema( Comment.NAME );
 		entityManagerFactory = ormSetupHelper.start().setup( Post.class, Comment.class );
@@ -56,7 +56,7 @@ public class FlushClearEvictAllIT {
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			Post post = new Post();
 			post.setName( "This is a post" );
@@ -66,7 +66,7 @@ public class FlushClearEvictAllIT {
 
 			post = entityManager.merge( post );
 			Long postId = post.getId();
-			assertNotNull( postId );
+			assertThat( postId ).isNotNull();
 
 			backendMock.expectWorks( Post.NAME )
 					.createFollowingWorks()

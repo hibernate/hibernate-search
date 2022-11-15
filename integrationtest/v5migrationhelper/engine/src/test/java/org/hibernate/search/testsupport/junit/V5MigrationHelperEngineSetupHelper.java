@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMapping
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
 import org.hibernate.search.testsupport.configuration.V5MigrationHelperTestLuceneBackendConfiguration;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoAssertionHelper;
 
@@ -42,7 +42,7 @@ public final class V5MigrationHelperEngineSetupHelper
 	private final StandalonePojoAssertionHelper assertionHelper;
 
 	private V5MigrationHelperEngineSetupHelper(BackendSetupStrategy backendSetupStrategy) {
-		super( backendSetupStrategy );
+		super( backendSetupStrategy, Type.METHOD );
 		this.assertionHelper = new StandalonePojoAssertionHelper( backendSetupStrategy );
 	}
 

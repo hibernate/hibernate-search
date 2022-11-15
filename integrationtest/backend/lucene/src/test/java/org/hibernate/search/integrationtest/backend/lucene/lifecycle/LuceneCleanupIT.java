@@ -9,6 +9,9 @@ package org.hibernate.search.integrationtest.backend.lucene.lifecycle;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -27,51 +30,42 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.directory.OpenResourceTracker;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.directory.TrackingDirectoryProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that the Lucene backend correctly releases open resources.
  */
-@RunWith(Parameterized.class)
-public class LuceneCleanupIT {
+class LuceneCleanupIT {
 
-	@Parameterized.Parameters(name = "commit_interval {0}, refresh_interval {0}")
-	public static Object[][] strategies() {
-		return new Object[][] {
-				{ null, null },
-				{ 0, 0 },
-				{ 0, 1_000 },
-				{ 1_000, 0 },
-				{ 1_000, 1_000 }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( null, null ),
+				Arguments.of( 0, 0 ),
+				Arguments.of( 0, 1_000 ),
+				Arguments.of( 1_000, 0 ),
+				Arguments.of( 1_000, 1_000 )
+		);
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private final Integer commitInterval;
-	private final Integer refreshInterval;
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	public LuceneCleanupIT(Integer commitInterval, Integer refreshInterval) {
-		this.commitInterval = commitInterval;
-		this.refreshInterval = refreshInterval;
-	}
-
-	@Test
-	public void test() {
+	@ParameterizedTest(name = "commit_interval {0}, refresh_interval {0}")
+	@MethodSource("params")
+	void test(Integer commitInterval, Integer refreshInterval) {
 		OpenResourceTracker tracker = new OpenResourceTracker();
-		StubMapping mapping = setup( tracker );
+		StubMapping mapping = setup( tracker, commitInterval, refreshInterval );
 
 		// Execute a few operations to be sure that we open files
 		doQuery();
@@ -124,7 +118,7 @@ public class LuceneCleanupIT {
 		plan.execute( OperationSubmitter.blocking() ).join();
 	}
 
-	private StubMapping setup(OpenResourceTracker tracker) {
+	private StubMapping setup(OpenResourceTracker tracker, Integer commitInterval, Integer refreshInterval) {
 		return setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )

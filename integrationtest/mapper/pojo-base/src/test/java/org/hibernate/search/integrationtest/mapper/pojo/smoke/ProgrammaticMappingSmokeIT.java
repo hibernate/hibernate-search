@@ -33,27 +33,27 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProgrammaticMappingSmokeIT {
+class ProgrammaticMappingSmokeIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
@@ -205,7 +205,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void index() {
+	void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -396,7 +396,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search() {
+	void search() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -431,7 +431,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search_singleElementProjection() {
+	void search_singleElementProjection() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<String> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -465,7 +465,7 @@ public class ProgrammaticMappingSmokeIT {
 	}
 
 	@Test
-	public void search_multipleElementsProjection() {
+	void search_multipleElementsProjection() {
 		SearchScope<ParentIndexedEntity> scope = mapping.scope(
 				Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 		);

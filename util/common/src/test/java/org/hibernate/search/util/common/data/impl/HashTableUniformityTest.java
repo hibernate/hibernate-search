@@ -17,9 +17,9 @@ import java.util.Map;
 
 import org.hibernate.search.util.impl.test.logging.Log;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.inference.TestUtils;
@@ -29,11 +29,9 @@ import org.apache.commons.math3.util.FastMath;
  * Tests that hash tables map various datasets to their buckets uniformly,
  * i.e. with approximately the same amount of elements in each bucket.
  */
-@RunWith(Parameterized.class)
-public class HashTableUniformityTest {
+class HashTableUniformityTest {
 
-	@Parameterized.Parameters(name = "{0} - {1}")
-	public static List<Object[]> params() {
+	public static List<? extends Arguments> params() {
 		// Try many datasets because some datasets contain lots of similar data (same string size, small character set, ...)
 		// and thus may not lead to uniform hashes with the imperfect hash functions we're using.
 		List<StringGenerator> generators = Arrays.asList(
@@ -57,42 +55,41 @@ public class HashTableUniformityTest {
 				RandomStringGenerator.randomUtf16Strings( 4, 6 ),
 				RandomStringGenerator.randomUtf16Strings( 5, 10 )
 		);
-		List<Object[]> params = new ArrayList<>();
+		List<Arguments> params = new ArrayList<>();
 		for ( HashTableProvider hashTableProvider : HashTableProvider.values() ) {
 			for ( StringGenerator generator : generators ) {
-				params.add( new Object[] { hashTableProvider, generator } );
+				params.add( Arguments.of( hashTableProvider, generator ) );
 			}
 		}
 		return params;
 	}
 
-	@Parameterized.Parameter(0)
-	public HashTableProvider hashTableProvider;
-
-	@Parameterized.Parameter(1)
-	public StringGenerator generator;
-
-	@Test
-	public void with2buckets() {
-		testUniformity( 2, 10_000 );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void with2buckets(HashTableProvider hashTableProvider, StringGenerator generator) {
+		testUniformity( 2, 10_000, hashTableProvider, generator );
 	}
 
-	@Test
-	public void with5buckets() {
-		testUniformity( 5, 10_000 );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void with5buckets(HashTableProvider hashTableProvider, StringGenerator generator) {
+		testUniformity( 5, 10_000, hashTableProvider, generator );
 	}
 
-	@Test
-	public void with10buckets() {
-		testUniformity( 10, 100_000 );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void with10buckets(HashTableProvider hashTableProvider, StringGenerator generator) {
+		testUniformity( 10, 100_000, hashTableProvider, generator );
 	}
 
-	@Test
-	public void with20buckets() {
-		testUniformity( 20, 1_000_000 );
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void with20buckets(HashTableProvider hashTableProvider, StringGenerator generator) {
+		testUniformity( 20, 1_000_000, hashTableProvider, generator );
 	}
 
-	private void testUniformity(int bucketCount, long maxKeyCount) {
+	private void testUniformity(int bucketCount, long maxKeyCount, HashTableProvider hashTableProvider,
+			StringGenerator generator) {
 		HashTable<Long> hashTable = hashTableProvider.create( bucketCount );
 
 		for ( int i = 0; i < hashTable.size(); i++ ) {

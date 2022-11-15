@@ -21,7 +21,8 @@ import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
@@ -35,10 +36,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	private static final String BACKEND2_NAME = "stubBackend2";
 
 	@ClassRule
-	public static BackendMock defaultBackendMock = new BackendMock();
+	public static BackendMockTestRule defaultBackendMock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
-	public static BackendMock backend2Mock = new BackendMock();
+	public static BackendMockTestRule backend2Mock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder;

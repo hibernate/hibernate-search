@@ -7,55 +7,51 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class IndexNullAsErrorIT<V, F> {
+class IndexNullAsErrorIT<V, F> {
 
 	private static final String FIELD_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_NAME;
 	private static final String FIELD_INDEXNULLAS_NAME =
 			DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[] types() {
+	public static List<? extends Arguments> params() {
 		return PropertyTypeDescriptor.getAll().stream()
 				.filter( type -> type.isNullable() )
-				.map( type -> new Object[] { type, type.getDefaultValueBridgeExpectations() } )
-				.toArray();
+				.map( type -> Arguments.of( type, type.getDefaultValueBridgeExpectations() ) )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final DefaultValueBridgeExpectations<V, F> expectations;
-
-	public IndexNullAsErrorIT(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
-		this.expectations = expectations;
-	}
-
-	@Test
-	public void testParsingException() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void testParsingException(PropertyTypeDescriptor<V, F> typeDescriptor, DefaultValueBridgeExpectations<V, F> expectations) {
 		String unparsableNullAsValue = expectations.getUnparsableNullAsValue();
 		// Null means "there's no value I can't parse". Useful for the String type.
-		assumeNotNull( unparsableNullAsValue );
+		assumeTrue( Objects.nonNull( unparsableNullAsValue ) );
 
 		assertThatThrownBy( () -> setupHelper.start().withConfiguration( c -> {
 			c.addEntityType( expectations.getTypeWithValueBridge1() );

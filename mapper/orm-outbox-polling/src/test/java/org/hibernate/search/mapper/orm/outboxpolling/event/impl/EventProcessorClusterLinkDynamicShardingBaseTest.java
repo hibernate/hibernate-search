@@ -11,18 +11,15 @@ import java.util.UUID;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
-import org.hibernate.search.util.impl.test.runner.nested.Nested;
-import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * Base tests of {@link OutboxPollingEventProcessorClusterLink}
  * with dynamic sharding.
  */
-@RunWith(NestedRunner.class)
-public class EventProcessorClusterLinkDynamicShardingBaseTest {
+class EventProcessorClusterLinkDynamicShardingBaseTest {
 
 	abstract static class AbstractBaseTest extends AbstractEventProcessorClusterLinkBaseTest {
 		// Define IDs in ascending order, because IDs matter when using dynamic sharding.
@@ -94,7 +91,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	// but should go through the waiting state first.
 	// See comments in OutboxPollingEventProcessorClusterLink.
 	@Nested
-	public static class NotRegisteredTest extends AbstractBaseTest {
+	public class NotRegisteredTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfNotCreatedYet();
@@ -112,7 +109,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class SuspendedTest extends AbstractBaseTest {
+	public class SuspendedTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.SUSPENDED, null );
@@ -130,7 +127,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class WaitingIn1NodeClusterTest extends AbstractBaseTest {
+	public class WaitingIn1NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.WAITING, selfShardAssignmentIn1NodeCluster() );
@@ -149,7 +146,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class RunningIn1NodeClusterTest extends AbstractBaseTest {
+	public class RunningIn1NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn1NodeCluster() );
@@ -167,7 +164,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class WaitingIn3NodeClusterTest extends AbstractBaseTest {
+	public class WaitingIn3NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.WAITING, selfShardAssignmentIn3NodeCluster() );
@@ -185,7 +182,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class RunningIn3NodeClusterTest extends AbstractBaseTest {
+	public class RunningIn3NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn3NodeCluster() );
@@ -203,7 +200,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class WaitingIn4NodeClusterTest extends AbstractBaseTest {
+	public class WaitingIn4NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.WAITING, selfShardAssignmentIn4NodeCluster() );
@@ -222,7 +219,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class RunningIn4NodeClusterTest extends AbstractBaseTest {
+	public class RunningIn4NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.RUNNING, selfShardAssignmentIn4NodeCluster() );
@@ -241,7 +238,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class WaitingIn5NodeClusterTest extends AbstractBaseTest {
+	public class WaitingIn5NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.WAITING, shardAssignmentIn5NodeCluster() );
@@ -259,7 +256,7 @@ public class EventProcessorClusterLinkDynamicShardingBaseTest {
 	}
 
 	@Nested
-	public static class RunningIn5NodeClusterTest extends AbstractBaseTest {
+	public class RunningIn5NodeClusterTest extends AbstractBaseTest {
 		@Override
 		protected void defineSelf() {
 			defineSelfCreatedAndStillPresent( AgentState.RUNNING, shardAssignmentIn5NodeCluster() );

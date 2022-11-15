@@ -8,12 +8,12 @@ package org.hibernate.search.engine.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class IndexSettingsTest {
+class IndexSettingsTest {
 
 	@Test
-	public void indexKey() {
+	void indexKey() {
 		assertThat( IndexSettings.indexKey( "indexName", "foo.bar" ) )
 				.isEqualTo( "hibernate.search.backend.indexes.indexName.foo.bar" );
 

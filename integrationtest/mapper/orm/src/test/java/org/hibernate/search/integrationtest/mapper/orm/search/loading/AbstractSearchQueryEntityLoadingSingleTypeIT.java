@@ -31,11 +31,15 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		}
 	}
 
-	protected final SingleTypeLoadingModel<T> model;
+	protected SingleTypeLoadingModel<T> model;
 
-	protected final SingleTypeLoadingMapping mapping;
+	protected SingleTypeLoadingMapping mapping;
 
 	AbstractSearchQueryEntityLoadingSingleTypeIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		init( model, mapping );
+	}
+
+	void init(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
 		this.model = model;
 		this.mapping = mapping;
 	}

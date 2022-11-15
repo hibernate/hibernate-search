@@ -13,13 +13,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 
@@ -27,20 +27,20 @@ import org.apache.logging.log4j.Level;
  * Test models with multiple getters for the same property.
  */
 @TestForIssue(jiraKey = "HSEARCH-4117")
-public class DuplicateGetterIT {
+class DuplicateGetterIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void duplicateGetter_unmapped() {
+	void duplicateGetter_unmapped() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
@@ -69,7 +69,7 @@ public class DuplicateGetterIT {
 	}
 
 	@Test
-	public void duplicateGetter_mapped() {
+	void duplicateGetter_mapped() {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {

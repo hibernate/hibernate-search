@@ -15,9 +15,9 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.test.SystemHelper;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -32,11 +32,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
  * <p>
  * See README to know how to run the benchmark from the command line to obtain more reliable results.
  */
-public class SmokeIT {
+class SmokeIT {
 	private final List<SystemHelper.SystemPropertyRestorer> toClose = new ArrayList<>();
 
-	@Before
-	public void setupConnectionInfo() {
+	@BeforeEach
+	void setupConnectionInfo() {
 		Map<String, String> connectionInfo = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( connectionInfo );
 		connectionInfo.forEach( (key, value) -> {
@@ -46,15 +46,15 @@ public class SmokeIT {
 		} );
 	}
 
-	@After
-	public void restoreSystemProperties() {
+	@AfterEach
+	void restoreSystemProperties() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( SystemHelper.SystemPropertyRestorer::close, toClose );
 		}
 	}
 
 	@Test
-	public void test() throws RunnerException {
+	void test() throws RunnerException {
 		Options opts = new OptionsBuilder()
 				.include( ".*" )
 				.warmupIterations( 0 )

@@ -10,28 +10,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class IndexManagerIT {
+class IndexManagerIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	private static Backend backendApi;
 	private static IndexManager indexApi;
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		StubMapping mapping = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
@@ -41,7 +41,7 @@ public class IndexManagerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void backend() {
+	void backend() {
 		assertThat( indexApi.backend() )
 				.isNotNull()
 				.isSameAs( backendApi );

@@ -11,12 +11,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link OutboxPollingMassIndexerAgentClusterLink#leaveCluster(AgentClusterLinkContextProvider)}.
  */
-public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassIndexerAgentClusterLinkTest {
+class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassIndexerAgentClusterLinkTest {
 	final OutboxPollingMassIndexerAgentClusterLink setupLink() {
 		return new OutboxPollingMassIndexerAgentClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock,
@@ -25,13 +25,13 @@ public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassInd
 	}
 
 	@Test
-	public void didNotJoin() {
+	void didNotJoin() {
 		OutboxPollingMassIndexerAgentClusterLink link = setupLink();
 		link.leaveCluster( contextMock );
 	}
 
 	@Test
-	public void joined_found() {
+	void joined_found() {
 		OutboxPollingMassIndexerAgentClusterLink link = setupLink();
 		defineSelfNotCreatedYet( link );
 		repositoryMockHelper.defineOtherAgents();
@@ -45,7 +45,7 @@ public class MassIndexerAgentClusterLinkLeaveClusterTest extends AbstractMassInd
 	}
 
 	@Test
-	public void joined_notFound() {
+	void joined_notFound() {
 		OutboxPollingMassIndexerAgentClusterLink link = setupLink();
 		defineSelfNotCreatedYet( link );
 		repositoryMockHelper.defineOtherAgents();

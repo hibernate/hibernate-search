@@ -17,12 +17,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Simple test to check that automatic indexing works correctly when multi-tenancy is enabled.
@@ -31,19 +31,19 @@ import org.junit.Test;
  * from a background thread, since they will have to remember the tenant ID somehow.
  */
 @TestForIssue(jiraKey = "HSEARCH-4316")
-public class AutomaticIndexingMultiTenancyIT {
+class AutomaticIndexingMultiTenancyIT {
 
 	private static final String TENANT_1_ID = "tenant1";
 	private static final String TENANT_2_ID = "tenant2";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Test
-	public void test() throws InterruptedException {
+	void test() throws InterruptedException {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 

@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -19,16 +19,16 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class DistanceSearchableSortableIT {
+class DistanceSearchableSortableIT {
 
 	private static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	private static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687, 4.835233 );
@@ -41,19 +41,19 @@ public class DistanceSearchableSortableIT {
 
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
-	public void searchableSortable() {
+	void searchableSortable() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "searchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
@@ -64,10 +64,10 @@ public class DistanceSearchableSortableIT {
 	}
 
 	@Test
-	public void searchableNotSortable() {
+	void searchableNotSortable() {
 		assumeFalse(
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
 		);
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortable";
@@ -92,7 +92,7 @@ public class DistanceSearchableSortableIT {
 	}
 
 	@Test
-	public void searchableNotSortableNotProjectable() {
+	void searchableNotSortableNotProjectable() {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortableNotProjectable";
 
@@ -116,10 +116,10 @@ public class DistanceSearchableSortableIT {
 	}
 
 	@Test
-	public void searchableDefaultSortable() {
+	void searchableDefaultSortable() {
 		assumeFalse(
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
 		);
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableDefaultSortable";
@@ -144,7 +144,7 @@ public class DistanceSearchableSortableIT {
 	}
 
 	@Test
-	public void notSearchableSortable() {
+	void notSearchableSortable() {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "notSearchableSortable";
 
@@ -168,7 +168,7 @@ public class DistanceSearchableSortableIT {
 	}
 
 	@Test
-	public void defaultSearchableSortable() {
+	void defaultSearchableSortable() {
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "defaultSearchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )

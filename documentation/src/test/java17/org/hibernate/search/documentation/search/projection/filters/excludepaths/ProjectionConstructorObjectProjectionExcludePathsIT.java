@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.util.Arrays;
 import java.util.Collections;
+
 import jakarta.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.search.projection.filters.Human;
@@ -19,13 +20,13 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProjectionConstructorObjectProjectionExcludePathsIT {
+class ProjectionConstructorObjectProjectionExcludePathsIT {
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
 			BackendConfigurations.simple(), true,
 			// Since we disable classpath scanning in tests for performance reasons,
@@ -36,13 +37,13 @@ public class ProjectionConstructorObjectProjectionExcludePathsIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start().setup( Human.class );
 	}
 
 	@Test
-	public void smoke() {
+	void smoke() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Human human1 = new Human();
 			human1.setId( 1 );

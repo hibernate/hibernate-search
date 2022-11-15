@@ -22,12 +22,12 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryCache;
@@ -35,15 +35,15 @@ import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.Version;
 
-public class LuceneQueryCacheConfigurerIT {
+class LuceneQueryCacheConfigurerIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	@Test
-	public void error_failingQueryCacheConfigurer() {
+	void error_failingQueryCacheConfigurer() {
 		setup( FailingQueryCacheConfigurer.class.getName() );
 		initData( 10 );
 
@@ -68,7 +68,7 @@ public class LuceneQueryCacheConfigurerIT {
 	}
 
 	@Test
-	public void error_failingQueryCachingPolicyConfigurer() {
+	void error_failingQueryCachingPolicyConfigurer() {
 		setup( FailingCachePolicyExceptionQueryCacheConfigurer.class.getName() );
 		initData( 10 );
 

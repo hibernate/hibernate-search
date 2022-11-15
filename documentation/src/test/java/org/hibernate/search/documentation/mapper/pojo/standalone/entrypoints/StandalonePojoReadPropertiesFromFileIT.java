@@ -21,20 +21,20 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class StandalonePojoReadPropertiesFromFileIT {
+class StandalonePojoReadPropertiesFromFileIT {
 
 	private CloseableSearchMapping theSearchMapping;
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
-	@Before
-	public void setup() throws IOException {
+	@BeforeEach
+	void setup() throws IOException {
 		// tag::setup[]
 		try (
 				Reader propertyFileReader = /* ... */ // <1>
@@ -61,8 +61,8 @@ public class StandalonePojoReadPropertiesFromFileIT {
 		// end::setup[]
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( theSearchMapping != null ) {
 			CloseableSearchMapping searchMapping = theSearchMapping;
 			searchMapping.close();
@@ -70,14 +70,14 @@ public class StandalonePojoReadPropertiesFromFileIT {
 	}
 
 	@Test
-	public void mappingContainsExpectedEntities() {
+	void mappingContainsExpectedEntities() {
 		assertThat( theSearchMapping.allIndexedEntities() )
 				.extracting( SearchIndexedEntity::name )
 				.contains( "Book", "Associate", "Manager" );
 	}
 
 	@Test
-	public void searchSession() {
+	void searchSession() {
 		SearchMapping searchMapping = theSearchMapping;
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
 			assertThat( searchSession ).isNotNull();

@@ -32,19 +32,15 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class BeanResolverImplRetrievalClassTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class BeanResolverImplRetrievalClassTest {
 
 	@Mock
 	private ClassResolver classResolverMock;
@@ -69,7 +65,7 @@ public class BeanResolverImplRetrievalClassTest {
 
 	private BeanResolver beanResolver;
 
-	@Before
+	@BeforeEach
 	// Raw types are the only way to set the return value for a wildcard return type (Optional<?>)
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setup() {
@@ -97,7 +93,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_matchingBeanManager() {
+	void resolve_matchingBeanManager() {
 		BeanHolder<BeanManagerType1> type1BeanHolder = BeanHolder.of( new BeanManagerType1() );
 		BeanHolder<BeanManagerType2> type2BeanHolder = BeanHolder.of( new BeanManagerType2() );
 		BeanHolder<BeanManagerType3> type3BeanHolder1 = BeanHolder.of( new BeanManagerType3() );
@@ -146,7 +142,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_matchingReflection() {
+	void resolve_matchingReflection() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 
 		// resolve(Class)
@@ -195,7 +191,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_noMatch() {
+	void resolve_noMatch() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 		RuntimeException classNotFoundException = new RuntimeException( "cannot find class" );
 
@@ -265,7 +261,7 @@ public class BeanResolverImplRetrievalClassTest {
 	}
 
 	@Test
-	public void resolve_beanManagerFailure() {
+	void resolve_beanManagerFailure() {
 		RuntimeException beanManagerFailure = new RuntimeException( "internal failure in provider" );
 
 		// resolve(Class)

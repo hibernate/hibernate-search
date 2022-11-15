@@ -6,23 +6,24 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.Arrays;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
+class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterIT {
 
 	@Test
-	public void directPersistUpdateDeleteApplicationFilter() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void directPersistUpdateDeleteApplicationFilter() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.class )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -41,17 +42,17 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 		} );
 		backendMock.verifyExpectationsMet();
 
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.class )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
@@ -63,11 +64,11 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 	}
 
 	@Test
-	public void directPersistUpdateDeleteApplicationFilterByName() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void directPersistUpdateDeleteApplicationFilterByName() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.INDEX )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
@@ -86,17 +87,17 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 		} );
 		backendMock.verifyExpectationsMet();
 
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( IndexedEntity.INDEX )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 			entity1.setIndexedField( "updatedValue" );
 
 		} );
 		backendMock.verifyExpectationsMet();
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
 			entity1.getContainedIndexedEmbedded().forEach( e -> e.setContainingAsIndexedEmbedded( null ) );
@@ -108,14 +109,14 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 	}
 
 	@Test
-	public void hierarchyFiltering() {
+	void hierarchyFiltering() {
 		// exclude all except one specific class.
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 						.include( Entity2A.class )
 		);
 
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityA( 1, "test" ) );
 			session.persist( new Entity1A( 2, "test" ) );
 			session.persist( new Entity1B( 3, "test" ) );
@@ -127,11 +128,11 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 		backendMock.verifyExpectationsMet();
 
 		// exclude all except one class branch.
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 						.include( Entity1A.class )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityA( 10, "test" ) );
 			session.persist( new Entity1A( 20, "test" ) );
 			session.persist( new Entity1B( 30, "test" ) );
@@ -145,10 +146,10 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 		backendMock.verifyExpectationsMet();
 
 		// only include - should include all since no excludes.
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.include( Entity1A.class )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityA( 100, "test" ) );
 			session.persist( new Entity1A( 200, "test" ) );
 			session.persist( new Entity1B( 300, "test" ) );
@@ -167,8 +168,8 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 	}
 
 	@Test
-	public void sameClassFails() {
-		assertThatThrownBy( () -> Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void sameClassFails() {
+		assertThatThrownBy( () -> Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 						.include( EntityA.class )
 		)
@@ -180,7 +181,7 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 						"Already excluded types:"
 				);
 
-		assertThatThrownBy( () -> Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+		assertThatThrownBy( () -> Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.include( EntityA.class )
 						.exclude( EntityA.class )
 		)
@@ -194,8 +195,8 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 	}
 
 	@Test
-	public void sameNameFails() {
-		assertThatThrownBy( () -> Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void sameNameFails() {
+		assertThatThrownBy( () -> Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.include( EntityA.INDEX )
 						.exclude( EntityA.INDEX )
 		)
@@ -209,11 +210,11 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 	}
 
 	@Test
-	public void applicationFilterDisableAll() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void applicationFilterDisableAll() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.class )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityA( 1, "test" ) );
 			session.persist( new Entity1A( 2, "test" ) );
 			session.persist( new Entity1B( 3, "test" ) );
@@ -223,11 +224,11 @@ public class ApplicationIndexingPlanFilterIT extends AbstractIndexingPlanFilterI
 	}
 
 	@Test
-	public void applicationFilterDisableAllByName() {
-		Search.mapping( setupHolder.entityManagerFactory() ).indexingPlanFilter(
+	void applicationFilterDisableAllByName() {
+		Search.mapping( sessionFactory ).indexingPlanFilter(
 				ctx -> ctx.exclude( EntityA.INDEX )
 		);
-		setupHolder.runInTransaction( session -> {
+		with( sessionFactory ).runInTransaction( session -> {
 			session.persist( new EntityA( 1, "test" ) );
 			session.persist( new Entity1A( 2, "test" ) );
 			session.persist( new Entity1B( 3, "test" ) );

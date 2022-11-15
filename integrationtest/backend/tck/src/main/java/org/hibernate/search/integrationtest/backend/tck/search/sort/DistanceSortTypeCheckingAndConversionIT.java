@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,7 +37,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -45,15 +45,15 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
  * for sorts by field value.
  */
-public class DistanceSortTypeCheckingAndConversionIT {
+class DistanceSortTypeCheckingAndConversionIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 
@@ -72,8 +72,8 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	private static final int DOCUMENT_2_ORDINAL = 3;
 	private static final int DOCUMENT_3_ORDINAL = 5;
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
@@ -86,8 +86,8 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex )
 				.setup();
@@ -96,10 +96,10 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void unsortable() {
+	void unsortable() {
 		assumeFalse(
-				"Skipping test for ES GeoPoint as those would become sortable by default in this case.",
-				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault()
+				TckConfiguration.get().getBackendFeatures().fieldsProjectableByDefault(),
+				"Skipping test for ES GeoPoint as those would become sortable by default in this case."
 		);
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath();
@@ -115,7 +115,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndex() {
+	void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -133,7 +133,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndex() {
+	void multiIndex_withRawFieldCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -152,7 +152,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex() {
+	void multiIndex_withMissingFieldIndex() {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		SearchQuery<DocumentReference> query;
@@ -180,10 +180,10 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_nested() {
+	void multiIndex_withMissingFieldIndex_nested() {
 		assumeTrue(
-				"This backend doesn't support distance sorts on a nested field that is missing from some of the target indexes.",
-				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes()
+				TckConfiguration.get().getBackendFeatures().supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes(),
+				"This backend doesn't support distance sorts on a nested field that is missing from some of the target indexes."
 		);
 
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
@@ -208,7 +208,7 @@ public class DistanceSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndex() {
+	void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();

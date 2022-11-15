@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
@@ -32,11 +32,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MultiTenancyBaseIT {
+class MultiTenancyBaseIT {
 
 	private static final String TENANT_1 = "tenant_1";
 	private static final String TENANT_2 = "tenant_2";
@@ -56,17 +56,17 @@ public class MultiTenancyBaseIT {
 	private static final Integer INTEGER_VALUE_4 = 4;
 	private static final Integer INTEGER_VALUE_5 = 5;
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper =
-			new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
+			SearchSetupHelper.create( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private StubSession tenant1SessionContext;
 	private StubSession tenant2SessionContext;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		StubMapping mapping = setupHelper.start().withIndex( index ).withMultiTenancy().setup();
 
 		tenant1SessionContext = mapping.session( TENANT_1 );
@@ -76,7 +76,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void search_only_returns_elements_of_the_selected_tenant() {
+	void search_only_returns_elements_of_the_selected_tenant() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
@@ -103,7 +103,7 @@ public class MultiTenancyBaseIT {
 	// In Elasticsearch, we used to expect the user to provide the ID already prefixed with the tenant ID, which is wrong
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3421")
-	public void id_predicate_takes_tenantId_into_account() {
+	void id_predicate_takes_tenantId_into_account() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
@@ -128,7 +128,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void search_on_nested_object_only_returns_elements_of_the_tenant() {
+	void search_on_nested_object_only_returns_elements_of_the_tenant() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
@@ -159,7 +159,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void delete_only_deletes_elements_of_the_tenant() {
+	void delete_only_deletes_elements_of_the_tenant() {
 		IndexIndexingPlan plan = index.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = index.createScope();
@@ -208,7 +208,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void update_only_updates_elements_of_the_tenant() {
+	void update_only_updates_elements_of_the_tenant() {
 		IndexIndexingPlan plan = index.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = index.createScope();
@@ -304,7 +304,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.query()
@@ -317,7 +317,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 
@@ -338,7 +338,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 
@@ -359,7 +359,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	@Test
-	public void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
+	void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan plan = index.createIndexingPlan();
 			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );

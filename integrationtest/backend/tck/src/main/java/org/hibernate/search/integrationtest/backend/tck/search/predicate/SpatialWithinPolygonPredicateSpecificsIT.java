@@ -11,9 +11,9 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SpatialWithinPolygonPredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
+class SpatialWithinPolygonPredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final GeoPolygon POLYGON_1 = GeoPolygon.of(
 			GeoPoint.of( 45.785889, 4.819749 ),
@@ -40,7 +40,7 @@ public class SpatialWithinPolygonPredicateSpecificsIT extends AbstractSpatialWit
 	);
 
 	@Test
-	public void matchMultipleDocuments() {
+	void matchMultipleDocuments() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).polygon( POLYGON_2 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );

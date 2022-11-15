@@ -23,34 +23,34 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchQueryDslIT {
+class ElasticsearchQueryDslIT {
 
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Rule
+	@RegisterExtension
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = setupHelper.start()
 				.setup( Book.class );
 		initData();
 	}
 
 	@Test
-	public void explain() {
+	void explain() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::explain-elasticsearch[]
@@ -74,7 +74,7 @@ public class ElasticsearchQueryDslIT {
 	}
 
 	@Test
-	public void json() {
+	void json() {
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::elasticsearch-requestTransformer[]

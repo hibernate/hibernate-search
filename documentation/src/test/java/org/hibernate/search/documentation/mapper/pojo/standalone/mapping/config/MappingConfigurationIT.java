@@ -22,20 +22,20 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class MappingConfigurationIT {
+class MappingConfigurationIT {
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private CloseableSearchMapping searchMapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		// tag::setup[]
 		SearchMappingBuilder builder = SearchMapping.builder()
 				// end::setup[]
@@ -67,15 +67,15 @@ public class MappingConfigurationIT {
 		this.searchMapping = searchMapping;
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( searchMapping != null ) {
 			searchMapping.close();
 		}
 	}
 
 	@Test
-	public void simple() {
+	void simple() {
 		try ( SearchSession session = searchMapping.createSessionWithOptions()
 				.indexingPlanSynchronizationStrategy( IndexingPlanSynchronizationStrategy.sync() )
 				.build() ) {

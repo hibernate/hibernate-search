@@ -16,14 +16,14 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to behavior independent from the field type
@@ -32,22 +32,22 @@ import org.junit.Test;
  * Behavior that is specific to the field type is tested elsewhere,
  * e.g. {@link DistanceProjectionSingleValuedBaseIT} and {@link DistanceProjectionTypeCheckingAndConversionIT}.
  */
-public class DistanceProjectionTypeIndependentIT {
+class DistanceProjectionTypeIndependentIT {
 
 	private static final GeoPoint SOME_POINT = GeoPoint.of( 45.749828, 4.854172 );
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
-	public void unknownField() {
+	void unknownField() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
@@ -62,7 +62,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void nullCenter() {
+	void nullCenter() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
@@ -77,7 +77,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void nullUnit() {
+	void nullUnit() {
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
@@ -92,7 +92,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_nested() {
+	void objectField_nested() {
 		String fieldPath = index.binding().nestedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
@@ -103,7 +103,7 @@ public class DistanceProjectionTypeIndependentIT {
 	}
 
 	@Test
-	public void objectField_flattened() {
+	void objectField_flattened() {
 		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 

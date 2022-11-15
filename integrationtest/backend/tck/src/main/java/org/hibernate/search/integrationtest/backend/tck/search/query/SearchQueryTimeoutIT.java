@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -24,17 +24,17 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SearchQueryTimeoutIT {
+class SearchQueryTimeoutIT {
 
 	private static final String EMPTY_FIELD_NAME = "emptyFieldName";
 	private static final int NON_MATCHING_INTEGER = 739;
@@ -42,13 +42,13 @@ public class SearchQueryTimeoutIT {
 	// Increasing this will increase query execution time.
 	private static final int DOCUMENT_COUNT = 100;
 
-	@ClassRule
-	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		index.bulkIndexer()
@@ -57,7 +57,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_failAfter_slowQuery_smallTimeout() {
+	void fetch_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -68,7 +68,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount_failAfter_slowQuery_smallTimeout() {
+	void fetchTotalHitCount_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -79,7 +79,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_failAfter_slowQuery_smallTimeout() {
+	void scroll_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -92,7 +92,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_truncateAfter_slowQuery_smallTimeout() {
+	void fetch_truncateAfter_slowQuery_smallTimeout() {
 		SearchResult<DocumentReference> result = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetch( 20 );
@@ -112,10 +112,10 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_truncateAfter_slowQuery_smallTimeout() {
+	void scroll_truncateAfter_slowQuery_smallTimeout() {
 		assumeTrue(
-				"The backend doesn't support truncateAfter() on scrolls",
-				TckConfiguration.get().getBackendFeatures().supportsTruncateAfterForScroll()
+				TckConfiguration.get().getBackendFeatures().supportsTruncateAfterForScroll(),
+				"The backend doesn't support truncateAfter() on scrolls"
 		);
 
 		SearchQuery<DocumentReference> query = startSlowQuery()
@@ -134,7 +134,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_failAfter_fastQuery_largeTimeout() {
+	void fetch_failAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.fetch( 20 );
@@ -146,7 +146,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetchTotalHitCount_failAfter_fastQuery_largeTimeout() {
+	void fetchTotalHitCount_failAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
@@ -155,7 +155,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_failAfter_fastQuery_largeTimeout() {
+	void scroll_failAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
@@ -172,7 +172,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void fetch_truncateAfter_fastQuery_largeTimeout() {
+	void fetch_truncateAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.truncateAfter( 1, TimeUnit.DAYS )
 				.fetch( 20 );
@@ -182,7 +182,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void scroll_truncateAfter_fastQuery_largeTimeout() {
+	void scroll_truncateAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.truncateAfter( 1, TimeUnit.DAYS )
 				.toQuery();

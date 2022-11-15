@@ -21,16 +21,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Keywor
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class RegexpPredicateSpecificsIT {
+class RegexpPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -61,15 +61,15 @@ public class RegexpPredicateSpecificsIT {
 	private static final String TEXT_ANYSTRING_MATCHING = "abcabc";
 	private static final String TEXT_ANYSTRING_NOT_MATCHING = "foo99";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -78,7 +78,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void analyzedField() {
+	void analyzedField() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -96,7 +96,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void normalizedField() {
+	void normalizedField() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().normalizedField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -118,7 +118,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void nonAnalyzedField() {
+	void nonAnalyzedField() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -133,7 +133,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void moreCases() {
+	void moreCases() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
@@ -150,7 +150,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void emptyString() {
+	void emptyString() {
 		String absoluteFieldPath = index.binding().analyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()
@@ -159,7 +159,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void flag_interval() {
+	void flag_interval() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().intervalField.relativeFieldName;
 
@@ -202,7 +202,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void flag_intersection() {
+	void flag_intersection() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().intersectionField.relativeFieldName;
 
@@ -245,7 +245,7 @@ public class RegexpPredicateSpecificsIT {
 	}
 
 	@Test
-	public void flag_anyString() {
+	void flag_anyString() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().anyStringField.relativeFieldName;
 

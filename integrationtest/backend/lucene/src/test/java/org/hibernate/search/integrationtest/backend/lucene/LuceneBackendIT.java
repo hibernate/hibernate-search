@@ -13,28 +13,28 @@ import org.hibernate.search.backend.lucene.analysis.impl.HibernateSearchNormaliz
 import org.hibernate.search.backend.lucene.analysis.impl.TokenizerChain;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
-public class LuceneBackendIT {
+class LuceneBackendIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	private static LuceneBackend backend;
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		SearchIntegration integration = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup().integration();
@@ -43,7 +43,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void analyzer() {
+	void analyzer() {
 		assertThat( backend.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 				.isNotEmpty()
 				.containsInstanceOf( StandardAnalyzer.class );
@@ -54,7 +54,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void analyzer_missing() {
+	void analyzer_missing() {
 		assertThat( backend.analyzer( "unknown" ) ).isEmpty();
 		// Normalizers are not analyzers
 		assertThat( backend.analyzer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) ).isEmpty();
@@ -62,7 +62,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void normalizer() {
+	void normalizer() {
 		assertThat( backend.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) )
 				.isNotEmpty()
 				.containsInstanceOf( HibernateSearchNormalizerWrapper.class );
@@ -70,7 +70,7 @@ public class LuceneBackendIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
-	public void normalizer_missing() {
+	void normalizer_missing() {
 		assertThat( backend.normalizer( "unknown" ) ).isEmpty();
 		// Analyzers are not normalizers
 		assertThat( backend.normalizer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).isEmpty();

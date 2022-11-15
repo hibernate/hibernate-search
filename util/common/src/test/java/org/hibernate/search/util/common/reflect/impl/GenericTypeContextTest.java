@@ -21,13 +21,13 @@ import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unused")
-public class GenericTypeContextTest {
+class GenericTypeContextTest {
 
 	@Test
-	public void simple() {
+	void simple() {
 		new GenericTypeContextAssert.AssertWithType<Iterable<CustomType>>() {
 		}
 				.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
@@ -138,13 +138,13 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void nullType() {
+	void nullType() {
 		assertThatThrownBy( () -> new GenericTypeContext( null ) )
 				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
-	public void nullType_nonNullContext() {
+	void nullType_nonNullContext() {
 		GenericTypeContext declaringContext = new GenericTypeContext( Object.class );
 
 		assertThatThrownBy( () -> new GenericTypeContext( declaringContext, null ) )
@@ -152,7 +152,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void genericArgument() {
+	void genericArgument() {
 		new GenericTypeContextAssert.AssertWithType<Iterable<CustomGenericType<String, Integer>>>() {
 		}
 				.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() {},
@@ -170,7 +170,7 @@ public class GenericTypeContextTest {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void rawType() {
+	void rawType() {
 		new GenericTypeContextAssert.AssertWithType<Collection>() {
 		}
 				.resolveTypeArgumentTo(
@@ -194,7 +194,7 @@ public class GenericTypeContextTest {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void boundedRawType() {
+	void boundedRawType() {
 		new GenericTypeContextAssert.AssertWithType<CustomBoundedGenericInterface>() {
 		}
 				.resolveTypeArgumentTo(
@@ -214,7 +214,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void swappedArguments() {
+	void swappedArguments() {
 		new GenericTypeContextAssert.AssertWithType<CustomGenericType<String, Integer>>() {
 		}
 				.resolveTypeArgumentTo( String.class, CustomGenericType.class, 0 )
@@ -224,7 +224,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void fixedArguments() {
+	void fixedArguments() {
 		new GenericTypeContextAssert.AssertWithType<CustomArgumentSettingType>() {
 		}
 				.resolveTypeArgumentTo( String.class, CustomGenericInterface.class, 0 )
@@ -232,7 +232,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public <T> void unboundedTypeVariable() {
+	<T> void unboundedTypeVariable() {
 		// Type variable as the tested type
 		new GenericTypeContextAssert.AssertWithType<T>() {
 		}
@@ -257,7 +257,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public <T extends CustomGenericInterface<Integer, String>> void singleUpperBoundTypeVariable() {
+	<T extends CustomGenericInterface<Integer, String>> void singleUpperBoundTypeVariable() {
 		// Type variable as the tested type
 		new GenericTypeContextAssert.AssertWithType<T>() {
 		}
@@ -283,7 +283,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public <T extends CustomGenericInterface<Integer, String> & Collection<Double>> void multipleUpperBoundsTypeVariable() {
+	<T extends CustomGenericInterface<Integer, String> & Collection<Double>> void multipleUpperBoundsTypeVariable() {
 		// Type variable as the tested type
 		new GenericTypeContextAssert.AssertWithType<T>() {
 		}
@@ -309,7 +309,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void unboundedWildcard() {
+	void unboundedWildcard() {
 		// Wildcard as the tested type
 		new GenericTypeContextAssert.AssertWithWildcardType<Of<?>>() {
 		}
@@ -335,7 +335,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void singleUpperBoundWildcard() {
+	void singleUpperBoundWildcard() {
 		// Wildcard as the tested type
 		new GenericTypeContextAssert.AssertWithWildcardType<Of<? extends CustomGenericInterface<Integer, String>>>() {
 		}
@@ -361,7 +361,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public <T> void unboundedTypeVariableUpperBoundWildcard() {
+	<T> void unboundedTypeVariableUpperBoundWildcard() {
 		// Wildcard as the tested type
 		new GenericTypeContextAssert.AssertWithWildcardType<Of<? extends T>>() {
 		}
@@ -387,7 +387,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public <T extends CustomGenericInterface<Integer, String>> void boundedTypeVariableUpperBoundWildcard() {
+	<T extends CustomGenericInterface<Integer, String>> void boundedTypeVariableUpperBoundWildcard() {
 		// Wildcard as the tested type
 		new GenericTypeContextAssert.AssertWithWildcardType<Of<? extends T>>() {
 		}
@@ -413,7 +413,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void badIndex() {
+	void badIndex() {
 		new GenericTypeContextAssert.AssertWithType<CustomGenericType<String, Integer>>() {
 		}
 				.typeParameterIndexTooHigh( CustomGenericInterface.class, 2 )
@@ -427,7 +427,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void declaringContext() throws NoSuchFieldException {
+	void declaringContext() throws NoSuchFieldException {
 		class GenericDeclaringClass<T> {
 			public List<T> property;
 		}
@@ -443,7 +443,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void declaringContext_array() throws NoSuchFieldException {
+	void declaringContext_array() throws NoSuchFieldException {
 		class GenericDeclaringClass<T> {
 			public T[] arrayProperty;
 			public T nonArrayProperty;
@@ -465,7 +465,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void declaringContext_multiNesting() throws NoSuchFieldException {
+	void declaringContext_multiNesting() throws NoSuchFieldException {
 		class GenericDeclaringLevel2Class<T> {
 			public T property;
 		}
@@ -489,7 +489,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void declaringContext_genericMethod() throws NoSuchMethodException {
+	void declaringContext_genericMethod() throws NoSuchMethodException {
 		abstract class GenericDeclaringClass<T> {
 			public abstract <U extends T> List<U> property();
 		}
@@ -505,7 +505,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
-	public void declaringContext_relatedParameters() throws NoSuchMethodException {
+	void declaringContext_relatedParameters() throws NoSuchMethodException {
 		abstract class GenericDeclaringClass<T, U extends List<T>> {
 			public abstract U property();
 		}

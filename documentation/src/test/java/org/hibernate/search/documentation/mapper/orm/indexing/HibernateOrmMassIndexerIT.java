@@ -25,14 +25,14 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingIT {
+class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Test
-	public void simple() {
+	void simple() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::simple[]
@@ -55,7 +55,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 	}
 
 	@Test
-	public void reindexOnly() {
+	void reindexOnly() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				// tag::reindexOnly[]
@@ -83,7 +83,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 	}
 
 	@Test
-	public void selectType() {
+	void selectType() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );
@@ -103,7 +103,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 	}
 
 	@Test
-	public void async_reactive() {
+	void async_reactive() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			CompletionStage<?> completionStage =
@@ -130,7 +130,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 	}
 
 	@Test
-	public void async_future() {
+	void async_future() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::async[]
@@ -151,7 +151,7 @@ public class HibernateOrmMassIndexerIT extends AbstractHibernateOrmMassIndexingI
 	}
 
 	@Test
-	public void parameters() {
+	void parameters() {
 		with( entityManagerFactory ).runNoTransaction( entityManager -> {
 			try {
 				SearchSession searchSession = Search.session( entityManager );

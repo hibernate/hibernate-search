@@ -12,12 +12,12 @@ import jakarta.persistence.Id;
 
 import org.hibernate.search.integrationtest.spring.testsupport.AbstractSpringITConfig;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -27,16 +27,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 // Adding a property here is just a "workaround" to make sure that a different context is used for this test
 // otherwise there can be build errors when running all the tests via maven.
 @SpringBootTest(properties = "spring.jta.atomikos.datasource.bean-name=hsearch-datasource1")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class TransactionIT {
+class TransactionIT {
 
 	@Configuration
 	@EntityScan
@@ -45,7 +45,7 @@ public class TransactionIT {
 	}
 
 	@Autowired
-	@Rule
+	@RegisterExtension
 	public BackendMock backendMock;
 
 	@Autowired
@@ -53,7 +53,7 @@ public class TransactionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1270")
-	public void innerTransactionRollback() {
+	void innerTransactionRollback() {
 		Integer outerId = 1;
 		Integer innerId = 2;
 
@@ -72,7 +72,7 @@ public class TransactionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1270")
-	public void innerTransactionRollback_flushBeforeInner() {
+	void innerTransactionRollback_flushBeforeInner() {
 		Integer outerId = 1;
 		Integer innerId = 2;
 

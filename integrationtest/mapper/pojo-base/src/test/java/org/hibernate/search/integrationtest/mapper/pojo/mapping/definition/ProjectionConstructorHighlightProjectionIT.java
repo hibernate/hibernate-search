@@ -27,18 +27,18 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConstructorIT {
+class ProjectionConstructorHighlightProjectionIT extends AbstractProjectionConstructorIT {
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void noArg() {
+	void noArg() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -80,7 +80,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void path() {
+	void path() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -122,7 +122,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void highlighter() {
+	void highlighter() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -165,7 +165,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void superType() {
+	void superType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -207,7 +207,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void singleValued() {
+	void singleValued() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -239,7 +239,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	// Technically this is not supported on the backend side,
 	// but we'll test it just to be sure the mapper side works.
 	@Test
-	public void inObjectField() {
+	void inObjectField() {
 		class Contained {
 			@DocumentId
 			public Integer id;
@@ -311,7 +311,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void collection() {
+	void collection() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -353,7 +353,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void iterable() {
+	void iterable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -395,7 +395,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void set() {
+	void set() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -425,7 +425,7 @@ public class ProjectionConstructorHighlightProjectionIT extends AbstractProjecti
 	}
 
 	@Test
-	public void invalidElementType() {
+	void invalidElementType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId

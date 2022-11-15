@@ -9,51 +9,47 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.hasValidationFailureReport;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to index custom mapping when validating indexes,
  * for all index-validating schema management operations.
  */
-@RunWith(Parameterized.class)
-public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
+class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
-		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticsearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
 
-	public ElasticsearchIndexSchemaManagerValidationCustomMappingIT(
-			ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void success(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -80,11 +76,12 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						" } "
 		);
 
-		setupAndValidate( "no-overlapping.json" );
+		setupAndValidate( "no-overlapping.json", operation );
 	}
 
-	@Test
-	public void wrongSource() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void wrongSource(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -111,7 +108,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						" } "
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
+		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.mappingAttributeContext( "_source" )
@@ -119,8 +116,9 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						.failure( "Custom index mapping attribute missing" ) );
 	}
 
-	@Test
-	public void missingSource() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void missingSource(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -144,15 +142,16 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						" } "
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
+		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.mappingAttributeContext( "_source" )
 						.failure( "Custom index mapping attribute missing" ) );
 	}
 
-	@Test
-	public void wrongField() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void wrongField(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -178,7 +177,7 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						" } "
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
+		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldContext( "userField" )
@@ -192,8 +191,9 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						.failure( "Invalid value. Expected 'true', actual is 'false'" ) );
 	}
 
-	@Test
-	public void missingField() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	void missingField(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() ).deleteAndCreate();
 		elasticsearchClient.index( index.name() ).type().putMapping(
 				" { " +
@@ -214,14 +214,14 @@ public class ElasticsearchIndexSchemaManagerValidationCustomMappingIT {
 						" } "
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json" ) )
+		assertThatThrownBy( () -> setupAndValidate( "no-overlapping.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies( hasValidationFailureReport()
 						.indexFieldContext( "userField" )
 						.failure( "Missing property mapping" ) );
 	}
 
-	private void setupAndValidate(String customMappingFile) {
+	private void setupAndValidate(String customMappingFile, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

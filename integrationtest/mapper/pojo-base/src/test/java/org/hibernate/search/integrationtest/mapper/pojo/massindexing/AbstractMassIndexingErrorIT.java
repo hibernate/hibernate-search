@@ -38,15 +38,15 @@ import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.standalone.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.massindexing.MassIndexer;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -60,21 +60,21 @@ public abstract class AbstractMassIndexingErrorIT {
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public ThreadSpy threadSpy = new ThreadSpy();
+	@RegisterExtension
+	public ThreadSpy threadSpy = ThreadSpy.create();
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-4218", "HSEARCH-4236" })
-	public void identifierLoading() {
+	void identifierLoading() {
 		String errorMessage = "ID loading error";
 
 		SearchMapping mapping = setupWithThrowingIdentifierLoading( errorMessage );
@@ -95,7 +95,7 @@ public abstract class AbstractMassIndexingErrorIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4236")
-	public void entityLoading() {
+	void entityLoading() {
 		String errorMessage = "entity loading error";
 
 		SearchMapping mapping = setupWithThrowingEntityLoading( errorMessage );
@@ -117,7 +117,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void indexing() {
+	void indexing() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "Indexing error";
@@ -138,7 +138,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getId() {
+	void getId() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "getId error";
@@ -161,7 +161,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void getTitle() {
+	void getTitle() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "getTitle error";
@@ -183,7 +183,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void dropAndCreateSchema_exception() {
+	void dropAndCreateSchema_exception() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "DROP_AND_CREATE error";
@@ -202,7 +202,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void purge() {
+	void purge() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "PURGE error";
@@ -221,7 +221,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsBefore() {
+	void mergeSegmentsBefore() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -241,7 +241,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void mergeSegmentsAfter() {
+	void mergeSegmentsAfter() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "MERGE_SEGMENTS error";
@@ -264,7 +264,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void flush() {
+	void flush() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "FLUSH error";
@@ -286,7 +286,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	@Test
-	public void refresh() {
+	void refresh() {
 		SearchMapping mapping = setup();
 
 		String errorMessage = "REFRESH error";

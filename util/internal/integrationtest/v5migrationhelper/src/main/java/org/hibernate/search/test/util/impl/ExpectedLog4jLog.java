@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.test.util.impl;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
+import org.hibernate.search.util.impl.test.extension.log4j.Log4j2ConfigurationAccessor;
 
 import org.junit.rules.TestRule;
 import org.junit.runners.model.Statement;

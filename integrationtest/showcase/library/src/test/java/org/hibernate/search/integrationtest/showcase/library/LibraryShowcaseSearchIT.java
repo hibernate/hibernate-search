@@ -29,8 +29,6 @@ import static org.hibernate.search.integrationtest.showcase.library.service.Test
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.SUBURBAN_2_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.THESAURUS_OF_LANGUAGES_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.UNIVERSITY_ID;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,22 +53,19 @@ import org.hibernate.search.integrationtest.showcase.library.service.LibraryServ
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 import org.hibernate.search.util.common.data.Range;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class LibraryShowcaseSearchIT {
+class LibraryShowcaseSearchIT {
 
 	private static boolean needsInit;
 
@@ -86,13 +81,13 @@ public class LibraryShowcaseSearchIT {
 	@Autowired
 	private TestDataService testDataService;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@BeforeAll
+	static void beforeClass() {
 		needsInit = true;
 	}
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		if ( needsInit ) {
 			testDataService.initDefaultDataSet();
 			needsInit = false;
@@ -100,7 +95,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void search_library() {
+	void search_library() {
 		List<Library> libraries = libraryService.search( "library", 0, 10 );
 		assertThat( libraries ).extracting( Library::getId ).containsExactly(
 				CITY_CENTER_ID,
@@ -130,7 +125,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void search_person() {
+	void search_person() {
 		List<Person> results = borrowalService.searchPerson(
 				"smith", 0, 10
 		);
@@ -170,22 +165,28 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void search_single() {
+	void search_single() {
 		Optional<Book> book = documentService.getByIsbn( "978-0-00-000001-1" );
-		assertTrue( book.isPresent() );
-		assertThat( book.get().getId() ).isEqualTo( CALLIGRAPHY_ID );
+		assertThat( book ).isPresent()
+				.get()
+				.extracting( Document::getId )
+				.isEqualTo( CALLIGRAPHY_ID );
 
 		book = documentService.getByIsbn( "978-0-00-000005-5" );
-		assertTrue( book.isPresent() );
-		assertThat( book.get().getId() ).isEqualTo( ART_OF_COMPUTER_PROG_ID );
+		assertThat( book ).isPresent()
+				.get()
+				.extracting( Document::getId )
+				.isEqualTo( ART_OF_COMPUTER_PROG_ID );
 
 		book = documentService.getByIsbn( "978-0-00-000005-1" );
-		assertFalse( book.isPresent() );
+		assertThat( book ).isNotPresent();
 
 		// Test the normalizer
 		book = documentService.getByIsbn( "9780000000055" );
-		assertTrue( book.isPresent() );
-		assertThat( book.get().getId() ).isEqualTo( ART_OF_COMPUTER_PROG_ID );
+		assertThat( book ).isPresent()
+				.get()
+				.extracting( Document::getId )
+				.isEqualTo( ART_OF_COMPUTER_PROG_ID );
 	}
 
 	/**
@@ -194,7 +195,7 @@ public class LibraryShowcaseSearchIT {
 	 * was successfully resolved to {@code List<BookCopy>}.
 	 */
 	@Test
-	public void searchByMedium() {
+	void searchByMedium() {
 		List<Book> books = documentService.searchByMedium(
 				"java", BookMedium.DEMATERIALIZED, 0, 10
 		);
@@ -212,7 +213,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void searchAroundMe_spatial() {
+	void searchAroundMe_spatial() {
 		GeoPoint myLocation = GeoPoint.of( 42.0, 0.5 );
 
 		List<Document<?>> documents = documentService.searchAroundMe(
@@ -280,7 +281,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void searchAroundMe_nested() {
+	void searchAroundMe_nested() {
 		List<Document<?>> documents = documentService.searchAroundMe(
 				"java", null,
 				null, null,
@@ -323,7 +324,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void searchAroundMe_searchBridge() {
+	void searchAroundMe_searchBridge() {
 		List<Document<?>> documents = documentService.searchAroundMe(
 				null, "java",
 				null, null,
@@ -365,7 +366,7 @@ public class LibraryShowcaseSearchIT {
 	 * and how this indexed data can then be queried.
 	 */
 	@Test
-	public void listTopBorrowers() {
+	void listTopBorrowers() {
 		List<Person> results = borrowalService.listTopBorrowers( 0, 3 );
 		assertThat( results ).extracting( Person::getId ).containsExactly(
 				JANE_SMITH_ID,
@@ -392,7 +393,7 @@ public class LibraryShowcaseSearchIT {
 	 * This demonstrates how to define a projection for the query and how to set order.
 	 */
 	@Test
-	public void projectionAndOrder() {
+	void projectionAndOrder() {
 		List<String> results = documentService.getAuthorsOfBooksHavingTerms( "java", SortOrder.ASC );
 		assertThat( results ).containsExactly( "Mark Red", "Michele Violet", "Stuart Green" );
 
@@ -401,7 +402,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void searchAndProject() {
+	void searchAndProject() {
 		List<LibrarySimpleProjection> libraries = libraryService.searchAndProject( "library", 0, 10 );
 		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
 				libraryService.getById( CITY_CENTER_ID, Library::getName ),
@@ -433,7 +434,7 @@ public class LibraryShowcaseSearchIT {
 
 	// This checks that method-local classes get automatically indexed by Hibernate Search with Jandex, in particular.
 	@Test
-	public void searchAndProjectToMethodLocalClass() {
+	void searchAndProjectToMethodLocalClass() {
 		List<LibrarySimpleProjection> libraries = libraryService.searchAndProjectToMethodLocalClass( "library", 0, 10 );
 		assertThat( libraries ).extracting( l -> l.name ).containsExactly(
 				libraryService.getById( CITY_CENTER_ID, Library::getName ),
@@ -464,7 +465,7 @@ public class LibraryShowcaseSearchIT {
 	}
 
 	@Test
-	public void searchFaceted() {
+	void searchFaceted() {
 		LibraryFacetedSearchResult result = libraryService.searchFaceted(
 				null, null, null,
 				0, 10

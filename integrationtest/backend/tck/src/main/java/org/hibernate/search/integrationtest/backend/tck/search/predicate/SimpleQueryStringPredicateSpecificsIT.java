@@ -25,7 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -33,11 +33,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class SimpleQueryStringPredicateSpecificsIT {
+class SimpleQueryStringPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -61,15 +61,15 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	private static final String TEXT_TERM_4_IN_PHRASE_SLOP_2 = "An elephant ran past John.";
 	private static final String TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 = "I came to the world in a dumpster.";
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndexes( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -80,7 +80,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
-	public void booleanOperators() {
+	void booleanOperators() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -105,7 +105,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3847")
-	public void booleanOperators_flags() {
+	void booleanOperators_flags() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -198,7 +198,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3844") // Used to throw NPE
-	public void nonAnalyzedField() {
+	void nonAnalyzedField() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -224,7 +224,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
-	public void defaultOperator() {
+	void defaultOperator() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 		SearchQuery<DocumentReference> query;
@@ -256,7 +256,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
-	public void phrase() {
+	void phrase() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -282,7 +282,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3847")
-	public void phrase_flag() {
+	void phrase_flag() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -331,7 +331,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testFuzzy")
-	public void fuzzy() {
+	void fuzzy() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -350,7 +350,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3847")
-	public void fuzzy_flag() {
+	void fuzzy_flag() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -376,7 +376,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	}
 
 	@Test
-	public void prefix() {
+	void prefix() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -393,7 +393,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3847")
-	public void prefix_flag() {
+	void prefix_flag() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -420,7 +420,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3612", "HSEARCH-3845" })
-	public void prefix_normalizePrefixTerm() {
+	void prefix_normalizePrefixTerm() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -437,7 +437,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3847")
-	public void whitespace() {
+	void whitespace() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 
@@ -457,7 +457,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3847")
-	public void escape() {
+	void escape() {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
@@ -476,7 +476,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 	}
 
 	@Test
-	public void incompatibleNestedPaths() {
+	void incompatibleNestedPaths() {
 		String fieldInRootPath = index.binding().analyzedStringField1.relativeFieldName;
 		String fieldInNestedPath = index.binding().nested.fieldPath();
 		assertThatThrownBy( () -> index.createScope()

@@ -13,7 +13,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.sin
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubSelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import org.assertj.core.api.SoftAssertions;
 
@@ -21,8 +21,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT extends Abstr
 
 	private SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectAnySchema( BasicIndexedEntity.NAME );
 
 		mapping = setupHelper.start()

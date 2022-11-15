@@ -14,26 +14,25 @@ import java.util.List;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.AbstractSpatialWithinPredicateIT;
-import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceProjectionSingleValuedBaseIT;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.assertj.core.api.ListAssert;
 
-public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredicateIT {
+class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredicateIT {
 
 	private static final Comparator<? super Double> APPROX_M_COMPARATOR = TestComparators.approximateDouble( 10.0 );
 	private static final Comparator<? super Double> APPROX_KM_COMPARATOR = TestComparators.approximateDouble( 0.010 );
 
 	/**
-	 * See also {@link DistanceProjectionSingleValuedBaseIT#several()}.
+	 * See also {@code org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceProjectionSingleValuedBaseIT#several()}.
 	 * <p>
 	 * The main difference is that we're targeting multiple fields here.
 	 */
 	@Test
-	public void several() {
+	void several() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		ListAssert<List<?>> hitsAssert = assertThatQuery( scope.query()
@@ -75,12 +74,12 @@ public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredi
 	}
 
 	/**
-	 * See also {@link DistanceProjectionSingleValuedBaseIT#sortable_withSort()}.
+	 * See also {@code org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceProjectionSingleValuedBaseIT#sortable_withSort()}.
 	 * <p>
 	 * The main difference is that we're composing multiple sorts here.
 	 */
 	@Test
-	public void withDistanceSort() {
+	void withDistanceSort() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
@@ -108,7 +107,7 @@ public class DistanceProjectionComplexCasesIT extends AbstractSpatialWithinPredi
 	 * This is relevant for Elasticsearch, which generates a name for computed values based on the field name.
 	 */
 	@Test
-	public void longFieldName() {
+	void longFieldName() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatQuery( scope.query()

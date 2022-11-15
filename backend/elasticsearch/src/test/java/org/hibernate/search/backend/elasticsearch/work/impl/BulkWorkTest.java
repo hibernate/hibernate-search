@@ -27,9 +27,8 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -37,28 +36,25 @@ import com.google.gson.JsonObject;
 import org.apache.http.HttpHost;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
-public class BulkWorkTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+class BulkWorkTest {
 
 	@Mock
 	private ElasticsearchClient clientMock;
 	@Mock(strictness = Mock.Strictness.LENIENT)
 	private ElasticsearchWorkExecutionContext contextMock;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		when( contextMock.getClient() ).thenReturn( clientMock );
 	}
 
 	@Test
-	public void execute_success() {
+	void execute_success() {
 		BulkableWork<Object> bulkableWork0 = bulkableWork( 0 );
 		BulkableWork<Object> bulkableWork1 = bulkableWork( 1 );
 
@@ -104,7 +100,7 @@ public class BulkWorkTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3869")
-	public void execute_http500() {
+	void execute_http500() {
 		BulkableWork<Object> bulkableWork0 = bulkableWork( 0 );
 		BulkableWork<Object> bulkableWork1 = bulkableWork( 1 );
 

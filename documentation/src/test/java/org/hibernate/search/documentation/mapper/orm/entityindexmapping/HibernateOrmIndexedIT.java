@@ -20,19 +20,18 @@ import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class HibernateOrmIndexedIT {
+class HibernateOrmIndexedIT {
 
 	private static final String BACKEND_2 = "backend2";
 
@@ -46,10 +45,8 @@ public class HibernateOrmIndexedIT {
 		NAMED_BACKEND_CONFIGURATIONS = map;
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
-				DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS,
 				mapping -> {
 					//tag::programmatic[]
 					TypeMappingStep bookMapping = mapping.type( Book.class );
@@ -63,20 +60,23 @@ public class HibernateOrmIndexedIT {
 		);
 	}
 
-	@Parameterized.Parameter
-	@Rule
-	public DocumentationSetupHelper setupHelper;
-
+	@RegisterExtension
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withMultipleBackends(
+			DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS );
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void setup() {
+	public void init(Boolean annotationProcessingEnabled, HibernateOrmSearchMappingConfigurer mappingContributor) {
+		setupHelper.withAnnotationProcessingEnabled( annotationProcessingEnabled )
+				.withMappingConfigurer( mappingContributor );
 		entityManagerFactory = setupHelper.start().setup( Book.class, User.class, Author.class );
 		initData();
 	}
 
-	@Test
-	public void search_separateQueries() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void search_separateQueries(Boolean annotationProcessingEnabled,
+			HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -92,8 +92,11 @@ public class HibernateOrmIndexedIT {
 		} );
 	}
 
-	@Test
-	public void search_singleQuery() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void search_singleQuery(Boolean annotationProcessingEnabled,
+			HibernateOrmSearchMappingConfigurer mappingContributor) {
+		init( annotationProcessingEnabled, mappingContributor );
 		assertThatThrownBy(
 				() -> with( entityManagerFactory ).runInTransaction( entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );

@@ -7,9 +7,8 @@
 package org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch.defaultanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration.BACKEND_TYPE;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,35 +25,35 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class GettingStartedDefaultAnalysisIT {
+class GettingStartedDefaultAnalysisIT {
 
 	private final String persistenceUnitName = "GettingStartedDefaultAnalysisIT_" + BACKEND_TYPE;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName,
 				TestConfiguration.ormMapperProperties( configurationProvider ) );
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( entityManagerFactory != null ) {
 			entityManagerFactory.close();
 		}
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		AtomicReference<Integer> bookIdHolder = new AtomicReference<>();
 
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
@@ -180,7 +179,7 @@ public class GettingStartedDefaultAnalysisIT {
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]
 
-			assertEquals( 1L, totalHitCount );
+			assertThat( totalHitCount ).isEqualTo( 1L );
 		} );
 	}
 

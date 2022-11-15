@@ -20,37 +20,37 @@ import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProvid
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests the creation of a {@link HibernateOrmSearchSession}
  * using a {@link HibernateSearchContextProviderService}
  * with an {@link EntityManager} owned by a different {@link SessionFactory}.
  */
-public class DifferentSessionFactoriesIT {
+class DifferentSessionFactoriesIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 	private SessionFactory sessionFactoryAlt;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		sessionFactory = initABasicSessionFactory();
 		sessionFactoryAlt = initABasicSessionFactory();
 	}
 
 	@Test
-	public void tryToUseDifferentSessionFactories() {
+	void tryToUseDifferentSessionFactories() {
 		// mapping is taken from the alternative session factory
 		HibernateSearchContextProviderService contextProvider =
 				sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )

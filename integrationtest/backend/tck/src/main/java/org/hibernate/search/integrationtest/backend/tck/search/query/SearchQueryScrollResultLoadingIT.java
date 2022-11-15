@@ -27,25 +27,24 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntity;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-public class SearchQueryScrollResultLoadingIT {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class SearchQueryScrollResultLoadingIT {
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final ProjectionMappedTypeContext typeContextMock = Mockito.mock( ProjectionMappedTypeContext.class );
 
@@ -53,11 +52,8 @@ public class SearchQueryScrollResultLoadingIT {
 
 	private static final IndexItem[] references = new IndexItem[37];
 
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		BulkIndexer indexer = index.bulkIndexer();
@@ -70,7 +66,7 @@ public class SearchQueryScrollResultLoadingIT {
 	}
 
 	@Test
-	public void resultLoadingOnScrolling() {
+	void resultLoadingOnScrolling() {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
@@ -92,7 +88,7 @@ public class SearchQueryScrollResultLoadingIT {
 	}
 
 	@Test
-	public void resultLoadingOnScrolling_entityLoadingTimeout() {
+	void resultLoadingOnScrolling_entityLoadingTimeout() {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );
@@ -116,7 +112,7 @@ public class SearchQueryScrollResultLoadingIT {
 	}
 
 	@Test
-	public void resultLoadingOnScrolling_softTimeout() {
+	void resultLoadingOnScrolling_softTimeout() {
 		@SuppressWarnings("unchecked")
 		SearchLoadingContext<StubEntity> loadingContextMock =
 				mock( SearchLoadingContext.class );

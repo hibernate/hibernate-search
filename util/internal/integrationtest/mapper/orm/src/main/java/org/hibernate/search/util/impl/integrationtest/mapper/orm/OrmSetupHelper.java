@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,10 +24,10 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
-import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendSetupStrategy;
+import org.hibernate.search.util.impl.integrationtest.common.extension.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
@@ -60,15 +60,52 @@ public final class OrmSetupHelper
 	}
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
+		return withBackendMock( Type.METHOD, backendMock );
+	}
+
+	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
+			Map<String, BackendMock> namedBackendMocks) {
+		return withBackendMocks( Type.METHOD, defaultBackendMock, namedBackendMocks );
+	}
+
+	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
+		return withSingleBackend( Type.METHOD, backendConfiguration );
+	}
+
+	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
+		return withMultipleBackends( Type.METHOD, defaultBackendConfiguration, namedBackendConfigurations );
+	}
+
+	public static OrmSetupHelper withBackendMockGlobal(BackendMock backendMock) {
+		return withBackendMock( Type.CLASS, backendMock );
+	}
+
+	public static OrmSetupHelper withBackendMocksGlobal(BackendMock defaultBackendMock,
+			Map<String, BackendMock> namedBackendMocks) {
+		return withBackendMocks( Type.CLASS, defaultBackendMock, namedBackendMocks );
+	}
+
+	public static OrmSetupHelper withSingleBackendGlobal(BackendConfiguration backendConfiguration) {
+		return withSingleBackend( Type.CLASS, backendConfiguration );
+	}
+
+	public static OrmSetupHelper withMultipleBackendsGlobal(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
+		return withMultipleBackends( Type.CLASS, defaultBackendConfiguration, namedBackendConfigurations );
+	}
+
+	private static OrmSetupHelper withBackendMock(Type type, BackendMock backendMock) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackendMock( backendMock ),
 				Collections.singleton( backendMock ),
 				// Mock backend => avoid schema management unless we want to test it
-				SchemaManagementStrategyName.NONE
+				SchemaManagementStrategyName.NONE,
+				type
 		);
 	}
 
-	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
+	private static OrmSetupHelper withBackendMocks(Type type, BackendMock defaultBackendMock,
 			Map<String, BackendMock> namedBackendMocks) {
 		List<BackendMock> backendMocks = new ArrayList<>();
 		if ( defaultBackendMock != null ) {
@@ -79,26 +116,29 @@ public final class OrmSetupHelper
 				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks ),
 				backendMocks,
 				// Mock backend => avoid schema management unless we want to test it
-				SchemaManagementStrategyName.NONE
+				SchemaManagementStrategyName.NONE,
+				type
 		);
 	}
 
-	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
+	private static OrmSetupHelper withSingleBackend(Type type, BackendConfiguration backendConfiguration) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				Collections.emptyList(),
 				// Real backend => ensure we clean up everything before and after the tests
-				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
+				type
 		);
 	}
 
-	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+	private static OrmSetupHelper withMultipleBackends(Type type, BackendConfiguration defaultBackendConfiguration,
 			Map<String, BackendConfiguration> namedBackendConfigurations) {
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
 				Collections.emptyList(),
 				// Real backend => ensure to clean up everything
-				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP,
+				type
 		);
 	}
 
@@ -109,8 +149,8 @@ public final class OrmSetupHelper
 			DEFAULT_COORDINATION_STRATEGY_EXPECTATIONS;
 
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
-			SchemaManagementStrategyName schemaManagementStrategyName) {
-		super( backendSetupStrategy );
+			SchemaManagementStrategyName schemaManagementStrategyName, Type type) {
+		super( backendSetupStrategy, type );
 		this.backendMocks = backendMocks;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
 		this.assertionHelper = new OrmAssertionHelper( backendSetupStrategy );
@@ -202,8 +242,8 @@ public final class OrmSetupHelper
 			withConfiguration( b -> b.onMetadata( metadataImplementor -> {
 				Dialect currentDialect = metadataImplementor.getDatabase().getDialect();
 				assumeFalse(
-						"Skipping test for dialect " + dialect.getName() + "; reason: " + reason,
-						dialect.isAssignableFrom( currentDialect.getClass() )
+						dialect.isAssignableFrom( currentDialect.getClass() ),
+						"Skipping test for dialect " + dialect.getName() + "; reason: " + reason
 				);
 			} ) );
 			return thisAsC();

@@ -15,24 +15,24 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.mapper.pojo.standalone.cfg.StandalonePojoMapperSettings;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class PojoStandaloneSearchMappingConfigurerIT {
+class PojoStandaloneSearchMappingConfigurerIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void none() {
+	void none() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 		);
@@ -43,7 +43,7 @@ public class PojoStandaloneSearchMappingConfigurerIT {
 	}
 
 	@Test
-	public void single() {
+	void single() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 				.field( "nonAnnotationMapped1", String.class )
@@ -68,7 +68,7 @@ public class PojoStandaloneSearchMappingConfigurerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4594")
-	public void multiple() {
+	void multiple() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "annotationMapped", String.class )
 				.field( "nonAnnotationMapped1", String.class )

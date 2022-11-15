@@ -22,34 +22,31 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 abstract class AbstractPojoIndexingProcessorFailureIT {
 
-	@Rule
-	public final BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public final BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
 	protected SearchMapping mapping;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		backendMock.expectSchema( RootEntity.NAME, b -> b
 				.field( "value", String.class )
 				.objectField( "containedNoContainer", b2 -> b2
@@ -74,7 +71,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 	}
 
 	@Test
-	public void getter() {
+	void getter() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
 
@@ -91,7 +88,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void containerExtraction() {
+	void containerExtraction() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
 		root.containedInContainer = Mockito.mock( List.class );
@@ -108,7 +105,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 	}
 
 	@Test
-	public void nested_getter() {
+	void nested_getter() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
 		NonRootEntity level1 = new NonRootEntity();
@@ -128,7 +125,7 @@ abstract class AbstractPojoIndexingProcessorFailureIT {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void nested_containerExtraction() {
+	void nested_containerExtraction() {
 		RootEntity root = new RootEntity();
 		root.id = 1;
 		NonRootEntity level1 = new NonRootEntity();

@@ -40,12 +40,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -53,7 +53,7 @@ import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 
 @Deprecated
-public class AutomaticIndexingSynchronizationStrategyIT {
+class AutomaticIndexingSynchronizationStrategyIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -67,17 +67,17 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	private static final int ENTITY_1_ID = 1;
 	private static final int ENTITY_2_ID = 2;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void success_async() throws InterruptedException, ExecutionException, TimeoutException {
+	void success_async() throws InterruptedException, ExecutionException, TimeoutException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -92,7 +92,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_writeSync_default() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_writeSync_default() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( null );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -114,7 +114,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -136,7 +136,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_readSync() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_readSync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.READ_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -158,7 +158,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_sync() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_sync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -180,7 +180,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -202,7 +202,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -222,7 +222,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_custom_blocking_submitter() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_custom_blocking_submitter() throws InterruptedException, TimeoutException, ExecutionException {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		SessionFactory sessionFactory = setup(
@@ -244,7 +244,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_custom_rejected_submitter() throws InterruptedException, TimeoutException, ExecutionException {
+	void success_custom_rejected_submitter() throws InterruptedException, TimeoutException, ExecutionException {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		SessionFactory sessionFactory = setup(
@@ -266,7 +266,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_async() throws InterruptedException, ExecutionException, TimeoutException {
+	void failure_async() throws InterruptedException, ExecutionException, TimeoutException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -294,7 +294,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_writeSync_default() throws InterruptedException, TimeoutException, ExecutionException {
+	void failure_writeSync_default() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( null );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -319,7 +319,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
+	void failure_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -344,7 +344,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_readSync() throws InterruptedException, TimeoutException, ExecutionException {
+	void failure_readSync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.READ_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -369,7 +369,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_sync() throws InterruptedException, TimeoutException, ExecutionException {
+	void failure_sync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -394,7 +394,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
+	void failure_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -419,7 +419,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
+	void failure_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -446,7 +446,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_custom() throws InterruptedException, ExecutionException, TimeoutException {
+	void failure_custom() throws InterruptedException, ExecutionException, TimeoutException {
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
 		SessionFactory sessionFactory = setup( new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ) );
@@ -473,7 +473,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void invalidReference() {
+	void invalidReference() {
 		assertThatThrownBy( () -> setup( "invalidName" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(

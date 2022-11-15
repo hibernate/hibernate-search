@@ -17,19 +17,19 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchShardsFailedExceptionIT {
+class ElasticsearchShardsFailedExceptionIT {
 
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new ).name( "index1" );
 	private final SimpleMappedIndex<IndexBinding> index2 = SimpleMappedIndex.of( IndexBinding::new ).name( "index2" );
@@ -53,7 +53,7 @@ public class ElasticsearchShardsFailedExceptionIT {
 	}
 
 	@Test
-	public void failureFetch() {
+	void failureFetch() {
 		setup( false );
 		SearchQuery<DocumentReference> query = createQuery();
 
@@ -66,7 +66,7 @@ public class ElasticsearchShardsFailedExceptionIT {
 	}
 
 	@Test
-	public void failureScroll() {
+	void failureScroll() {
 		setup( false );
 		SearchQuery<DocumentReference> query = createQuery();
 
@@ -79,7 +79,7 @@ public class ElasticsearchShardsFailedExceptionIT {
 	}
 
 	@Test
-	public void success() {
+	void success() {
 		setup( true );
 		SearchQuery<DocumentReference> query = createQuery();
 		assertThatHits( query.fetchAllHits() )

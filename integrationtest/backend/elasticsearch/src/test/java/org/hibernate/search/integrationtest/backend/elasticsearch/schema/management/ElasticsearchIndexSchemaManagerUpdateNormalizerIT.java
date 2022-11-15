@@ -7,46 +7,46 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendFeatures;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests related to normalizers when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionMigrationIT")
-public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
+class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+	@RegisterExtension
+	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	@Before
-	public void checkAssumption() {
+	@BeforeEach
+	void checkAssumption() {
 		assumeTrue(
-				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes.",
-				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening()
+				ElasticsearchTckBackendFeatures.supportsIndexClosingAndOpening(),
+				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes."
 		);
 	}
 
 	@Test
-	public void nothingToDo() throws Exception {
+	void nothingToDo() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -99,7 +99,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_missing() throws Exception {
+	void normalizer_missing() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -147,7 +147,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_componentDefinition_missing() throws Exception {
+	void normalizer_componentDefinition_missing() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -194,7 +194,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_componentReference_invalid() throws Exception {
+	void normalizer_componentReference_invalid() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
@@ -256,7 +256,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 	}
 
 	@Test
-	public void normalizer_componentDefinition_invalid() throws Exception {
+	void normalizer_componentDefinition_invalid() throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"

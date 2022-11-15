@@ -20,28 +20,28 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests behavior when an entity uses {@link jakarta.persistence.IdClass},
  */
-public class IdClassIT {
+class IdClassIT {
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	// This used to fail with an NPE at bootstrap
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3874")
-	public void idClass_indexed() {
+	void idClass_indexed() {
 		assertThatThrownBy( () -> ormSetupHelper.start().setup( IdClassIndexed.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -56,7 +56,7 @@ public class IdClassIT {
 	// This used to fail with an NPE at bootstrap
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3874")
-	public void idClass_nonIndexed() {
+	void idClass_nonIndexed() {
 		backendMock.expectAnySchema( NonIdClassIndexed.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -77,7 +77,7 @@ public class IdClassIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4025")
-	public void idClass_indexed_WithDocumentId() {
+	void idClass_indexed_WithDocumentId() {
 		backendMock.expectAnySchema( IdClassIndexedWithDocumentId.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()

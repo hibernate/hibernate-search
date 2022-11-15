@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.highlight;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +19,9 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class HighlighterUnifiedIT extends AbstractHighlighterIT {
+class HighlighterUnifiedIT extends AbstractHighlighterIT {
 
 	@Override
 	HighlighterUnifiedOptionsStep highlighter(SearchHighlighterFactory factory) {
@@ -49,7 +49,7 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 	}
 
 	@Test
-	public void boundaryScannerWord() {
+	void boundaryScannerWord() {
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(
@@ -70,10 +70,9 @@ public class HighlighterUnifiedIT extends AbstractHighlighterIT {
 	}
 
 	@Test
-	public void boundaryScannerSentenceExplicit() {
+	void boundaryScannerSentenceExplicit() {
 		assumeTrue(
-				TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize()
-		);
+				TckConfiguration.get().getBackendFeatures().supportsHighlighterUnifiedTypeFragmentSize() );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<String>> highlights = scope.query().select(

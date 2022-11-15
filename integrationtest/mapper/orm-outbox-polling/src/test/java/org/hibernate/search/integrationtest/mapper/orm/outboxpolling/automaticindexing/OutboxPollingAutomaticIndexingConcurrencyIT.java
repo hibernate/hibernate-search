@@ -25,15 +25,15 @@ import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport
 import org.hibernate.search.integrationtest.mapper.orm.outboxpolling.testsupport.util.TestFailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Tests highly concurrent background processing of events,
@@ -42,29 +42,29 @@ import org.junit.Test;
  * This used to fail on Microsoft SQL Server, in particular, because of its lock escalation mechanism.
  */
 @TestForIssue(jiraKey = "HSEARCH-4141")
-public class OutboxPollingAutomaticIndexingConcurrencyIT {
+class OutboxPollingAutomaticIndexingConcurrencyIT {
 
 	public static final int TOTAL_SHARD_COUNT = 23;
 	public static final int ENTITY_COUNT = 2000;
 	// Experimentation showed that larger batch sizes tend to reproduce the deadlock more reliably.
 	public static final int ENTITY_UPDATE_BATCH_SIZE = 500;
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final TestFailureHandler failureHandler = new TestFailureHandler();
 
 	private final List<SessionFactory> sessionFactories = new ArrayList<>();
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		sessionFactories.add( setup( "create-drop" ) );
 		for ( int i = 1; i < TOTAL_SHARD_COUNT; i++ ) {
 			// Avoid session factories stepping on each other's feet: use Action.NONE here.
@@ -94,7 +94,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 	// and indeed for most databases they will not due to how our queries are designed,
 	// but on some databases (CockroachDB) that's very hard (impossible?) to achieve.
 	@Test
-	public void resilientToTransactionDeadlocks() {
+	void resilientToTransactionDeadlocks() {
 		SessionFactory sessionFactory = sessionFactories.get( 0 );
 
 		Dialect dialect = sessionFactory.unwrap( SessionFactoryImplementor.class ).getJdbcServices().getDialect();

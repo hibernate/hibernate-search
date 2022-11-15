@@ -13,16 +13,16 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class AndPredicateSpecificsIT {
+class AndPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -52,27 +52,27 @@ public class AndPredicateSpecificsIT {
 	private static final Integer FIELD4_VALUE3 = 42_000; // Different from document 1
 	private static final Integer FIELD5_VALUE3 = 142_000; // Different from document 1
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
-	public void empty() {
+	void empty() {
 		assertThatQuery( index.query()
 				.where( f -> f.and() ) )
 				.hasNoHits();
 	}
 
 	@Test
-	public void and() {
+	void and() {
 		assertThatQuery( index.query()
 				.where( f -> f.and( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -93,7 +93,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void and_separatePredicateObject() {
+	void and_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -120,7 +120,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void nested() {
+	void nested() {
 		assertThatQuery( index.query()
 				.where( f -> f.and( f.or(
 						f.match().field( "field1" ).matching( FIELD1_VALUE1 ),
@@ -130,7 +130,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add() {
+	void add() {
 		assertThatQuery( index.query()
 				.where( f -> f.and()
 						.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
@@ -150,7 +150,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add_separatePredicateObject() {
+	void add_separatePredicateObject() {
 		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
@@ -176,7 +176,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void add_function() {
+	void add_function() {
 		assertThatQuery( index.query()
 				.where( f -> f.and()
 						.add( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) )
@@ -196,7 +196,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void where() {
+	void where() {
 		assertThatQuery( index.query()
 				.where( (f, root) -> {
 					root.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -219,7 +219,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void with() {
+	void with() {
 		assertThatQuery( index.query()
 				.where( f -> f.and().with( and -> and.add( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -239,7 +239,7 @@ public class AndPredicateSpecificsIT {
 	}
 
 	@Test
-	public void hasClause() {
+	void hasClause() {
 		StubMappingScope scope = index.createScope();
 
 		assertThat(

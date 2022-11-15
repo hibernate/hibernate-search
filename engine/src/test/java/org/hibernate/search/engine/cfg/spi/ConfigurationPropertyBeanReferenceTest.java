@@ -27,20 +27,16 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
-public class ConfigurationPropertyBeanReferenceTest {
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+class ConfigurationPropertyBeanReferenceTest {
 
 	@Mock
 	private ConfigurationPropertySource sourceMock;
@@ -48,7 +44,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	private BeanResolver beanResolverMock;
 
 	@Test
-	public void withDefault() {
+	void withDefault() {
 		String key = "withDefault";
 		ConfigurationProperty<BeanReference<? extends StubBean>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
@@ -117,7 +113,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void withoutDefault() {
+	void withoutDefault() {
 		String key = "withDefault";
 		ConfigurationProperty<Optional<BeanReference<? extends StubBean>>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
@@ -196,7 +192,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void multiValued() {
+	void multiValued() {
 		String key = "multiValued";
 		OptionalConfigurationProperty<List<BeanReference<? extends StubBean>>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
@@ -319,7 +315,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void invalidType() {
+	void invalidType() {
 		String key = "invalidType";
 		String resolvedKey = "some.prefix." + key;
 		ConfigurationProperty<Optional<BeanReference<? extends StubBean>>> property =
@@ -342,7 +338,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void invalidReference() {
+	void invalidReference() {
 		String key = "invalidReference";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<BeanReference<? extends StubBean>> property =
@@ -371,7 +367,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void multiValued_invalidReference() {
+	void multiValued_invalidReference() {
 		String key = "multiValued_invalidReference";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<List<BeanReference<? extends StubBean>>> property =
@@ -409,7 +405,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void invalidBeanRetrieval() {
+	void invalidBeanRetrieval() {
 		String key = "invalidBeanRetrieval";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<BeanReference<? extends StubBean>> property =
@@ -445,7 +441,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void substitute_function() {
+	void substitute_function() {
 		String key = "substitute_function";
 		ConfigurationProperty<Optional<BeanReference<? extends StubBean>>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
@@ -537,7 +533,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	@Test
-	public void substitute_literals() {
+	void substitute_literals() {
 		String key = "substitute_literals";
 		ConfigurationProperty<Optional<BeanReference<? extends StubBean>>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )

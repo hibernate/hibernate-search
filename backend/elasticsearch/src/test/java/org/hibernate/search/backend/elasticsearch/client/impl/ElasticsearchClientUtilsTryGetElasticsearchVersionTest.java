@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,69 +22,46 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpHost;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-@RunWith(Parameterized.class)
-public class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
+class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 
-	@Parameterized.Parameters(name = "{0} - {1}")
-	public static Object[][] data() {
-		return new Object[][] {
-				{ null, "1.0.0", ElasticsearchDistributionName.ELASTIC, 1, 0, 0, null },
-				{ null, "2.0.0", ElasticsearchDistributionName.ELASTIC, 2, 0, 0, null },
-				{ null, "2.4.4", ElasticsearchDistributionName.ELASTIC, 2, 4, 4, null },
-				{ null, "5.0.0", ElasticsearchDistributionName.ELASTIC, 5, 0, 0, null },
-				{ null, "5.6.6", ElasticsearchDistributionName.ELASTIC, 5, 6, 6, null },
-				{ null, "6.0.0", ElasticsearchDistributionName.ELASTIC, 6, 0, 0, null },
-				{ null, "6.7.0", ElasticsearchDistributionName.ELASTIC, 6, 7, 0, null },
-				{ null, "7.0.0-beta1", ElasticsearchDistributionName.ELASTIC, 7, 0, 0, "beta1" },
-				{ null, "7.0.0", ElasticsearchDistributionName.ELASTIC, 7, 0, 0, null },
-				{ "opensearch", "1.0.0-rc1", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 0, "rc1" },
-				{ "opensearch", "1.0.0", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 0, null },
-				{ "opensearch", "1.0.1", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 1, null }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( null, "1.0.0", ElasticsearchDistributionName.ELASTIC, 1, 0, 0, null ),
+				Arguments.of( null, "2.0.0", ElasticsearchDistributionName.ELASTIC, 2, 0, 0, null ),
+				Arguments.of( null, "2.4.4", ElasticsearchDistributionName.ELASTIC, 2, 4, 4, null ),
+				Arguments.of( null, "5.0.0", ElasticsearchDistributionName.ELASTIC, 5, 0, 0, null ),
+				Arguments.of( null, "5.6.6", ElasticsearchDistributionName.ELASTIC, 5, 6, 6, null ),
+				Arguments.of( null, "6.0.0", ElasticsearchDistributionName.ELASTIC, 6, 0, 0, null ),
+				Arguments.of( null, "6.7.0", ElasticsearchDistributionName.ELASTIC, 6, 7, 0, null ),
+				Arguments.of( null, "7.0.0-beta1", ElasticsearchDistributionName.ELASTIC, 7, 0, 0, "beta1" ),
+				Arguments.of( null, "7.0.0", ElasticsearchDistributionName.ELASTIC, 7, 0, 0, null ),
+				Arguments.of( "opensearch", "1.0.0-rc1", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 0, "rc1" ),
+				Arguments.of( "opensearch", "1.0.0", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 0, null ),
+				Arguments.of( "opensearch", "1.0.1", ElasticsearchDistributionName.OPENSEARCH, 1, 0, 1, null )
+		);
 	}
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
-	private final String distributionString;
-	private final String versionString;
-
-	private final ElasticsearchDistributionName expectedDistribution;
-	private final int expectedMajor;
-	private final int expectedMinor;
-	private final int expectedMicro;
-	private final String expectedQualifier;
 
 	@Mock
 	private ElasticsearchClient clientMock;
 
-	public ElasticsearchClientUtilsTryGetElasticsearchVersionTest(String distributionString, String versionString,
+
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void testValid(String distributionString, String versionString,
 			ElasticsearchDistributionName expectedDistribution,
 			int expectedMajor, int expectedMinor, int expectedMicro, String expectedQualifier) {
-		this.distributionString = distributionString;
-		this.versionString = versionString;
-		this.expectedDistribution = expectedDistribution;
-		this.expectedMajor = expectedMajor;
-		this.expectedMinor = expectedMinor;
-		this.expectedMicro = expectedMicro;
-		this.expectedQualifier = expectedQualifier;
-	}
-
-	@Test
-	public void testValid() {
 		doMock( distributionString, versionString );
 		ElasticsearchVersion version = ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock );
 		assertThat( version ).isNotNull();
@@ -98,8 +77,11 @@ public class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 		}
 	}
 
-	@Test
-	public void testInvalid_distribution() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void testInvalid_distribution(String distributionString, String versionString,
+			ElasticsearchDistributionName expectedDistribution,
+			int expectedMajor, int expectedMinor, int expectedMicro, String expectedQualifier) {
 		String invalidDistributionName = "QWDWQD" + distributionString;
 		doMock( invalidDistributionName, versionString );
 		assertThatThrownBy( () -> ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock ) )
@@ -107,11 +89,15 @@ public class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 				.hasMessageContainingAll(
 						"Invalid Elasticsearch distribution name",
 						"'" + invalidDistributionName.toLowerCase( Locale.ROOT ) + "'",
-						"Valid names are: [elastic, opensearch]" );
+						"Valid names are: [elastic, opensearch]"
+				);
 	}
 
-	@Test
-	public void testInvalid_version() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void testInvalid_version(String distributionString, String versionString,
+			ElasticsearchDistributionName expectedDistribution,
+			int expectedMajor, int expectedMinor, int expectedMicro, String expectedQualifier) {
 		String invalidVersionString = versionString.substring( 0, versionString.length() - 1 ) + "-A-B";
 		doMock( distributionString, invalidVersionString );
 		assertThatThrownBy( () -> ElasticsearchClientUtils.tryGetElasticsearchVersion( clientMock ) )
@@ -119,11 +105,15 @@ public class ElasticsearchClientUtilsTryGetElasticsearchVersionTest {
 				.hasMessageContainingAll(
 						"Invalid Elasticsearch version",
 						"'" + invalidVersionString.toLowerCase( Locale.ROOT ) + "'",
-						"Expected format is 'x.y.z-qualifier'" );
+						"Expected format is 'x.y.z-qualifier'"
+				);
 	}
 
-	@Test
-	public void testHttpStatus404() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	void testHttpStatus404(String distributionString, String versionString,
+			ElasticsearchDistributionName expectedDistribution,
+			int expectedMajor, int expectedMinor, int expectedMicro, String expectedQualifier) {
 		// This should only happen on Amazon OpenSearch Service,
 		// which doesn't allow retrieving the version.
 		when( clientMock.submit( any() ) )

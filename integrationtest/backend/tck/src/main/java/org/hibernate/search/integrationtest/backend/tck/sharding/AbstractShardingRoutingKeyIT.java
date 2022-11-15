@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,20 +25,20 @@ import org.hibernate.search.engine.backend.work.execution.spi.UnsupportedOperati
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * An abstract base for sharding tests with explicit routing keys.
  */
 public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
-	@Rule
+	@RegisterExtension
 	public final SearchSetupHelper setupHelper;
 
 	private final Set<String> routingKeys;
@@ -50,14 +50,14 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	public AbstractShardingRoutingKeyIT(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			Set<String> routingKeys) {
 		super( RoutingMode.EXPLICIT_ROUTING_KEYS );
-		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
+		this.setupHelper = SearchSetupHelper.create( setupStrategyFunction );
 		this.routingKeys = routingKeys;
 		documentCountPerRoutingKey = 100;
 		totalDocumentCount = routingKeys.size() * documentCountPerRoutingKey;
 	}
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start();
 		configure( setupContext );
 		setupContext.withIndex( index ).setup();
@@ -79,7 +79,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void search() {
+	void search() {
 		// No routing key => all documents should be returned
 		assertThatQuery( index.createScope().query()
 				.where( f -> f.matchAll() )
@@ -136,7 +136,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
-	public void purge_noRoutingKey() {
+	void purge_noRoutingKey() {
 		assumePurgeSupported();
 
 		index.createWorkspace()
@@ -150,7 +150,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
-	public void purge_oneRoutingKey() {
+	void purge_oneRoutingKey() {
 		assumePurgeSupported();
 
 		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
@@ -175,7 +175,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
-	public void purge_twoRoutingKeys() {
+	void purge_twoRoutingKeys() {
 		assumePurgeSupported();
 
 		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
@@ -198,7 +198,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
-	public void purge_allRoutingKeys() {
+	void purge_allRoutingKeys() {
 		assumePurgeSupported();
 
 		index.createWorkspace().purge( routingKeys, OperationSubmitter.blocking(), UnsupportedOperationBehavior.FAIL )
@@ -211,8 +211,8 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	private void assumePurgeSupported() {
 		assumeTrue(
-				"This test only makes sense if the backend supports explicit purge",
-				TckConfiguration.get().getBackendFeatures().supportsExplicitPurge()
+				TckConfiguration.get().getBackendFeatures().supportsExplicitPurge(),
+				"This test only makes sense if the backend supports explicit purge"
 		);
 	}
 

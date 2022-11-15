@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.spring.repackaged.application;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Projection
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.impl.test.SystemHelper;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
@@ -36,12 +36,12 @@ import org.springframework.boot.loader.jar.JarFile;
  * it manipulates the repackaged JAR
  * to inspect it and run it in a separate JVM.
  */
-public class RepackagedApplicationIT {
+class RepackagedApplicationIT {
 	private String javaLauncherCommand;
 	private Path repackedJarPath;
 
-	@Before
-	public void init() {
+	@BeforeEach
+	void init() {
 		javaLauncherCommand = System.getProperty( "test.launcher-command" );
 		String repackedJarPathString = System.getProperty( "test.repackaged-jar-path" );
 		repackedJarPath = repackedJarPathString == null ? null : Paths.get( repackedJarPathString );
@@ -59,7 +59,7 @@ public class RepackagedApplicationIT {
 	 * Test makes sure that the (repackaged) application behaves as expected on the current JDK.
 	 */
 	@Test
-	public void smokeTest() throws Exception {
+	void smokeTest() throws Exception {
 		Process process = SystemHelper.runCommandWithInheritedIO( javaLauncherCommand, "-jar", repackedJarPath.toString() );
 		assertThat( process.exitValue() )
 				.as( "Starting the repackaged application should succeed" )
@@ -71,7 +71,7 @@ public class RepackagedApplicationIT {
 	 * We try to create index and then see that that index has the info we need e.g. projection/entity classes etc.
 	 */
 	@Test
-	public void canReadJar() throws Exception {
+	void canReadJar() throws Exception {
 		try ( JarFile outerJar = new JarFile( repackedJarPath.toFile() ) ) {
 			for ( JarEntry jarEntry : outerJar ) {
 				if ( jarEntry.getName().contains( "hibernate-search-integrationtest-spring-repackaged-model" ) ) {

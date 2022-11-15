@@ -65,14 +65,16 @@ public class ValidationUtilComponentIT {
 						+ NotIndexed.class.getName() + ". Check whether they are annotated with '@Indexed'." );
 	}
 
-	@Test(expected = SearchException.class)
+	@Test
 	public void validatePositive_valueIsNegative() throws Exception {
-		ValidationUtil.validatePositive( "MyParameter", -1 );
+		assertThatThrownBy( () -> ValidationUtil.validatePositive( "MyParameter", -1 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
-	@Test(expected = SearchException.class)
+	@Test
 	public void validatePositive_valueIsZero() throws Exception {
-		ValidationUtil.validatePositive( "MyParameter", 0 );
+		assertThatThrownBy( () -> ValidationUtil.validatePositive( "MyParameter", 0 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	@Test
@@ -110,9 +112,10 @@ public class ValidationUtilComponentIT {
 		// ok
 	}
 
-	@Test(expected = SearchException.class)
+	@Test
 	public void validateSessionClearInterval_greaterThanCheckpointInterval() throws Exception {
-		ValidationUtil.validateEntityFetchSize( 101, 100 );
+		assertThatThrownBy( () -> ValidationUtil.validateEntityFetchSize( 101, 100 ) )
+				.isInstanceOf( SearchException.class );
 	}
 
 	private static class NotIndexed {

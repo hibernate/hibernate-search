@@ -33,34 +33,34 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.impl.test.extension.StaticCounters;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test common use cases of (custom) method parameter mapping annotations.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-4574")
-public class CustomMethodParameterMappingAnnotationBaseIT {
+class CustomMethodParameterMappingAnnotationBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Rule
-	public StaticCounters counters = new StaticCounters();
+	@RegisterExtension
+	public StaticCounters counters = StaticCounters.create();
 
 	protected final ProjectionFinalStep<?> dummyProjectionForEnclosingClassInstance(SearchProjectionFactory<?, ?> f) {
 		return f.constant( null );
@@ -70,7 +70,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 	 * Basic test checking that a simple constructor mapping will be applied as expected.
 	 */
 	@Test
-	public void simple() {
+	void simple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -144,7 +144,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void missingProcessorReference() {
+	void missingProcessorReference() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -171,7 +171,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void invalidAnnotationType() {
+	void invalidAnnotationType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -220,7 +220,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void annotatedElement() {
+	void annotatedElement() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -330,7 +330,7 @@ public class CustomMethodParameterMappingAnnotationBaseIT {
 	}
 
 	@Test
-	public void eventContext() {
+	void eventContext() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntityType {
 			@DocumentId

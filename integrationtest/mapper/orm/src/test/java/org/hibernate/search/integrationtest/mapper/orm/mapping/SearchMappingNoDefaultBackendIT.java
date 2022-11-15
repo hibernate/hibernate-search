@@ -22,7 +22,8 @@ import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.BackendMockTestRule;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -39,10 +40,10 @@ public class SearchMappingNoDefaultBackendIT {
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
 	@ClassRule
-	public static BackendMock backend1Mock = new BackendMock();
+	public static BackendMockTestRule backend1Mock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
-	public static BackendMock backend2Mock = new BackendMock();
+	public static BackendMockTestRule backend2Mock = BackendMockTestRule.createGlobal();
 
 	@ClassRule
 	public static ReusableOrmSetupHolder setupHolder;

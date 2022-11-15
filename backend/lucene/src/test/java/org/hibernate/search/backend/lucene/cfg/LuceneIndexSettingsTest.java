@@ -8,12 +8,12 @@ package org.hibernate.search.backend.lucene.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class LuceneIndexSettingsTest {
+class LuceneIndexSettingsTest {
 
 	@Test
-	public void shardKey() {
+	void shardKey() {
 		assertThat( LuceneIndexSettings.shardKey( "shardId", "foo.bar" ) )
 				.isEqualTo( "hibernate.search.backend.shards.shardId.foo.bar" );
 

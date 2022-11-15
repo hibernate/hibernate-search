@@ -46,7 +46,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -54,30 +54,26 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
  * for all single-field aggregations (range, terms, ...)
  * on supported types.
  */
-@RunWith(Parameterized.class)
-public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
+class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
-	private static List<DataSet<?>> dataSets;
+	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final List<DataSet<?>> dataSets = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		supportedFieldTypes = new LinkedHashSet<>();
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
 			for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
@@ -86,15 +82,18 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 					supportedFieldTypes.add( fieldTypeDescriptor );
 					DataSet<?> dataSet = new DataSet<>( expectations.get() );
 					dataSets.add( dataSet );
-					parameters.add( new Object[] { expectations.get(), dataSet } );
+					parameters.add( Arguments.of( expectations.get(), dataSet ) );
 				}
 			}
 		}
-		return parameters.toArray( new Object[0][] );
 	}
 
-	@ClassRule
-	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public static List<? extends Arguments> params() {
+		return parameters;
+	}
+
+	@RegisterExtension
+	public static final SearchSetupHelper setupHelper = SearchSetupHelper.createGlobal();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "Main" );
@@ -105,8 +104,8 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "Incompatible" );
 
-	@BeforeClass
-	public static void setup() {
+	@BeforeAll
+	static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						mainIndex,
@@ -121,24 +120,16 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		}
 	}
 
-	private final SupportedSingleFieldAggregationExpectations<F> expectations;
-	private final FieldTypeDescriptor<F> fieldType;
-	private final DataSet<F> dataSet;
-
-	public SingleFieldAggregationTypeCheckingAndConversionIT(SupportedSingleFieldAggregationExpectations<F> expectations,
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void aggregationObject_reuse_onScopeTargetingSameIndexes(SupportedSingleFieldAggregationExpectations<F> expectations,
 			DataSet<F> dataSet) {
-		this.expectations = expectations;
-		this.fieldType = expectations.fieldType();
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void aggregationObject_reuse_onScopeTargetingSameIndexes() {
 		// Need a separate method to handle the scenario generics
-		doTest_aggregationObject_reuse_onScopeTargetingSameIndexes( expectations.simple() );
+		doTest_aggregationObject_reuse_onScopeTargetingSameIndexes( expectations.simple(), expectations.fieldType(), dataSet );
 	}
 
-	private <A> void doTest_aggregationObject_reuse_onScopeTargetingSameIndexes(AggregationScenario<A> scenario) {
+	private <A> void doTest_aggregationObject_reuse_onScopeTargetingSameIndexes(AggregationScenario<A> scenario,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -186,13 +177,17 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void aggregationObject_reuse_onScopeTargetingDifferentIndexes() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void aggregationObject_reuse_onScopeTargetingDifferentIndexes(
+			SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
 		// Need a separate method to handle the scenario generics
-		doTest_aggregationObject_reuse_onScopeTargetingDifferentIndexes( expectations.simple() );
+		doTest_aggregationObject_reuse_onScopeTargetingDifferentIndexes( expectations.simple(), expectations.fieldType(),
+				dataSet );
 	}
 
-	private <A> void doTest_aggregationObject_reuse_onScopeTargetingDifferentIndexes(AggregationScenario<A> scenario) {
+	private <A> void doTest_aggregationObject_reuse_onScopeTargetingDifferentIndexes(AggregationScenario<A> scenario,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -226,11 +221,13 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 						"the given aggregation was built from a scope targeting indexes ", mainIndex.name() );
 	}
 
-	@Test
-	public void invalidFieldType_conversionEnabled() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidFieldType_conversionEnabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
-		FieldTypeDescriptor<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType );
+		FieldTypeDescriptor<?> wrongType = FieldTypeDescriptor.getIncompatible( expectations.fieldType() );
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
 
@@ -238,16 +235,18 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid type", "'" + wrongType.getJavaType().getName() + "'",
-						"Expected '" + fieldType.getJavaType().getName() + "'",
+						"Expected '" + expectations.fieldType().getJavaType().getName() + "'",
 						"field '" + fieldPath + "'"
 				);
 	}
 
-	@Test
-	public void invalidFieldType_conversionDisabled() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void invalidFieldType_conversionDisabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
-		FieldTypeDescriptor<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType );
+		FieldTypeDescriptor<?> wrongType = FieldTypeDescriptor.getIncompatible( expectations.fieldType() );
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
 
@@ -257,14 +256,15 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid type", "'" + wrongType.getJavaType().getName() + "'",
-						"Expected '" + fieldType.getJavaType().getName() + "'",
+						"Expected '" + expectations.fieldType().getJavaType().getName() + "'",
 						"field '" + fieldPath + "'"
 				);
 	}
 
-	@Test
-	public void nullFieldType() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void nullFieldType(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.nullType() );
@@ -278,18 +278,19 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	/**
 	 * Test that mentioning the same aggregation twice with different keys works as expected.
 	 */
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testMultipleFacets")
-	public void duplicated_differentKeys() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+	void duplicated_differentKeys(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple();
 
 		// A separate method is needed in order to write type-safe code
-		doTestDuplicatedDifferentKeys( fieldPath, scenario );
+		doTestDuplicatedDifferentKeys( fieldPath, scenario, dataSet );
 	}
 
-	private <A> void doTestDuplicatedDifferentKeys(String fieldPath, AggregationScenario<A> scenario) {
+	private <A> void doTestDuplicatedDifferentKeys(String fieldPath, AggregationScenario<A> scenario, DataSet<F> dataSet) {
 		AggregationKey<A> key1 = AggregationKey.of( "aggregationName1" );
 		AggregationKey<A> key2 = AggregationKey.of( "aggregationName2" );
 
@@ -313,9 +314,10 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	/**
 	 * Test that mentioning the same aggregation twice with the same key throws an exception as expected.
 	 */
-	@Test
-	public void duplicated_sameKey() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void duplicated_sameKey(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple();
 
@@ -334,14 +336,17 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( "Duplicate aggregation definitions for key: 'aggregationName1'" );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(
 			original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testKnownFieldNameNotConfiguredForFacetingThrowsException")
-	public void aggregationsDisabled() {
-		String fieldPath = mainIndex.binding().fieldWithAggregationDisabledModels.get( fieldType ).relativeFieldName;
+	void aggregationsDisabled(SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
+		String fieldPath =
+				mainIndex.binding().fieldWithAggregationDisabledModels.get( expectations.fieldType() ).relativeFieldName;
 
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( fieldType ) );
+		AggregationScenario<?> scenario =
+				expectations.withFieldType( TypeAssertionHelper.identity( expectations.fieldType() ) );
 
 		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
@@ -351,77 +356,93 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void withConverter_conversionEnabled() {
-		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withConverter_conversionEnabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType(
-				TypeAssertionHelper.wrapper( fieldType )
+				TypeAssertionHelper.wrapper( expectations.fieldType() )
 		);
 		testValidAggregation(
-				scenario, mainIndex.createScope(), fieldPath
+				scenario, mainIndex.createScope(), fieldPath,
+				dataSet
 		);
 	}
 
-	@Test
-	public void withConverter_conversionDisabled() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withConverter_conversionDisabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple();
 		testValidAggregationWithConverterSetting(
-				scenario, mainIndex.createScope(), fieldPath, ValueConvert.NO
+				scenario, mainIndex.createScope(), fieldPath, ValueConvert.NO,
+				dataSet
 		);
 	}
 
-	@Test
-	public void withConverter_invalidFieldType() {
-		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( fieldType ).relativeFieldName;
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void withConverter_invalidFieldType(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple();
 
 		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid type", "'" + fieldType.getJavaType().getName() + "'",
+						"Invalid type", "'" + expectations.fieldType().getJavaType().getName() + "'",
 						"Expected '" + ValueWrapper.class.getName() + "'",
 						"field '" + fieldPath + "'"
 				);
 	}
 
-	@Test
-	public void multiIndex_withCompatibleIndex_noConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withCompatibleIndex_noConverter(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.onMainAndOtherIndex();
 		testValidAggregation(
-				scenario, scope, fieldPath
+				scenario, scope, fieldPath,
+				dataSet
 		);
 	}
 
-	@Test
-	public void multiIndex_withCompatibleIndex_conversionEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withCompatibleIndex_conversionEnabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( fieldType ).relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldTypeOnMainAndOtherIndex(
-				TypeAssertionHelper.wrapper( fieldType )
+				TypeAssertionHelper.wrapper( expectations.fieldType() )
 		);
 		testValidAggregation(
-				scenario, scope, fieldPath
+				scenario, scope, fieldPath,
+				dataSet
 		);
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_conversionEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_conversionEnabled(
+			SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( fieldType ).relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldTypeOnMainAndOtherIndex(
-				TypeAssertionHelper.wrapper( fieldType )
+				TypeAssertionHelper.wrapper( expectations.fieldType() )
 		);
 
 		assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
@@ -432,23 +453,28 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_conversionDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withRawFieldCompatibleIndex_conversionDisabled(
+			SupportedSingleFieldAggregationExpectations<F> expectations, DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( fieldType ).relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.onMainAndOtherIndex();
 		testValidAggregationWithConverterSetting(
-				scenario, scope, fieldPath, ValueConvert.NO
+				scenario, scope, fieldPath, ValueConvert.NO,
+				dataSet
 		);
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_conversionEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_conversionEnabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple();
 
@@ -460,11 +486,13 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_conversionDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void multiIndex_withIncompatibleIndex_conversionDisabled(SupportedSingleFieldAggregationExpectations<F> expectations,
+			DataSet<F> dataSet) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple();
 
@@ -479,26 +507,29 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			String fieldPath) {
+			String fieldPath, DataSet<F> dataSet) {
 		testValidAggregation(
 				scenario, scope,
 				f -> f.matchAll(),
-				(f, e) -> e.setup( f, fieldPath )
+				(f, e) -> e.setup( f, fieldPath ),
+				dataSet
 		);
 	}
 
 	private <A> void testValidAggregationWithConverterSetting(AggregationScenario<A> scenario,
-			StubMappingScope scope, String fieldPath, ValueConvert convert) {
+			StubMappingScope scope, String fieldPath, ValueConvert convert, DataSet<F> dataSet) {
 		testValidAggregation(
 				scenario, scope,
 				f -> f.matchAll(),
-				(f, e) -> e.setupWithConverterSetting( f, fieldPath, convert )
+				(f, e) -> e.setupWithConverterSetting( f, fieldPath, convert ),
+				dataSet
 		);
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
 			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
-			BiFunction<SearchAggregationFactory, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor) {
+			BiFunction<SearchAggregationFactory, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor,
+			DataSet<F> dataSet) {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 		assertThatQuery(
 				scope.query()

@@ -23,14 +23,14 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoAssertionHelper;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class StandalonePojoMassLoadingIT {
+class StandalonePojoMassLoadingIT {
 
-	@Rule
+	@RegisterExtension
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private Map<String, Book> books;
@@ -39,8 +39,8 @@ public class StandalonePojoMassLoadingIT {
 
 	private StandalonePojoAssertionHelper assertions = new StandalonePojoAssertionHelper( BackendConfigurations.simple() );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		Map<Class<?>, Map<String, ?>> entities = new HashMap<>();
 		books = new LinkedHashMap<>();
 		entities.put( Book.class, books );
@@ -75,15 +75,15 @@ public class StandalonePojoMassLoadingIT {
 		this.searchMapping = searchMapping;
 	}
 
-	@After
-	public void cleanup() {
+	@AfterEach
+	void cleanup() {
 		if ( searchMapping != null ) {
 			searchMapping.close();
 		}
 	}
 
 	@Test
-	public void test() throws InterruptedException {
+	void test() throws InterruptedException {
 		try ( SearchSession searchSession = searchMapping.createSession() ) {
 			assertThat( searchSession.search( Book.class )
 					.select( f -> f.id( String.class ) )

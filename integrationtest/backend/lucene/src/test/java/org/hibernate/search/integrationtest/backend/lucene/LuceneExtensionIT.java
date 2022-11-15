@@ -58,7 +58,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -66,9 +66,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOpt
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoublePoint;
@@ -90,7 +90,7 @@ import org.apache.lucene.search.SortedSetSortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
-public class LuceneExtensionIT {
+class LuceneExtensionIT {
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -98,16 +98,16 @@ public class LuceneExtensionIT {
 	private static final String FOURTH_ID = "4";
 	private static final String FIFTH_ID = "5";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
 	private final SimpleMappedIndex<IndexBinding> otherIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
 	private SearchIntegration integration;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup().integration();
 
 		initData();
@@ -115,7 +115,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	@SuppressWarnings("unused")
-	public void queryContext() {
+	void queryContext() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
@@ -158,7 +158,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query() {
+	void query() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
@@ -181,7 +181,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_topDocs() {
+	void query_topDocs() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		LuceneSearchResult<DocumentReference> result = scope.query().extension( LuceneExtension.get() )
@@ -192,7 +192,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_explain_singleIndex() {
+	void query_explain_singleIndex() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
@@ -211,7 +211,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_explain_singleIndex_invalidId() {
+	void query_explain_singleIndex_invalidId() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
@@ -228,7 +228,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes() {
+	void query_explain_multipleIndexes() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
@@ -247,7 +247,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes_missingTypeName() {
+	void query_explain_multipleIndexes_missingTypeName() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
@@ -263,7 +263,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes_invalidIndexName() {
+	void query_explain_multipleIndexes_invalidIndexName() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
@@ -281,7 +281,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3974")
-	public void scroll_onFetchable() {
+	void scroll_onFetchable() {
 		// Check the scroll has the extended type and works correctly
 		try ( LuceneSearchScroll<DocumentReference> scroll = mainIndex.query()
 				.extension( LuceneExtension.get() ) // Call extension() on the DSL step
@@ -301,7 +301,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3974")
-	public void scroll_onQuery() {
+	void scroll_onQuery() {
 		// Check the scroll has the extended type and works correctly
 		try ( LuceneSearchScroll<DocumentReference> scroll = mainIndex.query()
 				.where( f -> f.matchAll() )
@@ -321,7 +321,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromLuceneQuery() {
+	void predicate_fromLuceneQuery() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -340,7 +340,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromLuceneQuery_separatePredicate() {
+	void predicate_fromLuceneQuery_separatePredicate() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( LuceneExtension.get() )
@@ -365,7 +365,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void predicate_fromLuceneQuery_withRoot() {
+	void predicate_fromLuceneQuery_withRoot() {
 		SearchQuery<DocumentReference> query = mainIndex.query()
 				.where( f -> {
 					LuceneSearchPredicateFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
@@ -380,7 +380,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void sort_fromLuceneSortField() {
+	void sort_fromLuceneSortField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -421,7 +421,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void sort_fromLuceneSortField_separateSort() {
+	void sort_fromLuceneSortField_separateSort() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchSort sort1 = scope.sort().extension()
@@ -468,7 +468,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void sort_fromLuceneSortField_withRoot() {
+	void sort_fromLuceneSortField_withRoot() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> {
@@ -489,7 +489,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void sort_filter_fromLuceneQuery() {
+	void sort_filter_fromLuceneQuery() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -527,7 +527,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField() {
+	void predicate_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = "nativeField";
@@ -549,7 +549,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromLuceneQuery() {
+	void predicate_nativeField_fromLuceneQuery() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -563,7 +563,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_exists() {
+	void predicate_nativeField_exists() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = "nativeField";
@@ -583,7 +583,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField() {
+	void sort_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = "nativeField";
@@ -603,7 +603,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField_fromLuceneSortField() {
+	void sort_nativeField_fromLuceneSortField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -617,7 +617,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void projection_nativeField() {
+	void projection_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Integer> query = scope.query()
@@ -630,7 +630,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void projection_nativeField_withProjectionConverters_enabled() {
+	void projection_nativeField_withProjectionConverters_enabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<ValueWrapper> query = scope.query()
@@ -642,7 +642,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void projection_nativeField_withProjectionConverters_disabled() {
+	void projection_nativeField_withProjectionConverters_disabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Integer> query = scope.query()
@@ -654,7 +654,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void projection_nativeField_unsupportedProjection() {
+	void projection_nativeField_unsupportedProjection() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		String fieldPath = "nativeField_unsupportedProjection";
@@ -683,7 +683,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void projection_document() {
+	void projection_document() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Document> query = scope.query()
@@ -738,7 +738,7 @@ public class LuceneExtensionIT {
 	 * even if there is a field projection, which would usually trigger document filtering.
 	 */
 	@Test
-	public void projection_documentAndField() {
+	void projection_documentAndField() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
@@ -766,7 +766,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void projection_explanation() {
+	void projection_explanation() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Explanation> query = scope.query()
@@ -783,7 +783,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void aggregation_filter_fromLuceneQuery() {
+	void aggregation_filter_fromLuceneQuery() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "agg" );
@@ -810,7 +810,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void nativeField_invalidFieldPath() {
+	void nativeField_invalidFieldPath() {
 		assertThatThrownBy( () -> mainIndex
 				.index( FIRST_ID, document -> document.addValue( mainIndex.binding().nativeField_invalidFieldPath, 45 )
 				) )
@@ -820,14 +820,14 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void backend_unwrap() {
+	void backend_unwrap() {
 		Backend backend = integration.backend();
 		assertThat( backend.unwrap( LuceneBackend.class ) )
 				.isNotNull();
 	}
 
 	@Test
-	public void backend_unwrap_error_unknownType() {
+	void backend_unwrap_error_unknownType() {
 		Backend backend = integration.backend();
 
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
@@ -839,14 +839,14 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void mainIndex_unwrap() {
+	void mainIndex_unwrap() {
 		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
 		assertThat( mainIndexFromIntegration.unwrap( LuceneIndexManager.class ) )
 				.isNotNull();
 	}
 
 	@Test
-	public void mainIndex_unwrap_error_unknownType() {
+	void mainIndex_unwrap_error_unknownType() {
 		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
 
 		assertThatThrownBy( () -> mainIndexFromIntegration.unwrap( String.class ) )
@@ -859,7 +859,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void indexReaderAccessor() throws Exception {
+	void indexReaderAccessor() throws Exception {
 		StubMappingScope scope = mainIndex.createScope();
 
 		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {
@@ -878,7 +878,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void documentProjectionInsideNested() {
+	void documentProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( LuceneExtension.get() ).document()
@@ -894,7 +894,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void explanationProjectionInsideNested() {
+	void explanationProjectionInsideNested() {
 		assertThatThrownBy( () -> mainIndex.createScope().query()
 				.select( f -> f.object( "nestedObject" ).from(
 						f.extension( LuceneExtension.get() ).explanation()

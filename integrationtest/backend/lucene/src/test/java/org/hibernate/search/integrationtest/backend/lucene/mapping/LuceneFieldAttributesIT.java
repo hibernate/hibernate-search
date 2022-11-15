@@ -20,31 +20,31 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.apache.lucene.analysis.ngram.NGramTokenizerFactory;
 import org.apache.lucene.analysis.payloads.TokenOffsetPayloadTokenFilterFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
-public class LuceneFieldAttributesIT {
+class LuceneFieldAttributesIT {
 
 	private static final String ANALYZER_NAME = "my-analyzer";
 
 	private static final String TEXT = "This is a text containing things. Red house with a blue carpet on the road...";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		setupHelper.start()
 				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						(LuceneAnalysisConfigurer) ctx -> ctx
@@ -61,7 +61,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyNorms() {
+	void verifyNorms() {
 		Document document = loadDocument();
 
 		// norms false => omit-norms true
@@ -74,7 +74,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	@Test
-	public void verifyTermVector() {
+	void verifyTermVector() {
 		Document document = loadDocument();
 
 		IndexableField field = document.getField( "text" );

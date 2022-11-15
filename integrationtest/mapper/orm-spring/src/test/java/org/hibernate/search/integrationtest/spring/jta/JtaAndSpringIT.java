@@ -15,30 +15,30 @@ import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHolder;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringApplicationConfiguration.class)
 @ActiveProfiles("jta")
 @PortedFromSearch5(original = "org.hibernate.search.test.integration.spring.jta.JtaAndSpringIT")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class JtaAndSpringIT {
+class JtaAndSpringIT {
 
 	@Autowired
-	@Rule
+	@RegisterExtension
 	public BackendMock backendMock;
 
 	@Autowired
@@ -47,20 +47,20 @@ public class JtaAndSpringIT {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void checkJta() {
+	@BeforeEach
+	void checkJta() {
 		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
 	}
 
-	@After
-	public void checkNoMemoryLeak() {
+	@AfterEach
+	void checkNoMemoryLeak() {
 		assertThat( HibernateOrmSearchSessionHolder.staticMapSize() ).isZero();
 	}
 
 	@Test
-	public void test() {
+	void test() {
 		Snert snert = new Snert();
 		snert.setId( 1L );
 		snert.setName( "dave" );

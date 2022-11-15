@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.spring.testsupport;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.BackendMappingHandle;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.HibernateOrmMappingHandle;
 
@@ -29,7 +29,7 @@ public abstract class AbstractSpringITConfig {
 
 	@Bean
 	public BackendMock backendMock() {
-		return new BackendMock().ignoreSchema();
+		return BackendMock.create().ignoreSchema();
 	}
 
 	@Bean

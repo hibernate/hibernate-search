@@ -13,19 +13,19 @@ import jakarta.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.extension.ExpectedLog4jLog;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Test warning message for enabling/disabling the dirty check.
  */
 @TestForIssue(jiraKey = "HSEARCH-4866")
-public class AutomaticIndexingDirtyCheckIT {
+class AutomaticIndexingDirtyCheckIT {
 
 	private static final String DEPRECATED_PROPERTY_MESSAGE = "Configuration property "
 			+ "'hibernate.search.automatic_indexing.enable_dirty_check' is deprecated. "
@@ -34,13 +34,13 @@ public class AutomaticIndexingDirtyCheckIT {
 			+ "After the removal of this property in a future version, "
 			+ "a dirty check will always be performed when considering whether to trigger reindexing.";
 
-	@Rule
-	public BackendMock backendMock = new BackendMock();
+	@RegisterExtension
+	public BackendMock backendMock = BackendMock.create();
 
-	@Rule
+	@RegisterExtension
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
+	@RegisterExtension
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private SessionFactory setup(Boolean enabled) {
@@ -56,7 +56,7 @@ public class AutomaticIndexingDirtyCheckIT {
 	}
 
 	@Test
-	public void enabled_default() {
+	void enabled_default() {
 		logged.expectMessage( DEPRECATED_PROPERTY_MESSAGE ).never();
 
 		setup( null );
@@ -65,7 +65,7 @@ public class AutomaticIndexingDirtyCheckIT {
 	}
 
 	@Test
-	public void enabled_explicit() {
+	void enabled_explicit() {
 		logged.expectMessage( DEPRECATED_PROPERTY_MESSAGE ).never();
 
 		setup( true );
@@ -74,7 +74,7 @@ public class AutomaticIndexingDirtyCheckIT {
 	}
 
 	@Test
-	public void disabled() {
+	void disabled() {
 		logged.expectMessage( DEPRECATED_PROPERTY_MESSAGE ).once();
 
 		setup( false );

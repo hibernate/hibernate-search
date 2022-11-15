@@ -15,12 +15,12 @@ import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.integrationtest.spring.jta.JtaAndSpringOutboxApplicationConfiguration;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.atomikos.icatch.jta.TransactionManagerImp;
 
@@ -28,16 +28,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JtaAndSpringOutboxApplicationConfiguration.class)
 @ActiveProfiles({ "jta", "outbox", "transaction-timeout", "raised-timeout" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class RaisedTimeoutJtaAndSpringOutboxIT {
+class RaisedTimeoutJtaAndSpringOutboxIT {
 
 	@Autowired
-	@Rule
+	@RegisterExtension
 	public BackendMock backendMock;
 
 	@Autowired
@@ -46,8 +46,8 @@ public class RaisedTimeoutJtaAndSpringOutboxIT {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void checkJta() {
+	@BeforeEach
+	void checkJta() {
 		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
@@ -60,7 +60,7 @@ public class RaisedTimeoutJtaAndSpringOutboxIT {
 	}
 
 	@Test
-	public void test() throws Exception {
+	void test() throws Exception {
 		Snert snert = new Snert();
 		snert.setId( 1L );
 		snert.setName( "dave" );

@@ -23,14 +23,14 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.extension.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.extension.StubSearchWorkBehavior;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -39,7 +39,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -48,10 +48,10 @@ import org.springframework.transaction.support.TransactionTemplate;
  *  one can create a single SearchSession for all threads, and it will correctly use the correct EntityManager
  *  depending on the current thread.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class SessionProxyIT {
+class SessionProxyIT {
 
 	@Configuration
 	@EntityScan
@@ -62,7 +62,7 @@ public class SessionProxyIT {
 	private static boolean needsInit;
 
 	@Autowired
-	@Rule
+	@RegisterExtension
 	public BackendMock backendMock;
 
 	@Autowired
@@ -71,13 +71,13 @@ public class SessionProxyIT {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@BeforeAll
+	static void beforeClass() {
 		needsInit = true;
 	}
 
-	@Before
-	public void before() {
+	@BeforeEach
+	void before() {
 		if ( needsInit ) {
 			TransactionTemplate template = new TransactionTemplate( transactionManager );
 			backendMock.inLenientMode( () -> template.execute( ignored -> {
@@ -89,7 +89,7 @@ public class SessionProxyIT {
 	}
 
 	@Test
-	public void useSingleSearchSessionFromMultipleThreads() {
+	void useSingleSearchSessionFromMultipleThreads() {
 		TransactionTemplate template = new TransactionTemplate( transactionManager );
 
 		template.execute( status -> {

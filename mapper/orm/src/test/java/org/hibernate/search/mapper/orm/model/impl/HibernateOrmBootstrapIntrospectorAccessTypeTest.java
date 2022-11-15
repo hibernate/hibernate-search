@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -26,117 +26,138 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class HibernateOrmBootstrapIntrospectorAccessTypeTest
+class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		extends AbstractHibernateOrmBootstrapIntrospectorPerReflectionStrategyTest {
 
-	@Test
-	public void entity_defaultFieldAccess() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithDefaultFieldAccess.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void entity_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
+				valueHandleFactory, EntityWithDefaultFieldAccess.class );
 		testEntityWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void entity_defaultMethodAccess() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithDefaultMethodAccess.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void entity_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
+				valueHandleFactory, EntityWithDefaultMethodAccess.class );
 		testEntityWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embeddedId_defaultFieldAccess() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithEmbeddedIdWithDefaultFieldAccess.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddedId_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
+				valueHandleFactory, EntityWithEmbeddedIdWithDefaultFieldAccess.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embeddedId_defaultMethodAccess() {
-		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddedIdWithDefaultMethodAccess.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddedId_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector(
+				valueHandleFactory, EntityWithEmbeddedIdWithDefaultMethodAccess.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embedded_defaultFieldAccess() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithEmbedded.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embedded_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector( valueHandleFactory, EntityWithEmbedded.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embedded_defaultMethodAccess() {
-		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithEmbedded.class );
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embedded_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
+		HibernateOrmBootstrapIntrospector introspector = createIntrospector( valueHandleFactory, EntityWithEmbedded.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embeddableElementCollection_defaultFieldAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableElementCollection_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableElementCollection.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollection.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embeddableElementCollection_defaultMethodAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableElementCollection_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableElementCollection.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollection.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embeddableAssociationMapKey_defaultFieldAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableAssociationMapKey_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableAssociationMapKey.class, OtherEntity.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapKey.class, OtherEntity.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embeddableAssociationMapKey_defaultMethodAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableAssociationMapKey_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableAssociationMapKey.class, OtherEntity.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapKey.class, OtherEntity.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embeddableAssociationMapValue_defaultFieldAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableAssociationMapValue_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableAssociationMapValue.class, OtherEntity.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapValue.class, OtherEntity.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embeddableAssociationMapValue_defaultMethodAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableAssociationMapValue_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableAssociationMapValue.class, OtherEntity.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableAssociationMapValue.class, OtherEntity.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embeddableElementCollectionMapKey_defaultFieldAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableElementCollectionMapKey_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableElementCollectionMapKey.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapKey.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embeddableElementCollectionMapKey_defaultMethodAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableElementCollectionMapKey_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableElementCollectionMapKey.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapKey.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 
-	@Test
-	public void embeddableElementCollectionMapValue_defaultFieldAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableElementCollectionMapValue_defaultFieldAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableElementCollectionMapValue.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapValue.class );
 		testEmbeddableWithDefaultFieldAccess( introspector );
 	}
 
-	@Test
-	public void embeddableElementCollectionMapValue_defaultMethodAccess() {
+	@ParameterizedTest(name = "Reflection strategy = {0}")
+	@MethodSource("params")
+	void embeddableElementCollectionMapValue_defaultMethodAccess(ValueHandleFactory valueHandleFactory) {
 		HibernateOrmBootstrapIntrospector introspector =
-				createIntrospector( EntityWithEmbeddableElementCollectionMapValue.class );
+				createIntrospector( valueHandleFactory, EntityWithEmbeddableElementCollectionMapValue.class );
 		testEmbeddableWithDefaultMethodAccess( introspector );
 	}
 

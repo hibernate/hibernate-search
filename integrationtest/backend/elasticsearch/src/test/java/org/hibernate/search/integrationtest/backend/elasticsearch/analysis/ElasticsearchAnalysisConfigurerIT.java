@@ -15,31 +15,31 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.extension.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.extension.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ElasticsearchAnalysisConfigurerIT {
+class ElasticsearchAnalysisConfigurerIT {
 
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Unable to apply analysis configuration";
 
 	private static final String TYPE_NAME = "mainType";
 	private static final String INDEX_NAME = "mainIndex";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@RegisterExtension
+	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
-	@Rule
-	public final TestElasticsearchClient client = new TestElasticsearchClient();
+	@RegisterExtension
+	public final TestElasticsearchClient client = TestElasticsearchClient.create();
 
 	@Test
-	public void error_invalidReference() {
+	void error_invalidReference() {
 		assertThatThrownBy(
 				() -> setup( "foobar" )
 		)
@@ -57,7 +57,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_failingConfigurer() {
+	void error_failingConfigurer() {
 		assertThatThrownBy(
 				() -> setup( FailingConfigurer.class.getName() )
 		)
@@ -88,7 +88,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_tokenizer_namingConflict() {
+	void error_tokenizer_namingConflict() {
 		assertThatThrownBy(
 				() -> setup( TokenizerNamingConflictConfigurer.class.getName() )
 		)
@@ -113,7 +113,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_tokenizer_missingType() {
+	void error_tokenizer_missingType() {
 		assertThatThrownBy(
 				() -> setup( TokenizerMissingTypeConfigurer.class.getName() )
 		)
@@ -137,7 +137,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_charFilter_namingConflict() {
+	void error_charFilter_namingConflict() {
 		assertThatThrownBy(
 				() -> setup( CharFilterNamingConflictConfigurer.class.getName() )
 		)
@@ -162,7 +162,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_charFilter_missingType() {
+	void error_charFilter_missingType() {
 		assertThatThrownBy(
 				() -> setup( CharFilterMissingTypeConfigurer.class.getName() )
 		)
@@ -186,7 +186,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_tokenFilter_namingConflict() {
+	void error_tokenFilter_namingConflict() {
 		assertThatThrownBy(
 				() -> setup( TokenFilterNamingConflictConfigurer.class.getName() )
 		)
@@ -211,7 +211,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_tokenFilter_missingType() {
+	void error_tokenFilter_missingType() {
 		assertThatThrownBy(
 				() -> setup( TokenFilterMissingTypeConfigurer.class.getName() )
 		)
@@ -235,7 +235,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_parameter_namingConflict() {
+	void error_parameter_namingConflict() {
 		assertThatThrownBy(
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
@@ -264,7 +264,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4594")
-	public void multipleConfigurers() {
+	void multipleConfigurers() {
 		StubMappedIndex index = setup( MultipleConfigurers1.class.getName() + "," + MultipleConfigurers2.class.getName() );
 
 		assertJsonEquals(
