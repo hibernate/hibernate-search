@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -792,11 +791,11 @@ public class IndexedEmbeddedBaseIT {
 		 * We can't check the GeoPoint bridge here, because it doesn't use static counters
 		 * like our stub bridges, but we will check it isn't executed below.
 		 */
-		assertEquals( 3, counters.get( filteredOutBridgeCounterKeys.instance ) );
-		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance )
-				- counters.get( filteredOutBridgeCounterKeys.close ) );
-		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance )
-				- counters.get( filteredOutBridgeCounterKeys.holderClose ) );
+		assertThat( counters.get( filteredOutBridgeCounterKeys.instance ) ).isEqualTo( 3 );
+		assertThat( counters.get( filteredOutBridgeCounterKeys.instance )
+				- counters.get( filteredOutBridgeCounterKeys.close ) ).isZero();
+		assertThat( counters.get( filteredOutBridgeCounterKeys.instance )
+				- counters.get( filteredOutBridgeCounterKeys.holderClose ) ).isZero();
 
 		doTestEmbeddedRuntime(
 				mapping,
@@ -807,9 +806,9 @@ public class IndexedEmbeddedBaseIT {
 		);
 
 		// The bridges that were filtered out should not have been used.
-		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.runtimeUse ) );
-		assertEquals( 0, counters.get( getLatitudeKey ) );
-		assertEquals( 0, counters.get( getLongitudeKey ) );
+		assertThat( counters.get( filteredOutBridgeCounterKeys.runtimeUse ) ).isZero();
+		assertThat( counters.get( getLatitudeKey ) ).isZero();
+		assertThat( counters.get( getLongitudeKey ) ).isZero();
 	}
 
 	@Test

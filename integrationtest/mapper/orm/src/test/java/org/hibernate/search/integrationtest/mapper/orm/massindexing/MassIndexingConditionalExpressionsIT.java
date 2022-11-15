@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.time.Instant;
 import javax.persistence.Access;

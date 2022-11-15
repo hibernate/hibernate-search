@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.integrationtest.batch.jsr352.component;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -121,10 +120,10 @@ public class EntityReaderComponentIT {
 			entityReader.open( null );
 			for ( Company expected : COMPANIES ) {
 				Company actual = (Company) entityReader.readItem();
-				assertEquals( expected.getName(), actual.getName() );
+				assertThat( actual.getName() ).isEqualTo( expected.getName() );
 			}
 			// no more item
-			assertNull( entityReader.readItem() );
+			assertThat( entityReader.readItem() ).isNull();
 		}
 		finally {
 			entityReader.close();

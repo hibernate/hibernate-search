@@ -7,7 +7,6 @@
 package org.hibernate.search.documentation.mapper.pojo.standalone.gettingstarted.withhsearch.defaultanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -183,7 +182,7 @@ public class GettingStartedDefaultAnalysisIT {
 					.fetchTotalHitCount(); // <1>
 			// end::counting[]
 
-			assertEquals( 1L, totalHitCount );
+			assertThat( totalHitCount ).isEqualTo( 1L );
 			// tag::counting[]
 		}
 		// end::counting[]

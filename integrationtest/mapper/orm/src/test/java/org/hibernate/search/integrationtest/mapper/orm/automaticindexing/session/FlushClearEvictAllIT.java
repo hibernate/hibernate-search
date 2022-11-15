@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class FlushClearEvictAllIT {
 
 			post = entityManager.merge( post );
 			Long postId = post.getId();
-			assertNotNull( postId );
+			assertThat( postId ).isNotNull();
 
 			backendMock.expectWorks( Post.NAME )
 					.createFollowingWorks()

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.JOB_TIMEOUT_MS;
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
@@ -127,9 +127,9 @@ public class RestartChunkIT {
 	}
 
 	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
-		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) ).isZero();
 		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
-		assertEquals( 0, google.size() );
+		assertThat( google ).isEmpty();
 
 		// start the job
 		MassIndexingJob.ParametersBuilder builder = MassIndexingJob.parameters()
@@ -147,7 +147,7 @@ public class RestartChunkIT {
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
 		// job will be stopped by the SimulatedFailure
-		assertEquals( BatchStatus.FAILED, getMainStepStatus( execId1 ) );
+		assertThat( getMainStepStatus( execId1 ) ).isEqualTo( BatchStatus.FAILED );
 
 		// restart the job
 		/*
@@ -157,12 +157,12 @@ public class RestartChunkIT {
 		long execId2 = jobOperator.restart( execId1, parameters );
 		JobExecution jobExec2 = jobOperator.getJobExecution( execId2 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec2, JOB_TIMEOUT_MS );
-		assertEquals( BatchStatus.COMPLETED, getMainStepStatus( execId2 ) );
+		assertThat( getMainStepStatus( execId2 ) ).isEqualTo( BatchStatus.COMPLETED );
 
 		// search again
-		assertEquals( expectedTotal, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
+		assertThat( JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) ).isEqualTo( expectedTotal );
 		google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "google" );
-		assertEquals( expectedGoogle, google.size() );
+		assertThat( google.size() ).isEqualTo( expectedGoogle );
 	}
 
 	private Object getMainStepStatus(long execId1) {

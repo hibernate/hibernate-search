@@ -7,7 +7,7 @@
 package org.hibernate.search.util.common.testsupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Type;
 import java.util.Optional;

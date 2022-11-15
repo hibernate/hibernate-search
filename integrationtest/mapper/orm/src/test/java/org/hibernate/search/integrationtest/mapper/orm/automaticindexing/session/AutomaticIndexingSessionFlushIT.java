@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import javax.persistence.Entity;
@@ -94,7 +94,7 @@ public class AutomaticIndexingSessionFlushIT {
 				backendMock.verifyExpectationsMet();
 			}
 
-			assertEquals( 1, resultList.size() );
+			assertThat( resultList ).hasSize( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.executeFollowingWorks()

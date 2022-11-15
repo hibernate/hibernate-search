@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;

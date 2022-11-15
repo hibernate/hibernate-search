@@ -8,10 +8,6 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -203,9 +199,9 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		inOrder.verify( nestedContextBuilderMock ).appendObject( "level3" );
 		inOrder.verify( nestedContextBuilderMock ).build( nestedContextCapture.capture() );
 		verifyNoOtherInteractionsAndReset();
-		assertNotNull( actualReturn );
-		assertTrue( actualReturn.isPresent() );
-		assertSame( expectedReturn, actualReturn.get() );
+		assertThat( actualReturn ).isNotNull();
+		assertThat( actualReturn.isPresent() ).isTrue();
+		assertThat( actualReturn.get() ).isSameAs( expectedReturn );
 
 		ConfiguredIndexSchemaNestingContext level3Context = nestedContextCapture.getValue();
 
@@ -932,7 +928,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( actualReturn ).isSameAs( expectedReturn );
 	}
 
 	private void checkLeafExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
@@ -942,7 +938,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( actualReturn ).isSameAs( expectedReturn );
 	}
 
 	private IndexSchemaNestingContext checkCompositeIncluded(String expectedPrefixedName,
@@ -957,7 +953,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, compositeFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( actualReturn ).isSameAs( expectedReturn );
 
 		// Also check that dynamic leaves will be included
 		checkDynamicIncluded( "", nestedContextCapture.getValue() );
@@ -982,7 +978,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nest( relativeFieldName, compositeFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( actualReturn ).isSameAs( expectedReturn );
 
 		if ( recurse ) {
 			// Also check that leaves will be excluded
@@ -997,7 +993,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( actualReturn ).isSameAs( expectedReturn );
 	}
 
 	private void checkDynamicExcluded(String expectedPrefix, IndexSchemaNestingContext context) {
@@ -1006,7 +1002,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				.thenReturn( expectedReturn );
 		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn );
+		assertThat( actualReturn ).isSameAs( expectedReturn );
 	}
 
 	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
@@ -1032,13 +1028,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded(
 				definition, pathTracker, nestedContextBuilderMock
 		);
-		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
-		assertTrue( "Expected the indexedEmbedded to be included in " + context, actualReturn.isPresent() );
+		assertThat( actualReturn ).as( "Expected addIndexedEmbeddedIfIncluded to return a non-null result" ).isNotNull();
+		assertThat( actualReturn.isPresent() ).as( "Expected the indexedEmbedded to be included in " + context ).isTrue();
 		InOrder inOrder = inOrder( nestedContextBuilderMock );
 		inOrder.verify( nestedContextBuilderMock ).appendObject( expectedObjectName );
 		inOrder.verify( nestedContextBuilderMock ).build( nestedContextCapture.capture() );
 		verifyNoOtherInteractionsAndReset();
-		assertSame( expectedReturn, actualReturn.get() );
+		assertThat( actualReturn.get() ).isSameAs( expectedReturn );
 
 		return nestedContextCapture.getValue();
 	}
@@ -1060,8 +1056,8 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 				definition, pathTracker, nestedContextBuilderMock
 		);
 		verifyNoOtherInteractionsAndReset();
-		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
-		assertFalse( "Expected the indexedEmbedded to be excluded from " + context, actualReturn.isPresent() );
+		assertThat( actualReturn ).as( "Expected addIndexedEmbeddedIfIncluded to return a non-null result" ).isNotNull();
+		assertThat( actualReturn.isPresent() ).as( "Expected the indexedEmbedded to be excluded from " + context ).isFalse();
 	}
 
 	private void checkFooBarIncluded(String expectedPrefix, IndexSchemaNestingContext context) {

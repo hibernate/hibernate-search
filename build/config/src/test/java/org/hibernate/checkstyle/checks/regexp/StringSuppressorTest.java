@@ -6,8 +6,7 @@
  */
 package org.hibernate.checkstyle.checks.regexp;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.Arrays;
@@ -26,35 +25,35 @@ public class StringSuppressorTest {
 	public void testOutsideString() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "  " ) );
-		assertFalse( suppressor.shouldSuppress( 1, 0, 0, 1 ) );
+		assertThat( suppressor.shouldSuppress( 1, 0, 0, 1 ) ).isFalse();
 	}
 
 	@Test
 	public void testInsideString() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "\"           \"" ) );
-		assertTrue( suppressor.shouldSuppress( 1, 4, 0, 6 ) );
+		assertThat( suppressor.shouldSuppress( 1, 4, 0, 6 ) ).isTrue();
 	}
 
 	@Test
 	public void testInsideStringWithText() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "\"text   text\"" ) );
-		assertTrue( suppressor.shouldSuppress( 1, 4, 0, 11 ) );
+		assertThat( suppressor.shouldSuppress( 1, 4, 0, 11 ) ).isTrue();
 	}
 
 	@Test
 	public void testInsideStringWithCode() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "System.out.println(\"text   text\");" ) );
-		assertTrue( suppressor.shouldSuppress( 1, 25, 0, 27 ) );
+		assertThat( suppressor.shouldSuppress( 1, 25, 0, 27 ) ).isTrue();
 	}
 
 	@Test
 	public void testOutsideStringWithCode() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "System.out.println   (\"text text\");" ) );
-		assertFalse( suppressor.shouldSuppress( 1, 18, 0, 20 ) );
+		assertThat( suppressor.shouldSuppress( 1, 18, 0, 20 ) ).isFalse();
 	}
 
 	private FileContents content(String string) {

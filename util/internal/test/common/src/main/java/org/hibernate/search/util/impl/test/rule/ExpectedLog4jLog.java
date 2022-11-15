@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.test.rule;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;

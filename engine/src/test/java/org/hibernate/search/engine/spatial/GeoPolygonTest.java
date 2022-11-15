@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.spatial;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 
@@ -19,11 +19,11 @@ public class GeoPolygonTest {
 	public void validPolygon() {
 		GeoPolygon polygon = GeoPolygon.of( GeoPoint.of( 26, 23 ), GeoPoint.of( 26, 26 ), GeoPoint.of( 24, 26 ),
 				GeoPoint.of( 24, 23 ), GeoPoint.of( 26, 23 ) );
-		assertNotNull( polygon );
+		assertThat( polygon ).isNotNull();
 
 		polygon = GeoPolygon.of( Arrays.asList( GeoPoint.of( 26, 23 ), GeoPoint.of( 26, 26 ), GeoPoint.of( 24, 26 ),
 				GeoPoint.of( 24, 23 ), GeoPoint.of( 26, 23 ) ) );
-		assertNotNull( polygon );
+		assertThat( polygon ).isNotNull();
 	}
 
 	@Test

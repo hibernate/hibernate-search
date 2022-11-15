@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
-import static org.junit.Assert.assertFalse;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.List;
 
@@ -65,6 +65,6 @@ public class LoggerInfoStreamTest {
 
 		List<String> logEvents = testAppender.searchByLoggerAndMessage( LOGGER_NAME, "IW:" );
 
-		assertFalse( logEvents.isEmpty() );
+		assertThat( logEvents.isEmpty() ).isFalse();
 	}
 }

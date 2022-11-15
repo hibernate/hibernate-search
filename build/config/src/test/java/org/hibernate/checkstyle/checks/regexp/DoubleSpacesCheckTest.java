@@ -6,8 +6,7 @@
  */
 package org.hibernate.checkstyle.checks.regexp;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "" ) );
 
-		assertTrue( check.violations.isEmpty() );
+		assertThat( check.violations ).isEmpty();
 	}
 
 	@Test
@@ -39,7 +38,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "  " ) );
 
-		assertFalse( check.violations.isEmpty() );
+		assertThat( check.violations ).isNotEmpty();
 	}
 
 	@Test
@@ -48,7 +47,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( false );
 		check.processLines( Arrays.asList( "\"  \"" ) );
 
-		assertFalse( check.violations.isEmpty() );
+		assertThat( check.violations ).isNotEmpty();
 	}
 
 	@Test
@@ -57,7 +56,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "\"  \"" ) );
 
-		assertTrue( check.violations.isEmpty() );
+		assertThat( check.violations ).isEmpty();
 	}
 
 	private static class DoubleSpacesCheckMock extends DoubleSpacesCheck {

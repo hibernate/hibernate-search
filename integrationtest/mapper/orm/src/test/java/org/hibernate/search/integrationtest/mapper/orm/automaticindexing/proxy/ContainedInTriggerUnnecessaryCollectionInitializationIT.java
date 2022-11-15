@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.assertFalse;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -97,10 +96,10 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 			// The posts should not be initialized
 			assertThat( group.getPosts() )
 					.isInstanceOf( PersistentCollection.class )
-					.satisfies( p -> assertFalse(
-							"The posts should not be initialized",
-							Hibernate.isInitialized( p )
-					) );
+					.satisfies( p -> assertThat( Hibernate.isInitialized( p ) )
+							.as( "The posts should not be initialized" )
+							.isFalse()
+					);
 
 			group.setSomeField( "updatedValue" );
 
@@ -117,10 +116,10 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 		Group group = groupFromModifyingTransaction.get();
 		assertThat( group.getPosts() )
 				.isInstanceOf( PersistentCollection.class )
-				.satisfies( p -> assertFalse(
-						"The posts should not be initialized by Hibernate Search",
-						Hibernate.isInitialized( p )
-				) );
+				.satisfies( p -> assertThat( Hibernate.isInitialized( p ) )
+						.as( "The posts should not be initialized by Hibernate Search" )
+						.isFalse()
+				);
 	}
 
 	@Entity(name = "Group_")

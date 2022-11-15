@@ -29,8 +29,6 @@ import static org.hibernate.search.integrationtest.showcase.library.service.Test
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.SUBURBAN_2_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.THESAURUS_OF_LANGUAGES_ID;
 import static org.hibernate.search.integrationtest.showcase.library.service.TestDataService.UNIVERSITY_ID;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -172,19 +170,19 @@ public class LibraryShowcaseSearchIT {
 	@Test
 	public void search_single() {
 		Optional<Book> book = documentService.getByIsbn( "978-0-00-000001-1" );
-		assertTrue( book.isPresent() );
+		assertThat( book.isPresent() ).isTrue();
 		assertThat( book.get().getId() ).isEqualTo( CALLIGRAPHY_ID );
 
 		book = documentService.getByIsbn( "978-0-00-000005-5" );
-		assertTrue( book.isPresent() );
+		assertThat( book.isPresent() ).isTrue();
 		assertThat( book.get().getId() ).isEqualTo( ART_OF_COMPUTER_PROG_ID );
 
 		book = documentService.getByIsbn( "978-0-00-000005-1" );
-		assertFalse( book.isPresent() );
+		assertThat( book.isPresent() ).isFalse();
 
 		// Test the normalizer
 		book = documentService.getByIsbn( "9780000000055" );
-		assertTrue( book.isPresent() );
+		assertThat( book.isPresent() ).isTrue();
 		assertThat( book.get().getId() ).isEqualTo( ART_OF_COMPUTER_PROG_ID );
 	}
 

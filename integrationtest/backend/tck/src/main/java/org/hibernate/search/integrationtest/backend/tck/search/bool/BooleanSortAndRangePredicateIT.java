@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.bool;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.function.Function;
@@ -127,19 +126,19 @@ public class BooleanSortAndRangePredicateIT {
 
 	private void assertHasHitsWithBooleanProperties(SearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
 		List<DocumentReference> hits = query.fetchAll().hits();
-		assertEquals( expectedPropertyValues.length, hits.size() );
+		assertThat( hits ).hasSize( expectedPropertyValues.length );
 
 		for ( int i = 0; i < expectedPropertyValues.length; i++ ) {
 			Boolean expectedPropertyValue = expectedPropertyValues[i];
 
 			if ( expectedPropertyValue == Boolean.TRUE ) {
-				assertTrue( isTrueDocument( hits.get( i ) ) );
+				assertThat( isTrueDocument( hits.get( i ) ) ).isTrue();
 			}
 			else if ( expectedPropertyValue == Boolean.FALSE ) {
-				assertTrue( isFalseDocument( hits.get( i ) ) );
+				assertThat( isFalseDocument( hits.get( i ) ) ).isTrue();
 			}
 			else {
-				assertTrue( isNullDocument( hits.get( i ) ) );
+				assertThat( isNullDocument( hits.get( i ) ) ).isTrue();
 			}
 		}
 	}

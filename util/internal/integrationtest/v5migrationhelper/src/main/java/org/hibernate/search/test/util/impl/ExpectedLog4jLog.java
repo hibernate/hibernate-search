@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.util.impl;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;

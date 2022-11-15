@@ -8,8 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.runInTransaction;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
@@ -89,7 +88,7 @@ public class ToSearchSessionFromSessionProxyIT {
 			);
 			try {
 				SearchSession searchSession = Search.session( wrapped );
-				assertNotNull( searchSession );
+				assertThat( searchSession ).isNotNull();
 				assertThat( searchSession.toEntityManager() ).isSameAs( wrapped );
 				assertThat( searchSession.toOrmSession() ).isSameAs( wrapped );
 			}
@@ -107,7 +106,7 @@ public class ToSearchSessionFromSessionProxyIT {
 		try {
 			runInTransaction( sessionFromFirstThread, ignored -> {
 				SearchSession searchSessionFromFirstThread = Search.session( sessionFromFirstThread );
-				assertNotNull( searchSessionFromFirstThread );
+				assertThat( searchSessionFromFirstThread ).isNotNull();
 				assertThat( searchSessionFromFirstThread.toEntityManager() ).isSameAs( sessionFromFirstThread );
 				assertThat( searchSessionFromFirstThread.toOrmSession() ).isSameAs( sessionFromFirstThread );
 				ThreadPoolExecutor executorService = new ThreadPoolExecutor(
@@ -119,7 +118,7 @@ public class ToSearchSessionFromSessionProxyIT {
 							Session sessionFromOtherThread = setupHolder.sessionFactory().getCurrentSession();
 							assertThat( sessionFromOtherThread ).isNotSameAs( sessionFromFirstThread );
 							SearchSession searchSessionFromOtherThread = Search.session( sessionFromOtherThread );
-							assertNotNull( searchSessionFromOtherThread );
+							assertThat( searchSessionFromOtherThread ).isNotNull();
 							assertThat( searchSessionFromOtherThread.toEntityManager() ).isSameAs( sessionFromOtherThread );
 							assertThat( searchSessionFromOtherThread.toOrmSession() ).isSameAs( sessionFromOtherThread );
 						},
@@ -139,7 +138,7 @@ public class ToSearchSessionFromSessionProxyIT {
 		final Session sessionFromFirstThread = setupHolder.sessionFactory().getCurrentSession();
 		try {
 			SearchSession searchSessionFromFirstThread = Search.session( sessionFromFirstThread );
-			assertNotNull( searchSessionFromFirstThread );
+			assertThat( searchSessionFromFirstThread ).isNotNull();
 			assertThat( searchSessionFromFirstThread.toEntityManager() ).isSameAs( sessionFromFirstThread );
 			assertThat( searchSessionFromFirstThread.toOrmSession() ).isSameAs( sessionFromFirstThread );
 			ThreadPoolExecutor executorService = new ThreadPoolExecutor(
@@ -151,7 +150,7 @@ public class ToSearchSessionFromSessionProxyIT {
 						Session sessionFromOtherThread = setupHolder.sessionFactory().getCurrentSession();
 						assertThat( sessionFromOtherThread ).isNotSameAs( sessionFromFirstThread );
 						SearchSession searchSessionFromOtherThread = Search.session( sessionFromOtherThread );
-						assertNotNull( searchSessionFromOtherThread );
+						assertThat( searchSessionFromOtherThread ).isNotNull();
 						assertThat( searchSessionFromOtherThread.toEntityManager() ).isSameAs( sessionFromOtherThread );
 						assertThat( searchSessionFromOtherThread.toOrmSession() ).isSameAs( sessionFromOtherThread );
 					},

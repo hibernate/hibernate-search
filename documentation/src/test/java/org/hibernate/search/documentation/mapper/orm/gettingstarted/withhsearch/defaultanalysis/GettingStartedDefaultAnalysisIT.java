@@ -9,7 +9,6 @@ package org.hibernate.search.documentation.mapper.orm.gettingstarted.withhsearch
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -175,7 +174,7 @@ public class GettingStartedDefaultAnalysisIT {
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]
 
-			assertEquals( 1L, totalHitCount );
+			assertThat( totalHitCount ).isEqualTo( 1L );
 		} );
 	}
 

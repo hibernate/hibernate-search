@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -58,46 +57,24 @@ public class MassIndexingJobParametersBuilderTest {
 				.tenantId( TENANT_ID )
 				.build();
 
-		assertEquals(
-				SESSION_FACTORY_NAME, props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) );
-		assertEquals( ID_FETCH_SIZE, Integer.parseInt( props.getProperty( MassIndexingJobParameters.ID_FETCH_SIZE ) ) );
-		assertEquals(
-				ENTITY_FETCH_SIZE,
-				Integer.parseInt( props.getProperty( MassIndexingJobParameters.ENTITY_FETCH_SIZE ) )
-		);
-		assertEquals(
-				MAX_RESULTS_PER_ENTITY,
-				Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY ) )
-		);
-		assertEquals(
-				MERGE_SEGMENTS_AFTER_PURGE,
-				Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE ) )
-		);
-		assertEquals(
-				MERGE_SEGMENTS_ON_FINISH,
-				Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH ) )
-		);
-		assertEquals(
-				ROWS_PER_PARTITION,
-				Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) )
-		);
-		assertEquals(
-				CHECKPOINT_INTERVAL,
-				Integer.parseInt( props.getProperty( MassIndexingJobParameters.CHECKPOINT_INTERVAL ) )
-		);
-		assertEquals(
-				PURGE_ALL_ON_START,
-				Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) )
-		);
-		assertEquals( MAX_THREADS, Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) );
-		assertEquals( CACHE_MODE, CacheMode.valueOf( props.getProperty( MassIndexingJobParameters.CACHE_MODE ) ) );
-		assertEquals( TENANT_ID, props.getProperty( MassIndexingJobParameters.TENANT_ID ) );
+		assertThat( props.getProperty( MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE ) ).isEqualTo( SESSION_FACTORY_NAME );
+		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.ID_FETCH_SIZE ) ) ).isEqualTo( ID_FETCH_SIZE );
+		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.ENTITY_FETCH_SIZE ) ) ).isEqualTo( ENTITY_FETCH_SIZE );
+		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY ) ) ).isEqualTo( MAX_RESULTS_PER_ENTITY );
+		assertThat( Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE ) ) ).isEqualTo( MERGE_SEGMENTS_AFTER_PURGE );
+		assertThat( Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH ) ) ).isEqualTo( MERGE_SEGMENTS_ON_FINISH );
+		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.ROWS_PER_PARTITION ) ) ).isEqualTo( ROWS_PER_PARTITION );
+		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.CHECKPOINT_INTERVAL ) ) ).isEqualTo( CHECKPOINT_INTERVAL );
+		assertThat( Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.PURGE_ALL_ON_START ) ) ).isEqualTo( PURGE_ALL_ON_START );
+		assertThat( Integer.parseInt( props.getProperty( MassIndexingJobParameters.MAX_THREADS ) ) ).isEqualTo( MAX_THREADS );
+		assertThat( CacheMode.valueOf( props.getProperty( MassIndexingJobParameters.CACHE_MODE ) ) ).isEqualTo( CACHE_MODE );
+		assertThat( props.getProperty( MassIndexingJobParameters.TENANT_ID ) ).isEqualTo( TENANT_ID );
 
 		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
 		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
-		assertTrue( entityNames.contains( Integer.class.getName() ) );
-		assertTrue( entityNames.contains( String.class.getName() ) );
+		assertThat( entityNames.contains( Integer.class.getName() ) );
+		assertThat( entityNames.contains( String.class.getName() ) );
 	}
 
 	@Test
@@ -110,8 +87,8 @@ public class MassIndexingJobParametersBuilderTest {
 		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
 		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
-		assertTrue( entityNames.contains( Integer.class.getName() ) );
-		assertTrue( entityNames.contains( String.class.getName() ) );
+		assertThat( entityNames.contains( Integer.class.getName() ) ).isTrue();
+		assertThat( entityNames.contains( String.class.getName() ) ).isTrue();
 	}
 
 	@Test
@@ -123,7 +100,7 @@ public class MassIndexingJobParametersBuilderTest {
 		String entityTypes = props.getProperty( MassIndexingJobParameters.ENTITY_TYPES );
 		List<String> entityNames = Arrays.asList( entityTypes.split( "," ) );
 		entityNames.forEach( entityName -> entityName = entityName.trim() );
-		assertTrue( entityNames.contains( Integer.class.getName() ) );
+		assertThat( entityNames.contains( Integer.class.getName() ) );
 	}
 
 	@Test(expected = IllegalArgumentException.class)

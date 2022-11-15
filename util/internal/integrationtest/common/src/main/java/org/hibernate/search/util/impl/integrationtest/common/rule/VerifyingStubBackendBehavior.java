@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.time.Duration;
 import java.util.ArrayList;

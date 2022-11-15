@@ -7,10 +7,9 @@
 package org.hibernate.search.integrationtest.java.modules.service.orm.elasticsearch.coordination.outboxpolling;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.hibernate.search.integrationtest.java.modules.orm.elasticsearch.coordination.outboxpolling.service.AuthorService;
 import org.hibernate.search.mapper.orm.Search;
@@ -37,7 +36,7 @@ public class JavaModulePathIT {
 		service.add( "foo bar" );
 
 		await().untilAsserted( () -> {
-			assertEquals( 2, service.search( "foo" ).size() );
+			assertThat( service.search( "foo" ) ).hasSize( 2 );
 		} );
 
 		assertThatThrownBy( service::triggerValidationFailure )
@@ -50,9 +49,8 @@ public class JavaModulePathIT {
 	}
 
 	private void checkIsInModulePath(Class<?> clazz) {
-		assertTrue(
-				clazz + " should be part of a named module - there is a problem in test setup",
-				clazz.getModule().isNamed()
-		);
+		assertThat( clazz.getModule().isNamed() )
+				.as( clazz + " should be part of a named module - there is a problem in test setup" )
+				.isTrue();
 	}
 }
