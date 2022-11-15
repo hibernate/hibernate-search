@@ -26,28 +26,26 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Check that even with the outbox-polling JAR in the classpath,
  * disabling Hibernate Search or picking a different coordination strategy
  * will disable the addition of OutboxEvent entities to the Hibernate ORM model.
  */
-@RunWith(Parameterized.class)
 public class OutboxPollingDisabledIT {
 
-	@Parameterized.Parameters(name = "enabled = {0}, strategy = {1}")
-	public static Object[][] params() {
-		return new Object[][] {
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
 				// We must not add OutboxEvent to the model if the coordination strategy is "none"
-				{ true, "none" },
+				Arguments.of( true, "none" ),
 				// We must not add OutboxEvent to the model if Hibernate Search is disabled
-				{ false, HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME },
-		};
+				Arguments.of( false, HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME )
+		);
 	}
 
 	@RegisterExtension
@@ -55,15 +53,14 @@ public class OutboxPollingDisabledIT {
 
 	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.defaults() );
+			.coordinationStrategy( CoordinationStrategyExpectations.defaults() )
+			.delayedInitialization( true );
 
 	@RegisterExtension
 	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
-	@Parameterized.Parameter
 	public boolean hibernateSearchEnabled;
 
-	@Parameterized.Parameter(1)
 	public String coordinationStrategyName;
 
 	@ReusableOrmSetupHolder.Setup
@@ -81,15 +78,26 @@ public class OutboxPollingDisabledIT {
 		return Arrays.asList( hibernateSearchEnabled, coordinationStrategyName );
 	}
 
-	@Test
-	public void metamodel_onlyUserEntities() {
+	void init(boolean hibernateSearchEnabled, String coordinationStrategyName) {
+		this.hibernateSearchEnabled = hibernateSearchEnabled;
+		this.coordinationStrategyName = coordinationStrategyName;
+
+		setupHolder.initialize();
+	}
+
+	@ParameterizedTest(name = "enabled = {0}, strategy = {1}")
+	@MethodSource("params")
+	void metamodel_onlyUserEntities(boolean hibernateSearchEnabled, String coordinationStrategyName) {
+		init( hibernateSearchEnabled, coordinationStrategyName );
 		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
 				.extracting( EntityType::getName )
 				.containsOnly( IndexedEntity.NAME );
 	}
 
-	@Test
-	public void queryOutboxEvent_exception() {
+	@ParameterizedTest(name = "enabled = {0}, strategy = {1}")
+	@MethodSource("params")
+	void queryOutboxEvent_exception(boolean hibernateSearchEnabled, String coordinationStrategyName) {
+		init( hibernateSearchEnabled, coordinationStrategyName );
 		setupHolder.runInTransaction( s -> assertThatThrownBy( () -> {
 			s.getCriteriaBuilder().createQuery( OutboxEvent.class ).from( OutboxEvent.class );
 		} )

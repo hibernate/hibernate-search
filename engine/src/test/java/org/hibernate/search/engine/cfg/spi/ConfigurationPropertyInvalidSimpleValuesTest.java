@@ -22,10 +22,10 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,13 +34,11 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-@RunWith(Parameterized.class)
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
 public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 
-	@Parameterized.Parameters(name = "{1}")
-	public static Object[][] data() {
-		return new Object[][] {
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
 				params(
 						KeyContext::asIntegerPositiveOrZeroOrNegative, "foo", 42,
 						"Invalid Integer value: expected either a Number or a String that can be parsed into an Integer.",
@@ -91,54 +89,40 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 								+ "' or a String that can be parsed into that type.",
 						MyPropertyType.INVALID_VALUE_ERROR_MESSAGE
 				)
-		};
+		);
 	}
 
-	private static <T> Object[] params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	private static <T> Arguments params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String invalidStringValue, T validValue,
 			String expectedInvalidValueCommonMessagePrefix,
 			String expectedInvalidStringMessage) {
 		return params( testedMethod, invalidStringValue, validValue, expectedInvalidValueCommonMessagePrefix,
-				expectedInvalidValueCommonMessagePrefix, expectedInvalidStringMessage );
+				expectedInvalidValueCommonMessagePrefix, expectedInvalidStringMessage
+		);
 	}
 
-	private static <T> Object[] params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	private static <T> Arguments params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String invalidStringValue, T validValue,
 			String expectedInvalidValueTypeMessagePrefix,
 			String expectedInvalidValueStringMessagePrefix,
 			String expectedInvalidStringMessage) {
-		return new Object[] {
+		return Arguments.of(
 				testedMethod, invalidStringValue, validValue,
 				expectedInvalidValueTypeMessagePrefix, expectedInvalidValueStringMessagePrefix,
 				expectedInvalidStringMessage
-		};
+		);
 	}
 
 	@Mock
 	private ConfigurationPropertySource sourceMock;
 
-	private final Function<KeyContext, OptionalPropertyContext<T>> testedMethod;
-	private final String invalidStringValue;
-	private final T validValue;
-	private final String expectedInvalidValueTypeMessagePrefix;
-	private final String expectedInvalidValueStringMessagePrefix;
-	private final String expectedInvalidStringMessage;
-
-	public ConfigurationPropertyInvalidSimpleValuesTest(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void withDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String invalidStringValue, T validValue,
 			String expectedInvalidValueTypeMessagePrefix,
 			String expectedInvalidValueStringMessagePrefix,
 			String expectedInvalidStringMessage) {
-		this.testedMethod = testedMethod;
-		this.invalidStringValue = invalidStringValue;
-		this.validValue = validValue;
-		this.expectedInvalidValueTypeMessagePrefix = expectedInvalidValueTypeMessagePrefix;
-		this.expectedInvalidValueStringMessagePrefix = expectedInvalidValueStringMessagePrefix;
-		this.expectedInvalidStringMessage = expectedInvalidStringMessage;
-	}
-
-	@Test
-	public void withDefault() {
 		String key = "withDefault";
 		String resolvedKey = "some.prefix." + key;
 		ConfigurationProperty<T> property =
@@ -171,8 +155,13 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		verifyNoOtherSourceInteractionsAndReset();
 	}
 
-	@Test
-	public void withoutDefault() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void withoutDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String invalidStringValue, T validValue,
+			String expectedInvalidValueTypeMessagePrefix,
+			String expectedInvalidValueStringMessagePrefix,
+			String expectedInvalidStringMessage) {
 		String key = "withoutDefault";
 		String resolvedKey = "some.prefix." + key;
 		ConfigurationProperty<Optional<T>> property =
@@ -204,8 +193,13 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		verifyNoOtherSourceInteractionsAndReset();
 	}
 
-	@Test
-	public void multiValued() {
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
+	void multiValued(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String invalidStringValue, T validValue,
+			String expectedInvalidValueTypeMessagePrefix,
+			String expectedInvalidValueStringMessagePrefix,
+			String expectedInvalidStringMessage) {
 		String key = "multiValued";
 		String resolvedKey = "some.prefix." + key;
 		ConfigurationProperty<Optional<List<T>>> property =

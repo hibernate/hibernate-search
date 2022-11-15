@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import static org.junit.platform.commons.util.AnnotationUtils.isAnnotated;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -48,15 +50,14 @@ import org.hibernate.search.util.impl.test.function.ThrowingBiFunction;
 import org.hibernate.search.util.impl.test.function.ThrowingConsumer;
 import org.hibernate.search.util.impl.test.function.ThrowingFunction;
 
-import org.hibernate.testing.junit4.CustomParameterized;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import org.jboss.logging.Logger;
 
@@ -185,6 +186,8 @@ public class ReusableOrmSetupHolder implements BeforeAllCallback, AfterAllCallba
 
 	private boolean inClassStatement;
 	private boolean inMethodStatement;
+	private boolean delayedInitialization = false;
+	private ExtensionContext context;
 	private DataClearConfigImpl config;
 	private SessionFactoryImplementor sessionFactory;
 	private Collection<?> testParamsForSessionFactory;
@@ -206,7 +209,12 @@ public class ReusableOrmSetupHolder implements BeforeAllCallback, AfterAllCallba
 		@Override
 		public void beforeEach(ExtensionContext context) {
 			inMethodStatement = true;
-			setupSessionFactory( context );
+			if ( !delayedInitialization ) {
+				setupSessionFactory( context );
+			}
+			else {
+				ReusableOrmSetupHolder.this.context = context;
+			}
 		}
 
 		@Override
@@ -224,11 +232,23 @@ public class ReusableOrmSetupHolder implements BeforeAllCallback, AfterAllCallba
 			}
 			finally {
 				inMethodStatement = false;
+				if ( delayedInitialization ) {
+					ReusableOrmSetupHolder.this.context = null;
+				}
 				for ( BackendMock backendMock : allBackendMocks ) {
 					backendMock.resetExpectations();
 				}
 			}
 		}
+	}
+
+	public ReusableOrmSetupHolder delayedInitialization(boolean delayedInitialization) {
+		this.delayedInitialization = delayedInitialization;
+		return this;
+	}
+
+	public void initialize() {
+		setupSessionFactory( context );
 	}
 
 	public ReusableOrmSetupHolder coordinationStrategy(CoordinationStrategyExpectations coordinationStrategyExpectations) {
@@ -251,8 +271,12 @@ public class ReusableOrmSetupHolder implements BeforeAllCallback, AfterAllCallba
 					+ " use a @BeforeEach method instead." );
 		}
 		if ( sessionFactory == null ) {
+			if ( delayedInitialization ) {
+				throw new Error( "The session factory in " + getClass().getSimpleName() + " was not created."
+						+ "Delayed initialization was configured but never initialized." );
+			}
 			throw new Error( "The session factory in " + getClass().getSimpleName() + " was not created."
-					+ " Did you use the rule as explained in the javadoc, with both a @ClassRule and a @Rule,"
+					+ " Did you use the rule as explained in the javadoc, with both `@RegisterExtension`s"
 					+ " on two separate fields?" );
 		}
 		return sessionFactory;
@@ -365,18 +389,16 @@ public class ReusableOrmSetupHolder implements BeforeAllCallback, AfterAllCallba
 			throw new Error( "Test class " + testInstance.getClass()
 					+ " must not declare more than one method annotated with " + SetupParams.class.getName() );
 		}
-		if ( setupParamsMethods.isEmpty() ) {
-			Class<?> runnerClass = runnerClass( testInstance.getClass() );
-			if ( Parameterized.class.equals( runnerClass ) || CustomParameterized.class.equals( runnerClass ) ) {
+		if ( isAnnotated( context.getTestMethod(), ParameterizedTest.class ) ) {
+			if ( !delayedInitialization ) {
 				throw new Error( "Test class " + testInstance.getClass()
-						+ " must declare one method annotated with " + SetupParams.class.getName()
-						+ " because it uses runner " + runnerClass.getSimpleName() );
+						+ " must use delayed initialization as parameters cannot be resolved before the test execution starts." );
 			}
 			else {
-				return Collections.emptyList();
+				return setupParamsMethods.iterator().next().call( testInstance, Collections.emptyMap() );
 			}
 		}
-		return setupParamsMethods.iterator().next().call( testInstance, Collections.emptyMap() );
+		return Collections.emptyList();
 	}
 
 	private Class<?> runnerClass(Class<?> testClass) {

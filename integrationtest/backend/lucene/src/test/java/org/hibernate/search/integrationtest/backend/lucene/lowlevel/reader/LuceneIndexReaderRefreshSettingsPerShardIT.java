@@ -10,18 +10,21 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.lucene.sharding.AbstractSettingsPerShardIT;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
@@ -36,12 +39,10 @@ public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettings
 	 */
 	private static final int NON_ZERO_DELAY = 2000;
 
-	public LuceneIndexReaderRefreshSettingsPerShardIT(String ignoredLabel, SearchSetupHelper setupHelper, List<String> shardIds) {
-		super( ignoredLabel, setupHelper, shardIds );
-	}
-
-	@Test
-	public void test() {
+	@ParameterizedTest(name = "{0} - {2}")
+	@MethodSource("params")
+	public void test(String ignoredLabel, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction, List<String> shardIds) {
+		init( ignoredLabel, setupStrategyFunction, shardIds );
 		setupHelper.start().withIndex( index )
 				.withIndexProperty( index.name(), "io.refresh_interval", NON_ZERO_DELAY )
 				.withIndexProperty( index.name(), "shards." + shardIds.get( 2 ) + ".io.refresh_interval", 0 )

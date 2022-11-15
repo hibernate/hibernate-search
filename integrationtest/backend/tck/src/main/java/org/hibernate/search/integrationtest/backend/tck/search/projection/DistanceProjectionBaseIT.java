@@ -27,8 +27,8 @@ import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
@@ -72,28 +72,10 @@ public class DistanceProjectionBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class InObjectProjectionIT
 			extends AbstractProjectionInObjectProjectionIT<GeoPoint, Double, DistanceProjectionTestValues> {
 		private static final List<FieldTypeDescriptor<?>> supportedFieldTypes =
 				Arrays.asList( GeoPointFieldTypeDescriptor.INSTANCE );
-		private static final List<DataSet<GeoPoint, Double, DistanceProjectionTestValues>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( ObjectStructure singleValuedObjectStructure :
-					new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
-				ObjectStructure multiValuedObjectStructure =
-						ObjectStructure.NESTED.equals( singleValuedObjectStructure )
-								|| TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
-								? ObjectStructure.NESTED
-								: ObjectStructure.FLATTENED;
-				DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet = new DataSet<>( testValues(),
-						singleValuedObjectStructure, multiValuedObjectStructure );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "main" );
@@ -110,15 +92,27 @@ public class DistanceProjectionBaseIT {
 				SimpleMappedIndex.of( root -> new MissingLevel2SingleValuedFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "missingLevel2Field1" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<DataSet<GeoPoint, Double, DistanceProjectionTestValues>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( ObjectStructure singleValuedObjectStructure :
+					new ObjectStructure[] { ObjectStructure.FLATTENED, ObjectStructure.NESTED } ) {
+				ObjectStructure multiValuedObjectStructure =
+						ObjectStructure.NESTED.equals( singleValuedObjectStructure )
+								|| TckConfiguration.get().getBackendFeatures().reliesOnNestedDocumentsForMultiValuedObjectProjection()
+								? ObjectStructure.NESTED
+								: ObjectStructure.FLATTENED;
+				DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet = new DataSet<>( testValues(),
+						singleValuedObjectStructure, multiValuedObjectStructure );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( mainIndex, missingLevel1Index, missingLevel1SingleValuedFieldIndex, missingLevel2Index,
+						missingLevel2SingleValuedFieldIndex,
+						dataSet ) );
+			}
 		}
 
-		public InObjectProjectionIT(DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
-			super( mainIndex, missingLevel1Index, missingLevel1SingleValuedFieldIndex, missingLevel2Index,
-					missingLevel2SingleValuedFieldIndex,
-					dataSet );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -129,13 +123,13 @@ public class DistanceProjectionBaseIT {
 
 		@Override
 		protected ProjectionFinalStep<Double> singleValuedProjection(SearchProjectionFactory<?, ?> f,
-				String absoluteFieldPath) {
+				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() );
 		}
 
 		@Override
 		protected ProjectionFinalStep<List<Double>> multiValuedProjection(SearchProjectionFactory<?, ?> f,
-				String absoluteFieldPath) {
+				String absoluteFieldPath, DataSet<GeoPoint, Double, DistanceProjectionTestValues> dataSet) {
 			return f.distance( absoluteFieldPath, dataSet.values.projectionCenterPoint() ).multi();
 		}
 

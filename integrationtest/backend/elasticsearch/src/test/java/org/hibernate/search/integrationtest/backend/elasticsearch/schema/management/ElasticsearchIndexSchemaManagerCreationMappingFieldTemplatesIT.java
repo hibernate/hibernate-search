@@ -10,7 +10,8 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForExpectations;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -22,22 +23,21 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to the mapping's field templates when creating indexes,
  * for all index-creating schema management operations.
  */
-@RunWith(Parameterized.class)
 public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 
-	@Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creating();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creating().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
 	@RegisterExtension
@@ -46,14 +46,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 	@RegisterExtension
 	public TestElasticsearchClient elasticSearchClient = TestElasticsearchClient.create();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void rootFieldTemplates() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void rootFieldTemplates(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate1", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_obj" );
@@ -64,7 +59,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				"{"
@@ -96,8 +91,9 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		);
 	}
 
-	@Test
-	public void nonRootFieldTemplates() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void nonRootFieldTemplates(ElasticsearchIndexSchemaManagerOperation operation) {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			IndexSchemaObjectField objectField = root.objectField( "staticObject" );
 			objectField.toReference();
@@ -110,7 +106,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setupAndCreateIndex( index );
+		setupAndCreateIndex( index, operation );
 
 		assertJsonEquals(
 				"{"
@@ -146,7 +142,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		);
 	}
 
-	private void setupAndCreateIndex(StubMappedIndex index) {
+	private void setupAndCreateIndex(StubMappedIndex index, ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

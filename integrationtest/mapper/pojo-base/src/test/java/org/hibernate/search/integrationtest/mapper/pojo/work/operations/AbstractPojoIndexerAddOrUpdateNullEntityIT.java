@@ -8,12 +8,15 @@ package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexer}
@@ -22,8 +25,10 @@ import org.junit.jupiter.api.Test;
 @TestForIssue(jiraKey = "HSEARCH-4153")
 public abstract class AbstractPojoIndexerAddOrUpdateNullEntityIT extends AbstractPojoIndexingOperationIT {
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	public void simple(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 

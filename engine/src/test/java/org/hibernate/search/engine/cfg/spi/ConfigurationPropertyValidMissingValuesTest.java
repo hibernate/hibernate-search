@@ -23,10 +23,10 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,13 +35,11 @@ import org.mockito.quality.Strictness;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-@RunWith(Parameterized.class)
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
 public class ConfigurationPropertyValidMissingValuesTest<T> {
 
-	@Parameterized.Parameters(name = "{2}")
-	public static Object[][] data() {
-		return new Object[][] {
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
 				params( KeyContext::asString, "string", "string" ),
 				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "42", 42 ),
 				params( KeyContext::asIntegerPositiveOrZeroOrNegative, "0", 0 ),
@@ -56,12 +54,12 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 						c -> c.as( MyPropertyType.class, MyPropertyType::new ),
 						"string", new MyPropertyType( "string" )
 				)
-		};
+		);
 	}
 
-	private static <T> Object[] params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	private static <T> Arguments params(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String stringValue, T expectedValue) {
-		return new Object[] { testedMethod, stringValue, expectedValue };
+		return Arguments.of( testedMethod, stringValue, expectedValue );
 	}
 
 	@Mock
@@ -69,19 +67,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 	@Mock
 	private Function<T, Object> mappingFunction;
 
-	private final Function<KeyContext, OptionalPropertyContext<T>> testedMethod;
-	private final String stringValue;
-	private final T expectedValue;
-
-	public ConfigurationPropertyValidMissingValuesTest(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String stringValue, T expectedValue) {
-		this.testedMethod = testedMethod;
-		this.stringValue = stringValue;
-		this.expectedValue = expectedValue;
-	}
-
-	@Test
-	public void withDefault() {
 		String key = "withDefault";
 		ConfigurationProperty<T> property =
 				testedMethod.apply(
@@ -111,8 +100,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
-	@Test
-	public void withoutDefault() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withoutDefault(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "withoutDefault";
 		ConfigurationProperty<Optional<T>> property =
 				testedMethod.apply(
@@ -141,8 +132,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThat( result ).contains( expectedValue );
 	}
 
-	@Test
-	public void withoutDefault_getAndMap() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withoutDefault_getAndMap(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "withoutDefault_getAndMap";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<T> property =
@@ -183,8 +176,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		verifyNoOtherSourceInteractionsAndReset();
 	}
 
-	@Test
-	public void withoutDefault_getOrThrow() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withoutDefault_getOrThrow(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "withoutDefault_getOrThrow";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<T> property =
@@ -210,8 +205,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
-	@Test
-	public void withoutDefault_getAndMapOrThrow() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void withoutDefault_getAndMapOrThrow(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "withoutDefault_getAndMapOrThrow";
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<T> property =
@@ -254,8 +251,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		verifyNoOtherSourceInteractionsAndReset();
 	}
 
-	@Test
-	public void blankCharacters() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void blankCharacters(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "extraBlankCharacters";
 		ConfigurationProperty<T> property =
 				testedMethod.apply(
@@ -285,8 +284,10 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
-	@Test
-	public void multiValued() {
+	@ParameterizedTest(name = "{2}")
+	@MethodSource("params")
+	void multiValued(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
+			String stringValue, T expectedValue) {
 		String key = "multiValued";
 		ConfigurationProperty<Optional<List<T>>> property =
 				testedMethod.apply(

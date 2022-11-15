@@ -23,16 +23,13 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that the simple mapping defined in Book works as expected.
  */
-@RunWith(Parameterized.class)
 public class ProjectionConstructorMappingJava17IT {
 
 	private static final int ASIMOV_ID = 1;
@@ -43,8 +40,7 @@ public class ProjectionConstructorMappingJava17IT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				// Since we disable classpath scanning in tests for performance reasons,
@@ -90,23 +86,22 @@ public class ProjectionConstructorMappingJava17IT {
 							.constructor( String.class, String.class )
 							.projectionConstructor();
 				}
-		);
+		).stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
-
-	@Parameterized.Parameter
-	@RegisterExtension
-	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@BeforeEach
-	public void setup() {
+	public void init(DocumentationSetupHelper setupHelper) {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class );
 		initData();
 	}
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void simple(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -165,8 +160,10 @@ public class ProjectionConstructorMappingJava17IT {
 		} );
 	}
 
-	@Test
-	public void multiConstructor_class() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiConstructor_class(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -185,8 +182,10 @@ public class ProjectionConstructorMappingJava17IT {
 		} );
 	}
 
-	@Test
-	public void multiConstructor_record() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiConstructor_record(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

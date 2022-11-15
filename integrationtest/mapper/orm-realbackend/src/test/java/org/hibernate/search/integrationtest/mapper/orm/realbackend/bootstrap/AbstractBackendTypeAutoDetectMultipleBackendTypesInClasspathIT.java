@@ -16,46 +16,31 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * Checks that Hibernate Search will fail to auto-detect the backend type and offer suggestions
  * if there are multiple backend types in the classpath.
  * Also checks that setting the property "hibernate.search.backend.type" will solve the problem.
  */
-@RunWith(Parameterized.class)
-public class BackendTypeAutoDetectMultipleBackendTypesInClasspathIT {
+public abstract class AbstractBackendTypeAutoDetectMultipleBackendTypesInClasspathIT {
 
-	@Parameterized.Parameters(name = "{1}")
-	public static Object[][] params() {
-		return new Object[][] {
-				{ new LuceneBackendConfiguration(), "lucene" },
-				{ new ElasticsearchBackendConfiguration(), "elasticsearch" }
-		};
+	protected AbstractBackendTypeAutoDetectMultipleBackendTypesInClasspathIT(String expectedBackendType, BackendConfiguration backendConfiguration) {
+		this.expectedBackendType = expectedBackendType;
+		this.ormSetupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
-
-	@RegisterExtension
-	public OrmSetupHelper ormSetupHelper;
 
 	private final String expectedBackendType;
-
-	public BackendTypeAutoDetectMultipleBackendTypesInClasspathIT(BackendConfiguration backendConfiguration,
-			String expectedBackendType) {
-		this.ormSetupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
-		this.expectedBackendType = expectedBackendType;
-	}
+	@RegisterExtension
+	private final OrmSetupHelper ormSetupHelper;
 
 	@Test
-	public void backendType_notSet() {
+	void backendType_notSet() {
 		assertThatThrownBy( () -> ormSetupHelper.start()
 				.withBackendProperty( "type", null )
 				.setup( IndexedEntity.class ) )
@@ -70,7 +55,7 @@ public class BackendTypeAutoDetectMultipleBackendTypesInClasspathIT {
 	}
 
 	@Test
-	public void backendType_set() {
+	void backendType_set() {
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withBackendProperty( "type", expectedBackendType )
 				.setup( IndexedEntity.class );

@@ -16,7 +16,8 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchVersionUtils.isAtMost;
 import static org.junit.Assume.assumeFalse;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -31,22 +32,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to aliases when validating indexes,
  * for all index-validating schema management operations.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
-		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
 	@RegisterExtension
@@ -57,48 +58,44 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
-
-	public ElasticsearchIndexSchemaManagerValidationAliasesIT(
-			ElasticsearchIndexSchemaManagerValidationOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success_defaultLayoutStrategy() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void success_defaultLayoutStrategy(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
-		setupAndValidate();
+		setupAndValidate( operation );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
-	@Test
-	public void success_noAliasLayoutStrategy() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void success_noAliasLayoutStrategy(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.indexNoAlias( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
 		elasticsearchClient.indexNoAlias( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
-		setupAndValidate( "no-alias" );
+		setupAndValidate( "no-alias", operation );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
-	@Test
-	public void writeAlias_missing() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void writeAlias_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), null, defaultReadAlias( index.name() ) )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
-		assertThatThrownBy( this::setupAndValidate )
+		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies(
 						hasValidationFailureReport()
@@ -107,8 +104,9 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				);
 	}
 
-	@Test
-	public void writeAlias_invalid_filter() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void writeAlias_invalid_filter(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -120,7 +118,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 						simpleAliasDefinition( true, "'filter': {'term': {'user_id': 12}}" )
 				);
 
-		assertThatThrownBy( this::setupAndValidate )
+		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies(
 						hasValidationFailureReport()
@@ -130,8 +128,9 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				);
 	}
 
-	@Test
-	public void writeAlias_invalid_isWriteIndex() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void writeAlias_invalid_isWriteIndex(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		assumeFalse(
 				"This test only is only relevant for Elasticsearch versions supporting the is_write_index" +
 						" attribute in alias definitions." +
@@ -146,7 +145,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( defaultWriteAlias( index.name() ).original, simpleAliasDefinition( false, "" ) );
 
-		assertThatThrownBy( this::setupAndValidate )
+		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies(
 						hasValidationFailureReport()
@@ -156,15 +155,16 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				);
 	}
 
-	@Test
-	public void readAlias_missing() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void readAlias_missing(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( defaultPrimaryName( index.name() ), defaultWriteAlias( index.name() ), null )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
-		assertThatThrownBy( this::setupAndValidate )
+		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies(
 						hasValidationFailureReport()
@@ -173,8 +173,9 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				);
 	}
 
-	@Test
-	public void readAlias_invalid_filter() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void readAlias_invalid_filter(ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -183,7 +184,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( index.name() ).aliases()
 				.put( defaultReadAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
-		assertThatThrownBy( this::setupAndValidate )
+		assertThatThrownBy( () -> setupAndValidate( operation ) )
 				.isInstanceOf( SearchException.class )
 				.satisfies(
 						hasValidationFailureReport()
@@ -193,11 +194,11 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				);
 	}
 
-	private void setupAndValidate() {
-		setupAndValidate( null );
+	private void setupAndValidate(ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		setupAndValidate( null, operation );
 	}
 
-	private void setupAndValidate(Object layoutStrategy) {
+	private void setupAndValidate(Object layoutStrategy, ElasticsearchIndexSchemaManagerValidationOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

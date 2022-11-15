@@ -11,7 +11,8 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -24,22 +25,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSch
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to preserving a pre-existing index,
  * for all schema management operations that create missing indexes but leave existing indexes as-is.
  */
-@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchSchemaCreateStrategyIT")
 public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creatingOrPreserving();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creatingOrPreserving().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
 	@RegisterExtension
@@ -53,15 +54,10 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 				.toReference()
 	);
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerCreationOrPreservationIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-2789")
-	public void alreadyExists() throws Exception {
+	public void alreadyExists(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
 		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
@@ -86,7 +82,7 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 
-		setupAndCreateIndexIfMissingOnly();
+		setupAndCreateIndexIfMissingOnly( operation );
 
 		// The mapping should be unchanged
 		assertJsonEquals(
@@ -102,13 +98,14 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		);
 	}
 
-	@Test
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-2789")
-	public void doesNotExist() throws Exception {
+	public void doesNotExist(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setupAndCreateIndexIfMissingOnly();
+		setupAndCreateIndexIfMissingOnly( operation );
 
 		// Just check that *something* changed
 		// Other test classes check that the changes actually make sense
@@ -118,7 +115,7 @@ public class ElasticsearchIndexSchemaManagerCreationOrPreservationIT {
 		);
 	}
 
-	private void setupAndCreateIndexIfMissingOnly() {
+	private void setupAndCreateIndexIfMissingOnly(ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

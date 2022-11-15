@@ -32,30 +32,28 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that the outbox polling strategy works fine regardless of how it is
  * referenced in the "coordination strategy" configuration property.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-4182")
 public class OutboxPollingStrategyPropertyValueIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object> params() {
+	public static List<? extends Arguments> params() {
 		return Arrays.asList(
-				HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
-				"builtin:" + HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
-				BeanReference.of(
+				Arguments.of( HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME ),
+				Arguments.of( "builtin:" + HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME ),
+				Arguments.of( BeanReference.of(
 						CoordinationStrategy.class,
 						HibernateOrmMapperOutboxPollingSettings.COORDINATION_STRATEGY_NAME,
 						BeanRetrieval.BUILTIN
-				)
+				) )
 		);
 	}
 
@@ -66,12 +64,12 @@ public class OutboxPollingStrategyPropertyValueIT {
 
 	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
-			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() );
+			.coordinationStrategy( CoordinationStrategyExpectations.outboxPolling() )
+			.delayedInitialization( true );
 
 	@RegisterExtension
 	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
-	@Parameterized.Parameter
 	public Object strategyPropertyValue;
 
 	@ReusableOrmSetupHolder.Setup
@@ -98,15 +96,25 @@ public class OutboxPollingStrategyPropertyValueIT {
 		outboxEventFinder.reset();
 	}
 
-	@Test
-	public void metamodel_userEntitiesAndOutboxEventAndAgent() {
+	void init(Object strategyPropertyValue) {
+		this.strategyPropertyValue = strategyPropertyValue;
+
+		setupHolder.initialize();
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void metamodel_userEntitiesAndOutboxEventAndAgent(Object strategyPropertyValue) {
+		init( strategyPropertyValue );
 		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
 				.<Class<?>>extracting( Type::getJavaType )
 				.containsExactlyInAnyOrder( IndexedEntity.class, OutboxEvent.class, Agent.class );
 	}
 
-	@Test
-	public void insert_createsOutboxEvent() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void insert_createsOutboxEvent(Object strategyPropertyValue) {
+		init( strategyPropertyValue );
 		setupHolder.runInTransaction( session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.persist( indexedPojo );

@@ -32,7 +32,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
@@ -53,48 +54,40 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 	private static final String MISSING_LEVEL2_DOCUMENT_ID = "missingLevel2DocId";
 	private static final String MISSING_LEVEL2_SINGLE_VALUED_FIELD_DOCUMENT_ID = "missingLevel2SVFieldDocId";
 
-	private final SimpleMappedIndex<IndexBinding> mainIndex;
-	private final SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index;
-	private final SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex;
-	private final SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index;
-	private final SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex;
-	protected final DataSet<F, P, V> dataSet;
-	private final RecursiveComparisonConfiguration recursiveComparisonConfig;
+	protected RecursiveComparisonConfiguration.Builder configureRecursiveComparison(RecursiveComparisonConfiguration.Builder builder) {
+		return builder;
+	}
 
-	public AbstractProjectionInObjectProjectionIT(SimpleMappedIndex<IndexBinding> mainIndex,
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void objectOnLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
 			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
 			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
 			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
 			DataSet<F, P, V> dataSet) {
-		this.mainIndex = mainIndex;
-		this.missingLevel1Index = missingLevel1Index;
-		this.missingLevel1SingleValuedFieldIndex = missingLevel1SingleValuedFieldIndex;
-		this.missingLevel2Index = missingLevel2Index;
-		this.missingLevel2SingleValuedFieldIndex = missingLevel2SingleValuedFieldIndex;
-		this.dataSet = dataSet;
-		this.recursiveComparisonConfig = configureRecursiveComparison( RecursiveComparisonConfiguration.builder() )
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
 				.build();
-	}
 
-	protected RecursiveComparisonConfiguration.Builder configureRecursiveComparison(RecursiveComparisonConfiguration.Builder builder) {
-		return builder;
-	}
-
-	@Test
-	public void objectOnLevel1AndObjectOnLevel2() {
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
-								f.object( level1Path() )
+								f.object( level1Path( mainIndex, dataSet ) )
 										.from(
-												singleValuedProjection( f, level1SingleValuedFieldPath() ),
-												multiValuedProjection( f, level1MultiValuedFieldPath() ),
-												f.object( level2Path() )
+												singleValuedProjection( f, level1SingleValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												multiValuedProjection( f, level1MultiValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												f.object( level2Path( mainIndex, dataSet ) )
 														.from(
-																singleValuedProjection( f, level2SingleValuedFieldPath() ),
-																multiValuedProjection( f, level2MultiValuedFieldPath() )
+																singleValuedProjection( f, level2SingleValuedFieldPath(
+																		mainIndex, dataSet ), dataSet ),
+																multiValuedProjection( f, level2MultiValuedFieldPath(
+																		mainIndex, dataSet ), dataSet )
 														)
 														.as( ObjectDto::new )
 														.multi()
@@ -139,7 +132,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( SINGLE_VALUED_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -151,7 +144,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -167,18 +160,18 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										null,
 										Collections.emptyList(),
 										Collections.emptyList()
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								(Level1ObjectDto<P>) null
-						) ),
-						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList() ),
+						), dataSet ),
+						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										null,
@@ -200,7 +193,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										null,
@@ -222,7 +215,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										null,
@@ -234,20 +227,33 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										Collections.emptyList(),
 										Collections.emptyList()
 								)
-						) )
+						), dataSet )
 				);
 	}
 
-	@Test
-	public void objectOnLevel1AndNoLevel2() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void objectOnLevel1AndNoLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
+				.build();
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
-								f.object( level1Path() )
+								f.object( level1Path( mainIndex, dataSet ) )
 										.from(
-												singleValuedProjection( f, level1SingleValuedFieldPath() ),
-												multiValuedProjection( f, level1MultiValuedFieldPath() )
+												singleValuedProjection( f, level1SingleValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												multiValuedProjection( f, level1MultiValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet )
 										)
 										.as( ObjectDto::new )
 										.multi()
@@ -267,29 +273,29 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										dataSet.values.projectedValue( 9 ),
 										dataSet.values.projectedValues( 10, 11 )
 								)
-						) ),
+						), dataSet ),
 						hit( SINGLE_VALUED_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
 										dataSet.values.projectedValues( 1 )
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
 										dataSet.values.projectedValues( 1, 2 )
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										null,
 										Collections.emptyList()
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								(ObjectDto<P>) null
-						) ),
-						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList() ),
+						), dataSet ),
+						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										null,
@@ -299,7 +305,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										null,
 										Collections.emptyList()
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										null,
@@ -309,7 +315,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										null,
 										Collections.emptyList()
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										null,
@@ -319,24 +325,39 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										null,
 										Collections.emptyList()
 								)
-						) )
+						), dataSet )
 				);
 	}
 
-	@Test
-	public void objectOnLevel1AndFlattenedLevel2() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void objectOnLevel1AndFlattenedLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
+				.build();
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
-								f.object( level1Path() )
+								f.object( level1Path( mainIndex, dataSet ) )
 										.from(
-												singleValuedProjection( f, level1SingleValuedFieldPath() ),
-												multiValuedProjection( f, level1MultiValuedFieldPath() ),
+												singleValuedProjection( f, level1SingleValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												multiValuedProjection( f, level1MultiValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
 												f.composite()
 														.from(
-																multiValuedProjection( f, level2SingleValuedFieldPath() ),
-																multiValuedProjection( f, level2MultiValuedFieldPath() )
+																multiValuedProjection( f, level2SingleValuedFieldPath(
+																		mainIndex, dataSet ), dataSet ),
+																multiValuedProjection( f, level2MultiValuedFieldPath(
+																		mainIndex, dataSet ), dataSet )
 														)
 														.as( FlattenedObjectDto::new )
 										)
@@ -366,7 +387,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 13, 14, 16, 17 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( SINGLE_VALUED_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectWithFlattenedLevel2Dto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -376,7 +397,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 3 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectWithFlattenedLevel2Dto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -386,7 +407,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 4, 5, 7, 8 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectWithFlattenedLevel2Dto<>(
 										null,
@@ -396,11 +417,11 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												Collections.emptyList()
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								(Level1ObjectWithFlattenedLevel2Dto<P>) null
-						) ),
-						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList() ),
+						), dataSet ),
+						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectWithFlattenedLevel2Dto<>(
 										null,
@@ -418,7 +439,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 4, 5 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectWithFlattenedLevel2Dto<>(
 										null,
@@ -436,7 +457,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												Collections.emptyList()
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectWithFlattenedLevel2Dto<>(
 										null,
@@ -454,20 +475,31 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												Collections.emptyList()
 										)
 								)
-						) )
+						), dataSet )
 				);
 	}
 
-	@Test
-	public void objectOnSingleValuedLevel1AndNoLevel2() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void objectOnSingleValuedLevel1AndNoLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
+				.build();
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
-								f.object( singleValuedLevel1Path() )
+								f.object( singleValuedLevel1Path( mainIndex, dataSet ) )
 										.from(
-												singleValuedProjection( f, singleValuedLevel1SingleValuedFieldPath() ),
-												multiValuedProjection( f, singleValuedLevel1MultiValuedFieldPath() )
+												singleValuedProjection( f, singleValuedLevel1SingleValuedFieldPath(
+														mainIndex, dataSet ), dataSet ),
+												multiValuedProjection( f, singleValuedLevel1MultiValuedFieldPath(
+														mainIndex, dataSet ), dataSet )
 										)
 										.as( ObjectDto::new )
 						)
@@ -479,41 +511,55 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						hit( FULL_DOCUMENT_ID, new ObjectDto<>(
 								dataSet.values.projectedValue( 18 ),
 								dataSet.values.projectedValues( 19, 20 )
-						) ),
+						), dataSet ),
 						hit( SINGLE_VALUED_DOCUMENT_ID, new ObjectDto<>(
 								dataSet.values.projectedValue( 4 ),
 								dataSet.values.projectedValues( 5 )
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID, new ObjectDto<>(
 								dataSet.values.projectedValue( 9 ),
 								dataSet.values.projectedValues( 10, 11 )
-						) ),
-						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, null ),
+						), dataSet ),
+						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, null, dataSet ),
 						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID,
 								TckConfiguration.get().getBackendFeatures()
 										.projectionPreservesEmptySingleValuedObject( dataSet.singleValuedObjectStructure )
 										? new ObjectDto<>(
 												null,
 												Collections.emptyList() )
-										: null
+										: null,
+								dataSet
 						),
-						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, null ),
-						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, null ),
-						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, null ),
-						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, null )
+						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, null, dataSet ),
+						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, null, dataSet ),
+						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, null, dataSet ),
+						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, null, dataSet )
 				);
 	}
 
-	@Test
-	public void noLevel1AndObjectOnLevel2() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void noLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
+				.build();
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
-								f.object( level2Path() )
+								f.object( level2Path( mainIndex, dataSet ) )
 										.from(
-												singleValuedProjection( f, level2SingleValuedFieldPath() ),
-												multiValuedProjection( f, level2MultiValuedFieldPath() )
+												singleValuedProjection( f, level2SingleValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												multiValuedProjection( f, level2MultiValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet )
 										)
 										.as( ObjectDto::new )
 										.multi()
@@ -542,13 +588,13 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										dataSet.values.projectedValue( 15 ),
 										dataSet.values.projectedValues( 16, 17 )
 								)
-						) ),
+						), dataSet ),
 						hit( SINGLE_VALUED_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										dataSet.values.projectedValue( 2 ),
 										dataSet.values.projectedValues( 3 )
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										dataSet.values.projectedValue( 3 ),
@@ -558,10 +604,10 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										dataSet.values.projectedValue( 6 ),
 										dataSet.values.projectedValues( 7, 8 )
 								)
-						) ),
-						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, Collections.emptyList() ),
-						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, Collections.emptyList() ),
-						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList() ),
+						), dataSet ),
+						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet ),
+						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet ),
+						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -571,7 +617,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										dataSet.values.projectedValue( 3 ),
 										dataSet.values.projectedValues( 4, 5 )
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, listMaybeWithNull(
 								new ObjectDto<>(
 										null,
@@ -581,25 +627,40 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										null,
 										Collections.emptyList()
 								)
-						) ),
-						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, Collections.emptyList() )
+						), dataSet ),
+						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, Collections.emptyList(), dataSet )
 				);
 	}
 
-	@Test
-	public void flattenedLevel1AndObjectOnLevel2() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void flattenedLevel1AndObjectOnLevel2(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
+				.build();
 		assertThatQuery( mainIndex.query()
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
 								f.composite()
 										.from(
-												multiValuedProjection( f, level1SingleValuedFieldPath() ),
-												multiValuedProjection( f, level1MultiValuedFieldPath() ),
-												f.object( level2Path() )
+												multiValuedProjection( f, level1SingleValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												multiValuedProjection( f, level1MultiValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												f.object( level2Path( mainIndex, dataSet ) )
 														.from(
-																singleValuedProjection( f, level2SingleValuedFieldPath() ),
-																multiValuedProjection( f, level2MultiValuedFieldPath() )
+																singleValuedProjection( f, level2SingleValuedFieldPath(
+																		mainIndex, dataSet ), dataSet ),
+																multiValuedProjection( f, level2MultiValuedFieldPath(
+																		mainIndex, dataSet ), dataSet )
 														)
 														.as( ObjectDto::new )
 														.multi()
@@ -634,7 +695,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 16, 17 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( SINGLE_VALUED_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								dataSet.values.projectedValues( 0 ),
 								dataSet.values.projectedValues( 1 ),
@@ -644,7 +705,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 3 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								dataSet.values.projectedValues( 0 ),
 								dataSet.values.projectedValues( 1, 2 ),
@@ -658,22 +719,22 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 7, 8 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_NULL_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								Collections.emptyList(),
 								Collections.emptyList(),
 								Collections.emptyList()
-						) ),
+						), dataSet ),
 						hit( LEVEL1_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								Collections.emptyList(),
 								Collections.emptyList(),
 								Collections.emptyList()
-						) ),
+						), dataSet ),
 						hit( LEVEL1_NO_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								Collections.emptyList(),
 								Collections.emptyList(),
 								Collections.emptyList()
-						) ),
+						), dataSet ),
 						hit( LEVEL2_SINGLE_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								Collections.emptyList(),
 								Collections.emptyList(),
@@ -687,7 +748,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												dataSet.values.projectedValues( 4, 5 )
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_SINGLE_EMPTY_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								Collections.emptyList(),
 								Collections.emptyList(),
@@ -701,23 +762,31 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												Collections.emptyList()
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( LEVEL2_NO_OBJECT_DOCUMENT_ID, new FlattenedLevel1ObjectDto<>(
 								Collections.emptyList(),
 								Collections.emptyList(),
 								Collections.emptyList()
-						) )
+						), dataSet )
 				);
 	}
 
-	@Test
-	public void fieldOutsideObjectFieldTree() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void fieldOutsideObjectFieldTree(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
 		assertThatThrownBy( () -> mainIndex.query()
-						.select( f -> f.object( level2Path() )
+						.select( f -> f.object( level2Path( mainIndex, dataSet ) )
 								.from(
 										// This is incorrect: the inner projection uses fields from "level1",
 										// which won't be present in "level1.level2".
-										singleValuedProjection( f, level1SingleValuedFieldPath() )
+										singleValuedProjection( f, level1SingleValuedFieldPath( mainIndex, dataSet ),
+												dataSet
+										)
 								)
 								.asList()
 								.multi() )
@@ -726,27 +795,43 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid context for projection on field '" + level1SingleValuedFieldPath() + "'",
-						"the surrounding projection is executed for each object in field '" + level2Path() + "',"
-								+ " which is not a parent of field '" + level1SingleValuedFieldPath() + "'",
+						"Invalid context for projection on field '" + level1SingleValuedFieldPath( mainIndex, dataSet ) + "'",
+						"the surrounding projection is executed for each object in field '" + level2Path( mainIndex,
+								dataSet
+						) + "',"
+								+ " which is not a parent of field '" + level1SingleValuedFieldPath( mainIndex,
+								dataSet
+						) + "'",
 						"Check the structure of your projections"
 				);
 	}
 
-	@Test
-	public void singleValuedField_effectivelyMultiValuedInContext() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void singleValuedField_effectivelyMultiValuedInContext(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
 		assertThatThrownBy( () -> mainIndex.query()
-						.select( f -> f.object( level1Path() )
+						.select( f -> f.object( level1Path( mainIndex, dataSet ) )
 								.from(
-										singleValuedProjection( f, level1SingleValuedFieldPath() ),
-										multiValuedProjection( f, level1MultiValuedFieldPath() ),
+										singleValuedProjection( f, level1SingleValuedFieldPath( mainIndex, dataSet ),
+												dataSet
+										),
+										multiValuedProjection( f, level1MultiValuedFieldPath( mainIndex, dataSet ),
+												dataSet
+										),
 										f.composite()
 												.from(
 														// This is incorrect: we don't use object( "level1.level2" ),
 														// so this field is multi-valued, because it's collected
 														// for each "level1" object, and "level1.level2" is multi-valued.
-														singleValuedProjection( f, level2SingleValuedFieldPath() ),
-														multiValuedProjection( f, level2MultiValuedFieldPath() )
+														singleValuedProjection( f, level2SingleValuedFieldPath(
+																mainIndex, dataSet ), dataSet ),
+														multiValuedProjection( f, level2MultiValuedFieldPath(
+																mainIndex, dataSet ), dataSet )
 												)
 												.asList()
 								)
@@ -757,17 +842,30 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid cardinality for projection on field '" + level2SingleValuedFieldPath() + "'",
+						"Invalid cardinality for projection on field '" + level2SingleValuedFieldPath( mainIndex,
+								dataSet
+						) + "'",
 						"the projection is single-valued, but this field is effectively multi-valued in this context",
-						"because parent object field '" + level2Path() + "' is multi-valued",
-						"call '.multi()' when you create the projection on field '" + level2SingleValuedFieldPath() + "'",
+						"because parent object field '" + level2Path( mainIndex, dataSet ) + "' is multi-valued",
+						"call '.multi()' when you create the projection on field '" + level2SingleValuedFieldPath(
+								mainIndex, dataSet ) + "'",
 						"or wrap that projection in an object projection like this:"
-								+ " 'f.object(\"" + level2Path() + "\").from(<the projection on field " + level2SingleValuedFieldPath() + ">).as(...).multi()'."
+								+ " 'f.object(\"" + level2Path( mainIndex, dataSet ) + "\").from(<the projection on field " + level2SingleValuedFieldPath(
+								mainIndex, dataSet ) + ">).as(...).multi()'."
 				);
 	}
 
-	@Test
-	public void missingFields() {
+	@ParameterizedTest(name = "{5}")
+	@MethodSource("params")
+	public void missingFields(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingLevel1IndexBinding> missingLevel1Index,
+			SimpleMappedIndex<MissingLevel1SingleValuedFieldIndexBinding> missingLevel1SingleValuedFieldIndex,
+			SimpleMappedIndex<MissingLevel2IndexBinding> missingLevel2Index,
+			SimpleMappedIndex<MissingLevel2SingleValuedFieldIndexBinding> missingLevel2SingleValuedFieldIndex,
+			DataSet<F, P, V> dataSet) {
+		RecursiveComparisonConfiguration recursiveComparisonConfig = configureRecursiveComparison(
+				RecursiveComparisonConfiguration.builder() )
+				.build();
 		StubMappingScope scope = mainIndex.createScope( missingLevel1Index, missingLevel1SingleValuedFieldIndex,
 				missingLevel2Index, missingLevel2SingleValuedFieldIndex
 		);
@@ -775,14 +873,20 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				.select( f -> f.composite()
 						.from(
 								f.id( String.class ),
-								f.object( level1Path() )
+								f.object( level1Path( mainIndex, dataSet ) )
 										.from(
-												singleValuedProjection( f, level1SingleValuedFieldPath() ),
-												multiValuedProjection( f, level1MultiValuedFieldPath() ),
-												f.object( level2Path() )
+												singleValuedProjection( f, level1SingleValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												multiValuedProjection( f, level1MultiValuedFieldPath( mainIndex,
+														dataSet
+												), dataSet ),
+												f.object( level2Path( mainIndex, dataSet ) )
 														.from(
-																singleValuedProjection( f, level2SingleValuedFieldPath() ),
-																multiValuedProjection( f, level2MultiValuedFieldPath() )
+																singleValuedProjection( f, level2SingleValuedFieldPath(
+																		mainIndex, dataSet ), dataSet ),
+																multiValuedProjection( f, level2MultiValuedFieldPath(
+																		mainIndex, dataSet ), dataSet )
 														)
 														.as( ObjectDto::new )
 														.multi()
@@ -795,7 +899,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 				.routing( dataSet.routingKey ) )
 				.hits().asIs().usingRecursiveFieldByFieldElementComparator( recursiveComparisonConfig )
 				.contains(
-						hit( MISSING_LEVEL1_DOCUMENT_ID, Collections.emptyList() ),
+						hit( MISSING_LEVEL1_DOCUMENT_ID, Collections.emptyList(), dataSet ),
 						hit( MISSING_LEVEL1_SINGLE_VALUED_FIELD_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										null,
@@ -825,7 +929,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) ),
+						), dataSet ),
 						hit( MISSING_LEVEL2_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -837,7 +941,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 										dataSet.values.projectedValues( 4, 5 ),
 										Collections.emptyList()
 								)
-						) ),
+						), dataSet ),
 						hit( MISSING_LEVEL2_SINGLE_VALUED_FIELD_DOCUMENT_ID, listMaybeWithNull(
 								new Level1ObjectDto<>(
 										dataSet.values.projectedValue( 0 ),
@@ -867,7 +971,7 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 												)
 										)
 								)
-						) )
+						), dataSet )
 				);
 	}
 
@@ -880,56 +984,58 @@ public abstract class AbstractProjectionInObjectProjectionIT<F, P, V extends Abs
 		}
 		return list;
 	}
-
-	private <T> IdAndObjectDto<T> hit(String docIdConstant, T object) {
+	private <T> IdAndObjectDto<T> hit(String docIdConstant, T object,
+			DataSet<F, P, V> dataSet) {
 		return new IdAndObjectDto<>( dataSet.docId( docIdConstant ), object );
 	}
 
-	private String level1Path() {
+	private String level1Path(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).absolutePath;
 	}
 
-	private String level1SingleValuedFieldPath() {
+	private String level1SingleValuedFieldPath(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure )
 				.singleValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	private String level1MultiValuedFieldPath() {
+	private String level1MultiValuedFieldPath(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure )
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	private String singleValuedLevel1Path() {
+	private String singleValuedLevel1Path(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().singleValuedLevel1( dataSet.singleValuedObjectStructure ).absolutePath;
 	}
 
-	private String singleValuedLevel1SingleValuedFieldPath() {
+	private String singleValuedLevel1SingleValuedFieldPath(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().singleValuedLevel1( dataSet.singleValuedObjectStructure )
 				.singleValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	private String singleValuedLevel1MultiValuedFieldPath() {
+	private String singleValuedLevel1MultiValuedFieldPath(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().singleValuedLevel1( dataSet.singleValuedObjectStructure )
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	private String level2Path() {
+	private String level2Path(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).level2.absolutePath;
 	}
 
-	private String level2SingleValuedFieldPath() {
+	private String level2SingleValuedFieldPath(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).level2
 				.singleValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	private String level2MultiValuedFieldPath() {
+	private String level2MultiValuedFieldPath(SimpleMappedIndex<IndexBinding> mainIndex, DataSet<F, P, V> dataSet) {
 		return mainIndex.binding().level1( dataSet.multiValuedObjectStructure ).level2
 				.multiValuedFieldAbsolutePath( dataSet.fieldType );
 	}
 
-	protected abstract ProjectionFinalStep<P> singleValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath);
+	protected abstract ProjectionFinalStep<P> singleValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath,
+			DataSet<F, P, V> dataSet);
 
-	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath);
+	protected abstract ProjectionFinalStep<List<P>> multiValuedProjection(SearchProjectionFactory<?, ?> f, String absoluteFieldPath,
+			DataSet<F, P, V> dataSet);
 
 	public static final class DataSet<F, P, V extends AbstractProjectionTestValues<F, P>>
 			extends AbstractPerFieldTypeProjectionDataSet<F, P, V> {

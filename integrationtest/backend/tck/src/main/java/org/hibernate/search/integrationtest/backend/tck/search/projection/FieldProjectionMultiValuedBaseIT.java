@@ -29,27 +29,25 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests basic behavior of projections on a multi-valued field, common to all supported types.
  * <p>
  * See {@link FieldProjectionSingleValuedBaseIT} for single-valued fields.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3391")
 public class FieldProjectionMultiValuedBaseIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
-	private static List<DataSet<?>> dataSets;
+	private static final List<DataSet<?>> dataSets = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0} - {1}")
-	public static Object[][] parameters() {
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
+
+	static {
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
 			for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
 				if ( fieldStructure.isSingleValued() ) {
@@ -57,10 +55,13 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 				}
 				DataSet<?> dataSet = new DataSet<>( fieldStructure, fieldType );
 				dataSets.add( dataSet );
-				parameters.add( new Object[] { fieldStructure, fieldType, dataSet } );
+				parameters.add( Arguments.of( fieldStructure, fieldType, dataSet ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	@RegisterExtension
@@ -88,22 +89,12 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 		indexer.join();
 	}
 
-	private final TestedFieldStructure fieldStructure;
-	private final FieldTypeDescriptor<F> fieldType;
-	private final DataSet<F> dataSet;
-
-	public FieldProjectionMultiValuedBaseIT(TestedFieldStructure fieldStructure,
-			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
-		this.fieldStructure = fieldStructure;
-		this.fieldType = fieldType;
-		this.dataSet = dataSet;
-	}
-
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	public void simple(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
@@ -118,11 +109,12 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 				);
 	}
 
-	@Test
-	public void noClass() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	public void noClass(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath ).multi() )
@@ -140,11 +132,12 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 	/**
 	 * Test that mentioning the same projection twice works as expected.
 	 */
-	@Test
-	public void duplicated() {
+	@ParameterizedTest(name = "{0} - {1}")
+	@MethodSource("params")
+	public void duplicated(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		StubMappingScope scope = index.createScope();
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure, fieldType );
 
 		assertThatQuery( scope.query()
 				.select( f ->
@@ -164,7 +157,7 @@ public class FieldProjectionMultiValuedBaseIT<F> {
 				);
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType) {
 		return index.binding().getFieldPath( fieldStructure, fieldType );
 	}
 

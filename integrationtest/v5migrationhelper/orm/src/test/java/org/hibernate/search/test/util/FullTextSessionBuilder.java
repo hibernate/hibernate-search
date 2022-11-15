@@ -134,7 +134,8 @@ public class FullTextSessionBuilder implements TestRule {
 				}
 			}
 		};
-		return setupHelper.apply( wrapped, description );
+		// TODO: fix me
+		return wrapped; //setupHelper.apply( wrapped, description );
 	}
 
 }

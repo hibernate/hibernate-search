@@ -31,25 +31,23 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.awaitility.Awaitility;
 
 /**
  * Verify that the {@link IndexIndexer}, provided by a backend, is working properly, storing correctly the indexes.
  */
-@RunWith(Parameterized.class)
 public class IndexIndexerIT {
 
-	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}")
-	public static List<Object[]> parameters() {
-		List<Object[]> params = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> params = new ArrayList<>();
 		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
 			for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
-				params.add( new Object[] { commitStrategy, refreshStrategy } );
+				params.add( Arguments.of( commitStrategy, refreshStrategy ) );
 			}
 		}
 		return params;
@@ -64,22 +62,14 @@ public class IndexIndexerIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	private final DocumentCommitStrategy commitStrategy;
-	private final DocumentRefreshStrategy refreshStrategy;
-
-	public IndexIndexerIT(DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
-		this.commitStrategy = commitStrategy;
-		this.refreshStrategy = refreshStrategy;
-	}
-
 	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	@Test
-	public void success() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
+	@MethodSource("params")
+	public void success(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 
@@ -100,7 +90,7 @@ public class IndexIndexerIT {
 		assertThatFuture( future ).isSuccessful();
 
 		int expectedMatchingBooks = NUMBER_OF_BOOKS;
-		refreshIfNecessary();
+		refreshIfNecessary( refreshStrategy );
 		assertThatQuery( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
@@ -125,7 +115,7 @@ public class IndexIndexerIT {
 		assertThatFuture( future ).isSuccessful();
 
 		expectedMatchingBooks -= booksToUpdate;
-		refreshIfNecessary();
+		refreshIfNecessary( refreshStrategy );
 		assertThatQuery( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
@@ -149,15 +139,16 @@ public class IndexIndexerIT {
 		assertThatFuture( future ).isSuccessful();
 
 		expectedMatchingBooks -= booksToDelete;
-		refreshIfNecessary();
+		refreshIfNecessary( refreshStrategy );
 		assertThatQuery( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
 				.hasTotalHitCount( expectedMatchingBooks );
 	}
 
-	@Test
-	public void add_failure() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
+	@MethodSource("params")
+	public void add_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
@@ -182,8 +173,9 @@ public class IndexIndexerIT {
 		}
 	}
 
-	@Test
-	public void addOrUpdate_failure() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
+	@MethodSource("params")
+	public void addOrUpdate_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
@@ -208,8 +200,9 @@ public class IndexIndexerIT {
 		}
 	}
 
-	@Test
-	public void delete_failure() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}")
+	@MethodSource("params")
+	public void delete_failure(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
@@ -232,7 +225,7 @@ public class IndexIndexerIT {
 		}
 	}
 
-	private void refreshIfNecessary() {
+	private void refreshIfNecessary(DocumentRefreshStrategy refreshStrategy) {
 		if ( DocumentRefreshStrategy.NONE.equals( refreshStrategy ) ) {
 			IndexWorkspace workspace = index.createWorkspace();
 			workspace.refresh( OperationSubmitter.BLOCKING ).join();

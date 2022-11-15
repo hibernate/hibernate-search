@@ -32,36 +32,36 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.aggregation.dsl.AggregationFilterStep#filter(Function) filtering}
  * that is not tested in {@link SingleFieldAggregationBaseIT}.
  */
-@RunWith(Parameterized.class)
 public class SingleFieldAggregationFilteringSpecificsIT<F> {
 
-	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
+	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		supportedFieldTypes = new LinkedHashSet<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
 			for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).getSupported();
 				if ( expectations.isPresent() ) {
 					supportedFieldTypes.add( fieldType );
-					parameters.add( new Object[] { expectations.get() } );
+					parameters.add( Arguments.of( expectations.get() ) );
 				}
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	@RegisterExtension
@@ -74,21 +74,14 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 		setupHelper.start().withIndexes( mainIndex ).setup();
 	}
 
-	private final SupportedSingleFieldAggregationExpectations<F> expectations;
-	private final FieldTypeDescriptor<F> fieldType;
-
-	public SingleFieldAggregationFilteringSpecificsIT(SupportedSingleFieldAggregationExpectations<F> expectations) {
-		this.expectations = expectations;
-		this.fieldType = expectations.fieldType();
-	}
-
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3881")
-	public void nonNested() {
+	public void nonNested(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		StubMappingScope scope = mainIndex.createScope();
 		AggregationScenario<?> scenario = expectations.simple();
 		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "."
-				+ mainIndex.binding().flattenedObject.fieldModels.get( fieldType ).relativeFieldName;
+				+ mainIndex.binding().flattenedObject.fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		assertThatThrownBy(
 				() -> scenario.setup( scope.aggregation(), fieldPath, pf -> pf.exists().field( fieldPath ) )
@@ -100,14 +93,15 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3881")
-	public void invalidNestedPath_parent() {
+	public void invalidNestedPath_parent(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		StubMappingScope scope = mainIndex.createScope();
 		AggregationScenario<?> scenario = expectations.simple();
 		String fieldPath = mainIndex.binding().nestedObject1.relativeFieldName + "."
-				+ mainIndex.binding().nestedObject1.fieldModels.get( fieldType ).relativeFieldName;
-		String fieldInParentPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+				+ mainIndex.binding().nestedObject1.fieldModels.get( expectations.fieldType() ).relativeFieldName;
+		String fieldInParentPath = mainIndex.binding().fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		assertThatThrownBy(
 				() -> scenario.setup( scope.aggregation(), fieldPath, pf -> pf.exists().field( fieldInParentPath ) )
@@ -120,15 +114,16 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 								+ " are allowed here." );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3881")
-	public void invalidNestedPath_sibling() {
+	public void invalidNestedPath_sibling(SupportedSingleFieldAggregationExpectations<F> expectations) {
 		StubMappingScope scope = mainIndex.createScope();
 		AggregationScenario<?> scenario = expectations.simple();
 		String fieldPath = mainIndex.binding().nestedObject1.relativeFieldName + "."
-				+ mainIndex.binding().nestedObject1.fieldModels.get( fieldType ).relativeFieldName;
+				+ mainIndex.binding().nestedObject1.fieldModels.get( expectations.fieldType() ).relativeFieldName;
 		String fieldInSiblingPath = mainIndex.binding().nestedObject2.relativeFieldName + "."
-				+ mainIndex.binding().nestedObject2.fieldModels.get( fieldType ).relativeFieldName;
+				+ mainIndex.binding().nestedObject2.fieldModels.get( expectations.fieldType() ).relativeFieldName;
 
 		assertThatThrownBy(
 				() -> scenario.setup( scope.aggregation(), fieldPath, pf -> pf.exists().field( fieldInSiblingPath ) )

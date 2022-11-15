@@ -44,39 +44,37 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior specific to the range aggregation on supported field types.
  * <p>
  * Behavior common to all single-field aggregations is tested in {@link SingleFieldAggregationBaseIT}.
  */
-@RunWith(Parameterized.class)
 public class RangeAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
-	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
-	private static List<DataSet<?>> dataSets;
+	private static final Set<FieldTypeDescriptor<?>> supportedFieldTypes = new LinkedHashSet<>();
+	private static final List<DataSet<?>> dataSets = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		supportedFieldTypes = new LinkedHashSet<>();
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		AggregationDescriptor aggregationDescriptor = RangeAggregationDescriptor.INSTANCE;
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				DataSet<?> dataSet = new DataSet<>( fieldType );
 				dataSets.add( dataSet );
-				parameters.add( new Object[] { fieldType, dataSet } );
+				parameters.add( Arguments.of( fieldType, dataSet ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	@RegisterExtension
@@ -93,19 +91,10 @@ public class RangeAggregationSpecificsIT<F> {
 		}
 	}
 
-	private final FieldTypeDescriptor<F> fieldType;
-	private final DataSet<F> dataSet;
-	private final List<F> ascendingValues;
-
-	public RangeAggregationSpecificsIT(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
-		this.fieldType = fieldType;
-		this.dataSet = dataSet;
-		this.ascendingValues = dataSet.ascendingValues;
-	}
-
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelow")
-	public void rangeAtMost() {
+	public void rangeAtMost(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -115,7 +104,7 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( Range.atMost( ascendingValues.get( 2 ) ) )
+								.range( Range.atMost( dataSet.ascendingValues.get( 2 ) ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -123,14 +112,15 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.atMost( ascendingValues.get( 2 ) ), 3L );
+							c.accept( Range.atMost( dataSet.ascendingValues.get( 2 ) ), 3L );
 						} )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelowExcludeLimit")
-	public void rangeLessThan() {
+	public void rangeLessThan(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -138,7 +128,7 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( Range.lessThan( ascendingValues.get( 2 ) ) )
+								.range( Range.lessThan( dataSet.ascendingValues.get( 2 ) ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -146,14 +136,15 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 2L );
 						} )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeAbove")
-	public void rangeAtLeast() {
+	public void rangeAtLeast(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -161,7 +152,7 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( Range.atLeast( ascendingValues.get( 3 ) ) )
+								.range( Range.atLeast( dataSet.ascendingValues.get( 3 ) ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -169,14 +160,15 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.atLeast( ascendingValues.get( 3 ) ), 4L );
+							c.accept( Range.atLeast( dataSet.ascendingValues.get( 3 ) ), 4L );
 						} )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeAboveExcludeLimit")
-	public void rangeGreaterThan() {
+	public void rangeGreaterThan(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -186,7 +178,7 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( Range.greaterThan( ascendingValues.get( 3 ) ) )
+								.range( Range.greaterThan( dataSet.ascendingValues.get( 3 ) ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -194,14 +186,15 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.greaterThan( ascendingValues.get( 3 ) ), 3L );
+							c.accept( Range.greaterThan( dataSet.ascendingValues.get( 3 ) ), 3L );
 						} )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeWithExcludeLimitsAtEachLevel")
-	public void rangesCanonical() {
+	public void rangesCanonical(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -210,9 +203,9 @@ public class RangeAggregationSpecificsIT<F> {
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
-										Range.canonical( null, ascendingValues.get( 3 ) ),
-										Range.canonical( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ),
-										Range.canonical( ascendingValues.get( 5 ), null )
+										Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+										Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ),
+										Range.canonical( dataSet.ascendingValues.get( 5 ), null )
 								) )
 						)
 						.routing( dataSet.name )
@@ -221,16 +214,17 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.canonical( null, ascendingValues.get( 3 ) ), 3L );
-							c.accept( Range.canonical( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ), 2L );
-							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 3 ) ), 3L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 3 ), dataSet.ascendingValues.get( 5 ) ), 2L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
 						} )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelowMiddleAbove")
-	public void rangesBetweenIncludingAllBounds() {
+	public void rangesBetweenIncludingAllBounds(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
@@ -242,10 +236,10 @@ public class RangeAggregationSpecificsIT<F> {
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
 										Range.between( null, RangeBoundInclusion.INCLUDED,
-												ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
-										Range.between( ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
-												ascendingValues.get( 4 ), RangeBoundInclusion.INCLUDED ),
-										Range.between( ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
+												dataSet.ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
+										Range.between( dataSet.ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
+												dataSet.ascendingValues.get( 4 ), RangeBoundInclusion.INCLUDED ),
+										Range.between( dataSet.ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
 												null, RangeBoundInclusion.INCLUDED )
 								) )
 						)
@@ -257,16 +251,16 @@ public class RangeAggregationSpecificsIT<F> {
 						containsExactly( c -> {
 							c.accept(
 									Range.between( null, RangeBoundInclusion.INCLUDED,
-											ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
+											dataSet.ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
 									3L
 							);
 							c.accept(
-									Range.between( ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
-											ascendingValues.get( 4 ), RangeBoundInclusion.INCLUDED ),
+									Range.between( dataSet.ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
+											dataSet.ascendingValues.get( 4 ), RangeBoundInclusion.INCLUDED ),
 									2L
 							);
 							c.accept(
-									Range.between( ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
+									Range.between( dataSet.ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
 											null, RangeBoundInclusion.INCLUDED ),
 									2L
 							);
@@ -276,8 +270,9 @@ public class RangeAggregationSpecificsIT<F> {
 
 	}
 
-	@Test
-	public void rangesOverlap() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void rangesOverlap(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -286,9 +281,9 @@ public class RangeAggregationSpecificsIT<F> {
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
-										Range.canonical( null, ascendingValues.get( 3 ) ),
-										Range.canonical( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ),
-										Range.canonical( ascendingValues.get( 2 ), null )
+										Range.canonical( null, dataSet.ascendingValues.get( 3 ) ),
+										Range.canonical( dataSet.ascendingValues.get( 1 ), dataSet.ascendingValues.get( 5 ) ),
+										Range.canonical( dataSet.ascendingValues.get( 2 ), null )
 								) )
 						)
 						.routing( dataSet.name )
@@ -297,16 +292,17 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.canonical( null, ascendingValues.get( 3 ) ), 3L );
-							c.accept( Range.canonical( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ), 4L );
-							c.accept( Range.canonical( ascendingValues.get( 2 ), null ), 5L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 3 ) ), 3L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 1 ), dataSet.ascendingValues.get( 5 ) ), 4L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), null ), 5L );
 						} )
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithNullToAndFrom")
-	public void rangeNull() {
+	public void rangeNull(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () ->
@@ -319,8 +315,9 @@ public class RangeAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must not be null" );
 	}
 
-	@Test
-	public void rangesNull() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void rangesNull(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () ->
@@ -333,15 +330,16 @@ public class RangeAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must not be null" );
 	}
 
-	@Test
-	public void rangesContainingNull() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void rangesContainingNull(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
 						.field( fieldPath, fieldType.getJavaType() )
 						.ranges( Arrays.asList(
-								Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 1 ) ),
+								Range.canonical( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 1 ) ),
 								null
 						) )
 		)
@@ -350,9 +348,10 @@ public class RangeAggregationSpecificsIT<F> {
 				.hasMessageContaining( "must not be null" );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testUnsupportedRangeParameterTypeThrowsException")
-	public void fieldTypeSuperClass() {
+	public void fieldTypeSuperClass(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Class<? super F> fieldTypeSuperClass = fieldType.getJavaType().getSuperclass();
@@ -370,9 +369,10 @@ public class RangeAggregationSpecificsIT<F> {
 	/**
 	 * Check that defining a predicate will affect the aggregation result.
 	 */
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryForDoubleWithZeroCount")
-	public void predicate() {
+	public void predicate(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -381,9 +381,9 @@ public class RangeAggregationSpecificsIT<F> {
 				index.createScope().query()
 						.where( f -> f.id().matchingAny( Arrays.asList( dataSet.name + "_document_1", dataSet.name + "_document_5" ) ) )
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( null, ascendingValues.get( 2 ) )
-								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
-								.range( ascendingValues.get( 5 ), null )
+								.range( null, dataSet.ascendingValues.get( 2 ) )
+								.range( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) )
+								.range( dataSet.ascendingValues.get( 5 ), null )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -392,10 +392,10 @@ public class RangeAggregationSpecificsIT<F> {
 						aggregationKey,
 						// Only document 1 and 5 should be taken into account by the aggregation
 						containsExactly( c -> {
-								c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 1L );
+								c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 1L );
 								// Ranges with 0 matching documents should still be returned
-								c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 0L );
-								c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 1L );
+								c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ), 0L );
+								c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 1L );
 						} )
 				);
 	}
@@ -403,8 +403,9 @@ public class RangeAggregationSpecificsIT<F> {
 	/**
 	 * Check that defining a limit and offset will <strong>not</strong> affect the aggregation result.
 	 */
-	@Test
-	public void limitAndOffset() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void limitAndOffset(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -412,9 +413,9 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatResult(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( null, ascendingValues.get( 2 ) )
-								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
-								.range( ascendingValues.get( 5 ), null )
+								.range( null, dataSet.ascendingValues.get( 2 ) )
+								.range( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) )
+								.range( dataSet.ascendingValues.get( 5 ), null )
 						)
 						.fetch( 3, 4 )
 		)
@@ -422,9 +423,9 @@ public class RangeAggregationSpecificsIT<F> {
 						aggregationKey,
 						// All documents should be taken into account by the aggregation, even those excluded by the limit/offset
 						containsExactly( c -> {
-							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
-							c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
-							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ), 3L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
 						} )
 				);
 	}
@@ -432,8 +433,9 @@ public class RangeAggregationSpecificsIT<F> {
 	/**
 	 * Check that defining overlapping ranges will work as expected.
 	 */
-	@Test
-	public void rangeOverlap() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void rangeOverlap(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -441,13 +443,13 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( ascendingValues.get( 0 ), null )
-								.range( null, ascendingValues.get( 2 ) )
-								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
+								.range( dataSet.ascendingValues.get( 0 ), null )
+								.range( null, dataSet.ascendingValues.get( 2 ) )
+								.range( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) )
 								.range( null, null )
-								.range( ascendingValues.get( 0 ), ascendingValues.get( 7 ) )
-								.range( ascendingValues.get( 5 ), null )
-								.range( null, ascendingValues.get( 6 ) )
+								.range( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 7 ) )
+								.range( dataSet.ascendingValues.get( 5 ), null )
+								.range( null, dataSet.ascendingValues.get( 6 ) )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -455,13 +457,13 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.canonical( ascendingValues.get( 0 ), null ), 7L );
-							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
-							c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 0 ), null ), 7L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ), 3L );
 							c.accept( Range.canonical( null, null ), 7L );
-							c.accept( Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 7 ) ), 7L );
-							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
-							c.accept( Range.canonical( null, ascendingValues.get( 6 ) ), 6L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 0 ), dataSet.ascendingValues.get( 7 ) ), 7L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 6 ) ), 6L );
 						} )
 				);
 	}
@@ -469,8 +471,9 @@ public class RangeAggregationSpecificsIT<F> {
 	/**
 	 * Check that, by default, ranges are returned in the order they are defined.
 	 */
-	@Test
-	public void order_asDefined() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void order_asDefined(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -478,9 +481,9 @@ public class RangeAggregationSpecificsIT<F> {
 		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
-								.range( null, ascendingValues.get( 2 ) )
-								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
-								.range( ascendingValues.get( 5 ), null )
+								.range( null, dataSet.ascendingValues.get( 2 ) )
+								.range( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) )
+								.range( dataSet.ascendingValues.get( 5 ), null )
 						)
 						.routing( dataSet.name )
 						.toQuery()
@@ -488,9 +491,9 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
-							c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
-							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, dataSet.ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 2 ), dataSet.ascendingValues.get( 5 ) ), 3L );
+							c.accept( Range.canonical( dataSet.ascendingValues.get( 5 ), null ), 2L );
 						} )
 				);
 	}

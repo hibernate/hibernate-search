@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.with;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -21,16 +22,13 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test that the simple mapping defined in Book works as expected.
  */
-@RunWith(Parameterized.class)
 public class HibernateOrmSimpleMappingIT {
 	private static final String BOOK1_TITLE = "I, Robot";
 	private static final Integer BOOK1_PAGECOUNT = 224;
@@ -41,8 +39,7 @@ public class HibernateOrmSimpleMappingIT {
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
 	private static final Integer BOOK3_PAGECOUNT = 435;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				mapping -> {
@@ -57,23 +54,22 @@ public class HibernateOrmSimpleMappingIT {
 					bookMapping.property( "pageCount" )
 							.genericField().projectable( Projectable.YES ).sortable( Sortable.YES );
 					//end::programmatic[]
-				} );
+				} ).stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
-
-	@Parameterized.Parameter
-	@RegisterExtension
-	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@BeforeEach
-	public void setup() {
+	public void init(DocumentationSetupHelper setupHelper) {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 		initData();
 	}
 
-	@Test
-	public void sort() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void sort(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -90,8 +86,10 @@ public class HibernateOrmSimpleMappingIT {
 		} );
 	}
 
-	@Test
-	public void projection_simple() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void projection_simple(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 

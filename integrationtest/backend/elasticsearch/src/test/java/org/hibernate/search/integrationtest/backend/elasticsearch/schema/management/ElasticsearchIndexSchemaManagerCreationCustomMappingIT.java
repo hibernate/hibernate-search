@@ -8,7 +8,8 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -21,22 +22,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to index custom mapping when creating indexes,
  * for all index-creating schema management operations.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-4253")
 public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creating();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creating().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
 	@RegisterExtension
@@ -47,15 +48,10 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerCreationCustomMappingIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void noOverlapping() {
-		setupAndCreateIndex( "no-overlapping.json" );
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void noOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
+		setupAndCreateIndex( "no-overlapping.json", operation );
 		assertJsonEquals(
 				" { " +
 				"    '_source':{ " +
@@ -121,9 +117,10 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				elasticsearchClient.index( index.name() ).type().getMapping() );
 	}
 
-	@Test
-	public void complexConflicts() {
-		setupAndCreateIndex( "complex-conflicts.json" );
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void complexConflicts(ElasticsearchIndexSchemaManagerOperation operation) {
+		setupAndCreateIndex( "complex-conflicts.json", operation );
 		assertJsonEquals(
 				" { " +
 				"    'dynamic':'strict', " +
@@ -202,7 +199,7 @@ public class ElasticsearchIndexSchemaManagerCreationCustomMappingIT {
 				elasticsearchClient.index( index.name() ).type().getMapping() );
 	}
 
-	private void setupAndCreateIndex(String customMappingFile) {
+	private void setupAndCreateIndex(String customMappingFile, ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MAPPING_FILE,

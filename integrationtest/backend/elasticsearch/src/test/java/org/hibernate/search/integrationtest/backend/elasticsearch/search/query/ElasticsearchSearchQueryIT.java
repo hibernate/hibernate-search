@@ -10,6 +10,9 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
@@ -27,11 +30,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -39,18 +41,16 @@ import com.google.gson.JsonObject;
 /**
  * Test the content of generated Elasticsearch search queries.
  */
-@RunWith(Parameterized.class)
 public class ElasticsearchSearchQueryIT {
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Parameterized.Parameters(name = "IndexLayoutStrategy = {0}")
-	public static Object[][] configurations() {
-		return new Object[][] {
-				{ null, defaultReadAlias( index.name() ) },
-				{ "no-alias", encodeName( index.name() ) },
-				{ new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( null, defaultReadAlias( index.name() ) ),
+				Arguments.of( "no-alias", encodeName( index.name() ) ),
+				Arguments.of( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) )
+		);
 	}
 
 	@RegisterExtension
@@ -59,16 +59,7 @@ public class ElasticsearchSearchQueryIT {
 	@RegisterExtension
 	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
-	private final Object layoutStrategy;
-	private final URLEncodedString readName;
-
-	public ElasticsearchSearchQueryIT(Object layoutStrategy, URLEncodedString readName) {
-		this.layoutStrategy = layoutStrategy;
-		this.readName = readName;
-	}
-
-	@BeforeEach
-	public void setup() {
+	public void init(Object layoutStrategy, URLEncodedString readName) {
 		setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
@@ -80,8 +71,10 @@ public class ElasticsearchSearchQueryIT {
 				.setup();
 	}
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void simple(Object layoutStrategy, URLEncodedString readName) {
+		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query()
@@ -100,8 +93,10 @@ public class ElasticsearchSearchQueryIT {
 		query.fetchAll();
 	}
 
-	@Test
-	public void defaultSourceFiltering() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void defaultSourceFiltering(Object layoutStrategy, URLEncodedString readName) {
+		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query()
@@ -120,8 +115,10 @@ public class ElasticsearchSearchQueryIT {
 		query.fetchAll();
 	}
 
-	@Test
-	public void projection_sourceFiltering() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void projection_sourceFiltering(Object layoutStrategy, URLEncodedString readName) {
+		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Object> query = scope.query()
@@ -141,8 +138,10 @@ public class ElasticsearchSearchQueryIT {
 		query.fetchAll();
 	}
 
-	@Test
-	public void routing() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void routing(Object layoutStrategy, URLEncodedString readName) {
+		init( layoutStrategy, readName );
 		StubMappingScope scope = index.createScope();
 
 		String routingKey = "someRoutingKey";
@@ -165,8 +164,10 @@ public class ElasticsearchSearchQueryIT {
 		query.fetchAll();
 	}
 
-	@Test
-	public void trackTotalHits_fetch() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void trackTotalHits_fetch(Object layoutStrategy, URLEncodedString readName) {
+		init( layoutStrategy, readName );
 		assumeTrue(
 				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
@@ -191,8 +192,10 @@ public class ElasticsearchSearchQueryIT {
 		query.fetch( 30 );
 	}
 
-	@Test
-	public void trackTotalHits_fetchHits() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void trackTotalHits_fetchHits(Object layoutStrategy, URLEncodedString readName) {
+		init( layoutStrategy, readName );
 		assumeTrue(
 				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()

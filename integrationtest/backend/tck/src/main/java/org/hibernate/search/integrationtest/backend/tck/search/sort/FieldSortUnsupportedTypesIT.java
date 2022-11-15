@@ -25,16 +25,15 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests basic behavior of field sort common to all unsupported types,
  * i.e. error messages.
  */
-@RunWith(Parameterized.class)
 public class FieldSortUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
@@ -42,13 +41,12 @@ public class FieldSortUnsupportedTypesIT<F> {
 				.filter( typeDescriptor -> ! typeDescriptor.isFieldSortSupported() );
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		unsupportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
-			parameters.add( new Object[] { fieldTypeDescriptor } );
+			parameters.add( Arguments.of( fieldTypeDescriptor ) );
 		} );
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
 	@RegisterExtension
@@ -61,17 +59,12 @@ public class FieldSortUnsupportedTypesIT<F> {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
-
-	public FieldSortUnsupportedTypesIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
-		this.fieldTypeDescriptor = fieldTypeDescriptor;
-	}
-
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3798")
-	public void error_notSupported() {
+	public void error_notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
-		String absoluteFieldPath = getFieldPath();
+		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 
 		assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath )
@@ -86,7 +79,7 @@ public class FieldSortUnsupportedTypesIT<F> {
 				) );
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		return index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 

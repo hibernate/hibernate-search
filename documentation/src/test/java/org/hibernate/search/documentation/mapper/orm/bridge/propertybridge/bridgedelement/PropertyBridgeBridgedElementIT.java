@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.mapper.orm.bridge.propertybridge.param.InvoiceLineItem;
@@ -22,16 +23,12 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class PropertyBridgeBridgedElementIT {
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				mapping -> {
@@ -40,22 +37,21 @@ public class PropertyBridgeBridgedElementIT {
 					invoiceMapping.indexed();
 					invoiceMapping.property( "lineItems" ).binder( new InvoiceLineItemsSummaryBinder() );
 					//end::programmatic[]
-				} );
+				} ).stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
-
-	@Parameterized.Parameter
-	@RegisterExtension
-	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@BeforeEach
-	public void setup() {
+	public void init(DocumentationSetupHelper setupHelper) {
 		entityManagerFactory = setupHelper.start().setup( Invoice.class );
 	}
 
-	@Test
-	public void smoke() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void smoke(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			Invoice invoice = new Invoice();
 			invoice.getLineItems()

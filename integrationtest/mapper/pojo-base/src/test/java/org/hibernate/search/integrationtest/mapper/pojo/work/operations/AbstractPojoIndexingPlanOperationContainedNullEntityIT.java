@@ -13,14 +13,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan}
@@ -29,8 +32,10 @@ import org.junit.jupiter.api.Test;
 @TestForIssue(jiraKey = "HSEARCH-4141")
 public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT extends AbstractPojoIndexingOperationIT {
 
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void simple(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -46,8 +51,10 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 		}
 	}
 
-	@Test
-	public void loadingDoesNotFindEntity() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void loadingDoesNotFindEntity(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitLoading();
 
 		try ( SearchSession session = createSession() ) {
@@ -60,8 +67,10 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 		}
 	}
 
-	@Test
-	public void nullProvidedId() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void nullProvidedId(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 			assertThatThrownBy( () -> scenario().addWithoutInstanceTo( indexingPlan, ContainedEntity.class, null, null ) )
@@ -72,8 +81,10 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 	}
 
 	// Provided routes are ignored for contained types
-	@Test
-	public void providedId_providedRoutes() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -94,9 +105,11 @@ public abstract class AbstractPojoIndexingPlanOperationContainedNullEntityIT ext
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void containingNotIndexed() {
+	void containingNotIndexed(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {

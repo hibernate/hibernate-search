@@ -10,6 +10,9 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendImplSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
@@ -26,11 +29,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -38,18 +40,16 @@ import com.google.gson.JsonObject;
 /**
  * Test the content of generated Elasticsearch indexing requests.
  */
-@RunWith(Parameterized.class)
 public class ElasticsearchIndexingIT {
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Parameterized.Parameters(name = "IndexLayoutStrategy = {0}")
-	public static Object[][] configurations() {
-		return new Object[][] {
-				{ null, defaultWriteAlias( index.name() ) },
-				{ "no-alias", encodeName( index.name() ) },
-				{ new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-write" ) }
-		};
+	public static List<? extends Arguments> params() {
+		return Arrays.asList(
+				Arguments.of( null, defaultWriteAlias( index.name() ) ),
+				Arguments.of( "no-alias", encodeName( index.name() ) ),
+				Arguments.of( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-write" ) )
+		);
 	}
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
@@ -60,16 +60,7 @@ public class ElasticsearchIndexingIT {
 	@RegisterExtension
 	public ElasticsearchClientSpy clientSpy = ElasticsearchClientSpy.create();
 
-	private final Object layoutStrategy;
-	private final URLEncodedString writeName;
-
-	public ElasticsearchIndexingIT(Object layoutStrategy, URLEncodedString writeName) {
-		this.layoutStrategy = layoutStrategy;
-		this.writeName = writeName;
-	}
-
-	@BeforeEach
-	public void setup() {
+	public void init(Object layoutStrategy, URLEncodedString writeName) {
 		setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendImplSettings.CLIENT_FACTORY, clientSpy.factoryReference()
@@ -81,8 +72,10 @@ public class ElasticsearchIndexingIT {
 				.setup();
 	}
 
-	@Test
-	public void addUpdateDelete_noRouting() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void addUpdateDelete_noRouting(Object layoutStrategy, URLEncodedString writeName) {
+		init( layoutStrategy, writeName );
 		Gson gson = new Gson();
 
 		IndexIndexingPlan plan = index.createIndexingPlan();
@@ -133,8 +126,10 @@ public class ElasticsearchIndexingIT {
 		clientSpy.verifyExpectationsMet();
 	}
 
-	@Test
-	public void addUpdateDelete_routing() {
+	@ParameterizedTest(name = "IndexLayoutStrategy = {0}")
+	@MethodSource("params")
+	public void addUpdateDelete_routing(Object layoutStrategy, URLEncodedString writeName) {
+		init( layoutStrategy, writeName );
 		Gson gson = new Gson();
 
 		String routingKey = "someRoutingKey";

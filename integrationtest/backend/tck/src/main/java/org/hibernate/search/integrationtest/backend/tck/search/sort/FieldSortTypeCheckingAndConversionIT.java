@@ -48,31 +48,31 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
  * for sorts by field value.
  */
-@RunWith(Parameterized.class)
 public class FieldSortTypeCheckingAndConversionIT<F> {
 
-	private static List<FieldTypeDescriptor<?>> supportedFieldTypes;
+	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		supportedFieldTypes = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
-				parameters.add( new Object[] { fieldType } );
+				parameters.add( Arguments.of( fieldType ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	private static final String DOCUMENT_1 = "1";
@@ -116,62 +116,63 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		initData();
 	}
 
-	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
-
-	public FieldSortTypeCheckingAndConversionIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
-		this.fieldTypeDescriptor = fieldTypeDescriptor;
-	}
-
-	@Test
-	public void withDslConverters_dslConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void withDslConverters_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldWithDslConverterPath();
+		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ) );
+				.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ) ) ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) ) );
+				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL,
+						fieldTypeDescriptor
+				) ) ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) ) );
+				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL,
+						fieldTypeDescriptor
+				) ) ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( new ValueWrapper<>( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ) );
+				.use( new ValueWrapper<>( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ) ) ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
-	@Test
-	public void withDslConverters_dslConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void withDslConverters_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldWithDslConverterPath();
+		String fieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ), ValueConvert.NO ) );
+				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ) );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
-	@Test
-	public void unsortable() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void unsortable(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
-		String fieldPath = getNonSortableFieldPath();
+		String fieldPath = getNonSortableFieldPath( fieldTypeDescriptor );
 
 		assertThatThrownBy( () -> {
 				scope.sort().field( fieldPath );
@@ -183,11 +184,12 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				);
 	}
 
-	@Test
-	public void invalidType_noDslConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void invalidType_noDslConverter(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String absoluteFieldPath = getFieldPath();
+		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 		Object invalidValueToMatch = new InvalidType();
 
 		assertThatThrownBy(
@@ -204,11 +206,12 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				) );
 	}
 
-	@Test
-	public void invalidType_withDslConverter() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void invalidType_withDslConverter(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope();
 
-		String absoluteFieldPath = getFieldWithDslConverterPath();
+		String absoluteFieldPath = getFieldWithDslConverterPath( fieldTypeDescriptor );
 		Object invalidValueToMatch = new InvalidType();
 
 		assertThatThrownBy(
@@ -225,15 +228,16 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				) );
 	}
 
-	@Test
-	public void multiIndex_withCompatibleIndex_usingField() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiIndex_withCompatibleIndex_usingField(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ) ), scope );
 
 		/*
 		 * Not testing the ordering of results here because some documents have the same value.
@@ -249,16 +253,19 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		} );
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_dslConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiIndex_withRawFieldCompatibleIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-							.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ), scope );
+							.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL,
+									fieldTypeDescriptor
+							) ) ), scope );
 				}
 		)
 				.isInstanceOf( SearchException.class )
@@ -271,15 +278,16 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				) );
 	}
 
-	@Test
-	public void multiIndex_withRawFieldCompatibleIndex_dslConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiIndex_withRawFieldCompatibleIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ), scope );
 
 		/*
 		 * Not testing the ordering of results here because some documents have the same value.
@@ -295,9 +303,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		} );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_dslConverterEnabled() {
+	public void multiIndex_withMissingFieldIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
 				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
 						+ "' that is missing from some of the target indexes.",
@@ -308,10 +317,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ) ), scope );
 
 		/*
 		 * Not testing the ordering of results here because it's not what we are interested in:
@@ -327,9 +336,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		} );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_dslConverterDisabled() {
+	public void multiIndex_withMissingFieldIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
 				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
 						+ "' that is missing from some of the target indexes.",
@@ -340,10 +350,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ), ValueConvert.NO ), scope );
 
 		/*
 		 * Not testing the ordering of results here because it's not what we are interested in:
@@ -363,9 +373,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 	 * Test the behavior when even the <strong>parent</strong> field of the field to sort on is missing,
 	 * and that parent field is <strong>nested</strong> in the main index.
 	 */
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4173")
-	public void multiIndex_withMissingFieldIndex_nested() {
+	public void multiIndex_withMissingFieldIndex_nested(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
 				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
 						+ "' that is missing from some of the target indexes.",
@@ -380,10 +391,10 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
 
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldInNestedPath();
+		String fieldPath = getFieldInNestedPath( fieldTypeDescriptor );
 
 		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope );
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL, fieldTypeDescriptor ) ), scope );
 
 		/*
 		 * Not testing the ordering of results here because it's not what we are interested in:
@@ -399,11 +410,12 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 		} );
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_dslConverterEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiIndex_withIncompatibleIndex_dslConverterEnabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		assertThatThrownBy(
 				() -> {
@@ -420,11 +432,12 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				) );
 	}
 
-	@Test
-	public void multiIndex_withIncompatibleIndex_dslConverterDisabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void multiIndex_withIncompatibleIndex_dslConverterDisabled(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldTypeDescriptor );
 
 		assertThatThrownBy(
 				() -> {
@@ -462,20 +475,20 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 				.toQuery();
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		return mainIndex.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private String getFieldInNestedPath() {
+	private String getFieldInNestedPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		return mainIndex.binding().nested.relativeFieldName
 				+ '.' + mainIndex.binding().nested.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private String getFieldWithDslConverterPath() {
+	private String getFieldWithDslConverterPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		return mainIndex.binding().fieldWithDslConverterModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private String getNonSortableFieldPath() {
+	private String getNonSortableFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		return mainIndex.binding().nonSortableFieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
@@ -489,7 +502,7 @@ public class FieldSortTypeCheckingAndConversionIT<F> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private F getSingleValueForMissingUse(int ordinal) {
+	private F getSingleValueForMissingUse(int ordinal, FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		F value = fieldTypeDescriptor.getAscendingUniqueTermValues().getSingle().get( ordinal );
 
 		if ( fieldTypeDescriptor instanceof NormalizedStringFieldTypeDescriptor

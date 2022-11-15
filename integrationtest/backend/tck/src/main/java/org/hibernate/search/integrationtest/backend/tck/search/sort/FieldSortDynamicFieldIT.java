@@ -29,29 +29,29 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class FieldSortDynamicFieldIT<F> {
 
-	private static List<FieldTypeDescriptor<?>> supportedFieldTypes;
+	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		supportedFieldTypes = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( fieldType.isFieldSortSupported()
 					&& TckConfiguration.get().getBackendFeatures()
-							.supportsValuesForDynamicField( fieldType.getJavaType() ) ) {
+					.supportsValuesForDynamicField( fieldType.getJavaType() ) ) {
 				supportedFieldTypes.add( fieldType );
-				parameters.add( new Object[] { fieldType } );
+				parameters.add( Arguments.of( fieldType ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	private static final String DOCUMENT_1 = "1";
@@ -79,15 +79,10 @@ public class FieldSortDynamicFieldIT<F> {
 		initData();
 	}
 
-	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
-
-	public FieldSortDynamicFieldIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
-		this.fieldTypeDescriptor = fieldTypeDescriptor;
-	}
-
-	@Test
-	public void simple() {
-		String fieldPath = mainFieldPath();
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void simple(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+		String fieldPath = mainFieldPath( fieldTypeDescriptor );
 
 		assertThatQuery( matchNonEmptyQuery( f -> f.field( fieldPath ).asc() ) )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
@@ -95,9 +90,10 @@ public class FieldSortDynamicFieldIT<F> {
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4531")
-	public void neverPopulated() {
+	public void neverPopulated(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		assumeTrue(
 				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
 						+ "' that is missing from some of the target indexes.",
@@ -105,8 +101,8 @@ public class FieldSortDynamicFieldIT<F> {
 						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
 		);
 
-		String neverPopulatedFieldPath = neverPopulatedFieldPath();
-		String mainFieldPath = mainFieldPath();
+		String neverPopulatedFieldPath = neverPopulatedFieldPath( fieldTypeDescriptor );
+		String mainFieldPath = mainFieldPath( fieldTypeDescriptor );
 
 		// The field that wasn't populated shouldn't have any effect on the sort,
 		// but it shouldn't trigger an exception, either (see HSEARCH-4531).
@@ -133,15 +129,11 @@ public class FieldSortDynamicFieldIT<F> {
 				.toQuery();
 	}
 
-	private String mainFieldPath() {
-		return mainFieldPath( fieldTypeDescriptor );
-	}
-
 	private static String mainFieldPath(FieldTypeDescriptor<?> type) {
 		return IndexBinding.fieldPath( type, "main" );
 	}
 
-	private String neverPopulatedFieldPath() {
+	private String neverPopulatedFieldPath(FieldTypeDescriptor<?> fieldTypeDescriptor) {
 		return IndexBinding.fieldPath( fieldTypeDescriptor, "neverPopulated" );
 	}
 

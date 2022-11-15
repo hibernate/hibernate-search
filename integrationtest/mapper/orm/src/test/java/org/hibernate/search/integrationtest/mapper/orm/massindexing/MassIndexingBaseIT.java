@@ -9,8 +9,10 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -32,22 +34,21 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
-@RunWith(Parameterized.class)
 public class MassIndexingBaseIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static TenancyMode[] params() {
-		return TenancyMode.values();
+	public static List<? extends Arguments> params() {
+		return Arrays.stream( TenancyMode.values() )
+				.map( v -> Arguments.of( v ) )
+				.collect( Collectors.toList() );
 	}
 
 	private static final String TENANT_1_ID = "tenant1";
@@ -66,12 +67,12 @@ public class MassIndexingBaseIT {
 	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@RegisterExtension
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
+			.delayedInitialization( true );
 
 	@RegisterExtension
 	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
-	@Parameterized.Parameter
 	public TenancyMode tenancyMode;
 
 	@ReusableOrmSetupHolder.SetupParams
@@ -92,7 +93,13 @@ public class MassIndexingBaseIT {
 		}
 	}
 
-	@BeforeEach
+	void init(TenancyMode tenancyMode) {
+		this.tenancyMode = tenancyMode;
+		setupHolder.initialize();
+
+		initData();
+	}
+
 	public void initData() {
 		setupHolder.with( targetTenantId() ).runInTransaction( session -> {
 			session.persist( new Book( 1, TITLE_1, AUTHOR_1 ) );
@@ -117,8 +124,10 @@ public class MassIndexingBaseIT {
 		return TenancyMode.MULTI_TENANCY.equals( tenancyMode ) ? TENANT_1_ID : null;
 	}
 
-	@Test
-	public void defaultMassIndexerStartAndWait() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void defaultMassIndexerStartAndWait(TenancyMode tenancyMode) throws Exception {
+		init( tenancyMode );
 		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer();
@@ -161,8 +170,10 @@ public class MassIndexingBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void dropAndCreateSchemaOnStart() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dropAndCreateSchemaOnStart(TenancyMode tenancyMode) {
+		init( tenancyMode );
 		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
@@ -206,8 +217,10 @@ public class MassIndexingBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void mergeSegmentsOnFinish() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void mergeSegmentsOnFinish(TenancyMode tenancyMode) {
+		init( tenancyMode );
 		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
@@ -252,8 +265,10 @@ public class MassIndexingBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void fromMappingWithoutSession() throws Exception {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void fromMappingWithoutSession(TenancyMode tenancyMode) throws Exception {
+		init( tenancyMode );
 		SearchMapping searchMapping = Search.mapping( setupHolder.sessionFactory() );
 		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer( targetTenantId() );
 
@@ -293,8 +308,10 @@ public class MassIndexingBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void dropAndCreateSchemaOnStartAndPurgeBothEnabled() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void dropAndCreateSchemaOnStartAndPurgeBothEnabled(TenancyMode tenancyMode) {
+		init( tenancyMode );
 		setupHolder.with( targetTenantId() ).runNoTransaction( session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer()
@@ -342,8 +359,10 @@ public class MassIndexingBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Test
-	public void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void reuseSearchSessionAfterOrmSessionIsClosed_createMassIndexer(TenancyMode tenancyMode) {
+		init( tenancyMode );
 		Session session = setupHolder.sessionFactory().withOptions()
 				.tenantIdentifier( targetTenantId() )
 				.openSession();
@@ -360,8 +379,10 @@ public class MassIndexingBaseIT {
 				.hasMessageContainingAll( "Unable to access Hibernate ORM session", "is closed" );
 	}
 
-	@Test
-	public void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void lazyCreateSearchSessionAfterOrmSessionIsClosed_createMassIndexer(TenancyMode tenancyMode) {
+		init( tenancyMode );
 		Session session = setupHolder.sessionFactory().withOptions()
 				.tenantIdentifier( targetTenantId() )
 				.openSession();

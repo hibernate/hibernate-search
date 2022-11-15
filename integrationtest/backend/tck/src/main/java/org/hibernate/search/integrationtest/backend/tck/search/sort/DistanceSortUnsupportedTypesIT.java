@@ -24,16 +24,15 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests basic behavior of distance sort common to all unsupported types,
  * i.e. error messages.
  */
-@RunWith(Parameterized.class)
 public class DistanceSortUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
@@ -41,13 +40,12 @@ public class DistanceSortUnsupportedTypesIT<F> {
 				.filter( typeDescriptor -> !GeoPoint.class.isAssignableFrom( typeDescriptor.getJavaType() ) );
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] parameters() {
-		List<Object[]> parameters = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> parameters = new ArrayList<>();
 		unsupportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
-				parameters.add( new Object[] { fieldTypeDescriptor } );
+				parameters.add( Arguments.of( fieldTypeDescriptor ) );
 		} );
-		return parameters.toArray( new Object[0][] );
+		return parameters;
 	}
 
 	@RegisterExtension
@@ -60,16 +58,11 @@ public class DistanceSortUnsupportedTypesIT<F> {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
-
-	public DistanceSortUnsupportedTypesIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
-		this.fieldTypeDescriptor = fieldTypeDescriptor;
-	}
-
-	@Test
-	public void error_notSupported() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void error_notSupported(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		StubMappingScope scope = index.createScope();
-		String absoluteFieldPath = getFieldPath();
+		String absoluteFieldPath = getFieldPath( fieldTypeDescriptor );
 
 		assertThatThrownBy(
 				() -> scope.sort().distance( absoluteFieldPath, GeoPoint.of( 42.0, 45.0 ) )
@@ -84,7 +77,7 @@ public class DistanceSortUnsupportedTypesIT<F> {
 				) );
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(FieldTypeDescriptor<F> fieldTypeDescriptor) {
 		return index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 

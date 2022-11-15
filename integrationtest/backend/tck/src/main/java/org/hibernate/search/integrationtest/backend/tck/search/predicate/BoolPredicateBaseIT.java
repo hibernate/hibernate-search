@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -17,6 +20,7 @@ import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.runner.RunWith;
 
 @RunWith(NestedRunner.class)
@@ -50,32 +54,36 @@ public class BoolPredicateBaseIT {
 
 		private static final StubMappedIndex index = StubMappedIndex.withoutFields().name( "score" );
 
-		public ScoreIT() {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return Arrays.asList( Arguments.of( index, dataSet ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.bool().should( f.id().matching( dataSet.docId( matchingDocOrdinal ) ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.bool().should( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
-				float boost) {
-			return f.bool().should( f.id().matching( dataSet.docId( matchingDocOrdinal ) ) )
+				float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.bool().should( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
 					.boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.bool().should( f.id().matching( dataSet.docId( matchingDocOrdinal ) ) )
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.bool().should( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
-				int matchingDocOrdinal, float boost) {
-			return f.bool().should( f.id().matching( dataSet.docId( matchingDocOrdinal ) ) )
+				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.bool().should( f.id().matching( ScoreIT.dataSet.docId( matchingDocOrdinal ) ) )
 					.constantScore().boost( boost );
 		}
 

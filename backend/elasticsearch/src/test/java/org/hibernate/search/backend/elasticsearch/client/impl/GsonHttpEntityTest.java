@@ -27,9 +27,9 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,12 +39,10 @@ import com.google.gson.JsonParser;
 import org.apache.http.Header;
 import org.apache.http.nio.ContentEncoder;
 
-@RunWith(Parameterized.class)
 public class GsonHttpEntityTest {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<Object[]> params() {
-		List<Object[]> params = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> params = new ArrayList<>();
 		Gson gson = GsonProvider.create( GsonBuilder::new, true ).getGson();
 
 		JsonObject bodyPart1 = JsonParser.parseString( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
@@ -52,7 +50,7 @@ public class GsonHttpEntityTest {
 		JsonObject bodyPart3 = JsonParser.parseString( "{ \"obj1\": " + bodyPart1.toString()
 				+ ", \"obj2\": " + bodyPart2.toString() + "}" ).getAsJsonObject();
 
-		for ( List<JsonObject> jsonObjects: Arrays.<List<JsonObject>>asList(
+		for ( List<JsonObject> jsonObjects : Arrays.<List<JsonObject>>asList(
 				Collections.emptyList(),
 				Collections.singletonList( bodyPart1 ),
 				Collections.singletonList( bodyPart2 ),
@@ -60,52 +58,58 @@ public class GsonHttpEntityTest {
 				Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ),
 				Arrays.asList( bodyPart3, bodyPart2, bodyPart1 )
 		) ) {
-			params.add( new Object[] { jsonObjects.toString(), jsonObjects } );
+			params.add( Arguments.of( jsonObjects.toString(), jsonObjects ) );
 		}
-		params.add( new Object[] {
+		params.add( Arguments.of(
 				"50 small objects",
 				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-						.flatMap( List::stream ).limit( 50 ).collect( Collectors.toList() ) } );
-		params.add( new Object[] {
+						.flatMap( List::stream ).limit( 50 ).collect( Collectors.toList() )
+		) );
+		params.add( Arguments.of(
 				"200 small objects",
 				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-						.flatMap( List::stream ).limit( 200 ).collect( Collectors.toList() ) } );
-		params.add( new Object[] {
+						.flatMap( List::stream ).limit( 200 ).collect( Collectors.toList() )
+		) );
+		params.add( Arguments.of(
 				"10,000 small objects",
 				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-						.flatMap( List::stream ).limit( 10_000 ).collect( Collectors.toList() ) } );
-		params.add( new Object[] {
+						.flatMap( List::stream ).limit( 10_000 ).collect( Collectors.toList() )
+		) );
+		params.add( Arguments.of(
 				"200 large objects",
 				Stream.generate( () -> {
-					// Generate one large object
-					JsonObject object = new JsonObject();
-					JsonArray array = new JsonArray();
-					object.add( "array", array );
-					Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-							.flatMap( List::stream ).limit( 1_000 ).forEach( array::add );
-					return object;
-				} )
+							// Generate one large object
+							JsonObject object = new JsonObject();
+							JsonArray array = new JsonArray();
+							object.add( "array", array );
+							Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+									.flatMap( List::stream ).limit( 1_000 ).forEach( array::add );
+							return object;
+						} )
 						// Reproduce the large object multiple times
-						.limit( 200 ).collect( Collectors.toList() ) } );
-		params.add( new Object[] {
+						.limit( 200 ).collect( Collectors.toList() )
+		) );
+		params.add( Arguments.of(
 				"1 very large object",
 				Stream.generate( () -> {
-					JsonObject object = new JsonObject();
-					JsonArray array = new JsonArray();
-					object.add( "array", array );
-					Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-							.flatMap( List::stream ).limit( 100_000 ).forEach( array::add );
-					return object;
-				} )
+							JsonObject object = new JsonObject();
+							JsonArray array = new JsonArray();
+							object.add( "array", array );
+							Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+									.flatMap( List::stream ).limit( 100_000 ).forEach( array::add );
+							return object;
+						} )
 						// Reproduce the large object multiple times
-						.limit( 1 ).collect( Collectors.toList() ) } );
+						.limit( 1 ).collect( Collectors.toList() )
+		) );
 
-		params.add( new Object[] {
+		params.add( Arguments.of(
 				"Reproducer for HSEARCH-4239",
 				// Yes these objects are weird, but then this is a weird edge-case.
 				Arrays.asList(
 						gson.fromJson( "{\"index\":{\"_index\":\"indexname-write\",\"_id\":\"0\"}}", JsonObject.class ),
-						gson.fromJson( "{\"content\":\"..........................................................."
+						gson.fromJson(
+								"{\"content\":\"..........................................................."
 										+ "...........—.....................—.......—....—....................................."
 										+ "...—.....................................................................——........."
 										+ "...................................................................................."
@@ -118,11 +122,12 @@ public class GsonHttpEntityTest {
 										+ ".................—.................................................................."
 										+ ".............................——....................................................."
 										+ "..........................................\",\"_entity_type\":\"indexNameType\"}",
-								JsonObject.class )
+								JsonObject.class
+						)
 				)
-		} );
+		) );
 
-		params.add( new Object[] {
+		params.add( Arguments.of(
 				"Reproducer for HSEARCH-4254",
 				Arrays.asList(
 						gson.fromJson(
@@ -135,19 +140,16 @@ public class GsonHttpEntityTest {
 								JsonObject.class
 						)
 				)
-		} );
+		) );
 
 		return params;
 	}
 
-	private final List<JsonObject> payload;
-	private final GsonHttpEntity gsonEntity;
-	private final String expectedPayloadString;
-	private final int expectedContentLength;
+	private GsonHttpEntity gsonEntity;
+	private String expectedPayloadString;
+	private int expectedContentLength;
 
-	@SuppressWarnings("unused")
-	public GsonHttpEntityTest(String ignoredLabel, List<JsonObject> payload) throws IOException {
-		this.payload = payload;
+	public void init(List<JsonObject> payload) throws IOException {
 		Gson gson = GsonProvider.create( GsonBuilder::new, true ).getGson();
 		this.gsonEntity = new GsonHttpEntity( gson, payload );
 		StringBuilder builder = new StringBuilder();
@@ -159,23 +161,29 @@ public class GsonHttpEntityTest {
 		this.expectedContentLength = StandardCharsets.UTF_8.encode( expectedPayloadString ).limit();
 	}
 
-	@Test
-	public void initialContentLength() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void initialContentLength(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		init( payload );
 		// The content length cannot be known from the start for large, multi-object payloads
 		assumeTrue( payload.size() <= 1 || expectedContentLength < 1024 );
 
 		assertThat( gsonEntity.getContentLength() ).isEqualTo( expectedContentLength );
 	}
 
-	@Test
-	public void contentType() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void contentType(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		init( payload );
 		Header contentType = gsonEntity.getContentType();
 		assertThat( contentType.getName() ).isEqualTo( "Content-Type" );
 		assertThat( contentType.getValue() ).isEqualTo( "application/json; charset=UTF-8" );
 	}
 
-	@Test
-	public void produceContent_noPushBack() throws IOException {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void produceContent_noPushBack(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		init( payload );
 		int pushBackPeriod = Integer.MAX_VALUE;
 		for ( int i = 0; i < 2; i++ ) { // Try several times: the result shouldn't change.
 			assertThat( doProduceContent( gsonEntity, pushBackPeriod ) )
@@ -185,8 +193,10 @@ public class GsonHttpEntityTest {
 		}
 	}
 
-	@Test
-	public void produceContent_pushBack_every5Bytes() throws IOException {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void produceContent_pushBack_every5Bytes(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		init( payload );
 		int pushBackPeriod = 5;
 		for ( int i = 0; i < 2; i++ ) { // Try several times: the result shouldn't change.
 			assertThat( doProduceContent( gsonEntity, pushBackPeriod ) )
@@ -196,8 +206,11 @@ public class GsonHttpEntityTest {
 		}
 	}
 
-	@Test
-	public void produceContent_pushBack_every100Bytes() throws IOException {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void produceContent_pushBack_every100Bytes(String ignoredLabel, List<JsonObject> payload)
+			throws IOException {
+		init( payload );
 		int pushBackPeriod = 100;
 		for ( int i = 0; i < 2; i++ ) { // Try several times: the result shouldn't change.
 			assertThat( doProduceContent( gsonEntity, pushBackPeriod ) )
@@ -207,8 +220,11 @@ public class GsonHttpEntityTest {
 		}
 	}
 
-	@Test
-	public void produceContent_pushBack_every500Bytes() throws IOException {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void produceContent_pushBack_every500Bytes(String ignoredLabel, List<JsonObject> payload)
+			throws IOException {
+		init( payload );
 		int pushBackPeriod = 500;
 		for ( int i = 0; i < 2; i++ ) { // Try several times: the result shouldn't change.
 			assertThat( doProduceContent( gsonEntity, pushBackPeriod ) )
@@ -218,8 +234,10 @@ public class GsonHttpEntityTest {
 		}
 	}
 
-	@Test
-	public void writeTo() throws IOException {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void writeTo(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		init( payload );
 		for ( int i = 0; i < 2; i++ ) { // Try several times: the result shouldn't change.
 			assertThat( doWriteTo( gsonEntity ) )
 					.isEqualTo( expectedPayloadString );
@@ -228,8 +246,10 @@ public class GsonHttpEntityTest {
 		}
 	}
 
-	@Test
-	public void getContent() throws IOException {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	void getContent(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		init( payload );
 		for ( int i = 0; i < 2; i++ ) { // Try several times: the result shouldn't change.
 			assertThat( doGetContent( gsonEntity ) )
 					.isEqualTo( expectedPayloadString );

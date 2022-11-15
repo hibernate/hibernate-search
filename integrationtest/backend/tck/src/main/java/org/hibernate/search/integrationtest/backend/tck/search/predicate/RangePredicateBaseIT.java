@@ -29,8 +29,10 @@ import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @RunWith(NestedRunner.class)
 public class RangePredicateBaseIT {
@@ -124,96 +126,75 @@ public class RangePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class SingleFieldIT<F> extends AbstractPredicateSingleFieldIT<RangePredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "singleField" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( index, dataSet ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public SingleFieldIT(DataSet<F, RangePredicateTestValues<F>> dataSet) {
-			super( index, dataSet );
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class MultiFieldIT<F> extends AbstractPredicateMultiFieldIT<RangePredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "multiField" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( index, dataSet ) );
+			}
 		}
 
-		public MultiFieldIT(DataSet<F, RangePredicateTestValues<F>> dataSet) {
-			super( index, dataSet );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndField(SearchPredicateFactory f, String fieldPath,
-				String otherFieldPath, int matchingDocOrdinal) {
+				String otherFieldPath, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).field( otherFieldPath )
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicateOnFields(SearchPredicateFactory f, String[] fieldPaths, int matchingDocOrdinal,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateOnFieldAndFields(SearchPredicateFactory f, String fieldPath,
-				String[] fieldPaths, int matchingDocOrdinal) {
+				String[] fieldPaths, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).fields( fieldPaths )
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<RangePredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
@@ -222,17 +203,23 @@ public class RangePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting_missingField" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public InObjectFieldIT(DataSet<F, RangePredicateTestValues<F>> dataSet) {
-			super( mainIndex, missingFieldIndex, dataSet );
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 	}
@@ -259,73 +246,70 @@ public class RangePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class ScoreIT<F> extends AbstractPredicateFieldScoreIT<RangePredicateTestValues<F>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "score" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( index, dataSet ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public ScoreIT(DataSet<F, RangePredicateTestValues<F>> dataSet) {
-			super( index, dataSet );
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal) {
+				int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).range( dataSet.values.matchingRange( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithPredicateLevelBoost(SearchPredicateFactory f, String[] fieldPaths,
-				int matchingDocOrdinal, float predicateBoost) {
+				int matchingDocOrdinal, float predicateBoost, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).range( dataSet.values.matchingRange( matchingDocOrdinal ) )
 					.boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
-				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost) {
+				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().fields( fieldPaths ).range( dataSet.values.matchingRange( matchingDocOrdinal ) )
 					.constantScore().boost( predicateBoost );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoost(SearchPredicateFactory f, String fieldPath,
-				float fieldBoost, int matchingDocOrdinal) {
+				float fieldBoost, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
-				String fieldPath, float fieldBoost, int matchingDocOrdinal) {
+				String fieldPath, float fieldBoost, int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndPredicateLevelBoost(SearchPredicateFactory f,
-				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost) {
+				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost,
+				DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) ).boost( predicateBoost );
 		}
@@ -352,26 +336,20 @@ public class RangePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class UnsupportedTypeIT extends AbstractPredicateUnsupportedTypeIT {
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
-				parameters.add( new Object[] { fieldType } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, unsupportedFieldTypes ) )
 						.name( "unsupportedType" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : unsupportedFieldTypes ) {
+				parameters.add( Arguments.of( index, fieldType ) );
+			}
 		}
 
-		public UnsupportedTypeIT(FieldTypeDescriptor<?> fieldType) {
-			super( index, fieldType );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -386,15 +364,7 @@ public class RangePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class SearchableIT extends AbstractPredicateSearchableIT {
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				parameters.add( new Object[] { fieldType } );
-			}
-		}
-
 		private static final SimpleMappedIndex<SearchableYesIndexBinding> searchableYesIndex =
 				SimpleMappedIndex.of( root -> new SearchableYesIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableYes" );
@@ -403,13 +373,15 @@ public class RangePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new SearchableNoIndexBinding( root, supportedFieldTypes ) )
 						.name( "searchableNo" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				parameters.add( Arguments.of( searchableYesIndex, searchableNoIndex, fieldType ) );
+			}
 		}
 
-		public SearchableIT(FieldTypeDescriptor<?> fieldType) {
-			super( searchableYesIndex, searchableNoIndex, fieldType );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -424,39 +396,34 @@ public class RangePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class ArgumentCheckingIT extends AbstractPredicateArgumentCheckingIT {
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				parameters.add( new Object[] { fieldType } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "argumentChecking" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				parameters.add( Arguments.of( index, fieldType ) );
+			}
+		}
+
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		public ArgumentCheckingIT(FieldTypeDescriptor<?> fieldType) {
-			super( index, fieldType );
-		}
-
-		@Test
-		public void nullBounds() {
+		@ParameterizedTest(name = "{1}")
+		@MethodSource("params")
+		public void nullBounds(SimpleMappedIndex<IndexBinding> index, FieldTypeDescriptor<?> fieldType) {
 			SearchPredicateFactory f = index.createScope().predicate();
 
-			assertThatThrownBy( () -> f.range().field( fieldPath() )
+			assertThatThrownBy( () -> f.range().field( fieldPath( index, fieldType ) )
 					.range( Range.between( null, null ) ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Invalid range",
 							"at least one bound in range predicates must be non-null",
-							fieldPath()
+							fieldPath( index, fieldType )
 					);
 		}
 
@@ -467,19 +434,8 @@ public class RangePredicateBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class TypeCheckingAndConversionIT<F>
 			extends AbstractPredicateTypeCheckingAndConversionIT<RangePredicateTestValues<F>, Range<?>> {
-		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
-
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_main" );
@@ -496,13 +452,18 @@ public class RangePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
-			return parameters;
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet ) );
+			}
 		}
 
-		public TypeCheckingAndConversionIT(DataSet<F, RangePredicateTestValues<F>> dataSet) {
-			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
+		public static List<? extends Arguments> params() {
+			return parameters;
 		}
 
 		@Override
@@ -528,13 +489,13 @@ public class RangePredicateBaseIT {
 		}
 
 		@Override
-		protected Range<?> unwrappedMatchingParam(int matchingDocOrdinal) {
+		protected Range<?> unwrappedMatchingParam(int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
 			return dataSet.values.matchingRange( matchingDocOrdinal );
 		}
 
 		@Override
-		protected Range<?> wrappedMatchingParam(int matchingDocOrdinal) {
-			return unwrappedMatchingParam( matchingDocOrdinal ).map( ValueWrapper::new );
+		protected Range<?> wrappedMatchingParam(int matchingDocOrdinal, DataSet<?, RangePredicateTestValues<F>> dataSet) {
+			return unwrappedMatchingParam( matchingDocOrdinal, dataSet ).map( ValueWrapper::new );
 		}
 
 		@Override

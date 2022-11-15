@@ -24,24 +24,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Basic tests of entity loading when executing a search query
  * when only a single type is involved.
  */
-@RunWith(Parameterized.class)
 public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "{0}, {1}")
-	public static List<Object[]> params() {
-		List<Object[]> result = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> result = new ArrayList<>();
 		forAllModelMappingCombinations( (model, mapping) -> {
-			result.add( new Object[] { model, mapping } );
+			result.add( Arguments.of( model, mapping ) );
 		} );
 		return result;
 	}
@@ -50,14 +48,11 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	public static BackendMock backendMock = BackendMock.createGlobal();
 
 	@RegisterExtension
-	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock );
+	public static ReusableOrmSetupHolder setupHolder = ReusableOrmSetupHolder.withBackendMock( backendMock )
+			.delayedInitialization( true );
 
 	@RegisterExtension
 	public Extension setupHolderMethodRule = setupHolder.methodExtension();
-
-	public SearchQueryEntityLoadingBaseIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
-		super( model, mapping );
-	}
 
 	@Override
 	protected BackendMock backendMock() {
@@ -80,11 +75,19 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		setupContext.withConfiguration( c -> mapping.configure( c, model ) );
 	}
 
+	@Override
+	protected void init(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		super.init( model, mapping );
+		setupHolder.initialize();
+	}
+
 	/**
 	 * Test loading without any specific configuration.
 	 */
-	@Test
-	public void simple() {
+	@ParameterizedTest(name = "{0}, {1}")
+	@MethodSource("params")
+	public void simple(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		init( model, mapping );
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -98,8 +101,10 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		);
 	}
 
-	@Test
-	public void simple_withVeryLargeTimeout() {
+	@ParameterizedTest(name = "{0}, {1}")
+	@MethodSource("params")
+	public void simple_withVeryLargeTimeout(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		init( model, mapping );
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -114,8 +119,10 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 		);
 	}
 
-	@Test
-	public void simple_entityLoadingTimeout() {
+	@ParameterizedTest(name = "{0}, {1}")
+	@MethodSource("params")
+	public void simple_entityLoadingTimeout(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		init( model, mapping );
 		final int entityCount = 3;
 
 		persistThatManyEntities( entityCount );
@@ -138,9 +145,11 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	 * In that case, we expect the loader to return null,
 	 * and the backend to skip the corresponding hits.
 	 */
-	@Test
+	@ParameterizedTest(name = "{0}, {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3349")
-	public void notFound() {
+	public void notFound(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		init( model, mapping );
 		persistThatManyEntities( 2 );
 
 		testLoading(
@@ -161,8 +170,10 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 	/**
 	 * Test that returned results are initialized even if a proxy was present in the persistence context.
 	 */
-	@Test
-	public void initializeProxyFromPersistenceContext() {
+	@ParameterizedTest(name = "{0}, {1}")
+	@MethodSource("params")
+	public void initializeProxyFromPersistenceContext(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		init( model, mapping );
 		final int entityCount = 10;
 
 		persistThatManyEntities( entityCount );

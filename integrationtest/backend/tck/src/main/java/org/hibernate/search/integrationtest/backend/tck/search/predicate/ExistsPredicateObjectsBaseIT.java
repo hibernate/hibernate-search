@@ -29,6 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
@@ -36,8 +37,10 @@ import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @RunWith(NestedRunner.class)
 public class ExistsPredicateObjectsBaseIT {
@@ -72,17 +75,7 @@ public class ExistsPredicateObjectsBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
-		private static final List<DataSet> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
-		static {
-			for ( ObjectStructure structure : Arrays.asList( ObjectStructure.NESTED, ObjectStructure.FLATTENED ) ) {
-				DataSet dataSet = new DataSet( structure );
-				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
-			}
-		}
 
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, Collections.singletonList( innerFieldType ) ) )
@@ -91,51 +84,63 @@ public class ExistsPredicateObjectsBaseIT {
 		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, Collections.singletonList( innerFieldType ) ) )
 						.name( "nesting_missingField" );
+		private static final List<DataSet> dataSets = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
+		static {
+			for ( ObjectStructure structure : Arrays.asList( ObjectStructure.NESTED, ObjectStructure.FLATTENED ) ) {
+				DataSet dataSet = new DataSet( structure );
+				dataSets.add( dataSet );
+				parameters.add( Arguments.of( mainIndex, missingFieldIndex, dataSet ) );
+			}
+		}
 
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		private final DataSet dataSet;
-
-		public InObjectFieldIT(DataSet dataSet) {
-			super( mainIndex, missingFieldIndex, dataSet );
-			this.dataSet = dataSet;
-		}
-
-		@Test
+		@ParameterizedTest(name = "{2}")
+		@MethodSource("params")
 		@TestForIssue(jiraKey = "HSEARCH-4162")
-		public void factoryWithRoot_nested() {
+		public void factoryWithRoot_nested(SimpleMappedIndex<IndexBinding> mainIndex,
+				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+				AbstractPredicateDataSet dataSet) {
 			assertThatQuery( mainIndex.query()
-					.where( f -> predicateWithRelativePath( f.withRoot( binding.nested.absolutePath ), binding.nested ) )
+					.where( f -> predicateWithRelativePath( f.withRoot( mainIndex.binding().nested.absolutePath ), mainIndex.binding().nested,
+							dataSet
+					) )
 					.routing( dataSet.routingKey ) )
 					.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 		}
 
-		@Test
+		@ParameterizedTest(name = "{2}")
+		@MethodSource("params")
 		@TestForIssue(jiraKey = "HSEARCH-4162")
-		public void factoryWithRoot_flattened() {
+		public void factoryWithRoot_flattened(SimpleMappedIndex<IndexBinding> mainIndex,
+				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+				AbstractPredicateDataSet dataSet) {
 			assertThatQuery( mainIndex.query()
-					.where( f -> predicateWithRelativePath( f.withRoot( binding.flattened.absolutePath ), binding.flattened ) )
+					.where( f -> predicateWithRelativePath( f.withRoot( mainIndex.binding().flattened.absolutePath ), mainIndex.binding().flattened,
+							dataSet
+					) )
 					.routing( dataSet.routingKey ) )
 					.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
-				int matchingDocOrdinal) {
+				int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			if ( matchingDocOrdinal != 0 ) {
 				throw new IllegalStateException( "This predicate can only match the first document" );
 			}
-			return f.exists().field( targetField( objectFieldBinding ).absolutePath );
+			return f.exists().field( targetField( objectFieldBinding, ( (DataSet) dataSet ) ).absolutePath );
 		}
 
-		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding) {
-			return f.exists().field( targetField( objectFieldBinding ).relativeName );
+		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+				AbstractPredicateDataSet dataSet) {
+			return f.exists().field( targetField( objectFieldBinding, ( (DataSet) dataSet ) ).relativeName );
 		}
 
-		private ObjectFieldBinding targetField(ObjectFieldBinding objectFieldBinding) {
+		private ObjectFieldBinding targetField(ObjectFieldBinding objectFieldBinding, DataSet dataSet) {
 			switch ( dataSet.structure ) {
 				case FLATTENED:
 					return objectFieldBinding.flattened;
@@ -165,56 +170,50 @@ public class ExistsPredicateObjectsBaseIT {
 	}
 
 	@Nested
-	@RunWith(Parameterized.class)
 	public static class ScoreIT extends AbstractPredicateScoreIT {
+		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "score" );
 		private static final List<DataSet> dataSets = new ArrayList<>();
-		private static final List<Object[]> parameters = new ArrayList<>();
+		private static final List<Arguments> parameters = new ArrayList<>();
 		static {
 			for ( ObjectStructure structure : ObjectStructure.values() ) {
 				DataSet dataSet = new DataSet( structure );
 				dataSets.add( dataSet );
-				parameters.add( new Object[] { dataSet } );
+				parameters.add( Arguments.of( index, dataSet ) );
 			}
 		}
 
-		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
-				.name( "score" );
-
-		@Parameterized.Parameters(name = "{0}")
-		public static List<Object[]> parameters() {
+		public static List<? extends Arguments> params() {
 			return parameters;
 		}
 
-		protected final DataSet dataSet;
-
-		public ScoreIT(DataSet dataSet) {
-			super( index, dataSet );
-			this.dataSet = dataSet;
-		}
-
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) );
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
-				float boost) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) ).boost( boost );
+				float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).boost( boost );
 		}
 
 		@Override
-		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) ).constantScore();
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal,
+				AbstractPredicateDataSet dataSet, StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore();
 		}
 
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
-				int matchingDocOrdinal, float boost) {
-			return f.exists().field( fieldPath( matchingDocOrdinal ) ).constantScore().boost( boost );
+				int matchingDocOrdinal, float boost, AbstractPredicateDataSet dataSet,
+				StubMappedIndex index) {
+			return f.exists().field( fieldPath( matchingDocOrdinal, dataSet ) ).constantScore().boost( boost );
 		}
 
-		private String fieldPath(int matchingDocOrdinal) {
+		private String fieldPath(int matchingDocOrdinal, AbstractPredicateDataSet dataSet) {
 			Map<ObjectStructure, ObjectFieldBinding> field;
 			switch ( matchingDocOrdinal ) {
 				case 0:
@@ -226,7 +225,7 @@ public class ExistsPredicateObjectsBaseIT {
 				default:
 					throw new IllegalStateException( "This test only works with up to two documents" );
 			}
-			return field.get( dataSet.structure ).relativeFieldName;
+			return field.get( ( (DataSet) dataSet ).structure ).relativeFieldName;
 		}
 
 		private static class IndexBinding {

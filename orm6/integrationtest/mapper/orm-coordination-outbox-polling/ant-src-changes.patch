@@ -1,24 +1,24 @@
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingDisabledIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingDisabledIT.java
-index ef59998f6f..e43f3b38e5 100644
+index d6a18984ff..97db2c8ae6 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingDisabledIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingDisabledIT.java
-@@ -83,7 +83,7 @@ public List<?> setupParams() {
- 
- 	@Test
- 	public void metamodel_onlyUserEntities() {
+@@ -89,7 +89,7 @@ void init(boolean hibernateSearchEnabled, String coordinationStrategyName) {
+ 	@MethodSource("params")
+ 	void metamodel_onlyUserEntities(boolean hibernateSearchEnabled, String coordinationStrategyName) {
+ 		init( hibernateSearchEnabled, coordinationStrategyName );
 -		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
 +		assertThat( setupHolder.sessionFactory().getJpaMetamodel().getEntities() )
  				.extracting( EntityType::getName )
  				.containsOnly( IndexedEntity.NAME );
  	}
 diff --git a/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java b/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java
-index a3d83491fa..7bb088d657 100644
+index 1f0434cdb5..43a91ce41e 100644
 --- a/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java
 +++ b/test/java/org/hibernate/search/integrationtest/mapper/orm/coordination/outboxpolling/OutboxPollingStrategyPropertyValueIT.java
-@@ -101,7 +101,7 @@ public void resetFilter() {
- 
- 	@Test
- 	public void metamodel_userEntitiesAndOutboxEventAndAgent() {
+@@ -106,7 +106,7 @@ void init(Object strategyPropertyValue) {
+ 	@MethodSource("params")
+ 	void metamodel_userEntitiesAndOutboxEventAndAgent(Object strategyPropertyValue) {
+ 		init( strategyPropertyValue );
 -		assertThat( setupHolder.sessionFactory().getMetamodel().getEntities() )
 +		assertThat( setupHolder.sessionFactory().getJpaMetamodel().getEntities() )
  				.<Class<?>>extracting( Type::getJavaType )

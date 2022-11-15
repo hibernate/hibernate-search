@@ -8,6 +8,9 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -20,17 +23,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * This is an extension of the backend TCK test {@link SearchMultiIndexIT}.
  */
-@RunWith(Parameterized.class)
 public class LuceneSearchMultiIndexIT {
 
 	private static final String STRING_1 = "string_1";
@@ -48,8 +48,6 @@ public class LuceneSearchMultiIndexIT {
 
 	private static final String DOCUMENT_2_1 = "2_1";
 
-	private final String directoryType;
-
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
 
@@ -58,17 +56,11 @@ public class LuceneSearchMultiIndexIT {
 	private final SimpleMappedIndex<IndexBinding2> index2 =
 			SimpleMappedIndex.of( IndexBinding2::new ).name( "index2" );;
 
-	@Parameters(name = "Lucene directory type {0}")
-	public static Object[] data() {
-		return new Object[] { "local-heap", "local-filesystem" };
+	public static List<? extends Arguments> params() {
+		return Arrays.asList( Arguments.of( "local-heap" ), Arguments.of( "local-filesystem" ) );
 	}
 
-	public LuceneSearchMultiIndexIT(String directoryType) {
-		this.directoryType = directoryType;
-	}
-
-	@BeforeEach
-	public void setup() {
+	public void init(String directoryType) {
 		setupHelper.start()
 				.withBackendProperty( "directory.type", directoryType )
 				.withIndexes( index1, index2 )
@@ -77,8 +69,10 @@ public class LuceneSearchMultiIndexIT {
 		initData();
 	}
 
-	@Test
-	public void field_in_one_index_only_is_supported_for_sorting() {
+	@ParameterizedTest(name = "Lucene directory type {0}")
+	@MethodSource("params")
+	public void field_in_one_index_only_is_supported_for_sorting(String directoryType) {
+		init( directoryType );
 		StubMappingScope scope = index1.createScope( index2 );
 
 		SearchQuery<DocumentReference> query = scope.query()

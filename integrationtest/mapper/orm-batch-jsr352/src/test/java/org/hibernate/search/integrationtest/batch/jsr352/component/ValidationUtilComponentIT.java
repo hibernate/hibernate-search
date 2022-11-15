@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * @author Mincong Huang
  */
-class ValidationUtilComponentIT {
+public class ValidationUtilComponentIT {
 
 	@RegisterExtension
 	public static ReusableOrmSetupHolder setupHolder =
@@ -37,7 +37,7 @@ class ValidationUtilComponentIT {
 	public Extension setupHolderMethodRule = setupHolder.methodExtension();
 
 	@ReusableOrmSetupHolder.Setup
-	void setup(OrmSetupHelper.SetupContext setupContext) {
+	public void setup(OrmSetupHelper.SetupContext setupContext) {
 		setupContext.withAnnotatedTypes( Company.class, Person.class )
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
 	}

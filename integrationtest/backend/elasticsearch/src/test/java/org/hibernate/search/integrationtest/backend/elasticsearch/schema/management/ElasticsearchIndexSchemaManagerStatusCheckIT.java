@@ -11,7 +11,8 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -25,23 +26,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for the index status checks,
  * for all status-checking schema management operations.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-2456")
 public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
-	@Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.statusChecking();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.statusChecking().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
 	@RegisterExtension
@@ -52,27 +52,23 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerStatusCheckIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void indexMissing() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void indexMissing(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		assumeFalse( "The operation " + operation + " creates an index automatically."
 				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
 		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
-		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json" ) )
+		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "HSEARCH400050" );
 	}
 
-	@Test
-	public void invalidIndexStatus_creatingIndex() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void invalidIndexStatus_creatingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		assumeTrue( "The operation " + operation + " doesn't create an index automatically."
 				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
@@ -81,13 +77,14 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 		// Make sure automatically created indexes will never be green by requiring 5 replicas
 		// (more than the amount of ES nodes)
-		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json" ) )
+		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "HSEARCH400024", "100ms" );
 	}
 
-	@Test
-	public void invalidIndexStatus_usingPreexistingIndex() throws Exception {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void invalidIndexStatus_usingPreexistingIndex(ElasticsearchIndexSchemaManagerOperation operation) throws Exception {
 		assumeFalse( "The operation " + operation + " drops the existing index automatically."
 						+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ) );
@@ -100,13 +97,13 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 						simpleMappingForInitialization( "" )
 				);
 
-		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json" ) )
+		assertThatThrownBy( () -> setupAndInspectIndex( "index-settings-for-tests/5-replicas.json", operation ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "HSEARCH400024", "100ms" );
 	}
 
 
-	private void setupAndInspectIndex(String settingsPath) {
+	private void setupAndInspectIndex(String settingsPath, ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, validation of those is tested in another test class

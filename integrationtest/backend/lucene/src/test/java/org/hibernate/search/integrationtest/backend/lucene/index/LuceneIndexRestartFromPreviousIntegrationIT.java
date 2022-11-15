@@ -20,21 +20,16 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class LuceneIndexRestartFromPreviousIntegrationIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return Arrays.asList( "local-heap", "local-filesystem" );
+	public static List<? extends Arguments> params() {
+		return Arrays.asList( Arguments.of( "local-heap" ), Arguments.of( "local-filesystem" ) );
 	}
-
-	@Parameterized.Parameter
-	public String directoryType;
 
 	@RegisterExtension
 	public final SearchSetupHelper setupHelper = SearchSetupHelper.create();
@@ -42,8 +37,9 @@ public class LuceneIndexRestartFromPreviousIntegrationIT {
 	private final SimpleMappedIndex<IndexBindingV1> indexV1 = SimpleMappedIndex.of( IndexBindingV1::new );
 	private final SimpleMappedIndex<IndexBindingV2> indexV2 = SimpleMappedIndex.of( IndexBindingV2::new );
 
-	@Test
-	public void addNewFieldOnExistingIndex() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void addNewFieldOnExistingIndex(String directoryType) {
 		StubMapping mappingV1 = setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY )
 				.withIndex( indexV1 )

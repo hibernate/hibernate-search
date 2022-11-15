@@ -9,7 +9,8 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -20,22 +21,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests related to index custom settings when creating indexes,
  * for all index-creating schema management operations.
  */
-@RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3934")
 public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 
-	@Parameterized.Parameters(name = "With operation {0}")
-	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
-		return ElasticsearchIndexSchemaManagerOperation.creating();
+	public static List<? extends Arguments> params() {
+		return ElasticsearchIndexSchemaManagerOperation.creating().stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
 
 	@RegisterExtension
@@ -46,20 +47,15 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
-
-	public ElasticsearchIndexSchemaManagerCreationCustomSettingsIT(ElasticsearchIndexSchemaManagerOperation operation) {
-		this.operation = operation;
-	}
-
-	@Test
-	public void success_mergeWithNoOverlapping() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void success_mergeWithNoOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		// merge the default analysis configurer with the custom settings,
 		// there are no overlapping of their definitions
-		setupAndCreateIndex( null, "custom-index-settings/valid.json" );
+		setupAndCreateIndex( null, "custom-index-settings/valid.json", operation );
 
 		assertJsonEquals(
 				" { " +
@@ -118,14 +114,15 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 				.isEqualTo( "\"3\"" );
 	}
 
-	@Test
-	public void success_mergeWithOverlapping() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void success_mergeWithOverlapping(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		// merge the default analysis configurer with the custom settings,
 		// there are some overlapping of their definitions
-		setupAndCreateIndex( null, "custom-index-settings/overlapping.json" );
+		setupAndCreateIndex( null, "custom-index-settings/overlapping.json", operation );
 
 		assertJsonEquals(
 				" { " +
@@ -171,14 +168,15 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 				.isEqualTo( "\"3\"" );
 	}
 
-	@Test
-	public void success_onlyCustomSettings() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void success_onlyCustomSettings(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		// use an empty analysis configurer,
 		// so that we have only the custom settings definitions
-		setupAndCreateIndex( new EmptyElasticsearchAnalysisConfigurer(), "custom-index-settings/valid.json" );
+		setupAndCreateIndex( new EmptyElasticsearchAnalysisConfigurer(), "custom-index-settings/valid.json", operation );
 
 		assertJsonEquals(
 				" { " +
@@ -209,14 +207,17 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 				.isEqualTo( "\"3\"" );
 	}
 
-	@Test
-	public void maxResultWindow() {
+	@ParameterizedTest(name = "With operation {0}")
+	@MethodSource("params")
+	public void maxResultWindow(ElasticsearchIndexSchemaManagerOperation operation) {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		// use an empty analysis configurer,
 		// so that we have only the custom settings definitions
-		setupAndCreateIndex( new EmptyElasticsearchAnalysisConfigurer(), "custom-index-settings/max-result-window.json" );
+		setupAndCreateIndex( new EmptyElasticsearchAnalysisConfigurer(), "custom-index-settings/max-result-window.json",
+				operation
+		);
 
 		assertJsonEquals(
 				"\"250\"",
@@ -224,7 +225,8 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 		);
 	}
 
-	private void setupAndCreateIndex(ElasticsearchAnalysisConfigurer analysisConfigurer, String customSettingsFile) {
+	private void setupAndCreateIndex(ElasticsearchAnalysisConfigurer analysisConfigurer, String customSettingsFile,
+			ElasticsearchIndexSchemaManagerOperation operation) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER, analysisConfigurer )

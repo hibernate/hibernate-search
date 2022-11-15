@@ -26,11 +26,9 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.provider.Arguments;
 
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,19 +41,17 @@ import org.mockito.quality.Strictness;
  */
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
 @ExtendWith(MockitoExtension.class)
-@RunWith(Parameterized.class)
 public abstract class AbstractPojoIndexingOperationIT {
 
-	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
-	public static List<Object[]> parameters() {
-		List<Object[]> params = new ArrayList<>();
+	public static List<? extends Arguments> params() {
+		List<Arguments> params = new ArrayList<>();
 		MyRoutingBinder routingBinder = new MyRoutingBinder();
 		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
 			for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
-				params.add( new Object[] { commitStrategy, refreshStrategy, null, null } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, null, routingBinder } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", null } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", routingBinder } );
+				params.add( Arguments.of( commitStrategy, refreshStrategy, null, null ) );
+				params.add( Arguments.of( commitStrategy, refreshStrategy, null, routingBinder ) );
+				params.add( Arguments.of( commitStrategy, refreshStrategy, "tenant1", null ) );
+				params.add( Arguments.of( commitStrategy, refreshStrategy, "tenant1", routingBinder ) );
 			}
 		}
 		return params;
@@ -68,13 +64,9 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public final StandalonePojoMappingSetupHelper setupHelper =
 			StandalonePojoMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	@Parameterized.Parameter
 	public DocumentCommitStrategy commitStrategy;
-	@Parameterized.Parameter(1)
 	public DocumentRefreshStrategy refreshStrategy;
-	@Parameterized.Parameter(2)
 	public String tenantId;
-	@Parameterized.Parameter(3)
 	public MyRoutingBinder routingBinder;
 
 	protected SearchMapping mapping;
@@ -85,8 +77,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 	@Mock
 	private SelectionEntityLoader<ContainedEntity> containedEntityLoaderMock;
 
-	@BeforeEach
-	public void setup() {
+	public void setup(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		this.commitStrategy = commitStrategy;
+		this.refreshStrategy = refreshStrategy;
+		this.tenantId = tenantId;
+		this.routingBinder = routingBinder;
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "value", String.class )
 				.objectField( "contained", b2 -> b2

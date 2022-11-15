@@ -31,35 +31,34 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests behavior common to all single-field aggregations (range, terms, ...)
  * on unsupported types.
  */
-@RunWith(Parameterized.class)
 public class SingleFieldAggregationUnsupportedTypesIT<F> {
 
-	private static Set<FieldTypeDescriptor<?>> unsupportedFieldTypes;
+	private static final Set<FieldTypeDescriptor<?>> unsupportedFieldTypes = new LinkedHashSet<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{1}")
-	public static Object[][] parameters() {
-		unsupportedFieldTypes = new LinkedHashSet<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
 			for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
 				Optional<? extends UnsupportedSingleFieldAggregationExpectations> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getUnsupported();
 				if ( expectations.isPresent() ) {
 					unsupportedFieldTypes.add( fieldTypeDescriptor );
-					parameters.add( new Object[] { fieldTypeDescriptor, expectations.get() } );
+					parameters.add( Arguments.of( fieldTypeDescriptor, expectations.get() ) );
 				}
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	@RegisterExtension
@@ -72,19 +71,11 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private final FieldTypeDescriptor<F> fieldType;
-	private final UnsupportedSingleFieldAggregationExpectations expectations;
-
-	public SingleFieldAggregationUnsupportedTypesIT(FieldTypeDescriptor<F> fieldType,
-			UnsupportedSingleFieldAggregationExpectations expectations) {
-		this.fieldType = fieldType;
-		this.expectations = expectations;
-	}
-
-	@Test
+	@ParameterizedTest(name = "{1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithUnsupportedType")
-	public void simple() {
+	public void simple(FieldTypeDescriptor<F> fieldType, UnsupportedSingleFieldAggregationExpectations expectations) {
 		SimpleFieldModel<F> model = index.binding().fieldModels.get( fieldType );
 		String fieldPath = model.relativeFieldName;
 
@@ -103,7 +94,7 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 	}
 
 	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration, FieldTypeDescriptor<F> fieldType) {
 		return SimpleFieldModel.mapper( fieldType, additionalConfiguration )
 				.map( parent, prefix + fieldType.getUniqueName() );
 	}

@@ -44,25 +44,22 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests basic behavior of sorts by distance.
  */
-@RunWith(Parameterized.class)
 public class DistanceSortBaseIT {
 
 	private static final GeoPointFieldTypeDescriptor fieldType = GeoPointFieldTypeDescriptor.INSTANCE;
 	private static final Set<FieldTypeDescriptor<GeoPoint>> supportedFieldTypes = Collections.singleton( fieldType );
-	private static List<DataSet> dataSets;
+	private static final List<DataSet> dataSets = new ArrayList<>();
+	private static final List<Arguments> parameters = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0} - {2} - {1}")
-	public static Object[][] parameters() {
-		dataSets = new ArrayList<>();
-		List<Object[]> parameters = new ArrayList<>();
+	static {
 		for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
 			// We need two separate datasets when the sort mode is not defined,
 			// because then the sort mode will be inferred automatically to
@@ -71,16 +68,19 @@ public class DistanceSortBaseIT {
 			dataSets.add( dataSetForAsc );
 			DataSet dataSetForDesc = new DataSet( fieldStructure, null, SortMode.MAX );
 			dataSets.add( dataSetForDesc );
-			parameters.add( new Object[] { fieldStructure, null, dataSetForAsc, dataSetForDesc } );
+			parameters.add( Arguments.of( fieldStructure, null, dataSetForAsc, dataSetForDesc ) );
 			for ( SortMode sortMode : SortMode.values() ) {
 				// When the sort mode is defined, we only need one dataset.
 				dataSetForAsc = new DataSet( fieldStructure, sortMode, sortMode );
 				dataSets.add( dataSetForAsc );
 				dataSetForDesc = dataSetForAsc;
-				parameters.add( new Object[] { fieldStructure, sortMode, dataSetForAsc, dataSetForDesc } );
+				parameters.add( Arguments.of( fieldStructure, sortMode, dataSetForAsc, dataSetForDesc ) );
 			}
 		}
-		return parameters.toArray( new Object[0][] );
+	}
+
+	public static List<? extends Arguments> params() {
+		return parameters;
 	}
 
 	private static final int BEFORE_DOCUMENT_1_ORDINAL = 0;
@@ -110,36 +110,27 @@ public class DistanceSortBaseIT {
 		indexer.join();
 	}
 
-	private final TestedFieldStructure fieldStructure;
-	private final SortMode sortMode;
-	private final DataSet dataSetForAsc;
-	private final DataSet dataSetForDesc;
-
-	public DistanceSortBaseIT(TestedFieldStructure fieldStructure, SortMode sortMode,
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
+	public void simple(TestedFieldStructure fieldStructure, SortMode sortMode,
 			DataSet dataSetForAsc, DataSet dataSetForDesc) {
-		this.fieldStructure = fieldStructure;
-		this.sortMode = sortMode;
-		this.dataSetForAsc = dataSetForAsc;
-		this.dataSetForDesc = dataSetForDesc;
-	}
-
-	@Test
-	public void simple() {
-		assumeTestParametersWork();
+		assumeTestParametersWork( sortMode, fieldStructure );
 
 		DataSet dataSet;
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
 		dataSet = dataSetForAsc;
-		query = simpleQuery( dataSet, b -> b.distance( fieldPath, CENTER_POINT ) );
+		query = simpleQuery( dataSet, b -> b.distance( fieldPath, CENTER_POINT ), sortMode, fieldStructure );
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
 				dataSet,
-				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() ),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
@@ -148,7 +139,9 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.asc()
+						.asc(),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
@@ -156,7 +149,9 @@ public class DistanceSortBaseIT {
 		dataSet = dataSetForDesc;
 		query = simpleQuery(
 				dataSet,
-				b -> b.distance( fieldPath, CENTER_POINT ).desc()
+				b -> b.distance( fieldPath, CENTER_POINT ).desc(),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
@@ -165,26 +160,32 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.desc()
+						.desc(),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 	}
 
-	@Test
-	public void missingValue_explicit() {
-		assumeTestParametersWork();
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
+	public void missingValue_explicit(TestedFieldStructure fieldStructure, SortMode sortMode,
+			DataSet dataSetForAsc, DataSet dataSetForDesc) {
+		assumeTestParametersWork( sortMode, fieldStructure );
 
 		DataSet dataSet;
 		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
 		// Explicit order with missing().last()
 		dataSet = dataSetForAsc;
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.asc().missing().last()
+						.asc().missing().last(),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
@@ -193,7 +194,9 @@ public class DistanceSortBaseIT {
 			assertThatThrownBy( () -> simpleQuery(
 					dataSetForDesc,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-							.desc().missing().last()
+							.desc().missing().last(),
+					sortMode,
+					fieldStructure
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid use of 'missing().last()' for a descending distance sort.",
@@ -204,7 +207,9 @@ public class DistanceSortBaseIT {
 			query = simpleQuery(
 					dataSet,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-							.desc().missing().last()
+							.desc().missing().last(),
+					sortMode,
+					fieldStructure
 			);
 			assertThatQuery( query )
 					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
@@ -215,7 +220,9 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.desc().missing().first()
+						.desc().missing().first(),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
@@ -225,7 +232,9 @@ public class DistanceSortBaseIT {
 			assertThatThrownBy( () -> simpleQuery(
 					dataSetForAsc,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-							.asc().missing().first()
+							.asc().missing().first(),
+					sortMode,
+					fieldStructure
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid use of 'missing().first()' for an ascending distance sort.",
@@ -235,7 +244,9 @@ public class DistanceSortBaseIT {
 			assertThatThrownBy( () -> simpleQuery(
 					dataSetForAsc,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-							.missing().first()
+							.missing().first(),
+					sortMode,
+					fieldStructure
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid use of 'missing().first()' for an ascending distance sort.",
@@ -246,7 +257,9 @@ public class DistanceSortBaseIT {
 			query = simpleQuery(
 					dataSet,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-							.asc().missing().first()
+							.asc().missing().first(),
+					sortMode,
+					fieldStructure
 			);
 			assertThatQuery( query )
 					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
@@ -257,7 +270,9 @@ public class DistanceSortBaseIT {
 			assertThatThrownBy( () -> simpleQuery(
 					dataSetForAsc,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-							.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) )
+							.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ),
+					sortMode,
+					fieldStructure
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid use of 'missing().use(...)' for a distance sort.",
@@ -271,7 +286,9 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) )
+						.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
@@ -280,7 +297,9 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) )
+						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.emptyDoc1Id, dataSet.doc2Id, dataSet.doc3Id );
@@ -289,7 +308,9 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) )
+						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.emptyDoc1Id, dataSet.doc3Id );
@@ -298,23 +319,29 @@ public class DistanceSortBaseIT {
 		query = simpleQuery(
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
-						.asc().missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) )
+						.asc().missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ),
+				sortMode,
+				fieldStructure
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
-	public void medianWithNestedField() {
+	public void medianWithNestedField(TestedFieldStructure fieldStructure, SortMode sortMode,
+			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		assumeTrue(
 				"This test is only relevant when using SortMode.MEDIAN in nested fields",
-				isMedianWithNestedField()
+				isMedianWithNestedField( sortMode, fieldStructure )
 		);
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
-		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
+		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ), sortMode,
+				fieldStructure
+		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid sort mode: MEDIAN",
@@ -323,17 +350,21 @@ public class DistanceSortBaseIT {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
-	public void sum() {
+	public void sum(TestedFieldStructure fieldStructure, SortMode sortMode,
+			DataSet dataSetForAsc, DataSet dataSetForDesc) {
 		assumeTrue(
 				"This test is only relevant when using SortMode.SUM",
-				isSum()
+				isSum( sortMode )
 		);
 
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
-		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
+		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ), sortMode,
+				fieldStructure
+		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid sort mode: SUM. This sort mode is not supported for a distance sort",
@@ -342,10 +373,12 @@ public class DistanceSortBaseIT {
 				);
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-4162")
-	public void factoryWithRoot() {
-		assumeTestParametersWork();
+	public void factoryWithRoot(TestedFieldStructure fieldStructure, SortMode sortMode,
+			DataSet dataSetForAsc, DataSet dataSetForDesc) {
+		assumeTestParametersWork( sortMode, fieldStructure );
 
 		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
 
@@ -359,7 +392,9 @@ public class DistanceSortBaseIT {
 				.sort( ( (Function<SearchSortFactory, DistanceSortOptionsStep<?, ?>>)
 						f -> f.withRoot( parentObjectBinding.absolutePath )
 								.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), CENTER_POINT ) )
-						.andThen( this::applySortMode )
+						.andThen( (DistanceSortOptionsStep<?, ?> optionsStep1) -> applySortMode( optionsStep1,
+								sortMode
+						) )
 						// Don't call this.applyFilter: we need to use the relative name of the discriminator field.
 						.andThen( optionsStep -> {
 							if ( fieldStructure.isInNested() ) {
@@ -375,17 +410,21 @@ public class DistanceSortBaseIT {
 						dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 	}
 
-	@Test
+	@ParameterizedTest(name = "{0} - {2} - {1}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = { "HSEARCH-4513" })
-	public void concurrentQueriesUsingSameSort() {
-		assumeTestParametersWork();
+	public void concurrentQueriesUsingSameSort(TestedFieldStructure fieldStructure, SortMode sortMode,
+			DataSet dataSetForAsc, DataSet dataSetForDesc) {
+		assumeTestParametersWork( sortMode, fieldStructure );
 
 		DataSet dataSet;
-		String fieldPath = getFieldPath();
+		String fieldPath = getFieldPath( fieldStructure );
 
 		StubMappingScope scope = index.createScope();
 
-		SearchSort sort = applyFilter( applySortMode( scope.sort().distance( fieldPath, CENTER_POINT ) ) ).toSort();
+		SearchSort sort = applyFilter( applySortMode( scope.sort().distance( fieldPath, CENTER_POINT ), sortMode ),
+				fieldStructure
+		).toSort();
 
 		dataSet = dataSetForAsc;
 		SearchQuery<DocumentReference> query1 = scope.query()
@@ -406,31 +445,33 @@ public class DistanceSortBaseIT {
 				.hasNoHits();
 	}
 
-	private void assumeTestParametersWork() {
+	private void assumeTestParametersWork(SortMode sortMode, TestedFieldStructure fieldStructure) {
 		assumeFalse(
 				"This combination is not expected to work",
-				isMedianWithNestedField() || isSum()
+				isMedianWithNestedField( sortMode, fieldStructure ) || isSum( sortMode )
 		);
 	}
 
-	private boolean isMedianWithNestedField() {
+	private boolean isMedianWithNestedField(SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return SortMode.MEDIAN.equals( sortMode ) && fieldStructure.isInNested();
 	}
 
-	private boolean isSum() {
+	private boolean isSum(SortMode sortMode) {
 		return SortMode.SUM.equals( sortMode );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(DataSet dataSet,
-			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?, ?>> sortContributor) {
+			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?, ?>> sortContributor,
+			SortMode sortMode, TestedFieldStructure fieldStructure) {
 		return index.query()
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
-				.sort( sortContributor.andThen( this::applySortMode ).andThen( this::applyFilter ) )
+				.sort( sortContributor.andThen( t -> applySortMode( t, sortMode ) )
+						.andThen( t -> applyFilter( t, fieldStructure ) ) )
 				.toQuery();
 	}
 
-	private DistanceSortOptionsStep<?, ?> applySortMode(DistanceSortOptionsStep<?, ?> optionsStep) {
+	private DistanceSortOptionsStep<?, ?> applySortMode(DistanceSortOptionsStep<?, ?> optionsStep, SortMode sortMode) {
 		if ( sortMode != null ) {
 			return optionsStep.mode( sortMode );
 		}
@@ -439,7 +480,8 @@ public class DistanceSortBaseIT {
 		}
 	}
 
-	private DistanceSortOptionsStep<?, ?> applyFilter(DistanceSortOptionsStep<?, ?> optionsStep) {
+	private DistanceSortOptionsStep<?, ?> applyFilter(DistanceSortOptionsStep<?, ?> optionsStep,
+			TestedFieldStructure fieldStructure) {
 		if ( fieldStructure.isInNested() ) {
 			return optionsStep.filter( f -> f.match()
 					.field( index.binding().getDiscriminatorFieldPath( fieldStructure ) )
@@ -450,7 +492,7 @@ public class DistanceSortBaseIT {
 		}
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(TestedFieldStructure fieldStructure) {
 		return index.binding().getFieldPath( fieldStructure, fieldType );
 	}
 

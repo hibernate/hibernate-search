@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -25,13 +26,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class HibernateOrmIndexedIT {
 
 	private static final String BACKEND_2 = "backend2";
@@ -46,8 +44,7 @@ public class HibernateOrmIndexedIT {
 		NAMED_BACKEND_CONFIGURATIONS = map;
 	}
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
+	public static List<? extends Arguments> params() {
 		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS,
 				mapping -> {
@@ -60,23 +57,22 @@ public class HibernateOrmIndexedIT {
 					userMapping.indexed().backend( "backend2" );
 					//end::programmatic[]
 				}
-		);
+		).stream()
+				.map( Arguments::of )
+				.collect( Collectors.toList() );
 	}
-
-	@Parameterized.Parameter
-	@RegisterExtension
-	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@BeforeEach
-	public void setup() {
+	public void init(DocumentationSetupHelper setupHelper) {
 		entityManagerFactory = setupHelper.start().setup( Book.class, User.class, Author.class );
 		initData();
 	}
 
-	@Test
-	public void search_separateQueries() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void search_separateQueries(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		with( entityManagerFactory ).runInTransaction( entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
@@ -92,8 +88,10 @@ public class HibernateOrmIndexedIT {
 		} );
 	}
 
-	@Test
-	public void search_singleQuery() {
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("params")
+	public void search_singleQuery(DocumentationSetupHelper setupHelper) {
+		init( setupHelper );
 		assertThatThrownBy(
 				() -> with( entityManagerFactory ).runInTransaction( entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );

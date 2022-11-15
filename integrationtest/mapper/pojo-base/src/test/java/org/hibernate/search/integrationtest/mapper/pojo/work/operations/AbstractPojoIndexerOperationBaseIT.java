@@ -14,21 +14,26 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
-import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexer}.
  */
 public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoIndexingOperationIT {
 
-	@Test
-	public void success() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void success(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -43,8 +48,10 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
-	public void providedId() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -59,8 +66,10 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
-	public void providedId_providedRoutes_currentAndNoPrevious() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes_currentAndNoPrevious(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -100,8 +109,10 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
-	public void providedId_providedRoutes_currentAndPrevious() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void providedId_providedRoutes_currentAndPrevious(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -145,9 +156,11 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void previouslyIndexedWithDifferentRoute() {
+	void previouslyIndexedWithDifferentRoute(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
@@ -176,9 +189,11 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void previouslyIndexedWithMultipleRoutes() {
+	void previouslyIndexedWithMultipleRoutes(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
@@ -212,9 +227,11 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void notIndexed_notPreviouslyIndexed() {
+	void notIndexed_notPreviouslyIndexed(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
@@ -229,9 +246,11 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void notIndexed_previouslyIndexedWithDifferentRoute() {
+	void notIndexed_previouslyIndexedWithDifferentRoute(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
@@ -252,9 +271,11 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void notIndexed_previouslyIndexedWithMultipleRoutes() {
+	void notIndexed_previouslyIndexedWithMultipleRoutes(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
@@ -282,8 +303,10 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
-	public void runtimeException() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void runtimeException(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		RuntimeException exception = new RuntimeException();
 		try ( SearchSession session = createSession() ) {
@@ -299,8 +322,10 @@ public abstract class AbstractPojoIndexerOperationBaseIT extends AbstractPojoInd
 		}
 	}
 
-	@Test
-	public void error() {
+	@ParameterizedTest(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
+	@MethodSource("params")
+	void error(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy, String tenantId, MyRoutingBinder routingBinder) {
+		setup( commitStrategy, refreshStrategy, tenantId, routingBinder );
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		Error error = new Error();
 		try ( SearchSession session = createSession() ) {
