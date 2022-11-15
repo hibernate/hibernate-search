@@ -31,9 +31,9 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AggregationDslIT {
 
@@ -47,7 +47,7 @@ public class AggregationDslIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, BookEdition.class );
 		initData();

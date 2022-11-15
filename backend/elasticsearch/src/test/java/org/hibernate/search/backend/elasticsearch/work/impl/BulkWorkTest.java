@@ -27,9 +27,9 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -51,7 +51,7 @@ public class BulkWorkTest {
 	@Mock(strictness = Mock.Strictness.LENIENT)
 	private ElasticsearchWorkExecutionContext contextMock;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		when( contextMock.getClient() ).thenReturn( clientMock );
 	}

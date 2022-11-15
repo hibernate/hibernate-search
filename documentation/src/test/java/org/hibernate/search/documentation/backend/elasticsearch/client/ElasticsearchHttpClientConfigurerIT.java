@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ElasticsearchHttpClientConfigurerIT {
 

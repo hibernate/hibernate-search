@@ -27,9 +27,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests a corner case that is not covered by
@@ -48,7 +48,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( Containing.INDEX );
 		backendMock.expectAnySchema( Contained.INDEX );

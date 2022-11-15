@@ -26,15 +26,15 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 
 // This does not work because Hibernate ORM doesn't support instantiating records
 // for entities/embeddables at the moment.
-@Ignore
+@Disabled
 public class IndexedEmbeddedRecordIT {
 
 	@Rule
@@ -45,7 +45,7 @@ public class IndexedEmbeddedRecordIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "myRecord", b2 -> b2

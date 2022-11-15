@@ -29,9 +29,9 @@ import org.hibernate.search.util.impl.test.data.TextContent;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.awaitility.Awaitility;
 
@@ -66,7 +66,7 @@ public class IndexIndexerLargeDocumentsIT {
 	public IndexIndexerLargeDocumentsIT() {
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}

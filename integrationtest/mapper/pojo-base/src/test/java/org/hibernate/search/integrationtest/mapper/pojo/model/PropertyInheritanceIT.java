@@ -20,9 +20,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class PropertyInheritanceIT {
@@ -35,7 +35,7 @@ public class PropertyInheritanceIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "parentDeclaredProperty", String.class )

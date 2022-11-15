@@ -27,9 +27,9 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HibernateOrmMassIndexerIT {
 
@@ -43,7 +43,7 @@ public class HibernateOrmMassIndexerIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false )

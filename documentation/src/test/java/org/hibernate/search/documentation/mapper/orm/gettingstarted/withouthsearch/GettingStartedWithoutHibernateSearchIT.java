@@ -15,20 +15,20 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class GettingStartedWithoutHibernateSearchIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		entityManagerFactory = Persistence.createEntityManagerFactory( "GettingStartedWithoutHibernateSearchIT" );
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( entityManagerFactory != null ) {
 			entityManagerFactory.close();

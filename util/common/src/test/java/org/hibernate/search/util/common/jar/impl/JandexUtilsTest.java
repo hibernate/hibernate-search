@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.HibernateSearchUtilInternalTestCommonClass;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.jboss.jandex.ClassInfo;

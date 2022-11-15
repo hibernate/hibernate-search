@@ -64,9 +64,9 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.rule.Retry;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.extension.Parameters;
@@ -123,7 +123,7 @@ public class ElasticsearchClientFactoryImplIT {
 		this.retry = Retry.withOtherRules( logged, wireMockRule1, wireMockRule2, testConfigurationProvider );
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();

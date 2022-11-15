@@ -21,8 +21,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.event.impl.Out
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
@@ -41,7 +41,7 @@ public class HibernateOrmMapperOutboxPollingClassesTest {
 
 	private static Index outboxPollingIndex;
 
-	@BeforeClass
+	@BeforeAll
 	public static void index() {
 		outboxPollingIndex = readOrBuildIndex(
 				codeSourceLocation( HibernateOrmMapperOutboxPollingSettings.class )

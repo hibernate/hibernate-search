@@ -33,9 +33,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test mass indexing of an entity type using an {@link EmbeddedId}.
@@ -60,7 +60,7 @@ public class MassIndexingEmbeddedIdIT {
 	private Book book2;
 	private Book book3;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 

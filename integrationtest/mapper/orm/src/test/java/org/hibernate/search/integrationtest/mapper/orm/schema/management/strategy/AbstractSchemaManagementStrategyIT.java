@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManageme
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSchemaManagementStrategyIT {
 

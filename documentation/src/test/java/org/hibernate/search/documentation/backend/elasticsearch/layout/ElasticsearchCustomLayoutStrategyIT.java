@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.test.JsonHelper;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.skyscreamer.jsonassert.JSONCompareMode;
 

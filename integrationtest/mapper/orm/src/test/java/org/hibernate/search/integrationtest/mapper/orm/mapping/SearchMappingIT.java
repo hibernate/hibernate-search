@@ -37,10 +37,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -75,7 +75,7 @@ public class SearchMappingIT {
 		setupContext.withAnnotatedTypes( Person.class, Pet.class, Toy.class );
 	}
 
-	@Before
+	@BeforeEach
 	public void before() {
 		mapping = Search.mapping( setupHolder.sessionFactory() );
 	}

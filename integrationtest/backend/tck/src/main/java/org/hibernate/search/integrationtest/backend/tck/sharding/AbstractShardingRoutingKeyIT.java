@@ -26,9 +26,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * An abstract base for sharding tests with explicit routing keys.
@@ -53,7 +53,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		totalDocumentCount = routingKeys.size() * documentCountPerRoutingKey;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start();
 		configure( setupContext );

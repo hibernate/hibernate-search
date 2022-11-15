@@ -45,9 +45,9 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class AnnotationMappingSmokeIT {
@@ -60,7 +60,7 @@ public class AnnotationMappingSmokeIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
 				.field( "numeric", Integer.class )

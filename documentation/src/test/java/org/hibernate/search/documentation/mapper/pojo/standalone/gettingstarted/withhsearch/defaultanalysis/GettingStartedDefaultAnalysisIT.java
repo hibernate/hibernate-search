@@ -20,10 +20,10 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GettingStartedDefaultAnalysisIT {
 
@@ -32,7 +32,7 @@ public class GettingStartedDefaultAnalysisIT {
 
 	private CloseableSearchMapping searchMapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		if ( BackendConfiguration.isLucene() ) {
 			// tag::setup-lucene[]
@@ -72,7 +72,7 @@ public class GettingStartedDefaultAnalysisIT {
 		}
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( searchMapping != null ) {
 			searchMapping.close();

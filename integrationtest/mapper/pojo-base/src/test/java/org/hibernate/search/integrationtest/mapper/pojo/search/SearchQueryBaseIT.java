@@ -32,9 +32,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test everything related to the search query itself.
@@ -53,7 +53,7 @@ public class SearchQueryBaseIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( Book.NAME );
 		backendMock.expectAnySchema( Author.NAME );

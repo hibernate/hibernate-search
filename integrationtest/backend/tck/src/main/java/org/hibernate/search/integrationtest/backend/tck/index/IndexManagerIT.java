@@ -16,9 +16,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class IndexManagerIT {
 
@@ -30,7 +30,7 @@ public class IndexManagerIT {
 	private static Backend backendApi;
 	private static IndexManager indexApi;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		StubMapping mapping = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )

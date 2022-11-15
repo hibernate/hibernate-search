@@ -26,9 +26,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class IdentifierProjectionBaseIT {
 
@@ -56,7 +56,7 @@ public class IdentifierProjectionBaseIT {
 		initValues();
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndexes( index, compatibleIndex, incompatibleIndex ).setup();
 		initData();

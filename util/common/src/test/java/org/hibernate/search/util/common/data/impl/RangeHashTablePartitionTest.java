@@ -15,8 +15,8 @@ import java.util.stream.IntStream;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -39,7 +39,7 @@ public class RangeHashTablePartitionTest {
 
 	private RangeHashTable<Void> hashTable;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		// The hash function is not used in this test
 		RangeCompatibleHashFunction irrelevantFunction = new RangeCompatibleHashFunction() {

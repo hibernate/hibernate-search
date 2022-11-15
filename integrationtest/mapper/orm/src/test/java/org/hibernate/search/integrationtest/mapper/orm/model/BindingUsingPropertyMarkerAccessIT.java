@@ -24,9 +24,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -72,7 +72,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 		this.modelPrimitives = modelPrimitives;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "location", GeoPoint.class,

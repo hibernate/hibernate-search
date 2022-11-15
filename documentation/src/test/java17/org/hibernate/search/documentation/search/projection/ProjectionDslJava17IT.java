@@ -23,9 +23,9 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ProjectionDslJava17IT {
 
@@ -48,7 +48,7 @@ public class ProjectionDslJava17IT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class, Author.class, EmbeddableGeoPoint.class );
 		initData();

@@ -29,9 +29,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-1710")
 public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
@@ -44,7 +44,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( Group.INDEX );
 		backendMock.expectAnySchema( Post.INDEX );

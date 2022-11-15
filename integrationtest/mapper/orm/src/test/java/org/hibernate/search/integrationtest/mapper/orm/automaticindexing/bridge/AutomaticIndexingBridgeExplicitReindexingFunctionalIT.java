@@ -34,9 +34,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test an actual use case of explicit reindexing declaration,
@@ -56,7 +56,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.objectField( "typeBridge", b2 -> b2

@@ -21,9 +21,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-3947")
 public class LuceneNoLimitSearchIT {
@@ -35,7 +35,7 @@ public class LuceneNoLimitSearchIT {
 
 	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 		initData();

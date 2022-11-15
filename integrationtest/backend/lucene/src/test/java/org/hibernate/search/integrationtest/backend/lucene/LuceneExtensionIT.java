@@ -85,9 +85,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LuceneExtensionIT {
 
@@ -105,7 +105,7 @@ public class LuceneExtensionIT {
 
 	private SearchIntegration integration;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup().integration();
 

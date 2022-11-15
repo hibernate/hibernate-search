@@ -219,9 +219,9 @@ public class ReusableOrmSetupHolder implements TestRule, PersistenceRunner<Sessi
 
 	public SessionFactoryImplementor sessionFactory() {
 		if ( !inMethodStatement ) {
-			throw new Error( "The session factory cannot be used outside of methods annotated with @Test, @Before, @After."
+			throw new Error( "The session factory cannot be used outside of methods annotated with @Test, @BeforeEach, @AfterEach."
 					+ " In particular, you cannot use it in a method annotated with " + Setup.class.getName() + ";"
-					+ " use a @Before method instead." );
+					+ " use a @BeforeEach method instead." );
 		}
 		if ( sessionFactory == null ) {
 			throw new Error( "The session factory in " + getClass().getSimpleName() + " was not created."

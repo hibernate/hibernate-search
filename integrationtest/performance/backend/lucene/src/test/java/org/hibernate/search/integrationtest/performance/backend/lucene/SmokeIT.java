@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.performance.backend.lucene;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;

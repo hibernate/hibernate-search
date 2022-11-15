@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.search.projection.Distan
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.assertj.core.api.ListAssert;
 

@@ -13,7 +13,7 @@ import java.time.Year;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ParseUtilsTest {
 

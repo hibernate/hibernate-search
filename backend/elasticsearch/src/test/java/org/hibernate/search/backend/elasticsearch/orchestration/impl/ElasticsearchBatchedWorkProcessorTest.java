@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;

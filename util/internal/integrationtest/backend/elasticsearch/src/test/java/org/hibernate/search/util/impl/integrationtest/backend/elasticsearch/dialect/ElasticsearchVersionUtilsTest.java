@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ElasticsearchVersionUtilsTest {
 

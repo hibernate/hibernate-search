@@ -16,9 +16,9 @@ import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.logging.log4j.Level;
 import org.mockito.Mock;
@@ -39,7 +39,7 @@ public class FailSafeFailureHandlerWrapperTest {
 
 	private FailSafeFailureHandlerWrapper wrapper;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		wrapper = new FailSafeFailureHandlerWrapper( failureHandlerMock );
 	}

@@ -17,8 +17,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.jar.impl.JandexUtils;
 import org.hibernate.search.util.impl.test.jar.JandexTestUtils;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
@@ -27,7 +27,7 @@ public class BuiltinAnnotationsTest {
 
 	private static Index pojoMapperBaseIndex;
 
-	@BeforeClass
+	@BeforeAll
 	public static void index() throws IOException {
 		pojoMapperBaseIndex = readOrBuildIndex(
 				codeSourceLocation( BuiltinAnnotations.class )

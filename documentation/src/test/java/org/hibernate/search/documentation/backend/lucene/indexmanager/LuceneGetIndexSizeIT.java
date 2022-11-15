@@ -18,9 +18,9 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LuceneGetIndexSizeIT {
 
@@ -30,7 +30,7 @@ public class LuceneGetIndexSizeIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}

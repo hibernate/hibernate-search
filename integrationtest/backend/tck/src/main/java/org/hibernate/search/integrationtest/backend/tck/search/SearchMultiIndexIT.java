@@ -28,9 +28,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SearchMultiIndexIT {
 
@@ -74,7 +74,7 @@ public class SearchMultiIndexIT {
 	private final SimpleMappedIndex<IndexBinding_2_1> index_2_1 =
 			SimpleMappedIndex.of( IndexBinding_2_1::new ).backendName( BACKEND_2 ).name( "index_2_1" );;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start( BACKEND_1 ).withIndexes( index_1_1, index_1_2 ).setup();
 		setupHelper.start( BACKEND_2 ).withIndexes( index_2_1 ).setup();

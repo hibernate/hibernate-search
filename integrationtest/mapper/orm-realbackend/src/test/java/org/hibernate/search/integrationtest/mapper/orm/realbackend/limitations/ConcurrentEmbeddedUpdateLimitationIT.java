@@ -39,7 +39,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.awaitility.Awaitility;
 import org.awaitility.core.ThrowingRunnable;

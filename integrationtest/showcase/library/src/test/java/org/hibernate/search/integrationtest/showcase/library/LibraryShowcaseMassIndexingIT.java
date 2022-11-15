@@ -14,9 +14,9 @@ import org.hibernate.search.integrationtest.showcase.library.service.DocumentSer
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +44,12 @@ public class LibraryShowcaseMassIndexingIT {
 	@Autowired
 	private TestDataService testDataService;
 
-	@Before
+	@BeforeEach
 	public void initData() {
 		testDataService.initBooksDataSet( NUMBER_OF_BOOKS );
 	}
 
-	@After
+	@AfterEach
 	public void cleanUpData() {
 		// we're cleaning the data manually,
 		// in order to have a class level application context,

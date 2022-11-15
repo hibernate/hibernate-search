@@ -21,9 +21,9 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.logging.log4j.Level;
 
@@ -54,7 +54,7 @@ public class MassIndexingMonitorIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( "hibernate.search.automatic_indexing.enabled", false )

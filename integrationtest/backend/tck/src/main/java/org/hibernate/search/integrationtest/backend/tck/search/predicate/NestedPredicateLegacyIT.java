@@ -24,9 +24,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the legacy syntax of nested predicate definition.
@@ -58,7 +58,7 @@ public class NestedPredicateLegacyIT {
 	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
 			SimpleMappedIndex.of( MissingFieldIndexBinding::new ).name( "missingField" );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, missingFieldIndex ).setup();
 

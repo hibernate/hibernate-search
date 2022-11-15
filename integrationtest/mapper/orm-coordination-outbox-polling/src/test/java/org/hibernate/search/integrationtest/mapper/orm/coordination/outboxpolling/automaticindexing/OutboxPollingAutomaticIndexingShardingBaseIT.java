@@ -25,9 +25,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -71,7 +71,7 @@ public class OutboxPollingAutomaticIndexingShardingBaseIT {
 	private final PerSessionFactoryIndexingCountHelper indexingCountHelper =
 			new PerSessionFactoryIndexingCountHelper( counters );
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		for ( int i = 0; i < totalShardCount; i++ ) {
 			setup(

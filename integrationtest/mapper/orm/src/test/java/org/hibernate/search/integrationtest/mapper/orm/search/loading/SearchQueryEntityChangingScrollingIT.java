@@ -33,9 +33,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SearchQueryEntityChangingScrollingIT {
 
@@ -48,7 +48,7 @@ public class SearchQueryEntityChangingScrollingIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( SimpleEntity.NAME );
 		sessionFactory = ormSetupHelper.start().setup( SimpleEntity.class );

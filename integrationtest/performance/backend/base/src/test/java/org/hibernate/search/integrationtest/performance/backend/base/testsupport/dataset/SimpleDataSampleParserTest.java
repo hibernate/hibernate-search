@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.hibernate.search.util.common.annotation.impl.SuppressJQAssistant;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.io.CharSource;
 

@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
@@ -28,7 +28,7 @@ public class CancellableExecutionCompletableFutureTest {
 
 	private ExecutorService executorService;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		executorService = new ThreadPoolExecutor(
 				1, 1,
@@ -38,7 +38,7 @@ public class CancellableExecutionCompletableFutureTest {
 		);
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( executorService != null ) {
 			executorService.shutdownNow();

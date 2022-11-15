@@ -39,9 +39,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Generic tests for sorts. More specific tests can be found in other classes,
@@ -66,7 +66,7 @@ public class SearchSortIT {
 			// What matters here is that is a different index.
 			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 

@@ -25,10 +25,10 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,12 +70,12 @@ public class SessionProxyIT {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		needsInit = true;
 	}
 
-	@Before
+	@BeforeEach
 	public void before() {
 		if ( needsInit ) {
 			TransactionTemplate template = new TransactionTemplate( transactionManager );

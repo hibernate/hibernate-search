@@ -25,9 +25,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
@@ -46,7 +46,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );

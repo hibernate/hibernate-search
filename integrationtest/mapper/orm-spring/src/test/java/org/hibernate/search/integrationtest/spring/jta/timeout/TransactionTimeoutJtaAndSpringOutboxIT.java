@@ -17,8 +17,8 @@ import org.hibernate.search.integrationtest.spring.jta.JtaAndSpringOutboxApplica
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import com.atomikos.icatch.jta.TransactionManagerImp;
@@ -40,7 +40,7 @@ public class TransactionTimeoutJtaAndSpringOutboxIT {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void checkJta() {
 		TimeoutFailureCollector.EXCEPTIONS.clear();
 

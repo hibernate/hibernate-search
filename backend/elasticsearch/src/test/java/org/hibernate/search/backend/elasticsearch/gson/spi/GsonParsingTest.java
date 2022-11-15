@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ro
 import org.hibernate.search.util.impl.test.JsonHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 

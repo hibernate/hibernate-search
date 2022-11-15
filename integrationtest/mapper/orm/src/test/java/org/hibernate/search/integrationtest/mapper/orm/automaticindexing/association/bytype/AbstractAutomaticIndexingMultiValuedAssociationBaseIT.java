@@ -10,7 +10,7 @@ import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.associa
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.bytype.accessor.PropertyAccessor;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Abstract base for tests of automatic indexing caused by association updates

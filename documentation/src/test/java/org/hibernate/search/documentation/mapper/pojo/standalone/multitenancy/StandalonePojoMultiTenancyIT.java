@@ -15,10 +15,10 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StandalonePojoMultiTenancyIT {
 
@@ -27,7 +27,7 @@ public class StandalonePojoMultiTenancyIT {
 
 	private CloseableSearchMapping theSearchMapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		// tag::setup[]
 		CloseableSearchMapping searchMapping = SearchMapping.builder() // <1>
@@ -42,7 +42,7 @@ public class StandalonePojoMultiTenancyIT {
 		this.theSearchMapping = searchMapping;
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( theSearchMapping != null ) {
 			theSearchMapping.close();

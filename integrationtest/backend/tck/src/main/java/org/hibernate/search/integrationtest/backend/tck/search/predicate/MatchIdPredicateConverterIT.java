@@ -13,9 +13,9 @@ import java.util.Arrays;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the DSL when the id of the entity is stored as a different type.
@@ -36,7 +36,7 @@ public class MatchIdPredicateConverterIT {
 	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
 			.idDslConverter( Integer.class, (value, context) -> "document" + value ) );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 

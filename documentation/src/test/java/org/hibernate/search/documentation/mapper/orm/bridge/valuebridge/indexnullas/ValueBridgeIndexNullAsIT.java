@@ -19,9 +19,9 @@ import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValueBridgeIndexNullAsIT {
 	@Rule
@@ -29,7 +29,7 @@ public class ValueBridgeIndexNullAsIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}

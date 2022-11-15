@@ -24,9 +24,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests related to index custom settings when updating indexes.
@@ -42,7 +42,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	@Before
+	@BeforeEach
 	public void checkAssumption() {
 		assumeFalse(
 				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes." +

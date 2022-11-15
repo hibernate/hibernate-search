@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.standalone.work.SearchIndexer;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexer}

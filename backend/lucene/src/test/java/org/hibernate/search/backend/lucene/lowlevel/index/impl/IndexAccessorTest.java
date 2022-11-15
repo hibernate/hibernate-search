@@ -24,10 +24,10 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvi
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
@@ -60,13 +60,13 @@ public class IndexAccessorTest {
 
 	private IndexAccessorImpl accessor;
 
-	@Before
+	@BeforeEach
 	public void start() throws IOException {
 		accessor = new IndexAccessorImpl( indexEventContext, directoryHolderMock,
 				indexWriterProviderMock, indexReaderProviderMock );
 	}
 
-	@After
+	@AfterEach
 	public void close() throws IOException {
 		accessor.close();
 	}

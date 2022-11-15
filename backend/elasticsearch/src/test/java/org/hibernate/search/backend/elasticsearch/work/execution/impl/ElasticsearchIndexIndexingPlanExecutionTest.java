@@ -30,9 +30,9 @@ import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecut
 import org.hibernate.search.engine.backend.work.execution.OperationSubmitter;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -56,7 +56,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest {
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		when( entityReferenceFactoryMock.createEntityReference( eq( TYPE_NAME ), any() ) )
 				.thenAnswer( invocation -> entityReference( invocation.getArgument( 1 ) ) );

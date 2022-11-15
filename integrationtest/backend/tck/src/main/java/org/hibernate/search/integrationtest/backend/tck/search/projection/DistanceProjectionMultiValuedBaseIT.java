@@ -40,9 +40,9 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.data.Pair;
 import org.hibernate.search.util.impl.test.data.Triplet;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -107,7 +107,7 @@ public class DistanceProjectionMultiValuedBaseIT {
 					)
 					.name( "sortable" );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, sortableIndex ).setup();
 

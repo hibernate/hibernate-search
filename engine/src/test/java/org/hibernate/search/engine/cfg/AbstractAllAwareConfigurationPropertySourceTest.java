@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractAllAwareConfigurationPropertySourceTest {

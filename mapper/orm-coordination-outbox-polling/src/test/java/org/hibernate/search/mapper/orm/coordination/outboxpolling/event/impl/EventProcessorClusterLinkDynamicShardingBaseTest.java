@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.S
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 /**

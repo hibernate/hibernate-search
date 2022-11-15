@@ -15,7 +15,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
 
 public abstract class AbstractSpatialWithinPredicateIT {
@@ -45,7 +45,7 @@ public abstract class AbstractSpatialWithinPredicateIT {
 	protected final SimpleMappedIndex<UnsearchableFieldsIndexBinding> unsearchableFieldsIndex =
 			SimpleMappedIndex.of( UnsearchableFieldsIndexBinding::new ).name( "unsearchableFields" );
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndexes( mainIndex, compatibleIndex, unsearchableFieldsIndex ).setup();
 

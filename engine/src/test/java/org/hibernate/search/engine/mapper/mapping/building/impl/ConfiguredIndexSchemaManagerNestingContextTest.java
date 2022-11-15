@@ -19,9 +19,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -29,9 +29,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -69,7 +69,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	@Mock
 	private ConfiguredIndexSchemaNestingContext.NestedContextBuilder<Object> nestedContextBuilderMock;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		when( typeModel1Mock.name() ).thenReturn( "typeModel1Mock" );
 		when( typeModel2Mock.name() ).thenReturn( "typeModel2Mock" );

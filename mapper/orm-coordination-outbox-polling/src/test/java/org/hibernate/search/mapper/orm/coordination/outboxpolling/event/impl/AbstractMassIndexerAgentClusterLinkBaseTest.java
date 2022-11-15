@@ -16,8 +16,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.ShardAssignmentDescriptor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This abstract class implements one test method for each "external" situation that
@@ -39,7 +39,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 
 	OutboxPollingMassIndexerAgentClusterLink link;
 
-	@Before
+	@BeforeEach
 	public final void initLink() {
 		link = new OutboxPollingMassIndexerAgentClusterLink(
 				SELF_REF.name, failureHandlerMock, clockMock,
@@ -117,7 +117,7 @@ abstract class AbstractMassIndexerAgentClusterLinkBaseTest extends AbstractMassI
 
 	protected abstract MassIndexerAgentClusterLinkPulseExpectations onClusterWith3NodesAll3NodesSuspended();
 
-	@Before
+	@BeforeEach
 	public void initPulseMocks() {
 		when( repositoryMock.findAllOrderById() ).thenAnswer( ignored -> repositoryMockHelper.allAgentsInIdOrder() );
 		when( clockMock.instant() ).thenReturn( NOW );

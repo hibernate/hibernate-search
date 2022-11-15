@@ -36,10 +36,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -68,7 +68,7 @@ public class ToHibernateOrmScrollableResultsIT {
 		setupContext.withAnnotatedTypes( IndexedEntity.class );
 	}
 
-	@Before
+	@BeforeEach
 	public void initData() {
 		backendMock.inLenientMode( () -> setupHolder.runInTransaction( session -> {
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {

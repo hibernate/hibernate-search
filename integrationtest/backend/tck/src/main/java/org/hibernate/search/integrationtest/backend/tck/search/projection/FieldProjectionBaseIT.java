@@ -22,9 +22,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -40,7 +40,7 @@ public class FieldProjectionBaseIT {
 		return new FieldProjectionTestValues<>( fieldType );
 	}
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes( InObjectProjectionIT.mainIndex, InObjectProjectionIT.missingLevel1Index,

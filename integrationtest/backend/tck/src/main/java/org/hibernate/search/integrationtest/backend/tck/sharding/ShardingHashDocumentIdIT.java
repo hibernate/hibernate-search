@@ -21,9 +21,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * A basic test for hash-based sharding with document IDs (without routing keys).
@@ -48,7 +48,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 		super( RoutingMode.DOCUMENT_IDS );
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
 

@@ -26,8 +26,8 @@ import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.A
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentState;
 import org.hibernate.search.mapper.orm.coordination.outboxpolling.cluster.impl.AgentType;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
 
 import org.mockito.Mock;
@@ -70,7 +70,7 @@ abstract class AbstractMassIndexerAgentClusterLinkTest {
 
 	protected AgentRepositoryMockingHelper repositoryMockHelper;
 
-	@Before
+	@BeforeEach
 	public final void initMocks() {
 		repositoryMockHelper = new AgentRepositoryMockingHelper( repositoryMock );
 		Collections.addAll( allMocks, failureHandlerMock, clockMock, repositoryMock );
@@ -80,7 +80,7 @@ abstract class AbstractMassIndexerAgentClusterLinkTest {
 		doNothing().when( contextMock ).commitAndBeginNewTransaction();
 	}
 
-	@After
+	@AfterEach
 	public void verifyNoMoreInvocationsOnAllMocks() {
 		verifyNoMoreInteractions( allMocks.toArray() );
 	}

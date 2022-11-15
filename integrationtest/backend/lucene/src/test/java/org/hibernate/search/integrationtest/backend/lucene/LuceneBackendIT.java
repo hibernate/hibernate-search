@@ -18,9 +18,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
@@ -33,7 +33,7 @@ public class LuceneBackendIT {
 
 	private static LuceneBackend backend;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		SearchIntegration integration = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )

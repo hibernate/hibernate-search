@@ -24,9 +24,9 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -56,7 +56,7 @@ public class AnalysisBuiltinIT {
 		this.setupHelper = setupHelper;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}

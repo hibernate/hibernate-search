@@ -25,9 +25,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests highly concurrent background processing of events,
@@ -54,7 +54,7 @@ public class OutboxPollingAutomaticIndexingConcurrencyIT {
 
 	private final List<SessionFactory> sessionFactories = new ArrayList<>();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		sessionFactories.add( setup( "create-drop" ) );
 		for ( int i = 1; i < TOTAL_SHARD_COUNT ; i++ ) {

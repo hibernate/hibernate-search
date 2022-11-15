@@ -17,9 +17,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.test.runner.nested.Nested;
 import org.hibernate.search.util.impl.test.runner.nested.NestedRunner;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(NestedRunner.class)
@@ -28,7 +28,7 @@ public class MatchIdPredicateBaseIT {
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(

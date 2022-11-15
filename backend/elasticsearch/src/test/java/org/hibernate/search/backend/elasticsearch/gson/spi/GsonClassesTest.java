@@ -23,8 +23,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.jar.JandexTestUtils;
 import org.hibernate.search.util.impl.test.logging.Log;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
@@ -40,7 +40,7 @@ public class GsonClassesTest {
 	private static Index gsonIndex;
 	private static Index backendElasticsearchIndex;
 
-	@BeforeClass
+	@BeforeAll
 	public static void index() throws IOException {
 		gsonIndex = readOrBuildIndex( codeSourceLocation( Gson.class )
 				.orElseThrow( () -> new AssertionFailure( "Could not find Gson JAR?" ) ) );

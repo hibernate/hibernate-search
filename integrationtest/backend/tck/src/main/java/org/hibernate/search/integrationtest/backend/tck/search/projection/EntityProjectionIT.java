@@ -33,9 +33,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMap
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;
 
@@ -60,7 +60,7 @@ public class EntityProjectionIT extends AbstractEntityProjectionIT {
 		super( mainIndex, multiIndex1, multiIndex2, multiIndex3, multiIndex4 );
 	}
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, multiIndex1, multiIndex2, multiIndex3, multiIndex4 ).setup();
 

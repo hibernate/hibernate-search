@@ -37,10 +37,10 @@ import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImp
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -89,13 +89,13 @@ public class BatchingExecutorTest {
 		this.operationSubmitter = operationSubmitter;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		mocks.add( processorMock );
 		mocks.add( failureHandlerMock );
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( executorService != null ) {
 			executorService.shutdownNow();

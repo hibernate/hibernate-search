@@ -28,9 +28,9 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -79,7 +79,7 @@ public class SearchIntegrationImplTest {
 
 	private SearchIntegrationImpl searchIntegration;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		Map<MappingKey<?, ?>, MappingImplementor<?>> mappings = new LinkedHashMap<>();
 		mappings.put( mappingKey( "mapping1" ), mapping1Mock );

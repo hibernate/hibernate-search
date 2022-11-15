@@ -30,9 +30,9 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -68,7 +68,7 @@ public class BeanResolverImplRetrievalBeanTest {
 
 	private BeanResolver beanResolver;
 
-	@Before
+	@BeforeEach
 	// Raw types are the only way to set the return value for a wildcard return type (Optional<?>)
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setup() {

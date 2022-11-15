@@ -32,7 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * See https://discourse.hibernate.org/t/propertybinder-for-base-type-reports-no-children-property-found-in-parent-class/5493/2

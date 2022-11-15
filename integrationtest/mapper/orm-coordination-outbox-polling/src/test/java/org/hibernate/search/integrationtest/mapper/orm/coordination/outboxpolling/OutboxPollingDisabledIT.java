@@ -28,7 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

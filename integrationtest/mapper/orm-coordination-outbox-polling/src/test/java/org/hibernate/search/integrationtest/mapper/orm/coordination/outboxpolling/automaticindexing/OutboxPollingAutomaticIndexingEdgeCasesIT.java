@@ -25,10 +25,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStr
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
 /**
@@ -63,7 +63,7 @@ public class OutboxPollingAutomaticIndexingEdgeCasesIT {
 				.withAnnotatedTypes( IndexedEntity.class, IndexedAndContainedEntity.class );
 	}
 
-	@Before
+	@BeforeEach
 	public void resetFilter() {
 		outboxEventFinder.reset();
 		// Disable the filter by default: only some of the tests actually need it.

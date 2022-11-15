@@ -21,10 +21,10 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMappingBuilder;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MappingConfigurationIT {
 
@@ -33,7 +33,7 @@ public class MappingConfigurationIT {
 
 	private CloseableSearchMapping searchMapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		// tag::setup[]
 		SearchMappingBuilder builder = SearchMapping.builder()
@@ -59,7 +59,7 @@ public class MappingConfigurationIT {
 		this.searchMapping = searchMapping;
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( searchMapping != null ) {
 			searchMapping.close();

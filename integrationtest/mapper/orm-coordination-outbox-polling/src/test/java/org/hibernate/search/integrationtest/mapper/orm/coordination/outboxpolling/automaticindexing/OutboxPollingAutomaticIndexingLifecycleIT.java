@@ -24,9 +24,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OutboxPollingAutomaticIndexingLifecycleIT {
 
@@ -39,7 +39,7 @@ public class OutboxPollingAutomaticIndexingLifecycleIT {
 
 	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
-	@Before
+	@BeforeEach
 	public void cleanUp() {
 		SessionFactory sessionFactory = setupWithCleanup();
 		sessionFactory.close();

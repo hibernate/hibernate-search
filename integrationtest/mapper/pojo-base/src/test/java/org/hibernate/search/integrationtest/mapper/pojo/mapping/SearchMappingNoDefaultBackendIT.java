@@ -25,10 +25,10 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SearchMappingNoDefaultBackendIT {
 
@@ -54,7 +54,7 @@ public class SearchMappingNoDefaultBackendIT {
 				null, namedBackendMocks );
 	}
 
-	@Before
+	@BeforeEach
 	public void before() {
 		backend1Mock.expectAnySchema( Person.INDEX_NAME );
 		backend2Mock.expectAnySchema( Pet.ENTITY_NAME );

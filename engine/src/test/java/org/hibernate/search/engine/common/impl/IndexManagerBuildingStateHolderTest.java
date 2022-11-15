@@ -36,9 +36,9 @@ import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -85,7 +85,7 @@ public class IndexManagerBuildingStateHolderTest {
 
 	private final List<Object> verifiedMocks = new ArrayList<>();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		Collections.addAll( verifiedMocks,
 				rootFailureCollectorMock, backendFailureCollectorMock,

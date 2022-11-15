@@ -25,10 +25,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -86,7 +86,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		dataClearConfig.clearOrder( model.getContainedClass(), model.getIndexedClass() );
 	}
 
-	@Before
+	@BeforeEach
 	public void initData() {
 		// We don't care about what is indexed exactly, so use the lenient mode
 		backendMock.inLenientMode( () -> with( sessionFactory() ).runInTransaction( session -> {

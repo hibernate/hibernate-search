@@ -29,9 +29,9 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Demonstrates the feasibility of zero-downtime reindexing,
@@ -48,7 +48,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}

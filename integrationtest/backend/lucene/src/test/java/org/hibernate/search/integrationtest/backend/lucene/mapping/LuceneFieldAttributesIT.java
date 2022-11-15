@@ -23,9 +23,9 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.analysis.ngram.NGramTokenizerFactory;
 import org.apache.lucene.analysis.payloads.TokenOffsetPayloadTokenFilterFactory;
@@ -43,7 +43,7 @@ public class LuceneFieldAttributesIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER,

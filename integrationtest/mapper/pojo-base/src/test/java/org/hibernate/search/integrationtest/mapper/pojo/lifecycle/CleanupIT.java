@@ -42,7 +42,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test that all resources are closed as expected upon shutdown, or when startup fails.

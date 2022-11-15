@@ -30,10 +30,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetu
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.stat.Statistics;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
 import org.assertj.core.api.AbstractLongAssert;
@@ -63,7 +63,7 @@ public class MassIndexingCachingIT {
 				.withAnnotatedTypes( IndexedEntity.class );
 	}
 
-	@Before
+	@BeforeEach
 	public void initData() {
 		// This will also add entities to the 2nd level cache
 		setupHolder.runInTransaction( session -> {

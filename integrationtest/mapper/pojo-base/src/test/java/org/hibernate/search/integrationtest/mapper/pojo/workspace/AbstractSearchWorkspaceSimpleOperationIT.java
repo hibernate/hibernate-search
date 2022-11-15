@@ -23,9 +23,9 @@ import org.hibernate.search.mapper.pojo.standalone.work.SearchWorkspace;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
@@ -49,7 +49,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 				defaultBackendMock, namedBackendMocks );
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );

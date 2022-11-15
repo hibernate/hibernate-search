@@ -23,9 +23,9 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test indexing and searching with built-in analyzer definitions overridden by the user
@@ -41,7 +41,7 @@ public class AnalysisBuiltinOverrideIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
 	}

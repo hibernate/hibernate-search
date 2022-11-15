@@ -20,10 +20,10 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MassIndexingManualSchemaManagementIT {
 
@@ -49,7 +49,7 @@ public class MassIndexingManualSchemaManagementIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( "hibernate.search.automatic_indexing.enabled", false )
@@ -60,7 +60,7 @@ public class MassIndexingManualSchemaManagementIT {
 		cleanup();
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		// Necessary to keep the server (ES) or filesystem (Lucene) clean after the tests,
 		// because the schema management strategy is "none"

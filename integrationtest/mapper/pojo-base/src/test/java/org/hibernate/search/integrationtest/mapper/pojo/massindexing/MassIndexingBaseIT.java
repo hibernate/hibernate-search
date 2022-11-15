@@ -27,9 +27,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
@@ -54,7 +54,7 @@ public class MassIndexingBaseIT {
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 

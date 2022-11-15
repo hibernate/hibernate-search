@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SpatialWithinCirclePredicateSpecificsIT extends AbstractSpatialWithinPredicateIT {
 

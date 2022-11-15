@@ -20,9 +20,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexScope;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ScopeExtensionIT {
 
@@ -35,7 +35,7 @@ public class ScopeExtensionIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		mapping = setupHelper.start().setup( IndexedEntity.class );

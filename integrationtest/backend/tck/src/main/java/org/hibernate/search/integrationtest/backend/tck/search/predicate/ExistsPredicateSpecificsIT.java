@@ -31,9 +31,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -67,7 +67,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	private static final SimpleMappedIndex<DifferentTypeIndexBinding> differentFieldTypeIndex =
 			SimpleMappedIndex.of( DifferentTypeIndexBinding::new ).name( "differentFieldType" );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, differentFieldTypeIndex ).setup();
 

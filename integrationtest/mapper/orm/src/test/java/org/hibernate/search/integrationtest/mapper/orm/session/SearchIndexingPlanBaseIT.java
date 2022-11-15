@@ -29,10 +29,10 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.MethodRule;
 
 @TestForIssue(jiraKey = "HSEARCH-3049")
@@ -65,7 +65,7 @@ public class SearchIndexingPlanBaseIT {
 		setupContext.withAnnotatedTypes( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class );
 	}
 
-	@After
+	@AfterEach
 	public void resetListenerEnabled() {
 		listenerEnabled( true );
 	}

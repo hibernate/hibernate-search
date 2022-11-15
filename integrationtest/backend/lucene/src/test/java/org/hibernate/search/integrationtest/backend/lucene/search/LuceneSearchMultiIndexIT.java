@@ -20,9 +20,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -67,7 +67,7 @@ public class LuceneSearchMultiIndexIT {
 		this.directoryType = directoryType;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty( "directory.type", directoryType )

@@ -35,9 +35,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSession;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -85,7 +85,7 @@ public class IndexIndexingPlanIT {
 		this.label = label;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start().withIndex( index );
 		if ( MULTI_TENANCY_LABEL.equals( label ) ) {

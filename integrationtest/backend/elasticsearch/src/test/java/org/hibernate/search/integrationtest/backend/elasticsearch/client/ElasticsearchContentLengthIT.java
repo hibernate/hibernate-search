@@ -45,9 +45,9 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -101,7 +101,7 @@ public class ElasticsearchContentLengthIT {
 	private ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();

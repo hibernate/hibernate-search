@@ -22,9 +22,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 
@@ -36,7 +36,7 @@ public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class );

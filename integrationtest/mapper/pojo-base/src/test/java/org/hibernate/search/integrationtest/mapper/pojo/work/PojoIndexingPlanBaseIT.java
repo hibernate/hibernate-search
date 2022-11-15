@@ -32,9 +32,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -65,7 +65,7 @@ public class PojoIndexingPlanBaseIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "value", String.class )

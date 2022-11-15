@@ -300,6 +300,7 @@
         <!-- >>> Common -->
         <version.log4j>2.19.0</version.log4j>
         <version.junit>4.13.2</version.junit>
+        <junit-jupiter>5.9.1</junit-jupiter>
         <version.org.osgi.core>6.0.0</version.org.osgi.core>
 
         <version.org.hamcrest>2.2</version.org.hamcrest>
@@ -1106,10 +1107,23 @@
             </dependency>
 
             <!-- Test -->
+            <!-- JUnit 4 is only used for legacy v5 tests that we won't be changing-->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <version>${junit-jupiter}</version>
             </dependency>
             <!--
                 Manage the upgrade from Hamcrest 1.x to 2.x:
@@ -1138,6 +1152,11 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
+                <version>${version.org.mockito}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
                 <version>${version.org.mockito}</version>
             </dependency>
             <dependency>

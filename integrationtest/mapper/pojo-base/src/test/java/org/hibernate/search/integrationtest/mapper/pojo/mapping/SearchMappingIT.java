@@ -36,9 +36,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 
@@ -64,7 +64,7 @@ public class SearchMappingIT {
 				defaultBackendMock, namedBackendMocks );
 	}
 
-	@Before
+	@BeforeEach
 	public void before() {
 		defaultBackendMock.expectAnySchema( Person.INDEX_NAME );
 		backend2Mock.expectAnySchema( Pet.ENTITY_NAME );

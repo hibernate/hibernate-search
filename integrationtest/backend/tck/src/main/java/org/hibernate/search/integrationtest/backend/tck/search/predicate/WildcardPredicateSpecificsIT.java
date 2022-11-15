@@ -25,9 +25,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class WildcardPredicateSpecificsIT {
 
@@ -63,7 +63,7 @@ public class WildcardPredicateSpecificsIT {
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 

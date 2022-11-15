@@ -24,9 +24,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-4034")
 @PortedFromSearch5(original = "org.hibernate.search.test.batchindexing.DatabaseMultitenancyTest")
@@ -62,7 +62,7 @@ public class DatabaseMultitenancyIT {
 
 	private SessionFactory sessionFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( Clock.INDEX, b -> b.field( "brand", String.class ) );
 		sessionFactory = ormSetupHelper

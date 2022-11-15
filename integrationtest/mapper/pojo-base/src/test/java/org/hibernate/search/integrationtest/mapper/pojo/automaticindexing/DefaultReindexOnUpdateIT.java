@@ -21,9 +21,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator#defaultReindexOnUpdate(ReindexOnUpdate)}.
@@ -38,7 +38,7 @@ public class DefaultReindexOnUpdateIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 	}
 

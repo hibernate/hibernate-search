@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.ObjectArrayAssert;

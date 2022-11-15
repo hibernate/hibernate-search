@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.search.loading;
 import org.hibernate.search.integrationtest.mapper.pojo.search.loading.model.singletype.BasicIndexedEntity;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic tests of entity loading when executing a search query

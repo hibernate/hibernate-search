@@ -26,9 +26,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ExistsPredicateObjectsSpecificsIT {
 
@@ -72,7 +72,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 	private static final SimpleMappedIndex<DifferentFieldsIndexBinding> differentFieldsIndex =
 			SimpleMappedIndex.of( DifferentFieldsIndexBinding::new ).name( "differentFields" );
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(

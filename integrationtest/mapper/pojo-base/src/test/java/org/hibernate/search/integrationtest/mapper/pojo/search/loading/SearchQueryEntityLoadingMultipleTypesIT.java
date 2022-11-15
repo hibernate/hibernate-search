@@ -34,8 +34,8 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.Stub
 import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test entity loading when executing a search query
@@ -50,7 +50,7 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 		return mapping;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectAnySchema( Hierarchy1_A_B.NAME );
 		backendMock.expectAnySchema( Hierarchy1_A_C.NAME );

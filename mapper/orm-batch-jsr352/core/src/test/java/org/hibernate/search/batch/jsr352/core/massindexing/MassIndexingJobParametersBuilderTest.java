@@ -17,7 +17,7 @@ import java.util.Properties;
 import org.hibernate.CacheMode;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Mincong Huang

@@ -20,9 +20,9 @@ import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrateg
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HibernateOrmSchemaManagerIT {
 
@@ -34,7 +34,7 @@ public class HibernateOrmSchemaManagerIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,

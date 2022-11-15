@@ -23,10 +23,10 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GettingStartedDefaultAnalysisIT {
 
@@ -37,13 +37,13 @@ public class GettingStartedDefaultAnalysisIT {
 	@Rule
 	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName,
 				TestConfiguration.ormMapperProperties( configurationProvider ) );
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		if ( entityManagerFactory != null ) {
 			entityManagerFactory.close();

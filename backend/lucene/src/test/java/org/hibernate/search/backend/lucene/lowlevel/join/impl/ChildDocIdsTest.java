@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdSetIterator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.search.ConjunctionDISI;
 import org.apache.lucene.search.DocIdSetIterator;

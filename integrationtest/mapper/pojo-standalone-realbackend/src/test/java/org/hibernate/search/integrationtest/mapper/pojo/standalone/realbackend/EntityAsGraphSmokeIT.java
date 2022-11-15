@@ -29,9 +29,9 @@ import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.pojo.standalone.StandalonePojoMappingSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Smoke test for the Standalone POJO mapper with a real backend
@@ -52,7 +52,7 @@ public class EntityAsGraphSmokeIT {
 
 	private final Map<String, IndexedEntity> simulatedIndexedEntityDatastore = new HashMap<>();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		mapping = setupHelper.start()
 				.withAnnotatedTypes( ContainedNonEntity.class, IndexedEntity.class, ContainedEntity.class )

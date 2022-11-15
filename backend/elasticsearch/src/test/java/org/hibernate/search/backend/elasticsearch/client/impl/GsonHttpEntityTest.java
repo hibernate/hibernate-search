@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 

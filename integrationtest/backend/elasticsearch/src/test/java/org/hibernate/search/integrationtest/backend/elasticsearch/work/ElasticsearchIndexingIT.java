@@ -26,9 +26,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -68,7 +68,7 @@ public class ElasticsearchIndexingIT {
 		this.writeName = writeName;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty(

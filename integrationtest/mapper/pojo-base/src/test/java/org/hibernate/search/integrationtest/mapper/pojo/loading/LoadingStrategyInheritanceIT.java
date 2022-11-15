@@ -28,9 +28,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-4203") // See https://github.com/hibernate/hibernate-search/pull/2564#issuecomment-833808403
 public class LoadingStrategyInheritanceIT {
@@ -44,7 +44,7 @@ public class LoadingStrategyInheritanceIT {
 
 	private final Map<Integer, RootEntity> entityMap = new HashMap<>();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		RootEntity root1 = new RootEntity();
 		root1.id = 1;

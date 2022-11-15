@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.hibernate.search.util.impl.test.logging.Log;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 

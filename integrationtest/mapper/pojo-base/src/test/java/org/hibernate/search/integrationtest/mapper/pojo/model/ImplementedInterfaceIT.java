@@ -17,9 +17,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-1656")
 public class ImplementedInterfaceIT {
@@ -32,7 +32,7 @@ public class ImplementedInterfaceIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( IndexedPojo.class.getSimpleName(), b -> b
 				.field( "text", String.class )

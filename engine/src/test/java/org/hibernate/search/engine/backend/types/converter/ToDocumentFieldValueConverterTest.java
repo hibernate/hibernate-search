@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;

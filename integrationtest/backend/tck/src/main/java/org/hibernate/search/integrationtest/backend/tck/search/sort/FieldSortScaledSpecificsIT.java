@@ -20,9 +20,9 @@ import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureRe
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FieldSortScaledSpecificsIT {
 
@@ -34,7 +34,7 @@ public class FieldSortScaledSpecificsIT {
 	private static final SimpleMappedIndex<IndexBinding> incompatibleDecimalScaleIndex =
 			SimpleMappedIndex.of( root -> new IndexBinding( root, 5 ) ).name( "incompatibleDecimalScale" );
 
-	@Before
+	@BeforeEach
 	public void initData() {
 		setupHelper.start().withIndexes( mainIndex, incompatibleDecimalScaleIndex ).setup();
 	}

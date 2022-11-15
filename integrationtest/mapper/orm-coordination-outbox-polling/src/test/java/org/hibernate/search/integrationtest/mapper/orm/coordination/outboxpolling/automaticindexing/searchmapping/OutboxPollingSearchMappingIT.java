@@ -18,9 +18,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.CoordinationStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OutboxPollingSearchMappingIT {
 
@@ -35,7 +35,7 @@ public class OutboxPollingSearchMappingIT {
 	private OutboxPollingSearchMapping searchMapping;
 	private AbortedEventsGenerator abortedEventsGenerator;
 
-	@Before
+	@BeforeEach
 	public void before() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()

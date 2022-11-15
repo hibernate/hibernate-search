@@ -33,9 +33,9 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LuceneBatchedWorkProcessorTest {
 
@@ -55,7 +55,7 @@ public class LuceneBatchedWorkProcessorTest {
 
 	private int nextWorkId = 0;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		processor = new LuceneBatchedWorkProcessor( indexEventContext, indexAccessorMock );
 	}

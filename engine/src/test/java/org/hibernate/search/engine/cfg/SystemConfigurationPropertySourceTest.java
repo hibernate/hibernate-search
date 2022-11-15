@@ -17,8 +17,8 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.test.SystemHelper;
 import org.hibernate.search.util.impl.test.SystemHelper.SystemPropertyRestorer;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfigurationPropertySourceTest {
 	private final List<SystemPropertyRestorer> toClose = new ArrayList<>();
@@ -29,7 +29,7 @@ public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfi
 		assertThat( propertySource ).asString().contains( "System" );
 	}
 
-	@After
+	@AfterEach
 	public void restoreSystemProperties() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( SystemPropertyRestorer::close, toClose );

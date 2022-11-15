@@ -22,9 +22,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PhrasePredicateSpecificsIT {
 
@@ -50,7 +50,7 @@ public class PhrasePredicateSpecificsIT {
 
 	private static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start().withIndexes( index ).setup();
 

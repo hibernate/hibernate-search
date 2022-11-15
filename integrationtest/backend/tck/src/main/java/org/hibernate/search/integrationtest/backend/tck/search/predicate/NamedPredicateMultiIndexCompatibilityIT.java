@@ -26,9 +26,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class NamedPredicateMultiIndexCompatibilityIT {
 
@@ -45,7 +45,7 @@ public class NamedPredicateMultiIndexCompatibilityIT {
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 	protected static final DataSet dataSet = new DataSet();
 
-	@BeforeClass
+	@BeforeAll
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes( index, compatibleIndex, missingPredicateIndex, incompatibleIndex )

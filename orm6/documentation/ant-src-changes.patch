@@ -3,7 +3,7 @@ index 6185209396..b7736775f3 100644
 --- a/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
 +++ b/test/java/org/hibernate/search/documentation/search/query/QueryDslIT.java
 @@ -61,7 +61,7 @@ public class QueryDslIT {
- 	@Before
+ 	@BeforeEach
  	public void setup() {
  		entityManagerFactory = setupHelper.start()
 -				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )

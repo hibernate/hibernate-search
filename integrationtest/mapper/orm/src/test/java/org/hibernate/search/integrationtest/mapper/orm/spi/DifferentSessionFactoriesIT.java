@@ -23,9 +23,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the creation of a {@link HibernateOrmSearchSession}
@@ -43,7 +43,7 @@ public class DifferentSessionFactoriesIT {
 	private SessionFactory sessionFactory;
 	private SessionFactory sessionFactoryAlt;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		sessionFactory = initABasicSessionFactory();
 		sessionFactoryAlt = initABasicSessionFactory();

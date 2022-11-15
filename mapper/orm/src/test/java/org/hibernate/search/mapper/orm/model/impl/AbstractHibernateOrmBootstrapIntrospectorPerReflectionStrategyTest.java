@@ -23,7 +23,7 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reflect.spi.ValueHandleFactory;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -43,7 +43,7 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 	@Parameterized.Parameter
 	public ValueHandleFactory valueHandleFactory;
 
-	@After
+	@AfterEach
 	public void cleanup() throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
 			closer.pushAll( AutoCloseable::close, toClose );

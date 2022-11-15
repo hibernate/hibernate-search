@@ -28,7 +28,7 @@ import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.mockito.Answers;
 import org.mockito.Mock;

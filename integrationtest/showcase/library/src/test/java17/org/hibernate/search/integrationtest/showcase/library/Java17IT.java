@@ -20,9 +20,9 @@ import org.hibernate.search.integrationtest.showcase.library.service.Java17Servi
 import org.hibernate.search.integrationtest.showcase.library.service.LibraryService;
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +48,12 @@ public class Java17IT {
 	@Autowired
 	private TestDataService testDataService;
 
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		needsInit = true;
 	}
 
-	@Before
+	@BeforeEach
 	public void before() {
 		if ( needsInit ) {
 			testDataService.initDefaultDataSet();

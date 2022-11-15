@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 		extends AbstractHibernateOrmBootstrapIntrospectorPerReflectionStrategyTest {

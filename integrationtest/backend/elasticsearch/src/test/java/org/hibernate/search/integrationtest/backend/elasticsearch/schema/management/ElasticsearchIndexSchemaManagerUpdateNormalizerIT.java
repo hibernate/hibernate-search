@@ -19,9 +19,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests related to normalizers when updating indexes.
@@ -37,7 +37,7 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	@Before
+	@BeforeEach
 	public void checkAssumption() {
 		assumeFalse(
 				"This test only is only relevant if we are allowed to open/close Elasticsearch indexes." +

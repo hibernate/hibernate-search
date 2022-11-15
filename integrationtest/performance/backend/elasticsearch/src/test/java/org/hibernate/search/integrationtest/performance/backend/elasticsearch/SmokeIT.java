@@ -15,9 +15,9 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.test.SystemHelper;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -35,7 +35,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 public class SmokeIT {
 	private final List<SystemHelper.SystemPropertyRestorer> toClose = new ArrayList<>();
 
-	@Before
+	@BeforeEach
 	public void setupConnectionInfo() {
 		Map<String, String> connectionInfo = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( connectionInfo );
@@ -46,7 +46,7 @@ public class SmokeIT {
 		} );
 	}
 
-	@After
+	@AfterEach
 	public void restoreSystemProperties() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( SystemHelper.SystemPropertyRestorer::close, toClose );

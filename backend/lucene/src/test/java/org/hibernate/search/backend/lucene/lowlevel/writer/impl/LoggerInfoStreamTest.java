@@ -13,9 +13,9 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
 import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -36,13 +36,13 @@ public class LoggerInfoStreamTest {
 		programmaticConfig = new Log4j2ConfigurationAccessor( LOGGER_NAME );
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		testAppender = new TestAppender( "LuceneTestAppender" );
 		programmaticConfig.addAppender( testAppender );
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		programmaticConfig.removeAppender();
 	}

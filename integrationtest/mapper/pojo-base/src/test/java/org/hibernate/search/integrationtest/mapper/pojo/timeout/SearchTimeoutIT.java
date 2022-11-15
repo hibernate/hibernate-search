@@ -25,9 +25,9 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SearchTimeoutIT {
 
@@ -41,7 +41,7 @@ public class SearchTimeoutIT {
 
 	private SearchMapping mapping;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "keyword", String.class ) );
 		mapping = setupHelper.start().setup( IndexedEntity.class );

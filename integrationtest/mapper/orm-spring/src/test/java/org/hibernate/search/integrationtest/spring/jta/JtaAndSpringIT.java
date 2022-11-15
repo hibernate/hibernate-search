@@ -18,10 +18,10 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHol
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,14 +47,14 @@ public class JtaAndSpringIT {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	@Before
+	@BeforeEach
 	public void checkJta() {
 		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
 	}
 
-	@After
+	@AfterEach
 	public void checkNoMemoryLeak() {
 		assertThat( HibernateOrmSearchSessionHolder.staticMapSize() ).isZero();
 	}

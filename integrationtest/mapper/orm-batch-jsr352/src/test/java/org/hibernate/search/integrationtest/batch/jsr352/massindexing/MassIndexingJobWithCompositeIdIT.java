@@ -40,11 +40,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.ReusableOrmSetupHolder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.rules.MethodRule;
 
 /**
@@ -75,7 +75,7 @@ public class MassIndexingJobWithCompositeIdIT {
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLED, false );
 	}
 
-	@Before
+	@BeforeEach
 	public void initData() throws Exception {
 		emf = setupHolder.entityManagerFactory();
 
@@ -91,7 +91,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
+	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
 	public void canHandleIdClass_strategyFull() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
@@ -105,7 +105,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
+	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
 	public void canHandleIdClass_strategyHql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
@@ -121,7 +121,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
+	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
 	public void canHandleEmbeddedId_strategyFull() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
@@ -137,7 +137,7 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
+	@Disabled("HSEARCH-4033") // TODO HSEARCH-4033 Support mass-indexing of composite id entities
 	public void canHandleEmbeddedId_strategyHql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.reporting.FailureReportUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSearchSchemaManagerValidatingSimpleOperationIT
 		extends AbstractSearchSchemaManagerSimpleOperationIT {
